@@ -46,7 +46,10 @@ public class App {
                 s.setDelegate(new Surrogate(jenkins));
                 s.run();
             } catch (Exception e) {
-                LOGGER.log(Level.WARNING, "Failed to execute " + f, e);
+                // if the configuration file fails to execute, don't let Jenkins start in a half-configured
+                // state and instead rather let it die. Apache fails to start if the config file is invalid,
+                // so this is standard practice.
+                throw new Error("Failed to execute "+f, e);
             }
         }
     }
