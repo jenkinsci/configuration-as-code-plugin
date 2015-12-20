@@ -6,11 +6,9 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <!-- Baseline Jenkins version you use to build and test the plugin. Users must have this version or newer to run. -->
-    <version>1.580.1</version>
+    <version>1.643-SNAPSHOT</version>
     <relativePath/>
   </parent>
-  <groupId>org.jenkins-ci.plugins</groupId>
   <artifactId>system-config-dsl</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>hpi</packaging>

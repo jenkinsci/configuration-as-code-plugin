@@ -1,8 +1,12 @@
 package org.jenkinsci.plugins.systemconfigdsl;
 
+import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
+import groovy.lang.Script;
 import hudson.init.Initializer;
+import hudson.util.spring.ClosureScript;
 import jenkins.model.Jenkins;
+import org.codehaus.groovy.control.CompilerConfiguration;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -17,6 +21,8 @@ import static hudson.init.InitMilestone.*;
  * @author Kohsuke Kawaguchi
  */
 public class App {
+    private final Jenkins jenkins = Jenkins.getInstance();
+
     @Initializer(after=EXTENSIONS_AUGMENTED,before=JOB_LOADED)
     public static void init(Jenkins j) throws IOException {
         new App().run(new File(Jenkins.getInstance().getRootDir(),"conf"));
@@ -32,11 +38,15 @@ public class App {
 
         Arrays.sort(files);
 
-        GroovyShell sh = new GroovyShell();
-        sh.setProperty("jenkins",new Surrogate(Jenkins.getInstance()));
+        CompilerConfiguration cc = new CompilerConfiguration();
+        cc.setScriptBaseClass(ClosureScript.class.getName());
+        GroovyShell sh = new GroovyShell(jenkins.pluginManager.uberClassLoader,new Binding(),cc);
+
         for (File f : files) {
             try {
-                sh.evaluate(f);
+                ClosureScript s = (ClosureScript) sh.parse(f);
+                s.setDelegate(new Surrogate(jenkins));
+                s.run();
             } catch (Exception e) {
                 LOGGER.log(Level.WARNING, "Failed to execute " + f, e);
             }

@@ -42,8 +42,9 @@ public class Surrogate extends GroovyObjectSupport {
 
     @Override
     public Object invokeMethod(String name, Object args) {
-        if (args instanceof Closure) {
-            Closure closure = (Closure) args;
+        Object arg = unpackSoleArg(args);
+        if (arg instanceof Closure) {
+            Closure closure = (Closure) arg;
             Class describable = map(name);
             if (describable!=null) {
                 DescribableFactory f = new DescribableFactory(describable);
@@ -53,6 +54,13 @@ public class Surrogate extends GroovyObjectSupport {
             }
         }
         return super.invokeMethod(name, args);
+    }
+
+    private Object unpackSoleArg(Object args) {
+        if (args instanceof Object[])
+            return ((Object[])args)[0];
+        else
+            return args;
     }
 
     private Class map(String name) {
