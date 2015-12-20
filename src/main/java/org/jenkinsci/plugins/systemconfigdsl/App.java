@@ -2,9 +2,7 @@ package org.jenkinsci.plugins.systemconfigdsl;
 
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
-import groovy.lang.Script;
 import hudson.init.Initializer;
-import hudson.util.spring.ClosureScript;
 import jenkins.model.Jenkins;
 import org.codehaus.groovy.control.CompilerConfiguration;
 
@@ -39,12 +37,12 @@ public class App {
         Arrays.sort(files);
 
         CompilerConfiguration cc = new CompilerConfiguration();
-        cc.setScriptBaseClass(ClosureScript.class.getName());
+        cc.setScriptBaseClass(ConfigScript.class.getName());
         GroovyShell sh = new GroovyShell(jenkins.pluginManager.uberClassLoader,new Binding(),cc);
 
         for (File f : files) {
             try {
-                ClosureScript s = (ClosureScript) sh.parse(f);
+                ConfigScript s = (ConfigScript) sh.parse(f);
                 s.setDelegate(new Surrogate(jenkins));
                 s.run();
             } catch (Exception e) {
