@@ -39,6 +39,8 @@ final class Property {
 
     private Object value;
 
+    private boolean set;
+
     public Property(String name, Type type, Setter setter) {
         this.name = name;
         this.type = type;
@@ -51,7 +53,7 @@ final class Property {
         if (Types.isSubClassOf(type,Collection.class)) {
             Type assignment = Types.getBaseClass(type, Collection.class);
             collection = true;
-            itemType = Types.erasure(Types.getTypeArgument(assignment,0));
+            itemType = Types.erasure(Types.getTypeArgument(assignment,0,Object.class));
         } else {
             collection = false;
             itemType = Types.erasure(type);
@@ -62,6 +64,7 @@ final class Property {
     }
 
     public void add(Object o) {
+        set = true;
         if (o!=null && !itemType.isInstance(o))
             throw new IllegalArgumentException(String.format("Expected %s but got %s instead",
                     itemType.getName(), o.getClass().getName()));
@@ -94,6 +97,7 @@ final class Property {
     }
 
     public void assignTo(Object instance) {
+        if (!set)           return; // no value assigned to this property
         if (setter==null)   return; // meant to be used with constructor
         try {
             setter.set(instance,pack());

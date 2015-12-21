@@ -24,7 +24,8 @@ import java.util.Map;
 
         for (Class c=type; c!=null; c=c.getSuperclass()) {
             for (Method m : c.getDeclaredMethods()) {
-                if (m.isAnnotationPresent(DataBoundSetter.class)) {
+                if (m.getName().startsWith("set") && m.getParameterTypes().length==1) {
+//                if (m.isAnnotationPresent(DataBoundSetter.class)) {
                     String n = Introspector.decapitalize(m.getName().substring(3));
                     properties.put(n,new Property(n,m.getParameterTypes()[0],Setter.create(m)));
                 }
@@ -79,7 +80,7 @@ import java.util.Map;
             return null;
         }
 
-        return super.invokeMethod(name, args);
+        return super.invokeMethod(name, _args);
     }
 
     /**

@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.systemconfigdsl;
 
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
+import hudson.ExtensionFinder;
 import hudson.init.Initializer;
 import jenkins.model.Jenkins;
 import org.codehaus.groovy.control.CompilerConfiguration;
@@ -38,6 +39,9 @@ public class App {
         CompilerConfiguration cc = new CompilerConfiguration();
         cc.setScriptBaseClass(ConfigScript.class.getName());
         GroovyShell sh = new GroovyShell(jenkins.pluginManager.uberClassLoader,new Binding(),cc);
+
+        // make sure Injector is prepared
+        jenkins.getExtensionList(ExtensionFinder.class).getComponents();
 
         for (File f : files) {
             try {
