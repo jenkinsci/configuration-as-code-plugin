@@ -5,19 +5,32 @@ import org.jvnet.tiger_types.Types;
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 /**
+ * Represents assignable property of an object in Jenkins.
+ *
  * @author Kohsuke Kawaguchi
  */
-public class Property {
-    private final String name;
-    private final Type type;
+final class Property {
+    /**
+     * Name of the property.
+     */
+    final String name;
+    /**
+     * Type of the property such as String or {@code List<Describable>}
+     */
+    final Type type;
 
-    private boolean collection;
-    private Class itemType;
+    /**
+     * If {@link #type} is a collection of a value (such as List or array), true.
+     */
+    final boolean collection;
+    /**
+     * If this is a collection property, type of the individual
+     */
+    final Class itemType;
 
     private Object value;
 
