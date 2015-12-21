@@ -10,7 +10,6 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static hudson.init.InitMilestone.*;
@@ -43,8 +42,10 @@ public class App {
         for (File f : files) {
             try {
                 ConfigScript s = (ConfigScript) sh.parse(f);
-                s.setDelegate(new Surrogate(jenkins));
+                Surrogate d = new Surrogate(jenkins);
+                s.setDelegate(d);
                 s.run();
+                d.assign();
             } catch (Exception e) {
                 // if the configuration file fails to execute, don't let Jenkins start in a half-configured
                 // state and instead rather let it die. Apache fails to start if the config file is invalid,

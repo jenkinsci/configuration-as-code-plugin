@@ -32,11 +32,17 @@ final class Property {
      */
     final Class itemType;
 
+    /**
+     * Abstracts away how to assign the property. Null if this is representing a parameter to constructor.
+     */
+    final Setter setter;
+
     private Object value;
 
-    public Property(String name, Type type) {
+    public Property(String name, Type type, Setter setter) {
         this.name = name;
         this.type = type;
+        this.setter = setter;
 
         if (Types.isArray(type)) {
             collection = true;
@@ -85,5 +91,15 @@ final class Property {
             }
         }
         return value;
+    }
+
+    public void assignTo(Object instance) {
+        if (setter==null)   return; // meant to be used with constructor
+        try {
+            setter.set(instance,pack());
+        } catch (Exception e) {
+            // TODO: chain source location
+            throw new RuntimeException(e);
+        }
     }
 }
