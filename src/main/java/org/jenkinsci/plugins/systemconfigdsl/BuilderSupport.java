@@ -1,6 +1,7 @@
 package org.jenkinsci.plugins.systemconfigdsl;
 
 import groovy.lang.Closure;
+import groovy.lang.GString;
 import groovy.lang.GroovyObjectSupport;
 import hudson.model.Descriptor;
 import org.jenkinsci.plugins.symbol.SymbolLookup;
@@ -12,11 +13,22 @@ import org.jenkinsci.plugins.symbol.SymbolLookup;
  */
 abstract class BuilderSupport extends GroovyObjectSupport {
 
-    protected Object[] wrap(Object args) {
+    /**
+     * Process arguments.
+     */
+    protected Object[] massageArgs(Object args) {
+        Object[] r;
         if (args instanceof Object[])
-            return (Object[])args;
+            r = (Object[])args;
         else
-            return new Object[]{args};
+            r = new Object[]{args};
+
+        // eval GStrings
+        for (int i=0; i<r.length; i++) {
+            if (r[i] instanceof GString)
+                r[i] = r[i].toString();
+        }
+        return r;
     }
 
     /**

@@ -52,7 +52,7 @@ import java.util.Map;
 
     @Override
     public Object invokeMethod(String name, Object _args) {
-        Object[] args = wrap(_args);
+        Object[] args = massageArgs(_args);
 
         Property p = properties.get(name);
         if (p==null)

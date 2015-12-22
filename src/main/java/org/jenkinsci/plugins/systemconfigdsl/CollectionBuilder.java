@@ -24,7 +24,7 @@ public class CollectionBuilder extends BuilderSupport {
 
     @Override
     public Object invokeMethod(String name, Object _args) {
-        Object[] args = wrap(_args);
+        Object[] args = massageArgs(_args);
 
         if (matches(args,Closure.class)) {
             // value building closure
