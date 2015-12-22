@@ -48,6 +48,9 @@ nodes {
 }
 ````
 
+See [JENKINS-31094](https://issues.jenkins-ci.org/browse/JENKINS-31094) as the context.
+Also see [Jenkins Job DSL plugin](https://github.com/jenkinsci/job-dsl-plugin)
+
 ## Scripting
 The configuration syntax is defined as Groovy DSL, which comes in handy when you have more complex configuration.
 
