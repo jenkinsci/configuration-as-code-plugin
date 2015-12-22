@@ -63,6 +63,7 @@ import java.util.Map;
 
             // collection building closure
             closure.setDelegate(new CollectionBuilder(p));
+            closure.setResolveStrategy(Closure.DELEGATE_FIRST);
             return closure.call();
         }
         if (matches(args,String.class,Closure.class)) {
