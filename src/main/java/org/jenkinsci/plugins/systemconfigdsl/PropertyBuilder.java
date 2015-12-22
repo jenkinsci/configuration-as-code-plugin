@@ -27,13 +27,13 @@ import java.util.Map;
                 if (m.getName().startsWith("set") && m.getParameterTypes().length==1) {
 //                if (m.isAnnotationPresent(DataBoundSetter.class)) {
                     String n = Introspector.decapitalize(m.getName().substring(3));
-                    properties.put(n,new Property(n,m.getParameterTypes()[0],Setter.create(m)));
+                    properties.put(n,new Property(n,m.getGenericParameterTypes()[0],Setter.create(m)));
                 }
             }
             for (Field f : c.getDeclaredFields()) {
                 if (f.isAnnotationPresent(DataBoundSetter.class)) {
                     String n = f.getName();
-                    properties.put(n,new Property(n,f.getType(),Setter.create(f)));
+                    properties.put(n,new Property(n,f.getGenericType(),Setter.create(f)));
                 }
             }
         }
