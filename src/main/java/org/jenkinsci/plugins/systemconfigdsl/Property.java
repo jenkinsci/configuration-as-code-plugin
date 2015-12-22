@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.systemconfigdsl;
 
+import com.thoughtworks.xstream.core.util.Primitives;
 import org.jvnet.tiger_types.Types;
 
 import java.lang.reflect.Array;
@@ -48,19 +49,24 @@ final class Property {
 
         if (Types.isArray(type)) {
             collection = true;
-            itemType = Types.erasure(Types.getComponentType(type));
+            itemType = box(Types.erasure(Types.getComponentType(type)));
         } else
         if (Types.isSubClassOf(type,Collection.class)) {
             Type assignment = Types.getBaseClass(type, Collection.class);
             collection = true;
-            itemType = Types.erasure(Types.getTypeArgument(assignment,0,Object.class));
+            itemType = box(Types.erasure(Types.getTypeArgument(assignment, 0, Object.class)));
         } else {
             collection = false;
-            itemType = Types.erasure(type);
+            itemType = box(Types.erasure(type));
         }
 
         if (collection)
             value = new ArrayList();
+    }
+
+    private Class box(Class t) {
+        Class b = Primitives.box(t);
+        return b!=null ? b : t;
     }
 
     public void add(Object o) {
