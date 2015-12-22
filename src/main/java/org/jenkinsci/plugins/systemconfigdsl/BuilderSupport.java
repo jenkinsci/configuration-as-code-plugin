@@ -47,9 +47,11 @@ abstract class BuilderSupport extends GroovyObjectSupport {
         Class describable = lookup(symbol);
         if (describable!=null) {
             DescribableFactory f = new DescribableFactory(describable);
-            body.setDelegate(f);
-            body.setResolveStrategy(Closure.DELEGATE_FIRST);
-            body.call();
+            if (body!=null) {
+                body.setDelegate(f);
+                body.setResolveStrategy(Closure.DELEGATE_FIRST);
+                body.call();
+            }
             return f.instantiate();
         }
         return null;

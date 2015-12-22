@@ -74,6 +74,14 @@ import java.util.Map;
                 return null;
             }
         }
+        if (matches(args,String.class) && p.type!=String.class) {
+            // value building without closure, if the type of the property is not String
+            Object v = buildValue((String) args[0], null);
+            if (v!=null) {
+                p.add(v);
+                return null;
+            }
+        }
         if (matches(args,Object.class)) {
             // value assignment
             // prop VALUE

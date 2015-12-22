@@ -34,6 +34,14 @@ public class CollectionBuilder extends BuilderSupport {
                 return v;
             }
         }
+        if (matches(args)) {
+            // value building without nested closure
+            Object v = buildValue(name, null);
+            if (v!=null) {
+                prop.add(v);
+                return v;
+            }
+        }
 
         return super.invokeMethod(name, args);
     }
