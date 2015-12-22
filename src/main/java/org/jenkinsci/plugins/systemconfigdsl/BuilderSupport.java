@@ -62,7 +62,7 @@ abstract class BuilderSupport extends GroovyObjectSupport {
             if (body!=null) {
                 body.setDelegate(f);
                 body.setResolveStrategy(Closure.DELEGATE_FIRST);
-                body.call();
+                body.call(f);
             }
             return f.instantiate();
         }

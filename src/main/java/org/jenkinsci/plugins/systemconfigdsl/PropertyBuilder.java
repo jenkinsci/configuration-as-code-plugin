@@ -62,9 +62,10 @@ import java.util.Map;
             Closure closure = (Closure) args[0];
 
             // collection building closure
-            closure.setDelegate(new CollectionBuilder(p));
+            CollectionBuilder b = new CollectionBuilder(p);
+            closure.setDelegate(b);
             closure.setResolveStrategy(Closure.DELEGATE_FIRST);
-            return closure.call();
+            return closure.call(b);
         }
         if (matches(args,String.class,Closure.class)) {
             // value building closure
