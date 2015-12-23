@@ -8,6 +8,12 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 
 /**
+ * Closure delegate that instantiates a data-bindable object
+ * via {@link DataBoundConstructor}.
+ *
+ * <p>
+ * Constructor arguments and setter arguments are equally treated in the syntax.
+ *
  * @author Kohsuke Kawaguchi
  */
 public class DescribableFactory extends PropertyBuilder {

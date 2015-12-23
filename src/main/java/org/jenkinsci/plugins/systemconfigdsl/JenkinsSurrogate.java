@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Root closure delegate that supports pseudo global functions
+ * as well as configuring the singleton {@link Jenkins} instance.
+ *
  * @author Kohsuke Kawaguchi
  */
 public class JenkinsSurrogate extends Surrogate {

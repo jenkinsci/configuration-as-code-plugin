@@ -7,7 +7,10 @@ import hudson.model.Descriptor;
 import org.jenkinsci.plugins.symbol.SymbolLookup;
 
 /**
- * Support for creating a builder pattern.
+ * Support for a builder pattern in Groovy.
+ *
+ * <p>
+ * This object is used as a {@linkplain Closure#setDelegate(Object) closure delegate}.
  *
  * @author Kohsuke Kawaguchi
  */

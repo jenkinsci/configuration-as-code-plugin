@@ -10,12 +10,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Builds up values into {@link #properties} either to be set to an existing object
+ * Closure delegate that builds up property values  to be set to an existing object
  * or to be assigned to the newly instantiated object.
+ *
+ * <p>
+ * After evaluating a closure, properties are accumulated to {@link #properties}
  *
  * @author Kohsuke Kawaguchi
  */
-/*package*/ class PropertyBuilder extends BuilderSupport {
+/*package*/ abstract class PropertyBuilder extends BuilderSupport {
     public final Class type;
     public final Map<String,Property> properties = new HashMap<String, Property>();
 
