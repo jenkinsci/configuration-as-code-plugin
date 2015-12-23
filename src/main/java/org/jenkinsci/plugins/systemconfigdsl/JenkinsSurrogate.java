@@ -45,6 +45,15 @@ public class JenkinsSurrogate extends Surrogate {
      * Updates a plugin if it's older than the specified version.
      */
     public void plugin(String name, String minimumRequiredVersion) {
-        this.recipes.add(new PluginRecipe(name,minimumRequiredVersion));
+        this.recipes.add(new PluginRecipe(name, minimumRequiredVersion));
+    }
+
+    /**
+     * Run the given closure and configure {@link Jenkins}
+     */
+    /*package*/ void runWith(ConfigScript s) {
+        s.setDelegate(this);
+        s.run();
+        assign();
     }
 }
