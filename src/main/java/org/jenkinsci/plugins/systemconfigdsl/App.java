@@ -46,10 +46,10 @@ public class App {
         for (File f : files) {
             try {
                 ConfigScript s = (ConfigScript) sh.parse(f);
-                Surrogate d = new Surrogate(jenkins);
-                s.setDelegate(d);
+                JenkinsSurrogate j = new JenkinsSurrogate(jenkins);
+                s.setDelegate(j);
                 s.run();
-                d.assign();
+                j.assign();
             } catch (Exception e) {
                 // if the configuration file fails to execute, don't let Jenkins start in a half-configured
                 // state and instead rather let it die. Apache fails to start if the config file is invalid,
