@@ -4,7 +4,7 @@ import groovy.lang.Closure;
 import groovy.lang.GString;
 import groovy.lang.GroovyObjectSupport;
 import hudson.model.Descriptor;
-import org.jenkinsci.plugins.symbol.SymbolLookup;
+import org.jenkinsci.plugins.structs.SymbolLookup;
 
 /**
  * Support for a builder pattern in Groovy.
