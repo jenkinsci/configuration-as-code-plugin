@@ -22,17 +22,14 @@ public class DescribableFactory extends PropertyBuilder {
         model = new DescribableModel<>(type);
 
         for (DescribableParameter p : model.getParameters()) {
-            if (p.isRequired()) // general setters are
-                properties.put(p.getName(), new Property(p.getName(), p.getRawType(), null));
+            properties.put(p.getName(), new Property(p.getName(), p.getRawType(), null));
         }
     }
 
 
     /*package*/ Object instantiate() {
         try {
-            Object o = model.instantiate(properties);
-            handleSetters(o);
-            return o;
+            return model.instantiate(properties);
         } catch (Exception e) {
             throw new IllegalArgumentException("Failed to instantiate "+type,e);
         }
