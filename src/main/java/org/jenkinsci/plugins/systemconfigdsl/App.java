@@ -43,15 +43,21 @@ public class App {
         // make sure Injector is prepared
         jenkins.getExtensionList(ExtensionFinder.class).getComponents();
 
-        for (File f : files) {
-            try {
-                new JenkinsSurrogate(jenkins).runWith((ConfigScript) sh.parse(f));
-            } catch (Exception e) {
                 // if the configuration file fails to execute, don't let Jenkins start in a half-configured
                 // state and instead rather let it die. Apache fails to start if the config file is invalid,
                 // so this is standard practice.
-                throw new Error("Failed to execute "+f, e);
+        JenkinsSurrogate root = new JenkinsSurrogate(jenkins);
+        for (File f : files) {
+            try {
+                root.runWith((ConfigScript) sh.parse(f));
+            } catch (Exception e) {
+                throw new Error("Failed to evaluate "+f, e);
             }
+        }
+        try {
+            root.assign();
+        } catch (Exception e) {
+            throw new Error("Failed to configure Jenkins", e);
         }
     }
 

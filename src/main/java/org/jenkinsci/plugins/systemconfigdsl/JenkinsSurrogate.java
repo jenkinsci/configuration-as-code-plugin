@@ -97,7 +97,10 @@ public class JenkinsSurrogate extends Surrogate {
     /*package*/ void runWith(ConfigScript s) throws Exception {
         s.setDelegate(this);
         s.run();
+    }
 
+    @Override
+    public void assign() throws Exception {
         for (PluginRecipe p : recipes) {
             p.perform();
         }
@@ -113,7 +116,7 @@ public class JenkinsSurrogate extends Surrogate {
             }
         }
 
-        assign();
+        super.assign();
     }
 
     private static final Logger LOGGER = Logger.getLogger(JenkinsSurrogate.class.getName());

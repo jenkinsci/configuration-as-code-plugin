@@ -42,7 +42,7 @@ public class Surrogate extends PropertyBuilder {
     /**
      * Set all the accumulated properties into the target object.
      */
-    public void assign() {
+    public void assign() throws Exception {
         handleSetters(target);
     }
 }
