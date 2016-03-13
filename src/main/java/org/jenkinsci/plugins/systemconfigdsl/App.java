@@ -43,9 +43,9 @@ public class App {
         // make sure Injector is prepared
         jenkins.getExtensionList(ExtensionFinder.class).getComponents();
 
-                // if the configuration file fails to execute, don't let Jenkins start in a half-configured
-                // state and instead rather let it die. Apache fails to start if the config file is invalid,
-                // so this is standard practice.
+        // if the configuration file fails to execute, don't let Jenkins start in a half-configured
+        // state and instead rather let it die. Apache fails to start if the config file is invalid,
+        // so this is standard practice.
         JenkinsSurrogate root = new JenkinsSurrogate(jenkins);
         for (File f : files) {
             try {
