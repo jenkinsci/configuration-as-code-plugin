@@ -8,6 +8,7 @@ import jenkins.model.Jenkins;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Root closure delegate that supports pseudo global functions
@@ -115,10 +116,13 @@ public class JenkinsSurrogate extends Surrogate {
                 l.restart();
                 return;
             } else {
-
+                LOGGER.severe("Need to start again to have the newly installed plugins take effect. Quitting");
+                System.exit(1);
             }
         }
 
         assign();
     }
+
+    private static final Logger LOGGER = Logger.getLogger(JenkinsSurrogate.class.getName());
 }
