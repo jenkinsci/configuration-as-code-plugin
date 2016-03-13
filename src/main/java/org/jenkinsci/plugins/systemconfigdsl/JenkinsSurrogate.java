@@ -35,14 +35,10 @@ public class JenkinsSurrogate extends Surrogate {
 
         /**
          * Ensures that the plugin requested is present by installing it if necessary
-         *
-         * @return
-         *      true if a change is made to the system, false otherwise.
          */
-        public boolean perform() throws Exception {
+        public void perform() throws Exception {
             if (requiresInstallation()) {
                 install();
-                return true;
             } else {
                 // if we are not installing/updating a plugin, it better be functioning
                 for (FailedPlugin f : jenkins.getPluginManager().getFailedPlugins()) {
@@ -51,7 +47,6 @@ public class JenkinsSurrogate extends Surrogate {
                     }
                 }
             }
-            return false;
         }
 
         /**
@@ -73,7 +68,7 @@ public class JenkinsSurrogate extends Surrogate {
          * Synchronously installs a plugin and throws an exception if the installation fails.
          */
         private void install() throws Exception {
-            jenkins.getUpdateCenter().getPlugin(name).deploy().get();
+            jenkins.getUpdateCenter().getPlugin(name).deploy(true).get();
         }
     }
 
@@ -103,13 +98,10 @@ public class JenkinsSurrogate extends Surrogate {
         s.setDelegate(this);
         s.run();
 
-        boolean restartRequired = false;
         for (PluginRecipe p : recipes) {
-            if (p.perform()) {
-                restartRequired = true;
-            }
+            p.perform();
         }
-        if (restartRequired) {
+        if (jenkins.getUpdateCenter().isRestartRequiredForCompletion()) {
             Lifecycle l = Lifecycle.get();
             if (l.canRestart()) {
                 // restart Jenkins to load up new plugins
