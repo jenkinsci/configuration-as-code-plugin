@@ -4,6 +4,7 @@ import groovy.lang.Closure;
 import hudson.PluginManager.FailedPlugin;
 import hudson.PluginWrapper;
 import hudson.lifecycle.Lifecycle;
+import hudson.model.Descriptor;
 import hudson.util.VersionNumber;
 import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
@@ -22,9 +23,9 @@ import java.util.logging.Logger;
  * @author Kohsuke Kawaguchi
  */
 public class Root extends ConfiguringObject {
-    private final Jenkins jenkins;
     private final List<PluginRecipe> recipes = new ArrayList<>();
     private final List<Callable> configs = new ArrayList<>();
+    private final Surrogate jenkins;
 
     class PluginRecipe {
         final String name;
@@ -79,7 +80,7 @@ public class Root extends ConfiguringObject {
     }
 
     public Root(Jenkins jenkins) {
-        this.jenkins = jenkins;
+        this.jenkins = new Surrogate(jenkins);
     }
 
     /**
@@ -104,7 +105,7 @@ public class Root extends ConfiguringObject {
             @Override
             public Object call() throws Exception {
                 // configure root Jenkins
-                new Surrogate(jenkins).runWith(config);
+                jenkins.runWith(config);
                 return null;
             }
         });
@@ -114,10 +115,21 @@ public class Root extends ConfiguringObject {
      * Configures {@link GlobalConfiguration} by running a given closure.
      */
     public void global(final String name, final Closure config) {
+        configure(name, GlobalConfiguration.class, config);
+    }
+
+    /**
+     * Configures {@link Descriptor} by running a given closure.
+     */
+    public void descriptor(final String name, final Closure config) {
+        configure(name, Descriptor.class, config);
+    }
+
+    private void configure(final String name, final Class type, final Closure config) {
         configs.add(new Callable() {
             @Override
             public Object call() throws Exception {
-                Surrogate s = new Surrogate(SymbolLookup.get().find(GlobalConfiguration.class, name));
+                Surrogate s = new Surrogate(SymbolLookup.get().find(type, name));
                 s.runWith(config);
                 return null;
             }
