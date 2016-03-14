@@ -11,7 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import static groovy.lang.Closure.DELEGATE_FIRST;
+
 /**
+ * Closure delegate to configure the root scope.
+ *
+ * This defines sub-scopes like 'plugin' and 'jenkins'
+ *
  * @author Kohsuke Kawaguchi
  */
 public class Root extends ConfiguringObject {
@@ -108,10 +114,10 @@ public class Root extends ConfiguringObject {
         }
 
         // configure root Jenkins
-        JenkinsSurrogate js = new JenkinsSurrogate(jenkins);
+        Surrogate js = new Surrogate(jenkins);
         for (Closure config : jenkinsConfigs) {
             config.setDelegate(js);
-            config.setResolveStrategy(Closure.DELEGATE_FIRST);
+            config.setResolveStrategy(DELEGATE_FIRST);
             config.call(js);
         }
         js.assign();
