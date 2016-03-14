@@ -46,7 +46,7 @@ public class App {
         // if the configuration file fails to execute, don't let Jenkins start in a half-configured
         // state and instead rather let it die. Apache fails to start if the config file is invalid,
         // so this is standard practice.
-        JenkinsSurrogate root = new JenkinsSurrogate(jenkins);
+        Root root = new Root();
         for (File f : files) {
             try {
                 root.runWith((ConfigScript) sh.parse(f));
@@ -55,7 +55,7 @@ public class App {
             }
         }
         try {
-            root.assign();
+            root.assign(jenkins);
         } catch (Exception e) {
             throw new Error("Failed to configure Jenkins", e);
         }

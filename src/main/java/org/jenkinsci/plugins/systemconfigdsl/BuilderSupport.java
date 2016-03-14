@@ -14,7 +14,7 @@ import org.jenkinsci.plugins.structs.SymbolLookup;
  *
  * @author Kohsuke Kawaguchi
  */
-abstract class BuilderSupport extends GroovyObjectSupport {
+abstract class BuilderSupport extends ConfiguringObject {
 
     /**
      * Process arguments.
