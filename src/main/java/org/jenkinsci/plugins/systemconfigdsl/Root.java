@@ -5,14 +5,14 @@ import hudson.PluginManager.FailedPlugin;
 import hudson.PluginWrapper;
 import hudson.lifecycle.Lifecycle;
 import hudson.util.VersionNumber;
+import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
+import org.jenkinsci.plugins.structs.SymbolLookup;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.logging.Logger;
-
-import static groovy.lang.Closure.DELEGATE_FIRST;
 
 /**
  * Closure delegate to configure the root scope.
@@ -104,11 +104,21 @@ public class Root extends ConfiguringObject {
             @Override
             public Object call() throws Exception {
                 // configure root Jenkins
-                Surrogate js = new Surrogate(jenkins);
-                config.setDelegate(js);
-                config.setResolveStrategy(DELEGATE_FIRST);
-                config.call(js);
-                js.assign();
+                new Surrogate(jenkins).runWith(config);
+                return null;
+            }
+        });
+    }
+
+    /**
+     * Configures {@link GlobalConfiguration}.
+     */
+    public void global(final String name, final Closure config) {
+        configs.add(new Callable() {
+            @Override
+            public Object call() throws Exception {
+                Surrogate s = new Surrogate(SymbolLookup.get().find(GlobalConfiguration.class, name));
+                s.runWith(config);
                 return null;
             }
         });

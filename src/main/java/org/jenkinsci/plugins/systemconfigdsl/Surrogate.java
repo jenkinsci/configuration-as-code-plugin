@@ -1,10 +1,13 @@
 package org.jenkinsci.plugins.systemconfigdsl;
 
+import groovy.lang.Closure;
 import groovy.lang.MetaClass;
 import org.codehaus.groovy.runtime.InvokerHelper;
 
 import java.beans.Introspector;
 import java.lang.reflect.Method;
+
+import static groovy.lang.Closure.DELEGATE_FIRST;
 
 /**
  * Closure delegate that configures an existing instance.
@@ -44,5 +47,15 @@ public class Surrogate extends PropertyBuilder {
      */
     public void assign() throws Exception {
         handleSetters(target);
+    }
+
+    /**
+     * Run the given closure with 'this' as delegate
+     */
+    /*package*/ void runWith(Closure c) throws Exception {
+        c.setDelegate(this);
+        c.setResolveStrategy(DELEGATE_FIRST);
+        c.call(this);
+        assign();
     }
 }
