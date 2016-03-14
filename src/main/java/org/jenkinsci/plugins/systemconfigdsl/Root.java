@@ -87,7 +87,7 @@ public class Root extends ConfiguringObject {
      * Installs the latest version of a plugin if it's not present
      */
     public void plugin(String name) {
-        plugin(name, null);
+        this.recipes.add(new PluginRecipe(name, null));
     }
 
     /**
