@@ -111,7 +111,7 @@ public class Root extends ConfiguringObject {
     }
 
     /**
-     * Configures {@link GlobalConfiguration}.
+     * Configures {@link GlobalConfiguration} by running a given closure.
      */
     public void global(final String name, final Closure config) {
         configs.add(new Callable() {
