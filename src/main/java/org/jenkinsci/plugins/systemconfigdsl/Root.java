@@ -9,6 +9,7 @@ import jenkins.model.Jenkins;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
 import static groovy.lang.Closure.DELEGATE_FIRST;
@@ -21,8 +22,9 @@ import static groovy.lang.Closure.DELEGATE_FIRST;
  * @author Kohsuke Kawaguchi
  */
 public class Root extends ConfiguringObject {
+    private final Jenkins jenkins;
     private final List<PluginRecipe> recipes = new ArrayList<>();
-    private final List<Closure> jenkinsConfigs = new ArrayList<>();
+    private final List<Callable> configs = new ArrayList<>();
 
     class PluginRecipe {
         final String name;
@@ -76,11 +78,15 @@ public class Root extends ConfiguringObject {
         }
     }
 
+    public Root(Jenkins jenkins) {
+        this.jenkins = jenkins;
+    }
+
     /**
      * Installs the latest version of a plugin if it's not present
      */
     public void plugin(String name) {
-        plugin(name,null);
+        plugin(name, null);
     }
 
     /**
@@ -93,8 +99,19 @@ public class Root extends ConfiguringObject {
     /**
      * Configures the root {@link Jenkins} instance.
      */
-    public void jenkins(Closure config) {
-        this.jenkinsConfigs.add(config);
+    public void jenkins(final Closure config) {
+        configs.add(new Callable() {
+            @Override
+            public Object call() throws Exception {
+                // configure root Jenkins
+                Surrogate js = new Surrogate(jenkins);
+                config.setDelegate(js);
+                config.setResolveStrategy(DELEGATE_FIRST);
+                config.call(js);
+                js.assign();
+                return null;
+            }
+        });
     }
 
     /*package*/ void assign(Jenkins jenkins) throws Exception {
@@ -113,14 +130,10 @@ public class Root extends ConfiguringObject {
             }
         }
 
-        // configure root Jenkins
-        Surrogate js = new Surrogate(jenkins);
-        for (Closure config : jenkinsConfigs) {
-            config.setDelegate(js);
-            config.setResolveStrategy(DELEGATE_FIRST);
-            config.call(js);
+        // apply the rest of the configuration
+        for (Callable c : configs) {
+            c.call();
         }
-        js.assign();
     }
 
     private static final Logger LOGGER = Logger.getLogger(Root.class.getName());
