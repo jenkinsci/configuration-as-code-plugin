@@ -25,7 +25,10 @@ import java.util.logging.Logger;
 public class Root extends ConfiguringObject {
     private final List<PluginRecipe> recipes = new ArrayList<>();
     private final List<Callable> configs = new ArrayList<>();
-    private final Surrogate jenkins;
+    private final Surrogate jenkinsSurrogate;
+    private final Jenkins jenkins;
+
+    private boolean updateCenterMetadataFetched = false;
 
     class PluginRecipe {
         final String name;
@@ -75,12 +78,17 @@ public class Root extends ConfiguringObject {
          * Synchronously installs a plugin and throws an exception if the installation fails.
          */
         private void install() throws Exception {
-            Jenkins.getInstance().getUpdateCenter().getPlugin(name).deploy(true).get();
+            if (!updateCenterMetadataFetched) {
+                jenkins.pluginManager.doCheckUpdatesServer();
+                updateCenterMetadataFetched = true;
+            }
+            jenkins.getUpdateCenter().getPlugin(name).deploy(true).get();
         }
     }
 
     public Root(Jenkins jenkins) {
-        this.jenkins = new Surrogate(jenkins);
+        this.jenkins = jenkins;
+        this.jenkinsSurrogate = new Surrogate(jenkins);
     }
 
     /**
@@ -105,7 +113,7 @@ public class Root extends ConfiguringObject {
             @Override
             public Object call() throws Exception {
                 // configure root Jenkins
-                jenkins.runWith(config);
+                jenkinsSurrogate.runWith(config);
                 return null;
             }
         });
