@@ -4,6 +4,10 @@ import org.jenkinsci.plugins.structs.describable.DescribableModel;
 import org.jenkinsci.plugins.structs.describable.DescribableParameter;
 import org.kohsuke.stapler.DataBoundConstructor;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 /**
  * Closure delegate that instantiates a data-bindable object
  * via {@link DataBoundConstructor}.
@@ -29,7 +33,11 @@ public class DescribableFactory extends PropertyBuilder {
 
     /*package*/ Object instantiate() {
         try {
-            return model.instantiate(properties);
+            Map args = new HashMap();
+            for (Entry<String, Property> e : properties.entrySet()) {
+                args.put(e.getKey(), e.getValue().pack());
+            }
+            return model.instantiate(args);
         } catch (Exception e) {
             throw new IllegalArgumentException("Failed to instantiate "+type,e);
         }
