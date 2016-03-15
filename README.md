@@ -7,43 +7,51 @@ you specify a directory that contains `*.conf` through the `JENKINS_CONF` enviro
 
 Here is an example of a configuration file:
 ````
-securityRealm 'pam'
-authorizationStrategy('fullControlOnceLoggedIn') {
-}
+plugin 'ldap'   # install some plugins
+plugin 'git'
 
-views {
-  list {
-    name 'All'
-    columns {
-      status()
-      weather()
-      jobName()
-      buildButton()
+jenkins {
+  # configure security
+  securityRealm 'pam'
+  authorizationStrategy('fullControlOnceLoggedIn') {
+  }
+
+  # set a couple of views with exact set of columns, etc
+  views {
+    list {
+      name 'All'
+      columns {
+        status()
+        weather()
+        jobName()
+        buildButton()
+      }
+    }
+    list {
+      name 'another'
+      columns {
+        status()
+        jobName()
+      }
     }
   }
-  list {
-    name 'another'
-    columns {
-      status()
-      jobName()
+  
+  slaveAgentPort 9532
+  
+  # configure exactly two build agents
+  nodes {
+    slave {
+      name 'localhost1'
+      remoteFS '/tmp/1'
+      launcher 'jnlp'
+      numExecutors 5
     }
-  }
-}
-
-slaveAgentPort 9532
-
-nodes {
-  slave {
-    name 'localhost1'
-    remoteFS '/tmp/1'
-    launcher 'jnlp'
-    numExecutors 5
-  }
-  slave {
-    name 'localhost2'
-    remoteFS '/tmp/2'
-    launcher 'jnlp'
-    labelString 'windows foo'
+    slave {
+      name 'localhost2'
+      remoteFS '/tmp/2'
+      launcher 'jnlp'
+      labelString 'windows foo'
+    }
   }
 }
 ````
