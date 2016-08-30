@@ -41,13 +41,13 @@ jenkins {
   # configure exactly two build agents
   nodes {
     slave {
-      name 'localhost1'
+      name 'foo'
       remoteFS '/tmp/1'
       launcher 'jnlp'
       numExecutors 5
     }
     slave {
-      name 'localhost2'
+      name 'bar'
       remoteFS '/tmp/2'
       launcher 'jnlp'
       labelString 'windows foo'
