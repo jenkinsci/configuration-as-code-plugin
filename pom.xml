@@ -25,7 +25,7 @@
   </licenses>
 
   <properties>
-    <jenkins.version>2.0-alpha-4-SNAPSHOT</jenkins.version>
+    <jenkins.version>2.60.1</jenkins.version>
   </properties>
 
   <!-- If you want this to appear on the wiki page:
@@ -61,7 +61,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>structs</artifactId>
-      <version>1.0</version>
+      <version>1.9</version>
     </dependency>
   </dependencies>
 
