@@ -26,6 +26,7 @@
 
   <properties>
     <jenkins.version>2.60.1</jenkins.version>
+    <jenkins-test-harness.version>2.23</jenkins-test-harness.version>
   </properties>
 
   <!-- If you want this to appear on the wiki page:
