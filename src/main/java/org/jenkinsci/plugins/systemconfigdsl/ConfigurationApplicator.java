@@ -15,7 +15,7 @@ public class ConfigurationApplicator {
         for (Object configuration: configurations) {
             for (Object section: ((Map) configuration).keySet()) {
                 if (configurators.containsKey(section)) {
-                    configurators.get(section).configure(configuration, dryRun);
+                    configurators.get(section).configure(((Map) configuration).get(section), dryRun);
                 } else {
                     // Would it be better to throw exeception in here?
                     // TODO: add printout to UI when calling dryRun from UI
