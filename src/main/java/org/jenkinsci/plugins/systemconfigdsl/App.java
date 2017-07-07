@@ -1,16 +1,15 @@
 package org.jenkinsci.plugins.systemconfigdsl;
 
-import groovy.lang.Binding;
-import groovy.lang.GroovyShell;
-import hudson.ExtensionFinder;
+import com.esotericsoftware.yamlbeans.YamlReader;
 import hudson.init.Initializer;
 import jenkins.model.Jenkins;
-import org.codehaus.groovy.control.CompilerConfiguration;
+import org.jenkinsci.plugins.systemconfigdsl.api.Configurator;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.*;
 import java.util.logging.Logger;
 
 import static hudson.init.InitMilestone.*;
@@ -29,35 +28,29 @@ public class App {
     public void run(File dir) throws IOException {
         File[] files = dir.listFiles(new FilenameFilter() {
             public boolean accept(File dir, String name) {
-                return name.endsWith(".conf");
+                return name.endsWith(".yml");
             }
         });
         if (files==null)    return;
 
-        Arrays.sort(files);
-
-        CompilerConfiguration cc = new CompilerConfiguration();
-        cc.setScriptBaseClass(ConfigScript.class.getName());
-        GroovyShell sh = new GroovyShell(jenkins.pluginManager.uberClassLoader,new Binding(),cc);
-
-        // make sure Injector is prepared
-        jenkins.getExtensionList(ExtensionFinder.class).getComponents();
-
-        // if the configuration file fails to execute, don't let Jenkins start in a half-configured
-        // state and instead rather let it die. Apache fails to start if the config file is invalid,
-        // so this is standard practice.
-        Root root = new Root(jenkins);
-        for (File f : files) {
-            try {
-                root.runWith((ConfigScript) sh.parse(f));
-            } catch (Exception e) {
-                throw new Error("Failed to evaluate "+f, e);
-            }
+        final Map<String,Configurator> supportedPlugins = new HashMap<>();
+        final ServiceLoader<Configurator> loader = ServiceLoader.load(Configurator.class, Jenkins.getInstance().getPluginManager().uberClassLoader);
+        Iterator<Configurator> recipeIterator = loader.iterator();
+        while (recipeIterator.hasNext()) {
+            Configurator configurator = recipeIterator.next();
+            LOGGER.warning("Found configurator implementation: " + configurator.getConfigFileSectionName());
+            supportedPlugins.put(configurator.getConfigFileSectionName(), configurator);
         }
-        try {
-            root.assign(jenkins);
-        } catch (Exception e) {
-            throw new Error("Failed to configure Jenkins", e);
+
+        for (File file: files) {
+            YamlReader reader = new YamlReader(new FileReader(file));
+            Map config = (Map) reader.read();
+            for (Object key: config.keySet()) {
+                if (supportedPlugins.containsKey(key)) {
+                    System.out.println("configuration section " + key.toString() + " supported");
+                    supportedPlugins.get(key).configure(config.get(key));
+                }
+            }
         }
     }
 
