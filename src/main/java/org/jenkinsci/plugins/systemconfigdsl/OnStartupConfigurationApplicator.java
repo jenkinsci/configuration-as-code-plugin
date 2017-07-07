@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import static hudson.init.InitMilestone.EXTENSIONS_AUGMENTED;
 import static hudson.init.InitMilestone.JOB_LOADED;
 
+@SuppressWarnings("unused") // loaded by Jenkins
 public class OnStartupConfigurationApplicator {
     private static final Logger LOGGER = Logger.getLogger(OnStartupConfigurationApplicator.class.getName());
 

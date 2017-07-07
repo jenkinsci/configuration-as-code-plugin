@@ -85,6 +85,12 @@
       <artifactId>auto-service</artifactId>
       <version>1.0-rc3</version>
     </dependency>
+    <!-- Have to be removed when we move credentials configuration to corresponding plugin -->
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>credentials</artifactId>
+      <version>2.1.14</version>
+    </dependency>
   </dependencies>
 
 </project>
