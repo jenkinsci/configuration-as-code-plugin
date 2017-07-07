@@ -1,0 +1,6 @@
+{% if page.organization and page.repo and page.github-issues %}
+
+<a class="github-link" href="
+https://github.com/{{page.organization}}/{{page.repo}}/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+"  target="_blank">GitHub issues</a>
+
+{% endif %}
