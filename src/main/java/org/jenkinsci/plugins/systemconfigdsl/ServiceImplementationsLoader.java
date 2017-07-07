@@ -25,8 +25,8 @@ public class ServiceImplementationsLoader {
         while (configuratorIterator.hasNext()) {
             Configurator configurator = configuratorIterator.next();
             this.configurators.put(configurator.getConfigFileSectionName(), configurator);
-            LOGGER.info("Registered configurator implementation: " + configurator.getConfigFileSectionName());
         }
+        LOGGER.info("Registered the following configurator implementations: " + this.configurators.keySet().toString());
     }
 
     public void reloadConfigurators() {

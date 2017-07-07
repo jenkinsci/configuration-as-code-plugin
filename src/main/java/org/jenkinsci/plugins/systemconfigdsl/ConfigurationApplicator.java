@@ -11,7 +11,18 @@ public class ConfigurationApplicator {
 
     public ConfigurationApplicator() {}
 
-    public void applyConfiguration(List<Object> configuration, Map<String, Configurator> configurators, boolean dryRun) {
+    public void applyConfiguration(List<Object> configurations, Map<String, Configurator> configurators, boolean dryRun) {
+        for (Object configuration: configurations) {
+            for (Object section: ((Map) configuration).keySet()) {
+                if (configurators.containsKey(section)) {
+                    configurators.get(section).configure(configuration, dryRun);
+                } else {
+                    // Would it be better to throw exeception in here?
+                    // TODO: add printout to UI when calling dryRun from UI
+                    LOGGER.warning("No configurator found that could handle section " + section.toString() + ". Skip it");
+                }
+            }
+        }
 
     }
 }
