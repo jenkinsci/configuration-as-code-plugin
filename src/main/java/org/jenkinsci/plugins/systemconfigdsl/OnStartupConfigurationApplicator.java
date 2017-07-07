@@ -12,12 +12,12 @@ import java.util.logging.Logger;
 import static hudson.init.InitMilestone.EXTENSIONS_AUGMENTED;
 import static hudson.init.InitMilestone.JOB_LOADED;
 
-public class OnStrartupConfiurationApplicator {
-    private static final Logger LOGGER = Logger.getLogger(OnStrartupConfiurationApplicator.class.getName());
+public class OnStartupConfigurationApplicator {
+    private static final Logger LOGGER = Logger.getLogger(OnStartupConfigurationApplicator.class.getName());
 
     @Initializer(after=EXTENSIONS_AUGMENTED,before=JOB_LOADED)
     public static void init(Jenkins j) throws IOException {
-        new OnStrartupConfiurationApplicator().apply();
+        new OnStartupConfigurationApplicator().apply();
     }
 
     public void apply() throws IOException {
