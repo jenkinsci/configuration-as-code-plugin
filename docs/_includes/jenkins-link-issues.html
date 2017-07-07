@@ -1,0 +1,10 @@
+{% if page.jenkins-component %}
+
+{% assign jenkins-jira = page.jenkins-component %}
+{% if page.jenkins-jira %}
+  {% assign jenkins-jira = page.jenkins-jira %}
+{% endif %}
+
+<a class="jenkins-link" href="https://issues.jenkins-ci.org/issues/?jql=project%20%3D%20JENKINS%20AND%20status%20in%20(Open%2C%20%22In%20Progress%22%2C%20Reopened)%20AND%20component%20%3D%20%27{{ jenkins-jira }}%27" target="_blank">Open issues on Jenkins Community</a>
+
+{% endif %}

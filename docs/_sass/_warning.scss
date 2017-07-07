@@ -1,0 +1,27 @@
+
+.warning {
+    display: block;
+    background-color: #f3d21e;
+    font-size: $font-family-base;
+    padding: 5px;
+    margin-left: 55px;
+    margin-right: 55px;
+    font-family: $font-family-header;
+}
+
+  .warning:before {
+    content: "";
+    background-image: url("../images/warning.svg");*
+    background-size: 40px 40px;
+    background-repeat: no-repeat;
+    background-size: contain;
+    display: block;
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    /*padding: 10px;*/
+    /*margin-left: 0px;*/
+    margin-left: -50px;
+    /*margin-bottom: -1px;*/
+    /*margin-top: 0px;*/
+  }
