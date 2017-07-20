@@ -65,15 +65,11 @@ public class CredentialsConfigurator extends Configurator {
         }
     }
 
-    // TODO: possibly a method of the main class, i.e. it will be the same for all implementations
-    // just need to find a way to resolve pluginName correctly
     @Override
     public boolean isConfigurationValid(final String config) {
         boolean status = true;
-        final Validator validator = new Validator("schema/" + this.pluginName + ".json");
-        try {
-            validator.validate(config);
-        } catch (ValidationException e) {
+        if (! super.isSchemaValid(config, this.getConfigFileSectionName())) {
+            LOGGER.warning("Provided configuration doesn't match schema");
             status = false;
         }
         return status;
