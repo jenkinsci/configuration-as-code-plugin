@@ -1,0 +1,89 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "javaType": "org.jenkinsci.plugins.systemconfigdsl.impl.jenkins.generated.JenkinsConfig",
+  "javaInterfaces" : ["org.jenkinsci.plugins.systemconfigdsl.api.ConfigurationDescription"],
+  "properties": {
+    "numExecutorsOnMaster": {
+      "type": "integer"
+    },
+    "scmQuietPeriod": {
+      "type": "integer"
+    },
+    "scmCheckoutRetryCount": {
+      "type": "integer"
+    },
+    "jenkinsRootUrl": {
+      "type": "string"
+    },
+    "jenkinsAdminEmail": {
+      "type": "string"
+    },
+    "variables": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "javaType": "org.jenkinsci.plugins.systemconfigdsl.impl.jenkins.generated.EnvVariable",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "value"
+        ]
+      }
+    },
+    "smtp": {
+      "type": "object",
+      "javaType": "org.jenkinsci.plugins.systemconfigdsl.impl.jenkins.generated.SmtpConfig",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "host": {
+          "type": "string"
+        },
+        "port": {
+          "type": "integer"
+        },
+        "reply_to_address": {
+          "type": "string"
+        },
+        "authentication": {
+          "type": "object",
+          "javaType": "org.jenkinsci.plugins.systemconfigdsl.impl.jenkins.generated.SmtpAuthConfig",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "login": {
+              "type": "string"
+            },
+            "passwordFile": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "enabled"
+          ]
+        },
+        "additionalProperties": false,
+        "required": [
+          "enabled"
+        ]
+      },
+      "additionalProperties": false,
+      "required": [
+        "enabled"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

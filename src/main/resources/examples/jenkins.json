@@ -1,0 +1,52 @@
+{
+  "numExecutorsOnMaster": 0,
+  "scmQuietPeriod": 3,
+  "scmCheckoutRetryCount": 3,
+  "jenkinsRootUrl": "",
+  "jenkinsAdminEmail": "Jenkins <no-reply@yourcompany.com>",
+  "variables": [
+    {
+      "name": "default_credentials",
+      "value": "jenkins"
+    },
+    {
+      "name": "default_repo",
+      "value": "git@github.com:Praqma/JenkinsAsCodeReference.git"
+    },
+    {
+      "name": "default_branch",
+      "value": "master"
+    },
+    {
+      "name": "default_registry_url",
+      "value": "localhost:5000"
+    },
+    {
+      "name": "default_registry_credId",
+      "value": "jenkins"
+    },
+    {
+      "name": "utility_slave",
+      "value": "utility-slave"
+    },
+    {
+      "name": "master_image_name",
+      "value": ""
+    },
+    {
+      "name": "slave_image_name",
+      "value": ""
+    }
+  ],
+  "smtp": {
+    "enabled": false,
+    "host": "1.1.1.1",
+    "port": 25,
+    "reply_to_address": "no-reply@yourcompany.com",
+    "authentication": {
+      "enabled": true,
+      "login": "jenkins",
+      "passwordFile": "/var/jenkins_home/.ssh/.smtp_password"
+    }
+  }
+}
