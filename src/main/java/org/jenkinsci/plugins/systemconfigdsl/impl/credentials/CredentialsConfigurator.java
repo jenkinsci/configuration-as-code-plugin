@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.systemconfigdsl.impl;
+package org.jenkinsci.plugins.systemconfigdsl.impl.credentials;
 
 import com.cloudbees.plugins.credentials.*;
 import com.cloudbees.plugins.credentials.domains.Domain;
@@ -7,79 +7,80 @@ import com.google.auto.service.AutoService;
 import hudson.ExtensionList;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.systemconfigdsl.Utils;
+import org.jenkinsci.plugins.systemconfigdsl.Validator;
 import org.jenkinsci.plugins.systemconfigdsl.api.Configurator;
+import org.jenkinsci.plugins.systemconfigdsl.error.ValidationException;
+import org.jenkinsci.plugins.systemconfigdsl.impl.credentials.generated.UsernamePasswordCrendetials;
+import org.jenkinsci.plugins.systemconfigdsl.impl.credentials.generated.UsernamePasswordCrendetialsConfig;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 @AutoService(Configurator.class)
 public class CredentialsConfigurator extends Configurator {
 
     private static final Logger LOGGER = Logger.getLogger(CredentialsConfigurator.class.getName());
+    private final String pluginName = "credentials";
 
     @Override
     public String getConfigFileSectionName() {
-        return "credentials";
+        return this.pluginName;
     }
 
     @Override
-    public void configure(Object config, boolean dryRun) {
+    public void configure(final String config, boolean dryRun) {
         LOGGER.info("Configuring credentials: " + config.toString());
-        if (! Utils.isPluginInstalled("credentials")) {
+        // We don't need this check when classes moved to credentials plugin
+        if (! Utils.isPluginInstalled(this.pluginName)) {
             LOGGER.warning("credentials plugins is not installed. can't configure what you asked me to");
             return;
         }
-        if (! isConfigurationValid(config)) {
+        /*if (! isConfigurationValid(config)) {
             LOGGER.warning("Provided configuration isn't valid. can't configure what you asked me to");
             return;
-        }
+        }*/
         if (dryRun == true) {
             LOGGER.info("DryRun: Only print what you will change");
             // TODO: add printout to UI
         } else {
-            for (Object cred: (List) config) {
+            final UsernamePasswordCrendetialsConfig configObject = (UsernamePasswordCrendetialsConfig) super.parseConfiguration(config, UsernamePasswordCrendetialsConfig.class);
+            for (UsernamePasswordCrendetials cred: configObject.getCredentials()) {
                 SystemCredentialsProvider.ProviderImpl system = ExtensionList.lookup(CredentialsProvider.class).get(
                         SystemCredentialsProvider.ProviderImpl.class);
                 CredentialsStore systemStore = system.getStore(Jenkins.getInstance());
 
                 List<Credentials> credentialsList = new ArrayList<Credentials>(systemStore.getCredentials(Domain.global()));
                 // TODO: check that credentials already exists and then only modify them
-                UsernamePasswordCredentialsImpl creds = null;
+                UsernamePasswordCredentialsImpl upc = null;
                 try {
-                    creds = new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL,
-                            Utils.getAsStringOrDie("credentialsId", cred),
-                            Utils.getAsString("description", cred, ""),
-                            Utils.getAsStringOrDie("userId", cred),
-                            new String((Files.readAllBytes(Paths.get(Utils.getAsStringOrDie("path", cred))))).trim());
-                    systemStore.addCredentials(Domain.global(), creds);
+                    // TODO: handle credentials scope
+                    upc = new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL,
+                            cred.getCredentialsId(),
+                            cred.getDescription(),
+                            cred.getCredentialsId(),
+                            new String((Files.readAllBytes(Paths.get(cred.getPath())))).trim());
+                    systemStore.addCredentials(Domain.global(), upc);
                 } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (NoSuchFieldException e) {
                     e.printStackTrace();
                 }
             }
         }
     }
 
+    // TODO: possibly a method of the main class, i.e. it will be the same for all implementations
+    // just need to find a way to resolve pluginName correctly
     @Override
-    public boolean isConfigurationValid(Object config) {
+    public boolean isConfigurationValid(final String config) {
         boolean status = true;
-        UsernamePasswordCredentialsStructure structure = new UsernamePasswordCredentialsStructure();
-        // TODO: get a warnign about non-used fileds from configuration
-        for (Object cred: (List) config) {
-            for(Field field : structure.getClass().getFields()){
-                if(! ((Map) cred).containsKey(field.getName())){
-                    LOGGER.info("Provided configuration isn't valid. Filed " + field.getName() + ". Provided config: " + cred.toString());
-                    status = false;
-                    continue;
-                }
-            }
+        final Validator validator = new Validator("schema/" + this.pluginName + ".json");
+        try {
+            validator.validate(config);
+        } catch (ValidationException e) {
+            status = false;
         }
         return status;
     }

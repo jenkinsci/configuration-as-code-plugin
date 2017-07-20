@@ -2,7 +2,6 @@ package org.jenkinsci.plugins.systemconfigdsl;
 
 import org.jenkinsci.plugins.systemconfigdsl.api.Configurator;
 
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -11,18 +10,15 @@ public class ConfigurationApplicator {
 
     public ConfigurationApplicator() {}
 
-    public void applyConfiguration(List<Object> configurations, Map<String, Configurator> configurators, boolean dryRun) {
-        for (Object configuration: configurations) {
-            for (Object section: ((Map) configuration).keySet()) {
-                if (configurators.containsKey(section)) {
-                    configurators.get(section).configure(((Map) configuration).get(section), dryRun);
-                } else {
-                    // Would it be better to throw exeception in here?
-                    // TODO: add printout to UI when calling dryRun from UI
-                    LOGGER.warning("No configurator found that could handle section " + section.toString() + ". Skip it");
-                }
+    public void applyConfiguration(final Map<String, String> configurations, final Map<String, Configurator> configurators, final boolean dryRun) {
+        for (String configurationName: configurations.keySet()) {
+            if (configurators.containsKey(configurationName)) {
+                configurators.get(configurationName).configure(configurations.get(configurationName), dryRun);
+            } else {
+                // Would it be better to throw exeception in here?
+                // TODO: add printout to UI when calling dryRun from UI
+                LOGGER.warning("No configurator found that could handle section " + configurationName + ". Skip it");
             }
         }
-
     }
 }

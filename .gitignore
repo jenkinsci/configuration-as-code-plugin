@@ -2,3 +2,4 @@
 *.iml
 work
 target
+generated/

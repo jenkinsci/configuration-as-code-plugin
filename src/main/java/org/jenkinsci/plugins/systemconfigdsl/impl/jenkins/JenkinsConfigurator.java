@@ -1,7 +1,6 @@
-package org.jenkinsci.plugins.systemconfigdsl.impl;
+package org.jenkinsci.plugins.systemconfigdsl.impl.jenkins;
 
 import com.google.auto.service.AutoService;
-import hudson.util.DescribableList;
 import org.jenkinsci.plugins.systemconfigdsl.api.Configurator;
 
 import java.io.IOException;
@@ -11,6 +10,8 @@ import jenkins.model.*;
 import java.util.logging.Logger;
 import java.net.InetAddress;
 import hudson.slaves.EnvironmentVariablesNodeProperty;
+import org.jenkinsci.plugins.systemconfigdsl.impl.jenkins.generated.EnvVariable;
+import org.jenkinsci.plugins.systemconfigdsl.impl.jenkins.generated.JenkinsConfig;
 
 /**
  * Created by ewelinawilkosz on 07/07/2017.
@@ -27,10 +28,10 @@ public class JenkinsConfigurator extends Configurator {
     }
 
     @Override
-    public void configure(Object config, boolean dryRun) {
-        LOGGER.info("Configuring jenkins: " + config.toString());
-        Map map = (Map)config;
+    public void configure(final String config, boolean dryRun) {
+        LOGGER.info("Configuring jenkins: " + config);
         JenkinsLocationConfiguration jlc = JenkinsLocationConfiguration.get();
+        JenkinsConfig jenkinsConfig = (JenkinsConfig) super.parseConfiguration(config, JenkinsConfig.class);
 
         if (dryRun == true) {
             LOGGER.info("DryRun: Only print what you will change");
@@ -38,42 +39,38 @@ public class JenkinsConfigurator extends Configurator {
             LOGGER.info("Applying configuration...");
 
             try {
-                LOGGER.info("--> set number of executors on master to " + map.get("numExecutorsOnMaster"));
-                Jenkins.getInstance().setNumExecutors(Integer.parseInt(map.get("numExecutorsOnMaster").toString()));
+                LOGGER.info("--> set number of executors on master to " + jenkinsConfig.getNumExecutorsOnMaster().toString());
+                Jenkins.getInstance().setNumExecutors(jenkinsConfig.getNumExecutorsOnMaster());
 
-                LOGGER.info("--> set quite period to  " + map.get("scmQuietPeriod"));
-                Jenkins.getInstance().setQuietPeriod(Integer.parseInt(map.get("scmQuietPeriod").toString()));
+                LOGGER.info("--> set quite period to  " + jenkinsConfig.getScmQuietPeriod().toString());
+                Jenkins.getInstance().setQuietPeriod(jenkinsConfig.getScmQuietPeriod());
 
-                LOGGER.info("--> set checkout retry to  " + map.get("scmCheckoutRetryCount"));
-                Jenkins.getInstance().setScmCheckoutRetryCount(Integer.parseInt(map.get("scmCheckoutRetryCount").toString()));
+                LOGGER.info("--> set checkout retry to  " + jenkinsConfig.getScmCheckoutRetryCount().toString());
+                Jenkins.getInstance().setScmCheckoutRetryCount(jenkinsConfig.getScmCheckoutRetryCount());
 
 
                 // Set Admin Email as a string "Name <email>"
-                if (map.get("jenkinsAdminEmail").toString().length() > 0) {
-                    LOGGER.info("--> set admin e-mail address to  " + map.get("jenkinsAdminEmail"));
-                    jlc.setAdminAddress(map.get("jenkinsAdminEmail").toString());
+                if (jenkinsConfig.getJenkinsAdminEmail() != "") {
+                    LOGGER.info("--> set admin e-mail address to  " + jenkinsConfig.getJenkinsAdminEmail());
+                    jlc.setAdminAddress(jenkinsConfig.getJenkinsAdminEmail());
                     jlc.save();
                 }
 
                 // Change it to the DNS name if you have it
-                if (map.get("jenkinsRootUrl").toString().length() > 0) {
-                    LOGGER.info("--> set jenkins root url to ${properties.global.jenkinsRootUrl}");
-                    jlc.setUrl(map.get("jenkinsRootUrl").toString());
+                if (jenkinsConfig.getJenkinsRootUrl() != "") {
+                    LOGGER.info("--> set jenkins root url to " + jenkinsConfig.getJenkinsRootUrl());
+                    jlc.setUrl(jenkinsConfig.getJenkinsRootUrl());
                 } else {
                     String ip = InetAddress.getLocalHost().getHostAddress();
-                    LOGGER.info("--> set jenkins root url to " + ip);
+                    LOGGER.info("--> set jenkins root url to http://" + ip + ":8080");
                     jlc.setUrl("http://" + ip + ":8080");
                 }
                 jlc.save();
 
-                LOGGER.info("--> set global env variables  " + map.get("variables"));
-                Map variables = (Map) map.get("variables");
-                Iterator it = variables.entrySet().iterator();
-                while (it.hasNext()) {
-                    Map.Entry variable = (Map.Entry)it.next();
-                    addGlobalEnvVariable(variable.getKey(), variable.getValue());
+                LOGGER.info("--> set global env variables");
+                for (EnvVariable variable: jenkinsConfig.getVariables()) {
+                    addGlobalEnvVariable(variable.getName(), variable.getValue());
                 }
-
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -82,11 +79,11 @@ public class JenkinsConfigurator extends Configurator {
     }
 
     @Override
-    public boolean isConfigurationValid(Object config) {
+    public boolean isConfigurationValid(final String config) {
         return true;
     }
 
-    private void addGlobalEnvVariable(Object key, Object value) {
+    private void addGlobalEnvVariable(final String key, final String value) {
         Jenkins instance = Jenkins.getInstance();
         LOGGER.info("--> envVarsNodePropertyList " + instance.getGlobalNodeProperties().getAll(EnvironmentVariablesNodeProperty.class));
         if ( instance.getGlobalNodeProperties().getAll(EnvironmentVariablesNodeProperty.class).isEmpty()) {

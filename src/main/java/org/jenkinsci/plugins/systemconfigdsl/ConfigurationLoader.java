@@ -1,15 +1,12 @@
 package org.jenkinsci.plugins.systemconfigdsl;
 
-import com.esotericsoftware.yamlbeans.YamlException;
-import com.esotericsoftware.yamlbeans.YamlReader;
 import jenkins.model.Jenkins;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FilenameFilter;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 public class ConfigurationLoader {
@@ -28,21 +25,15 @@ public class ConfigurationLoader {
         return configurationDir;
     }
 
-    public List<Object> loadConfiguration() throws YamlException, FileNotFoundException {
+    public Map<String, String> loadConfiguration() throws IOException {
         LOGGER.info("Loading configuration from " + configurationDir.getAbsolutePath());
-        final List<Object> configuration = new ArrayList<>();
+        final HashMap<String, String> configurations = new HashMap<>();
 
-        File[] files = this.configurationDir.listFiles(new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                return name.endsWith(".yml");
-            }
-        });
-
-        for (File file : files) {
-            YamlReader reader = new YamlReader(new FileReader(file));
-            configuration.add(reader.read());
-            LOGGER.info("Found and parsed configuration file " + file.getAbsolutePath());
+        for (File file : this.configurationDir.listFiles((dir, name) -> name.endsWith(".json"))) {
+            configurations.put(file.getName().replace(".json", ""), new String(Files.readAllBytes(file.toPath())));
+            LOGGER.info("Found and parsed configuration file: " + file.getAbsolutePath());
+            LOGGER.info("Content: " + configurations.get(file.getName().replace(".json", "")));
         }
-        return configuration;
+        return configurations;
     }
 }
