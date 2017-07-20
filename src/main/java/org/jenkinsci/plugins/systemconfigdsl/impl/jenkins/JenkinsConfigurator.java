@@ -1,17 +1,16 @@
 package org.jenkinsci.plugins.systemconfigdsl.impl.jenkins;
 
 import com.google.auto.service.AutoService;
-import org.jenkinsci.plugins.systemconfigdsl.api.Configurator;
-
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.Map;
-import jenkins.model.*;
-import java.util.logging.Logger;
-import java.net.InetAddress;
 import hudson.slaves.EnvironmentVariablesNodeProperty;
+import jenkins.model.Jenkins;
+import jenkins.model.JenkinsLocationConfiguration;
+import org.jenkinsci.plugins.systemconfigdsl.api.Configurator;
 import org.jenkinsci.plugins.systemconfigdsl.impl.jenkins.generated.EnvVariable;
 import org.jenkinsci.plugins.systemconfigdsl.impl.jenkins.generated.JenkinsConfig;
+
+import java.io.IOException;
+import java.net.InetAddress;
+import java.util.logging.Logger;
 
 /**
  * Created by ewelinawilkosz on 07/07/2017.

@@ -5,7 +5,6 @@ import com.github.fge.jackson.JsonLoader;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
-import com.google.gson.JsonObject;
 import org.jenkinsci.plugins.systemconfigdsl.error.ValidationException;
 
 import java.util.logging.Logger;

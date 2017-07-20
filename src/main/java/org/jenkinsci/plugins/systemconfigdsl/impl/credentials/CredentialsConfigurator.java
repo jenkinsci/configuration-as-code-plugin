@@ -6,7 +6,6 @@ import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 import com.google.auto.service.AutoService;
 import hudson.ExtensionList;
 import jenkins.model.Jenkins;
-import org.jenkinsci.plugins.systemconfigdsl.Utils;
 import org.jenkinsci.plugins.systemconfigdsl.Validator;
 import org.jenkinsci.plugins.systemconfigdsl.api.Configurator;
 import org.jenkinsci.plugins.systemconfigdsl.error.ValidationException;
@@ -34,11 +33,6 @@ public class CredentialsConfigurator extends Configurator {
     @Override
     public void configure(final String config, boolean dryRun) {
         LOGGER.info("Configuring credentials: " + config.toString());
-        // We don't need this check when classes moved to credentials plugin
-        if (! Utils.isPluginInstalled(this.pluginName)) {
-            LOGGER.warning("credentials plugins is not installed. can't configure what you asked me to");
-            return;
-        }
         /*if (! isConfigurationValid(config)) {
             LOGGER.warning("Provided configuration isn't valid. can't configure what you asked me to");
             return;
