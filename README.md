@@ -3,7 +3,9 @@ This plugin helps configuration management tools like Chef/Puppet to deploy Jenk
 by allowing you to describe Jenkins configuration through human-writable configuration files.
 
 You place these configuration files as `$JENKINS_HOME/conf/*.json`, or alternatively
-you specify a directory that contains `*.json` through the `JENKINS_CONF` environment variable.
+you specify a directory that contains `*.json` through the `JENKINS_CONF` environment variable or jenkinsConf
+system property. If you have both env variable and system property set then plugin will read system property first,
+then read env variable (override system property). If nothing is set plugin defaults to `$JENKINS_HOME/conf/`
 
 Take a look on example configuation files under src/main/resources/examples
 

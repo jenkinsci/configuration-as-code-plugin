@@ -3,6 +3,7 @@ package org.jenkinsci.plugins.systemconfigdsl;
 import hudson.init.Initializer;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.systemconfigdsl.api.Configurator;
+import org.jenkinsci.plugins.systemconfigdsl.error.ConfigurationNotFoundException;
 
 import java.io.IOException;
 import java.util.Map;
@@ -21,7 +22,14 @@ public class OnStartupConfigurationApplicator {
     }
 
     public void apply() throws IOException {
-        final ConfigurationLoader configurationLoader = new ConfigurationLoader();
+
+        final ConfigurationLoader configurationLoader;
+        try {
+            configurationLoader = new ConfigurationLoader();
+        } catch (ConfigurationNotFoundException e) {
+            LOGGER.warning("Can't load configuration due to: " + e.getMessage() + ". Will not continue with configuration as code");
+            return;
+        }
 
         LOGGER.info("Applying configuration from " + configurationLoader.getConfigurationDir().getAbsolutePath());
 
