@@ -39,6 +39,9 @@
         ]
       }
     },
+    "systemMessage": {
+      "type": "string"
+    },
     "smtp": {
       "type": "object",
       "javaType": "org.jenkinsci.plugins.systemconfigdsl.impl.jenkins.generated.SmtpConfig",
