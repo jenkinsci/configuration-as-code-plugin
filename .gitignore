@@ -3,3 +3,4 @@
 work
 target
 generated/
+**/*.generated
