@@ -1,0 +1,29 @@
+.jenkins-link, .github-link, java-link{
+  display: block;
+  font-size: $font-family-base;
+  font-family: $font-family-header;
+}
+
+.jenkins-link:before{
+  content: '';
+  background: transparent url(/images/jenkins.png) 0 0 no-repeat;
+  background-size: 70%;
+  background-position: center;
+  padding-left: 17px;
+}
+
+.github-link:before{
+  content: '';
+  background: transparent url(/images/github.png) 0 0 no-repeat;
+  background-size: 70%;
+  background-position: center;
+  padding-left: 17px;
+}
+
+.java-link:before{
+  content: '';
+  background: transparent url(/images/java.png) 0 0 no-repeat;
+  background-size: 70%;
+  background-position: center;
+  padding-left: 17px;
+}

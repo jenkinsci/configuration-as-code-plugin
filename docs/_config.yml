@@ -1,0 +1,13 @@
+# Site settings
+title: system-config-dsl-plugin
+tag_text: system-config-dsl-plugin
+description: This plugin helps configuration management tools like Chef/Puppet to deploy Jenkins by allowing you to describe Jenkins configuration through human-writable configuration files.
+css-path: /css/praqmacode.css
+
+# Build settings
+permalink: /:categories/:title/
+markdown: kramdown
+highlighter: rouge
+exclude: ["README.md"]
+sass:
+  style: compressed

@@ -1,0 +1,31 @@
+// fonts
+@import url(//fonts.googleapis.com/css?family=Inconsolata:400,700|Montserrat:700);
+
+@import
+url(//fonts.googleapis.com/css?family=Oswald:300,400,700|Noto+Serif:400,700,400italic,700italic);
+
+$font-family-base: "Noto Serif", serif, Helvetica, sans-serif;
+$font-family-header: Oswald, sans-serif;
+$font-family-monospace: "Inconsolata", monospace;
+$font-size-header: 20px;
+$font-size-base: 20px;
+
+$font-letter-spacing: 0.05em;
+$transition-time: 0.2s;
+
+// colors
+
+$color-orange: #FF9900;
+$color-black: #000;
+$color-white: #fff;
+$color-gray: #e5e4e2;
+$color-gray-text: #959492;
+
+
+
+$grid-columns: 60;
+$thumbnail-border: transparent;
+$thumbnail-padding: 0;
+
+$link-color:            $color-orange;
+$link-hover-color:      darken($link-color, 15%);
