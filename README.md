@@ -13,7 +13,7 @@ Take a look on example configuation files under src/main/resources/examples
 When it is all done, and we have a name and release automation for the plugin - Add <final plugin name> as dependency to your project <Maven coordinates>
 For now - you can add your implementation to this plugin source code base to test it
 
-* In order to implement support for your plugin you need to do two things - define JSON schema to describe confuguration file and extend anstract Configurator class
+* In order to implement support for your plugin you need to do two things - define JSON schema to describe confuguration file and extend abstract Configurator class
 
 ### JSON schema.
 Used to validate configuration file before we process it. Also, you can use [jsonschema2pojo](http://www.jsonschema2pojo.org/) to generate classes from schema and then use them to deserialise configuration files.
@@ -87,7 +87,7 @@ Example configuration file that corresponds to schema above
 ```
 
 ### Extending abstract Configurtor class.
-When extending org.jenkinsci.plugins.systemconfigdsl.api.Configurator annotet your class wiht `@AutoService` annotation. We are relying on [ServiceLoader](https://docs.oracle.com/javase/6/docs/api/java/util/ServiceLoader.html) to discover all implementations supplied by the plugins. `@AutoService` annotation provided by the following dependency.
+When extending org.jenkinsci.plugins.systemconfigdsl.api.Configurator annotate your class wiht `@AutoService` annotation. We are relying on [ServiceLoader](https://docs.oracle.com/javase/6/docs/api/java/util/ServiceLoader.html) to discover all implementations supplied by the plugins. `@AutoService` annotation provided by the following dependency.
 
 ```
     <dependency>
@@ -100,9 +100,9 @@ When extending org.jenkinsci.plugins.systemconfigdsl.api.Configurator annotet yo
 We are using naming convention to match configurators and configurations. Name of the json file containing configuration and schema file should be the same as the string returned by the getConfigFileSectionName method. Recomendation is to use your plugin short name (plugin id)
 
 When implementing configure method consider the following:
-* There are two primary scenarios for configuration. One is phoenix server when configuration applied only once on startup. When configuration needed then installation is recreated from scratch. Think deploying in Docker containers. The second scenario is when you do hot reload of configation, i.e. reconfiguring already existing server which is already configured. In the first case you just apply configuration. In the second you have to check if something already exists and then reconfigure existing objects. For instance, is a bad idea to just create one more Artifactory server object and add it to the list of Artifactory servers since it will be one there already. And it could be so that it will have the same configuration.
-* Consider implementing possibility to do a dry run. In this case we do not appy configuration but only print what will happen if we would apply it
-* Since Configurator implementation distributed together with the plugin we don't need to support multiple versions of the plugin at the same time. However it is still a good idea to keep backward compatibility for schema and configuration files, i.e. if some field isn't used anylonger then do not remove it from schema straight away - print warning message that it is depricated and will be soon removed. In this way you will give a chance to people to adjust their configuration without breaking things. Also, update migration guide in your plugin documentation. Do not have one? Time to add it.
+* There are two primary scenarios for configuration. One is phoenix server when configuration applied only once on startup. When configuration needed then installation is recreated from scratch. Think deploying in Docker containers. The second scenario is when you do hot reload of configation, i.e. reconfiguring already existing server which is already configured. In the first case you just apply configuration. In the second you have to check if something already exists and then reconfigure existing objects. For instance, it is a bad idea to just create one more Artifactory server object and add it to the list of Artifactory servers since it will be one there already. And it could be so that it will have the same configuration.
+* Consider implementing possibility to do a dry run. In this case we do not apply configuration but only print what will happen if we would apply it
+* Since Configurator implementation is distributed together with the plugins we don't need to support multiple versions of the plugin at the same time. However it is still a good idea to keep backward compatibility for schema and configuration files, i.e. if some field isn't used anylonger then do not remove it from schema straight away - print warning message that it is depricated and will be soon removed. In this way you will give a chance to people to adjust their configuration without breaking things. Also, update migration guide in your plugin documentation. Do not have one? Time to add it.
 
 # See also
 
