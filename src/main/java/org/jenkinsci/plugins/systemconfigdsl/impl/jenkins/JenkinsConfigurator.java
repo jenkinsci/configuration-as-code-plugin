@@ -79,7 +79,12 @@ public class JenkinsConfigurator extends Configurator {
 
     @Override
     public boolean isConfigurationValid(final String config) {
-        return true;
+        boolean status = true;
+        if (! super.isSchemaValid(config, this.getConfigFileSectionName())) {
+            LOGGER.warning("Provided configuration doesn't match schema");
+            status = false;
+        }
+        return status;
     }
 
     private void addGlobalEnvVariable(final String key, final String value) {
