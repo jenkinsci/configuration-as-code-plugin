@@ -38,15 +38,18 @@ public class JenkinsConfigurator extends Configurator {
             LOGGER.info("Applying configuration...");
 
             try {
-                LOGGER.info("--> set number of executors on master to " + jenkinsConfig.getNumExecutorsOnMaster().toString());
-                Jenkins.getInstance().setNumExecutors(jenkinsConfig.getNumExecutorsOnMaster());
-
-                LOGGER.info("--> set quite period to  " + jenkinsConfig.getScmQuietPeriod().toString());
-                Jenkins.getInstance().setQuietPeriod(jenkinsConfig.getScmQuietPeriod());
-
-                LOGGER.info("--> set checkout retry to  " + jenkinsConfig.getScmCheckoutRetryCount().toString());
-                Jenkins.getInstance().setScmCheckoutRetryCount(jenkinsConfig.getScmCheckoutRetryCount());
-
+                if (jenkinsConfig.getNumExecutorsOnMaster() != 0) {
+                    LOGGER.info("--> set number of executors on master to " + jenkinsConfig.getNumExecutorsOnMaster().toString());
+                    Jenkins.getInstance().setNumExecutors(jenkinsConfig.getNumExecutorsOnMaster());
+                }
+                if (jenkinsConfig.getScmQuietPeriod() != 0) {
+                    LOGGER.info("--> set quite period to  " + jenkinsConfig.getScmQuietPeriod().toString());
+                    Jenkins.getInstance().setQuietPeriod(jenkinsConfig.getScmQuietPeriod());
+                }
+                if (jenkinsConfig.getScmCheckoutRetryCount() != 0) {
+                    LOGGER.info("--> set checkout retry to  " + jenkinsConfig.getScmCheckoutRetryCount().toString());
+                    Jenkins.getInstance().setScmCheckoutRetryCount(jenkinsConfig.getScmCheckoutRetryCount());
+                }
 
                 // Set Admin Email as a string "Name <email>"
                 if (jenkinsConfig.getJenkinsAdminEmail() != "") {
@@ -70,6 +73,10 @@ public class JenkinsConfigurator extends Configurator {
                 for (EnvVariable variable: jenkinsConfig.getVariables()) {
                     addGlobalEnvVariable(variable.getName(), variable.getValue());
                 }
+                if (jenkinsConfig.getSystemMessage() != "") {
+                    LOGGER.info("--> set system message");
+                    Jenkins.getInstance().setSystemMessage(jenkinsConfig.getSystemMessage());
+                }
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -79,7 +86,12 @@ public class JenkinsConfigurator extends Configurator {
 
     @Override
     public boolean isConfigurationValid(final String config) {
-        return true;
+        boolean status = true;
+        if (! super.isSchemaValid(config, this.getConfigFileSectionName())) {
+            LOGGER.warning("Provided configuration doesn't match schema");
+            status = false;
+        }
+        return status;
     }
 
     private void addGlobalEnvVariable(final String key, final String value) {
