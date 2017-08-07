@@ -1,5 +1,6 @@
 .idea
 *.iml
+*.jar
 work
 target
 generated/

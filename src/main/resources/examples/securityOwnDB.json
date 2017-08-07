@@ -1,0 +1,12 @@
+{
+  "users" : [
+    {
+      "userId" : "user1",
+      "path"   : "/Users/alexandrasedova/praqma_projects/system-config-dsl-plugin/work/conf/user1pwd"
+    },
+    {
+      "userId" : "user2",
+      "path"   : "/Users/alexandrasedova/praqma_projects/system-config-dsl-plugin/work/conf/user2pwd"
+    }
+  ]
+}
