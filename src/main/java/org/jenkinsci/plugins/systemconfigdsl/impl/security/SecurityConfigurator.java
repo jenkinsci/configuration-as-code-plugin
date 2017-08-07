@@ -50,17 +50,6 @@ public class SecurityConfigurator extends Configurator{
                     e.printStackTrace();
                 }
             }
-            try {
-                Jenkins.getInstance().setSecurityRealm(realm);
-                // TODO: A ?hack? to prevent unsecure authorization. By setting security realm, all security settings
-                // turning off, by default it sets anyone can do anything. Is it a bug?? Need to investigate!
-                // Also it sets Allowing Jenkins CLI to work and master security subsystem is off.
-                Jenkins.getInstance().setAuthorizationStrategy(new FullControlOnceLoggedInAuthorizationStrategy());
-                Jenkins.getInstance().save();
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
             LOGGER.info("Applying configuration...");
         }
 
