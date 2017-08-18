@@ -1,6 +1,6 @@
 # Site settings
-title: system-config-dsl-plugin
-tag_text: system-config-dsl-plugin
+title: jenkins-coco-plugin
+tag_text: jenkins-coco-plugin
 description: This plugin helps configuration management tools like Chef/Puppet to deploy Jenkins by allowing you to describe Jenkins configuration through human-writable configuration files.
 css-path: /css/praqmacode.css
 
