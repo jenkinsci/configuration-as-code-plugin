@@ -2,11 +2,11 @@
   "users" : [
     {
       "userId" : "user1",
-      "path"   : "/Users/alexandrasedova/praqma_projects/system-config-dsl-plugin/work/conf/user1pwd"
+      "path"   : "/Users/alexandrasedova/praqma_projects/jenkins-coco-plugin/work/conf/user1pwd"
     },
     {
       "userId" : "user2",
-      "path"   : "/Users/alexandrasedova/praqma_projects/system-config-dsl-plugin/work/conf/user2pwd"
+      "path"   : "/Users/alexandrasedova/praqma_projects/jenkins-coco-plugin/work/conf/user2pwd"
     }
   ]
 }

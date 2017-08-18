@@ -1,7 +1,7 @@
 ---
-layout:            system-config-dsl-plugin
+layout:            jenkins-coco-plugin
 organization:      Praqma
-repo:              system-config-dsl-plugin
+repo:              jenkins-coco-plugin
 github-issues:     true
 javadoc:           false
 ---
