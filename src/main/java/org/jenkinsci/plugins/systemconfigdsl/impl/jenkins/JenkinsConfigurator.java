@@ -10,6 +10,9 @@ import org.jenkinsci.plugins.systemconfigdsl.impl.jenkins.generated.JenkinsConfi
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.Logger;
 
 /**
@@ -75,7 +78,13 @@ public class JenkinsConfigurator extends Configurator {
                 }
                 if (jenkinsConfig.getSystemMessage() != "") {
                     LOGGER.info("--> set system message");
-                    Jenkins.getInstance().setSystemMessage(jenkinsConfig.getSystemMessage());
+//                    Jenkins.getInstance().setSystemMessage(jenkinsConfig.getSystemMessage());
+//                } else {
+                    DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                    Date date = new Date();
+                    Jenkins.getInstance().setSystemMessage("This Jenkins instance generated from code.\n\n" +
+                        "Avoid any manual changes since they will be discarded with next deployment.\n " +
+                        "Deployment date: " + dateFormat.format(date) + "\n\n");
                 }
 
             } catch (IOException e) {
