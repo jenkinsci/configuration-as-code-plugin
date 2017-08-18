@@ -82,7 +82,7 @@ Example configuration file that corresponds to schema above
       "userId": "publisher",
       "credentialsId": "artifactory-publisher",
       "description": "",
-      "path": "/Users/andrey9kin/code/system-config-dsl-plugin/work/conf/password"
+      "path": "/Users/andrey9kin/code/jenkins-coco-plugin/work/conf/password"
     }
   ]
 }
