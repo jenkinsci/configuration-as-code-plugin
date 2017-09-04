@@ -1,0 +1,33 @@
+jenkins:
+  # securityRealm: local
+  securityRealm:
+    ldap:
+      configurations:
+        - server: ldap.acme.com
+          rootDN: dc=acme,dc=fr
+          managerPasswordSecret: ${LDAP_PASSWORD}
+      cache:
+        size: 100
+        ttl: 10
+      userIdStrategy: CaseSensitive
+      groupIdStrategy: CaseSensitive
+
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+
+  noUsageStatistics: true
+  slaveAgentPort: 6666
+  viewsTabBar: standard
+  
+  nodes:
+    - slave:
+        name: "foo"
+        remoteFS: '/tmp/2'
+        launcher: "jnlp"
+        numExecutors: 1
+    - slave:
+        name: "bar"
+        remoteFS: '/tmp/1'
+        launcher: "jnlp"
+        numExecutors: 1
