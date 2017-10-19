@@ -2,4 +2,3 @@ target/
 work/
 .idea/
 *.iml
-src/main/resources/org/

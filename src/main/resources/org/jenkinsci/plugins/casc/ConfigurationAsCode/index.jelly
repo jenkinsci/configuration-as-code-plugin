@@ -1,0 +1,61 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout">
+  <st:contentType value="text/html;charset=UTF-8"/>
+  <html><head>
+  <style class='anchorjs'></style><link href='https://jenkins.io/assets/bower/bootstrap/css/bootstrap.min.css' media='screen' rel='stylesheet'/>
+  <link href='https://jenkins.io/assets/bower/tether/css/tether.min.css' media='screen' rel='stylesheet'/>
+  <link href='https://jenkins.io/css/font-icons.css' media='screen' rel='stylesheet'/>
+  <link href='https://jenkins.io/css/jenkins.css' media='screen' rel='stylesheet'/>
+  <link href='https://jenkins.io/assets/bower/ionicons/css/ionicons.min.css' media='screen' rel='stylesheet'/>
+  <link href='https://jenkins.io/css/footer.css' media='screen' rel='stylesheet'/>
+  <link href='https://jenkins.io/css/font-awesome.min.css' media='screen' rel='stylesheet'/>
+  </head>
+
+  <body class='syntax'>
+  <div class='container'>
+  <div class='row body'>
+  <div class='section'>
+  <h2>Jenkins Configuration as Code Reference</h2>
+
+  <div class='sect3'>
+  <j:forEach items="${it.configurators}" var="c">
+    <h4 id="${c.extensionpoint.simpleName}-${c.name}">${c.name}</h4>
+    <j:if test="${c.extensionpoint != c.target}">
+      Implementation of ${c.extensionpoint.simpleName}
+    </j:if>
+    <div class='paragraph'>${c.displayName}</div>
+    <div class='dlist'><dl>
+    <j:forEach items="${c.attributes}" var="a">
+      <dt class='hdlist1'>${a.name}</dt>
+
+      <dd>
+      <j:out value="${c.getHtmlHelp(a.name)}"/>
+      <!-- FIXME .html is not a standard facet, stapler only looks for groovy/jelly
+      <st:include page="help-${a.name}.html" class="${c.target}" optional="true"/>
+      -->
+      </dd>
+      
+      <j:if test="${a.multiple}">
+        list of
+      </j:if>
+      ${a.type.simpleName}
+      <j:if test="${not a.possibleValues().isEmpty()}">
+        <ul>
+          <j:forEach items="${a.possibleValues()}" var="v">
+            <li><a href="#${a.type.simpleName}-${v}">${v}</a></li>
+          </j:forEach>
+        </ul>
+
+      </j:if>
+    </j:forEach>
+    </dl>
+    </div>
+  </j:forEach>
+  </div>
+  </div>
+  </div>
+  </div>
+  </body>
+  </html>
+
+</j:jelly>
