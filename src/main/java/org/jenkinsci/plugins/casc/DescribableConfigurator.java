@@ -1,7 +1,6 @@
 package org.jenkinsci.plugins.casc;
 
 import com.google.common.base.Defaults;
-import hudson.DescriptorExtensionList;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
 import jenkins.model.Jenkins;
@@ -122,7 +121,7 @@ public class DescribableConfigurator extends BaseConfigurator<Describable> {
         return Jenkins.getInstance().getDescriptor(getTarget());
     }
 
-    public Class getExtensionpoint() {
+    public Class getExtensionPoint() {
 
         // detect common pattern DescriptorImpl extends Descriptor<ExtensionPoint>
         final Type superclass = getDescriptor().getClass().getGenericSuperclass();
@@ -136,7 +135,7 @@ public class DescribableConfigurator extends BaseConfigurator<Describable> {
                 return (Class) type;
             }
         }
-        return super.getExtensionpoint();
+        return super.getExtensionPoint();
     }
 
 
@@ -161,7 +160,6 @@ public class DescribableConfigurator extends BaseConfigurator<Describable> {
 
 
     public String getDisplayName() {
-        final List<Descriptor> list = Jenkins.getInstance().getDescriptorList(target);
-        return list.get(0).getDisplayName();
+        return getDescriptor().getDisplayName();
     }
 }

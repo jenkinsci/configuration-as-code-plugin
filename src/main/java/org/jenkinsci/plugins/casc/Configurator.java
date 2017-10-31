@@ -4,6 +4,7 @@ import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.ExtensionPoint;
 import hudson.model.Describable;
+import hudson.remoting.Which;
 import jenkins.model.Jenkins;
 import org.apache.commons.io.IOUtils;
 import org.jenkinsci.Symbol;
@@ -114,9 +115,22 @@ public abstract class Configurator<T> implements ExtensionPoint {
     /**
      * The extension point being implemented by this configurator. Can be null
      */
-    public Class getExtensionpoint() {
+    public Class getExtensionPoint() {
         return ExtensionPoint.class.isAssignableFrom(getTarget()) ? getTarget() : null;
     }
+
+
+    /**
+     * Retrieve which plugin do provide this extension point
+     */
+    public String getExtensionSource() throws IOException {
+        final Class e = getExtensionPoint();
+        if (e == null) return null;
+        final String jar = Which.jarFile(e).getName();
+        if (jar.startsWith("jenkins-core-")) return "jenkins-core"; // core jar has version in name
+        return jar.substring(0, jar.lastIndexOf('.'));
+    }
+
 
     /**
      * Human friendly display name for this component.

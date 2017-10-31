@@ -19,9 +19,9 @@
 
   <div class='sect3'>
   <j:forEach items="${it.configurators}" var="c">
-    <h4 id="${c.extensionpoint.simpleName}-${c.name}">${c.name}</h4>
-    <j:if test="${c.extensionpoint != c.target}">
-      Implementation of ${c.extensionpoint.simpleName}
+    <h4 id="${c.extensionPoint.simpleName}-${c.name}">${c.name}</h4>
+    <j:if test="${c.extensionPoint != c.target}">
+      Implementation of <a href="https://jenkins.io/doc/developer/extensions/${c.extensionSource}/#${c.extensionPoint.simpleName.toLowerCase()}">${c.extensionPoint.simpleName}</a>
     </j:if>
     <div class='paragraph'>${c.displayName}</div>
     <div class='dlist'><dl>
