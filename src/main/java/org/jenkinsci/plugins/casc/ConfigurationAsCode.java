@@ -3,13 +3,14 @@ package org.jenkinsci.plugins.casc;
 import hudson.Plugin;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
+import hudson.model.Descriptor;
 import jenkins.model.Jenkins;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -43,13 +44,30 @@ public class ConfigurationAsCode extends Plugin {
         }
     }
 
+    // for documentation generation in index.jelly
     public List<?> getConfigurators() {
         List<Object> elements = new ArrayList<>();
-        for (RootElementConfigurator c : Jenkins.getInstance().getExtensionList(RootElementConfigurator.class)) {
+        for (RootElementConfigurator c : getRootConfigurators()) {
             elements.add(c);
             listElements(elements, c.describe());
         }
         return elements;
+    }
+
+    static List<RootElementConfigurator> getRootConfigurators() {
+        List<RootElementConfigurator> configurators = new ArrayList<>();
+        configurators.addAll(Jenkins.getInstance().getExtensionList(RootElementConfigurator.class));
+
+        // Check for Descriptors with a global.jelly view
+        for (Descriptor descriptor : Jenkins.getInstance().getExtensionList(Descriptor.class)) {
+            final String cl = descriptor.getKlass().toJavaClass().getCanonicalName().replace('.', '/');
+            URL global = ConfigurationAsCode.class.getClassLoader().getResource(cl+"/global.jelly");
+            if (global != null) {
+                configurators.add(new DescriptorRootElementConfigurator(descriptor));
+            }
+        }
+
+        return configurators;
     }
 
     private void listElements(List<Object> elements, Set<Attribute> attributes) {
@@ -81,7 +99,7 @@ public class ConfigurationAsCode extends Plugin {
         documented.add(Integer.class);
         // ...
 
-        for (RootElementConfigurator c : Jenkins.getInstance().getExtensionList(RootElementConfigurator.class)) {
+        for (RootElementConfigurator c : getRootConfigurators()) {
             final String name = c.getName();
             document(name, c.describe());
         }

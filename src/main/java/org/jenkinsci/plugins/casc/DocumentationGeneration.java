@@ -29,7 +29,7 @@ public class DocumentationGeneration {
         documented.add(Integer.class);
         // ...
 
-        for (RootElementConfigurator c : Jenkins.getInstance().getExtensionList(RootElementConfigurator.class)) {
+        for (RootElementConfigurator c : ConfigurationAsCode.getRootConfigurators()) {
             final String name = c.getName();
             document(name, c.describe());
         }

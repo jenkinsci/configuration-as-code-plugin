@@ -28,11 +28,9 @@ import java.util.Set;
 public abstract class Configurator<T> implements ExtensionPoint {
 
     public static Configurator lookupRootElement(String name) {
-        final ExtensionList<Configurator> l = Jenkins.getInstance().getExtensionList(Configurator.class);
-        for (Configurator c : l) {
-            if (c instanceof RootElementConfigurator
-                && ((RootElementConfigurator)c).getName().equals(name)) {
-                return c;
+        for (RootElementConfigurator c : ConfigurationAsCode.getRootConfigurators()) {
+            if (c.getName().equals(name)) {
+                return (Configurator) c;
             }
         }
         return null;

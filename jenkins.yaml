@@ -31,3 +31,12 @@ jenkins:
         remoteFS: '/tmp/1'
         launcher: "jnlp"
         numExecutors: 1
+
+
+mailer:
+  smtpAuthUsername: foo
+  smtpAuthPassword: bar
+  adminAddress: admin@acme.org
+  replyToAddress: do-not-reply@acme.org
+  smtpHost: smtp.acme.org
+  smtpPort: 4441

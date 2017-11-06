@@ -37,25 +37,7 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
         Map config = (Map) c;
         Jenkins jenkins = Jenkins.getInstance();
 
-        final Set<Attribute> attributes = describe();
-
-        for (Attribute attribute : attributes) {
-            final String name = attribute.getName();
-            if (config.containsKey(name)) {
-                final Object sub = config.get(name);
-                if (attribute.isMultiple()) {
-                    List values = new ArrayList<>();
-                    for (Object o : (List) sub) {
-                        Object value = Configurator.lookup(attribute.getType()).configure(o);
-                        values.add(value);
-                    }
-                    attribute.setValue(jenkins, values);
-                } else {
-                    Object value = Configurator.lookup(attribute.getType()).configure(sub);
-                    attribute.setValue(jenkins, value);
-                }
-            }
-        }
+        configure(config, jenkins);
         return jenkins;
     }
 
