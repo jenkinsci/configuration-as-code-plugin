@@ -47,7 +47,7 @@ endif::[]
 //
 // Uncomment if there will be a BDFL delegate for this JEP.
 | BDFL-Delegate
-| https://github.com/buep[Bue Petersen]
+| https://github.com/ewelinawilkosz2[Ewelina Wilkosz]
 //
 //
 // Uncomment if discussion will occur in forum other than jenkinsci-dev@ mailing list.
