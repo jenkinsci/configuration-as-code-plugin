@@ -71,6 +71,7 @@ endif::[]
 
 |===
 
+image:logo.png[logo]
 
 == Abstract
 
