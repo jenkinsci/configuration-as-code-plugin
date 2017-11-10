@@ -63,19 +63,6 @@
       <artifactId>snakeyaml</artifactId>
       <version>1.18</version>
     </dependency>
-
-
-    <!-- for demo purpose -->
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>ldap</artifactId>
-      <version>1.16</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>mailer</artifactId>
-      <version>1.20</version>
-    </dependency>
   </dependencies>
 
   <build>
