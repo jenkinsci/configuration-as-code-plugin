@@ -19,4 +19,4 @@ assumes it make sense to expose it as a root element extension.
 
 Descriptor do define setters so we can inject configuration, but for SMTP authentication parameters. 
 See https://github.com/jenkinsci/configuration-as-code-plugin/issues/2.
-
+See https://github.com/jenkinsci/mailer-plugin/pull/39
