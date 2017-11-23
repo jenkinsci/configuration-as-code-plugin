@@ -1,4 +1,4 @@
-# Jenkins Configuration as Code : implemntation details
+# Jenkins Configuration as Code : implementation details
 
 Input configuration file uses a YAML hierarchical data structure.
 every node of this data structure is passed to a `Configurator` responsible
@@ -33,5 +33,12 @@ the web UI, which are expected to be human friendly.
 
 `org.jenkinsci.plugins.casc.DescriptorRootElementConfigurator` can configure
 global configuration for Descriptors, to mimic the `global.jelly` UI exposed
-to end user on the web UI.  
+to end user on the web UI. 
+
+Jenkins has hundreds Descriptors, most of them for internal technical reasons,
+so only the ones to have a `global.jelly` view are accessible from 
+configuration-as-code.
+For Descriptors to work well with configuration-as-code, they need to follow
+[some design best practices](PLUGINS.md)
+
  
