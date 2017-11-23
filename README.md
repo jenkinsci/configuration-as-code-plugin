@@ -9,6 +9,6 @@ read [JEP proposal](JEP.adoc) for details
 Here is a list of plugin we have successfuly tested to support configuration-as-code approach :
 
  - [ ] ldap plugin ([demo](demos/ldap/README.md))
- - [ ] mailer plugin ([demo](demos/ldap/README.md))
+ - [ ] mailer plugin ([demo](demos/mailer/README.md))
  
  More to come soon... 
