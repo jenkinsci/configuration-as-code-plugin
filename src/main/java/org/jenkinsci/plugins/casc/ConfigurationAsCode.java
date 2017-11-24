@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.casc;
 
+import hudson.ExtensionList;
 import hudson.Plugin;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
