@@ -61,7 +61,9 @@ public class ConfigurationAsCode extends Plugin {
         // Check for Descriptors with a global.jelly view
         for (Descriptor descriptor : Jenkins.getInstance().getExtensionList(Descriptor.class)) {
             final String cl = descriptor.getKlass().toJavaClass().getCanonicalName().replace('.', '/');
-            URL global = ConfigurationAsCode.class.getClassLoader().getResource(cl+"/global.jelly");
+
+            URL global = descriptor.getKlass().toJavaClass().getClassLoader().getResource(cl+"/global.jelly");
+
             if (global != null) {
                 configurators.add(new DescriptorRootElementConfigurator(descriptor));
             }
