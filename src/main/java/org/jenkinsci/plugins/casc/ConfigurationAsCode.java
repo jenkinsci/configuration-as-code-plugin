@@ -38,7 +38,7 @@ public class ConfigurationAsCode extends Plugin {
         for (Map.Entry<String, Object> e : config.entrySet()) {
             final Configurator configurator = Configurator.lookupRootElement(e.getKey());
             if (configurator == null) {
-                throw new IllegalArgumentException("no configurator for root element "+e.getKey());
+                throw new IllegalArgumentException("no configurator for root element '"+e.getKey()+"'");
             }
             configurator.configure(e.getValue());
         }
@@ -56,15 +56,13 @@ public class ConfigurationAsCode extends Plugin {
 
     static List<RootElementConfigurator> getRootConfigurators() {
         List<RootElementConfigurator> configurators = new ArrayList<>();
-        configurators.addAll(Jenkins.getInstance().getExtensionList(RootElementConfigurator.class));
+        final Jenkins jenkins = Jenkins.getInstance();
+        configurators.addAll(jenkins.getExtensionList(RootElementConfigurator.class));
 
         // Check for Descriptors with a global.jelly view
-        for (Descriptor descriptor : Jenkins.getInstance().getExtensionList(Descriptor.class)) {
-            final String cl = descriptor.getKlass().toJavaClass().getCanonicalName().replace('.', '/');
-
-            URL global = descriptor.getKlass().toJavaClass().getClassLoader().getResource(cl+"/global.jelly");
-
-            if (global != null) {
+        final ExtensionList<Descriptor> descriptors = jenkins.getExtensionList(Descriptor.class);
+        for (Descriptor descriptor : descriptors) {
+            if (descriptor.getGlobalConfigPage() != null) {
                 configurators.add(new DescriptorRootElementConfigurator(descriptor));
             }
         }

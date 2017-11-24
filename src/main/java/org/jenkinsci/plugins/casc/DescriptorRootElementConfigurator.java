@@ -47,7 +47,8 @@ public class DescriptorRootElementConfigurator extends BaseConfigurator<Descript
         if (extensionList.size() != 1) {
             throw new IllegalStateException("Failed to retrieve Descriptor "+ target);
         }
-        Descriptor d = (Descriptor) extensionList.get(0);configure((Map) config, d);
+        Descriptor d = (Descriptor) extensionList.get(0);
+        configure((Map) config, d);
         return d;
     }
 
