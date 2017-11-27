@@ -19,7 +19,7 @@ public class MailerTest {
     public JenkinsRule j = new JenkinsRule();
 
     @Test
-    public void configure_mailer() throws Exception {
+    public void set_mailer() throws Exception {
         ConfigurationAsCode.configure(getClass().getResourceAsStream("MailerTest.yml"));
 
         final Jenkins jenkins = Jenkins.getInstance();

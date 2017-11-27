@@ -38,7 +38,7 @@ public class PrimitiveConfigurator extends Configurator {
             final Matcher matcher = ENV_VARIABLE.matcher(s);
             if (matcher.matches()) {
                 final String var = matcher.group(1);
-                config = System.getenv(var);
+                config = System.getProperty(var, System.getenv(var));
                 if (config == null) throw new IllegalStateException("Environment variable not set: "+var);
             }
         }

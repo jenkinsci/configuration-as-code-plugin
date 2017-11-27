@@ -18,7 +18,7 @@ public class GitToolInstallationTest {
     public JenkinsRule j = new JenkinsRule();
 
     @Test
-    public void set_git_installations() throws Exception {
+    public void configure_git_installations() throws Exception {
         ConfigurationAsCode.configure(getClass().getResourceAsStream("GitToolInstallationTest.yml"));
 
         final Jenkins jenkins = Jenkins.getInstance();
