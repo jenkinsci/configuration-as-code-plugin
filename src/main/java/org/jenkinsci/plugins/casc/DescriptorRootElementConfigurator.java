@@ -16,9 +16,11 @@ public class DescriptorRootElementConfigurator extends BaseConfigurator<Descript
 
 
     private final String name;
+    private final Descriptor descriptor;
     private final Class target;
 
     public DescriptorRootElementConfigurator(Descriptor descriptor) {
+        this.descriptor = descriptor;
         this.target = descriptor.getClass();
         final Symbol symbol = descriptor.getClass().getAnnotation(Symbol.class);
         if (symbol != null) {
@@ -43,13 +45,8 @@ public class DescriptorRootElementConfigurator extends BaseConfigurator<Descript
 
     @Override
     public Descriptor configure(Object config) throws Exception {
-        final ExtensionList extensionList = Jenkins.getInstance().getExtensionList(target);
-        if (extensionList.size() != 1) {
-            throw new IllegalStateException("Failed to retrieve Descriptor "+ target);
-        }
-        Descriptor d = (Descriptor) extensionList.get(0);
-        configure((Map) config, d);
-        return d;
+        configure((Map) config, descriptor);
+        return descriptor;
     }
 
 }

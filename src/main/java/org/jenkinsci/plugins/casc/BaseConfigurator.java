@@ -7,9 +7,12 @@ import org.jenkinsci.Symbol;
 import org.kohsuke.accmod.Restricted;
 
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.Array;
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,28 +39,63 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
             if (setter.getAnnotation(Deprecated.class) != null) continue; // not actually public
             if (setter.getAnnotation(Restricted.class) != null) continue; // not actually public     - require access-modifier 1.12
 
-            Class c;
-            final Type type = setter.getGenericParameterTypes()[0];
-            if (type instanceof ParameterizedType) {
-                // List<? extends Foo>
+            Class c = null;
+            boolean multiple = false;
+
+            // FIXME move this all into cleaner logic to discover property type
+            Type type = setter.getGenericParameterTypes()[0];
+
+            if (type instanceof GenericArrayType) {
+                // type is a parameterized array: <Foo>[]
+                multiple = true;
+                GenericArrayType at = (GenericArrayType) type;
+                type = at.getGenericComponentType();
+            }
+            else if (type instanceof ParameterizedType) {
+                // type is parameterized `Some<Foo>`
                 ParameterizedType pt = (ParameterizedType) type;
-                c = (Class) pt.getRawType();
-            } else {
-                c = (Class) type;
+
+                Class rawType = (Class) pt.getRawType();
+                if (Collection.class.isAssignableFrom(rawType)) {
+                    // type is `Collection<Foo>`
+                    multiple = true;
+                }
+
+                type = pt.getActualTypeArguments()[0];
+                if (type instanceof WildcardType) {
+                    // type is <? extends Foo>
+                    type = ((WildcardType) type).getUpperBounds()[0];
+                }
             }
 
-            boolean multiple = false;
-            if (Collection.class.isAssignableFrom(c)) {
+            while (c == null) {
+                if (type instanceof Class) {
+                    c = (Class) type;
+                } else if (type instanceof TypeVariable) {
+
+                    // type is declared as parameterized type
+                    // unfortunately, java reflection doesn't allow to get the actual parameter type
+                    // so, if superclass it parameterized, we assume parameter type match
+                    // i.e target is Foo extends AbtractFoo<Bar> with
+                    // public abstract class AbtractFoo<T> { void setBar(T bar) }
+                    final Type superclass = getTarget().getGenericSuperclass();
+                    if (superclass instanceof ParameterizedType) {
+                        final ParameterizedType psc = (ParameterizedType) superclass;
+                        type = psc.getActualTypeArguments()[0];
+                        continue;
+                    } else {
+                        c = (Class) ((TypeVariable) type).getBounds()[0];
+                    }
+
+                    TypeVariable tv = (TypeVariable) type;
+                } else {
+                    throw new IllegalStateException("Unable to detect type of attribute " + getTarget() + '#' + name);
+                }
+            }
+
+            if (c.isArray()) {
                 multiple = true;
-                ParameterizedType pt = (ParameterizedType) type;
-                Type actualType = pt.getActualTypeArguments()[0];
-                if (actualType instanceof WildcardType) {
-                    actualType = ((WildcardType) actualType).getUpperBounds()[0];
-                }
-                if (!(actualType instanceof Class)) {
-                    throw new IllegalStateException("Can't handle "+type);
-                }
-                c = (Class) actualType;
+                c = c.getComponentType();
             }
 
             Attribute attribute;

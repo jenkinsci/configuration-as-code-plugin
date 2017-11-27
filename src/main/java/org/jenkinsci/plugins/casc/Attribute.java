@@ -1,17 +1,23 @@
 package org.jenkinsci.plugins.casc;
 
 import org.apache.commons.beanutils.PropertyUtils;
-import org.kohsuke.stapler.lang.Klass;
 
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Array;
+import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 public class Attribute<T> {
+
+    private final static Logger logger = Logger.getLogger(Attribute.class.getName());
 
     protected final String name;
     protected final Class<T> type;
@@ -51,6 +57,26 @@ public class Attribute<T> {
 
 
     public void setValue(Object target, T value) throws Exception {
-        PropertyUtils.setProperty(target, name, value);
+        logger.info("Setting "+target.getClass().getCanonicalName()+'#'+name+" = " + value);
+        final PropertyDescriptor property = PropertyUtils.getPropertyDescriptor(target, name);
+        final Method writeMethod = property.getWriteMethod();
+
+        Object o = value;
+        if (multiple) {
+            if (!(value instanceof Collection)) {
+                throw new IllegalArgumentException(target + "#" + name + " should be a list.");
+            }
+            // if setter expect an Array, convert Collection to expected array type
+            // Typically required for hudson.tools.ToolDescriptor.setInstallations
+            // as java varargs unfortunately only supports Arrays, not all Iterable (sic)
+            final Class c = writeMethod.getParameterTypes()[0];
+            if (c.isArray() && value instanceof Collection) {
+                Collection collection = (Collection) value;
+                o = collection.toArray((Object[]) Array.newInstance(c.getComponentType(), collection.size()));
+            }
+
+        }
+        
+        writeMethod.invoke(target, o);
     }
 }
