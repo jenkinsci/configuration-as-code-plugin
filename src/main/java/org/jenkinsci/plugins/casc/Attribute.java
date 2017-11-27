@@ -72,7 +72,7 @@ public class Attribute<T> {
             final Class c = writeMethod.getParameterTypes()[0];
             if (c.isArray() && value instanceof Collection) {
                 Collection collection = (Collection) value;
-                o = collection.toArray((Object[]) Array.newInstance(c.getComponentType(), collection.size()));
+                o = collection.toArray((Object[]) Array.newInstance(type, collection.size()));
             }
 
         }
