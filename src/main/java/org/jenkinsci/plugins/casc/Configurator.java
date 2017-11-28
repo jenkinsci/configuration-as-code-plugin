@@ -6,10 +6,12 @@ import hudson.ExtensionList;
 import hudson.ExtensionPoint;
 import hudson.model.Describable;
 import hudson.remoting.Which;
+import hudson.util.Secret;
 import jenkins.model.Jenkins;
 import org.apache.commons.io.IOUtils;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.lang.Klass;
 
 import java.io.IOException;
@@ -76,7 +78,7 @@ public abstract class Configurator<T> implements ExtensionPoint {
             return new ExtensionConfigurator(clazz);
         }
 
-        if (clazz == String.class || Primitives.unwrap(clazz).isPrimitive()) {
+        if (Stapler.CONVERT_UTILS.lookup(clazz) != null) {
             return new PrimitiveConfigurator(clazz);
         }
 

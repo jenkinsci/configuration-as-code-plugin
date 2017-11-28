@@ -46,6 +46,7 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
     public Set<Attribute> describe() {
         final Set<Attribute> attributes = super.describe();
 
+        /*
         final List<ExtensionPoint> all = Jenkins.getInstance().getExtensionList(ExtensionPoint.class);
         for (Object e : all) {
             if (e instanceof Descriptor) continue;
@@ -61,7 +62,7 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
             }
 
             attributes.add(new ExtensionAttribute(symbol.value()[0], e.getClass()));
-        }
+        }       */
 
         return attributes;
     }
