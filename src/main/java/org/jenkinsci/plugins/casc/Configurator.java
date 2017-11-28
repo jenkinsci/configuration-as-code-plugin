@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.casc;
 
+import com.google.common.primitives.Primitives;
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.ExtensionPoint;
@@ -8,9 +9,11 @@ import hudson.remoting.Which;
 import jenkins.model.Jenkins;
 import org.apache.commons.io.IOUtils;
 import org.jenkinsci.Symbol;
+import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.lang.Klass;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -60,18 +63,24 @@ public abstract class Configurator<T> implements ExtensionPoint {
             return lookup(actualType);
         }
 
-        if (Describable.class.isAssignableFrom(clazz)) {
-            if (Modifier.isAbstract(clazz.getModifiers())) {
-                return new HeteroDescribableConfigurator(clazz);
-            }
-            return new DescribableConfigurator(clazz);
+        if (getDataBoundConstructor(clazz) != null) {
+            return new DataBoundConfigurator(clazz);
+        }
+
+        if (Modifier.isAbstract(clazz.getModifiers()) && Describable.class.isAssignableFrom(clazz)) {
+            // this is a jenkins Describable component, with various implementations
+            return new HeteroDescribableConfigurator(clazz);
         }
 
         if (Extension.class.isAssignableFrom(clazz)) {
             return new ExtensionConfigurator(clazz);
         }
 
-        return new PrimitiveConfigurator(clazz);
+        if (clazz == String.class || Primitives.unwrap(clazz).isPrimitive()) {
+            return new PrimitiveConfigurator(clazz);
+        }
+
+        throw new IllegalArgumentException("Configuration-as-Code can't handle type "+ type);
     }
 
     private static Class asClass(Type type) {
@@ -84,6 +93,15 @@ public abstract class Configurator<T> implements ExtensionPoint {
         }
         return clazz;
     }
+
+    public static Constructor getDataBoundConstructor(Class type) {
+        for (Constructor c : type.getConstructors()) {
+            if (c.getAnnotation(DataBoundConstructor.class) != null) return c;
+        }
+        return null;
+
+    }
+
 
     // ---
 
@@ -162,7 +180,7 @@ public abstract class Configurator<T> implements ExtensionPoint {
     public String getHtmlHelp(String attribute) throws IOException {
         final URL resource = getKlass().getResource("help-" + attribute + ".html");
         if (resource != null) {
-            return IOUtils.toString(resource);
+            return IOUtils.toString(resource.openStream());
         }
         return "";
     }

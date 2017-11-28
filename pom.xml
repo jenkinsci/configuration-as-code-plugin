@@ -64,6 +64,8 @@
       <version>1.18</version>
     </dependency>
 
+    <!-- tested plugins -->
+
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>git-client</artifactId>
@@ -84,6 +86,13 @@
       <version>1.16</version>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>artifactory</artifactId>
+      <version>2.11.0</version>
+    </dependency>
+
   </dependencies>
 
   <build>

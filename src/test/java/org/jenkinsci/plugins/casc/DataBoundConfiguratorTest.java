@@ -14,13 +14,13 @@ import static org.junit.Assert.*;
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-public class DescribableConfiguratorTest {
+public class DataBoundConfiguratorTest {
 
     @Rule
     public JenkinsRule j = new JenkinsRule();
 
     @Test
-    public void _databound() throws Exception {
+    public void configure_databound() throws Exception {
         Map<String, Object> config = new HashMap<>();
         config.put("foo", "foo");
         config.put("bar", true);
@@ -32,7 +32,7 @@ public class DescribableConfiguratorTest {
     }
 
 
-    public static class Foo extends AbstractDescribableImpl<Foo> {
+    public static class Foo {
 
         final String foo;
         final boolean bar;

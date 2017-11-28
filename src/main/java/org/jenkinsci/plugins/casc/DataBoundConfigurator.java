@@ -21,26 +21,26 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A generic {@link Configurator} to configure {@link Describable} which offer a
+ * A generic {@link Configurator} to configure components which offer a
  * {@link org.kohsuke.stapler.DataBoundConstructor}
  *
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-public class DescribableConfigurator extends BaseConfigurator<Describable> {
+public class DataBoundConfigurator extends BaseConfigurator<Object> {
 
     private final Class target;
 
-    public DescribableConfigurator(Class clazz) {
+    public DataBoundConfigurator(Class clazz) {
         this.target = clazz;
     }
 
     @Override
-    public Class<Describable> getTarget() {
+    public Class getTarget() {
         return target;
     }
 
     @Override
-    public Describable configure(Object c) throws Exception {
+    public Object configure(Object c) throws Exception {
 
         Map config = c instanceof Map ? (Map) c : Collections.EMPTY_MAP;
 
@@ -87,7 +87,7 @@ public class DescribableConfigurator extends BaseConfigurator<Describable> {
                 }
             }
         }
-        Describable object = (Describable) constructor.newInstance(args);
+        Object object = constructor.newInstance(args);
 
         final Set<Attribute> attributes = describe();
 
@@ -100,15 +100,6 @@ public class DescribableConfigurator extends BaseConfigurator<Describable> {
         }
         return object;
     }
-
-    public Constructor getDataBoundConstructor(Class type) {
-        for (Constructor c : type.getConstructors()) {
-            if (c.getAnnotation(DataBoundConstructor.class) != null) return c;
-        }
-        return null;
-
-    }
-
 
     public String getName() {
         final Descriptor d = getDescriptor();

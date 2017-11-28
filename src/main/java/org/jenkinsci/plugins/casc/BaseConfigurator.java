@@ -3,6 +3,7 @@ package org.jenkinsci.plugins.casc;
 import hudson.model.Describable;
 import jenkins.model.Jenkins;
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.kohsuke.accmod.Restricted;
 
@@ -10,6 +11,7 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -99,7 +101,10 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
             }
 
             Attribute attribute;
-            if (Describable.class.isAssignableFrom(c)) {
+            if (!c.isPrimitive() && Modifier.isAbstract(c.getModifiers())) {
+                if (!Describable.class.isAssignableFrom(c)) {
+                    throw new IllegalStateException("Configuration-as-Code can't manage abstract attributes which are not Describable.");
+                }
                 attribute = new DescribableAttribute(p.getName(), c);
             } else {
                 attribute = new Attribute(p.getName(), c);
@@ -119,7 +124,7 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
         for (Attribute attribute : attributes) {
             final String name = attribute.getName();
             if (config.containsKey(name)) {
-                final Object sub = config.get(name);
+                final Object sub = config.remove(name);
                 if (attribute.isMultiple()) {
                     List values = new ArrayList<>();
                     for (Object o : (List) sub) {
@@ -132,6 +137,10 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
                     attribute.setValue(instance, value);
                 }
             }
+        }
+        if (!config.isEmpty()) {
+            final String invalid = StringUtils.join(config.keySet(), ',');
+            throw new IllegalArgumentException("Invalid configuration elements for type " + instance.getClass() + ":" + invalid);
         }
     }
 }
