@@ -2,7 +2,7 @@
 
 ![logo](logo.png)
 
-read [JEP proposal](JEP.adoc) for details
+read [JEP proposal](https://github.com/jenkinsci/jep/tree/master/jep/201) for details
 
 ## Supported plugins
 
