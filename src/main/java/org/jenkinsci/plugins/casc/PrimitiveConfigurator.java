@@ -42,7 +42,7 @@ public class PrimitiveConfigurator extends Configurator {
                 if (config == null) throw new IllegalStateException("Environment variable not set: "+var);
             }
         }
-        return Stapler.CONVERT_UTILS.convert(config, target);
+        return Stapler.lookupConverter(target).convert(target, config);
     }
 
 

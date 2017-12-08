@@ -95,6 +95,15 @@ public class HeteroDescribableConfigurator extends Configurator<Describable> {
             }
         }
 
+        // Search for implicit symbol, i.e "Foo" for FooCredentialsImpl implementing Credentials
+        s = shortname + target.getSimpleName() + "Impl";
+        for (Descriptor d : candidates) {
+            final String cn = d.getKlass().toJavaClass().getSimpleName();
+            if (s.equalsIgnoreCase(cn)) {
+                return d.getKlass().toJavaClass();
+            }
+        }
+
         throw new IllegalArgumentException("No "+target.getName()+ "implementation found for "+shortname);
     }
 

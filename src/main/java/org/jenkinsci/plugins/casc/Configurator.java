@@ -78,7 +78,7 @@ public abstract class Configurator<T> implements ExtensionPoint {
             return new ExtensionConfigurator(clazz);
         }
 
-        if (Stapler.CONVERT_UTILS.lookup(clazz) != null) {
+        if (Stapler.lookupConverter(clazz) != null) {
             return new PrimitiveConfigurator(clazz);
         }
 
