@@ -12,4 +12,5 @@ Here is a list of plugin we have successfuly tested to support configuration-as-
  - [x] mailer plugin with some limitations ([details](demos/mailer/README.md))
  - [x] git plugin ([details](demos/git/README.md))
  - [x] artifactory plugin ([details](demos/artifactory/README.md))
+ - [x] tfs plugin with some limitations ([details](demos/tfs/README.md))
  - [ ] more to come soon... 
