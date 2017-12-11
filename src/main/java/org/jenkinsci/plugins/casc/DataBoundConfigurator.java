@@ -103,7 +103,7 @@ public class DataBoundConfigurator extends BaseConfigurator<Object> {
 
     public String getName() {
         final Descriptor d = getDescriptor();
-        return DescribableAttribute.getSymbolName(d, getTarget());
+        return DescribableAttribute.getSymbolName(d, getExtensionPoint());
     }
 
     private Descriptor getDescriptor() {
