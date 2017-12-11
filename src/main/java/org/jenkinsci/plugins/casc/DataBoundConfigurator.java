@@ -141,7 +141,8 @@ public class DataBoundConfigurator extends BaseConfigurator<Object> {
             final String[] names = ClassDescriptor.loadParameterNames(constructor);
             for (int i = 0; i < parameters.length; i++) {
                 final Parameter p = parameters[i];
-                final Attribute a = new Attribute(names[i], p.getType());
+
+                final Attribute a = detectActualType(names[i], p.getParameterizedType());
                 attributes.add(a);
             }
         }

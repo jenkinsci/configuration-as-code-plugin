@@ -26,11 +26,15 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 public abstract class Configurator<T> implements ExtensionPoint {
+
+    private final static Logger logger = Logger.getLogger(Configurator.class.getName());
+
 
     public static Configurator lookupRootElement(String name) {
         for (RootElementConfigurator c : ConfigurationAsCode.getRootConfigurators()) {
@@ -82,7 +86,8 @@ public abstract class Configurator<T> implements ExtensionPoint {
             return new PrimitiveConfigurator(clazz);
         }
 
-        throw new IllegalArgumentException("Configuration-as-Code can't handle type "+ type);
+        logger.warning("Configuration-as-Code can't handle type "+ type);
+        return null;
     }
 
     private static Class asClass(Type type) {
