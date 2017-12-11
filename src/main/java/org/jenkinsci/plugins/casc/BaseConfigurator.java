@@ -122,7 +122,7 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
         }
 
         Attribute attribute;
-        if (!c.isPrimitive() && Modifier.isAbstract(c.getModifiers())) {
+        if (!c.isPrimitive() && !c.isEnum() && Modifier.isAbstract(c.getModifiers())) {
             if (!Describable.class.isAssignableFrom(c)) {
                 throw new IllegalStateException("Configuration-as-Code can't manage abstract attributes which are not Describable.");
             }
