@@ -61,47 +61,8 @@ public class HeteroDescribableConfigurator extends Configurator<Describable> {
 
         // Search for @Symbol annotation on Descriptor to match shortName
         for (Descriptor d : candidates) {
-            final Symbol symbol = d.getClass().getAnnotation(Symbol.class);
-            if (symbol == null) continue;
-            for (String s : symbol.value()) {
-                if (s.equals(shortname)) {
-                    return d.getKlass().toJavaClass();
-                }
-            }
-        }
-
-        // Search for Fully qualified class name
-        for (Descriptor d : candidates) {
-            final String fqcn = d.getKlass().toJavaClass().getName();
-            if (shortname.equals(fqcn)) {
-                return d.getKlass().toJavaClass();
-            }
-        }
-
-        // Search for class name
-        for (Descriptor d : candidates) {
-            final String cn = d.getKlass().toJavaClass().getSimpleName();
-            if (shortname.equalsIgnoreCase(cn)) {
-                return d.getKlass().toJavaClass();
-            }
-        }
-
-        // Search for implicit symbol, i.e "ldap" for LdapSecurityRealm implementing SecurityRealm
-        String s = shortname + target.getSimpleName();
-        for (Descriptor d : candidates) {
-            final String cn = d.getKlass().toJavaClass().getSimpleName();
-            if (s.equalsIgnoreCase(cn)) {
-                return d.getKlass().toJavaClass();
-            }
-        }
-
-        // Search for implicit symbol, i.e "Foo" for FooCredentialsImpl implementing Credentials
-        s = shortname + target.getSimpleName() + "Impl";
-        for (Descriptor d : candidates) {
-            final String cn = d.getKlass().toJavaClass().getSimpleName();
-            if (s.equalsIgnoreCase(cn)) {
-                return d.getKlass().toJavaClass();
-            }
+            final String symbol = DescribableAttribute.getSymbolName(d, target);
+            if (symbol.equalsIgnoreCase(shortname)) return d.getKlass().toJavaClass();
         }
 
         throw new IllegalArgumentException("No "+target.getName()+ "implementation found for "+shortname);

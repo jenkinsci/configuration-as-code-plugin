@@ -21,12 +21,31 @@ public class DescribableAttribute extends Attribute {
     public List<String> possibleValues() {
         final List<Descriptor> descriptors = Jenkins.getInstance().getDescriptorList(type);
         return descriptors.stream()
-                .map(d -> {
-                    Symbol s = (Symbol) d.getClass().getAnnotation(Symbol.class);
-                    if (s != null) return s.value()[0];
-                    // TODO truncate extension class name, so LegacyAuthorizationStrategy => "Legacy"
-                    else return d.getKlass().toJavaClass().getSimpleName();
-                })
+                .map(d -> getSymbolName(d, type))
                 .collect(Collectors.toList());
+    }
+
+    public static String getSymbolName(Descriptor d, Class target) {
+
+        // explicit @Symbol annotation on descriptor
+        Symbol s = d.getClass().getAnnotation(Symbol.class);
+        if (s != null) return s.value()[0];
+
+        final String sn = target.getSimpleName();
+        final String cn = d.getKlass().toJavaClass().getSimpleName();
+
+        // extension type Foo is implemented as SomeFoo. => "some"
+        if (cn.endsWith(sn)) {
+            return cn.substring(0, cn.length() - sn.length());
+        }
+
+        // extension type Foo is implemented as SomeFooImpl. => "some"
+        final String in = target.getSimpleName() + "Impl";
+        if (cn.endsWith(in)) {
+            return cn.substring(0, cn.length() - in.length());
+        }
+
+        // Fall back to simple class name
+        return cn;
     }
 }
