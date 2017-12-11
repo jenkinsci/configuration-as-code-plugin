@@ -103,9 +103,7 @@ public class DataBoundConfigurator extends BaseConfigurator<Object> {
 
     public String getName() {
         final Descriptor d = getDescriptor();
-        final Symbol annotation = d.getClass().getAnnotation(Symbol.class);
-        if (annotation != null) return annotation.value()[0];
-        return getTarget().getSimpleName();
+        return DescribableAttribute.getSymbolName(d, getTarget());
     }
 
     private Descriptor getDescriptor() {

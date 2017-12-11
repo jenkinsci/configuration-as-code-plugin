@@ -9,6 +9,7 @@ import hudson.remoting.Which;
 import hudson.util.Secret;
 import jenkins.model.Jenkins;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.Stapler;
@@ -109,6 +110,15 @@ public abstract class Configurator<T> implements ExtensionPoint {
 
     }
 
+    public static String normalize(String name) {
+        if (name.toUpperCase().equals(name)) {
+            name = name.toLowerCase();
+        } else {
+            name = StringUtils.uncapitalize(name);
+        }
+        return name;
+    }
+
 
     // ---
 
@@ -127,7 +137,7 @@ public abstract class Configurator<T> implements ExtensionPoint {
     public String getName() {
         final Symbol annotation = getTarget().getAnnotation(Symbol.class);
         if (annotation != null) return annotation.value()[0];
-        return getTarget().getSimpleName();
+        return normalize(getTarget().getSimpleName());
     }
 
     /**

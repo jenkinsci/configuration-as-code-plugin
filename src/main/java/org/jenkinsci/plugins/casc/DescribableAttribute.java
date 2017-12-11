@@ -8,6 +8,8 @@ import org.jenkinsci.Symbol;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.jenkinsci.plugins.casc.Configurator.normalize;
+
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
@@ -27,25 +29,28 @@ public class DescribableAttribute extends Attribute {
 
     public static String getSymbolName(Descriptor d, Class target) {
 
-        // explicit @Symbol annotation on descriptor
-        Symbol s = d.getClass().getAnnotation(Symbol.class);
-        if (s != null) return s.value()[0];
+        if (d != null) {
+            // explicit @Symbol annotation on descriptor
+            Symbol s = d.getClass().getAnnotation(Symbol.class);
+            if (s != null) return s.value()[0];
 
-        final String sn = target.getSimpleName();
-        final String cn = d.getKlass().toJavaClass().getSimpleName();
+            final String sn = target.getSimpleName();
+            final String cn = d.getKlass().toJavaClass().getSimpleName();
 
-        // extension type Foo is implemented as SomeFoo. => "some"
-        if (cn.endsWith(sn)) {
-            return cn.substring(0, cn.length() - sn.length());
-        }
+            // extension type Foo is implemented as SomeFoo. => "some"
+            if (cn.endsWith(sn)) {
+                return normalize(cn.substring(0, cn.length() - sn.length()));
+            }
 
-        // extension type Foo is implemented as SomeFooImpl. => "some"
-        final String in = target.getSimpleName() + "Impl";
-        if (cn.endsWith(in)) {
-            return cn.substring(0, cn.length() - in.length());
+            // extension type Foo is implemented as SomeFooImpl. => "some"
+            final String in = target.getSimpleName() + "Impl";
+            if (cn.endsWith(in)) {
+                return normalize(cn.substring(0, cn.length() - in.length()));
+            }
         }
 
         // Fall back to simple class name
-        return cn;
+        return normalize(target.getSimpleName());
     }
+
 }
