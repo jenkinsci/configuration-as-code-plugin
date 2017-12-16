@@ -1,14 +1,12 @@
 package org.jenkinsci.plugins.casc;
 
 import hudson.model.Describable;
-import jenkins.model.Jenkins;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.kohsuke.accmod.Restricted;
 
 import java.beans.PropertyDescriptor;
-import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -48,7 +46,9 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
 
             // See https://github.com/jenkinsci/structs-plugin/pull/18
             final Symbol s = setter.getAnnotation(Symbol.class);
-            // TODO record symbol as preferred name / alias for this attribute
+            if (s != null) {
+                attribute.preferredName(s.value()[0]);
+            }
         }
         return attributes;
     }
@@ -130,7 +130,7 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
         } else {
             attribute = new Attribute(name, c);
         }
-        attribute.withMultiple(multiple);
+        attribute.multiple(multiple);
         return attribute;
     }
 

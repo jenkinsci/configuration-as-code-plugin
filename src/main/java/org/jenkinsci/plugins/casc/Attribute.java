@@ -22,6 +22,7 @@ public class Attribute<T> {
     protected final String name;
     protected final Class<T> type;
     private boolean multiple;
+    protected String preferredName;
 
     public Attribute(String name, Class<T> type) {
         this.name = name;
@@ -29,7 +30,7 @@ public class Attribute<T> {
     }
 
     public String getName() {
-        return name;
+        return preferredName != null ? preferredName : name;
     }
 
     public Class<T> getType() {
@@ -41,10 +42,16 @@ public class Attribute<T> {
         return multiple;
     }
 
-    public Attribute<T> withMultiple(boolean multiple) {
+    public Attribute<T> multiple(boolean multiple) {
         this.multiple = multiple;
         return this;
     }
+
+    public Attribute<T> preferredName(String preferredName) {
+        this.preferredName = preferredName;
+        return this;
+    }
+
 
     /** If this attribute is constrained to a limited set of value, here they are */
     public List<String> possibleValues() {
@@ -79,4 +86,5 @@ public class Attribute<T> {
         
         writeMethod.invoke(target, o);
     }
+
 }
