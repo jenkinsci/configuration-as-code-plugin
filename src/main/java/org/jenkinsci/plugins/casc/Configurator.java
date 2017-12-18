@@ -1,12 +1,10 @@
 package org.jenkinsci.plugins.casc;
 
-import com.google.common.primitives.Primitives;
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.ExtensionPoint;
 import hudson.model.Describable;
 import hudson.remoting.Which;
-import hudson.util.Secret;
 import jenkins.model.Jenkins;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -38,7 +36,7 @@ public abstract class Configurator<T> implements ExtensionPoint {
 
 
     public static Configurator lookupRootElement(String name) {
-        for (RootElementConfigurator c : ConfigurationAsCode.getRootConfigurators()) {
+        for (RootElementConfigurator c : RootElementConfigurator.all()) {
             if (c.getName().equals(name)) {
                 return (Configurator) c;
             }

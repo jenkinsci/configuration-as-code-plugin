@@ -1,7 +1,5 @@
 package org.jenkinsci.plugins.casc;
 
-import jenkins.model.Jenkins;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -29,7 +27,7 @@ public class DocumentationGeneration {
         documented.add(Integer.class);
         // ...
 
-        for (RootElementConfigurator c : ConfigurationAsCode.getRootConfigurators()) {
+        for (RootElementConfigurator c : RootElementConfigurator.all()) {
             final String name = c.getName();
             document(name, c.describe());
         }

@@ -1,0 +1,38 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout">
+  <st:contentType value="application/json"/>
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "id": "http://jenkins.io/configuration-as-code#",
+  "description": "Jenkins Configuration as Code",
+  "type": "object",
+  "properties": {
+<j:forEach items="${it.rootConfigurators}" var="r" varStatus="rst">
+    "${r.name}": {
+      "type": "object",
+      "$ref": "#/definitions/${r.target.name}"
+    }<j:if test="${!rst.last}">,</j:if>
+</j:forEach>
+  },
+  "definitions": {
+<j:forEach items="${it.configurators}" var="c" varStatus="cst">
+    "${c.target.name}": {
+      "type": "object",
+      "properties": {
+<j:forEach items="${c.attributes}" var="a" varStatus="ast">
+        "${a.name}": {
+<j:if test="${a.multiple}">
+          "type": "array",
+          "items": {
+</j:if>
+<st:include page="schema.jelly" it="${a}"/>
+<j:if test="${a.multiple}">}</j:if>
+        } <j:if test="${!ast.last}">,</j:if>
+</j:forEach>
+      }
+    }<j:if test="${!cst.last}">,</j:if>
+</j:forEach>
+  }
+}
+
+</j:jelly>
