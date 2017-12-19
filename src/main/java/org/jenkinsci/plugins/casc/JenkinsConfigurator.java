@@ -3,11 +3,15 @@ package org.jenkinsci.plugins.casc;
 import hudson.Extension;
 import hudson.ExtensionPoint;
 import hudson.model.Descriptor;
+import hudson.model.Job;
+import hudson.model.TopLevelItem;
+import hudson.slaves.Cloud;
 import jenkins.model.Jenkins;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.jenkinsci.Symbol;
 import org.kohsuke.accmod.Restricted;
 
+import java.awt.*;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -41,28 +45,39 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
         return jenkins;
     }
 
-
     @Override
     public Set<Attribute> describe() {
         final Set<Attribute> attributes = super.describe();
 
-        /*
-        final List<ExtensionPoint> all = Jenkins.getInstance().getExtensionList(ExtensionPoint.class);
-        for (Object e : all) {
-            if (e instanceof Descriptor) continue;
-            final Symbol symbol = e.getClass().getAnnotation(Symbol.class);
-            if (symbol == null) {
-                continue; // This extension doesn't even have a shortname
+        attributes.add(new Attribute<Jenkins>("jobs", Job.class) {
+            @Override
+            public void setValue(Jenkins jenkins, Object value) throws Exception {
+                List<TopLevelItem> jobs = (List<TopLevelItem>) value;
+                for (TopLevelItem item : jobs) {
+                    final String name = item.getName();
+                    if (jenkins.getItem(name) == null) {
+                        jenkins.add(item, name);
+                    } else {
+                        // FIXME re-configure ? remove/replace ?
+                    }
+                }
             }
+        }.multiple(true));
 
-            if (Configurator.lookup(e.getClass()).describe().isEmpty()) {
-                // There's nothing on can configure on this extension
-                // So this useless to expose it - this probably is some technical stuff
-                continue;
+        attributes.add(new Attribute<Jenkins>("clouds", Cloud.class) {
+            @Override
+            public void setValue(Jenkins jenkins, Object value) throws Exception {
+                List<Cloud> clouds = (List<Cloud>) value;
+                for (Cloud cloud : clouds) {
+                    if (jenkins.getCloud(cloud.name) == null) {
+                        jenkins.clouds.add(cloud);
+                    } else {
+                        // FIXME re-configure ? remove/replace ?
+                    }
+                }
             }
+        }.multiple(true));
 
-            attributes.add(new ExtensionAttribute(symbol.value()[0], e.getClass()));
-        }       */
 
         return attributes;
     }
@@ -70,16 +85,5 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
     @Override
     public String getName() {
         return "jenkins";
-    }
-
-    private class ExtensionAttribute extends Attribute {
-        public ExtensionAttribute(String name, Class type) {
-            super(name, type);
-        }
-
-        @Override
-        public void setValue(Object target, Object value) throws Exception {
-            // nop
-        }
     }
 }

@@ -20,11 +20,11 @@ public class Attribute<T> {
     private final static Logger logger = Logger.getLogger(Attribute.class.getName());
 
     protected final String name;
-    protected final Class<T> type;
+    protected final Class type;
     private boolean multiple;
     protected String preferredName;
 
-    public Attribute(String name, Class<T> type) {
+    public Attribute(String name, Class type) {
         this.name = name;
         this.type = type;
     }
@@ -33,7 +33,7 @@ public class Attribute<T> {
         return preferredName != null ? preferredName : name;
     }
 
-    public Class<T> getType() {
+    public Class getType() {
         return type;
     }
 
@@ -42,12 +42,12 @@ public class Attribute<T> {
         return multiple;
     }
 
-    public Attribute<T> multiple(boolean multiple) {
+    public Attribute multiple(boolean multiple) {
         this.multiple = multiple;
         return this;
     }
 
-    public Attribute<T> preferredName(String preferredName) {
+    public Attribute preferredName(String preferredName) {
         this.preferredName = preferredName;
         return this;
     }
@@ -63,7 +63,7 @@ public class Attribute<T> {
     }
 
 
-    public void setValue(Object target, T value) throws Exception {
+    public void setValue(T target, Object value) throws Exception {
         logger.info("Setting "+target.getClass().getCanonicalName()+'#'+name+" = " + value);
         final PropertyDescriptor property = PropertyUtils.getPropertyDescriptor(target, name);
         final Method writeMethod = property.getWriteMethod();

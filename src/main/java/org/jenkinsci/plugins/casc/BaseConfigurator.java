@@ -138,9 +138,9 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
             if (!Describable.class.isAssignableFrom(c)) {
                 throw new IllegalStateException("Configuration-as-Code can't manage abstract attributes which are not Describable.");
             }
-            attribute = new DescribableAttribute(name, c);
+            attribute = new DescribableAttribute<T>(name, c);
         } else {
-            attribute = new Attribute(name, c);
+            attribute = new Attribute<T>(name, c);
         }
         attribute.multiple(multiple);
         return attribute;

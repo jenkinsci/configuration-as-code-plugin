@@ -108,6 +108,14 @@
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>active-directory</artifactId>
       <version>2.6</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.jenkins.docker</groupId>
+      <artifactId>docker-plugin</artifactId>
+      <version>1.1.2</version>
+      <scope>test</scope>
     </dependency>
     
   </dependencies>
