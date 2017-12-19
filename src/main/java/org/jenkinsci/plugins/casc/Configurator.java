@@ -4,6 +4,7 @@ import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.ExtensionPoint;
 import hudson.model.Describable;
+import hudson.model.TopLevelItem;
 import hudson.remoting.Which;
 import jenkins.model.Jenkins;
 import org.apache.commons.io.IOUtils;
@@ -75,6 +76,10 @@ public abstract class Configurator<T> implements ExtensionPoint {
         if (Modifier.isAbstract(clazz.getModifiers()) && Describable.class.isAssignableFrom(clazz)) {
             // this is a jenkins Describable component, with various implementations
             return new HeteroDescribableConfigurator(clazz);
+        }
+
+        if (TopLevelItem.class.isAssignableFrom(clazz)) {
+            return new TopLevelItemConfigurator(clazz);
         }
 
         if (Extension.class.isAssignableFrom(clazz)) {

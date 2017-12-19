@@ -47,6 +47,9 @@ public class DescribableAttribute<T> extends Attribute<T> {
             if (cn.endsWith(in)) {
                 return normalize(cn.substring(0, cn.length() - in.length()));
             }
+
+            // Fall back to simple class name
+            return normalize(cn);
         }
 
         // Fall back to simple class name

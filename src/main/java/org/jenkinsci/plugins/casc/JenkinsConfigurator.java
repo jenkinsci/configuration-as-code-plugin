@@ -49,7 +49,7 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
     public Set<Attribute> describe() {
         final Set<Attribute> attributes = super.describe();
 
-        attributes.add(new Attribute<Jenkins>("jobs", Job.class) {
+        attributes.add(new Attribute<Jenkins>("jobs", TopLevelItem.class) {
             @Override
             public void setValue(Jenkins jenkins, Object value) throws Exception {
                 List<TopLevelItem> jobs = (List<TopLevelItem>) value;

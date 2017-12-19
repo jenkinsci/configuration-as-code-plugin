@@ -15,7 +15,7 @@
   <packaging>hpi</packaging>
 
   <properties>
-    <jenkins.version>2.60</jenkins.version>
+    <jenkins.version>2.60.3</jenkins.version>
     <java.level>8</java.level>
   </properties>
 
@@ -115,6 +115,19 @@
       <groupId>io.jenkins.docker</groupId>
       <artifactId>docker-plugin</artifactId>
       <version>1.1.2</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>github-branch-source</artifactId>
+      <version>2.3.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>branch-api</artifactId>
+      <version>2.0.16</version>
       <scope>test</scope>
     </dependency>
     
