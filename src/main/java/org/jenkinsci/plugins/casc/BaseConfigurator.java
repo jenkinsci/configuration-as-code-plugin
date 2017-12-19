@@ -45,6 +45,7 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
             // FIXME move this all into cleaner logic to discover property type
             Type type = setter.getGenericParameterTypes()[0];
             Attribute attribute = detectActualType(name, type);
+            if (attribute == null) continue;
             attributes.add(attribute);
 
 
@@ -136,7 +137,8 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
         Attribute attribute;
         if (!c.isPrimitive() && !c.isEnum() && Modifier.isAbstract(c.getModifiers())) {
             if (!Describable.class.isAssignableFrom(c)) {
-                throw new IllegalStateException("Configuration-as-Code can't manage abstract attributes which are not Describable.");
+                // Not a Describable, so probably not an attribute expected to be selected as sub-component
+                return null;
             }
             attribute = new DescribableAttribute<T>(name, c);
         } else {

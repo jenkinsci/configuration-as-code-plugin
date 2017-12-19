@@ -38,7 +38,7 @@ public abstract class Configurator<T> implements ExtensionPoint {
 
     public static Configurator lookupRootElement(String name) {
         for (RootElementConfigurator c : RootElementConfigurator.all()) {
-            if (c.getName().equals(name)) {
+            if (c.getName().equalsIgnoreCase(name)) {
                 return (Configurator) c;
             }
         }

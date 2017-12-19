@@ -141,6 +141,7 @@ public class DataBoundConfigurator extends BaseConfigurator<Object> {
                 final Parameter p = parameters[i];
 
                 final Attribute a = detectActualType(names[i], p.getParameterizedType());
+                if (a == null) continue;
                 attributes.add(a);
             }
         }

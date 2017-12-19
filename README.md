@@ -11,8 +11,10 @@ Here is a list of plugin we have successfuly tested to support configuration-as-
  - [x] active directory plugin ([details](demos/credentials/README.md))
  - [x] artifactory plugin ([details](demos/artifactory/README.md))
  - [x] credentials plugin ([details](demos/credentials/README.md))
+ - [x] docker plugin ([details](demos/docker/README.md))
  - [x] git plugin ([details](demos/git/README.md))
  - [x] ldap plugin ([details](demos/ldap/README.md))
  - [x] mailer plugin with some limitations ([details](demos/mailer/README.md))
  - [x] tfs plugin with some limitations ([details](demos/tfs/README.md))
+ - [x] workflow-cps-global-lib _aka_ "global libraries" ([details](demos/workflow-cps-global-lib/README.md))                  
  - [ ] more to come soon... 

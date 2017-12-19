@@ -53,14 +53,18 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
             @Override
             public void setValue(Jenkins jenkins, Object value) throws Exception {
                 List<TopLevelItem> jobs = (List<TopLevelItem>) value;
+                // FIXME not pleasant we have to re-implement jenkins.createProject logic here
                 for (TopLevelItem item : jobs) {
                     final String name = item.getName();
                     if (jenkins.getItem(name) == null) {
+                        item.onCreatedFromScratch();
+                        item.save();
                         jenkins.add(item, name);
                     } else {
                         // FIXME re-configure ? remove/replace ?
                     }
                 }
+                Jenkins.getInstance().rebuildDependencyGraphAsync();
             }
         }.multiple(true));
 
