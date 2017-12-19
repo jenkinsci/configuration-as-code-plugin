@@ -5,6 +5,7 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.kohsuke.accmod.Restricted;
+import org.kohsuke.stapler.export.Exported;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.GenericArrayType;
@@ -20,6 +21,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -43,6 +46,15 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
             Type type = setter.getGenericParameterTypes()[0];
             Attribute attribute = detectActualType(name, type);
             attributes.add(attribute);
+
+
+            final Method getter = p.getReadMethod();
+            if (getter != null) {
+                final Exported annotation = getter.getAnnotation(Exported.class);
+                if (annotation != null && isNotBlank(annotation.name())) {
+                    attribute.preferredName(annotation.name());
+                }
+            }
 
             // See https://github.com/jenkinsci/structs-plugin/pull/18
             final Symbol s = setter.getAnnotation(Symbol.class);
