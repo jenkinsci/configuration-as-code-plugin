@@ -26,6 +26,9 @@ public class DockerCloudTest {
 
         final DockerCloud docker = DockerCloud.getCloudByName("docker");
         assertNotNull(docker);
+        assertNotNull(docker.getDockerApi());
+        assertNotNull(docker.getDockerApi().getDockerHost());
+        assertEquals("unix:///var/run/docker.sock", docker.getDockerApi().getDockerHost().getUri());
         final DockerTemplate template = docker.getTemplate("jenkins/slave");
         checkTemplate(template, "docker-agent", "jenkins", "/home/jenkins/agent", "10");
     }
