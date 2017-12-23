@@ -73,10 +73,11 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
             public void setValue(Jenkins jenkins, Object value) throws Exception {
                 List<Cloud> clouds = (List<Cloud>) value;
                 for (Cloud cloud : clouds) {
-                    if (jenkins.getCloud(cloud.name) == null) {
+                    Cloud currentCloud = jenkins.getCloud(cloud.name);
+                    if (currentCloud == null) {
                         jenkins.clouds.add(cloud);
                     } else {
-                        // FIXME re-configure ? remove/replace ?
+                        jenkins.clouds.replace(currentCloud, cloud);
                     }
                 }
             }
