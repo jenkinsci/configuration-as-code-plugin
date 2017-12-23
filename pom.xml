@@ -137,7 +137,14 @@
       <version>2.9</version>
       <scope>test</scope>
     </dependency>
-    
+
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>job-dsl</artifactId>
+      <version>1.66</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
