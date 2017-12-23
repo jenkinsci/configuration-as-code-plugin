@@ -5,10 +5,7 @@ import org.apache.commons.beanutils.PropertyUtils;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -77,9 +74,14 @@ public class Attribute<T> {
             // Typically required for hudson.tools.ToolDescriptor.setInstallations
             // as java varargs unfortunately only supports Arrays, not all Iterable (sic)
             final Class c = writeMethod.getParameterTypes()[0];
-            if (c.isArray() && value instanceof Collection) {
+            if (c.isArray()) {
                 Collection collection = (Collection) value;
                 o = collection.toArray((Object[]) Array.newInstance(type, collection.size()));
+
+            // if setter expect a Set, convert Collection to Set
+            // see jenkins.agentProtocols
+            } else if(c.isAssignableFrom(Set.class)){
+                o = new HashSet((Collection)value);
             }
 
         }
