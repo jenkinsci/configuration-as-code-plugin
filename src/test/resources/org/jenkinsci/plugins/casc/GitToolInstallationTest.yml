@@ -1,8 +1,8 @@
-
-git:
-  installations:
-    - name: git
-      home: /bin/git
-    - name: another_git
-      home: /usr/local/bin/git
+tool:
+  git:
+    installations:
+      - name: git
+        home: /bin/git
+      - name: another_git
+        home: /usr/local/bin/git
 

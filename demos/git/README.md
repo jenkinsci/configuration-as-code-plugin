@@ -5,10 +5,11 @@
 ## sample configuration
 
 ```yaml
-git:
-  installations:
-    - name: git
-      home: /usr/local/bin/git
+tool:
+  git:
+    installations:
+      - name: git
+        home: /usr/local/bin/git
 ```
 
 ## implementation note

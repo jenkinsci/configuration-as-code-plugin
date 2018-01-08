@@ -4,6 +4,7 @@ import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.ExtensionPoint;
 import hudson.model.Describable;
+import hudson.model.Descriptor;
 import hudson.model.TopLevelItem;
 import hudson.remoting.Which;
 import jenkins.model.Jenkins;
@@ -49,7 +50,8 @@ public abstract class Configurator<T> implements ExtensionPoint {
 
         Class clazz = asClass(type);
 
-        final ExtensionList<Configurator> l = Jenkins.getInstance().getExtensionList(Configurator.class);
+        final Jenkins jenkins = Jenkins.getInstance();
+        final ExtensionList<Configurator> l = jenkins.getExtensionList(Configurator.class);
         for (Configurator c : l) {
             if (clazz == c.getTarget()) {
                 // this type has a dedicated Configurator implementation
@@ -67,6 +69,10 @@ public abstract class Configurator<T> implements ExtensionPoint {
                 throw new IllegalStateException("Can't handle "+type);
             }
             return lookup(actualType);
+        }
+
+        if (Descriptor.class.isAssignableFrom(clazz)) {
+            return new DescriptorRootElementConfigurator((Descriptor) jenkins.getExtensionList(clazz).get(0));
         }
 
         if (getDataBoundConstructor(clazz) != null) {

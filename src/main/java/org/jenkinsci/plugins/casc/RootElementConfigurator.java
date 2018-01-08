@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.casc;
 
 import hudson.ExtensionList;
 import hudson.model.Descriptor;
+import jenkins.model.GlobalConfigurationCategory;
 import jenkins.model.Jenkins;
 
 import java.util.ArrayList;
@@ -20,10 +21,14 @@ public interface RootElementConfigurator {
         final Jenkins jenkins = Jenkins.getInstance();
         configurators.addAll(jenkins.getExtensionList(RootElementConfigurator.class));
 
-        // Check for Descriptors with a global.jelly view
+        for (GlobalConfigurationCategory category : GlobalConfigurationCategory.all()) {
+            configurators.add(new GlobalConfigurationCategoryConfigurator(category));
+        }
+
+        // Check for unclassified Descriptors
         final ExtensionList<Descriptor> descriptors = jenkins.getExtensionList(Descriptor.class);
         for (Descriptor descriptor : descriptors) {
-            if (descriptor.getGlobalConfigPage() != null) {
+            if (descriptor.getGlobalConfigPage() != null && descriptor.getCategory() instanceof GlobalConfigurationCategory.Unclassified) {
                 configurators.add(new DescriptorRootElementConfigurator(descriptor));
             }
         }
