@@ -1,12 +1,9 @@
 package org.jenkinsci.plugins.casc;
 
 import com.google.common.base.Defaults;
-import hudson.model.Describable;
 import hudson.model.Descriptor;
 import jenkins.model.Jenkins;
-import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.ClassDescriptor;
-import org.kohsuke.stapler.DataBoundConstructor;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.Constructor;

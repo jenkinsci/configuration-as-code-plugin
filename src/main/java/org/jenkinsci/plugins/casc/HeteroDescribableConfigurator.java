@@ -3,7 +3,6 @@ package org.jenkinsci.plugins.casc;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
 import jenkins.model.Jenkins;
-import org.jenkinsci.Symbol;
 
 import java.util.Collections;
 import java.util.List;

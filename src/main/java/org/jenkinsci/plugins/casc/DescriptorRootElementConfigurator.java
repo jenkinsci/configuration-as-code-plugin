@@ -1,12 +1,9 @@
 package org.jenkinsci.plugins.casc;
 
-import hudson.ExtensionList;
 import hudson.model.Descriptor;
-import jenkins.model.Jenkins;
 import org.jenkinsci.Symbol;
 
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Define a Configurator for a Descriptor

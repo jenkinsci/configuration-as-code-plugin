@@ -1,11 +1,8 @@
 package org.jenkinsci.plugins.casc;
 
-import hudson.Extension;
 import hudson.ExtensionList;
-import hudson.model.Descriptor;
 import jenkins.model.Jenkins;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
