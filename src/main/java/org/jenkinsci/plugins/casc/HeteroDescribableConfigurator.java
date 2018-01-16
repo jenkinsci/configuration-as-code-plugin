@@ -60,7 +60,7 @@ public class HeteroDescribableConfigurator extends Configurator<Describable> {
 
         // Search for @Symbol annotation on Descriptor to match shortName
         for (Descriptor d : candidates) {
-            final String symbol = DescribableAttribute.getSymbolName(d, target);
+            final String symbol = DescribableAttribute.getSymbolName(d, getExtensionPoint(), target);
             if (symbol.equalsIgnoreCase(shortname)) return d.getKlass().toJavaClass();
         }
 

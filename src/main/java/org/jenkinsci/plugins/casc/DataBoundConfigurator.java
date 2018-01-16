@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * A generic {@link Configurator} to configure components which offer a
@@ -24,6 +25,8 @@ import java.util.Set;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 public class DataBoundConfigurator extends BaseConfigurator<Object> {
+
+    private final static Logger logger = Logger.getLogger(DataBoundConfigurator.class.getName());
 
     private final Class target;
 
@@ -100,7 +103,7 @@ public class DataBoundConfigurator extends BaseConfigurator<Object> {
 
     public String getName() {
         final Descriptor d = getDescriptor();
-        return DescribableAttribute.getSymbolName(d, getExtensionPoint());
+        return DescribableAttribute.getSymbolName(d, getExtensionPoint(), getTarget());
     }
 
     private Descriptor getDescriptor() {
@@ -109,16 +112,19 @@ public class DataBoundConfigurator extends BaseConfigurator<Object> {
 
     public Class getExtensionPoint() {
 
-        // detect common pattern DescriptorImpl extends Descriptor<ExtensionPoint>
-        final Type superclass = getDescriptor().getClass().getGenericSuperclass();
-        if (superclass instanceof ParameterizedType) {
-            final ParameterizedType genericSuperclass = (ParameterizedType) superclass;
-            Type type = genericSuperclass.getActualTypeArguments()[0];
-            if (type instanceof ParameterizedType) {
-                type = ((ParameterizedType) type).getRawType();
-            }
-            if (type instanceof Class) {
-                return (Class) type;
+        final Descriptor descriptor = getDescriptor();
+        if (descriptor != null) {
+            // detect common pattern DescriptorImpl extends Descriptor<ExtensionPoint>
+            final Type superclass = descriptor.getClass().getGenericSuperclass();
+            if (superclass instanceof ParameterizedType) {
+                final ParameterizedType genericSuperclass = (ParameterizedType) superclass;
+                Type type = genericSuperclass.getActualTypeArguments()[0];
+                if (type instanceof ParameterizedType) {
+                    type = ((ParameterizedType) type).getRawType();
+                }
+                if (type instanceof Class) {
+                    return (Class) type;
+                }
             }
         }
         return super.getExtensionPoint();
@@ -148,6 +154,7 @@ public class DataBoundConfigurator extends BaseConfigurator<Object> {
 
 
     public String getDisplayName() {
-        return getDescriptor().getDisplayName();
+        final Descriptor descriptor = getDescriptor();
+        return descriptor != null ? descriptor.getDisplayName() : "";
     }
 }
