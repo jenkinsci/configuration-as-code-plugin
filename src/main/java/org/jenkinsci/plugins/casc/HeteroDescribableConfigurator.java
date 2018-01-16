@@ -30,6 +30,7 @@ public class HeteroDescribableConfigurator extends Configurator<Describable> {
         final List<Descriptor> candidates = Jenkins.getInstance().getDescriptorList(target);
         return candidates.stream()
                 .map(d -> Configurator.lookup(d.getKlass().toJavaClass()))
+                .filter(c -> c != null)
                 .collect(Collectors.toList());
     }
 

@@ -1,0 +1,37 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout">
+
+  <div class='section'>
+    <h4 id="${it.extensionPoint.simpleName}-${it.name}">${it.name}</h4>
+    <j:if test="${it.extensionPoint != c.target}">
+      Implementation of <a href="https://jenkins.io/doc/developer/extensions/${it.extensionSource}/#${it.extensionPoint.simpleName.toLowerCase()}">${it.extensionPoint.simpleName}</a>
+    </j:if>
+    <div class='paragraph'>${it.displayName}</div>
+    <div class='dlist'><dl>
+    <j:forEach items="${it.attributes}" var="a">
+      <dt class='hdlist1'>${a.name}</dt>
+
+      <dd>
+      <j:out value="${it.getHtmlHelp(a.name)}"/>
+      <!-- FIXME .html is not a standard facet, stapler only looks for groovy/jelly
+      <st:include page="help-${a.name}.html" class="${it.target}" optional="true"/>
+      -->
+      </dd>
+
+      <j:if test="${a.multiple}">
+        list of
+      </j:if>
+      ${a.type.simpleName}
+      <j:if test="${not a.possibleValues().isEmpty()}">
+        <ul>
+          <j:forEach items="${a.possibleValues()}" var="v">
+            <li><a href="#${a.type.simpleName}-${v}">${v}</a></li>
+          </j:forEach>
+        </ul>
+
+      </j:if>
+    </j:forEach>
+    </dl></div>
+  </div>
+
+</j:jelly>
