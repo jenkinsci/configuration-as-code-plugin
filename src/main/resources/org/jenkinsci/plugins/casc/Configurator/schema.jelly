@@ -1,0 +1,18 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout">
+    "${it.target.name}": {
+      "type": "object",
+      "properties": {
+<j:forEach items="${it.attributes}" var="a" varStatus="ast">
+        "${a.name}": {
+<j:if test="${a.multiple}">
+          "type": "array",
+          "items": {
+</j:if>
+<st:include page="schema.jelly" it="${a}"/>
+<j:if test="${a.multiple}">}</j:if>
+        } <j:if test="${!ast.last}">,</j:if>
+</j:forEach>
+      }
+    }
+</j:jelly>
