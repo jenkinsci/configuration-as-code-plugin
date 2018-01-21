@@ -33,6 +33,9 @@ public interface RootElementConfigurator {
             }
         }
 
+        for (RootElementConfigurator c: configurators)
+            System.out.println("[Configurator] " + c.getName());
+
         return configurators;
     }
 
