@@ -2,3 +2,4 @@ target/
 work/
 .idea/
 *.iml
+jenkins.yaml
