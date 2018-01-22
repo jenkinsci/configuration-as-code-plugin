@@ -34,22 +34,24 @@ public class DescribableAttribute<T> extends Attribute<T> {
             Symbol s = d.getClass().getAnnotation(Symbol.class);
             if (s != null) return s.value()[0];
 
-            final String ext = extensionPoint.getSimpleName();
-            final String cn = d.getKlass().toJavaClass().getSimpleName();
+            if (extensionPoint != null) {
+                final String ext = extensionPoint.getSimpleName();
+                final String cn = d.getKlass().toJavaClass().getSimpleName();
 
-            // extension type Foo is implemented as SomeFoo. => "some"
-            if (cn.endsWith(ext)) {
-                return normalize(cn.substring(0, cn.length() - ext.length()));
+                // extension type Foo is implemented as SomeFoo. => "some"
+                if (cn.endsWith(ext)) {
+                    return normalize(cn.substring(0, cn.length() - ext.length()));
+                }
+
+                // extension type Foo is implemented as SomeFooImpl. => "some"
+                final String in = target.getSimpleName() + "Impl";
+                if (cn.endsWith(in)) {
+                    return normalize(cn.substring(0, cn.length() - in.length()));
+                }
+
+                // Fall back to simple class name
+                return normalize(cn);
             }
-
-            // extension type Foo is implemented as SomeFooImpl. => "some"
-            final String in = target.getSimpleName() + "Impl";
-            if (cn.endsWith(in)) {
-                return normalize(cn.substring(0, cn.length() - in.length()));
-            }
-
-            // Fall back to simple class name
-            return normalize(cn);
         }
 
         // Fall back to simple class name
