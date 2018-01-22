@@ -153,8 +153,8 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
 
         for (Attribute attribute : attributes) {
             final String name = attribute.getName();
-            if (config.containsKey(name)) {
-                final Object sub = config.remove(name);
+            final Object sub = removeIgnoreCase(config, name);
+            if (sub != null) {
                 if (attribute.isMultiple()) {
                     List values = new ArrayList<>();
                     for (Object o : (List) sub) {
@@ -170,7 +170,16 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
         }
         if (!config.isEmpty()) {
             final String invalid = StringUtils.join(config.keySet(), ',');
-            throw new IllegalArgumentException("Invalid configuration elements for type " + instance.getClass() + ":" + invalid);
+            throw new IllegalArgumentException("Invalid configuration elements for type " + instance.getClass() + " : " + invalid);
         }
+    }
+
+    private Object removeIgnoreCase(Map config, String name) {
+        for (Object k : config.keySet()) {
+            if (name.equalsIgnoreCase(k.toString())) {
+                return config.remove(k);
+            }
+        }
+        return null;
     }
 }
