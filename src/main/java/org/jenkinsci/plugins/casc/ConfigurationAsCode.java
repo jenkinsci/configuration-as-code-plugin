@@ -32,7 +32,7 @@ public class ConfigurationAsCode extends Plugin {
 
         Map<String, Object> config = new Yaml().loadAs(in, Map.class);
         for (Map.Entry<String, Object> e : config.entrySet()) {
-            final Configurator configurator = Configurator.lookupRootElement(e.getKey());
+            final RootElementConfigurator configurator = Configurator.lookupRootElement(e.getKey());
             if (configurator == null) {
                 throw new IllegalArgumentException("no configurator for root element '"+e.getKey()+"'");
             }

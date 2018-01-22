@@ -42,4 +42,6 @@ public interface RootElementConfigurator {
     String getName();
 
     Set<Attribute> describe();
+
+    Object configure(Object config) throws Exception;
 }

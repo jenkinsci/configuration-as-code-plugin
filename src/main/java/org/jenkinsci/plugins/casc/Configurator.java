@@ -37,10 +37,10 @@ public abstract class Configurator<T> implements ExtensionPoint {
     private final static Logger logger = Logger.getLogger(Configurator.class.getName());
 
 
-    public static Configurator lookupRootElement(String name) {
+    public static RootElementConfigurator lookupRootElement(String name) {
         for (RootElementConfigurator c : RootElementConfigurator.all()) {
             if (c.getName().equalsIgnoreCase(name)) {
-                return (Configurator) c;
+                return c;
             }
         }
         return null;
