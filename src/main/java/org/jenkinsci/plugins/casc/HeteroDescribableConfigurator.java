@@ -65,7 +65,7 @@ public class HeteroDescribableConfigurator extends Configurator<Describable> {
             if (symbol.equalsIgnoreCase(shortname)) return d.getKlass().toJavaClass();
         }
 
-        throw new IllegalArgumentException("No "+target.getName()+ "implementation found for "+shortname);
+        throw new IllegalArgumentException("No "+target.getName()+ " implementation found for "+shortname);
     }
 
     @Override
