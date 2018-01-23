@@ -4,7 +4,7 @@
 
 ## Introduction
 
-Setting up Jenkins is a complex process, as both Jenkins and it's plugin require some cunning and configuration, 
+Setting up Jenkins is a complex process, as both Jenkins and its plugins require some tuning and configuration, 
 with dozens of parameters to set within the web UI `manage` section. 
 
 Experienced Jenkins users rely on groovy init scripts to customize jenkins and enforce desired state. Those
@@ -54,7 +54,7 @@ There's no release yet.
 
 ## Examples
 
-Configuration file includes root entries for various components of your jenkins master installation. the `jenkins`
+This configuration file includes root entries for various components of your jenkins master installation. the `jenkins`
 one is for the root jenkins object, and other ones are for various global configuration elements.
 
 ```yaml
