@@ -1,3 +1,5 @@
+[![Build Status](https://ci.jenkins.io/job/Plugins/job/configuration-as-code-plugin/job/master/badge/icon)](https://ci.jenkins.io/job/Plugins/job/configuration-as-code-plugin/job/master/)
+
 # Jenkins Configuration as Code Plugin
 
 ![logo](logo.png)
