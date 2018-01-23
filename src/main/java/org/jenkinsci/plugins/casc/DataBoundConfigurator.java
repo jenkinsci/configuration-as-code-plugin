@@ -93,8 +93,19 @@ public class DataBoundConfigurator extends BaseConfigurator<Object> {
 
         for (Attribute attribute : attributes) {
             final String name = attribute.getName();
+            final Configurator lookup = Configurator.lookup(attribute.getType());
             if (config.containsKey(name)) {
-                final Object value = Configurator.lookup(attribute.getType()).configure(config.get(name));
+                final Object yaml = config.get(name);
+                Object value;
+                if (attribute.isMultiple()) {
+                    List l = new ArrayList<>();
+                    for (Object o : (List) yaml) {
+                        l.add(lookup.configure(o));
+                    }
+                    value = l;
+                } else {
+                    value = lookup.configure(config.get(name));
+                }
                 attribute.setValue(object, value);
             }
         }

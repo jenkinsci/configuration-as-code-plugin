@@ -25,6 +25,7 @@ public class Attribute<T> {
     protected final Class type;
     private boolean multiple;
     protected String preferredName;
+    private Setter setter = DEFAULT_SETTER;
 
     public Attribute(String name, Class type) {
         this.name = name;
@@ -54,6 +55,11 @@ public class Attribute<T> {
         return this;
     }
 
+    public Attribute setter(Setter setter) {
+        this.setter = setter;
+        return this;
+    }
+
 
     /** If this attribute is constrained to a limited set of value, here they are */
     public List<String> possibleValues() {
@@ -66,14 +72,26 @@ public class Attribute<T> {
 
 
     public void setValue(T target, Object value) throws Exception {
-        logger.info("Setting "+target.getClass().getCanonicalName()+'#'+name+" = " + value);
-        final PropertyDescriptor property = PropertyUtils.getPropertyDescriptor(target, name);
+        setter.setValue(target, this, value);
+    }
+
+    @FunctionalInterface
+    public interface Setter {
+        void setValue(Object target, Attribute attribute, Object value) throws Exception;
+    }
+
+    /**
+     * Default Setter implementation based on JavaBean property write method.
+     */
+    private static final Setter DEFAULT_SETTER = (target, attribute, value) -> {
+        logger.info("Setting "+target.getClass().getCanonicalName()+'#'+attribute.name+" = " + value);
+        final PropertyDescriptor property = PropertyUtils.getPropertyDescriptor(target, attribute.name);
         final Method writeMethod = property.getWriteMethod();
 
         Object o = value;
-        if (multiple) {
+        if (attribute.multiple) {
             if (!(value instanceof Collection)) {
-                throw new IllegalArgumentException(target + "#" + name + " should be a list.");
+                throw new IllegalArgumentException(target + "#" + attribute.name + " should be a list.");
             }
             // if setter expect an Array, convert Collection to expected array type
             // Typically required for hudson.tools.ToolDescriptor.setInstallations
@@ -81,17 +99,16 @@ public class Attribute<T> {
             final Class c = writeMethod.getParameterTypes()[0];
             if (c.isArray()) {
                 Collection collection = (Collection) value;
-                o = collection.toArray((Object[]) Array.newInstance(type, collection.size()));
+                o = collection.toArray((Object[]) Array.newInstance(attribute.type, collection.size()));
 
-            // if setter expect a Set, convert Collection to Set
-            // see jenkins.agentProtocols
+                // if setter expect a Set, convert Collection to Set
+                // see jenkins.agentProtocols
             } else if(c.isAssignableFrom(Set.class)){
                 o = new HashSet((Collection)value);
             }
-
         }
-        
+
         writeMethod.invoke(target, o);
-    }
+    };
 
 }
