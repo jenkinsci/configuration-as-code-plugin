@@ -6,7 +6,7 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
 
 public class ConfigurationAsCodeTest {
 
@@ -16,7 +16,8 @@ public class ConfigurationAsCodeTest {
     @Test
     public void init_test_from_accepted_sources() throws Exception {
         File tmpConfigFile = tempFolder.newFile("jenkins_tmp.yaml");
-        assertNotNull(ConfigurationAsCode.getConfigurationInput(tmpConfigFile.getAbsolutePath()));
-        assertNotNull(ConfigurationAsCode.getConfigurationInput("file://"+tmpConfigFile.getAbsolutePath()));
+        tempFolder.newFile("jenkins_tmp2.yaml");
+        assertEquals(1, ConfigurationAsCode.getConfigurationInput(tmpConfigFile.getAbsolutePath()).size());
+        assertEquals(2, ConfigurationAsCode.getConfigurationInput(tempFolder.getRoot().getAbsolutePath()).size());
     }
 }
