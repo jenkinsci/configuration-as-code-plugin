@@ -45,8 +45,9 @@ public class HeteroDescribableConfigurator extends Configurator<Describable> {
             if (map.size() != 1) {
                 throw new IllegalArgumentException("single entry map expected to configure a "+target.getName());
             }
-            shortname = map.keySet().iterator().next();
-            subconfig = map.get(shortname);
+            final Map.Entry<String, ?> next = map.entrySet().iterator().next();
+            shortname = next.getKey();
+            subconfig = next.getValue();
         } else {
             throw new IllegalArgumentException("Unexpected configuration type "+config);
         }

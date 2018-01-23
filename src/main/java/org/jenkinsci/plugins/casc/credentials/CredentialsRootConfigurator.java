@@ -61,6 +61,7 @@ public class CredentialsRootConfigurator extends Configurator<CredentialsStore> 
     }
 
     @Override
+    @SuppressWarnings(value="DM_NEW_FOR_GETCLASS") // one can't get a parameterized type .class
     public Set<Attribute> describe() {
         return Collections.singleton(new Attribute("system", new HashMap<Domain, List<Credentials>>().getClass()));
     }
