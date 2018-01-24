@@ -40,7 +40,9 @@ jenkins:
 ```  
   
 In addition, we want such a file to have a well documented syntax, and tooling to assist in writing and testing,
-so end-users have full guidance in using this toolset and don't have to search stackoverflow for samples. 
+so end-users have full guidance in using this toolset and don't have to search stackoverflow for samples.
+
+Have a look at [this presentation](https://docs.google.com/presentation/d/1-irLGTAvMe8Fz1md1zkJtpIpYo9NItZKnsgTYnIqbZU/edit?usp=sharing) for more details. 
 
 ## Jenkins Enhancement Proposal 
 
