@@ -4,6 +4,7 @@ import com.cloudbees.plugins.credentials.Credentials;
 import com.cloudbees.plugins.credentials.CredentialsStore;
 import com.cloudbees.plugins.credentials.SystemCredentialsProvider;
 import com.cloudbees.plugins.credentials.domains.Domain;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.Configurator;
@@ -61,7 +62,7 @@ public class CredentialsRootConfigurator extends Configurator<CredentialsStore> 
     }
 
     @Override
-    @SuppressWarnings(value="DM_NEW_FOR_GETCLASS") // one can't get a parameterized type .class
+    @SuppressFBWarnings(value="DM_NEW_FOR_GETCLASS", justification="one can't get a parameterized type .class")
     public Set<Attribute> describe() {
         return Collections.singleton(new Attribute("system", new HashMap<Domain, List<Credentials>>().getClass()));
     }
