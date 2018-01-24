@@ -84,7 +84,12 @@ public class ConfigurationAsCode extends Plugin {
         List<InputStream> is = new ArrayList<>();
         //Default
         if(StringUtils.isBlank(configPath)) {
-            is = Arrays.asList(new FileInputStream(new File("./jenkins.yaml")));
+            File defaultConfig = new File("./jenkins.yaml");
+            if(defaultConfig.exists()) {
+                is = Arrays.asList(new FileInputStream(new File("./jenkins.yaml")));
+            } else {
+                is = Collections.EMPTY_LIST;
+            }
         } else {
             File cfg = new File(configPath);
             if(cfg.isDirectory()) {
