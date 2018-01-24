@@ -54,7 +54,7 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator im
         for (Descriptor descriptor : descriptors) {
             if (descriptor.getCategory() == category && descriptor.getGlobalConfigPage() != null) {
 
-                final DescriptorRootElementConfigurator configurator = new DescriptorRootElementConfigurator(descriptor);
+                final DescriptorConfigurator configurator = new DescriptorConfigurator(descriptor);
                 attributes.add(new Attribute(configurator.getName(), configurator.getTarget()) {
                     @Override
                     public void setValue(Object target, Object value) throws Exception {

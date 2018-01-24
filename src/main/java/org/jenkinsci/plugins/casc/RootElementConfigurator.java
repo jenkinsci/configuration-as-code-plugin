@@ -25,17 +25,6 @@ public interface RootElementConfigurator {
             configurators.add(new GlobalConfigurationCategoryConfigurator(category));
         }
 
-        // Check for unclassified Descriptors
-        final ExtensionList<Descriptor> descriptors = jenkins.getExtensionList(Descriptor.class);
-        for (Descriptor descriptor : descriptors) {
-            if (descriptor.getGlobalConfigPage() != null && descriptor.getCategory() instanceof GlobalConfigurationCategory.Unclassified) {
-                configurators.add(new DescriptorRootElementConfigurator(descriptor));
-            }
-        }
-
-        for (RootElementConfigurator c: configurators)
-            System.out.println("[Configurator] " + c.getName());
-
         return configurators;
     }
 

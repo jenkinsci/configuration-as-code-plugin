@@ -1,7 +1,10 @@
 package org.jenkinsci.plugins.casc;
 
 import hudson.Extension;
+import hudson.ExtensionList;
+import hudson.model.Descriptor;
 import hudson.slaves.Cloud;
+import jenkins.model.GlobalConfigurationCategory;
 import jenkins.model.Jenkins;
 
 import java.util.Map;
@@ -12,6 +15,10 @@ import java.util.Set;
  */
 @Extension
 public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements RootElementConfigurator {
+
+    public static final Attribute.Setter NOOP = (target, attribute, value) -> {
+        // Nop
+    };
 
     @Override
     public Class<Jenkins> getTarget() {
@@ -31,7 +38,17 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
     public Set<Attribute> describe() {
         final Set<Attribute> attributes = super.describe();
 
-        attributes.add(new PersistedListAttribute<Cloud>("clouds", Jenkins.getInstance().clouds, Cloud.class));
+        final Jenkins jenkins = Jenkins.getInstance();
+        attributes.add(new PersistedListAttribute<Cloud>("clouds", jenkins.clouds, Cloud.class));
+
+        // Check for unclassified Descriptors
+        final ExtensionList<Descriptor> descriptors = jenkins.getExtensionList(Descriptor.class);
+        for (Descriptor descriptor : descriptors) {
+            if (descriptor.getGlobalConfigPage() != null && descriptor.getCategory() instanceof GlobalConfigurationCategory.Unclassified) {
+                final DescriptorConfigurator configurator = new DescriptorConfigurator(descriptor);
+                attributes.add(new Attribute(configurator.getName(), configurator.getTarget()).setter(NOOP));
+            }
+        }
 
         return attributes;
     }

@@ -9,14 +9,14 @@ import java.util.Map;
  * Define a Configurator for a Descriptor
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-public class DescriptorRootElementConfigurator extends BaseConfigurator<Descriptor> implements RootElementConfigurator {
+public class DescriptorConfigurator extends BaseConfigurator<Descriptor> implements RootElementConfigurator {
 
 
     private final String name;
     private final Descriptor descriptor;
     private final Class target;
 
-    public DescriptorRootElementConfigurator(Descriptor descriptor) {
+    public DescriptorConfigurator(Descriptor descriptor) {
         this.descriptor = descriptor;
         this.target = descriptor.getClass();
         final Symbol symbol = descriptor.getClass().getAnnotation(Symbol.class);

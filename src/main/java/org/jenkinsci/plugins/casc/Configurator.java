@@ -72,7 +72,7 @@ public abstract class Configurator<T> implements ExtensionPoint {
         }
 
         if (Descriptor.class.isAssignableFrom(clazz)) {
-            return new DescriptorRootElementConfigurator((Descriptor) jenkins.getExtensionList(clazz).get(0));
+            return new DescriptorConfigurator((Descriptor) jenkins.getExtensionList(clazz).get(0));
         }
 
         if (getDataBoundConstructor(clazz) != null) {
