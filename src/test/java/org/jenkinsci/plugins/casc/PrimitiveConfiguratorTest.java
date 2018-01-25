@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.casc;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import static org.junit.Assert.*;
@@ -13,6 +14,9 @@ public class PrimitiveConfiguratorTest {
 
     @Rule
     public JenkinsRule j = new JenkinsRule();
+
+    @Rule
+    public final EnvironmentVariables environment = new EnvironmentVariables();
 
     @Test
     public void _boolean() throws Exception {
@@ -39,6 +43,22 @@ public class PrimitiveConfiguratorTest {
     public void _string() throws Exception {
         Configurator c = Configurator.lookup(String.class);
         final Object value = c.configure("abc");
+        assertEquals("abc", value);
+    }
+
+    @Test
+    public void _Integer_env() throws Exception {
+        environment.set("ENV_FOR_TEST", "123");
+        Configurator c = Configurator.lookup(Integer.class);
+        final Object value = c.configure("${env.ENV_FOR_TEST}");
+        assertTrue(123 == ((Integer) value).intValue());
+    }
+
+    @Test
+    public void _string_env() throws  Exception {
+        environment.set("ENV_FOR_TEST", "abc");
+        Configurator c = Configurator.lookup(String.class);
+        final Object value = c.configure("${env.ENV_FOR_TEST}");
         assertEquals("abc", value);
     }
 }
