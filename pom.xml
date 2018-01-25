@@ -187,6 +187,19 @@
       <version>1.21</version>
       <scope>test</scope>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/com.github.stefanbirkner/system-rules -->
+    <dependency>
+      <groupId>com.github.stefanbirkner</groupId>
+      <artifactId>system-rules</artifactId>
+      <version>1.17.1</version>
+      <scope>test</scope>
+    </dependency>
+    <!--TODO: This should be in a seperate plugin at some point -->
+    <dependency>
+      <groupId>com.bettercloud</groupId>
+      <artifactId>vault-java-driver</artifactId>
+      <version>3.0.0</version>
+    </dependency>
 
   </dependencies>
 

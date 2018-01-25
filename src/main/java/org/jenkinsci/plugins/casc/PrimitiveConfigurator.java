@@ -28,18 +28,16 @@ public class PrimitiveConfigurator extends Configurator {
         return Collections.EMPTY_SET;
     }
 
-    public static final Pattern ENV_VARIABLE = Pattern.compile("\\$\\{(.*)\\}");
-
     @Override
     public Object configure(Object config) throws Exception {
         if (config instanceof String) {
             String s = (String) config;
-            // TODO I Wonder this could be done during parsing with some snakeyml extension
-            final Matcher matcher = ENV_VARIABLE.matcher(s);
-            if (matcher.matches()) {
-                final String var = matcher.group(1);
-                config = System.getProperty(var, System.getenv(var));
-                if (config == null) throw new IllegalStateException("Environment variable not set: "+var);
+            for(SecretSource secretSource : SecretSource.all()) {
+                String reveal = secretSource.reveal(s);
+                if(reveal != null) {
+                    config = reveal;
+                    break;
+                }
             }
         }
         return Stapler.lookupConverter(target).convert(target, config);
