@@ -27,7 +27,6 @@ public class VaultSecretSource extends SecretSource {
         String vaultUsr = System.getenv("CASC_VAULT_USER");
         String vaultPth = System.getenv("CASC_VAULT_PATH");
         String vaultUrl = System.getenv("CASC_VAULT_URL");
-        Optional<String> returnValue = Optional.empty();
         if(vaultPw != null && vaultUsr != null && vaultPth != null && vaultUrl != null) {
             try {
                 VaultConfig config = new VaultConfig().address(vaultUrl).build();
