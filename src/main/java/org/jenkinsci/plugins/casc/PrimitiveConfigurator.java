@@ -43,7 +43,6 @@ public class PrimitiveConfigurator extends Configurator {
         return Stapler.lookupConverter(target).convert(target, config);
     }
 
-
     @Override
     public List<Configurator> getConfigurators() {
         return Collections.EMPTY_LIST;

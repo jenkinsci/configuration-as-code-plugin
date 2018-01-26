@@ -5,7 +5,7 @@ jenkins:
       configurations:
         - server: ldap.acme.com
           rootDN: dc=acme,dc=fr
-          managerPasswordSecret: ${env.LDAP_PASSWORD}
+          managerPasswordSecret: ${LDAP_PASSWORD}
       cache:
         size: 100
         ttl: 10

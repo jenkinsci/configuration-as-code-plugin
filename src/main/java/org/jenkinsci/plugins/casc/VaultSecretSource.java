@@ -19,7 +19,6 @@ import java.util.regex.Pattern;
 public class VaultSecretSource extends SecretSource {
 
     private final static Logger LOGGER = Logger.getLogger(VaultSecretSource.class.getName());
-    private static final Pattern VAULT_VARIABLE = Pattern.compile("\\$\\{vault\\.(.*)\\}");
 
     @Override
     public String reveal(String fromKey) {
@@ -29,7 +28,7 @@ public class VaultSecretSource extends SecretSource {
         String vaultUrl = System.getenv("CASC_VAULT_URL");
         if(vaultPw != null && vaultUsr != null && vaultPth != null && vaultUrl != null) {
             try {
-                Matcher m = VAULT_VARIABLE.matcher(fromKey);
+                Matcher m = SecretSource.SECRET_PATTERN.matcher(fromKey);
                 if (m.matches()) {
                     final String vaultKey = m.group(1);
                     VaultConfig config = new VaultConfig().address(vaultUrl).build();
