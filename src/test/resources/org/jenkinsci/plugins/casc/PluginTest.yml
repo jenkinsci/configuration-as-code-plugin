@@ -1,0 +1,9 @@
+plugins:
+  proxy:
+    name: "proxy.acme.com"
+    port: 9090
+    userName: "foo"
+    password: "bar"
+  updateSites:
+    extra:
+      url: "http://some.other.site.org"
