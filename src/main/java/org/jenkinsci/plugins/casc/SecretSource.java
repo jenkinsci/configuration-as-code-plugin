@@ -3,6 +3,7 @@ package org.jenkinsci.plugins.casc;
 import hudson.ExtensionPoint;
 import jenkins.model.Jenkins;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +28,7 @@ public abstract class SecretSource implements ExtensionPoint {
         return Optional.empty();
     }
 
-    public abstract Optional<String> reveal(String secret);
+    public abstract Optional<String> reveal(String secret) throws IOException;
 
     public static List<SecretSource> all() {
         List<SecretSource> all = new ArrayList<>();
