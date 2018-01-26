@@ -4,9 +4,8 @@ import org.kohsuke.stapler.Stapler;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -31,12 +30,18 @@ public class PrimitiveConfigurator extends Configurator {
     @Override
     public Object configure(Object config) throws Exception {
         if (config instanceof String) {
-            String s = (String) config;
-            for(SecretSource secretSource : SecretSource.all()) {
-                String reveal = secretSource.reveal(s);
-                if(reveal != null) {
-                    config = reveal;
-                    break;
+            Optional<String> r = SecretSource.requiresReveal((String) config);
+            if(r.isPresent()) {
+                Optional<String> reveal = Optional.empty();
+                for (SecretSource secretSource : SecretSource.all()) {
+                    reveal = secretSource.reveal(r.get());
+                    if(reveal.isPresent()) {
+                        config = reveal.get();
+                        break;
+                    }
+                }
+                if(!reveal.isPresent()) {
+                    throw new IllegalArgumentException("Unable to reveal variable with key: "+config);
                 }
             }
         }

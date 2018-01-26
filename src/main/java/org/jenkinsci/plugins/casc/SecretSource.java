@@ -5,6 +5,8 @@ import jenkins.model.Jenkins;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class SecretSource implements ExtensionPoint {
@@ -16,7 +18,16 @@ public abstract class SecretSource implements ExtensionPoint {
      */
     public static final Pattern SECRET_PATTERN = Pattern.compile("\\$\\{(.*)\\}");
 
-    public abstract String reveal(String secret);
+    //We need to compile the matcher once for every key we examine.
+    public static Optional<String> requiresReveal(String key) {
+        Matcher m = SECRET_PATTERN.matcher(key);
+        if(m.matches()) {
+            return Optional.of(m.group(1));
+        }
+        return Optional.empty();
+    }
+
+    public abstract Optional<String> reveal(String secret);
 
     public static List<SecretSource> all() {
         List<SecretSource> all = new ArrayList<>();
