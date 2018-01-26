@@ -8,12 +8,10 @@ import java.util.regex.Pattern;
 @Extension
 public class EnvSecretSource extends SecretSource {
 
-    private static final Pattern ENV_VARIABLE = Pattern.compile("\\$\\{env\\.(.*)\\}");
-
     @Override
     public String reveal(String fromKey) {
         // TODO I Wonder this could be done during parsing with some snakeyml extension
-        Matcher m = ENV_VARIABLE.matcher(fromKey);
+        Matcher m = SecretSource.SECRET_PATTERN.matcher(fromKey);
         if(m.matches()) {
             final String var = m.group(1);
             String config = System.getProperty(var, System.getenv(var));

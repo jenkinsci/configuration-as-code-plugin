@@ -50,7 +50,7 @@ public class PrimitiveConfiguratorTest {
     public void _Integer_env() throws Exception {
         environment.set("ENV_FOR_TEST", "123");
         Configurator c = Configurator.lookup(Integer.class);
-        final Object value = c.configure("${env.ENV_FOR_TEST}");
+        final Object value = c.configure("${ENV_FOR_TEST}");
         assertTrue(123 == ((Integer) value).intValue());
     }
 
@@ -58,7 +58,7 @@ public class PrimitiveConfiguratorTest {
     public void _string_env() throws  Exception {
         environment.set("ENV_FOR_TEST", "abc");
         Configurator c = Configurator.lookup(String.class);
-        final Object value = c.configure("${env.ENV_FOR_TEST}");
+        final Object value = c.configure("${ENV_FOR_TEST}");
         assertEquals("abc", value);
     }
 }
