@@ -44,7 +44,7 @@ public class VaultSecretSource extends SecretSource {
     @Override
     public Optional<String> reveal(String vaultKey) {
         Optional<String> returnValue = Optional.empty();
-        if(secrets.get(vaultKey) != null)  {
+        if(secrets.containsKey(vaultKey))  {
             returnValue = Optional.of(secrets.get(vaultKey));
         }
         return returnValue;
