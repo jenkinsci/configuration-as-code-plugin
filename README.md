@@ -107,6 +107,28 @@ The configuration file format depends on the version of jenkins-core and install
 Documentation is generated from a live instance, as well as a JSON-schema you can use to validate configuration file
 with your favourite yaml tools.
 
+## How to provide initial secrets for Configuration-as-Code
+
+Currently you can provide initial secrets to Configuration-as-Code that all rely on <key,value>
+substitution of strings in configuration. Just like in Jenkins: `${some_var}`. We can provide these initial secrets in
+the following ways:
+
+ - Using environment variables
+ - Using docker-secrets, where files on path `/run/secrets/${KEY}` will be replaced by `${KEY}` in configuration
+ - Using vault, see instructions in the section below
+
+### Using Vault initial secrets
+
+**Prerequisites**
+
+ - The environment variable `CASC_VAULT_PW` must be present (Vault password)
+ - The environment variable `CASC_VAULT_USER` must be present (Vault username)
+ - The environment variable `CASC_VAULT_PATH` must be present (Vault key path, I.E /secrets/jenkins)
+ - The environment variable `CASC_VAULT_URL` must be present (Vault url, including port)
+ 
+If all those 4 are present, Configuration-as-Code will try to gather initial secrets from Vault. Requires read access for
+user.
+
 **TODO** provide a dockerfile to 'build' this documentation from specified jenkins-core release and plugins.
 
 
