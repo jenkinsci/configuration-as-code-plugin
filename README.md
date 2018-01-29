@@ -115,7 +115,7 @@ the following ways:
 
  - Using environment variables
  - Using docker-secrets, where files on path `/run/secrets/${KEY}` will be replaced by `${KEY}` in configuration
- - Using vault, see instructions in the section below
+ - Using vault, see instructions in section below
 
 ### Using Vault initial secrets
 
@@ -126,8 +126,7 @@ the following ways:
  - The environment variable `CASC_VAULT_PATH` must be present (Vault key path, I.E /secrets/jenkins)
  - The environment variable `CASC_VAULT_URL` must be present (Vault url, including port)
  
-If all those 4 are present, Configuration-as-Code will try to gather initial secrets from Vault. Requires read access for
-user.
+If all those 4 are present, Configuration-as-Code will try to gather initial secrets from Vault. Requires read access for the configured user.
 
 **TODO** provide a dockerfile to 'build' this documentation from specified jenkins-core release and plugins.
 
