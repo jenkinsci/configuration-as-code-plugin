@@ -45,17 +45,17 @@ public class Attribute<T> {
         return multiple;
     }
 
-    public Attribute multiple(boolean multiple) {
+    public Attribute<T> multiple(boolean multiple) {
         this.multiple = multiple;
         return this;
     }
 
-    public Attribute preferredName(String preferredName) {
+    public Attribute<T> preferredName(String preferredName) {
         this.preferredName = preferredName;
         return this;
     }
 
-    public Attribute setter(Setter setter) {
+    public Attribute<T> setter(Setter setter) {
         this.setter = setter;
         return this;
     }

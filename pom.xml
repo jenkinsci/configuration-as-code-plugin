@@ -64,6 +64,12 @@
       <version>1.18</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>job-dsl</artifactId>
+      <version>1.66</version>
+    </dependency>
+
     <!-- plugin adapters-->
 
     <dependency>
@@ -130,14 +136,7 @@
       <version>2.9</version>
       <scope>test</scope>
     </dependency>
-
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>job-dsl</artifactId>
-      <version>1.66</version>
-      <scope>test</scope>
-    </dependency>
-
+    
     <!-- required to satisfy plugins dependencies and get testPluginActive to pass -->
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
@@ -168,6 +167,11 @@
       <artifactId>workflow-support</artifactId>
       <version>2.16</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins.workflow</groupId>
+      <artifactId>workflow-multibranch</artifactId>
+      <version>2.9.2</version>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>

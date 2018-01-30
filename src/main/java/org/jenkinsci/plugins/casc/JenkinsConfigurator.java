@@ -1,12 +1,17 @@
 package org.jenkinsci.plugins.casc;
 
+import hudson.EnvVars;
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.model.Descriptor;
 import hudson.slaves.Cloud;
+import javaposse.jobdsl.plugin.JenkinsDslScriptLoader;
+import javaposse.jobdsl.plugin.JenkinsJobManagement;
+import javaposse.jobdsl.plugin.LookupStrategy;
 import jenkins.model.GlobalConfigurationCategory;
 import jenkins.model.Jenkins;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -40,7 +45,13 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
 
         final Jenkins jenkins = Jenkins.getInstance();
         attributes.add(new PersistedListAttribute<Cloud>("clouds", jenkins.clouds, Cloud.class));
-
+        attributes.add(new Attribute<String>("jobs", String.class).multiple(true).setter((target, attribute, value) -> {
+            JenkinsJobManagement mng = new JenkinsJobManagement(System.out, new EnvVars(), null, null, LookupStrategy.JENKINS_ROOT);
+            for (String script : (List<String>) value) {
+                new JenkinsDslScriptLoader(mng).runScript(script);
+            }
+        }));
+        
         // Check for unclassified Descriptors
         final ExtensionList<Descriptor> descriptors = jenkins.getExtensionList(Descriptor.class);
         for (Descriptor descriptor : descriptors) {
@@ -52,6 +63,7 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
 
         return attributes;
     }
+
 
     @Override
     public String getName() {
