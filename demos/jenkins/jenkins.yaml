@@ -32,8 +32,9 @@ jenkins:
   clouds:
     - docker:
         name: "docker"
-        dockerHost:
-          uri: "unix:///var/run/docker.sock"
+        dockerApi:
+          dockerHost:
+            uri: "unix:///var/run/docker.sock"
         templates:
           - labelString: "docker-agent"
             dockerTemplateBase:
