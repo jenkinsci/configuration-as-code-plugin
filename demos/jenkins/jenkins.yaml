@@ -1,0 +1,61 @@
+jenkins:
+  systemMessage: "Jenkins configured automatically by Jenkins Configuration as Code Plugin\n\n"
+  numExecutors: 5
+  scmCheckoutRetryCount: 2
+  mode: NORMAL
+  scmCheckoutRetryCount: 4
+
+  globalLibraries:
+    libraries:
+      - name: "awesome-lib"
+        retriever:
+          modernSCM:
+            scm:
+              git:
+                remote: "https://github.com/jenkins-infra/pipeline-library.git"
+
+  teampluginglobalconfig:
+    collectionConfigurations:
+      - collectionUrl: http://test.com
+        credentialsId: tfsCredentials
+    enableTeamPushTriggerForAllJobs: true
+    enableTeamStatusForAllJobs: true
+    #userAccountMapper:
+    configFolderPerNode: true
+
+  mailer:
+    adminAddress: admin@acme.org
+    replyToAddress: do-not-reply@acme.org
+    smtpHost: smtp.acme.org
+    smtpPort: 4441
+
+  clouds:
+    - docker:
+        name: "docker"
+        dockerHost:
+          uri: "unix:///var/run/docker.sock"
+        templates:
+          - labelString: "docker-agent"
+            dockerTemplateBase:
+              image: "jenkins/slave"
+            remoteFs: "/home/jenkins/agent"
+            connector:
+              attach:
+                user: "jenkins"
+            instanceCapStr: "10"
+
+  artifactorybuilder:
+    useCredentialsPlugin: true
+    artifactoryServers:
+      - name: foo
+        serverId: artifactory
+        artifactoryUrl: http://acme.com/artifactory
+        resolverCredentialsConfig:
+          username: artifactory_user
+          password: SECRET
+
+tool:
+  git:
+    installations:
+      - name: git
+        home: /usr/local/bin/git
