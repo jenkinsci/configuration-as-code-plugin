@@ -1,5 +1,5 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:f="/lib/form">
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
   <l:layout norefresh="true" type="one-column" title="${%about(app.VERSION)}">
 
   <l:main-panel>
@@ -21,7 +21,7 @@
           </j:forEach>
         </ul>
 
-        <p>Last time applied : ${it.lastTimeLoaded}</p>
+        <p>Last time applied : <i:formatDate value="${it.lastTimeLoaded}" type="both" dateStyle="medium" timeStyle="long"/></p>
 
         <form method="post" action="reload" name="reload">
           <f:submit name="reload" value="Reload"/>
