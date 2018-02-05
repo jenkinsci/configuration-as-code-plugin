@@ -25,6 +25,8 @@ import java.util.Set;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 /**
+ * {@link Configurator} that uses Java Beans pattern to the target object.
+ *
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 public abstract class BaseConfigurator<T> extends Configurator<T> {
