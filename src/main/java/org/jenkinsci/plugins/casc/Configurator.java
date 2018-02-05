@@ -11,6 +11,7 @@ import jenkins.model.Jenkins;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
+import org.jvnet.tiger_types.Types;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.lang.Klass;
@@ -47,8 +48,7 @@ public abstract class Configurator<T> implements ExtensionPoint {
     }
 
     public static Configurator lookup(Type type) {
-
-        Class clazz = asClass(type);
+        Class clazz = Types.erasure(type);
 
         final Jenkins jenkins = Jenkins.getInstance();
         final ExtensionList<Configurator> l = jenkins.getExtensionList(Configurator.class);
@@ -98,17 +98,6 @@ public abstract class Configurator<T> implements ExtensionPoint {
 
         logger.warning("Configuration-as-Code can't handle type "+ type);
         return null;
-    }
-
-    private static Class asClass(Type type) {
-        Class clazz;
-        if (type instanceof ParameterizedType) {
-            ParameterizedType pt = (ParameterizedType) type;
-            clazz = (Class) pt.getRawType();
-        } else {
-            clazz = (Class) type;
-        }
-        return clazz;
     }
 
     public static Constructor getDataBoundConstructor(Class type) {
