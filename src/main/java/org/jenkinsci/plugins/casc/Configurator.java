@@ -31,6 +31,15 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 /**
+ * Defines a mapping between a tree that represents user configuration and a Jenkins object produced from it.
+ *
+ * <p>
+ * Different {@link Configurator}s define mapping for different Jenkins objects.
+ *
+ * <p>
+ * This mapping includes not just performing the instantiation of Jenkins objects but also static description
+ * of the mapping to enable schema/doc generation.
+ *
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 public abstract class Configurator<T> implements ExtensionPoint {
