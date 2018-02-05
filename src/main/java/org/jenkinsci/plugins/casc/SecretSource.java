@@ -10,6 +10,12 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Resolves variable references in configuration file of the form "${abc}"
+ *
+ * <p>
+ * Variable references are meant to hide secrets from configuration files.
+ */
 public abstract class SecretSource implements ExtensionPoint {
     /**
      *

@@ -2,7 +2,10 @@ package org.jenkinsci.plugins.casc;
 
 import hudson.model.Describable;
 import hudson.model.Descriptor;
+import hudson.security.HudsonPrivateSecurityRealm;
+import hudson.security.SecurityRealm;
 import jenkins.model.Jenkins;
+import org.jenkinsci.Symbol;
 
 import java.util.Collections;
 import java.util.List;
@@ -11,6 +14,17 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
+ * {@link Configurator} that works with {@link Describable} subtype as a {@link #target}.
+ *
+ * <p>
+ * The configuration object will be specify the 'short name' which we use to resolve to a specific
+ * subtype of {@link #target}. For example, if {@link #target} is {@link SecurityRealm} and the short name
+ * is 'local', we resolve to {@link HudsonPrivateSecurityRealm} (because it has {@link Symbol} annotation that
+ * specifies that name.
+ *
+ * <p>
+ * The corresponding {@link Configurator} will be then invoked to configure the chosen subtype.
+ *
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 public class HeteroDescribableConfigurator extends Configurator<Describable> {
@@ -55,7 +69,9 @@ public class HeteroDescribableConfigurator extends Configurator<Describable> {
         final List<Descriptor> candidates = Jenkins.getInstance().getDescriptorList(target);
 
         Class<? extends Describable> k = findDescribableBySymbol(shortname, candidates);
-        return (Describable) Configurator.lookup(k).configure(subconfig);
+        final Configurator configurator = Configurator.lookup(k);
+        if (configurator == null) throw new IllegalStateException("No configurator implementation to manage "+k);
+        return (Describable) configurator.configure(subconfig);
     }
 
     private Class findDescribableBySymbol(String shortname, List<Descriptor> candidates) {
@@ -64,6 +80,16 @@ public class HeteroDescribableConfigurator extends Configurator<Describable> {
         for (Descriptor d : candidates) {
             final String symbol = DescribableAttribute.getSymbolName(d, getExtensionPoint(), target);
             if (symbol.equalsIgnoreCase(shortname)) return d.getKlass().toJavaClass();
+        }
+
+        // Not all Describable classes have symbols, give a chance to custom configurators in standalone plugins
+        // TODO: probably this logic should have a priority over Symbol so that extensions can override it
+        final Configurator c = Configurator.lookupForBaseType(target, shortname);
+        if (c != null) {
+            Class<?> clazz = c.getTarget();
+            if (Describable.class.isAssignableFrom(clazz)) {
+                return clazz;
+            }
         }
 
         throw new IllegalArgumentException("No "+target.getName()+ " implementation found for "+shortname);

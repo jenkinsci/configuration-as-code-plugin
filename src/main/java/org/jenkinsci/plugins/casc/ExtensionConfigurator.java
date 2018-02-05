@@ -39,7 +39,10 @@ public class ExtensionConfigurator extends BaseConfigurator {
             for (Attribute attribute : attributes) {
                 final String name = attribute.getName();
                 if (config.containsKey(name)) {
-                    final Object value = Configurator.lookup(attribute.getType()).configure(config.get(name));
+                    final Class k = attribute.getType();
+                    final Configurator configurator = Configurator.lookup(k);
+                    if (configurator == null) throw new IllegalStateException("No configurator implementation to manage "+ k);
+                    final Object value = configurator.configure(config.get(name));
                     attribute.setValue(o, value);
                 }
             }

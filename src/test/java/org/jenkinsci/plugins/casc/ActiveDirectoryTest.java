@@ -21,6 +21,8 @@ public class ActiveDirectoryTest {
 
     @Test
     public void configure_active_directory() throws Exception {
+        System.setProperty("BIND_PASSWORD", "ADMIN123");
+
         ConfigurationAsCode.configure(getClass().getResourceAsStream("ActiveDirectoryTest.yml"));
 
         final Jenkins jenkins = Jenkins.getInstance();

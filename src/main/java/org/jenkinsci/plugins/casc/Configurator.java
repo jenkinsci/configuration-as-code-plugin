@@ -11,10 +11,13 @@ import jenkins.model.Jenkins;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
+import org.jvnet.tiger_types.Types;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.lang.Klass;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
@@ -29,7 +32,17 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+
 /**
+ * Defines a mapping between a tree that represents user configuration and a Jenkins object produced from it.
+ *
+ * <p>
+ * Different {@link Configurator}s define mapping for different Jenkins objects.
+ *
+ * <p>
+ * This mapping includes not just performing the instantiation of Jenkins objects but also static description
+ * of the mapping to enable schema/doc generation.
+ *
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 public abstract class Configurator<T> implements ExtensionPoint {
@@ -46,9 +59,14 @@ public abstract class Configurator<T> implements ExtensionPoint {
         return null;
     }
 
+    /**
+     * Looks for a configurator for exact type.
+     * @param type Type
+     * @return Configurator or {@code null} if it is not found
+     */
+    @CheckForNull
     public static Configurator lookup(Type type) {
-
-        Class clazz = asClass(type);
+        Class clazz = Types.erasure(type);
 
         final Jenkins jenkins = Jenkins.getInstance();
         final ExtensionList<Configurator> l = jenkins.getExtensionList(Configurator.class);
@@ -100,15 +118,24 @@ public abstract class Configurator<T> implements ExtensionPoint {
         return null;
     }
 
-    private static Class asClass(Type type) {
-        Class clazz;
-        if (type instanceof ParameterizedType) {
-            ParameterizedType pt = (ParameterizedType) type;
-            clazz = (Class) pt.getRawType();
-        } else {
-            clazz = (Class) type;
+    /**
+     * Finds a Configurator for base type and a short name
+     * @param clazz Base class
+     * @param shortname Short name of the implementation
+     * @return Configurator
+     */
+    @CheckForNull
+    public static Configurator lookupForBaseType(Class<?> clazz, @Nonnull String shortname) {
+        final Jenkins jenkins = Jenkins.getInstance();
+        final ExtensionList<Configurator> l = jenkins.getExtensionList(Configurator.class);
+        for (Configurator c : l) {
+            if (shortname.equalsIgnoreCase(c.getName())) { // short name match, ensure that the type is compliant
+                if (clazz.isAssignableFrom(c.getTarget())) { // Implements child class
+                    return c;
+                }
+            }
         }
-        return clazz;
+        return null;
     }
 
     public static Constructor getDataBoundConstructor(Class type) {
@@ -185,6 +212,15 @@ public abstract class Configurator<T> implements ExtensionPoint {
         return Klass.java(getTarget());
     }
 
+    /**
+     * Configures/creates a Jenkins object based on a tree.
+     *
+     * @param config
+     *      Map/List/primitive objects (think YAML) that represents the configuration from which
+     *      a Jenkins object is configured.
+     * @return
+     *      Fully configured Jenkins object that results from this configuration.
+     */
     public abstract T configure(Object config) throws Exception;
 
     /**
@@ -194,6 +230,17 @@ public abstract class Configurator<T> implements ExtensionPoint {
         final ArrayList<Attribute> attributes = new ArrayList<>(describe());
         Collections.sort(attributes, (a,b) -> a.name.compareTo(b.name));
         return attributes;
+    }
+
+    @CheckForNull
+    public Attribute getAttribute(@Nonnull String name) {
+        Set<Attribute> attrs = describe();
+        for (Attribute attr : attrs) {
+            if (attr.name.equalsIgnoreCase(name)) {
+                return attr;
+            }
+        }
+        return null;
     }
 
     /**
