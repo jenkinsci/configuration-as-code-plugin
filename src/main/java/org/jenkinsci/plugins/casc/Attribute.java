@@ -60,6 +60,9 @@ public class Attribute<T> {
         return this;
     }
 
+    public Setter getSetter() {
+        return setter;
+    }
 
     /** If this attribute is constrained to a limited set of value, here they are */
     public List<String> possibleValues() {

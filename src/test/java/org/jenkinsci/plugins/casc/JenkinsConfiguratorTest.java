@@ -5,6 +5,7 @@ import hudson.security.HudsonPrivateSecurityRealm;
 import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
+import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import static org.junit.Assert.*;
@@ -36,6 +37,13 @@ public class JenkinsConfiguratorTest {
         assertFalse(((FullControlOnceLoggedInAuthorizationStrategy) jenkins.getAuthorizationStrategy()).isAllowAnonymousRead());
     }
 
-
+    @Test
+    @Issue("Issue #60")
+    public void shouldHaveAuthStrategyConfigurator() throws Exception {
+        Configurator c = Configurator.lookup(Jenkins.class);
+        Attribute attr = c.getAttribute("authorizationStrategy");
+        assertNotNull(attr);
+        assertNotEquals(JenkinsConfigurator.NOOP, attr.getSetter());
+    }
 
 }
