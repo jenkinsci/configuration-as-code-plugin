@@ -69,7 +69,9 @@ public class HeteroDescribableConfigurator extends Configurator<Describable> {
         final List<Descriptor> candidates = Jenkins.getInstance().getDescriptorList(target);
 
         Class<? extends Describable> k = findDescribableBySymbol(shortname, candidates);
-        return (Describable) Configurator.lookup(k).configure(subconfig);
+        final Configurator configurator = Configurator.lookup(k);
+        if (configurator == null) throw new IllegalStateException("No configurator implementation to manage "+k);
+        return (Describable) configurator.configure(subconfig);
     }
 
     private Class findDescribableBySymbol(String shortname, List<Descriptor> candidates) {
