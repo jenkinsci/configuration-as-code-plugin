@@ -79,7 +79,10 @@ public class DataBoundConfigurator extends BaseConfigurator<Object> {
 
                     } else {
                         final Type pt = parameters[i].getParameterizedType();
-                        args[i] = Configurator.lookup(pt != null ? pt : t).configure(value);
+                        final Type k = pt != null ? pt : t;
+                        final Configurator configurator = Configurator.lookup(k);
+                        if (configurator == null) throw new IllegalStateException("No configurator implementation to manage "+k);
+                        args[i] = configurator.configure(value);
                     }
                     System.out.println("Setting " + target + "." + names[i] + " = " + value);
                 } else if (t.isPrimitive()) {
