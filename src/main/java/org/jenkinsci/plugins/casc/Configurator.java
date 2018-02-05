@@ -174,6 +174,15 @@ public abstract class Configurator<T> implements ExtensionPoint {
         return Klass.java(getTarget());
     }
 
+    /**
+     * Configures/creates a Jenkins object based on a tree.
+     *
+     * @param config
+     *      Map/List/primitive objects (think YAML) that represents the configuration from which
+     *      a Jenkins object is configured.
+     * @return
+     *      Fully configured Jenkins object that results from this configuration.
+     */
     public abstract T configure(Object config) throws Exception;
 
     /**
