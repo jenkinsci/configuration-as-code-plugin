@@ -1,0 +1,52 @@
+jenkins:
+
+  authorizationStrategy:
+    roleStrategy:
+      roles:
+        global:
+          - role:
+              name: "admin"
+              description: "Jenkins administrators"
+              permissions:
+                - "Jenkins/Administer"
+            assignments:
+              - "admin"
+          - role:
+              name: "readonly"
+              description: "Read-only users"
+              permissions:
+                - "Jenkins/Read"
+                - "Item/Read"
+            assignments:
+              - "authenticated"
+        items:
+          - role:
+              name: "FolderA"
+              description: "Jobs in Folder A, but not the folder itself"
+              pattern: "A/.*"
+              permissions:
+                - "Item/Configure"
+                - "Item/Build"
+                - "Item/Delete"
+            assignments:
+              - "authenticated"
+          - role:
+              name: "FolderB"
+              description: "Jobs in Folder B, but not the folder itself"
+              pattern: "B/.*"
+              permissions:
+                - "Item/Configure"
+                - "Item/Build"
+                - "Item/Delete"
+            assignments:
+              - "user1"
+              - "user2"
+        agents:
+          - role:
+              name: "Agent1"
+              description: "Agent 1"
+              pattern: "agent1*"
+              permissions:
+                - "Computer/Run"
+            assignments:
+              - "user1"
