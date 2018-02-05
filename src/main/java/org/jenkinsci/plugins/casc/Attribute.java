@@ -15,7 +15,10 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
+ * One attribute of {@link Configurator}.
+ *
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
+ * @see Configurator#describe()
  */
 public class Attribute<T> {
 
@@ -75,6 +78,9 @@ public class Attribute<T> {
         setter.setValue(target, this, value);
     }
 
+    /**
+     * Abstracts away how to assign a value to a 'target' Jenkins object.
+     */
     @FunctionalInterface
     public interface Setter {
         void setValue(Object target, Attribute attribute, Object value) throws Exception;
