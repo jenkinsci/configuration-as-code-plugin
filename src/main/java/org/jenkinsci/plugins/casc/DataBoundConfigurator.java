@@ -6,11 +6,13 @@ import jenkins.model.Jenkins;
 import org.kohsuke.stapler.ClassDescriptor;
 
 import javax.annotation.Nonnull;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -90,7 +92,19 @@ public class DataBoundConfigurator extends BaseConfigurator<Object> {
                 }
             }
         }
-        Object object = constructor.newInstance(args);
+
+        final Object object;
+        try {
+            object = constructor.newInstance(args);
+        } catch (IllegalArgumentException ex) {
+             List<String> argumentTypes = new ArrayList<>(args.length);
+             for (Object arg : args) {
+                argumentTypes.add(arg != null ? arg.getClass().getName() : "null");
+             }
+             throw new IOException("Failed to construct instance of " + target +
+                    ". Constructor: " + constructor.toString() +
+                    ". Arguments: " + argumentTypes, ex);
+        }
 
         final Set<Attribute> attributes = describe();
 
