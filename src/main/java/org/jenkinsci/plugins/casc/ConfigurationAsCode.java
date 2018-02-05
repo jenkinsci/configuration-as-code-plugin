@@ -1,24 +1,79 @@
 package org.jenkinsci.plugins.casc;
 
-import hudson.Plugin;
+import hudson.Extension;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
+import hudson.model.ManagementLink;
+import jenkins.model.Jenkins;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.interceptor.RequirePOST;
 import org.yaml.snakeyaml.Yaml;
 
+import javax.annotation.CheckForNull;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * {@linkplain #configure() Main entry point of the logic}.
  *
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-public class ConfigurationAsCode extends Plugin {
+@Extension
+public class ConfigurationAsCode extends ManagementLink {
+
+
+
+    @CheckForNull
+    @Override
+    public String getIconFileName() {
+        return "images/48x48/setting.png";
+    }
+
+    @CheckForNull
+    @Override
+    public String getDisplayName() {
+        return "configuration-as-code";
+    }
+
+    @CheckForNull
+    @Override
+    public String getUrlName() {
+        return "configuration-as-code";
+    }
+
+    private long lastTimeLoaded;
+
+    private List<String> sources = Collections.EMPTY_LIST;
+
+    public long getLastTimeLoaded() {
+        return lastTimeLoaded;
+    }
+
+    public List<String> getSources() {
+        return sources;
+    }
+
+    @RequirePOST
+    public void doReload(StaplerRequest request, StaplerResponse response) throws Exception {
+        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+            return;
+        }
+
+        configure();
+        response.sendRedirect(getUrlName());
+    }
 
     /**
      * Defaults to use a file in the current working directory with the name 'jenkins.yaml'
@@ -29,14 +84,26 @@ public class ConfigurationAsCode extends Plugin {
      * @throws Exception when the file provided cannot be found or parsed
      */
     @Initializer(after = InitMilestone.EXTENSIONS_AUGMENTED)
-    public static void configure() throws Exception {
+    public static void init() throws Exception {
+        get().configure();
+    }
+
+
+    public void configure() throws Exception {
+        List<String> files = new ArrayList<>();
+
         final String configParameter = System.getenv("CASC_JENKINS_CONFIG");
-        final List<InputStream> is = getConfigurationInput(configParameter);
-        for(InputStream isToConfigure : is) {
-            if (isToConfigure != null) {
-                configure(isToConfigure);
-            }
+        final Map<String, InputStream> is = getConfigurationInputs(configParameter);
+        for (Map.Entry<String, InputStream> e : is.entrySet()) {
+            files.add(e.getKey());
+            configure(e.getValue());
         }
+        sources = files;
+        lastTimeLoaded = System.currentTimeMillis();
+    }
+
+    public static ConfigurationAsCode get() {
+        return Jenkins.getInstance().getExtensionList(ConfigurationAsCode.class).get(0);
     }
 
     /**
@@ -85,26 +152,25 @@ public class ConfigurationAsCode extends Plugin {
         }
     }
 
-    public static List<InputStream> getConfigurationInput(String configPath) throws IOException {
-        List<InputStream> is = new ArrayList<>();
+    public Map<String, InputStream> getConfigurationInputs(String configPath) throws IOException {
         //Default
         if(StringUtils.isBlank(configPath)) {
             File defaultConfig = new File("./jenkins.yaml");
             if(defaultConfig.exists()) {
-                is = Arrays.asList(new FileInputStream(new File("./jenkins.yaml")));
+                return Collections.singletonMap("jenkins.yaml", new FileInputStream(new File("./jenkins.yaml")));
             } else {
-                is = Collections.EMPTY_LIST;
-            }
-        } else {
-            File cfg = new File(configPath);
-            if(cfg.isDirectory()) {
-                for(File cfgFile : FileUtils.listFiles(cfg, new String[]{"yml","yaml"},true)) {
-                    is.add(new FileInputStream(cfgFile));
-                }
-            } else {
-                is = Arrays.asList(new FileInputStream(cfg));
+                return Collections.EMPTY_MAP;
             }
         }
-        return is;
+        File cfg = new File(configPath);
+        if(cfg.isDirectory()) {
+            Map<String, InputStream> is = new HashMap<>();
+            for(File cfgFile : FileUtils.listFiles(cfg, new String[]{"yml","yaml"},true)) {
+                is.put(cfgFile.getName(), new FileInputStream(cfgFile));
+            }
+            return is;
+        }
+        return Collections.singletonMap(cfg.getName(), new FileInputStream(cfg));
     }
+
 }

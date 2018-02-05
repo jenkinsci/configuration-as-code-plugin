@@ -1,31 +1,46 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout">
-  <st:contentType value="text/html;charset=UTF-8"/>
-  <html><head>
-  <style class='anchorjs'></style><link href='https://jenkins.io/assets/bower/bootstrap/css/bootstrap.min.css' media='screen' rel='stylesheet'/>
-  <link href='https://jenkins.io/assets/bower/tether/css/tether.min.css' media='screen' rel='stylesheet'/>
-  <link href='https://jenkins.io/css/font-icons.css' media='screen' rel='stylesheet'/>
-  <link href='https://jenkins.io/css/jenkins.css' media='screen' rel='stylesheet'/>
-  <link href='https://jenkins.io/assets/bower/ionicons/css/ionicons.min.css' media='screen' rel='stylesheet'/>
-  <link href='https://jenkins.io/css/footer.css' media='screen' rel='stylesheet'/>
-  <link href='https://jenkins.io/css/font-awesome.min.css' media='screen' rel='stylesheet'/>
-  </head>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:f="/lib/form">
+  <l:layout norefresh="true" type="one-column" title="${%about(app.VERSION)}">
 
-  <body class='syntax'>
-  <div class='container'>
-  <div class='row body'>
-  <div class='section'>
-  <h2>Jenkins Configuration as Code Reference</h2>
+  <l:main-panel>
 
-  <div class='sect3'>
-  <j:forEach items="${it.configurators}" var="c">
-    <st:include page="documentation.jelly" it="${c}" optional="true"/>
-  </j:forEach>
+  <div class="container-fluid">
+  <div class="row">
+  <div class="col-md-24">
+    <h1>Configuration as Code</h1>
+
+    <j:choose>
+      <j:when test="${empty it.sources}">
+        Master has no configuration as code file set.
+      </j:when>
+      <j:otherwise>
+        Configuration loaded from :
+        <ul>
+          <j:forEach var="source" items="${it.sources}">
+            <li>${source}</li>
+          </j:forEach>
+        </ul>
+
+        <p>Last time applied : ${it.lastTimeLoaded}</p>
+
+        <form method="post" action="reload" name="reload">
+          <f:submit name="reload" value="Reload"/>
+        </form>
+
+      </j:otherwise>
+    </j:choose>
+
+
+    <h2>Reference</h2>
+    <dt>
+      <dl><a href="reference">Documentation</a></dl>
+      <dl><a href="schema">JSON schema</a></dl>
+    </dt>
+
   </div>
   </div>
   </div>
-  </div>
-  </body>
-  </html>
+  </l:main-panel>
+  </l:layout>
 
 </j:jelly>
