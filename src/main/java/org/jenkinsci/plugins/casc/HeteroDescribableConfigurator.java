@@ -66,6 +66,16 @@ public class HeteroDescribableConfigurator extends Configurator<Describable> {
             if (symbol.equalsIgnoreCase(shortname)) return d.getKlass().toJavaClass();
         }
 
+        // Not all Describable classes have symbols, give a chance to custom configurators in standalone plugins
+        // TODO: probably this logic should have a priority over Symbol so that extensions can override it
+        final Configurator c = Configurator.lookupForBaseType(target, shortname);
+        if (c != null) {
+            Class<?> clazz = c.getTarget();
+            if (Describable.class.isAssignableFrom(clazz)) {
+                return clazz;
+            }
+        }
+
         throw new IllegalArgumentException("No "+target.getName()+ " implementation found for "+shortname);
     }
 

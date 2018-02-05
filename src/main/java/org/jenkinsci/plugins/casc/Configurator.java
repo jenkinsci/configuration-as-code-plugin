@@ -15,6 +15,8 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.lang.Klass;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
@@ -46,6 +48,12 @@ public abstract class Configurator<T> implements ExtensionPoint {
         return null;
     }
 
+    /**
+     * Looks for a configurator for exact type.
+     * @param type Type
+     * @return Configurator or {@code null} if it is not found
+     */
+    @CheckForNull
     public static Configurator lookup(Type type) {
 
         Class clazz = asClass(type);
@@ -97,6 +105,26 @@ public abstract class Configurator<T> implements ExtensionPoint {
         }
 
         logger.warning("Configuration-as-Code can't handle type "+ type);
+        return null;
+    }
+
+    /**
+     * Finds a Configurator for base type and a short name
+     * @param clazz Base class
+     * @param shortname Short name of the implementation
+     * @return Configurator
+     */
+    @CheckForNull
+    public static Configurator lookupForBaseType(Class<?> clazz, @Nonnull String shortname) {
+        final Jenkins jenkins = Jenkins.getInstance();
+        final ExtensionList<Configurator> l = jenkins.getExtensionList(Configurator.class);
+        for (Configurator c : l) {
+            if (shortname.equalsIgnoreCase(c.getName())) { // short name match, ensure that the type is compliant
+                if (clazz.isAssignableFrom(c.getTarget())) { // Implements child class
+                    return c;
+                }
+            }
+        }
         return null;
     }
 
@@ -194,6 +222,17 @@ public abstract class Configurator<T> implements ExtensionPoint {
         final ArrayList<Attribute> attributes = new ArrayList<>(describe());
         Collections.sort(attributes, (a,b) -> a.name.compareTo(b.name));
         return attributes;
+    }
+
+    @CheckForNull
+    public Attribute getAttribute(@Nonnull String name) {
+        Set<Attribute> attrs = describe();
+        for (Attribute attr : attrs) {
+            if (name.equalsIgnoreCase(name)) {
+                return attr;
+            }
+        }
+        return null;
     }
 
     /**
