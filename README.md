@@ -125,16 +125,15 @@ Job-DSL plugin uses groovy syntax for it's job configuration DSL, so you'll have
 configuration-as-code file:
 
 ```yaml
-jenkins:
-  jobs:
-    - >
-        multibranchPipelineJob('configuration-as-code') {
-            branchSources {
-                git {
-                    remote('https://github.com/jenkinsci/configuration-as-code-plugin.git')
-                }
-            }
-        }
+jobs:
+  - >
+      multibranchPipelineJob('configuration-as-code') {
+          branchSources {
+              git {
+                  remote('https://github.com/jenkinsci/configuration-as-code-plugin.git')
+              }
+          }
+      }
 ```         
 
 ## How to provide initial secrets for Configuration-as-Code

@@ -236,7 +236,7 @@ public abstract class Configurator<T> implements ExtensionPoint {
     public Attribute getAttribute(@Nonnull String name) {
         Set<Attribute> attrs = describe();
         for (Attribute attr : attrs) {
-            if (name.equalsIgnoreCase(name)) {
+            if (attr.name.equalsIgnoreCase(name)) {
                 return attr;
             }
         }
