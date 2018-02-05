@@ -14,6 +14,8 @@ import jenkins.model.Jenkins;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -21,8 +23,13 @@ import java.util.Set;
 @Extension
 public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements RootElementConfigurator {
 
+    private static final Logger LOGGER = Logger.getLogger(JenkinsConfigurator.class.getName());
+
+    //TODO: All fields should be rather replaced by another setter which throws error (error propagation)
+    // https://github.com/jenkinsci/configuration-as-code-plugin/issues/63
     public static final Attribute.Setter NOOP = (target, attribute, value) -> {
         // Nop
+        LOGGER.log(Level.WARNING, "Ignoring attribute {0} for Jenkins instance. No setter", attribute.name);
     };
 
     @Override

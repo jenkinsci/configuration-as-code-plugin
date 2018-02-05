@@ -1,10 +1,13 @@
 package org.jenkinsci.plugins.casc;
 
+import hudson.security.AuthorizationStrategy;
 import hudson.security.FullControlOnceLoggedInAuthorizationStrategy;
 import hudson.security.HudsonPrivateSecurityRealm;
 import jenkins.model.Jenkins;
+import org.hamcrest.CoreMatchers;
 import org.junit.Rule;
 import org.junit.Test;
+import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import static org.junit.Assert.*;
@@ -36,6 +39,19 @@ public class JenkinsConfiguratorTest {
         assertFalse(((FullControlOnceLoggedInAuthorizationStrategy) jenkins.getAuthorizationStrategy()).isAllowAnonymousRead());
     }
 
+    @Test
+    @Issue("Issue #60")
+    public void shouldHaveAuthStrategyConfigurator() throws Exception {
+        Configurator c = Configurator.lookup(Jenkins.class);
+        Attribute attr = c.getAttribute("authorizationStrategy");
+        assertNotNull(attr);
+        // Apparently Java always thinks that labmdas are equal
+        //assertTrue("The operation should not be NOOP", JenkinsConfigurator.NOOP != attr.getSetter());
+        attr.getSetter().setValue(j.jenkins, attr, new AuthorizationStrategy.Unsecured());
 
+        assertThat("Authorization strategy has not been set",
+                j.jenkins.getAuthorizationStrategy(),
+                CoreMatchers.instanceOf(AuthorizationStrategy.Unsecured.class));
+    }
 
 }
