@@ -13,6 +13,7 @@ import org.kohsuke.stapler.interceptor.RequirePOST;
 import org.yaml.snakeyaml.Yaml;
 
 import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -54,16 +55,19 @@ public class ConfigurationAsCode extends ManagementLink {
         return "configuration-as-code";
     }
 
+    @CheckForNull
     private Date lastTimeLoaded;
 
-    private List<String> sources = Collections.EMPTY_LIST;
+    private List<String> sources;
 
+    @CheckForNull
     public Date getLastTimeLoaded() {
-        return lastTimeLoaded;
+        return lastTimeLoaded != null ? (Date)lastTimeLoaded.clone() : null;
     }
 
+    @Nonnull
     public List<String> getSources() {
-        return sources;
+        return sources != null ? sources : Collections.emptyList();
     }
 
     @RequirePOST
