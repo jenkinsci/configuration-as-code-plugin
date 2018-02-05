@@ -17,6 +17,7 @@ import java.util.*;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 public class ConfigurationAsCode extends Plugin {
+    public static final String CASC_JENKINS_CONFIG = "CASC_JENKINS_CONFIG";
 
     /**
      * Defaults to use a file in the current working directory with the name 'jenkins.yaml'
@@ -28,7 +29,7 @@ public class ConfigurationAsCode extends Plugin {
      */
     @Initializer(after = InitMilestone.EXTENSIONS_AUGMENTED)
     public static void configure() throws Exception {
-        final String configParameter = System.getenv("CASC_JENKINS_CONFIG");
+        final String configParameter = System.getProperty(CASC_JENKINS_CONFIG, System.getenv(CASC_JENKINS_CONFIG));
         final List<InputStream> is = getConfigurationInput(configParameter);
         for(InputStream isToConfigure : is) {
             if (isToConfigure != null) {
