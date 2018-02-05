@@ -14,6 +14,8 @@ import java.io.InputStream;
 import java.util.*;
 
 /**
+ * {@linkplain #configure() Main entry point of the logic}.
+ *
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 public class ConfigurationAsCode extends Plugin {
@@ -37,6 +39,9 @@ public class ConfigurationAsCode extends Plugin {
         }
     }
 
+    /**
+     * Reads YAML from the given {@link InputStream} and applies that to Jenkins.
+     */
     public static void configure(InputStream in) throws Exception {
         Map<String, Object> config = new Yaml().loadAs(in, Map.class);
         for (Map.Entry<String, Object> e : config.entrySet()) {
