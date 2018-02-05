@@ -4,6 +4,8 @@ This sums up a few usage scenarios for Jenkins configuration as code and our rec
 
 It's based on some real customer cases and potential users we already have plans with or could see using it in early stages of the project 2018.
 
+In the early stage of the project, we use the scenarios to detect the most important missing features. Later we will use the scenarios as documentation and guidance on how to adapt the configuration as code approach.
+
 
 ## Manage and version control Jenkins global configuration
 
@@ -24,24 +26,41 @@ They try to remember to ping each other on their chat to inform about changes.
 The devops team would like more traceability around changes, by completely move to manage the Jenkins global configuration as code and put it under version control. They will like to benefit also from having it as code to be able to spin up test environments and re-use common configuration across instances.
 
 
-**With Jenkins configuration as code plugin** installed on their master, the devops team will describe all the configuration in the `jenkins.yml` and maintain it through a git repository. When-ever they want to change anything, they will edit the file in git and their production server will refresh the configuration or the list of installed plugins.
+**With Jenkins Configuration as Code plugin** installed on their master, the devops team will describe all the configuration in the `jenkins.yml` and maintain it through a git repository. When-ever they want to change anything, they will edit the file in git and their production server will refresh the configuration or the list of installed plugins.
 
 From that point on they all have full traceability of all the changes made, and they are able to roll it back easily by reverting commits. They can review the changes simply by looking at the git diffs on commits.
 
-**Getting there and adopting Jenkins configuration as code** is also quite easy for the devops team. They will need to install the plugin, and go the the Configuration as Code menu in Manage Jenkins, and use the export function to create the initial YAML files that represent their current global configuration and plugin's installed.
+**Getting there and adopting Jenkins Configuration as Code** is also quite easy for the devops team. They will need to install the plugin, and go the the Configuration as Code menu in Manage Jenkins, and use the export function to create the initial YAML files that represent their current global configuration and plugin's installed.
 
 When the files are in git, they can point to the file in the repository in the Configuration as Code menu, and click reload so Jenkins updates it's configuration accordingly.
 
 
+_Migration step-by-step guide:_ For the exact steps, see this part of the migration guide - TBD when all relevant issues fixed:
+
+  * [#6 about reloading configuration when changed](https://github.com/jenkinsci/configuration-as-code-plugin/issues/6)
+  * [#7 about plugin installation support](https://github.com/jenkinsci/configuration-as-code-plugin/issues/7)
+  * [#10 related to hierarchy and re-use of configuration](https://github.com/jenkinsci/configuration-as-code-plugin/issues/10)
+  * [#32 where to draft a migration to Jenkins Configuration as Code guide](https://github.com/jenkinsci/configuration-as-code-plugin/issues/32)
+  * [#65 helping users migrate by export existing configuration](https://github.com/jenkinsci/configuration-as-code-plugin/issues/65)
 
 
 
+## Jenkins master already in docker
+
+A small full stack developer team have their single Jenkins master running in a container and they orchestrate and deploy it using one of the many container orchestration tools.
+Their Jenkins global configuration is the only piece not under version control, so they depend on the current data in `JENKINS_HOME` to persist the Jenkins global configuration and be able to redeploy the Jenkins master with existing installed plugins. They do not care about their historic build data.
+
+**With Jenkins configuration as code plugin** they can get their missing configuration under version control as well and their installed plugin combinations and for this little full stack developer team it means they can always just redeploy their Jenkins should something be wrong or failing, and their container orchestration tool will keep their Jenkins master always running for them completely automatically.
+
+**Migrating to use the Jenkins Configuration as Code plugin** is easy if they can live with doing just few manual steps before it is all automated. They need to install the Jenkins Configuration as Code plugin on their current master, then use the export functionality to create the `plugins.yml` and `jenkins.yml` file for them, which they need to add to a git repository.
+Then the last thing they need to do is to update their deployment recipe to use the customized Jenkins where the Jenkins Configuration as Code plugin comes pre-installed, and have the recipe pass the URI to the `jenkins.yml` file when starting Jenkins.
+
+After that they only do changes in the configuration file through git, and Jenkins Configuration as Code will refresh global configuration. Should their infrastructure fail their orchestration tool will recreate their master from scratch, but still with the same configuration and without depending on old data sets.
 
 
-## Infrastructure as code Jenkins master in docker
+_Migration step-by-step guide:_ For the exact steps, see this part of the migration guide - TBD when all relevant issues fixed:
 
-TBD the company already using docker, they just need to version control the configuration
-
-## Migrating existing instance
-
-TBD ... export functionality not yet there... but basically install plugin and run export and save the file, then ...
+  * [#6 about reloading configuration when changed](https://github.com/jenkinsci/configuration-as-code-plugin/issues/6)
+  * [#7 about plugin installation support](https://github.com/jenkinsci/configuration-as-code-plugin/issues/7)
+  * [#32 where to draft a migration to Jenkins Configuration as Code guide](https://github.com/jenkinsci/configuration-as-code-plugin/issues/32)
+  * [#65 helping users migrate by export existing configuration](https://github.com/jenkinsci/configuration-as-code-plugin/issues/65)
