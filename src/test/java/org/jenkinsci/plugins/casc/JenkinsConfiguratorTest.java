@@ -1,8 +1,10 @@
 package org.jenkinsci.plugins.casc;
 
+import hudson.security.AuthorizationStrategy;
 import hudson.security.FullControlOnceLoggedInAuthorizationStrategy;
 import hudson.security.HudsonPrivateSecurityRealm;
 import jenkins.model.Jenkins;
+import org.hamcrest.CoreMatchers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
@@ -43,7 +45,13 @@ public class JenkinsConfiguratorTest {
         Configurator c = Configurator.lookup(Jenkins.class);
         Attribute attr = c.getAttribute("authorizationStrategy");
         assertNotNull(attr);
-        assertNotEquals(JenkinsConfigurator.NOOP, attr.getSetter());
+        // Apparently Java always thinks that labmdas are equal
+        //assertTrue("The operation should not be NOOP", JenkinsConfigurator.NOOP != attr.getSetter());
+        attr.getSetter().setValue(j.jenkins, attr, new AuthorizationStrategy.Unsecured());
+
+        assertThat("Authorization strategy has not been set",
+                j.jenkins.getAuthorizationStrategy(),
+                CoreMatchers.instanceOf(AuthorizationStrategy.Unsecured.class));
     }
 
 }
