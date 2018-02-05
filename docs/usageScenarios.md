@@ -57,7 +57,7 @@ Then the last thing they need to do is to update their deployment recipe to use 
 
 After that they only do changes in the configuration file through git, and Jenkins Configuration as Code will refresh global configuration. Should their infrastructure fail their orchestration tool will recreate their master from scratch, but still with the same configuration and without depending on old data sets.
 
-Notice a slight difference between `plugins.yml` as part of the Configuration as Code vs `Plugins.txt` known from the Jenkins container setups. The latter one will need to contain all plugins and their dependencies and will usually be auto generated to support starting a Jenkins container with all the plug-ins one like. The `plugin.yml` takes the approach of only mentioning the plugin and their version (or latest) the user really cares about, and Configuration as Code will resolve dependencies for the user.
+Notice a slight difference between `plugins.yml` as part of the Configuration as Code vs `plugins.txt` known from the Jenkins container setups. The latter one will need to contain all plugins and their dependencies and will usually be auto generated to support starting a Jenkins container with all the plug-ins one like. The `plugin.yml` takes the approach of only mentioning the plugin and their version (or latest) the user really cares about, and Configuration as Code will resolve dependencies for the user.
 
 This means the team above will only have to maintain the `plugins.yml` entries for plugins they use and then make sure their clean Jenkins they start have the Configuration as Code plug-in installed. That can be done with a customized container image or the one supplied with Configuration as Code plugin.
 
