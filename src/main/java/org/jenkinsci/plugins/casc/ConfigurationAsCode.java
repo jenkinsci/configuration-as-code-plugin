@@ -18,7 +18,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -54,12 +53,12 @@ public class ConfigurationAsCode extends ManagementLink {
         return "configuration-as-code";
     }
 
-    private Date lastTimeLoaded;
+    private long lastTimeLoaded;
 
     private List<String> sources = Collections.EMPTY_LIST;
 
     public Date getLastTimeLoaded() {
-        return lastTimeLoaded;
+        return new Date(lastTimeLoaded);
     }
 
     public List<String> getSources() {
@@ -100,7 +99,7 @@ public class ConfigurationAsCode extends ManagementLink {
             configure(e.getValue());
         }
         sources = files;
-        lastTimeLoaded = new Date();
+        lastTimeLoaded = System.currentTimeMillis();
     }
 
     public static ConfigurationAsCode get() {
