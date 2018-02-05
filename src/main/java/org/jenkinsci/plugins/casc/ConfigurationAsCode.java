@@ -73,7 +73,7 @@ public class ConfigurationAsCode extends ManagementLink {
         }
 
         configure();
-        response.sendRedirect(getUrlName());
+        response.sendRedirect("");
     }
 
     /**
