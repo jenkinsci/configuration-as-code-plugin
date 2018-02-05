@@ -15,7 +15,7 @@ jenkins:
         artifactoryUrl: http://acme.com/artifactory
         resolverCredentialsConfig:
           username: artifactory_user
-          password: SECRET
+          password: ${ARTIFACTORY_PASSWORD}
 ```
 
 ## implementation note

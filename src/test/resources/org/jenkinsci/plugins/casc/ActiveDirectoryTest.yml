@@ -7,7 +7,7 @@ jenkins:
         servers: "ad1.acme.com:123,ad2.acme.com:456"
         site: "site"
         bindName: "admin"
-        bindPassword: "ADMIN123"
+        bindPassword: "${BIND_PASSWORD}"
       groupLookupStrategy: "RECURSIVE"
       removeIrrelevantGroups: true
       customDomain: true
