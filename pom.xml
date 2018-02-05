@@ -15,7 +15,7 @@
   <packaging>hpi</packaging>
 
   <properties>
-    <jenkins.version>2.60.3</jenkins.version>
+    <jenkins.version>2.106-SNAPSHOT</jenkins.version>
     <java.level>8</java.level>
   </properties>
 

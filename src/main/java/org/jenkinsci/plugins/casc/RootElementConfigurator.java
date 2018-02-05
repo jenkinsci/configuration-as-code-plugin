@@ -1,7 +1,9 @@
 package org.jenkinsci.plugins.casc;
 
 import hudson.ExtensionList;
+import hudson.model.Describable;
 import hudson.model.Descriptor;
+import hudson.model.ManagementLink;
 import jenkins.model.GlobalConfigurationCategory;
 import jenkins.model.Jenkins;
 
@@ -23,6 +25,12 @@ public interface RootElementConfigurator {
 
         for (GlobalConfigurationCategory category : GlobalConfigurationCategory.all()) {
             configurators.add(new GlobalConfigurationCategoryConfigurator(category));
+        }
+
+        for (ManagementLink link : ManagementLink.all()) {
+            if (link instanceof Describable) {
+                configurators.add(new ExtensionConfigurator(link.getClass()));
+            }
         }
 
         return configurators;

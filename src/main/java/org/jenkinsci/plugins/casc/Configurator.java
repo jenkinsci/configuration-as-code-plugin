@@ -144,9 +144,10 @@ public abstract class Configurator<T> implements ExtensionPoint {
      * @return short name for this component when used in a configuration.yaml file
      */
     public String getName() {
-        final Symbol annotation = getTarget().getAnnotation(Symbol.class);
-        if (annotation != null) return annotation.value()[0];
-        return normalize(getTarget().getSimpleName());
+        final Class<T> target = getTarget();
+        final Symbol symbol = target.getAnnotation(Symbol.class);
+        if (symbol != null) return symbol.value()[0];
+        return normalize(target.getSimpleName());
     }
 
     /**
