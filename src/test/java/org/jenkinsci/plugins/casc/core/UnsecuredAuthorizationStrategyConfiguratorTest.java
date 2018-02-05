@@ -16,7 +16,7 @@ public class UnsecuredAuthorizationStrategyConfiguratorTest {
     public JenkinsRule j = new JenkinsRule();
 
     @Test
-    public void configure_local_security_and_admin_user() throws Exception {
+    public void unsecured() throws Exception {
         ConfigurationAsCode.configure(getClass().getResourceAsStream("UnsecuredAuthorizationStrategyConfiguratorTest.yml"));
         assertSame(AuthorizationStrategy.UNSECURED, j.jenkins.getAuthorizationStrategy());
     }
