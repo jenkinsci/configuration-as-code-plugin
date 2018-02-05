@@ -1,8 +1,6 @@
-jenkins:
-  jobs:
-    - organizationFolder:
-        name: "ndeloof"
-        navigators:
-          - github:
-              repoOwner: "ndeloof"
-
+jobs:
+  - organizationFolder:
+      name: "ndeloof"
+      navigators:
+        - github:
+            repoOwner: "ndeloof"
