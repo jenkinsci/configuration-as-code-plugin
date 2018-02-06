@@ -93,14 +93,18 @@ public class Attribute<T> {
      * Default Setter implementation based on JavaBean property write method.
      */
     private static final Setter DEFAULT_SETTER = (target, attribute, value) -> {
-        logger.info("Setting "+target.getClass().getCanonicalName()+'#'+attribute.name+" = " + value);
+        final String setterId = target.getClass().getCanonicalName()+'#'+attribute.name;
+        logger.info("Setting " + setterId + " = " + value);
         final PropertyDescriptor property = PropertyUtils.getPropertyDescriptor(target, attribute.name);
+        if (property == null) {
+            throw new Exception("Default value setter cannot find Property Descriptor for " + setterId);
+        }
         final Method writeMethod = property.getWriteMethod();
 
         Object o = value;
         if (attribute.multiple) {
             if (!(value instanceof Collection)) {
-                throw new IllegalArgumentException(target + "#" + attribute.name + " should be a list.");
+                throw new IllegalArgumentException(setterId + " should be a list.");
             }
             // if setter expect an Array, convert Collection to expected array type
             // Typically required for hudson.tools.ToolDescriptor.setInstallations
