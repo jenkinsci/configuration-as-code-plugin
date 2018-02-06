@@ -35,6 +35,11 @@ public class Attribute<T> {
         this.type = type;
     }
 
+    @Override
+    public String toString() {
+        return String.format("%s(class: %s, multiple: %s)", name, type, multiple);
+    }
+
     public String getName() {
         return preferredName != null ? preferredName : name;
     }
