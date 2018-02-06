@@ -10,6 +10,7 @@ import javaposse.jobdsl.plugin.JenkinsJobManagement;
 import javaposse.jobdsl.plugin.LookupStrategy;
 import jenkins.model.GlobalConfigurationCategory;
 import jenkins.model.Jenkins;
+import jenkins.security.s2m.AdminWhitelistRule;
 
 import java.util.List;
 import java.util.Map;
@@ -67,6 +68,9 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
                 attributes.add(new Attribute(configurator.getName(), configurator.getTarget()).setter(NOOP));
             }
         }
+
+        // Add remoting security, all legwork will be done by a configurator
+        attributes.add(new Attribute("remotingSecurity", AdminWhitelistRule.class).setter(NOOP));
 
         return attributes;
     }
