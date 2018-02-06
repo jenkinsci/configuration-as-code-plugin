@@ -160,16 +160,23 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
                 final Class k = attribute.getType();
                 final Configurator configurator = Configurator.lookup(k);
                 if (configurator == null) throw new IllegalStateException("No configurator implementation to manage "+k);
+
+                final Object valueToSet;
                 if (attribute.isMultiple()) {
                     List values = new ArrayList<>();
                     for (Object o : (List) sub) {
                         Object value = configurator.configure(o);
                         values.add(value);
                     }
-                    attribute.setValue(instance, values);
+                    valueToSet= values;
                 } else {
-                    Object value = configurator.configure(sub);
-                    attribute.setValue(instance, value);
+                    valueToSet = configurator.configure(sub);
+                }
+
+                try {
+                    attribute.setValue(instance, valueToSet);
+                } catch (Exception ex) {
+                    throw new Exception("Failed to set attribute " + attribute, ex);
                 }
             }
         }
