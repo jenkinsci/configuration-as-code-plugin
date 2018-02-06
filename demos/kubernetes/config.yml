@@ -14,6 +14,15 @@ data:
         - kubernetes:
             name: kubernetes
             containerCapStr: 100
+            templates:
+              - name: maven
+                label: mavenpodtemplate
+                containers:
+                  - name: maven
+                    image: maven:3.3.9-jdk-8-alpine
+                    ttyEnabled: true
+                    command: cat
+
       jobs:
         - >
           pipelineJob('configuration-as-code') {
