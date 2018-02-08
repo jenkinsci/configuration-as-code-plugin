@@ -50,7 +50,7 @@ public class RoleStrategyTest {
     @Test
     @Issue("Issue #48")
     public void shouldReadRolesCorrectly() throws Exception {
-        ConfigurationAsCode.configure(getClass().getResourceAsStream("GlobalMatrixStrategy.yml"));
+        ConfigurationAsCode.configure(getClass().getResourceAsStream("RoleStrategy1.yml"));
 
         final Jenkins jenkins = Jenkins.getInstance();
 
