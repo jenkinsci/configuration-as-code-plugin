@@ -1,8 +1,7 @@
-package org.jenkinsci.plugins.casc.integrations;
+package org.jenkinsci.plugins.casc.integrations.globalmatrixauth;
 
 import hudson.security.AuthorizationStrategy;
 import hudson.security.GlobalMatrixAuthorizationStrategy;
-import hudson.security.Permission;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.casc.ConfigurationAsCode;
 import org.jenkinsci.plugins.casc.Configurator;
@@ -38,14 +37,14 @@ public class GlobalMatrixAuthorizationTest {
 
     @Test
     public void checkCorrectlyConfiguredPermissions() throws Exception {
-        ConfigurationAsCode.configure(getClass().getResourceAsStream("global-matrix-auth/GlobalMatrixStrategy.yml"));
+        ConfigurationAsCode.configure(getClass().getResourceAsStream("GlobalMatrixStrategy.yml"));
         assertEquals("The configured instance must use the Global Matrix Authentication Strategy", GlobalMatrixAuthorizationStrategy.class, Jenkins.getInstance().getAuthorizationStrategy().getClass());
         GlobalMatrixAuthorizationStrategy gms = (GlobalMatrixAuthorizationStrategy)Jenkins.getInstance().getAuthorizationStrategy();
 
-        List<String> adminPermission = new ArrayList<>(gms.getGrantedPermissions().get(Permission.fromId("hudson.model.Hudson.Administer")));
+        List<String> adminPermission = new ArrayList<>(gms.getGrantedPermissions().get(Jenkins.ADMINISTER));
         assertEquals("authenticated", adminPermission.get(0));
 
-        List<String> readPermission = new ArrayList<>(gms.getGrantedPermissions().get(Permission.fromId("hudson.model.Hudson.Read")));
+        List<String> readPermission = new ArrayList<>(gms.getGrantedPermissions().get(Jenkins.READ));
         assertEquals("anonymous", readPermission.get(0));
     }
 }

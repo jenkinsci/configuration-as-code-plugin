@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.casc.integrations;
+package org.jenkinsci.plugins.casc.integrations.rolebasedauth;
 
 import com.michelin.cio.hudson.plugins.rolestrategy.Role;
 import org.kohsuke.accmod.Restricted;

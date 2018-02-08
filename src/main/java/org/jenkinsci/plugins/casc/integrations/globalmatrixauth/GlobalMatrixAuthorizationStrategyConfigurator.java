@@ -1,31 +1,19 @@
-package org.jenkinsci.plugins.casc.integrations;
+package org.jenkinsci.plugins.casc.integrations.globalmatrixauth;
 
 import hudson.Extension;
 import hudson.security.GlobalMatrixAuthorizationStrategy;
 import hudson.security.Permission;
+import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.Configurator;
 import org.jenkinsci.plugins.casc.RootElementConfigurator;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import java.util.*;
 
-/**
- * Example
- *
- * jenkins:
- *   authorizationStrategy:
- *     globalMatrix:
- *       grantedPermissions:
- *         - group:
- *             name: "anonymous"
- *             permissions:
- *               - "hudson.model.Hudson.Read"
- *         - group
- *             name: "authenticated"
- *             permissions:
- *               - "hudson.model.Hudson.Administer"
- */
 @Extension(optional = true)
+@Restricted(NoExternalUse.class)
 public class GlobalMatrixAuthorizationStrategyConfigurator extends Configurator<GlobalMatrixAuthorizationStrategy> implements RootElementConfigurator {
 
     @Override

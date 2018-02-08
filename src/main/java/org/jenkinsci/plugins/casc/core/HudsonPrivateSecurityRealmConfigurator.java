@@ -42,6 +42,5 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
             this.password = password;
         }
 
-
     }
 }
