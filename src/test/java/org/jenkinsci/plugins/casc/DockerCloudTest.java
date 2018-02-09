@@ -4,6 +4,7 @@ import com.nirima.jenkins.plugins.docker.DockerCloud;
 import com.nirima.jenkins.plugins.docker.DockerTemplate;
 import hudson.model.Label;
 import io.jenkins.docker.connector.DockerComputerAttachConnector;
+import org.jenkinsci.plugins.casc.misc.TestConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -22,7 +23,7 @@ public class DockerCloudTest {
 
     @Test
     public void configure_docker_cloud() throws Exception {
-        ConfigurationAsCode.configure(getClass().getResourceAsStream("DockerCloudTest.yml"));
+        new TestConfiguration("DockerCloudTest.yml").configure(getClass());
 
         final DockerCloud docker = DockerCloud.getCloudByName("docker");
         assertNotNull(docker);
@@ -35,8 +36,7 @@ public class DockerCloudTest {
 
     @Test
     public void update_docker_cloud() throws Exception {
-        ConfigurationAsCode.configure(getClass().getResourceAsStream(
-                "DockerCloudTest/update_docker_cloud/DockerCloudTest1.yml"));
+        new TestConfiguration("DockerCloudTest/update_docker_cloud/DockerCloudTest1.yml").configure(getClass());
 
         DockerCloud docker = DockerCloud.getCloudByName("docker");
         assertNotNull(docker);
@@ -47,8 +47,7 @@ public class DockerCloudTest {
         DockerTemplate template = docker.getTemplate(Label.get("docker-agent"));
         checkTemplate(template, "docker-agent", "jenkins", "/home/jenkins/agent", "10");
 
-        ConfigurationAsCode.configure(getClass().getResourceAsStream(
-                "DockerCloudTest/update_docker_cloud/DockerCloudTest2.yml"));
+        new TestConfiguration("DockerCloudTest/update_docker_cloud/DockerCloudTest2.yml").configure(getClass());
 
         docker = DockerCloud.getCloudByName("docker");
         assertNotNull(docker);

@@ -22,7 +22,7 @@ package org.jenkinsci.plugins.casc.core;
 
 import jenkins.model.Jenkins;
 import jenkins.security.s2m.AdminWhitelistRule;
-import org.jenkinsci.plugins.casc.ConfigurationAsCode;
+import org.jenkinsci.plugins.casc.misc.TestConfiguration;
 import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -39,7 +39,7 @@ public class AdminWhitelistRuleConfiguratorTest {
     @Test
     @Issue("Issue #28")
     public void checkM2SSecurityKillSwitch_enabled() throws Exception {
-        ConfigurationAsCode.configure(getClass().getResourceAsStream("AdminWhitelistRuleConfigurator/Slave2MasterSecurityKillSwitch_enabled.yml"));
+        new TestConfiguration("AdminWhitelistRuleConfigurator/Slave2MasterSecurityKillSwitch_enabled.yml").configure(getClass());
 
         final Jenkins jenkins = Jenkins.getInstance();
         AdminWhitelistRule rule = jenkins.getInjector().getInstance(AdminWhitelistRule.class);
@@ -49,7 +49,7 @@ public class AdminWhitelistRuleConfiguratorTest {
     @Test
     @Issue("Issue #28")
     public void checkM2SSecurityKillSwitch_disabled() throws Exception {
-        ConfigurationAsCode.configure(getClass().getResourceAsStream("AdminWhitelistRuleConfigurator/Slave2MasterSecurityKillSwitch_disabled.yml"));
+        new TestConfiguration("AdminWhitelistRuleConfigurator/Slave2MasterSecurityKillSwitch_disabled.yml").configure(getClass());
 
         final Jenkins jenkins = Jenkins.getInstance();
         AdminWhitelistRule rule = jenkins.getInjector().getInstance(AdminWhitelistRule.class);

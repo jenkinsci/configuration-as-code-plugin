@@ -5,7 +5,6 @@ import hudson.init.InitMilestone;
 import hudson.init.Initializer;
 import hudson.model.ManagementLink;
 import jenkins.model.Jenkins;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -13,17 +12,20 @@ import org.kohsuke.stapler.interceptor.RequirePOST;
 import org.yaml.snakeyaml.Yaml;
 
 import javax.annotation.CheckForNull;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Objects;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * {@linkplain #configure() Main entry point of the logic}.
@@ -33,7 +35,9 @@ import java.util.Set;
 @Extension
 public class ConfigurationAsCode extends ManagementLink {
 
-
+    public static final String CASC_JENKINS_CONFIG_PROPERTY = "casc.jenkins.config";
+    public static final String CASC_JENKINS_CONFIG_ENV = "CASC_JENKINS_CONFIG";
+    public static final String DEFAULT_JENKINS_YAML_PATH = "./jenkins.yaml";
 
     @CheckForNull
     @Override
@@ -55,7 +59,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
     private long lastTimeLoaded;
 
-    private List<String> sources = Collections.EMPTY_LIST;
+    private List<String> sources = Collections.emptyList();
 
     public Date getLastTimeLoaded() {
         return new Date(lastTimeLoaded);
@@ -88,89 +92,73 @@ public class ConfigurationAsCode extends ManagementLink {
         get().configure();
     }
 
-
     public void configure() throws Exception {
-        List<String> files = new ArrayList<>();
+        final String path = System.getProperty(
+                CASC_JENKINS_CONFIG_PROPERTY,
+                System.getenv(CASC_JENKINS_CONFIG_ENV)
+        );
 
-        final String configParameter = System.getenv("CASC_JENKINS_CONFIG");
-        final Map<String, InputStream> is = getConfigurationInputs(configParameter);
-        for (Map.Entry<String, InputStream> e : is.entrySet()) {
-            files.add(e.getKey());
-            configure(e.getValue());
-        }
-        sources = files;
+        List<Path> configs = configs(path);
+        sources = configs.stream().map(Path::toAbsolutePath).map(Path::toString).collect(toList());
+        configs.stream()
+                .flatMap(ConfigurationAsCode::entries)
+                .forEach(ConfigurationAsCode::configureWith);
+
         lastTimeLoaded = System.currentTimeMillis();
     }
+
+    public List<Path> configs(String path) throws IOException {
+        try (Stream<Path> configs = Files.find(
+                Paths.get(StringUtils.defaultIfBlank(path, DEFAULT_JENKINS_YAML_PATH)),
+                Integer.MAX_VALUE,
+                (next, attrs) -> next.toString().endsWith(".yml") || next.toString().endsWith(".yaml")
+        )) {
+            return configs.collect(toList());
+        } catch (NoSuchFileException e) {
+            return Collections.emptyList();
+        }
+    }
+
+    private static Stream<? extends Map.Entry<String, Object>> entries(Path config) {
+        try (Reader reader = Files.newBufferedReader(config)) {
+            return ((Map<String, Object>) new Yaml().loadAs(reader, Map.class)).entrySet().stream();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public static void configureWith(Map.Entry<String, Object> entry) {
+        RootElementConfigurator configurator = Objects.requireNonNull(
+                Configurator.lookupRootElement(entry.getKey()),
+                "no configurator for root element '" + entry.getKey() + "'"
+        );
+        try {
+            configurator.configure(entry.getValue());
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
 
     public static ConfigurationAsCode get() {
         return Jenkins.getInstance().getExtensionList(ConfigurationAsCode.class).get(0);
     }
 
-    /**
-     * Reads YAML from the given {@link InputStream} and applies that to Jenkins.
-     */
-    public static void configure(InputStream in) throws Exception {
-        Map<String, Object> config = new Yaml().loadAs(in, Map.class);
-        for (Map.Entry<String, Object> e : config.entrySet()) {
-            final RootElementConfigurator configurator = Configurator.lookupRootElement(e.getKey());
-            if (configurator == null) {
-                throw new IllegalArgumentException("no configurator for root element '"+e.getKey()+"'");
-            }
-            configurator.configure(e.getValue());
-        }
-    }
-
     // for documentation generation in index.jelly
     public List<?> getConfigurators() {
-        List<Object> elements = new ArrayList<>();
-        for (RootElementConfigurator c : RootElementConfigurator.all()) {
-            elements.add(c);
-            listElements(elements, c.describe());
-        }
-        return elements;
+        Stream<RootElementConfigurator> roots = RootElementConfigurator.all().stream();
+
+        Stream<Configurator<?>> children = roots
+                .flatMap(root -> root.describe().stream())
+                .flatMap(attribute -> attribute.configurators());
+
+        Stream<Configurator> configurators = children.flatMap(configurator -> configurator.flattened());
+
+        return Stream.concat(roots, configurators).distinct().collect(toList());
     }
 
     // for documentation generation in index.jelly
     public List<?> getRootConfigurators() {
         return RootElementConfigurator.all();
     }
-
-    private void listElements(List<Object> elements, Set<Attribute> attributes) {
-        for (Attribute attribute : attributes) {
-
-            final Class type = attribute.type;
-            Configurator configurator = Configurator.lookup(type);
-            if (configurator == null ) {
-                continue;
-            }
-            for (Object o : configurator.getConfigurators()) {
-                if (!elements.contains(o)) {
-                    elements.add(o);
-                }
-            }
-            listElements(elements, configurator.describe());
-        }
-    }
-
-    public Map<String, InputStream> getConfigurationInputs(String configPath) throws IOException {
-        //Default
-        if(StringUtils.isBlank(configPath)) {
-            File defaultConfig = new File("./jenkins.yaml");
-            if(defaultConfig.exists()) {
-                return Collections.singletonMap("jenkins.yaml", new FileInputStream(new File("./jenkins.yaml")));
-            } else {
-                return Collections.EMPTY_MAP;
-            }
-        }
-        File cfg = new File(configPath);
-        if(cfg.isDirectory()) {
-            Map<String, InputStream> is = new HashMap<>();
-            for(File cfgFile : FileUtils.listFiles(cfg, new String[]{"yml","yaml"},true)) {
-                is.put(cfgFile.getName(), new FileInputStream(cfgFile));
-            }
-            return is;
-        }
-        return Collections.singletonMap(cfg.getName(), new FileInputStream(cfg));
-    }
-
 }

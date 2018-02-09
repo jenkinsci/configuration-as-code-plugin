@@ -5,6 +5,7 @@ import hudson.security.FullControlOnceLoggedInAuthorizationStrategy;
 import hudson.security.HudsonPrivateSecurityRealm;
 import jenkins.model.Jenkins;
 import org.hamcrest.CoreMatchers;
+import org.jenkinsci.plugins.casc.misc.TestConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
@@ -22,7 +23,7 @@ public class JenkinsConfiguratorTest {
 
     @Test
     public void jenkins_primitive_attributes() throws Exception {
-        ConfigurationAsCode.configure(getClass().getResourceAsStream("Primitives.yml"));
+        new TestConfiguration("Primitives.yml").configure(getClass());
 
         final Jenkins jenkins = Jenkins.getInstance();
         assertEquals(6666, jenkins.getSlaveAgentPort());
@@ -31,7 +32,7 @@ public class JenkinsConfiguratorTest {
 
     @Test
     public void jenkins_abstract_describable_attributes() throws Exception {
-        ConfigurationAsCode.configure(getClass().getResourceAsStream("HeteroDescribable.yml"));
+        new TestConfiguration("HeteroDescribable.yml").configure(getClass());
 
         final Jenkins jenkins = Jenkins.getInstance();
         assertTrue(jenkins.getSecurityRealm() instanceof HudsonPrivateSecurityRealm);

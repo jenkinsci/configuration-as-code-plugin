@@ -3,6 +3,7 @@ package org.jenkinsci.plugins.casc;
 import hudson.plugins.active_directory.ActiveDirectoryDomain;
 import hudson.plugins.active_directory.ActiveDirectorySecurityRealm;
 import jenkins.model.Jenkins;
+import org.jenkinsci.plugins.casc.misc.TestConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -23,7 +24,7 @@ public class ActiveDirectoryTest {
     public void configure_active_directory() throws Exception {
         System.setProperty("BIND_PASSWORD", "ADMIN123");
 
-        ConfigurationAsCode.configure(getClass().getResourceAsStream("ActiveDirectoryTest.yml"));
+        new TestConfiguration("ActiveDirectoryTest.yml").configure(getClass());
 
         final Jenkins jenkins = Jenkins.getInstance();
         final ActiveDirectorySecurityRealm realm = (ActiveDirectorySecurityRealm) jenkins.getSecurityRealm();

@@ -3,6 +3,7 @@ package org.jenkinsci.plugins.casc;
 import hudson.plugins.git.GitTool;
 import hudson.tasks.Mailer;
 import jenkins.model.Jenkins;
+import org.jenkinsci.plugins.casc.misc.TestConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -20,7 +21,7 @@ public class MailerTest {
 
     @Test
     public void configure_mailer() throws Exception {
-        ConfigurationAsCode.configure(getClass().getResourceAsStream("MailerTest.yml"));
+        new TestConfiguration("MailerTest.yml").configure(getClass());
 
         final Jenkins jenkins = Jenkins.getInstance();
         final Mailer.DescriptorImpl descriptor = (Mailer.DescriptorImpl) jenkins.getDescriptor(Mailer.class);

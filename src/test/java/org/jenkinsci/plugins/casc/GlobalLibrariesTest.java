@@ -5,6 +5,7 @@ import com.nirima.jenkins.plugins.docker.DockerTemplate;
 import io.jenkins.docker.connector.DockerComputerAttachConnector;
 import jenkins.plugins.git.GitSCMSource;
 import jenkins.scm.api.SCMSource;
+import org.jenkinsci.plugins.casc.misc.TestConfiguration;
 import org.jenkinsci.plugins.workflow.libs.GlobalLibraries;
 import org.jenkinsci.plugins.workflow.libs.LibraryConfiguration;
 import org.jenkinsci.plugins.workflow.libs.LibraryRetriever;
@@ -27,7 +28,7 @@ public class GlobalLibrariesTest {
 
     @Test
     public void configure_global_library() throws Exception {
-        ConfigurationAsCode.configure(getClass().getResourceAsStream("GlobalLibrariesTest.yml"));
+        new TestConfiguration("GlobalLibrariesTest.yml").configure(getClass());
 
         assertEquals(1, GlobalLibraries.get().getLibraries().size());
         final LibraryConfiguration library = GlobalLibraries.get().getLibraries().get(0);

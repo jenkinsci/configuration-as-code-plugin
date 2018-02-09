@@ -1,11 +1,10 @@
 package org.jenkinsci.plugins.casc.core;
 
 import hudson.model.User;
-import hudson.security.AuthorizationStrategy;
 import hudson.security.FullControlOnceLoggedInAuthorizationStrategy;
 import hudson.security.HudsonPrivateSecurityRealm;
 import jenkins.model.Jenkins;
-import org.jenkinsci.plugins.casc.ConfigurationAsCode;
+import org.jenkinsci.plugins.casc.misc.TestConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -22,7 +21,7 @@ public class HudsonPrivateSecurityRealmConfiguratorTest {
 
     @Test
     public void configure_local_security_and_admin_user() throws Exception {
-        ConfigurationAsCode.configure(getClass().getResourceAsStream("HudsonPrivateSecurityRealmConfiguratorTest.yml"));
+        new TestConfiguration("HudsonPrivateSecurityRealmConfiguratorTest.yml").configure(getClass());
 
         final Jenkins jenkins = Jenkins.getInstance();
         final HudsonPrivateSecurityRealm securityRealm = (HudsonPrivateSecurityRealm) jenkins.getSecurityRealm();

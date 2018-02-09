@@ -1,13 +1,11 @@
 package org.jenkinsci.plugins.casc;
 
-import com.nirima.jenkins.plugins.docker.DockerCloud;
-import com.nirima.jenkins.plugins.docker.DockerTemplate;
 import hudson.model.TopLevelItem;
 import jenkins.branch.OrganizationFolder;
 import jenkins.model.Jenkins;
+import org.jenkinsci.plugins.casc.misc.TestConfiguration;
 import org.jenkinsci.plugins.github_branch_source.GitHubSCMNavigator;
 import org.junit.Rule;
-import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import static org.junit.Assert.assertEquals;
@@ -26,7 +24,7 @@ public class GithubOrganisationFolderTest {
     // @Test
     // Fails as Items do override submit() with manual data-binding implementation
     public void configure_github_organisation_folder_seed_job() throws Exception {
-        ConfigurationAsCode.configure(getClass().getResourceAsStream("GithubOrganisationFolderTest.yml"));
+        new TestConfiguration("GithubOrganisationFolderTest.yml").configure(getClass());
 
         final TopLevelItem job = Jenkins.getInstance().getItem("ndeloof");
         assertNotNull(job);

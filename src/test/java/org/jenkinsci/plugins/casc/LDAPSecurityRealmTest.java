@@ -6,6 +6,7 @@ import hudson.tasks.Mailer;
 import jenkins.model.IdStrategy;
 import jenkins.model.Jenkins;
 import jenkins.security.plugins.ldap.LDAPConfiguration;
+import org.jenkinsci.plugins.casc.misc.TestConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -25,7 +26,7 @@ public class LDAPSecurityRealmTest {
     @Test
     public void configure_securityRealm() throws Exception {
         System.setProperty("LDAP_PASSWORD", "SECRET");
-        ConfigurationAsCode.configure(getClass().getResourceAsStream("LDAPSecurityRealmTest.yml"));
+        new TestConfiguration("LDAPSecurityRealmTest.yml").configure(getClass());
 
         final Jenkins jenkins = Jenkins.getInstance();
         final LDAPSecurityRealm securityRealm = (LDAPSecurityRealm) jenkins.getSecurityRealm();

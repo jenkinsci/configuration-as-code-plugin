@@ -2,14 +2,12 @@ package org.jenkinsci.plugins.casc.integrations;
 
 import com.michelin.cio.hudson.plugins.rolestrategy.Role;
 import com.michelin.cio.hudson.plugins.rolestrategy.RoleBasedAuthorizationStrategy;
-import com.michelin.cio.hudson.plugins.rolestrategy.RoleMap;
 import hudson.security.AuthorizationStrategy;
 import jenkins.model.Jenkins;
 import static org.hamcrest.CoreMatchers.*;
-import org.jenkinsci.plugins.casc.ConfigurationAsCode;
 import org.jenkinsci.plugins.casc.Configurator;
+import org.jenkinsci.plugins.casc.misc.TestConfiguration;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -50,7 +48,7 @@ public class RoleStrategyTest {
     @Test
     @Issue("Issue #48")
     public void shouldReadRolesCorrectly() throws Exception {
-        ConfigurationAsCode.configure(getClass().getResourceAsStream("role-strategy/RoleStrategy1.yml"));
+        new TestConfiguration("role-strategy/RoleStrategy1.yml").configure(getClass());
 
         final Jenkins jenkins = Jenkins.getInstance();
         AuthorizationStrategy s = jenkins.getAuthorizationStrategy();

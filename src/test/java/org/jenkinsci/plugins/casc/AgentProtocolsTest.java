@@ -1,12 +1,12 @@
 package org.jenkinsci.plugins.casc;
 
 import jenkins.model.Jenkins;
+import org.jenkinsci.plugins.casc.misc.TestConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -22,7 +22,7 @@ public class AgentProtocolsTest {
 
     @Test
     public void configure_agent_protocols() throws Exception {
-        ConfigurationAsCode.configure(getClass().getResourceAsStream("AgentProtocolsTest.yml"));
+        new TestConfiguration("AgentProtocolsTest.yml").configure(getClass());
 
         final Jenkins jenkins = Jenkins.getInstance();
         final Set<String> agentProtocols =

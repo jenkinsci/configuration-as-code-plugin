@@ -1,7 +1,7 @@
 package org.jenkinsci.plugins.casc.core;
 
 import hudson.security.AuthorizationStrategy;
-import org.jenkinsci.plugins.casc.ConfigurationAsCode;
+import org.jenkinsci.plugins.casc.misc.TestConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -17,7 +17,7 @@ public class UnsecuredAuthorizationStrategyConfiguratorTest {
 
     @Test
     public void unsecured() throws Exception {
-        ConfigurationAsCode.configure(getClass().getResourceAsStream("UnsecuredAuthorizationStrategyConfiguratorTest.yml"));
+        new TestConfiguration("UnsecuredAuthorizationStrategyConfiguratorTest.yml").configure(getClass());
         assertSame(AuthorizationStrategy.UNSECURED, j.jenkins.getAuthorizationStrategy());
     }
 }

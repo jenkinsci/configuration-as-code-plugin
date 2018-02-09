@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 
 /**
@@ -247,6 +248,14 @@ public abstract class Configurator<T> implements ExtensionPoint {
      * Determine the list of Attribute available for configuration of the managed component.
      */
     public abstract Set<Attribute> describe();
+
+    public Stream<Configurator<?>> flattened() {
+        Stream<Configurator<?>> self = Stream.of(this);
+        Stream<Configurator<?>> configurators = describe().stream().flatMap(attribute -> attribute.configurators());
+        Stream<Configurator<?>> children = configurators.flatMap(configurator -> configurator.flattened());
+
+        return Stream.concat(self, children).distinct();
+    }
 
     /**
      * Retrieve the html help tip associated to an attribute.

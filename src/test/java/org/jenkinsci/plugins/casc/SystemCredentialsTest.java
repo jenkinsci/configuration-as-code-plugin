@@ -4,6 +4,7 @@ import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.CertificateCredentials;
 import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
 import hudson.security.ACL;
+import org.jenkinsci.plugins.casc.misc.TestConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -27,7 +28,7 @@ public class SystemCredentialsTest {
         System.setProperty("SUDO_PASSWORD", "1234");
         System.setProperty("SSH_KEY_PASSWORD", "ABCD");
 
-        ConfigurationAsCode.configure(getClass().getResourceAsStream("SystemCredentialsTest.yml"));
+        new TestConfiguration("SystemCredentialsTest.yml").configure(getClass());
 
         List<UsernamePasswordCredentials> ups = CredentialsProvider.lookupCredentials(UsernamePasswordCredentials.class, j.jenkins, ACL.SYSTEM, Collections.EMPTY_LIST);
         assertEquals(1, ups.size());
