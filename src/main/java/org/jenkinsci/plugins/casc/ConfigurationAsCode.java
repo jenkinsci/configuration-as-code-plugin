@@ -146,15 +146,15 @@ public class ConfigurationAsCode extends ManagementLink {
 
     // for documentation generation in index.jelly
     public List<?> getConfigurators() {
-        Stream<RootElementConfigurator> roots = RootElementConfigurator.all().stream();
+        List<RootElementConfigurator> roots = RootElementConfigurator.all();
 
-        Stream<Configurator<?>> children = roots
+        Stream<Configurator<?>> children = roots.stream()
                 .flatMap(root -> root.describe().stream())
                 .flatMap(attribute -> attribute.configurators());
 
         Stream<Configurator> configurators = children.flatMap(configurator -> configurator.flattened());
 
-        return Stream.concat(roots, configurators).distinct().collect(toList());
+        return Stream.concat(roots.stream(), configurators).distinct().collect(toList());
     }
 
     // for documentation generation in index.jelly
