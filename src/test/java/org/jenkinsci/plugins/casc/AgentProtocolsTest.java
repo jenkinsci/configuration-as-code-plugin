@@ -1,9 +1,11 @@
 package org.jenkinsci.plugins.casc;
 
 import jenkins.model.Jenkins;
-import org.jenkinsci.plugins.casc.misc.TestConfiguration;
+import org.jenkinsci.plugins.casc.misc.CodeConfiguratorRunner;
+import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import java.util.Arrays;
@@ -17,13 +19,15 @@ import static org.junit.Assert.assertEquals;
  */
 public class AgentProtocolsTest {
 
-    @Rule
     public JenkinsRule j = new JenkinsRule();
+    public CodeConfiguratorRunner config = new CodeConfiguratorRunner();
+
+    @Rule
+    public RuleChain chain = RuleChain.outerRule(j).around(config);
 
     @Test
+    @ConfiguredWithCode(value = "AgentProtocolsTest.yml")
     public void configure_agent_protocols() throws Exception {
-        new TestConfiguration("AgentProtocolsTest.yml").configure(getClass());
-
         final Jenkins jenkins = Jenkins.getInstance();
         final Set<String> agentProtocols =
                 Arrays.stream(new String[]{"JNLP4-connect", "Ping"}).collect(Collectors.toSet());

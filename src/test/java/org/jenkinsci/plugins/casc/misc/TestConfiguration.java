@@ -10,6 +10,9 @@ import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+/**
+ * Loads resource as configuration-as-code
+ */
 public class TestConfiguration {
     private final String resource;
 
