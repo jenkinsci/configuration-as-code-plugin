@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * One attribute of {@link Configurator}.
@@ -85,11 +84,6 @@ public class Attribute<T> {
 
     public void setValue(T target, Object value) throws Exception {
         setter.setValue(target, this, value);
-    }
-
-    public Stream<Configurator<?>> configurators() {
-        Configurator configurator = Configurator.lookup(type);
-        return configurator == null ? Stream.empty() : configurator.getConfigurators().stream();
     }
 
     /**

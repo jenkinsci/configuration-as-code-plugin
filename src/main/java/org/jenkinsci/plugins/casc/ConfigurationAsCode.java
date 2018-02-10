@@ -20,9 +20,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -147,14 +150,20 @@ public class ConfigurationAsCode extends ManagementLink {
     // for documentation generation in index.jelly
     public List<?> getConfigurators() {
         List<RootElementConfigurator> roots = RootElementConfigurator.all();
+        Set<Object> elements = new LinkedHashSet<>(roots);
+        roots.forEach(root -> listElements(elements, root.describe()));
+        return new LinkedList<>(elements);
+    }
 
-        Stream<Configurator<?>> children = roots.stream()
-                .flatMap(root -> root.describe().stream())
-                .flatMap(attribute -> attribute.configurators());
-
-        Stream<Configurator> configurators = children.flatMap(configurator -> configurator.flattened());
-
-        return Stream.concat(roots.stream(), configurators).distinct().collect(toList());
+    private void listElements(Set<Object> elements, Set<Attribute> attributes) {
+        attributes.stream()
+                .map(Attribute::getType)
+                .map(Configurator::lookup)
+                .filter(Objects::nonNull)
+                .forEach(configurator -> {
+                    elements.addAll(configurator.getConfigurators());
+                    listElements(elements, configurator.describe());
+                });
     }
 
     // for documentation generation in index.jelly
