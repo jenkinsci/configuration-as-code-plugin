@@ -1,37 +1,49 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout">
 
-  <div class='section'>
-    <h4 id="${it.extensionPoint.simpleName}-${it.name}">${it.name}</h4>
+  <div class='configurator'>
+    <div id="${it.extensionPoint.simpleName}-${it.name}" class='configurator__name'>${it.name} <sup class='configurator-pointer'>CONFIGURATOR</sup></div>
+
     <j:if test="${it.extensionPoint != c.target}">
-      Implementation of <a href="https://jenkins.io/doc/developer/extensions/${it.extensionSource}/#${it.extensionPoint.simpleName.toLowerCase()}">${it.extensionPoint.simpleName}</a>
+        <div class='configurator__implementation'>
+            Implementation of
+            <a href="https://jenkins.io/doc/developer/extensions/${it.extensionSource}/#${it.extensionPoint.simpleName.toLowerCase()}">
+                ${it.extensionPoint.simpleName}
+            </a>
+        </div>
     </j:if>
-    <div class='paragraph'>${it.displayName}</div>
-    <div class='dlist'><dl>
+
+    <div class='configurator__display-name'>${it.displayName}</div>
+    <div class='configurator-attributes'>
     <j:forEach items="${it.attributes}" var="a">
-      <dt class='hdlist1'>${a.name}</dt>
+        <div class='configurator-attribute'>
+            <div class='configurator-attribute__name'><span class='attribute-name'>${a.name}</span></div>
+            <div class='configurator-attribute__details'>
+                <div class='attribute-type'>
+                    <j:if test="${a.multiple}"><span class='attribute-type__list'>list of</span></j:if> <span class='attribute-type__class'>${a.type.simpleName}</span>
+                </div>
+                <div class='attribute-help'>
+                    <j:out value="${it.getHtmlHelp(a.name)}"/>
+                              <!-- FIXME .html is not a standard facet, stapler only looks for groovy/jelly
+                              <st:include page="help-${a.name}.html" class="${it.target}" optional="true"/>
+                              -->
+                </div>
 
-      <dd>
-      <j:out value="${it.getHtmlHelp(a.name)}"/>
-      <!-- FIXME .html is not a standard facet, stapler only looks for groovy/jelly
-      <st:include page="help-${a.name}.html" class="${it.target}" optional="true"/>
-      -->
-      </dd>
+                <j:if test="${not a.possibleValues().isEmpty()}">
+                <div class='attribute-values'>
+                    <div class='attribute-values__title'>Possible values: </div>
+                    <ul class='attribute-values__list'>
+                      <j:forEach items="${a.possibleValues()}" var="v">
+                        <li><a href="#${a.type.simpleName}-${v}">${v}</a></li>
+                      </j:forEach>
+                    </ul>
+                </div>
+                </j:if>
 
-      <j:if test="${a.multiple}">
-        list of
-      </j:if>
-      ${a.type.simpleName}
-      <j:if test="${not a.possibleValues().isEmpty()}">
-        <ul>
-          <j:forEach items="${a.possibleValues()}" var="v">
-            <li><a href="#${a.type.simpleName}-${v}">${v}</a></li>
-          </j:forEach>
-        </ul>
-
-      </j:if>
-    </j:forEach>
-    </dl></div>
+            </div>
+        </div>
+        </j:forEach>
+    </div>
   </div>
 
 </j:jelly>
