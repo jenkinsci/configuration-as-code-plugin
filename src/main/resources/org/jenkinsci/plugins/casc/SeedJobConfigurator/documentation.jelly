@@ -1,14 +1,12 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout">
 
-  <div class='section'>
-    <h4 id="${it.extensionPoint.simpleName}-${it.name}">${it.name}</h4>
-    <div class='paragraph'>${it.displayName}</div>
-    <div class='dlist'>
-      <dl>list of strings</dl>
-      <dd>JobDSL plugin scripts to generate initial seed jobs.</dd>
-    </div>
-
+  <div class='configurator'>
+    <div id="${it.extensionPoint.simpleName}-${it.name}" class='configurator__name'>${it.name}</div>
+    <div class='configurator__display-name'>JobDSL plugin scripts to generate initial seed jobs. ${it.displayName}</div>
+     <div class='attribute-type'>
+        <span class='attribute-type__list'>list of</span> <span class='attribute-type__class'>strings</span>
+     </div>
   </div>
 
 </j:jelly>
