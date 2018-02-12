@@ -78,15 +78,18 @@ public abstract class Configurator<T> implements ExtensionPoint {
         }
 
         if (Collection.class.isAssignableFrom(clazz)) {
-            ParameterizedType pt = (ParameterizedType) type;
-            Type actualType = pt.getActualTypeArguments()[0];
-            if (actualType instanceof WildcardType) {
-                actualType = ((WildcardType) actualType).getUpperBounds()[0];
+            //TODO: Only try to cast if we can actually get the parameterized type
+            if (type instanceof ParameterizedType) {
+                ParameterizedType pt = (ParameterizedType) type;
+                Type actualType = pt.getActualTypeArguments()[0];
+                if (actualType instanceof WildcardType) {
+                    actualType = ((WildcardType) actualType).getUpperBounds()[0];
+                }
+                if (!(actualType instanceof Class)) {
+                    throw new IllegalStateException("Can't handle " + type);
+                }
+                return lookup(actualType);
             }
-            if (!(actualType instanceof Class)) {
-                throw new IllegalStateException("Can't handle "+type);
-            }
-            return lookup(actualType);
         }
 
         if (Descriptor.class.isAssignableFrom(clazz)) {
@@ -178,11 +181,15 @@ public abstract class Configurator<T> implements ExtensionPoint {
 
     /**
      * The actual component being managed by this Configurator
+     *
+     * @return the actual class that this configurator is configuring
      */
     public abstract Class<T> getTarget();
 
     /**
      * The extension point being implemented by this configurator.
+     *
+     * @return The
      */
     public Class getExtensionPoint() {
         Class t = getTarget();
@@ -193,6 +200,8 @@ public abstract class Configurator<T> implements ExtensionPoint {
 
     /**
      * Retrieve which plugin do provide this extension point
+     *
+     * @return String
      */
     public String getExtensionSource() throws IOException {
         final Class e = getExtensionPoint();
@@ -205,6 +214,8 @@ public abstract class Configurator<T> implements ExtensionPoint {
 
     /**
      * Human friendly display name for this component.
+     *
+     * @return An empty string
      */
     public String getDisplayName() { return ""; }
 
@@ -225,6 +236,9 @@ public abstract class Configurator<T> implements ExtensionPoint {
 
     /**
      * Ordered version of {@link #describe()} for documentation generation
+     *
+     * @return
+     *      A list of {@Link Attribute}s
      */
     public List<Attribute> getAttributes() {
         final ArrayList<Attribute> attributes = new ArrayList<>(describe());
@@ -245,12 +259,15 @@ public abstract class Configurator<T> implements ExtensionPoint {
 
     /**
      * Determine the list of Attribute available for configuration of the managed component.
+     *
+     * @return A set of {@Link Attribute}s that describes this object
      */
     public abstract Set<Attribute> describe();
 
     /**
      * Retrieve the html help tip associated to an attribute.
      * FIXME would prefer <st:include page="help-${a.name}.html" class="${c.target}" optional="true"/>
+     * @return String that shows help
      */
     public String getHtmlHelp(String attribute) throws IOException {
         final URL resource = getKlass().getResource("help-" + attribute + ".html");
