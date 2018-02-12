@@ -5,8 +5,8 @@ jenkins:
      - group:
          name: "anonymous"
          permissions:
-          - "hudson.model.Hudson.Read"
+          - "Overall/Read"
      - group
          name: "authenticated"
          permissions:
-          - "hudson.model.Hudson.Administer"
+          - "Overall/Administer"
