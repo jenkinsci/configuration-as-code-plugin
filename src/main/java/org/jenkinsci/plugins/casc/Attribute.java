@@ -48,7 +48,10 @@ public class Attribute<T> {
         return type;
     }
 
-    /** Attribute acutaly is a Collection of documented type */
+    /**
+     * Attribute is actually a Collection of documented type
+     * @return boolean indicating if this attribute is a list of multiple items of documented type
+     */
     public boolean isMultiple() {
         return multiple;
     }
@@ -72,7 +75,11 @@ public class Attribute<T> {
         return setter;
     }
 
-    /** If this attribute is constrained to a limited set of value, here they are */
+    /**
+     * If this attribute is constrained to a limited set of value, here they are
+     *
+     * @return A list of possible types
+     */
     public List<String> possibleValues() {
         if (type.isEnum()) {
             Class<Enum> e = (Class<Enum>) type;
@@ -96,6 +103,7 @@ public class Attribute<T> {
 
     /**
      * Default Setter implementation based on JavaBean property write method.
+     *
      */
     private static final Setter DEFAULT_SETTER = (target, attribute, value) -> {
         final String setterId = target.getClass().getCanonicalName()+'#'+attribute.name;
