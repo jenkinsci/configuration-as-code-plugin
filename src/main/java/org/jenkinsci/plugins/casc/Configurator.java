@@ -77,7 +77,7 @@ public abstract class Configurator<T> implements ExtensionPoint {
             }
         }
 
-        if (Collection.class.isAssignableFrom(clazz)) {
+        if (Collection.class.isAssignableFrom(clazz) && type instanceof ParameterizedType) {
             ParameterizedType pt = (ParameterizedType) type;
             Type actualType = pt.getActualTypeArguments()[0];
             if (actualType instanceof WildcardType) {

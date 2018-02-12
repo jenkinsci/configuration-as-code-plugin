@@ -5,7 +5,8 @@ import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.jvnet.hudson.test.JenkinsRule;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -55,7 +56,7 @@ public class PrimitiveConfiguratorTest {
     }
 
     @Test
-    public void _string_env() throws  Exception {
+    public void _string_env() throws Exception {
         environment.set("ENV_FOR_TEST", "abc");
         Configurator c = Configurator.lookup(String.class);
         final Object value = c.configure("${ENV_FOR_TEST}");

@@ -4,8 +4,12 @@ import com.nirima.jenkins.plugins.docker.DockerCloud;
 import com.nirima.jenkins.plugins.docker.DockerTemplate;
 import hudson.model.Label;
 import io.jenkins.docker.connector.DockerComputerAttachConnector;
+import org.jenkinsci.plugins.casc.misc.CodeConfiguratorRunner;
+import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
+import org.jenkinsci.plugins.casc.misc.TestConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import static org.junit.Assert.assertEquals;
@@ -16,14 +20,15 @@ import static org.junit.Assert.assertNotNull;
  */
 public class DockerCloudTest {
 
+    public JenkinsRule j = new JenkinsRule();
+    public CodeConfiguratorRunner config = new CodeConfiguratorRunner();
 
     @Rule
-    public JenkinsRule j = new JenkinsRule();
+    public RuleChain chain = RuleChain.outerRule(j).around(config);
 
     @Test
+    @ConfiguredWithCode("DockerCloudTest.yml")
     public void configure_docker_cloud() throws Exception {
-        ConfigurationAsCode.configure(getClass().getResourceAsStream("DockerCloudTest.yml"));
-
         final DockerCloud docker = DockerCloud.getCloudByName("docker");
         assertNotNull(docker);
         assertNotNull(docker.getDockerApi());
@@ -34,10 +39,8 @@ public class DockerCloudTest {
     }
 
     @Test
+    @ConfiguredWithCode("DockerCloudTest/update_docker_cloud/DockerCloudTest1.yml")
     public void update_docker_cloud() throws Exception {
-        ConfigurationAsCode.configure(getClass().getResourceAsStream(
-                "DockerCloudTest/update_docker_cloud/DockerCloudTest1.yml"));
-
         DockerCloud docker = DockerCloud.getCloudByName("docker");
         assertNotNull(docker);
         assertNotNull(docker.getDockerApi());
@@ -47,8 +50,7 @@ public class DockerCloudTest {
         DockerTemplate template = docker.getTemplate(Label.get("docker-agent"));
         checkTemplate(template, "docker-agent", "jenkins", "/home/jenkins/agent", "10");
 
-        ConfigurationAsCode.configure(getClass().getResourceAsStream(
-                "DockerCloudTest/update_docker_cloud/DockerCloudTest2.yml"));
+        new TestConfiguration("DockerCloudTest/update_docker_cloud/DockerCloudTest2.yml").configure(getClass());
 
         docker = DockerCloud.getCloudByName("docker");
         assertNotNull(docker);
@@ -65,7 +67,7 @@ public class DockerCloudTest {
     }
 
     private void checkTemplate(DockerTemplate template, String labelString, String user, String remoteFs,
-                               String instanceCapStr){
+                               String instanceCapStr) {
         assertNotNull(template);
         assertEquals(labelString, template.getLabelString());
         assertEquals(user, ((DockerComputerAttachConnector) template.getConnector()).getUser());

@@ -1,10 +1,12 @@
 package org.jenkinsci.plugins.casc;
 
-import hudson.plugins.git.GitTool;
 import hudson.tasks.Mailer;
 import jenkins.model.Jenkins;
+import org.jenkinsci.plugins.casc.misc.CodeConfiguratorRunner;
+import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import static org.junit.Assert.assertEquals;
@@ -14,14 +16,16 @@ import static org.junit.Assert.assertEquals;
  */
 public class MailerTest {
 
+    public JenkinsRule j = new JenkinsRule();
+    public CodeConfiguratorRunner config = new CodeConfiguratorRunner();
 
     @Rule
-    public JenkinsRule j = new JenkinsRule();
+    public RuleChain chain = RuleChain.outerRule(j).around(config);
+
 
     @Test
+    @ConfiguredWithCode("MailerTest.yml")
     public void configure_mailer() throws Exception {
-        ConfigurationAsCode.configure(getClass().getResourceAsStream("MailerTest.yml"));
-
         final Jenkins jenkins = Jenkins.getInstance();
         final Mailer.DescriptorImpl descriptor = (Mailer.DescriptorImpl) jenkins.getDescriptor(Mailer.class);
         assertEquals("4441", descriptor.getSmtpPort());

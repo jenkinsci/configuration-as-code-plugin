@@ -18,7 +18,7 @@ public class ConfigurationAsCodeTest {
         ConfigurationAsCode casc = new ConfigurationAsCode();
         File tmpConfigFile = tempFolder.newFile("jenkins_tmp.yaml");
         tempFolder.newFile("jenkins_tmp2.yaml");
-        assertEquals(1, casc.getConfigurationInputs(tmpConfigFile.getAbsolutePath()).size());
-        assertEquals(2, casc.getConfigurationInputs(tempFolder.getRoot().getAbsolutePath()).size());
+        assertEquals(1, casc.configs(tmpConfigFile.getAbsolutePath()).size());
+        assertEquals(2, casc.configs(tempFolder.getRoot().getAbsolutePath()).size());
     }
 }
