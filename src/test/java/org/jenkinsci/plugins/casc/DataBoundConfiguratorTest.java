@@ -1,6 +1,5 @@
 package org.jenkinsci.plugins.casc;
 
-import hudson.model.AbstractDescribableImpl;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -9,7 +8,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>

@@ -3,13 +3,12 @@ package org.jenkinsci.plugins.casc.integrations.rolebasedauth;
 import com.michelin.cio.hudson.plugins.rolestrategy.Role;
 import com.michelin.cio.hudson.plugins.rolestrategy.RoleBasedAuthorizationStrategy;
 import hudson.security.AuthorizationStrategy;
-import hudson.security.Permission;
 import jenkins.model.Jenkins;
-import static org.hamcrest.CoreMatchers.*;
-import org.jenkinsci.plugins.casc.ConfigurationAsCode;
 import org.jenkinsci.plugins.casc.Configurator;
-import org.jenkinsci.plugins.casc.integrations.rolebasedauth.RoleBasedAuthorizationStrategyConfigurator;
+import org.jenkinsci.plugins.casc.misc.CodeConfiguratorRunner;
+import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -17,6 +16,8 @@ import org.jvnet.hudson.test.JenkinsRule;
 import java.util.Map;
 import java.util.Set;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -29,6 +30,9 @@ public class RoleStrategyTest {
 
     @ClassRule
     public static JenkinsRule j = new JenkinsRule();
+
+    @Rule
+    public CodeConfiguratorRunner config = new CodeConfiguratorRunner();
 
     @Test
     public void shouldReturnCustomConfigurator() {
@@ -49,15 +53,14 @@ public class RoleStrategyTest {
 
     @Test
     @Issue("Issue #48")
+    @ConfiguredWithCode("RoleStrategy1.yml")
     public void shouldReadRolesCorrectly() throws Exception {
-        ConfigurationAsCode.configure(getClass().getResourceAsStream("RoleStrategy1.yml"));
-
         final Jenkins jenkins = Jenkins.getInstance();
 
         AuthorizationStrategy s = jenkins.getAuthorizationStrategy();
         assertThat("Authorization Strategy has been read incorrectly",
                 s, instanceOf(RoleBasedAuthorizationStrategy.class));
-        RoleBasedAuthorizationStrategy rbas = (RoleBasedAuthorizationStrategy)s;
+        RoleBasedAuthorizationStrategy rbas = (RoleBasedAuthorizationStrategy) s;
 
         Map<Role, Set<String>> globalRoles = rbas.getGrantedRoles(RoleBasedAuthorizationStrategy.GLOBAL);
         assertThat(globalRoles.size(), equalTo(2));

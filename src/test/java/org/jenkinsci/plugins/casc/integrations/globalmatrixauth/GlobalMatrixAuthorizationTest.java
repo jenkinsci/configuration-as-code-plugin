@@ -5,7 +5,10 @@ import hudson.security.GlobalMatrixAuthorizationStrategy;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.casc.ConfigurationAsCode;
 import org.jenkinsci.plugins.casc.Configurator;
+import org.jenkinsci.plugins.casc.misc.CodeConfiguratorRunner;
+import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
@@ -24,6 +27,9 @@ public class GlobalMatrixAuthorizationTest {
     @ClassRule
     public static JenkinsRule j = new JenkinsRule();
 
+    @Rule
+    public CodeConfiguratorRunner config = new CodeConfiguratorRunner();
+
     @Test
     public void shouldReturnCustomConfigurator() {
         Configurator configurator = Configurator.lookup(GlobalMatrixAuthorizationStrategy.class);
@@ -40,8 +46,8 @@ public class GlobalMatrixAuthorizationTest {
     }
 
     @Test
+    @ConfiguredWithCode("GlobalMatrixStrategy.yml")
     public void checkCorrectlyConfiguredPermissions() throws Exception {
-        ConfigurationAsCode.configure(getClass().getResourceAsStream("GlobalMatrixStrategy.yml"));
         assertEquals("The configured instance must use the Global Matrix Authentication Strategy", GlobalMatrixAuthorizationStrategy.class, Jenkins.getInstance().getAuthorizationStrategy().getClass());
         GlobalMatrixAuthorizationStrategy gms = (GlobalMatrixAuthorizationStrategy)Jenkins.getInstance().getAuthorizationStrategy();
 
