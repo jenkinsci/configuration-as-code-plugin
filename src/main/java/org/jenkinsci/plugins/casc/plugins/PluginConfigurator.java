@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 /**
  * Created by mads on 1/29/18.
  */
-@Extension(ordinal = Double.MAX_VALUE)
+@Extension(ordinal = Double.MAX_VALUE, optional = true)
 public class PluginConfigurator implements RootElementConfigurator {
 
     private static final Logger LOGGER = Logger.getLogger(PluginConfigurator.class.getName());
@@ -47,8 +47,13 @@ public class PluginConfigurator implements RootElementConfigurator {
         }
 
         //Extra sites from configuration
-        UpdateSiteInfo in = configUpdateInfo.configure(map.get("updateSites"));
-        allUpdateSites.putAll(in);
+        if(map.containsKey("updateSites")) {
+            Configurator<UpdateSiteInfo> updateSiteConfiguratorConfigurator = Configurator.lookup(UpdateSiteInfo.class);
+            for (Object o : (Collection) map.get("updateSites")) {
+                UpdateSiteInfo usi = updateSiteConfiguratorConfigurator.configure(o);
+                allUpdateSites.put(usi.getId(), usi.toUpdateSiteObject());
+            }
+        }
 
         //Clear all
         sites.clear();
@@ -59,13 +64,14 @@ public class PluginConfigurator implements RootElementConfigurator {
 
         //Do check to see if we have installed the required plugins
         StringBuilder existingPlugins = new StringBuilder();
-        Configurator<VersionNumber> vnc = Configurator.lookup(VersionNumber.class);
-        HashMap<String,VersionNumber> requiredPlugins = new HashMap<>();
 
+        HashMap<String,VersionNumber> requiredPlugins = new HashMap<>();
+        Configurator<RequiredPluginInfo> requiredPluginInfoConfigurator = Configurator.lookup(RequiredPluginInfo.class);
         //Required plugins list is optional
         if(map.containsKey("required")) {
-            for (Map.Entry reqPlug : ((Map<?, ?>) map.get("required")).entrySet()) {
-                requiredPlugins.put((String) reqPlug.getKey(), vnc.configure(reqPlug.getValue()));
+            for (Object reqPlug : (Collection)map.get("required")) {
+                RequiredPluginInfo rInfo = requiredPluginInfoConfigurator.configure(reqPlug);
+                requiredPlugins.put(rInfo.getPluginId(), rInfo.toVersionNumberObject());
             }
         }
 
