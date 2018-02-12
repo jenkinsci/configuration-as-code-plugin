@@ -3,15 +3,19 @@ package org.jenkinsci.plugins.casc.integrations.globalmatrixauth;
 import hudson.Extension;
 import hudson.security.GlobalMatrixAuthorizationStrategy;
 import hudson.security.Permission;
-import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.Configurator;
 import org.jenkinsci.plugins.casc.RootElementConfigurator;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
+import java.lang.reflect.Field;
 import java.util.*;
 
+/**
+ * @author Mads Nielsen
+ * @since TODO
+ */
 @Extension(optional = true)
 @Restricted(NoExternalUse.class)
 public class GlobalMatrixAuthorizationStrategyConfigurator extends Configurator<GlobalMatrixAuthorizationStrategy> implements RootElementConfigurator {
@@ -42,6 +46,12 @@ public class GlobalMatrixAuthorizationStrategyConfigurator extends Configurator<
             //We transform the linear list to a matrix (Where permission is the key instead)
             gpd.grantPermission(grantedPermissions);
         }
-        return new GlobalMatrixAuthorizationStrategy(grantedPermissions);
+
+        //TODO: Once change is in place for GlobalMatrixAuthentication. Switch away from reflection
+        GlobalMatrixAuthorizationStrategy gms = new GlobalMatrixAuthorizationStrategy();
+        Field f = gms.getClass().getDeclaredField("grantedPermissions");
+        f.setAccessible(true);
+        f.set(gms, grantedPermissions);
+        return gms;
     }
 }

@@ -9,7 +9,8 @@ import java.util.*;
 import java.util.logging.Logger;
 
 /**
- * Created by mads on 2/7/18.
+ * @author Mads Nielsen
+ * @since TODO
  */
 @Restricted(NoExternalUse.class)
 public class GroupPermissionDefinition {
@@ -28,7 +29,8 @@ public class GroupPermissionDefinition {
     public void grantPermission(Map<Permission,Set<String>> grantedPermissions) {
 
         for(String permission : permissions) {
-            Permission pm = Permission.fromId(permission);
+            //Permission pm = Permission.fromId(permission);
+            Permission pm = PermissionFinder.findPermission(permission);
             if(pm != null) {
                 if (grantedPermissions.containsKey(pm)) {
                     grantedPermissions.get(pm).add(name);

@@ -16,8 +16,8 @@ jenkins:
       grantedPermissions:
         - name: "anonymous"
           permissions:
-           - "hudson.model.Hudson.Read"
+           - "Overall/Read"
         - name: "authenticated"
           permissions:
-           - "hudson.model.Hudson.Administer"
+           - "Overall/Administer"
 

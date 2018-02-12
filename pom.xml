@@ -95,10 +95,9 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>matrix-auth</artifactId>
-      <version>2.3-SNAPSHOT</version>
+      <version>2.2</version>
       <optional>true</optional>
     </dependency>
-
 
     <!-- tested plugins -->
 
