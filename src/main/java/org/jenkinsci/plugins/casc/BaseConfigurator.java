@@ -1,7 +1,6 @@
 package org.jenkinsci.plugins.casc;
 
 import hudson.model.Describable;
-import jenkins.annotations.ManagedBy;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
@@ -44,7 +43,6 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
             if (setter == null) continue; // read only
             if (setter.getAnnotation(Deprecated.class) != null) continue; // not actually public
             if (setter.getAnnotation(Restricted.class) != null) continue; // not actually public     - require access-modifier 1.12
-            if (setter.getAnnotation(ManagedBy.class) != null) continue;  // actually managed by third party component
 
             // FIXME move this all into cleaner logic to discover property type
             Type type = setter.getGenericParameterTypes()[0];

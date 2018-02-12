@@ -10,7 +10,7 @@ import java.util.Set;
  * A generic {@link Configurator} for {@link hudson.Extension} singletons
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-public class ExtensionConfigurator extends BaseConfigurator implements RootElementConfigurator {
+public class ExtensionConfigurator extends BaseConfigurator {
 
     private final Class target;
 
