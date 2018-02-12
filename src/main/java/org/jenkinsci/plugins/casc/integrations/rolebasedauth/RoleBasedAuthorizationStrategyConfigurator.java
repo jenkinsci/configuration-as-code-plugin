@@ -1,7 +1,6 @@
-package org.jenkinsci.plugins.casc.integrations;
+package org.jenkinsci.plugins.casc.integrations.rolebasedauth;
 
 
-import com.cloudbees.plugins.credentials.domains.Domain;
 import com.michelin.cio.hudson.plugins.rolestrategy.Role;
 import com.michelin.cio.hudson.plugins.rolestrategy.RoleBasedAuthorizationStrategy;
 import com.michelin.cio.hudson.plugins.rolestrategy.RoleMap;
@@ -21,7 +20,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
 import java.util.TreeMap;
 
 /**

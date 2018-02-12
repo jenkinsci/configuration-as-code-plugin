@@ -1,0 +1,12 @@
+jenkins:
+  authorizationStrategy:
+  globalMatrix:
+    grantedPermissions:
+     - group:
+         name: "anonymous"
+         permissions:
+          - "hudson.model.Hudson.Read"
+     - group
+         name: "authenticated"
+         permissions:
+          - "hudson.model.Hudson.Administer"
