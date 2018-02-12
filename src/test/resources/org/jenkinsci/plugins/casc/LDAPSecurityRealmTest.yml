@@ -1,13 +1,16 @@
 jenkins:
+  systemMessage: "Jenkins configured automatically by Jenkins Configuration as Code Plugin\n\n"
 
-  securityRealm:
-    ldap:
-      configurations:
-        - server: ldap.acme.com
-          rootDN: dc=acme,dc=fr
-          managerPasswordSecret: ${LDAP_PASSWORD}
-      cache:
-        size: 100
-        ttl: 10
-      userIdStrategy: CaseInsensitive
-      groupIdStrategy: CaseSensitive
+securityConfig:
+  useSecurity:
+    securityRealm:
+      ldap:
+        configurations:
+          - server: ldap.acme.com
+            rootDN: dc=acme,dc=fr
+            managerPasswordSecret: ${LDAP_PASSWORD}
+        cache:
+          size: 100
+          ttl: 10
+        userIdStrategy: CaseInsensitive
+        groupIdStrategy: CaseSensitive
