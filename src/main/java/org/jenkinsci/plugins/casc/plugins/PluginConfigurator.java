@@ -11,8 +11,10 @@ import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.Configurator;
+import org.jenkinsci.plugins.casc.PersistedListAttribute;
 import org.jenkinsci.plugins.casc.RootElementConfigurator;
 
+import java.net.UnknownHostException;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -83,26 +85,27 @@ public class PluginConfigurator implements RootElementConfigurator {
                 LOGGER.info("Missing plugin: "+requiredPlugin.getKey()+". Adding to list of plugins to install");
                 pluginsToInstall.add(requiredPlugin.getKey());
             } else if (plugin.getVersionNumber().isOlderThan(requiredPlugin.getValue())) {
-                existingPlugins.append(String.format("Required plugin %s(%s) is older than the required version: %s",
+                LOGGER.info(String.format("Required plugin %s(%s) is older than the required version: %s",
                         plugin.getShortName(),
                         plugin.getVersion(),
-                        requiredPlugin.getValue()) + "\n");
+                        requiredPlugin.getValue()));
+                pluginsToInstall.add(requiredPlugin.getKey());
             } else {
                 LOGGER.info(String.format("Plugin '%s' is up to date for configuration-as-code plugin", requiredPlugin.getKey()));
             }
         }
 
-        //Install missing plugins
+        //Install missing and/or plugins that need update plugins
+        try {
+            Jenkins.getInstance().getPluginManager().doCheckUpdatesServer();
+        } catch (UnknownHostException ex) {
+            LOGGER.fine("Unable to contact update site: "+ex.getMessage());
+        }
         Jenkins.getInstance().getPluginManager().install(pluginsToInstall, true);
 
         //Restart if necessary
         if(Jenkins.getInstance().getUpdateCenter().isRestartRequiredForCompletion()) {
             Jenkins.getInstance().restart();
-        }
-
-        if(!StringUtils.isBlank(existingPlugins.toString())) {
-            //TODO: What is the proper reaction?
-            throw new RuntimeException("Missing plugins detected: \n" + existingPlugins.toString());
         }
 
         return Jenkins.getInstance().getPluginManager();
@@ -123,8 +126,8 @@ public class PluginConfigurator implements RootElementConfigurator {
     public Set<Attribute> describe() {
         Set<Attribute> attr =  new HashSet<Attribute>();
         attr.add(new Attribute("proxy", ProxyConfiguration.class));
-        attr.add(new Attribute("updateSites", new HashMap<String,UpdateSite>().getClass()));
-        attr.add(new Attribute("required", new HashMap<String,VersionNumber>().getClass()));
+        attr.add(new Attribute("updateSites", new ArrayList<UpdateSiteInfo>().getClass()));
+        attr.add(new Attribute("required", new ArrayList<RequiredPluginInfo>().getClass()));
         return attr;
     }
 }
