@@ -82,18 +82,18 @@ public class PluginConfigurator implements RootElementConfigurator {
         for(Map.Entry<String,VersionNumber> requiredPlugin : requiredPlugins.entrySet()) {
             PluginWrapper plugin = Jenkins.getInstance().getPluginManager().getPlugin(requiredPlugin.getKey());
             if(plugin == null) {
-                LOGGER.info("Missing plugin: "+requiredPlugin.getKey()+". Adding to list of plugins to install");
+                LOGGER.info("Missing plugin: '"+requiredPlugin.getKey()+"'. Adding to list of plugins to install");
                 pluginsToInstall.add(requiredPlugin.getKey());
             } else if (plugin.getVersionNumber().isNewerThan(requiredPlugin.getValue())) {
-                LOGGER.info(String.format("Plugin '%s' is up new than specified in configuration-as-code plugin. OK", requiredPlugin.getKey()));
+                LOGGER.info(String.format("Installed plugin '%s' is newer than specified in configuration-as-code plugin. OK", requiredPlugin.getKey()));
             } else if (plugin.getVersionNumber().isOlderThan(requiredPlugin.getValue())) {
-                LOGGER.info(String.format("Required plugin %s(%s) is older than the required version: %s. Installing newest",
+                LOGGER.info(String.format("Installed plugin '%s'(%s) is older than the required version: %s. Installing newest",
                         plugin.getShortName(),
                         plugin.getVersion(),
                         requiredPlugin.getValue()));
                 pluginsToInstall.add(requiredPlugin.getKey());
             } else {
-                LOGGER.info(String.format("Plugin '%s' is up to date. OK", requiredPlugin.getKey()));
+                LOGGER.info(String.format("Installed plugin '%s' is up to date. OK", requiredPlugin.getKey()));
             }
         }
 
