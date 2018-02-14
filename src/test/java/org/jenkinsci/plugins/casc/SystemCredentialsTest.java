@@ -48,7 +48,9 @@ public class SystemCredentialsTest {
         assertThat(certs, hasSize(1));
         assertThat(certs.get(0).getPassword().getPlainText(), equalTo("ABCD"));
 
-        List<BasicSSHUserPrivateKey> sshPrivateKeys = CredentialsProvider.lookupCredentials(BasicSSHUserPrivateKey.class, j.jenkins, ACL.SYSTEM, Collections.EMPTY_LIST);
+        List<BasicSSHUserPrivateKey> sshPrivateKeys = CredentialsProvider.lookupCredentials(
+                BasicSSHUserPrivateKey.class, jenkins, ACL.SYSTEM, Collections.emptyList()
+        );
         assertThat(sshPrivateKeys, hasSize(2));
         assertThat(sshPrivateKeys.get(0).getPassphrase().getPlainText(), equalTo("ABCD"));
     }
