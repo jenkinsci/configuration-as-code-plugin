@@ -84,14 +84,16 @@ public class PluginConfigurator implements RootElementConfigurator {
             if(plugin == null) {
                 LOGGER.info("Missing plugin: "+requiredPlugin.getKey()+". Adding to list of plugins to install");
                 pluginsToInstall.add(requiredPlugin.getKey());
+            } else if (plugin.getVersionNumber().isNewerThan(requiredPlugin.getValue())) {
+                LOGGER.info(String.format("Plugin '%s' is up new than specified in configuration-as-code plugin. OK", requiredPlugin.getKey()));
             } else if (plugin.getVersionNumber().isOlderThan(requiredPlugin.getValue())) {
-                LOGGER.info(String.format("Required plugin %s(%s) is older than the required version: %s",
+                LOGGER.info(String.format("Required plugin %s(%s) is older than the required version: %s. Installing newest",
                         plugin.getShortName(),
                         plugin.getVersion(),
                         requiredPlugin.getValue()));
                 pluginsToInstall.add(requiredPlugin.getKey());
             } else {
-                LOGGER.info(String.format("Plugin '%s' is up to date for configuration-as-code plugin", requiredPlugin.getKey()));
+                LOGGER.info(String.format("Plugin '%s' is up to date. OK", requiredPlugin.getKey()));
             }
         }
 
