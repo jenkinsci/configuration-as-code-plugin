@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.casc;
 
+import com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.CertificateCredentials;
 import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
@@ -26,6 +27,7 @@ public class SystemCredentialsTest {
     public void configure_system_credentials() throws Exception {
         System.setProperty("SUDO_PASSWORD", "1234");
         System.setProperty("SSH_KEY_PASSWORD", "ABCD");
+        System.setProperty("SSH_PRIVATE_KEY", "s3cr3t");
 
         ConfigurationAsCode.configure(getClass().getResourceAsStream("SystemCredentialsTest.yml"));
 
@@ -38,6 +40,12 @@ public class SystemCredentialsTest {
         assertEquals(1, certs.size());
         final CertificateCredentials cert = certs.get(0);
         assertEquals("ABCD", cert.getPassword().getPlainText());
+
+        List<BasicSSHUserPrivateKey> sshPrivateKeys = CredentialsProvider.lookupCredentials(BasicSSHUserPrivateKey.class, j.jenkins, ACL.SYSTEM, Collections.EMPTY_LIST);
+        assertEquals(2, sshPrivateKeys.size());
+        final BasicSSHUserPrivateKey sshUserPrivateKey = sshPrivateKeys.get(0);
+        assertEquals("ABCD", sshUserPrivateKey.getPassphrase().getPlainText());
+
 
     }
 }

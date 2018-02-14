@@ -44,3 +44,45 @@ we consider the `Impl` suffix as a common pattern to flag implementation class.
 => symbol name is `usernamePassword` 
 
 
+## Examples
+
+A list of some of the more common credentials. 
+
+### SSH Credentials
+
+Example that uses the [SSH credentials plugin](https://plugins.jenkins.io/ssh-credentials)
+
+```yaml
+credentials:
+  system:
+    ? name: "test.com"
+      description: "test.com domain"
+      specifications:
+        - hostnameSpecification:
+            includes:
+              - "*.test.com"
+    : - usernamePassword:
+          scope:    SYSTEM
+          id:       sudo_password
+          username: root
+          password: ${SUDO_PASSWORD}
+    ? # "global"
+      - basicSSHUserPrivateKey:
+          scope: SYSTEM
+          id: ssh_with_passprase
+          username: ssh_root
+          passphrase: ${SSH_KEY_PASSWORD}
+          description: "SSH passphrase with private key file"
+          privateKeySource:
+            fileOnMaster:
+              keyStoreFile: /docker/secret/id_rsa_2
+      - basicSSHUserPrivateKey:
+          scope: SYSTEM
+          id: ssh_with_passprase_provided
+          username: ssh_root
+          passphrase: ${SSH_KEY_PASSWORD}
+          description: "SSH passphrase with private key file. Private key provided"
+          privateKeySource:
+            directEntry:
+              privateKey: ${SSH_PRIVATE_KEY}
+```
