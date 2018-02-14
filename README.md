@@ -173,5 +173,7 @@ Here is a list of plugin we have successfuly tested to support configuration-as-
  - [x] ldap plugin ([details](demos/ldap/README.md))
  - [x] mailer plugin with some limitations ([details](demos/mailer/README.md))
  - [x] tfs plugin with some limitations ([details](demos/tfs/README.md))
- - [x] workflow-cps-global-lib _aka_ "global libraries" ([details](demos/workflow-cps-global-lib/README.md))                  
+ - [x] workflow-cps-global-lib _aka_ "global libraries" ([details](demos/workflow-cps-global-lib/README.md))
+ - [x] matrix-auth-plugin ([details](demos/global-matrix-auth/README.md))
+ - [ ] role-strategy-plugin ([details](demos/role-strategy-auth/README.md))
  - [ ] more to come soon...

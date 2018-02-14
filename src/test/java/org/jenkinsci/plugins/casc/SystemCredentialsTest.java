@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.casc;
 
+import com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.CertificateCredentials;
 import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
@@ -27,6 +28,7 @@ public class SystemCredentialsTest {
     @Rule
     public RuleChain chain = RuleChain.outerRule(new EnvVarsRule()
             .env("SUDO_PASSWORD", "1234")
+            .env("SSH_PRIVATE_KEY", "s3cr3t")
             .env("SSH_KEY_PASSWORD", "ABCD"))
             .around(new JenkinsConfiguredWithCodeRule());
 
@@ -46,5 +48,8 @@ public class SystemCredentialsTest {
         assertThat(certs, hasSize(1));
         assertThat(certs.get(0).getPassword().getPlainText(), equalTo("ABCD"));
 
+        List<BasicSSHUserPrivateKey> sshPrivateKeys = CredentialsProvider.lookupCredentials(BasicSSHUserPrivateKey.class, j.jenkins, ACL.SYSTEM, Collections.EMPTY_LIST);
+        assertThat(sshPrivateKeys, hasSize(2));
+        assertThat(sshPrivateKeys.get(0).getPassphrase().getPlainText(), equalTo("ABCD"));
     }
 }
