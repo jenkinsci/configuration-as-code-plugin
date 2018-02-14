@@ -180,7 +180,7 @@ plugins:
       url: https://acme.corp.net.repo  
 ``` 
 
-What this will od is that when configuration as code is loaded it will go through the list and check if the plugin
+What this will do is that when configuration as code is loaded it will go through the list and check if the plugin
 is already installed or is too old. In either case, it will install the newest possible version of the plugin.
 After installation, c-as-c will restart your Jenkins instance in case a restart is required.
 
