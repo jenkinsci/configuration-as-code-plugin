@@ -4,13 +4,11 @@ import com.nirima.jenkins.plugins.docker.DockerCloud;
 import com.nirima.jenkins.plugins.docker.DockerTemplate;
 import hudson.model.Label;
 import io.jenkins.docker.connector.DockerComputerAttachConnector;
-import org.jenkinsci.plugins.casc.misc.CodeConfiguratorRunner;
 import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
+import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import org.jenkinsci.plugins.casc.misc.TestConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.RuleChain;
-import org.jvnet.hudson.test.JenkinsRule;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -20,11 +18,8 @@ import static org.junit.Assert.assertNotNull;
  */
 public class DockerCloudTest {
 
-    public JenkinsRule j = new JenkinsRule();
-    public CodeConfiguratorRunner config = new CodeConfiguratorRunner();
-
     @Rule
-    public RuleChain chain = RuleChain.outerRule(j).around(config);
+    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 
     @Test
     @ConfiguredWithCode("DockerCloudTest.yml")
@@ -50,7 +45,7 @@ public class DockerCloudTest {
         DockerTemplate template = docker.getTemplate(Label.get("docker-agent"));
         checkTemplate(template, "docker-agent", "jenkins", "/home/jenkins/agent", "10");
 
-        new TestConfiguration("DockerCloudTest/update_docker_cloud/DockerCloudTest2.yml").configure(getClass());
+        TestConfiguration.withCode("DockerCloudTest/update_docker_cloud/DockerCloudTest2.yml").configure(getClass());
 
         docker = DockerCloud.getCloudByName("docker");
         assertNotNull(docker);

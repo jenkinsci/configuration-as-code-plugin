@@ -3,13 +3,12 @@ package org.jenkinsci.plugins.casc;
 import hudson.plugins.active_directory.ActiveDirectoryDomain;
 import hudson.plugins.active_directory.ActiveDirectorySecurityRealm;
 import jenkins.model.Jenkins;
-import org.jenkinsci.plugins.casc.misc.CodeConfiguratorRunner;
 import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
+import org.jenkinsci.plugins.casc.misc.EnvVarsRule;
+import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExternalResource;
 import org.junit.rules.RuleChain;
-import org.jvnet.hudson.test.JenkinsRule;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -19,18 +18,10 @@ import static org.junit.Assert.assertTrue;
  */
 public class ActiveDirectoryTest {
 
-    public JenkinsRule j = new JenkinsRule();
-    public CodeConfiguratorRunner config = new CodeConfiguratorRunner();
-
     @Rule
-    public RuleChain chain = RuleChain.outerRule(j)
-            .around(new ExternalResource() {
-                @Override
-                protected void before() {
-                    System.setProperty("BIND_PASSWORD", "ADMIN123");
-                }
-            })
-            .around(config);
+    public RuleChain chain = RuleChain.outerRule(new EnvVarsRule()
+            .env("BIND_PASSWORD", "ADMIN123"))
+            .around(new JenkinsConfiguredWithCodeRule());
 
     @Test
     @ConfiguredWithCode(value = "ActiveDirectoryTest.yml")

@@ -3,12 +3,10 @@ package org.jenkinsci.plugins.casc;
 import hudson.model.TopLevelItem;
 import jenkins.branch.OrganizationFolder;
 import jenkins.model.Jenkins;
-import org.jenkinsci.plugins.casc.misc.CodeConfiguratorRunner;
 import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
+import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import org.jenkinsci.plugins.github_branch_source.GitHubSCMNavigator;
 import org.junit.Rule;
-import org.junit.rules.RuleChain;
-import org.jvnet.hudson.test.JenkinsRule;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -19,11 +17,9 @@ import static org.junit.Assert.assertTrue;
  */
 public class GithubOrganisationFolderTest {
 
-    public JenkinsRule j = new JenkinsRule();
-    public CodeConfiguratorRunner config = new CodeConfiguratorRunner();
-
     @Rule
-    public RuleChain chain = RuleChain.outerRule(j).around(config);
+    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+
 
     // @Test
     // Fails as Items do override submit() with manual data-binding implementation

@@ -4,12 +4,10 @@ import hudson.model.User;
 import hudson.security.FullControlOnceLoggedInAuthorizationStrategy;
 import hudson.security.HudsonPrivateSecurityRealm;
 import jenkins.model.Jenkins;
-import org.jenkinsci.plugins.casc.misc.CodeConfiguratorRunner;
 import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
+import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.RuleChain;
-import org.jvnet.hudson.test.JenkinsRule;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -20,11 +18,8 @@ import static org.junit.Assert.assertTrue;
  */
 public class HudsonPrivateSecurityRealmConfiguratorTest {
 
-    public JenkinsRule j = new JenkinsRule();
-    public CodeConfiguratorRunner config = new CodeConfiguratorRunner();
-
     @Rule
-    public RuleChain chain = RuleChain.outerRule(j).around(config);
+    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 
     @Test
     @ConfiguredWithCode("HudsonPrivateSecurityRealmConfiguratorTest.yml")

@@ -5,13 +5,11 @@ import com.michelin.cio.hudson.plugins.rolestrategy.RoleBasedAuthorizationStrate
 import hudson.security.AuthorizationStrategy;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.casc.Configurator;
-import org.jenkinsci.plugins.casc.misc.CodeConfiguratorRunner;
 import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
-import org.junit.ClassRule;
+import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
-import org.jvnet.hudson.test.JenkinsRule;
 
 import java.util.Map;
 import java.util.Set;
@@ -28,11 +26,8 @@ import static org.junit.Assert.assertThat;
  */
 public class RoleStrategyTest {
 
-    @ClassRule
-    public static JenkinsRule j = new JenkinsRule();
-
     @Rule
-    public CodeConfiguratorRunner config = new CodeConfiguratorRunner();
+    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 
     @Test
     public void shouldReturnCustomConfigurator() {

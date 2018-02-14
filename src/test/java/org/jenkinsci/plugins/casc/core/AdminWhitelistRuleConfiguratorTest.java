@@ -22,24 +22,19 @@ package org.jenkinsci.plugins.casc.core;
 
 import jenkins.model.Jenkins;
 import jenkins.security.s2m.AdminWhitelistRule;
-import org.jenkinsci.plugins.casc.misc.CodeConfiguratorRunner;
 import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
+import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import org.junit.Assert;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.For;
 import org.jvnet.hudson.test.Issue;
-import org.jvnet.hudson.test.JenkinsRule;
 
 @For(AdminWhitelistRule.class)
 public class AdminWhitelistRuleConfiguratorTest {
 
-    @ClassRule
-    public static JenkinsRule j = new JenkinsRule();
-
     @Rule
-    public CodeConfiguratorRunner config = new CodeConfiguratorRunner();
+    public JenkinsConfiguredWithCodeRule config = new JenkinsConfiguredWithCodeRule();
 
     @Test
     @Issue("Issue #28")

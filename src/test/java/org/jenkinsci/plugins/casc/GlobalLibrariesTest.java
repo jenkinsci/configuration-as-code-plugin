@@ -1,15 +1,13 @@
 package org.jenkinsci.plugins.casc;
 
 import jenkins.plugins.git.GitSCMSource;
-import org.jenkinsci.plugins.casc.misc.CodeConfiguratorRunner;
 import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
+import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import org.jenkinsci.plugins.workflow.libs.GlobalLibraries;
 import org.jenkinsci.plugins.workflow.libs.LibraryConfiguration;
 import org.jenkinsci.plugins.workflow.libs.SCMSourceRetriever;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.RuleChain;
-import org.jvnet.hudson.test.JenkinsRule;
 
 import static org.junit.Assert.assertEquals;
 
@@ -18,13 +16,8 @@ import static org.junit.Assert.assertEquals;
  */
 public class GlobalLibrariesTest {
 
-
-    public JenkinsRule j = new JenkinsRule();
-    public CodeConfiguratorRunner config = new CodeConfiguratorRunner();
-
     @Rule
-    public RuleChain chain = RuleChain.outerRule(j).around(config);
-
+    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 
     @Test
     @ConfiguredWithCode("GlobalLibrariesTest.yml")
