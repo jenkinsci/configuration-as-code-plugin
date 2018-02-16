@@ -6,8 +6,10 @@ import jenkins.model.Jenkins;
 import org.kohsuke.stapler.ClassDescriptor;
 
 import javax.annotation.Nonnull;
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -126,6 +128,13 @@ public class DataBoundConfigurator extends BaseConfigurator<Object> {
                 attribute.setValue(object, value);
             }
         }
+
+        for (Method method : target.getMethods()) {
+            if (method.getParameterCount() == 0 && method.getAnnotation(PostConstruct.class) != null) {
+                method.invoke(object, null);
+            }
+        }
+
         return object;
     }
 
