@@ -7,6 +7,7 @@ import hudson.PluginWrapper;
 import hudson.ProxyConfiguration;
 import hudson.model.UpdateCenter;
 import hudson.model.UpdateSite;
+import hudson.util.VersionNumber;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.Configurator;
@@ -72,24 +73,32 @@ public class PluginConfigurator implements RootElementConfigurator {
                 requiredPlugins.put(rInfo.getPluginId(), rInfo);
             }
         }
-
-        //TODO: Much of this will change. Until we get a proper way to install plugins
-        List<String> pluginsToInstall = new ArrayList<>();
-        for(Map.Entry<String,RequiredPluginInfo> requiredPlugin : requiredPlugins.entrySet()) {
-            PluginWrapper plugin = Jenkins.getInstance().getPluginManager().getPlugin(requiredPlugin.getKey());
-            if(plugin == null) {
-                LOGGER.info("Missing plugin: '"+requiredPlugin.getKey()+"'. Adding to list of plugins to install");
-                pluginsToInstall.add(requiredPlugin.getKey());
-            } else if(requiredPlugin.getValue().needsInstall(plugin.getVersionNumber())) {
-                pluginsToInstall.add(requiredPlugin.getKey());
-            }
-        }
-
         //Install missing and/or plugins that need update plugins
         try {
             Jenkins.getInstance().getPluginManager().doCheckUpdatesServer();
         } catch (UnknownHostException ex) {
             LOGGER.fine("Unable to contact update site: "+ex.getMessage());
+        }
+
+        //TODO: Much of this will change. Until we get a proper way to install plugins
+        List<String> pluginsToInstall = new ArrayList<>();
+        for(Map.Entry<String,RequiredPluginInfo> requiredPlugin : requiredPlugins.entrySet()) {
+            UpdateSite.Plugin p = Jenkins.getInstance().getUpdateCenter().getPlugin(requiredPlugin.getKey());
+            if(p != null) {
+                VersionNumber fromUpdateCenter = new VersionNumber(p.version);
+                PluginWrapper plugin = Jenkins.getInstance().getPluginManager().getPlugin(requiredPlugin.getKey());
+                if(requiredPlugin.getValue().toVersionNumberObject().isNewerThan(fromUpdateCenter)) {
+                    LOGGER.warning(String.format("The plugin '%s' specified as a requirement is newer than the newest version found in the update center.", requiredPlugin.getKey()));
+                } else if (plugin == null) {
+                    LOGGER.info("Missing plugin: '" + requiredPlugin.getKey() + "'. Adding to list of plugins to install.");
+                    pluginsToInstall.add(requiredPlugin.getKey());
+                } else if (requiredPlugin.getValue().needsInstall(plugin.getVersionNumber())) {
+                    LOGGER.info(String.format("Installing plugin '%s'", requiredPlugin.getKey()));
+                    pluginsToInstall.add(requiredPlugin.getKey());
+                }
+            } else {
+                LOGGER.warning(String.format("Plugin '%s' not found in update center.", requiredPlugin.getKey()));
+            }
         }
 
         //TODO: This needs to be change soon
