@@ -260,6 +260,23 @@
 
   <build>
     <plugins>
+      <!--
+        TODO: THIS NEEDS TO BE REMOVED ONCE WE HAVE PROPER PLUGIN INSTALL SUPPORT
+        Disabled because we have no way to programatically install a plugin.
+        Jenkins.getInstance().getPluginManager().install(...) has no ExternalUse and
+        UpdateCenter.UpdateCenterJob() has a protected constructor.
+      -->
+      <plugin>
+        <artifactId>access-modifier-checker</artifactId>
+        <groupId>org.kohsuke</groupId>
+        <executions>
+          <execution>
+            <id>default-enforce</id>
+            <phase>none</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- END -->
       <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
         <configuration>
@@ -288,5 +305,4 @@
       </plugin>
     </plugins>
   </build>
-
 </project>

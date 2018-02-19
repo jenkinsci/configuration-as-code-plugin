@@ -170,11 +170,11 @@ In your yaml file you specify a root element `plugins` like so:
 plugins:
   required:
     - pluginId: git
-      version: 3.5.0
+      version: ">= 3.5.0"
     - pluginId: mailer
-      version: 1.20
+      version: ">= 1.20"
     - pluginId: elastic-axis
-      version: 1.2
+      version: ">= 1.2"
   updateSites:
     - id: extra
       url: https://acme.corp.net.repo  

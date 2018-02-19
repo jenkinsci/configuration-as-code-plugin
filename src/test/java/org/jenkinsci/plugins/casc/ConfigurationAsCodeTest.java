@@ -4,6 +4,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.jvnet.hudson.test.JenkinsRule;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,11 +14,15 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class ConfigurationAsCodeTest {
 
     @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder();
+
+    @Rule
+    public JenkinsRule j = new JenkinsRule();
 
     @Test
     public void init_test_from_accepted_sources() throws Exception {

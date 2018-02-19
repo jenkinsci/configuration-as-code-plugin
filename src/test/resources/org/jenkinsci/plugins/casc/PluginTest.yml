@@ -5,5 +5,5 @@ plugins:
     userName: "foo"
     password: "bar"
   updateSites:
-    extra:
+    - id: "extra"
       url: "http://some.other.site.org"

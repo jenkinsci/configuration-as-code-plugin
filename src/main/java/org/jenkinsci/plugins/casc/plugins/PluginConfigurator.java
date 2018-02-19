@@ -5,13 +5,11 @@ import hudson.Extension;
 import hudson.PluginManager;
 import hudson.PluginWrapper;
 import hudson.ProxyConfiguration;
+import hudson.model.UpdateCenter;
 import hudson.model.UpdateSite;
-import hudson.util.VersionNumber;
 import jenkins.model.Jenkins;
-import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.Configurator;
-import org.jenkinsci.plugins.casc.PersistedListAttribute;
 import org.jenkinsci.plugins.casc.RootElementConfigurator;
 
 import java.net.UnknownHostException;
@@ -63,37 +61,26 @@ public class PluginConfigurator implements RootElementConfigurator {
         //Add ones from configuration
         sites.addAll(allUpdateSites.values());
         Jenkins.getInstance().save();
-
-        //Do check to see if we have installed the required plugins
-        StringBuilder existingPlugins = new StringBuilder();
-
-        HashMap<String,VersionNumber> requiredPlugins = new HashMap<>();
+        
+        HashMap<String,RequiredPluginInfo> requiredPlugins = new HashMap<>();
         Configurator<RequiredPluginInfo> requiredPluginInfoConfigurator = Configurator.lookup(RequiredPluginInfo.class);
         //Required plugins list is optional
         if(map.containsKey("required")) {
             for (Object reqPlug : (Collection)map.get("required")) {
                 RequiredPluginInfo rInfo = requiredPluginInfoConfigurator.configure(reqPlug);
-                requiredPlugins.put(rInfo.getPluginId(), rInfo.toVersionNumberObject());
+                requiredPlugins.put(rInfo.getPluginId(), rInfo);
             }
         }
 
         //TODO: Much of this will change. Until we get a proper way to install plugins
         List<String> pluginsToInstall = new ArrayList<>();
-        for(Map.Entry<String,VersionNumber> requiredPlugin : requiredPlugins.entrySet()) {
+        for(Map.Entry<String,RequiredPluginInfo> requiredPlugin : requiredPlugins.entrySet()) {
             PluginWrapper plugin = Jenkins.getInstance().getPluginManager().getPlugin(requiredPlugin.getKey());
             if(plugin == null) {
                 LOGGER.info("Missing plugin: '"+requiredPlugin.getKey()+"'. Adding to list of plugins to install");
                 pluginsToInstall.add(requiredPlugin.getKey());
-            } else if (plugin.getVersionNumber().isNewerThan(requiredPlugin.getValue())) {
-                LOGGER.info(String.format("Installed plugin '%s' is newer than specified in configuration-as-code plugin. OK", requiredPlugin.getKey()));
-            } else if (plugin.getVersionNumber().isOlderThan(requiredPlugin.getValue())) {
-                LOGGER.info(String.format("Installed plugin '%s'(%s) is older than the required version: %s. Installing newest",
-                        plugin.getShortName(),
-                        plugin.getVersion(),
-                        requiredPlugin.getValue()));
+            } else if(requiredPlugin.getValue().needsInstall(plugin.getVersionNumber())) {
                 pluginsToInstall.add(requiredPlugin.getKey());
-            } else {
-                LOGGER.info(String.format("Installed plugin '%s' is up to date. OK", requiredPlugin.getKey()));
             }
         }
 
@@ -103,6 +90,8 @@ public class PluginConfigurator implements RootElementConfigurator {
         } catch (UnknownHostException ex) {
             LOGGER.fine("Unable to contact update site: "+ex.getMessage());
         }
+
+        //TODO: This needs to be change soon
         Jenkins.getInstance().getPluginManager().install(pluginsToInstall, true);
 
         //Restart if necessary

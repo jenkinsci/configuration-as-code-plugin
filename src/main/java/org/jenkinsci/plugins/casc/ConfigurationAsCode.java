@@ -33,8 +33,6 @@ import java.util.Set;
 @Extension
 public class ConfigurationAsCode extends ManagementLink {
 
-
-
     @CheckForNull
     @Override
     public String getIconFileName() {
