@@ -38,7 +38,7 @@ jenkins:
         ttl: 10
       userIdStrategy: CaseSensitive
       groupIdStrategy: CaseSensitive
-```  
+```
 
 In addition, we want such a file to have a well documented syntax, and tooling to assist in writing and testing,
 so end-users have full guidance in using this toolset and don't have to search stackoverflow for samples.
@@ -79,7 +79,7 @@ jenkins:
 
   slaveAgentPort: 50000
   agentProtocols:
-    - "jnlp2"    
+    - "jnlp2"
 
 tool:
   git:
@@ -101,7 +101,7 @@ credentials:
           id:       ssh_private_key
           keyStoreSource:
             fileOnMaster:
-              keyStoreFile: /docker/secret/id_rsa      
+              keyStoreFile: /docker/secret/id_rsa
 ```
 
 Also see [demos](demos) folder with various samples.
@@ -119,7 +119,7 @@ For this purpose, we delegate to the popular [job-dsl-plugin](https://wiki.jenki
 and run a job-dsl script to create an initial set of jobs.
 
 Typical usage is to rely on a multi-branch, or organization folder job type, so further jobs will be dynamically
-created. So a multi-branch seed job will prepare a master to be fully configured for CI/CD targetting a repository
+created. So a multi-branch seed job will prepare a master to be fully configured for CI/CD targeting a repository
 or organization.
 
 Job-DSL plugin uses groovy syntax for it's job configuration DSL, so you'll have to mix yaml and groovy within your
@@ -135,7 +135,7 @@ jobs:
               }
           }
       }
-```         
+```
 
 ## How to provide initial secrets for Configuration-as-Code
 
@@ -163,7 +163,7 @@ If all those 4 are present, Configuration-as-Code will try to gather initial sec
 
 ## Supported plugins
 
-Here is a list of plugin we have successfuly tested to support configuration-as-code approach :
+Here is a list of plugin we have successfully tested to support configuration-as-code approach :
 
  - [x] active directory plugin ([details](demos/credentials/README.md))
  - [x] artifactory plugin ([details](demos/artifactory/README.md))
