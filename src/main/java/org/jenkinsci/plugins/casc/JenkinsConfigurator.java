@@ -11,7 +11,6 @@ import javaposse.jobdsl.plugin.LookupStrategy;
 import jenkins.model.GlobalConfigurationCategory;
 import jenkins.model.Jenkins;
 import jenkins.security.s2m.AdminWhitelistRule;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,7 +41,6 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
     public Jenkins configure(Object c) throws Exception {
         Map config = (Map) c;
         Jenkins jenkins = Jenkins.getInstance();
-
         configure(config, jenkins);
         return jenkins;
     }

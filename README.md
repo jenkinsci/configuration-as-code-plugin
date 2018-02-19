@@ -161,6 +161,31 @@ If all those 4 are present, Configuration-as-Code will try to gather initial sec
 **TODO** provide a dockerfile to 'build' this documentation from specified jenkins-core release and plugins.
 
 
+## Automatic plugin installation
+
+Currently we offer a very simple solution to specify the plugins you want to use and ensure are installed. 
+
+In your yaml file you specify a root element `plugins` like so:
+
+```yaml
+plugins:
+  required:
+    - pluginId: git
+      version: ">= 3.5.0"
+    - pluginId: mailer
+      version: ">= 1.20"
+    - pluginId: elastic-axis
+      version: ">= 1.2"
+  updateSites:
+    - id: extra
+      url: https://acme.corp.net.repo  
+``` 
+
+What this will do is that when configuration as code is loaded it will go through the list and check if the plugin
+is already installed or is too old. In either case, it will install the newest possible version of the plugin.
+After installation, c-as-c will restart your Jenkins instance in case a restart is required.
+
+We plan to extend this as the project progresses, so that for example it installs the exact version you specify.
 ## Supported plugins
 
 Here is a list of plugin we have successfuly tested to support configuration-as-code approach :

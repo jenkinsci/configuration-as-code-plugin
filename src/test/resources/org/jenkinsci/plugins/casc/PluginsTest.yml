@@ -1,0 +1,11 @@
+plugins:
+  required:
+    - pluginId: git
+      version: ">= 3.7.0"
+    - pluginId: mailer
+      version: ">= 1.20"
+    - pluginId: elastic-axis
+      version: ">= 1.2"
+    - pluginId: pretested-integration
+      version: ">= 4.0.0"
+

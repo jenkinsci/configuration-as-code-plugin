@@ -33,8 +33,6 @@ import java.util.Set;
 @Extension
 public class ConfigurationAsCode extends ManagementLink {
 
-
-
     @CheckForNull
     @Override
     public String getIconFileName() {
@@ -88,10 +86,8 @@ public class ConfigurationAsCode extends ManagementLink {
         get().configure();
     }
 
-
     public void configure() throws Exception {
         List<String> files = new ArrayList<>();
-
         final String configParameter = System.getenv("CASC_JENKINS_CONFIG");
         final Map<String, InputStream> is = getConfigurationInputs(configParameter);
         for (Map.Entry<String, InputStream> e : is.entrySet()) {
@@ -162,15 +158,16 @@ public class ConfigurationAsCode extends ManagementLink {
                 return Collections.EMPTY_MAP;
             }
         }
+        Map<String, InputStream> is = new HashMap<>();
         File cfg = new File(configPath);
         if(cfg.isDirectory()) {
-            Map<String, InputStream> is = new HashMap<>();
             for(File cfgFile : FileUtils.listFiles(cfg, new String[]{"yml","yaml"},true)) {
                 is.put(cfgFile.getName(), new FileInputStream(cfgFile));
             }
-            return is;
+        } else {
+            is.put(cfg.getName(), new FileInputStream(cfg));
         }
-        return Collections.singletonMap(cfg.getName(), new FileInputStream(cfg));
+        return is;
     }
 
 }

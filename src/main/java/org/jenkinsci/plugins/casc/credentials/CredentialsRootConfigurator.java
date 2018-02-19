@@ -27,7 +27,6 @@ public class CredentialsRootConfigurator extends Configurator<CredentialsStore> 
 
     private final static Logger logger = Logger.getLogger(CredentialsRootConfigurator.class.getName());
 
-
     @Override
     public String getName() {
         return "credentials";
