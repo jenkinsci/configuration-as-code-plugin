@@ -33,7 +33,9 @@ import java.util.Set;
 @Extension
 public class ConfigurationAsCode extends ManagementLink {
 
-
+    public static final String CASC_JENKINS_CONFIG_PROPERTY = "casc.jenkins.config";
+    public static final String CASC_JENKINS_CONFIG_ENV = "CASC_JENKINS_CONFIG";
+    public static final String DEFAULT_JENKINS_YAML_PATH = "./jenkins.yaml";
 
     @CheckForNull
     @Override
@@ -55,7 +57,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
     private long lastTimeLoaded;
 
-    private List<String> sources = Collections.EMPTY_LIST;
+    private List<String> sources = Collections.emptyList();
 
     public Date getLastTimeLoaded() {
         return new Date(lastTimeLoaded);
@@ -90,9 +92,12 @@ public class ConfigurationAsCode extends ManagementLink {
 
 
     public void configure() throws Exception {
-        List<String> files = new ArrayList<>();
+        String configParameter = System.getProperty(
+                CASC_JENKINS_CONFIG_PROPERTY,
+                System.getenv(CASC_JENKINS_CONFIG_ENV)
+        );
 
-        final String configParameter = System.getenv("CASC_JENKINS_CONFIG");
+        List<String> files = new ArrayList<>();
         final Map<String, InputStream> is = getConfigurationInputs(configParameter);
         for (Map.Entry<String, InputStream> e : is.entrySet()) {
             files.add(e.getKey());
@@ -155,11 +160,11 @@ public class ConfigurationAsCode extends ManagementLink {
     public Map<String, InputStream> getConfigurationInputs(String configPath) throws IOException {
         //Default
         if(StringUtils.isBlank(configPath)) {
-            File defaultConfig = new File("./jenkins.yaml");
+            File defaultConfig = new File(DEFAULT_JENKINS_YAML_PATH);
             if(defaultConfig.exists()) {
-                return Collections.singletonMap("jenkins.yaml", new FileInputStream(new File("./jenkins.yaml")));
+                return Collections.singletonMap("jenkins.yaml", new FileInputStream(defaultConfig));
             } else {
-                return Collections.EMPTY_MAP;
+                return Collections.emptyMap();
             }
         }
         File cfg = new File(configPath);
