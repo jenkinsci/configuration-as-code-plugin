@@ -31,13 +31,14 @@ public class PluginConfigurator implements RootElementConfigurator {
         //Proxy is optional
         if(map.containsKey("proxy")) {
             Configurator<ProxyConfiguration> pc = Configurator.lookup(ProxyConfiguration.class);
-            ProxyConfiguration pcc = pc.configure(map.get("proxy"));
-            Jenkins.getInstance().proxy = pcc;
+            Object o = map.get("proxy");
+            if(o != null) {
+                ProxyConfiguration pcc = pc.configure(o);
+                Jenkins.getInstance().proxy = pcc;
+            }
         }
 
         HashMap<String, UpdateSite> allUpdateSites = new HashMap<>();
-        Configurator<UpdateSiteInfo> configUpdateInfo = Configurator.lookup(UpdateSiteInfo.class);
-
         //Reuse the default update center
         List<UpdateSite> sites = Jenkins.getInstance().getUpdateCenter().getSites();
         for(UpdateSite us : sites) {
@@ -61,7 +62,7 @@ public class PluginConfigurator implements RootElementConfigurator {
         //Add ones from configuration
         sites.addAll(allUpdateSites.values());
         Jenkins.getInstance().save();
-        
+
         HashMap<String,RequiredPluginInfo> requiredPlugins = new HashMap<>();
         Configurator<RequiredPluginInfo> requiredPluginInfoConfigurator = Configurator.lookup(RequiredPluginInfo.class);
         //Required plugins list is optional
