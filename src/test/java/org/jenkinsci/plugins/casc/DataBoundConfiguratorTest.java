@@ -1,6 +1,5 @@
 package org.jenkinsci.plugins.casc;
 
-import hudson.model.AbstractDescribableImpl;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -11,7 +10,9 @@ import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -33,7 +34,7 @@ public class DataBoundConfiguratorTest {
         assertEquals(true, configured.bar);
         assertEquals(123, configured.qix);
         assertEquals("DataBoundSetter", configured.zot);
-        assertTrue( configured.intialized);
+        assertThat(configured.intialized, is(true));
     }
 
 

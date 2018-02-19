@@ -3,11 +3,11 @@ package org.jenkinsci.plugins.casc.integrations.globalmatrixauth;
 import hudson.security.AuthorizationStrategy;
 import hudson.security.GlobalMatrixAuthorizationStrategy;
 import jenkins.model.Jenkins;
-import org.jenkinsci.plugins.casc.ConfigurationAsCode;
 import org.jenkinsci.plugins.casc.Configurator;
-import org.junit.ClassRule;
+import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
+import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import org.junit.Rule;
 import org.junit.Test;
-import org.jvnet.hudson.test.JenkinsRule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +21,9 @@ import static org.junit.Assert.assertNotNull;
  */
 public class GlobalMatrixAuthorizationTest {
 
-    @ClassRule
-    public static JenkinsRule j = new JenkinsRule();
+    @Rule
+    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+
 
     @Test
     public void shouldReturnCustomConfigurator() {
@@ -40,10 +41,10 @@ public class GlobalMatrixAuthorizationTest {
     }
 
     @Test
+    @ConfiguredWithCode("GlobalMatrixStrategy.yml")
     public void checkCorrectlyConfiguredPermissions() throws Exception {
-        ConfigurationAsCode.configure(getClass().getResourceAsStream("GlobalMatrixStrategy.yml"));
         assertEquals("The configured instance must use the Global Matrix Authentication Strategy", GlobalMatrixAuthorizationStrategy.class, Jenkins.getInstance().getAuthorizationStrategy().getClass());
-        GlobalMatrixAuthorizationStrategy gms = (GlobalMatrixAuthorizationStrategy)Jenkins.getInstance().getAuthorizationStrategy();
+        GlobalMatrixAuthorizationStrategy gms = (GlobalMatrixAuthorizationStrategy) Jenkins.getInstance().getAuthorizationStrategy();
 
         List<String> adminPermission = new ArrayList<>(gms.getGrantedPermissions().get(Jenkins.ADMINISTER));
         assertEquals("authenticated", adminPermission.get(0));

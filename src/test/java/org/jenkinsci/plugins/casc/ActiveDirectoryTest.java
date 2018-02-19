@@ -3,9 +3,12 @@ package org.jenkinsci.plugins.casc;
 import hudson.plugins.active_directory.ActiveDirectoryDomain;
 import hudson.plugins.active_directory.ActiveDirectorySecurityRealm;
 import jenkins.model.Jenkins;
+import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
+import org.jenkinsci.plugins.casc.misc.EnvVarsRule;
+import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.jvnet.hudson.test.JenkinsRule;
+import org.junit.rules.RuleChain;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -15,16 +18,14 @@ import static org.junit.Assert.assertTrue;
  */
 public class ActiveDirectoryTest {
 
-
     @Rule
-    public JenkinsRule j = new JenkinsRule();
+    public RuleChain chain = RuleChain.outerRule(new EnvVarsRule()
+            .env("BIND_PASSWORD", "ADMIN123"))
+            .around(new JenkinsConfiguredWithCodeRule());
 
     @Test
+    @ConfiguredWithCode(value = "ActiveDirectoryTest.yml")
     public void configure_active_directory() throws Exception {
-        System.setProperty("BIND_PASSWORD", "ADMIN123");
-
-        ConfigurationAsCode.configure(getClass().getResourceAsStream("ActiveDirectoryTest.yml"));
-
         final Jenkins jenkins = Jenkins.getInstance();
         final ActiveDirectorySecurityRealm realm = (ActiveDirectorySecurityRealm) jenkins.getSecurityRealm();
         assertEquals(1, realm.domains.size());

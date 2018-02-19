@@ -1,14 +1,15 @@
 package org.jenkinsci.plugins.casc;
 
 import hudson.security.LDAPSecurityRealm;
-import hudson.security.SecurityRealm;
-import hudson.tasks.Mailer;
 import jenkins.model.IdStrategy;
 import jenkins.model.Jenkins;
 import jenkins.security.plugins.ldap.LDAPConfiguration;
+import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
+import org.jenkinsci.plugins.casc.misc.EnvVarsRule;
+import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.jvnet.hudson.test.JenkinsRule;
+import org.junit.rules.RuleChain;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -18,15 +19,14 @@ import static org.junit.Assert.assertTrue;
  */
 public class LDAPSecurityRealmTest {
 
-
     @Rule
-    public JenkinsRule j = new JenkinsRule();
+    public RuleChain chain = RuleChain.outerRule(new EnvVarsRule()
+            .env("LDAP_PASSWORD", "SECRET"))
+            .around(new JenkinsConfiguredWithCodeRule());
 
     @Test
-    public void configure_securityRealm() throws Exception {
-        System.setProperty("LDAP_PASSWORD", "SECRET");
-        ConfigurationAsCode.configure(getClass().getResourceAsStream("LDAPSecurityRealmTest.yml"));
-
+    @ConfiguredWithCode("LDAPSecurityRealmTest.yml")
+    public void configure_securityRealm() {
         final Jenkins jenkins = Jenkins.getInstance();
         final LDAPSecurityRealm securityRealm = (LDAPSecurityRealm) jenkins.getSecurityRealm();
         assertEquals(1, securityRealm.getConfigurations().size());

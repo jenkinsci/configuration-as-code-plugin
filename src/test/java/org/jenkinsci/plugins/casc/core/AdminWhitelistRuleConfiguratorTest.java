@@ -22,25 +22,24 @@ package org.jenkinsci.plugins.casc.core;
 
 import jenkins.model.Jenkins;
 import jenkins.security.s2m.AdminWhitelistRule;
-import org.jenkinsci.plugins.casc.ConfigurationAsCode;
+import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
+import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import org.junit.Assert;
-import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.For;
 import org.jvnet.hudson.test.Issue;
-import org.jvnet.hudson.test.JenkinsRule;
 
 @For(AdminWhitelistRule.class)
 public class AdminWhitelistRuleConfiguratorTest {
 
-    @ClassRule
-    public static JenkinsRule j = new JenkinsRule();
+    @Rule
+    public JenkinsConfiguredWithCodeRule config = new JenkinsConfiguredWithCodeRule();
 
     @Test
     @Issue("Issue #28")
+    @ConfiguredWithCode("AdminWhitelistRuleConfigurator/Slave2MasterSecurityKillSwitch_enabled.yml")
     public void checkM2SSecurityKillSwitch_enabled() throws Exception {
-        ConfigurationAsCode.configure(getClass().getResourceAsStream("AdminWhitelistRuleConfigurator/Slave2MasterSecurityKillSwitch_enabled.yml"));
-
         final Jenkins jenkins = Jenkins.getInstance();
         AdminWhitelistRule rule = jenkins.getInjector().getInstance(AdminWhitelistRule.class);
         Assert.assertTrue("MasterToSlave Security should be enabled", rule.getMasterKillSwitch());
@@ -48,9 +47,8 @@ public class AdminWhitelistRuleConfiguratorTest {
 
     @Test
     @Issue("Issue #28")
+    @ConfiguredWithCode("AdminWhitelistRuleConfigurator/Slave2MasterSecurityKillSwitch_disabled.yml")
     public void checkM2SSecurityKillSwitch_disabled() throws Exception {
-        ConfigurationAsCode.configure(getClass().getResourceAsStream("AdminWhitelistRuleConfigurator/Slave2MasterSecurityKillSwitch_disabled.yml"));
-
         final Jenkins jenkins = Jenkins.getInstance();
         AdminWhitelistRule rule = jenkins.getInjector().getInstance(AdminWhitelistRule.class);
         Assert.assertFalse("MasterToSlave Security should be disabled", rule.getMasterKillSwitch());

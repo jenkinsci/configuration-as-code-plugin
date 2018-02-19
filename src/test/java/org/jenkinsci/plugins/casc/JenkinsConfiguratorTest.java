@@ -5,12 +5,17 @@ import hudson.security.FullControlOnceLoggedInAuthorizationStrategy;
 import hudson.security.HudsonPrivateSecurityRealm;
 import jenkins.model.Jenkins;
 import org.hamcrest.CoreMatchers;
+import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
+import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
-import org.jvnet.hudson.test.JenkinsRule;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -18,21 +23,19 @@ import static org.junit.Assert.*;
 public class JenkinsConfiguratorTest {
 
     @Rule
-    public JenkinsRule j = new JenkinsRule();
+    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 
     @Test
+    @ConfiguredWithCode("Primitives.yml")
     public void jenkins_primitive_attributes() throws Exception {
-        ConfigurationAsCode.configure(getClass().getResourceAsStream("Primitives.yml"));
-
         final Jenkins jenkins = Jenkins.getInstance();
         assertEquals(6666, jenkins.getSlaveAgentPort());
         assertEquals(false, jenkins.isUsageStatisticsCollected());
     }
 
     @Test
+    @ConfiguredWithCode("HeteroDescribable.yml")
     public void jenkins_abstract_describable_attributes() throws Exception {
-        ConfigurationAsCode.configure(getClass().getResourceAsStream("HeteroDescribable.yml"));
-
         final Jenkins jenkins = Jenkins.getInstance();
         assertTrue(jenkins.getSecurityRealm() instanceof HudsonPrivateSecurityRealm);
         assertTrue(jenkins.getAuthorizationStrategy() instanceof FullControlOnceLoggedInAuthorizationStrategy);

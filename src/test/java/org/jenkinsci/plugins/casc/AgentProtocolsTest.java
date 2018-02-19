@@ -1,12 +1,12 @@
 package org.jenkinsci.plugins.casc;
 
 import jenkins.model.Jenkins;
+import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
+import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.jvnet.hudson.test.JenkinsRule;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -18,12 +18,11 @@ import static org.junit.Assert.assertEquals;
 public class AgentProtocolsTest {
 
     @Rule
-    public JenkinsRule j = new JenkinsRule();
+    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 
     @Test
+    @ConfiguredWithCode(value = "AgentProtocolsTest.yml")
     public void configure_agent_protocols() throws Exception {
-        ConfigurationAsCode.configure(getClass().getResourceAsStream("AgentProtocolsTest.yml"));
-
         final Jenkins jenkins = Jenkins.getInstance();
         final Set<String> agentProtocols =
                 Arrays.stream(new String[]{"JNLP4-connect", "Ping"}).collect(Collectors.toSet());

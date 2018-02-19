@@ -2,9 +2,10 @@ package org.jenkinsci.plugins.casc;
 
 import hudson.plugins.git.GitTool;
 import jenkins.model.Jenkins;
+import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
+import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.jvnet.hudson.test.JenkinsRule;
 
 import static org.junit.Assert.assertEquals;
 
@@ -13,14 +14,12 @@ import static org.junit.Assert.assertEquals;
  */
 public class GitToolInstallationTest {
 
-
     @Rule
-    public JenkinsRule j = new JenkinsRule();
+    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 
     @Test
+    @ConfiguredWithCode("GitToolInstallationTest.yml")
     public void configure_git_installations() throws Exception {
-        ConfigurationAsCode.configure(getClass().getResourceAsStream("GitToolInstallationTest.yml"));
-
         final Jenkins jenkins = Jenkins.getInstance();
         final GitTool.DescriptorImpl descriptor = (GitTool.DescriptorImpl) jenkins.getDescriptor(GitTool.class);
         assertEquals(2, descriptor.getInstallations().length);
