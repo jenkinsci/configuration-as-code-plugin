@@ -40,19 +40,24 @@ public class ConfigurationAsCode extends ManagementLink {
     @CheckForNull
     @Override
     public String getIconFileName() {
-        return "images/48x48/setting.png";
+        return "/plugin/configuration-as-code/img/logo-head.svg";
     }
 
     @CheckForNull
     @Override
     public String getDisplayName() {
-        return "configuration-as-code";
+        return "Configuration as Code";
     }
 
     @CheckForNull
     @Override
     public String getUrlName() {
         return "configuration-as-code";
+    }
+
+    @Override
+    public String getDescription() {
+        return "An opinionated way to configure jenkins based on human-readable declarative configuration files";
     }
 
     private long lastTimeLoaded;
