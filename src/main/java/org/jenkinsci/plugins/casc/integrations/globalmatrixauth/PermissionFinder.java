@@ -20,7 +20,7 @@ public class PermissionFinder {
 
     /**
      * Attempt to match a given permission to what is defined in the UI.
-     * TODO: Refector this away when proper permission API is in place for C-as-C
+     * TODO: Refactor this away when proper permission API is in place for C-as-C
      * @param id String of the form "Title/Permission" (Look in the UI) for a particular permission
      * @return a matched permission
      */
