@@ -1,0 +1,8 @@
+jenkins:
+  securityRealm:
+    github:
+      githubWebUri: "https://github.com"
+      githubApiUri: "https://api.github.com"
+      clientID: "someId"
+      clientSecret: "${GITHUB_SECRET}"
+      oauthScopes: "read:org,user:email"

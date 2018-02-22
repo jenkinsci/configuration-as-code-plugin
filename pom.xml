@@ -181,6 +181,20 @@
       <version>2.9</version>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>github-oauth</artifactId>
+      <version>0.29</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <!-- Provided by the Git plugin -->
+          <groupId>org.jenkins-ci.plugins</groupId>
+          <artifactId>matrix-project</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
     
     <!-- required to satisfy plugins dependencies and get testPluginActive to pass -->
     <dependency>
