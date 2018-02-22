@@ -8,10 +8,13 @@ import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.Configurator;
 import org.jenkinsci.plugins.casc.RootElementConfigurator;
 import org.jenkinsci.plugins.casc.integrations.globalmatrixauth.GroupPermissionDefinition;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import java.util.*;
 
 @Extension(optional = true)
+@Restricted(NoExternalUse.class)
 public class ProjectMatrixAuthorizationStrategyConfigurator extends Configurator<ProjectMatrixAuthorizationStrategy> implements RootElementConfigurator {
 
     @Override
