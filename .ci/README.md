@@ -6,7 +6,7 @@ The pull request builder job that runs on this project on the Jenkins community 
 
 The release job that performs the release of the plugin is hosted currently at [Praqma's](https://www.praqma.com/) Jenkins CI infrastructure and automates the release process.
 
-Job is publicly available here:
+Job is publicly available [here](http://code.praqma.net/ci/job/jenkins-configuration-as-code-plugin-release/)
 
 Jenkinsfile is here [Jenkinsfile](/.ci/Jenkinsfile).
 
