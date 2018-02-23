@@ -1,6 +1,7 @@
 package org.jenkinsci.plugins.casc.integrations.globalmatrixauth;
 
 import hudson.security.Permission;
+import org.jenkinsci.plugins.casc.util.PermissionFinder;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.DataBoundConstructor;
