@@ -28,4 +28,7 @@ jenkins:
             launchTimeoutSeconds: 60
             maxNumRetries: 3
             retryWaitTime: 30
+            sshHostKeyVerificationStrategy:
+              manuallyTrustedKeyVerificationStrategy:
+                requireInitialManualTrust: false
 ```
