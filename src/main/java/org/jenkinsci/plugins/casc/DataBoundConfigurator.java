@@ -14,7 +14,6 @@ import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -88,7 +87,7 @@ public class DataBoundConfigurator extends BaseConfigurator<Object> {
                         if (configurator == null) throw new IllegalStateException("No configurator implementation to manage "+k);
                         args[i] = configurator.configure(value);
                     }
-                    System.out.println("Setting " + target + "." + names[i] + " = " + value);
+                    logger.info("Setting " + target + "." + names[i] + " = " + value);
                 } else if (t.isPrimitive()) {
                     args[i] = Defaults.defaultValue(t);
                 }
