@@ -3,7 +3,7 @@
 
 # Jenkins Configuration as Code Plugin
 
-![logo](logo.png)
+<img src="src/main/webapp/img/logo.svg" width="250">
 
 ## Introduction
 
