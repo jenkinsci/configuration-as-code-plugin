@@ -10,7 +10,7 @@
   </parent>
   <groupId>org.jenkins-ci.plugins</groupId>
   <artifactId>configuration-as-code</artifactId>
-  <version>0.1-alpha</version>
+  <version>0.2-alpha-SNAPSHOT</version>
   <packaging>hpi</packaging>
 
   <properties>
@@ -41,7 +41,7 @@
     <connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-plugin.git</connection>
     <developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection>
     <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
-    <tag>configuration-as-code-0.1-alpha</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <repositories>
