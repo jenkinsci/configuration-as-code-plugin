@@ -53,6 +53,8 @@ public class RoleDefinition {
                 String resolvedId = PermissionFinder.findPermissionId(id);
                 if (resolvedId != null) {
                     resolvedIds.add(resolvedId);
+                } else {
+                    throw new IllegalStateException("Cannot resolve permission for ID: " + id);
                 }
             }
             role = new Role(name, pattern, resolvedIds, description);

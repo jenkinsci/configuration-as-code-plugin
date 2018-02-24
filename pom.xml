@@ -256,6 +256,12 @@
       <version>1.21</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>cloudbees-folder</artifactId>
+      <version>6.1.2</version>
+      <scope>test</scope>
+    </dependency>
     <!-- https://mvnrepository.com/artifact/com.github.stefanbirkner/system-rules -->
     <dependency>
       <groupId>com.github.stefanbirkner</groupId>
