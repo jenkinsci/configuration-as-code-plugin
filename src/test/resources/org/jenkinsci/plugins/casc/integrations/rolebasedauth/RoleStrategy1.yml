@@ -4,49 +4,67 @@ jenkins:
     roleStrategy:
       roles:
         global:
-          - role:
-              name: "admin"
-              description: "Jenkins administrators"
-              permissions:
-                - "Jenkins/Administer"
+          - name: "admin"
+            description: "Jenkins administrators"
+            permissions:
+              - "Overall/Administer"
             assignments:
               - "admin"
-          - role:
-              name: "readonly"
-              description: "Read-only users"
-              permissions:
-                - "Jenkins/Read"
-                - "Item/Read"
+          - name: "readonly"
+            description: "Read-only users"
+            permissions:
+              - "Overall/Read"
+              - "Job/Read"
             assignments:
               - "authenticated"
         items:
-          - role:
-              name: "FolderA"
-              description: "Jobs in Folder A, but not the folder itself"
-              pattern: "A/.*"
-              permissions:
-                - "Item/Configure"
-                - "Item/Build"
-                - "Item/Delete"
-            assignments:
-              - "authenticated"
-          - role:
-              name: "FolderB"
-              description: "Jobs in Folder B, but not the folder itself"
-              pattern: "B/.*"
-              permissions:
-                - "Item/Configure"
-                - "Item/Build"
-                - "Item/Delete"
+          - name: "FolderA"
+            description: "Jobs in Folder A, but not the folder itself"
+            pattern: "A/.*"
+            permissions:
+              - "Job/Configure"
+              - "Job/Build"
+              - "Job/Delete"
             assignments:
               - "user1"
               - "user2"
+          - name: "FolderB"
+            description: "Jobs in Folder B, but not the folder itself"
+            pattern: "B.*"
+            permissions:
+              - "Job/Configure"
+              - "Job/Build"
+            assignments:
+              - "user2"
         agents:
-          - role:
-              name: "Agent1"
-              description: "Agent 1"
-              pattern: "agent1*"
-              permissions:
-                - "Computer/Run"
+          - name: "Agent1"
+            description: "Agent 1"
+            pattern: "agent1"
+            permissions:
+              - "Agent/Build"
             assignments:
               - "user1"
+
+  # System for test
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "admin"
+          password: "1234"
+        - id: "user1"
+          password: ""
+
+  nodes:
+    - dumb:
+        mode: NORMAL
+        name: "agent1"
+        remoteFS: "/home/user1"
+        launcher:
+          jnlp:
+    - dumb:
+        mode: NORMAL
+        name: "agent2"
+        remoteFS: "/home/user1"
+        launcher:
+          jnlp:
