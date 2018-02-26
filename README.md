@@ -5,6 +5,11 @@
 
 <img src="src/main/webapp/img/logo.svg" width="250">
 
+## Release information
+
+### 0.1-alpha
+Version **0.1-alpha** available. For more information go to [Release notes](docs/RELEASE_NOTES.md) available under `docs` folder
+
 ## Introduction
 
 Setting up Jenkins is a complex process, as both Jenkins and its plugins require some tuning and configuration,
