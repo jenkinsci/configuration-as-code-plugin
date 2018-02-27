@@ -1,6 +1,14 @@
 package org.jenkinsci.plugins.casc.misc;
 
 import org.jenkinsci.plugins.casc.ConfigurationAsCode;
+import org.yaml.snakeyaml.Yaml;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.Map;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Loads resource as configuration-as-code
@@ -17,10 +25,12 @@ public class TestConfiguration {
     }
 
     public void configure(Class<?> clazz) {
-        try {
-            ConfigurationAsCode.configure(clazz.getResourceAsStream(resource));
-        } catch (Exception e) {
-            throw new IllegalStateException("Can't configure test with " + resource, e);
+        try (Reader reader = new InputStreamReader(clazz.getResourceAsStream(resource), UTF_8)) {
+            ((Map<String, Object>) new Yaml().loadAs(reader, Map.class))
+                    .entrySet()
+                    .forEach(ConfigurationAsCode::configureWith);
+        } catch (IOException e) {
+            throw new IllegalStateException(String.format("Can't configure test <%s> with <%s>", clazz, resource), e);
         }
     }
 }
