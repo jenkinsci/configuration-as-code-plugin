@@ -131,6 +131,8 @@ Job-DSL plugin uses groovy syntax for it's job configuration DSL, so you'll have
 configuration-as-code file:
 
 ```yaml
+jenkins:
+  systemMessage: "Simple seed job example"
 jobs:
   - >
       multibranchPipelineJob('configuration-as-code') {
@@ -141,6 +143,7 @@ jobs:
           }
       }
 ```
+
 
 ## How to provide initial secrets for Configuration-as-Code
 
