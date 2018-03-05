@@ -1,6 +1,5 @@
 package org.jenkinsci.plugins.casc;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
@@ -13,18 +12,27 @@ import org.kohsuke.stapler.interceptor.RequirePOST;
 import org.yaml.snakeyaml.Yaml;
 
 import javax.annotation.CheckForNull;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.nio.Buffer;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
@@ -219,35 +227,40 @@ public class ConfigurationAsCode extends ManagementLink {
         return Jenkins.getInstance().getExtensionList(ConfigurationAsCode.class).get(0);
     }
 
-    // for documentation generation in index.jelly
-    public List<?> getConfigurators() {
-        List<Object> elements = new ArrayList<>();
-        for (RootElementConfigurator c : RootElementConfigurator.all()) {
-            elements.add(c);
-            listElements(elements, c.describe());
+    /**
+     * Used for documentation generation in index.jelly
+     */
+    public Collection<?> getRootConfigurators() {
+        return new LinkedHashSet<>(RootElementConfigurator.all());
+    }
+
+    /**
+     * Used for documentation generation in index.jelly
+     */
+    public Collection<?> getConfigurators() {
+        List<RootElementConfigurator> roots = RootElementConfigurator.all();
+        Set<Object> elements = new LinkedHashSet<>(roots);
+        for (RootElementConfigurator root : roots) {
+            listElements(elements, root.describe());
         }
         return elements;
     }
 
-    // for documentation generation in index.jelly
-    public List<?> getRootConfigurators() {
-        return RootElementConfigurator.all();
-    }
-
-    private void listElements(List<Object> elements, Set<Attribute> attributes) {
-        for (Attribute attribute : attributes) {
-
-            final Class type = attribute.type;
-            Configurator configurator = Configurator.lookup(type);
-            if (configurator == null ) {
-                continue;
-            }
-            for (Object o : configurator.getConfigurators()) {
-                if (!elements.contains(o)) {
-                    elements.add(o);
-                }
-            }
-            listElements(elements, configurator.describe());
-        }
+    /**
+     * Recursive configurators tree walk (DFS).
+     * Collects all configurators starting from root ones in {@link #getConfigurators()}
+     *
+     * @param elements   linked set (to save order) of visited elements
+     * @param attributes siblings to find associated configurators and dive to next tree levels
+     */
+    private void listElements(Set<Object> elements, Set<Attribute> attributes) {
+        attributes.stream()
+                .map(Attribute::getType)
+                .map(Configurator::lookup)
+                .filter(Objects::nonNull)
+                .forEach(configurator -> {
+                    elements.addAll(configurator.getConfigurators());
+                    listElements(elements, configurator.describe());
+                });
     }
 }
