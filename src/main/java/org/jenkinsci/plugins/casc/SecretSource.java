@@ -17,12 +17,7 @@ import java.util.regex.Pattern;
  * Variable references are meant to hide secrets from configuration files.
  */
 public abstract class SecretSource implements ExtensionPoint {
-    /**
-     *
-     * @param secret
-     * @return the revealed secret. Null in the case that the implementation is not replacing anything. Throws exception
-     * if the secret could not be fetched.
-     */
+
     public static final Pattern SECRET_PATTERN = Pattern.compile("\\$\\{(.*)\\}");
 
     //We need to compile the matcher once for every key we examine.
