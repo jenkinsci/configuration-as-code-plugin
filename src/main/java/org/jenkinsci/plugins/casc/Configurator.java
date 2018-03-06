@@ -202,6 +202,7 @@ public abstract class Configurator<T> implements ExtensionPoint {
      * Retrieve which plugin do provide this extension point
      *
      * @return String
+     * @throws IOException if config file cannot be saved
      */
     public String getExtensionSource() throws IOException {
         final Class e = getExtensionPoint();
@@ -231,6 +232,7 @@ public abstract class Configurator<T> implements ExtensionPoint {
      *      a Jenkins object is configured.
      * @return
      *      Fully configured Jenkins object that results from this configuration.
+     * @throws Exception if something went wrong, depends on the concrete implementation
      */
     public abstract T configure(Object config) throws Exception;
 
@@ -238,7 +240,7 @@ public abstract class Configurator<T> implements ExtensionPoint {
      * Ordered version of {@link #describe()} for documentation generation
      *
      * @return
-     *      A list of {@Link Attribute}s
+     *      A list of {@link Attribute}s
      */
     public List<Attribute> getAttributes() {
         final ArrayList<Attribute> attributes = new ArrayList<>(describe());
@@ -260,14 +262,16 @@ public abstract class Configurator<T> implements ExtensionPoint {
     /**
      * Determine the list of Attribute available for configuration of the managed component.
      *
-     * @return A set of {@Link Attribute}s that describes this object
+     * @return A set of {@link Attribute}s that describes this object
      */
     public abstract Set<Attribute> describe();
 
     /**
      * Retrieve the html help tip associated to an attribute.
-     * FIXME would prefer <st:include page="help-${a.name}.html" class="${c.target}" optional="true"/>
+     * FIXME would prefer &lt;st:include page="help-${a.name}.html" class="${c.target}" optional="true"/&gt;
+     * @param attribute to get help for
      * @return String that shows help
+     * @throws IOException if the resource cannot be read
      */
     public String getHtmlHelp(String attribute) throws IOException {
         final URL resource = getKlass().getResource("help-" + attribute + ".html");
