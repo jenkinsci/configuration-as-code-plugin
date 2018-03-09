@@ -21,6 +21,8 @@ jenkins:
             labelString: 'docker'
             slaveCpus: 0.1
             slaveMem: 512
+            slaveAttributes: >
+                  {"rack":"jenkins-build-agents"}
             executorCpus: 0.1
             executorMem: 128
             diskNeeded: 0.0
@@ -46,7 +48,6 @@ jenkins:
 
 ## implementation note
 
-Jenkins singleton doesn't offer any `setClouds` method. So here we rely on a pseudo-property implemented by a dedicated 
-`Attribute` to add the configured clouds to `Jenkins.clouds`. The current implementation only adds the configured cloud 
-if it doesn't exists yet. 
- 
+Jenkins singleton doesn't offer any `setClouds` method. So here we rely on a pseudo-property implemented by a dedicated
+`Attribute` to add the configured clouds to `Jenkins.clouds`. The current implementation only adds the configured cloud
+if it doesn't exists yet.
