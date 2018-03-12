@@ -74,6 +74,7 @@
           <artifactId>groovy-all</artifactId>
         </exclusion>
       </exclusions>
+      <optional>true</optional>
     </dependency>
 
     <!-- plugin adapters-->
