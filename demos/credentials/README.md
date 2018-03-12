@@ -75,7 +75,7 @@ credentials:
           description: "SSH passphrase with private key file"
           privateKeySource:
             fileOnMaster:
-              keyStoreFile: /docker/secret/id_rsa_2
+              privateKeyFile: /docker/secret/id_rsa_2
       - basicSSHUserPrivateKey:
           scope: SYSTEM
           id: ssh_with_passprase_provided
