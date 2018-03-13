@@ -10,7 +10,7 @@ Jenkins Configuration as Code solves both problems - you don't need to access Je
 We've decided to use yaml format so writing the configuration "by hand" should be easy. Your existing Jenkins can be also used as a documentation - yaml file tries to mimic UI you're used to as much as possible.
 
 Plugin provides documentation generated for your specific Jenkins instance - after you install it, and it is available at:
-http://[your_jenkins_url]/plugin/configuration-as-code/
+http://[your_jenkins_url]/configuration-as-code/
 
 Various samples of plugins' configuration can be found in [demos](../demos) folder
 
