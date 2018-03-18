@@ -21,6 +21,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
@@ -31,25 +33,38 @@ import static org.apache.commons.lang.StringUtils.isNotBlank;
  */
 public abstract class BaseConfigurator<T> extends Configurator<T> {
 
+    private static final Logger LOGGER = Logger.getLogger(BaseConfigurator.class.getName());
+
     public Set<Attribute> describe() {
 
         Set<Attribute> attributes = new HashSet<>();
 
-        final PropertyDescriptor[] properties = PropertyUtils.getPropertyDescriptors(getTarget());
+        final Class<T> target = getTarget();
+        final PropertyDescriptor[] properties = PropertyUtils.getPropertyDescriptors(target);
+        LOGGER.log(Level.FINE, "Found {0} properties for {1}", new Object[]{properties.length, target});
         for (PropertyDescriptor p : properties) {
             final String name = p.getName();
+            LOGGER.log(Level.FINER, "Processing {0} property", name);
 
             final Method setter = p.getWriteMethod();
-            if (setter == null) continue; // read only
-            if (setter.getAnnotation(Deprecated.class) != null) continue; // not actually public
-            if (setter.getAnnotation(Restricted.class) != null) continue; // not actually public     - require access-modifier 1.12
+            if (setter == null) {
+                LOGGER.log(Level.FINE, "Ignored {0} property: read only", name);
+                continue; // read only
+            }
+            if (setter.getAnnotation(Deprecated.class) != null) {
+                LOGGER.log(Level.FINE, "Ignored {0} property: deprecated", name);
+                continue; // not actually public
+            }
+            if (setter.getAnnotation(Restricted.class) != null) {
+                LOGGER.log(Level.FINE, "Ignored {0} property: restricted", name);
+                continue; // not actually public     - require access-modifier 1.12
+            }
 
             // FIXME move this all into cleaner logic to discover property type
             Type type = setter.getGenericParameterTypes()[0];
             Attribute attribute = detectActualType(name, type);
             if (attribute == null) continue;
             attributes.add(attribute);
-
 
             final Method getter = p.getReadMethod();
             if (getter != null) {
