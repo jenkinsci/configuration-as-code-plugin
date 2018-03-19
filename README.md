@@ -184,5 +184,5 @@ Here is a list of plugin we have successfully tested to support configuration-as
  - [x] workflow-cps-global-lib _aka_ "global libraries" ([details](demos/workflow-cps-global-lib/README.md))
  - [x] matrix-auth-plugin ([details](demos/global-matrix-auth/README.md))
  - [ ] role-strategy-plugin ([details](demos/role-strategy-auth/README.md))
- - [x] warnings-plugin (>= 4.66) ([details](demos/warnings.md))
+ - [x] warnings-plugin (>= 4.66) ([details](demos/warnings/README.md))
  - [ ] more to come soon...
