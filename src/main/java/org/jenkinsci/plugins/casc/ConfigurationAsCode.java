@@ -12,21 +12,17 @@ import org.kohsuke.stapler.interceptor.RequirePOST;
 import org.yaml.snakeyaml.Yaml;
 
 import javax.annotation.CheckForNull;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
@@ -112,13 +108,44 @@ public class ConfigurationAsCode extends ManagementLink {
                 System.getenv(CASC_JENKINS_CONFIG_ENV)
         );
 
+        if(isSupportedURI(configParameter)) {
+            _configureWithURI(configParameter);
+        } else {
+            //Must be a plain path
+            _configureWithPaths(configParameter);
+        }
+        lastTimeLoaded = System.currentTimeMillis();
+    }
+
+    private boolean isSupportedURI(String configurationParameter) {
+        final List<String> supportedProtocols = Arrays.asList("https","http","file");
+        URI uri = URI.create(configurationParameter);
+        if(uri == null || uri.getScheme() == null) {
+            return false;
+        }
+        return supportedProtocols.contains(uri.getScheme());
+    }
+
+    private void _configureWithURI(String configParameter) {
+        try {
+            URL url = URI.create(configParameter).toURL();
+            try(BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
+                entries(reader).forEach(ConfigurationAsCode::configureWith);
+                sources = Collections.singletonList(configParameter);
+            } catch (IOException e) {
+                throw new IllegalStateException("Failed to read from URL: "+configParameter, e);
+            }
+        } catch (MalformedURLException e) {
+            throw new IllegalStateException("Failed to read from url. Url is malformed: "+configParameter, e);
+        }
+    }
+
+    private void _configureWithPaths(String configParameter) {
         List<Path> configs = configs(configParameter);
         sources = configs.stream().map(Path::toAbsolutePath).map(Path::toString).collect(toList());
         configs.stream()
                 .flatMap(ConfigurationAsCode::entries)
                 .forEach(ConfigurationAsCode::configureWith);
-
-        lastTimeLoaded = System.currentTimeMillis();
     }
 
     /**
@@ -151,10 +178,14 @@ public class ConfigurationAsCode extends ManagementLink {
      */
     private static Stream<? extends Map.Entry<String, Object>> entries(Path config) {
         try (Reader reader = Files.newBufferedReader(config)) {
-            return ((Map<String, Object>) new Yaml().loadAs(reader, Map.class)).entrySet().stream();
+            return entries(reader);
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    private static Stream<? extends Map.Entry<String, Object>> entries(Reader config) {
+        return ((Map<String, Object>) new Yaml().loadAs(config, Map.class)).entrySet().stream();
     }
 
     /**
