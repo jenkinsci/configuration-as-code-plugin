@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.casc;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
@@ -16,6 +17,7 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.Buffer;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -132,7 +134,7 @@ public class ConfigurationAsCode extends ManagementLink {
     private void _configureWithURI(String configParameter) {
         try {
             URL url = URI.create(configParameter).toURL();
-            try(BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
+            try(InputStreamReader reader = new InputStreamReader(url.openStream(), "UTF-8")) {
                 entries(reader).forEach(ConfigurationAsCode::configureWith);
                 sources = Collections.singletonList(configParameter);
             } catch (IOException e) {
