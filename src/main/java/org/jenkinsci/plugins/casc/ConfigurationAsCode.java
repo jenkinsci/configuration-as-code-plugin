@@ -117,7 +117,10 @@ public class ConfigurationAsCode extends ManagementLink {
         lastTimeLoaded = System.currentTimeMillis();
     }
 
-    private boolean isSupportedURI(String configurationParameter) {
+    public static boolean isSupportedURI(String configurationParameter) {
+        if(configurationParameter == null) {
+            return false;
+        }
         final List<String> supportedProtocols = Arrays.asList("https","http","file");
         URI uri = URI.create(configurationParameter);
         if(uri == null || uri.getScheme() == null) {
