@@ -18,7 +18,7 @@ public class DockerSecretSource extends SecretSource {
     public Optional<String> reveal(String secret) throws IOException {
         final File file = new File("/run/secrets/" + secret);
         if (file.exists()) {
-            return Optional.of(FileUtils.readFileToString(file));
+            return Optional.of(FileUtils.readFileToString(file).trim());
         }
         return Optional.empty();
     }
