@@ -52,7 +52,7 @@ Have a look at [this presentation](https://docs.google.com/presentation/d/1-irLG
 
 ## Demo
 
-Switch to `milestone1` branch and run `./demo.sh` script to build a containter and run Jenkins locally with basic setup (jenkins.yaml available on that branch in `milestone-1` folder)
+Switch to `milestone1` branch and run `./demo.sh` script to build a containter and run Jenkins locally with basic setup (jenkins.yaml available on that branch in `milestone1` folder)
 
 ## Jenkins Enhancement Proposal
 
