@@ -60,3 +60,7 @@ tool:
     installations:
       - name: git
         home: /usr/local/bin/git
+
+security:
+    remotingCLI:
+          enabled: false
