@@ -49,7 +49,7 @@ public class HeteroDescribableConfigurator extends Configurator<Describable> {
     }
 
     @Override
-    public Describable configure(Object config) throws Exception {
+    public Describable configure(Object config) throws ConfiguratorException {
         String shortname;
         Object subconfig = null;
         if (config instanceof String) {

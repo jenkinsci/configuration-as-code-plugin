@@ -23,7 +23,7 @@ public class TopLevelItemConfigurator extends BaseConfigurator<TopLevelItem> {
     }
 
     @Override
-    public TopLevelItem configure(Object c) throws Exception {
+    public TopLevelItem configure(Object c) throws ConfiguratorException {
 
         Map config = (Map) c;
 

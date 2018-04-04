@@ -8,6 +8,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.Configurator;
+import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.RootElementConfigurator;
 
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ public class CredentialsRootConfigurator extends Configurator<CredentialsStore> 
     }
 
     @Override
-    public CredentialsStore configure(Object config) throws Exception {
+    public CredentialsStore configure(Object config) throws ConfiguratorException {
         Map map = (Map) config;
         final Map<?,?> system = (Map) map.get("system");
         final Map<Domain, List<Credentials>> target = SystemCredentialsProvider.getInstance().getDomainCredentialsMap();

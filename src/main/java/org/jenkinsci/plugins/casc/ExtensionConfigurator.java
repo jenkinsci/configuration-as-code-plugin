@@ -26,7 +26,7 @@ public class ExtensionConfigurator extends BaseConfigurator {
 
 
     @Override
-    public Object configure(Object c) throws Exception {
+    public Object configure(Object c) throws ConfiguratorException {
         final ExtensionList list = Jenkins.getInstance().getExtensionList(target);
         if (list.size() != 1) {
             throw new IllegalStateException();
@@ -43,7 +43,11 @@ public class ExtensionConfigurator extends BaseConfigurator {
                     final Configurator configurator = Configurator.lookup(k);
                     if (configurator == null) throw new IllegalStateException("No configurator implementation to manage "+ k);
                     final Object value = configurator.configure(config.get(name));
-                    attribute.setValue(o, value);
+                    try {
+                        attribute.setValue(o, value);
+                    } catch (Exception e) {
+                        throw new ConfiguratorException(this, "Failed to set attribute " + attribute, e);
+                    }
                 }
             }
         }

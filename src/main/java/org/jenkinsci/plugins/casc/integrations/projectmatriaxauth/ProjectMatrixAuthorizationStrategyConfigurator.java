@@ -6,6 +6,7 @@ import hudson.security.Permission;
 import hudson.security.ProjectMatrixAuthorizationStrategy;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.Configurator;
+import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.RootElementConfigurator;
 import org.jenkinsci.plugins.casc.integrations.globalmatrixauth.GroupPermissionDefinition;
 import org.kohsuke.accmod.Restricted;
@@ -28,7 +29,7 @@ public class ProjectMatrixAuthorizationStrategyConfigurator extends Configurator
     }
 
     @Override
-    public ProjectMatrixAuthorizationStrategy configure(Object config) throws Exception {
+    public ProjectMatrixAuthorizationStrategy configure(Object config) throws ConfiguratorException {
         Map map = (Map) config;
         Collection o = (Collection<?>)map.get("grantedPermissions");
         Configurator<GroupPermissionDefinition> permissionConfigurator = Configurator.lookup(GroupPermissionDefinition.class);

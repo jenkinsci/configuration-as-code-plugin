@@ -8,6 +8,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.Configurator;
+import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.RootElementConfigurator;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
@@ -42,12 +43,12 @@ public class RoleBasedAuthorizationStrategyConfigurator extends Configurator<Rol
     }
 
     @Override
-    public RoleBasedAuthorizationStrategy configure(Object config) throws Exception {
+    public RoleBasedAuthorizationStrategy configure(Object config) throws ConfiguratorException {
         //TODO: API should return a qualified type
         final Configurator<RoleDefinition> roleDefinitionConfigurator =
                 (Configurator<RoleDefinition>) Configurator.lookup(RoleDefinition.class);
         if (roleDefinitionConfigurator == null) {
-            throw new IOException("Cannot find configurator for" + RoleDefinition.class);
+            throw new ConfiguratorException(this, "Cannot find configurator for" + RoleDefinition.class);
         }
 
 
@@ -67,7 +68,7 @@ public class RoleBasedAuthorizationStrategyConfigurator extends Configurator<Rol
     }
 
     @Nonnull
-    private static RoleMap retrieveRoleMap(@Nonnull Object config, @Nonnull String name, Configurator<RoleDefinition> configurator) throws Exception {
+    private static RoleMap retrieveRoleMap(@Nonnull Object config, @Nonnull String name, Configurator<RoleDefinition> configurator) throws ConfiguratorException {
         Map map = (Map) config;
         final Collection<?> c = (Collection<?>) map.get(name);
 

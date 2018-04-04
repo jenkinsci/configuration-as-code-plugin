@@ -41,7 +41,7 @@ public class DescriptorConfigurator extends BaseConfigurator<Descriptor> impleme
     }
 
     @Override
-    public Descriptor configure(Object config) throws Exception {
+    public Descriptor configure(Object config) throws ConfiguratorException {
         configure((Map) config, descriptor);
         return descriptor;
     }

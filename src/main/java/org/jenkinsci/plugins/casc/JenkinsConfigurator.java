@@ -39,7 +39,7 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
     }
 
     @Override
-    public Jenkins configure(Object c) throws Exception {
+    public Jenkins configure(Object c) throws ConfiguratorException {
         Map config = (Map) c;
         Jenkins jenkins = Jenkins.getInstance();
 

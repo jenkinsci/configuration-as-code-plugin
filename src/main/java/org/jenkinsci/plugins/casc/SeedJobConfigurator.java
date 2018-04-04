@@ -28,10 +28,14 @@ public class SeedJobConfigurator implements RootElementConfigurator {
     }
 
     @Override
-    public Object configure(Object config) throws Exception {
+    public Object configure(Object config) throws ConfiguratorException {
         JenkinsJobManagement mng = new JenkinsJobManagement(System.out, new EnvVars(), null, null, LookupStrategy.JENKINS_ROOT);
         for (String script : (List<String>) config) {
-            new JenkinsDslScriptLoader(mng).runScript(script);
+            try {
+                new JenkinsDslScriptLoader(mng).runScript(script);
+            } catch (Exception ex) {
+                throw new ConfiguratorException(this, "Failed to execute script with hash " + script.hashCode(), ex);
+            }
         }
 
         return null;

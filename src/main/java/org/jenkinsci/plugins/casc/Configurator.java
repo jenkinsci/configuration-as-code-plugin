@@ -45,7 +45,7 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-public abstract class Configurator<T> implements ExtensionPoint {
+public abstract class Configurator<T> implements ExtensionPoint, ElementConfigurator {
 
     private final static Logger logger = Logger.getLogger(Configurator.class.getName());
 
@@ -173,9 +173,7 @@ public abstract class Configurator<T> implements ExtensionPoint {
         return Collections.singletonList(this);
     }
 
-    /**
-     * @return short name for this component when used in a configuration.yaml file
-     */
+    @Override
     public String getName() {
         final Symbol annotation = getTarget().getAnnotation(Symbol.class);
         if (annotation != null) return annotation.value()[0];
@@ -183,9 +181,7 @@ public abstract class Configurator<T> implements ExtensionPoint {
     }
 
     /**
-     * The actual component being managed by this Configurator
-     *
-     * @return the actual class that this configurator is configuring
+     * {@inheritDoc}
      */
     public abstract Class<T> getTarget();
 
@@ -233,16 +229,9 @@ public abstract class Configurator<T> implements ExtensionPoint {
     }
 
     /**
-     * Configures/creates a Jenkins object based on a tree.
-     *
-     * @param config
-     *      Map/List/primitive objects (think YAML) that represents the configuration from which
-     *      a Jenkins object is configured.
-     * @return
-     *      Fully configured Jenkins object that results from this configuration.
-     * @throws Exception if something went wrong, depends on the concrete implementation
+     * {@inheritDoc}
      */
-    public abstract T configure(Object config) throws Exception;
+    public abstract T configure(Object config) throws ConfiguratorException;
 
     /**
      * Ordered version of {@link #describe()} for documentation generation

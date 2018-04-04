@@ -41,7 +41,7 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator im
     }
 
     @Override
-    public Object configure(Object config) throws Exception {
+    public Object configure(Object config) throws ConfiguratorException {
         configure((Map) config, category);
         return category;
     }

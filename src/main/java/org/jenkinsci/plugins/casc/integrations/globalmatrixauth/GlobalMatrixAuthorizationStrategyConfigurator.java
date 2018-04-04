@@ -6,6 +6,7 @@ import hudson.security.GlobalMatrixAuthorizationStrategy;
 import hudson.security.Permission;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.Configurator;
+import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.RootElementConfigurator;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
@@ -38,7 +39,7 @@ public class GlobalMatrixAuthorizationStrategyConfigurator extends Configurator<
     }
 
     @Override
-    public GlobalMatrixAuthorizationStrategy configure(Object config) throws Exception {
+    public GlobalMatrixAuthorizationStrategy configure(Object config) throws ConfiguratorException {
         Map map = (Map) config;
         Collection o = (Collection<?>)map.get("grantedPermissions");
         Configurator<GroupPermissionDefinition> permissionConfigurator = Configurator.lookup(GroupPermissionDefinition.class);
@@ -51,9 +52,13 @@ public class GlobalMatrixAuthorizationStrategyConfigurator extends Configurator<
 
         //TODO: Once change is in place for GlobalMatrixAuthentication. Switch away from reflection
         GlobalMatrixAuthorizationStrategy gms = new GlobalMatrixAuthorizationStrategy();
-        Field f = gms.getClass().getDeclaredField("grantedPermissions");
-        f.setAccessible(true);
-        f.set(gms, grantedPermissions);
+        try {
+            Field f = gms.getClass().getDeclaredField("grantedPermissions");
+            f.setAccessible(true);
+            f.set(gms, grantedPermissions);
+        } catch (NoSuchFieldException | IllegalAccessException ex) {
+            throw new ConfiguratorException(this, "Cannot set GlobalMatrixAuthorizationStrategy#grantedPermissions via reflection", ex);
+        }
         return gms;
     }
 }
