@@ -45,7 +45,7 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-public abstract class Configurator<T> implements ExtensionPoint, ElementConfigurator {
+public abstract class Configurator<T> implements ExtensionPoint, ElementConfigurator<T> {
 
     private final static Logger logger = Logger.getLogger(Configurator.class.getName());
 
