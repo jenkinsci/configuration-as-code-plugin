@@ -34,7 +34,7 @@ jenkins:
             defaultSlave: true
             idleTerminationMinutes: '5'
             containerInfo:
-              type: "docker"
+              type: "DOCKER"
               dockerImage: "cloudbees/java-with-docker-client:latest"
               networking: "BRIDGE"
               volumes:
