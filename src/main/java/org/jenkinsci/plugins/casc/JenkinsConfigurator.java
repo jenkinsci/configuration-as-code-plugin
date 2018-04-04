@@ -22,7 +22,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Extension
-public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements RootElementConfigurator {
+public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements RootElementConfigurator<Jenkins> {
 
     private static final Logger LOGGER = Logger.getLogger(JenkinsConfigurator.class.getName());
 

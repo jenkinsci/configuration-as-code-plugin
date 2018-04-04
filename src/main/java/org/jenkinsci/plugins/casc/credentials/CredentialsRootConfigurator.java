@@ -24,7 +24,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Extension(optional = true)
-public class CredentialsRootConfigurator extends Configurator<CredentialsStore> implements RootElementConfigurator {
+public class CredentialsRootConfigurator extends Configurator<CredentialsStore> implements RootElementConfigurator<CredentialsStore> {
 
     private final static Logger logger = Logger.getLogger(CredentialsRootConfigurator.class.getName());
 
@@ -46,11 +46,11 @@ public class CredentialsRootConfigurator extends Configurator<CredentialsStore> 
         final Map<Domain, List<Credentials>> target = SystemCredentialsProvider.getInstance().getDomainCredentialsMap();
         target.clear();
 
-        final Configurator<Domain> domainConfigurator = Configurator.lookup(Domain.class);
-        final Configurator<Credentials> credentialsConfigurator = Configurator.lookup(Credentials.class);
+        final Configurator<Domain> domainConfigurator = Configurator.lookupOrFail(Domain.class);
+        final Configurator<Credentials> credentialsConfigurator = Configurator.lookupOrFail(Credentials.class);
 
         for (Map.Entry dc : system.entrySet()) {
-            final Domain domain = domainConfigurator.configure(dc.getKey());
+            final Domain domain = domainConfigurator.configureNonNull(dc.getKey());
             List values = (List) dc.getValue();
             final List<Credentials> credentials =  new ArrayList<>();
             for (Object value : values) {

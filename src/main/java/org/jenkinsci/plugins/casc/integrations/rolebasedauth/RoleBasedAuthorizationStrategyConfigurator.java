@@ -30,7 +30,8 @@ import java.util.TreeMap;
  */
 @Extension(optional = true)
 @Restricted({NoExternalUse.class})
-public class RoleBasedAuthorizationStrategyConfigurator extends Configurator<RoleBasedAuthorizationStrategy> implements RootElementConfigurator {
+public class RoleBasedAuthorizationStrategyConfigurator extends Configurator<RoleBasedAuthorizationStrategy>
+        implements RootElementConfigurator<RoleBasedAuthorizationStrategy> {
 
     @Override
     public String getName() {
@@ -46,11 +47,7 @@ public class RoleBasedAuthorizationStrategyConfigurator extends Configurator<Rol
     public RoleBasedAuthorizationStrategy configure(Object config) throws ConfiguratorException {
         //TODO: API should return a qualified type
         final Configurator<RoleDefinition> roleDefinitionConfigurator =
-                (Configurator<RoleDefinition>) Configurator.lookup(RoleDefinition.class);
-        if (roleDefinitionConfigurator == null) {
-            throw new ConfiguratorException(this, "Cannot find configurator for" + RoleDefinition.class);
-        }
-
+                (Configurator<RoleDefinition>) Configurator.lookupOrFail(RoleDefinition.class);
 
         Map map = (Map) config;
         Map<String, RoleMap> grantedRoles = new HashMap<>();
@@ -79,7 +76,7 @@ public class RoleBasedAuthorizationStrategyConfigurator extends Configurator<Rol
         }
 
         for (Object entry : c) {
-            RoleDefinition definition = configurator.configure(entry);
+            RoleDefinition definition = configurator.configureNonNull(entry);
             resMap.put(definition.getRole(), definition.getAssignments());
         }
 

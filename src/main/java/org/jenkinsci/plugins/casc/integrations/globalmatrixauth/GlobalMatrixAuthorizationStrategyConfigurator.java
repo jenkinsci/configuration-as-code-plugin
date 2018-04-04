@@ -20,7 +20,7 @@ import java.util.*;
  */
 @Extension(optional = true)
 @Restricted(NoExternalUse.class)
-public class GlobalMatrixAuthorizationStrategyConfigurator extends Configurator<GlobalMatrixAuthorizationStrategy> implements RootElementConfigurator {
+public class GlobalMatrixAuthorizationStrategyConfigurator extends Configurator<GlobalMatrixAuthorizationStrategy> implements RootElementConfigurator<GlobalMatrixAuthorizationStrategy> {
 
     @Override
     public String getName() {
@@ -42,10 +42,10 @@ public class GlobalMatrixAuthorizationStrategyConfigurator extends Configurator<
     public GlobalMatrixAuthorizationStrategy configure(Object config) throws ConfiguratorException {
         Map map = (Map) config;
         Collection o = (Collection<?>)map.get("grantedPermissions");
-        Configurator<GroupPermissionDefinition> permissionConfigurator = Configurator.lookup(GroupPermissionDefinition.class);
+        Configurator<GroupPermissionDefinition> permissionConfigurator = Configurator.lookupOrFail(GroupPermissionDefinition.class);
         Map<Permission,Set<String>> grantedPermissions = new HashMap<>();
         for(Object entry : o) {
-            GroupPermissionDefinition gpd = permissionConfigurator.configure(entry);
+            GroupPermissionDefinition gpd = permissionConfigurator.configureNonNull(entry);
             //We transform the linear list to a matrix (Where permission is the key instead)
             gpd.grantPermission(grantedPermissions);
         }

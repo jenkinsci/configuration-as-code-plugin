@@ -62,6 +62,21 @@ public abstract class Configurator<T> implements ExtensionPoint, ElementConfigur
     /**
      * Looks for a configurator for exact type.
      * @param type Type
+     * @return Configurator
+     * @throws ConfiguratorException Configurator is not found
+     */
+    @Nonnull
+    public static Configurator lookupOrFail(Type type) throws ConfiguratorException {
+        Configurator cfg = lookup(type);
+        if (cfg == null) {
+            throw new ConfiguratorException("Cannot find configurator for type " + type);
+        }
+        return cfg;
+    }
+
+    /**
+     * Looks for a configurator for exact type.
+     * @param type Type
      * @return Configurator or {@code null} if it is not found
      */
     @CheckForNull
