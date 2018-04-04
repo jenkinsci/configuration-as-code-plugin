@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.casc;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
@@ -207,6 +208,7 @@ public class ConfigurationAsCode extends ManagementLink {
      *
      * @param entry key-value pair, where key should match to root configurator and value have all required properties
      */
+    @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE", justification = "FindBugs is too picky about Objects.requireNonNull()")
     public static void configureWith(Map.Entry<String, Object> entry) {
         RootElementConfigurator configurator = Objects.requireNonNull(
                 Configurator.lookupRootElement(entry.getKey()),

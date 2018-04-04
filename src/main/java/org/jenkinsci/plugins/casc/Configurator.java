@@ -49,7 +49,7 @@ public abstract class Configurator<T> implements ExtensionPoint {
 
     private final static Logger logger = Logger.getLogger(Configurator.class.getName());
 
-
+    @CheckForNull
     public static RootElementConfigurator lookupRootElement(String name) {
         for (RootElementConfigurator c : RootElementConfigurator.all()) {
             if (c.getName().equalsIgnoreCase(name)) {
@@ -141,7 +141,8 @@ public abstract class Configurator<T> implements ExtensionPoint {
         return null;
     }
 
-    public static Constructor getDataBoundConstructor(Class type) {
+    @CheckForNull
+    public static Constructor getDataBoundConstructor(@Nonnull Class type) {
         for (Constructor c : type.getConstructors()) {
             if (c.getAnnotation(DataBoundConstructor.class) != null) return c;
         }
@@ -149,7 +150,8 @@ public abstract class Configurator<T> implements ExtensionPoint {
 
     }
 
-    public static String normalize(String name) {
+    @Nonnull
+    public static String normalize(@Nonnull String name) {
         if (name.toUpperCase().equals(name)) {
             name = name.toLowerCase();
         } else {
@@ -166,6 +168,7 @@ public abstract class Configurator<T> implements ExtensionPoint {
      * @return the list of Configurator to be considered so one can fully configure this component.
      * Typically, an extension point with multiple implementations will return Configurators for available implementations.
      */
+    @Nonnull
     public List<Configurator> getConfigurators() {
         return Collections.singletonList(this);
     }
@@ -189,8 +192,9 @@ public abstract class Configurator<T> implements ExtensionPoint {
     /**
      * The extension point being implemented by this configurator.
      *
-     * @return The
+     * @return Extension point or {@code null} if undefined
      */
+    @CheckForNull
     public Class getExtensionPoint() {
         Class t = getTarget();
         if (ExtensionPoint.class.isAssignableFrom(t)) return t;
@@ -201,9 +205,11 @@ public abstract class Configurator<T> implements ExtensionPoint {
     /**
      * Retrieve which plugin do provide this extension point
      *
-     * @return String
+     * @return String representation of the extension source, usually artifactId.
+     *         {@code null} if {@link #getExtensionPoint()} returns {@code null}.
      * @throws IOException if config file cannot be saved
      */
+    @CheckForNull
     public String getExtensionSource() throws IOException {
         final Class e = getExtensionPoint();
         if (e == null) return null;
@@ -213,11 +219,13 @@ public abstract class Configurator<T> implements ExtensionPoint {
     }
 
 
+    //TODO: replace by a ClassName by default?
     /**
      * Human friendly display name for this component.
      *
-     * @return An empty string
+     * @return Display name or empty string
      */
+    @CheckForNull
     public String getDisplayName() { return ""; }
 
     private Klass getKlass() {
@@ -242,6 +250,7 @@ public abstract class Configurator<T> implements ExtensionPoint {
      * @return
      *      A list of {@link Attribute}s
      */
+    @Nonnull
     public List<Attribute> getAttributes() {
         final ArrayList<Attribute> attributes = new ArrayList<>(describe());
         Collections.sort(attributes, (a,b) -> a.name.compareTo(b.name));
@@ -264,15 +273,17 @@ public abstract class Configurator<T> implements ExtensionPoint {
      *
      * @return A set of {@link Attribute}s that describes this object
      */
+    @Nonnull
     public abstract Set<Attribute> describe();
 
     /**
      * Retrieve the html help tip associated to an attribute.
      * FIXME would prefer &lt;st:include page="help-${a.name}.html" class="${c.target}" optional="true"/&gt;
      * @param attribute to get help for
-     * @return String that shows help
+     * @return String that shows help. May be empty
      * @throws IOException if the resource cannot be read
      */
+    @Nonnull
     public String getHtmlHelp(String attribute) throws IOException {
         final URL resource = getKlass().getResource("help-" + attribute + ".html");
         if (resource != null) {
