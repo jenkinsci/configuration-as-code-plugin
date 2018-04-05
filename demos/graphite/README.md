@@ -1,4 +1,4 @@
-# configure mesos plugin
+# configure Metrics Graphite Plugin
 
 ## sample configuration
 
