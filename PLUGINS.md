@@ -6,7 +6,7 @@ using those annotations for data-binding, same attributes will be usable for con
 
 ## Descriptors global configuration
 
-Most ot the interesting plugin's configuration you want ot expose to end users with configuration-as-code is managed by your plugin's 
+Most of the interesting plugin's configuration you want to expose to end users with configuration-as-code is managed by your plugin's 
 Descriptor(s) and exposed on web UI with a `global.jelly` view. This is fully supported by configuration-as-code as long as you rely on
 the exact same `DataBound` mechanism, which isn't a common practice (yet).
 
