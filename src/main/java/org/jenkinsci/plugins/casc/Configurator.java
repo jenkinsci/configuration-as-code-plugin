@@ -191,10 +191,12 @@ public abstract class Configurator<T> implements ExtensionPoint {
      *
      * @return The
      */
-    public Class getExtensionPoint() {
+    public Class<? extends ExtensionPoint> getExtensionPoint() {
         Class t = getTarget();
-        if (ExtensionPoint.class.isAssignableFrom(t)) return t;
-        return t;
+        if (ExtensionPoint.class.isAssignableFrom(t)) {
+            return (Class<? extends ExtensionPoint>)t;
+        }
+        return null; // Target is not an extension point or its implementation
     }
 
 
