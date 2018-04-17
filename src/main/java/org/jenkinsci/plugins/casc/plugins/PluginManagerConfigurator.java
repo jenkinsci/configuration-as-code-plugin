@@ -3,6 +3,7 @@ package org.jenkinsci.plugins.casc.plugins;
 import hudson.Extension;
 import hudson.Plugin;
 import hudson.PluginManager;
+import hudson.PluginWrapper;
 import hudson.ProxyConfiguration;
 import hudson.model.UpdateCenter;
 import hudson.model.UpdateSite;
@@ -13,12 +14,16 @@ import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.BaseConfigurator;
 import org.jenkinsci.plugins.casc.Configurator;
 import org.jenkinsci.plugins.casc.RootElementConfigurator;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -65,18 +70,35 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
 
 
         final Map<String, String> plugins = (Map) map.get("required");
-        final List<UpdateSite.Plugin> requiredPlugins = getRequiredPlugins(plugins, jenkins, updateCenter);
-        List<Future<UpdateCenter.UpdateCenterJob>> installations = new ArrayList<>();
-        for (UpdateSite.Plugin plugin : requiredPlugins) {
-            installations.add(plugin.deploy());
-        }
+        if (plugins != null) {
+            File shrinkwrap = new File("./plugins-shrinkwrap.yaml");
+            if (shrinkwrap.exists()) {
+                try (FileReader io = new FileReader(shrinkwrap)) {
+                    plugins.putAll(new Yaml().loadAs(io, Map.class));
+                }
+            }
+            final List<UpdateSite.Plugin> requiredPlugins = getRequiredPlugins(plugins, jenkins, updateCenter);
+            List<Future<UpdateCenter.UpdateCenterJob>> installations = new ArrayList<>();
+            for (UpdateSite.Plugin plugin : requiredPlugins) {
+                installations.add(plugin.deploy());
+            }
 
-        for (Future<UpdateCenter.UpdateCenterJob> job : installations) {
-            // TODO manage failure, timeout, etc
-            job.get();
-        }
+            for (Future<UpdateCenter.UpdateCenterJob> job : installations) {
+                // TODO manage failure, timeout, etc
+                job.get();
+            }
 
-        if (!installations.isEmpty()) jenkins.restart();
+            Map<String, String> installed = new HashMap<>();
+            for (PluginWrapper pw : jenkins.getPluginManager().getPlugins()) {
+                if (pw.getShortName().equals("configuration-as-code")) continue;
+                installed.put(pw.getShortName(), pw.getVersionNumber().toString());
+            }
+            try (FileWriter w = new FileWriter(shrinkwrap)) {
+                w.append(new Yaml().dump(installed));
+            }
+
+            if (!installations.isEmpty()) jenkins.restart();
+        }
 
         jenkins.save();
         return jenkins.getPluginManager();
