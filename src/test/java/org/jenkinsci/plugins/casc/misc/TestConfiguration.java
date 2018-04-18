@@ -26,9 +26,9 @@ public class TestConfiguration {
 
     public void configure(Class<?> clazz) {
         try (Reader reader = new InputStreamReader(clazz.getResourceAsStream(resource), UTF_8)) {
-            ((Map<String, Object>) new Yaml().loadAs(reader, Map.class))
-                    .entrySet()
-                    .forEach(ConfigurationAsCode::configureWith);
+            for (Map.Entry<String, Object> entry : ((Map<String, Object>) new Yaml().loadAs(reader, Map.class)).entrySet()) {
+                 ConfigurationAsCode.configureWith(entry);
+            }
         } catch (IOException e) {
             throw new IllegalStateException(String.format("Can't configure test <%s> with <%s>", clazz, resource), e);
         }

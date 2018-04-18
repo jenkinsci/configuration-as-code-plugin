@@ -14,7 +14,7 @@ import java.util.Set;
  * Note: we assume any configurator here will use a unique name for root element.
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-public interface RootElementConfigurator {
+public interface RootElementConfigurator<T> extends ElementConfigurator<T> {
 
     static List<RootElementConfigurator> all() {
         List<RootElementConfigurator> configurators = new ArrayList<>();
@@ -27,10 +27,4 @@ public interface RootElementConfigurator {
 
         return configurators;
     }
-
-    String getName();
-
-    Set<Attribute> describe();
-
-    Object configure(Object config) throws Exception;
 }

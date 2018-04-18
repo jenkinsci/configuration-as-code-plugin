@@ -6,6 +6,7 @@ import hudson.security.GlobalMatrixAuthorizationStrategy;
 import hudson.security.Permission;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.Configurator;
+import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.RootElementConfigurator;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
@@ -19,7 +20,7 @@ import java.util.*;
  */
 @Extension(optional = true)
 @Restricted(NoExternalUse.class)
-public class GlobalMatrixAuthorizationStrategyConfigurator extends Configurator<GlobalMatrixAuthorizationStrategy> implements RootElementConfigurator {
+public class GlobalMatrixAuthorizationStrategyConfigurator extends Configurator<GlobalMatrixAuthorizationStrategy> implements RootElementConfigurator<GlobalMatrixAuthorizationStrategy> {
 
     @Override
     public String getName() {
@@ -38,22 +39,26 @@ public class GlobalMatrixAuthorizationStrategyConfigurator extends Configurator<
     }
 
     @Override
-    public GlobalMatrixAuthorizationStrategy configure(Object config) throws Exception {
+    public GlobalMatrixAuthorizationStrategy configure(Object config) throws ConfiguratorException {
         Map map = (Map) config;
         Collection o = (Collection<?>)map.get("grantedPermissions");
-        Configurator<GroupPermissionDefinition> permissionConfigurator = Configurator.lookup(GroupPermissionDefinition.class);
+        Configurator<GroupPermissionDefinition> permissionConfigurator = Configurator.lookupOrFail(GroupPermissionDefinition.class);
         Map<Permission,Set<String>> grantedPermissions = new HashMap<>();
         for(Object entry : o) {
-            GroupPermissionDefinition gpd = permissionConfigurator.configure(entry);
+            GroupPermissionDefinition gpd = permissionConfigurator.configureNonNull(entry);
             //We transform the linear list to a matrix (Where permission is the key instead)
             gpd.grantPermission(grantedPermissions);
         }
 
         //TODO: Once change is in place for GlobalMatrixAuthentication. Switch away from reflection
         GlobalMatrixAuthorizationStrategy gms = new GlobalMatrixAuthorizationStrategy();
-        Field f = gms.getClass().getDeclaredField("grantedPermissions");
-        f.setAccessible(true);
-        f.set(gms, grantedPermissions);
+        try {
+            Field f = gms.getClass().getDeclaredField("grantedPermissions");
+            f.setAccessible(true);
+            f.set(gms, grantedPermissions);
+        } catch (NoSuchFieldException | IllegalAccessException ex) {
+            throw new ConfiguratorException(this, "Cannot set GlobalMatrixAuthorizationStrategy#grantedPermissions via reflection", ex);
+        }
         return gms;
     }
 }

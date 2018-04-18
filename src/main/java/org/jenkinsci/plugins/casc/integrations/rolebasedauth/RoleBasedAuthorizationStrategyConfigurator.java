@@ -8,6 +8,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.Configurator;
+import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.RootElementConfigurator;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
@@ -29,7 +30,8 @@ import java.util.TreeMap;
  */
 @Extension(optional = true)
 @Restricted({NoExternalUse.class})
-public class RoleBasedAuthorizationStrategyConfigurator extends Configurator<RoleBasedAuthorizationStrategy> implements RootElementConfigurator {
+public class RoleBasedAuthorizationStrategyConfigurator extends Configurator<RoleBasedAuthorizationStrategy>
+        implements RootElementConfigurator<RoleBasedAuthorizationStrategy> {
 
     @Override
     public String getName() {
@@ -42,14 +44,10 @@ public class RoleBasedAuthorizationStrategyConfigurator extends Configurator<Rol
     }
 
     @Override
-    public RoleBasedAuthorizationStrategy configure(Object config) throws Exception {
+    public RoleBasedAuthorizationStrategy configure(Object config) throws ConfiguratorException {
         //TODO: API should return a qualified type
         final Configurator<RoleDefinition> roleDefinitionConfigurator =
-                (Configurator<RoleDefinition>) Configurator.lookup(RoleDefinition.class);
-        if (roleDefinitionConfigurator == null) {
-            throw new IOException("Cannot find configurator for" + RoleDefinition.class);
-        }
-
+                (Configurator<RoleDefinition>) Configurator.lookupOrFail(RoleDefinition.class);
 
         Map map = (Map) config;
         Map<String, RoleMap> grantedRoles = new HashMap<>();
@@ -67,7 +65,7 @@ public class RoleBasedAuthorizationStrategyConfigurator extends Configurator<Rol
     }
 
     @Nonnull
-    private static RoleMap retrieveRoleMap(@Nonnull Object config, @Nonnull String name, Configurator<RoleDefinition> configurator) throws Exception {
+    private static RoleMap retrieveRoleMap(@Nonnull Object config, @Nonnull String name, Configurator<RoleDefinition> configurator) throws ConfiguratorException {
         Map map = (Map) config;
         final Collection<?> c = (Collection<?>) map.get(name);
 
@@ -78,7 +76,7 @@ public class RoleBasedAuthorizationStrategyConfigurator extends Configurator<Rol
         }
 
         for (Object entry : c) {
-            RoleDefinition definition = configurator.configure(entry);
+            RoleDefinition definition = configurator.configureNonNull(entry);
             resMap.put(definition.getRole(), definition.getAssignments());
         }
 

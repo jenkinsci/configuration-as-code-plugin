@@ -9,7 +9,7 @@ import java.util.Map;
  * Define a Configurator for a Descriptor
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-public class DescriptorConfigurator extends BaseConfigurator<Descriptor> implements RootElementConfigurator {
+public class DescriptorConfigurator extends BaseConfigurator<Descriptor> implements RootElementConfigurator<Descriptor> {
 
 
     private final String name;
@@ -41,7 +41,7 @@ public class DescriptorConfigurator extends BaseConfigurator<Descriptor> impleme
     }
 
     @Override
-    public Descriptor configure(Object config) throws Exception {
+    public Descriptor configure(Object config) throws ConfiguratorException {
         configure((Map) config, descriptor);
         return descriptor;
     }

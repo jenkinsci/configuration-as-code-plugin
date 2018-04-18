@@ -6,6 +6,7 @@ import hudson.security.Permission;
 import hudson.security.ProjectMatrixAuthorizationStrategy;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.Configurator;
+import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.RootElementConfigurator;
 import org.jenkinsci.plugins.casc.integrations.globalmatrixauth.GroupPermissionDefinition;
 import org.kohsuke.accmod.Restricted;
@@ -15,7 +16,7 @@ import java.util.*;
 
 @Extension(optional = true)
 @Restricted(NoExternalUse.class)
-public class ProjectMatrixAuthorizationStrategyConfigurator extends Configurator<ProjectMatrixAuthorizationStrategy> implements RootElementConfigurator {
+public class ProjectMatrixAuthorizationStrategyConfigurator extends Configurator<ProjectMatrixAuthorizationStrategy> implements RootElementConfigurator<ProjectMatrixAuthorizationStrategy> {
 
     @Override
     public String getName() {
@@ -28,13 +29,13 @@ public class ProjectMatrixAuthorizationStrategyConfigurator extends Configurator
     }
 
     @Override
-    public ProjectMatrixAuthorizationStrategy configure(Object config) throws Exception {
+    public ProjectMatrixAuthorizationStrategy configure(Object config) throws ConfiguratorException {
         Map map = (Map) config;
         Collection o = (Collection<?>)map.get("grantedPermissions");
-        Configurator<GroupPermissionDefinition> permissionConfigurator = Configurator.lookup(GroupPermissionDefinition.class);
+        Configurator<GroupPermissionDefinition> permissionConfigurator = Configurator.lookupOrFail(GroupPermissionDefinition.class);
         Map<Permission,Set<String>> grantedPermissions = new HashMap<>();
         for(Object entry : o) {
-            GroupPermissionDefinition gpd = permissionConfigurator.configure(entry);
+            GroupPermissionDefinition gpd = permissionConfigurator.configureNonNull(entry);
             //We transform the linear list to a matrix (Where permission is the key instead)
             gpd.grantPermission(grantedPermissions);
         }

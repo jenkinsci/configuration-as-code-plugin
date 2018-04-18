@@ -8,6 +8,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.Configurator;
+import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.RootElementConfigurator;
 
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Extension(optional = true)
-public class CredentialsRootConfigurator extends Configurator<CredentialsStore> implements RootElementConfigurator {
+public class CredentialsRootConfigurator extends Configurator<CredentialsStore> implements RootElementConfigurator<CredentialsStore> {
 
     private final static Logger logger = Logger.getLogger(CredentialsRootConfigurator.class.getName());
 
@@ -39,17 +40,17 @@ public class CredentialsRootConfigurator extends Configurator<CredentialsStore> 
     }
 
     @Override
-    public CredentialsStore configure(Object config) throws Exception {
+    public CredentialsStore configure(Object config) throws ConfiguratorException {
         Map map = (Map) config;
         final Map<?,?> system = (Map) map.get("system");
         final Map<Domain, List<Credentials>> target = SystemCredentialsProvider.getInstance().getDomainCredentialsMap();
         target.clear();
 
-        final Configurator<Domain> domainConfigurator = Configurator.lookup(Domain.class);
-        final Configurator<Credentials> credentialsConfigurator = Configurator.lookup(Credentials.class);
+        final Configurator<Domain> domainConfigurator = Configurator.lookupOrFail(Domain.class);
+        final Configurator<Credentials> credentialsConfigurator = Configurator.lookupOrFail(Credentials.class);
 
         for (Map.Entry dc : system.entrySet()) {
-            final Domain domain = domainConfigurator.configure(dc.getKey());
+            final Domain domain = domainConfigurator.configureNonNull(dc.getKey());
             List values = (List) dc.getValue();
             final List<Credentials> credentials =  new ArrayList<>();
             for (Object value : values) {

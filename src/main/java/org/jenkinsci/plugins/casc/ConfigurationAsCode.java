@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.casc;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
@@ -111,8 +112,9 @@ public class ConfigurationAsCode extends ManagementLink {
 
     /**
      * Main entry point to start configuration process
+     * @throws ConfiguratorException Configuration error
      */
-    public void configure() {
+    public void configure() throws ConfiguratorException {
         String configParameter = System.getProperty(
                 CASC_JENKINS_CONFIG_PROPERTY,
                 System.getenv(CASC_JENKINS_CONFIG_ENV)
@@ -139,26 +141,29 @@ public class ConfigurationAsCode extends ManagementLink {
         return supportedProtocols.contains(uri.getScheme());
     }
 
-    private void _configureWithURI(String configParameter) {
+    private void _configureWithURI(String configParameter) throws ConfiguratorException {
         try {
             URL url = URI.create(configParameter).toURL();
             try(InputStreamReader reader = new InputStreamReader(url.openStream(), "UTF-8")) {
-                entries(reader).forEach(ConfigurationAsCode::configureWith);
+                for (Map.Entry<String, Object> entry : entries(reader).collect(toList())) {
+                    configureWith(entry);
+                }
                 sources = Collections.singletonList(configParameter);
             } catch (IOException e) {
-                throw new IllegalStateException("Failed to read from URL: "+configParameter, e);
+                throw new ConfiguratorException("Failed to read from URL: "+configParameter, e);
             }
         } catch (MalformedURLException e) {
-            throw new IllegalStateException("Failed to read from url. Url is malformed: "+configParameter, e);
+            throw new ConfiguratorException("Failed to read from url. Url is malformed: "+configParameter, e);
         }
     }
 
-    private void _configureWithPaths(String configParameter) {
+    private void _configureWithPaths(String configParameter) throws ConfiguratorException  {
         List<Path> configs = configs(configParameter);
         sources = configs.stream().map(Path::toAbsolutePath).map(Path::toString).collect(toList());
-        configs.stream()
-                .flatMap(ConfigurationAsCode::entries)
-                .forEach(ConfigurationAsCode::configureWith);
+        for (Map.Entry<String, Object> entry : configs.stream()
+                .flatMap(ConfigurationAsCode::entries).collect(toList())) {
+            configureWith(entry);
+        }
     }
 
     /**
@@ -206,16 +211,19 @@ public class ConfigurationAsCode extends ManagementLink {
      * Corresponding configurator is searched by entry key, passing entry value as object with all required properties.
      *
      * @param entry key-value pair, where key should match to root configurator and value have all required properties
+     * @throws ConfiguratorException configuration error
      */
-    public static void configureWith(Map.Entry<String, Object> entry) {
-        RootElementConfigurator configurator = Objects.requireNonNull(
-                Configurator.lookupRootElement(entry.getKey()),
-                format("no configurator for root element <%s>", entry.getKey())
-        );
+    public static void configureWith(Map.Entry<String, Object> entry) throws ConfiguratorException {
+
+        RootElementConfigurator configurator = Configurator.lookupRootElement(entry.getKey());
+        if (configurator == null) {
+            throw new ConfiguratorException(format("no configurator for root element <%s>", entry.getKey()));
+        }
         try {
             configurator.configure(entry.getValue());
-        } catch (Exception e) {
-            throw new IllegalStateException(
+        } catch (ConfiguratorException e) {
+            throw new ConfiguratorException(
+                    configurator,
                     format("error configuring <%s> with <%s> configurator", entry.getKey(), configurator.getName()),
                     e
             );

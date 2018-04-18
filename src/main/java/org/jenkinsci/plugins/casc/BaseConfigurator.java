@@ -165,7 +165,7 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
         return attribute;
     }
 
-    protected void configure(Map config, T instance) throws Exception {
+    protected void configure(Map config, T instance) throws ConfiguratorException {
         final Set<Attribute> attributes = describe();
 
         for (Attribute attribute : attributes) {
@@ -191,13 +191,13 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
                 try {
                     attribute.setValue(instance, valueToSet);
                 } catch (Exception ex) {
-                    throw new Exception("Failed to set attribute " + attribute, ex);
+                    throw new ConfiguratorException(configurator, "Failed to set attribute " + attribute, ex);
                 }
             }
         }
         if (!config.isEmpty()) {
             final String invalid = StringUtils.join(config.keySet(), ',');
-            throw new IllegalArgumentException("Invalid configuration elements for type " + instance.getClass() + " : " + invalid);
+            throw new ConfiguratorException("Invalid configuration elements for type " + instance.getClass() + " : " + invalid);
         }
     }
 

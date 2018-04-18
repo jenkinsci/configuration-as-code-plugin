@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.casc;
 
 import org.kohsuke.stapler.Stapler;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -28,20 +29,24 @@ public class PrimitiveConfigurator extends Configurator {
     }
 
     @Override
-    public Object configure(Object config) throws Exception {
+    public Object configure(Object config) throws ConfiguratorException {
         if (config instanceof String) {
             Optional<String> r = SecretSource.requiresReveal((String) config);
             if(r.isPresent()) {
                 Optional<String> reveal = Optional.empty();
                 for (SecretSource secretSource : SecretSource.all()) {
-                    reveal = secretSource.reveal(r.get());
+                    try {
+                        reveal = secretSource.reveal(r.get());
+                    } catch (IOException ex) {
+                        throw new ConfiguratorException(this, "Cannot reveal secret source for variable with key: " + config, ex);
+                    }
                     if(reveal.isPresent()) {
                         config = reveal.get();
                         break;
                     }
                 }
                 if(!reveal.isPresent()) {
-                    throw new IllegalArgumentException("Unable to reveal variable with key: "+config);
+                    throw new ConfiguratorException("Unable to reveal variable with key: "+config);
                 }
             }
         }

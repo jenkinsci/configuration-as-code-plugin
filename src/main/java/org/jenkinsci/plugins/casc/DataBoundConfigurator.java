@@ -9,6 +9,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
@@ -43,7 +44,7 @@ public class DataBoundConfigurator extends BaseConfigurator<Object> {
     }
 
     @Override
-    public Object configure(Object c) throws Exception {
+    public Object configure(Object c) throws ConfiguratorException {
 
         Map config = c instanceof Map ? (Map) c : Collections.EMPTY_MAP;
 
@@ -97,12 +98,13 @@ public class DataBoundConfigurator extends BaseConfigurator<Object> {
         final Object object;
         try {
             object = constructor.newInstance(args);
-        } catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException | InstantiationException | InvocationTargetException | IllegalAccessException ex) {
              List<String> argumentTypes = new ArrayList<>(args.length);
              for (Object arg : args) {
                 argumentTypes.add(arg != null ? arg.getClass().getName() : "null");
              }
-             throw new IOException("Failed to construct instance of " + target +
+             throw new ConfiguratorException(this,
+                     "Failed to construct instance of " + target +
                     ". Constructor: " + constructor.toString() +
                     ". Arguments: " + argumentTypes, ex);
         }
@@ -124,13 +126,21 @@ public class DataBoundConfigurator extends BaseConfigurator<Object> {
                 } else {
                     value = lookup.configure(config.get(name));
                 }
-                attribute.setValue(object, value);
+                try {
+                    attribute.setValue(object, value);
+                } catch (Exception e) {
+                    throw new ConfiguratorException(this, "Failed to set attribute " + attribute, e);
+                }
             }
         }
 
         for (Method method : target.getMethods()) {
             if (method.getParameterCount() == 0 && method.getAnnotation(PostConstruct.class) != null) {
-                method.invoke(object, null);
+                try {
+                    method.invoke(object, null);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new ConfiguratorException(this, "Failed to invoke configurator method " + method, e);
+                }
             }
         }
 
