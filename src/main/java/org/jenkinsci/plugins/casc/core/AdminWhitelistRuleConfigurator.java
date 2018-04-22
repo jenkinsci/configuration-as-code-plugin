@@ -73,7 +73,7 @@ public class AdminWhitelistRuleConfigurator extends BaseConfigurator<AdminWhitel
 
         @Override
         public void set(AdminWhitelistRule instance, Boolean value) {
-            instance.setMasterKillSwitch(value);
+            instance.setMasterKillSwitch(!value);
         }
     }
 
