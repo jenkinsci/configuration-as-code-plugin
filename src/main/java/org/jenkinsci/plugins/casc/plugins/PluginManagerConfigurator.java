@@ -5,6 +5,7 @@ import hudson.Plugin;
 import hudson.PluginManager;
 import hudson.PluginWrapper;
 import hudson.ProxyConfiguration;
+import hudson.lifecycle.RestartNotSupportedException;
 import hudson.model.UpdateCenter;
 import hudson.model.UpdateSite;
 import hudson.util.PersistedList;
@@ -14,10 +15,12 @@ import org.apache.commons.io.IOUtils;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.BaseConfigurator;
 import org.jenkinsci.plugins.casc.Configurator;
+import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.RootElementConfigurator;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -29,13 +32,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Extension(ordinal = 999)
-public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> implements RootElementConfigurator {
+public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> implements RootElementConfigurator<PluginManager> {
 
     @Override
     public Class<PluginManager> getTarget() {
@@ -43,7 +47,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
     }
 
     @Override
-    public PluginManager configure(Object config) throws Exception {
+    public PluginManager configure(Object config) throws ConfiguratorException {
         Map<?,?> map = (Map) config;
         final Jenkins jenkins = Jenkins.getInstance();
 
@@ -67,7 +71,11 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
                 updateSites.add(in);
             }
 
-            updateCenter.getSites().replaceBy(updateSites);
+            try {
+                updateCenter.getSites().replaceBy(updateSites);
+            } catch (IOException e) {
+                throw new ConfiguratorException("failed to reconfigure updateCenter.sites", e);
+            }
         }
 
 
@@ -77,6 +85,8 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
             if (shrinkwrap.exists()) {
                 try (FileReader io = new FileReader(shrinkwrap)) {
                     plugins.putAll(new Yaml().loadAs(io, Map.class));
+                } catch (IOException e) {
+                    throw new ConfiguratorException("failed to load shrinkwrap file", e);
                 }
             }
             final List<UpdateSite.Plugin> requiredPlugins = getRequiredPlugins(plugins, jenkins, updateCenter);
@@ -87,7 +97,11 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
 
             for (Future<UpdateCenter.UpdateCenterJob> job : installations) {
                 // TODO manage failure, timeout, etc
-                job.get();
+                try {
+                    job.get();
+                } catch (InterruptedException | ExecutionException e) {
+                    throw new ConfiguratorException("interrupted while waiting for plugins installation", e);
+                }
             }
 
             Map<String, String> installed = new HashMap<>();
@@ -97,19 +111,31 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
             }
             try (FileWriter w = new FileWriter(shrinkwrap)) {
                 w.append(new Yaml().dump(installed));
+            } catch (IOException e) {
+                throw new ConfiguratorException("failed to write shrinkwrap file", e);
             }
 
-            if (!installations.isEmpty()) jenkins.restart();
+            if (!installations.isEmpty()) {
+                try {
+                    jenkins.restart();
+                } catch (RestartNotSupportedException e) {
+                    throw new ConfiguratorException("Can't restart master after plugins installation", e);
+                }
+            }
         }
 
-        jenkins.save();
+        try {
+            jenkins.save();
+        } catch (IOException e) {
+            throw new ConfiguratorException("failed to save Jenkins configuration", e);
+        }
         return jenkins.getPluginManager();
     }
 
     /**
      * Collect required plugins as {@link UpdateSite.Plugin} so we can trigger installation if required
      */
-    private List<UpdateSite.Plugin> getRequiredPlugins(Map<String, String> plugins, Jenkins jenkins, UpdateCenter updateCenter) throws IOException {
+    private List<UpdateSite.Plugin> getRequiredPlugins(Map<String, String> plugins, Jenkins jenkins, UpdateCenter updateCenter) {
         List<UpdateSite.Plugin> installations = new ArrayList<>();
         if (plugins != null) {
             for (Map.Entry<String, String> e : plugins.entrySet()) {

@@ -19,7 +19,7 @@ public class UpdateSiteConfigurator extends BaseConfigurator<UpdateSite> {
     }
 
     @Override
-    public UpdateSite configure(Object config) throws Exception {
+    public UpdateSite configure(Object config) {
         Map<String, String> map = (Map) config;
         return new UpdateSite(map.get("id"), map.get("url"));
     }
