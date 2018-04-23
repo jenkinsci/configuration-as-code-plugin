@@ -20,12 +20,19 @@ import org.jenkinsci.plugins.casc.RootElementConfigurator;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -54,6 +61,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
         final Object proxy = map.get("proxy");
         if (proxy != null) {
             Configurator<ProxyConfiguration> pc = Configurator.lookup(ProxyConfiguration.class);
+            if (pc == null) throw new ConfiguratorException("ProxyConfiguration not well registered");
             ProxyConfiguration pcc = pc.configure(proxy);
             jenkins.proxy = pcc;
         }
@@ -83,7 +91,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
         if (plugins != null) {
             File shrinkwrap = new File("./plugins-shrinkwrap.yaml");
             if (shrinkwrap.exists()) {
-                try (FileReader io = new FileReader(shrinkwrap)) {
+                try (Reader io = new InputStreamReader(new FileInputStream(shrinkwrap), StandardCharsets.UTF_8)) {
                     plugins.putAll(new Yaml().loadAs(io, Map.class));
                 } catch (IOException e) {
                     throw new ConfiguratorException("failed to load shrinkwrap file", e);
@@ -109,7 +117,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
                 if (pw.getShortName().equals("configuration-as-code")) continue;
                 installed.put(pw.getShortName(), pw.getVersionNumber().toString());
             }
-            try (FileWriter w = new FileWriter(shrinkwrap)) {
+            try (Writer w = new OutputStreamWriter(new FileOutputStream(shrinkwrap), StandardCharsets.UTF_8)) {
                 w.append(new Yaml().dump(installed));
             } catch (IOException e) {
                 throw new ConfiguratorException("failed to write shrinkwrap file", e);
@@ -179,8 +187,8 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
     public Set<Attribute> describe() {
         Set<Attribute> attr =  new HashSet<>();
         attr.add(new Attribute("proxy", ProxyConfiguration.class));
-        attr.add(new Attribute("updateSites", new ArrayList<UpdateSite>().getClass()));
-        attr.add(new Attribute("required", new ArrayList<Plugins>().getClass()));
+        attr.add(new Attribute("updateSites", UpdateSite.class).multiple(true));
+        attr.add(new Attribute("required", Plugins.class).multiple(true));
         return attr;
     }
 }
