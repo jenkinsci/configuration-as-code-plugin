@@ -7,6 +7,7 @@ import hudson.PluginWrapper;
 import hudson.ProxyConfiguration;
 import hudson.model.UpdateCenter;
 import hudson.model.UpdateSite;
+import hudson.util.PersistedList;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
@@ -33,7 +34,7 @@ import java.util.concurrent.Future;
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-@Extension
+@Extension(ordinal = 999)
 public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> implements RootElementConfigurator {
 
     @Override
@@ -60,12 +61,13 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
             List<UpdateSite> updateSites = new ArrayList<>();
             for (Object data : sites) {
                 UpdateSite in = usc.configure(data);
+                if (in.isDue()) {
+                    in.updateDirectly(true);
+                }
                 updateSites.add(in);
             }
 
-            List<UpdateSite> us = updateCenter.getSites();
-            us.clear();
-            us.addAll(updateSites);
+            updateCenter.getSites().replaceBy(updateSites);
         }
 
 
@@ -118,21 +120,19 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
 
                     boolean found = false;
                     for (UpdateSite updateSite : updateCenter.getSites()) {
-                        final UpdateSite.Plugin p = updateSite.getPlugin(shortname);
-                        if (p != null) {
-                            // This plugin is distributed by this update site
-
-                            // FIXME see https://github.com/jenkins-infra/update-center2/pull/192
-                            // get plugin metadata for this specific version of the target plugin
-                            final URI metadata = URI.create(updateSite.getUrl()).resolve("download/plugins/" + shortname + "/" + version + "/metadata.json");
-                            try (InputStream open = ProxyConfiguration.open(metadata.toURL()).getInputStream()) {
-                                final JSONObject json = JSONObject.fromObject(IOUtils.toString(open));
-                                final UpdateSite.Plugin installable = updateSite.new Plugin(updateSite.getId(), json);
-                                installations.add(installable);
-                            }
-                            found = true;
-                            break;
+                        // FIXME see https://github.com/jenkins-infra/update-center2/pull/192
+                        // get plugin metadata for this specific version of the target plugin
+                        final URI metadata = URI.create(updateSite.getUrl()).resolve("download/plugins/" + shortname + "/" + version + "/metadata.json");
+                        try (InputStream open = ProxyConfiguration.open(metadata.toURL()).getInputStream()) {
+                            final JSONObject json = JSONObject.fromObject(IOUtils.toString(open));
+                            final UpdateSite.Plugin installable = updateSite.new Plugin(updateSite.getId(), json);
+                            installations.add(installable);
+                        } catch (IOException io) {
+                            // Not published by this update site
+                            System.err.println(io);
                         }
+                        found = true;
+                        break;
                     }
 
                     if (!found) {
