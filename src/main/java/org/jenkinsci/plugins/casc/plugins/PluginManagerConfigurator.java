@@ -143,7 +143,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
     /**
      * Collect required plugins as {@link UpdateSite.Plugin} so we can trigger installation if required
      */
-    private List<UpdateSite.Plugin> getRequiredPlugins(Map<String, String> plugins, Jenkins jenkins, UpdateCenter updateCenter) {
+    private List<UpdateSite.Plugin> getRequiredPlugins(Map<String, String> plugins, Jenkins jenkins, UpdateCenter updateCenter) throws ConfiguratorException {
         List<UpdateSite.Plugin> installations = new ArrayList<>();
         if (plugins != null) {
             for (Map.Entry<String, String> e : plugins.entrySet()) {
@@ -169,7 +169,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
                     }
 
                     if (!found) {
-                        throw new IllegalArgumentException("Can't find plugin "+shortname+" in configured update sites");
+                        throw new ConfiguratorException("Can't find plugin "+shortname+" in configured update sites");
                     }
                 }
             }
