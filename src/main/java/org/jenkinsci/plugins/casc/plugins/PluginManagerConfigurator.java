@@ -161,12 +161,11 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
                             final JSONObject json = JSONObject.fromObject(IOUtils.toString(open));
                             final UpdateSite.Plugin installable = updateSite.new Plugin(updateSite.getId(), json);
                             installations.add(installable);
+                            found = true;
+                            break;
                         } catch (IOException io) {
                             // Not published by this update site
-                            System.err.println(io);
                         }
-                        found = true;
-                        break;
                     }
 
                     if (!found) {
