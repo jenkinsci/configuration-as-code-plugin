@@ -6,9 +6,9 @@ import hudson.PluginManager;
 import hudson.PluginWrapper;
 import hudson.ProxyConfiguration;
 import hudson.lifecycle.RestartNotSupportedException;
+import hudson.model.DownloadService;
 import hudson.model.UpdateCenter;
 import hudson.model.UpdateSite;
-import hudson.util.PersistedList;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
@@ -21,10 +21,7 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -74,7 +71,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
             for (Object data : sites) {
                 UpdateSite in = usc.configure(data);
                 if (in.isDue()) {
-                    in.updateDirectly(true);
+                    in.updateDirectly(DownloadService.signatureCheck);
                 }
                 updateSites.add(in);
             }
