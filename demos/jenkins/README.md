@@ -15,7 +15,6 @@ jenkins:
   numExecutors: 5
   scmCheckoutRetryCount: 2
   mode: NORMAL
-  scmCheckoutRetryCount: 4
 ```
 
 # implementation note  
