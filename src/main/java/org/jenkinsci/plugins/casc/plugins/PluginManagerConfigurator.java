@@ -11,23 +11,18 @@ import hudson.model.UpdateCenter;
 import hudson.model.UpdateSite;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.BaseConfigurator;
 import org.jenkinsci.plugins.casc.Configurator;
 import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.RootElementConfigurator;
-import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.PrintWriter;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -86,12 +81,16 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
 
         final Map<String, String> plugins = (Map) map.get("required");
         if (plugins != null) {
-            File shrinkwrap = new File("./plugins-shrinkwrap.yaml");
+            File shrinkwrap = new File("./plugins.txt");
             if (shrinkwrap.exists()) {
-                try (Reader io = new InputStreamReader(new FileInputStream(shrinkwrap), StandardCharsets.UTF_8)) {
-                    plugins.putAll(new Yaml().loadAs(io, Map.class));
+                try {
+                    final List<String> lines = FileUtils.readLines(shrinkwrap, StandardCharsets.UTF_8);
+                    for (String line : lines) {
+                        int i = line.indexOf(':');
+                        plugins.put(line.substring(0,i), line.substring(i+1));
+                    }
                 } catch (IOException e) {
-                    throw new ConfiguratorException("failed to load shrinkwrap file", e);
+                    throw new ConfiguratorException("failed to load plugins.txt shrinkwrap file", e);
                 }
             }
             final List<UpdateSite.Plugin> requiredPlugins = getRequiredPlugins(plugins, jenkins, updateCenter);
@@ -110,14 +109,13 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
             }
 
             Map<String, String> installed = new HashMap<>();
-            for (PluginWrapper pw : jenkins.getPluginManager().getPlugins()) {
-                if (pw.getShortName().equals("configuration-as-code")) continue;
-                installed.put(pw.getShortName(), pw.getVersionNumber().toString());
-            }
-            try (Writer w = new OutputStreamWriter(new FileOutputStream(shrinkwrap), StandardCharsets.UTF_8)) {
-                w.append(new Yaml().dump(installed));
+            try (PrintWriter w = new PrintWriter(shrinkwrap)) {
+                for (PluginWrapper pw : jenkins.getPluginManager().getPlugins()) {
+                    if (pw.getShortName().equals("configuration-as-code")) continue;
+                    w.println(pw.getShortName() + ":" + pw.getVersionNumber().toString());
+                }
             } catch (IOException e) {
-                throw new ConfiguratorException("failed to write shrinkwrap file", e);
+                throw new ConfiguratorException("failed to write plugins.txt shrinkwrap file", e);
             }
 
             if (!installations.isEmpty()) {
@@ -151,6 +149,10 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
 
                     boolean found = false;
                     for (UpdateSite updateSite : updateCenter.getSites()) {
+
+                        final UpdateSite.Plugin latest = updateSite.getPlugin(shortname);
+
+
                         // FIXME see https://github.com/jenkins-infra/update-center2/pull/192
                         // get plugin metadata for this specific version of the target plugin
                         final URI metadata = URI.create(updateSite.getUrl()).resolve("download/plugins/" + shortname + "/" + version + "/metadata.json");
