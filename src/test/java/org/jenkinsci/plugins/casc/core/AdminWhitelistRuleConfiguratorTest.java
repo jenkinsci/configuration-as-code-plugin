@@ -22,6 +22,7 @@ package org.jenkinsci.plugins.casc.core;
 
 import jenkins.model.Jenkins;
 import jenkins.security.s2m.AdminWhitelistRule;
+import jenkins.security.s2m.MasterKillSwitchConfiguration;
 import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
 import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import org.junit.Assert;
@@ -38,19 +39,39 @@ public class AdminWhitelistRuleConfiguratorTest {
 
     @Test
     @Issue("Issue #28")
-    @ConfiguredWithCode("AdminWhitelistRuleConfigurator/Slave2MasterSecurityKillSwitch_enabled.yml")
-    public void checkM2SSecurityKillSwitch_enabled() throws Exception {
+    @ConfiguredWithCode("AdminWhitelistRuleConfigurator/Agent2MasterSecurityKillSwitch_enabled.yml")
+    public void checkM2ASecurityKillSwitch_disabled() throws Exception {
         final Jenkins jenkins = Jenkins.getInstance();
         AdminWhitelistRule rule = jenkins.getInjector().getInstance(AdminWhitelistRule.class);
-        Assert.assertTrue("MasterToSlave Security should be enabled", rule.getMasterKillSwitch());
+        Assert.assertFalse("MasterToAgent Security should be disabled", rule.getMasterKillSwitch());
     }
 
     @Test
     @Issue("Issue #28")
-    @ConfiguredWithCode("AdminWhitelistRuleConfigurator/Slave2MasterSecurityKillSwitch_disabled.yml")
-    public void checkM2SSecurityKillSwitch_disabled() throws Exception {
+    @ConfiguredWithCode("AdminWhitelistRuleConfigurator/Agent2MasterSecurityKillSwitch_disabled.yml")
+    public void checkM2ASecurityKillSwitch_enabled() throws Exception {
         final Jenkins jenkins = Jenkins.getInstance();
         AdminWhitelistRule rule = jenkins.getInjector().getInstance(AdminWhitelistRule.class);
-        Assert.assertFalse("MasterToSlave Security should be disabled", rule.getMasterKillSwitch());
+        Assert.assertTrue("MasterToAgent Security should be enabled", rule.getMasterKillSwitch());
     }
+
+    @Test
+    @Issue("Issue #172")
+    @ConfiguredWithCode("AdminWhitelistRuleConfigurator/Agent2MasterSecurityKillSwitch_enabled.yml")
+    public void checkA2MAccessControl_enabled() {
+        final Jenkins jenkins = Jenkins.getInstance();
+        MasterKillSwitchConfiguration config = jenkins.getDescriptorByType(MasterKillSwitchConfiguration.class);
+        Assert.assertTrue("Agent → Master Access Control should be enabled", config.getMasterToSlaveAccessControl());
+    }
+
+    @Test
+    @Issue("Issue #172")
+    @ConfiguredWithCode("AdminWhitelistRuleConfigurator/Agent2MasterSecurityKillSwitch_disabled.yml")
+    public void checkA2MAccessControl_disable() {
+        final Jenkins jenkins = Jenkins.getInstance();
+        MasterKillSwitchConfiguration config = jenkins.getDescriptorByType(MasterKillSwitchConfiguration.class);
+        Assert.assertFalse("Agent → Master Access Control should be disabled", config.getMasterToSlaveAccessControl());
+    }
+
+    
 }
