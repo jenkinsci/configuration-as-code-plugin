@@ -173,7 +173,7 @@ If all those 4 are present, Configuration-as-Code will try to gather initial sec
 
 Here is a list of plugin we have successfully tested to support configuration-as-code approach :
 
- - [x] active directory plugin ([details](demos/credentials/README.md))
+ - [x] active directory plugin ([details](demos/active-directory/README.md))
  - [x] artifactory plugin ([details](demos/artifactory/README.md))
  - [x] credentials plugin ([details](demos/credentials/README.md))
  - [x] docker plugin ([details](demos/docker/README.md))
