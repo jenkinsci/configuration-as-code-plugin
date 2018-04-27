@@ -4,7 +4,9 @@ import hudson.EnvVars;
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.model.Descriptor;
+import hudson.model.Node;
 import hudson.slaves.Cloud;
+import hudson.slaves.NodeProperty;
 import javaposse.jobdsl.plugin.JenkinsDslScriptLoader;
 import javaposse.jobdsl.plugin.JenkinsJobManagement;
 import javaposse.jobdsl.plugin.LookupStrategy;
@@ -12,6 +14,7 @@ import jenkins.model.GlobalConfigurationCategory;
 import jenkins.model.Jenkins;
 import jenkins.security.s2m.AdminWhitelistRule;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -59,6 +62,11 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
                 new JenkinsDslScriptLoader(mng).runScript(script);
             }
         }));
+        attributes.add(new Attribute("nodeProperties", NodeProperty.class).multiple(true).setter(
+                (target, attribute, value) -> jenkins.getNodeProperties().replaceBy((Collection) value)));
+        attributes.add(new Attribute("globalNodeProperties", NodeProperty.class).multiple(true).setter(
+                (target, attribute, value) -> jenkins.getGlobalNodeProperties().replaceBy((Collection) value)));
+
         
         // Check for unclassified Descriptors
         final ExtensionList<Descriptor> descriptors = jenkins.getExtensionList(Descriptor.class);

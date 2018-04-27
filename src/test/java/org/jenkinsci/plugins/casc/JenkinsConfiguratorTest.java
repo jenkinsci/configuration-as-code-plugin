@@ -1,8 +1,14 @@
 package org.jenkinsci.plugins.casc;
 
+import hudson.EnvVars;
+import hudson.model.TaskListener;
 import hudson.security.AuthorizationStrategy;
 import hudson.security.FullControlOnceLoggedInAuthorizationStrategy;
 import hudson.security.HudsonPrivateSecurityRealm;
+import hudson.slaves.EnvironmentVariablesNodeProperty;
+import hudson.slaves.NodeProperty;
+import hudson.slaves.NodePropertyDescriptor;
+import hudson.util.DescribableList;
 import jenkins.model.Jenkins;
 import org.hamcrest.CoreMatchers;
 import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
@@ -55,6 +61,18 @@ public class JenkinsConfiguratorTest {
         assertThat("Authorization strategy has not been set",
                 j.jenkins.getAuthorizationStrategy(),
                 CoreMatchers.instanceOf(AuthorizationStrategy.Unsecured.class));
+    }
+
+    @Test
+    @Issue("Issue #173")
+    @ConfiguredWithCode("SetEnvironmentVariable.yml")
+    public void shouldSetEnvironmentVariable() throws Exception {
+        final DescribableList<NodeProperty<?>, NodePropertyDescriptor> properties = Jenkins.getInstance().getNodeProperties();
+        EnvVars env = new EnvVars();
+        for (NodeProperty<?> property : properties) {
+            property.buildEnvVars(env, TaskListener.NULL);
+        }
+        assertEquals("BAR", env.get("FOO"));
     }
 
 }
