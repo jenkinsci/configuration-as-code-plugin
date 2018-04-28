@@ -1,0 +1,6 @@
+jenkins:
+  nodeProperties:
+    - envVars:
+        env:
+          - key: FOO
+            value: BAR
