@@ -15,7 +15,13 @@ jenkins:
   numExecutors: 5
   scmCheckoutRetryCount: 2
   mode: NORMAL
+  globalNodeProperties:
+    - envVars:
+        env:
+          - key: FOO
+            value: BAR
 ```
 
 # implementation note  
-Example above is only a subset of commonly used settings, full list available in generated documentation
+Example above is only a subset of commonly used settings, check [jenkins.yaml](jenkins.yaml) to see more. 
+Full list available in generated documentation
