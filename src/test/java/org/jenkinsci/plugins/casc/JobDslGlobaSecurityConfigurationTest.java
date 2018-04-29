@@ -2,7 +2,6 @@ package org.jenkinsci.plugins.casc;
 
 import javaposse.jobdsl.plugin.GlobalJobDslSecurityConfiguration;
 import jenkins.model.GlobalConfiguration;
-import org.jenkinsci.plugins.casc.misc.TestConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -26,7 +25,8 @@ public class JobDslGlobaSecurityConfigurationTest {
         dslSecurity.setUseScriptSecurity(true);
         assertThat("ScriptSecurity", dslSecurity.isUseScriptSecurity(), is(true));
 
-        TestConfiguration.withCode("JobDslGlobaSecurityConfigurationTest.yml").configure(getClass());
+        ConfigurationAsCode.get().configure(getClass().getResource("JobDslGlobaSecurityConfigurationTest.yml").toExternalForm());
+
         assertThat("ScriptSecurity", dslSecurity.isUseScriptSecurity(), is(false));
     }
 

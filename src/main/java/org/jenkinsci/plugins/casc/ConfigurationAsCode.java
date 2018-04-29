@@ -1,22 +1,26 @@
 package org.jenkinsci.plugins.casc;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
 import hudson.model.ManagementLink;
 import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.plugins.casc.yaml.YamlReader;
+import org.jenkinsci.plugins.casc.yaml.YamlSource;
+import org.jenkinsci.plugins.casc.yaml.YamlUtils;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.interceptor.RequirePOST;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.composer.Composer;
+import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.nodes.Node;
 
 import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.FileSystems;
@@ -25,6 +29,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -34,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
@@ -119,15 +125,41 @@ public class ConfigurationAsCode extends ManagementLink {
                 CASC_JENKINS_CONFIG_PROPERTY,
                 System.getenv(CASC_JENKINS_CONFIG_ENV)
         );
-
-        if(isSupportedURI(configParameter)) {
-            _configureWithURI(configParameter);
+        if (configParameter == null  && Files.exists(Paths.get(DEFAULT_JENKINS_YAML_PATH))) {
+            configParameter = DEFAULT_JENKINS_YAML_PATH;
         } else {
-            //Must be a plain path
-            _configureWithPaths(configParameter);
+            // No configuration set nor default config file
+            return;
         }
+
+        configure(configParameter);
+    }
+
+
+    public void configure(String ... configParameters) throws ConfiguratorException {
+
+        List<YamlSource> configs = new ArrayList<>();
+
+        for (String p : configParameters) {
+            if (isSupportedURI(p)) {
+                configs.add(new YamlSource<>(p, READ_FROM_URL));
+            } else {
+                configs.addAll(configs(p).stream()
+                        .map(s -> new YamlSource<>(s, READ_FROM_PATH))
+                        .collect(toList()));
+            }
+        }
+        configureWith(configs);
         lastTimeLoaded = System.currentTimeMillis();
     }
+
+    private static final YamlReader<String> READ_FROM_URL = config -> {
+        final URL url = URI.create(config).toURL();
+        return new InputStreamReader(url.openStream(), "UTF-8");
+    };
+
+    private static final YamlReader<Path> READ_FROM_PATH = Files::newBufferedReader;
+
 
     public static boolean isSupportedURI(String configurationParameter) {
         if(configurationParameter == null) {
@@ -141,30 +173,27 @@ public class ConfigurationAsCode extends ManagementLink {
         return supportedProtocols.contains(uri.getScheme());
     }
 
-    private void _configureWithURI(String configParameter) throws ConfiguratorException {
-        try {
-            URL url = URI.create(configParameter).toURL();
-            try(InputStreamReader reader = new InputStreamReader(url.openStream(), "UTF-8")) {
-                for (Map.Entry<String, Object> entry : entries(reader).collect(toList())) {
-                    configureWith(entry);
-                }
-                sources = Collections.singletonList(configParameter);
-            } catch (IOException e) {
-                throw new ConfiguratorException("Failed to read from URL: "+configParameter, e);
-            }
-        } catch (MalformedURLException e) {
-            throw new ConfiguratorException("Failed to read from url. Url is malformed: "+configParameter, e);
-        }
-    }
-
-    private void _configureWithPaths(String configParameter) throws ConfiguratorException  {
-        List<Path> configs = configs(configParameter);
-        sources = configs.stream().map(Path::toAbsolutePath).map(Path::toString).collect(toList());
-        for (Map.Entry<String, Object> entry : configs.stream()
-                .flatMap(ConfigurationAsCode::entries).collect(toList())) {
+    private void configureWith(List<YamlSource> configs) throws ConfiguratorException {
+        final Node merged = YamlUtils.merge(configs);
+        final Map<String, Object> map = loadAs(merged);
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
             configureWith(entry);
         }
     }
+
+    private Map<String, Object> loadAs(Node node) {
+        final Constructor constructor = new Constructor();
+        constructor.setComposer(new Composer(null, null) {
+
+            @Override
+            public Node getSingleNode() {
+                return node;
+            }
+        });
+        return (Map<String, Object>) constructor.getSingleData(Map.class);
+    }
+
+
 
     /**
      * Recursive search for all {@link #YAML_FILES_PATTERN} in provided base path
@@ -172,33 +201,16 @@ public class ConfigurationAsCode extends ManagementLink {
      * @param path base path to start (can be file or directory)
      * @return list of all paths matching pattern. Only base file itself if it is a file matching pattern
      */
-    public List<Path> configs(String path) {
+    public List<Path> configs(String path) throws ConfiguratorException {
         PathMatcher matcher = FileSystems.getDefault().getPathMatcher(YAML_FILES_PATTERN);
 
-        try (Stream<Path> configs = Files.find(
-                Paths.get(StringUtils.defaultIfBlank(path, DEFAULT_JENKINS_YAML_PATH)),
-                Integer.MAX_VALUE,
-                (next, attrs) -> attrs.isRegularFile() && matcher.matches(next)
-        )) {
-            return configs.collect(toList());
+        try (Stream<Path> stream = Files.find(Paths.get(path), Integer.MAX_VALUE,
+                (next, attrs) -> attrs.isRegularFile() && matcher.matches(next))) {
+            return stream.collect(toList());
         } catch (NoSuchFileException e) {
-            return Collections.emptyList();
+            throw new ConfiguratorException("File does not exist: " + path, e);
         } catch (IOException e) {
             throw new IllegalStateException("failed config scan for " + path, e);
-        }
-    }
-
-    /**
-     * Creates the stream of configurable entries in config in form [root key -> some object]
-     *
-     * @param config path to read from
-     * @return stream of entries from yaml
-     */
-    private static Stream<? extends Map.Entry<String, Object>> entries(Path config) {
-        try (Reader reader = Files.newBufferedReader(config)) {
-            return entries(reader);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
         }
     }
 
