@@ -6,7 +6,6 @@ import hudson.model.Label;
 import io.jenkins.docker.connector.DockerComputerAttachConnector;
 import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
 import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
-import org.jenkinsci.plugins.casc.misc.TestConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -45,7 +44,7 @@ public class DockerCloudTest {
         DockerTemplate template = docker.getTemplate(Label.get("docker-agent"));
         checkTemplate(template, "docker-agent", "jenkins", "/home/jenkins/agent", "10");
 
-        TestConfiguration.withCode("DockerCloudTest/update_docker_cloud/DockerCloudTest2.yml").configure(getClass());
+        ConfigurationAsCode.get().configure(getClass().getResource("DockerCloudTest/update_docker_cloud/DockerCloudTest2.yml").toExternalForm());
 
         docker = DockerCloud.getCloudByName("docker");
         assertNotNull(docker);

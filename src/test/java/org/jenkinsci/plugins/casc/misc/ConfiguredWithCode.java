@@ -1,5 +1,7 @@
 package org.jenkinsci.plugins.casc.misc;
 
+import org.junit.Test;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -16,5 +18,7 @@ public @interface ConfiguredWithCode {
     /**
      * resource path in classpath
      */
-    String value();
+    String[] value();
+
+    Class<? extends Throwable> expected() default Test.None.class;
 }

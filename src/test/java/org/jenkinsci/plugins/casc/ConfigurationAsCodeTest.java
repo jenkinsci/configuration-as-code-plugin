@@ -1,19 +1,30 @@
 package org.jenkinsci.plugins.casc;
 
+import hudson.EnvVars;
+import hudson.slaves.EnvironmentVariablesNodeProperty;
+import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
+import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import org.jenkinsci.plugins.workflow.libs.GlobalLibraries;
+import org.jenkinsci.plugins.workflow.libs.LibraryConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
-import java.io.IOException;
+import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 public class ConfigurationAsCodeTest {
 
     @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder();
+
+    @Rule
+    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 
     @Test
     public void init_test_from_accepted_sources() throws Exception {
@@ -30,9 +41,25 @@ public class ConfigurationAsCodeTest {
         assertThat(casc.configs(tempFolder.getRoot().getAbsolutePath()), hasSize(5));
     }
 
-    @Test
-    public void shouldReturnEmptyMapOnNotFoundConfig() {
+    @Test(expected = ConfiguratorException.class)
+    public void shouldReportMissingFileOnNotFoundConfig() throws ConfiguratorException {
         ConfigurationAsCode casc = new ConfigurationAsCode();
-        assertThat(casc.configs("some"), hasSize(0));
+        casc.configure("some");
+    }
+
+    @Test
+    @ConfiguredWithCode(value = { "merge1.yml", "merge3.yml"}, expected = ConfiguratorException.class)
+    public void shouldMergeYamlConfig() {
+        assertEquals("Configured by configuration-as-code-plugin", j.jenkins.getSystemMessage());
+        assertEquals(0, j.jenkins.getNumExecutors());
+        final List<LibraryConfiguration> libraries = GlobalLibraries.get().getLibraries();
+        assertEquals(2, libraries.size());
+        assertEquals("awesome-lib", libraries.get(0).getName());
+        assertEquals("another-lib", libraries.get(1).getName());
+    }
+
+    @Test
+    @ConfiguredWithCode(value = { "merge1.yml", "merge2.yml"}, expected = ConfiguratorException.class)
+    public void shouldReportConfigurationConflict() {
     }
 }
