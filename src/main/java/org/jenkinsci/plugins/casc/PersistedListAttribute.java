@@ -22,4 +22,14 @@ public class PersistedListAttribute<T> extends Attribute<T> {
         Collection values = (Collection) o;
         target.replaceBy(values);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }
