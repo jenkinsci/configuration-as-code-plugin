@@ -25,11 +25,14 @@ public class PersistedListAttribute<T> extends Attribute<T> {
 
     @Override
     public boolean equals(Object o) {
-        return super.equals(o);
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PersistedListAttribute<?> pla = (PersistedListAttribute<?>) o;
+        return pla.target == target;
     }
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return target.hashCode();
     }
 }
