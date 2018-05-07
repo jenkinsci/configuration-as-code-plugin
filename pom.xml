@@ -8,7 +8,7 @@
     <version>3.4</version>
     <relativePath />
   </parent>
-  <groupId>org.jenkins-ci.plugins</groupId>
+  <groupId>io.jenkins</groupId>
   <artifactId>configuration-as-code</artifactId>
   <version>0.6-alpha-SNAPSHOT</version>
   <packaging>hpi</packaging>
