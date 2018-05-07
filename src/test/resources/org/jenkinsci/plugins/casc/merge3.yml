@@ -1,11 +1,8 @@
 jenkins:
   systemMessage: "Configured by configuration-as-code-plugin"
 
-  globalLibraries:
-    libraries:
-      - name: "another-lib"
-        retriever:
-          modernSCM:
-            scm:
-              git:
-                remote: "https://github.com/foo-bar/pipeline-library.git"
+tool:
+  git:
+    installations:
+      - name: anothergit
+        home: /usr/local/bin/git.sh

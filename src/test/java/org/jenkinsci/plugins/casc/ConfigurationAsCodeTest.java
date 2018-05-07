@@ -1,22 +1,16 @@
 package org.jenkinsci.plugins.casc;
 
-import hudson.EnvVars;
-import hudson.slaves.EnvironmentVariablesNodeProperty;
+import hudson.plugins.git.GitTool;
 import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
 import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
-import org.jenkinsci.plugins.workflow.libs.GlobalLibraries;
-import org.jenkinsci.plugins.workflow.libs.LibraryConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
-import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 public class ConfigurationAsCodeTest {
 
@@ -52,10 +46,9 @@ public class ConfigurationAsCodeTest {
     public void shouldMergeYamlConfig() {
         assertEquals("Configured by configuration-as-code-plugin", j.jenkins.getSystemMessage());
         assertEquals(0, j.jenkins.getNumExecutors());
-        final List<LibraryConfiguration> libraries = GlobalLibraries.get().getLibraries();
-        assertEquals(2, libraries.size());
-        assertEquals("awesome-lib", libraries.get(0).getName());
-        assertEquals("another-lib", libraries.get(1).getName());
+        GitTool.DescriptorImpl tools = j.jenkins.getDescriptorByType(GitTool.DescriptorImpl.class);
+        assertNotNull(tools.getInstallation("git"));
+        assertNotNull(tools.getInstallation("anothergit"));
     }
 
     @Test
