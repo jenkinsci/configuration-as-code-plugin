@@ -1,0 +1,42 @@
+jenkins:
+  clouds:
+    - kubernetes:
+        name: "kubernetes"
+        serverUrl: "serverUrl"
+        serverCertificate: "serverCertificate"
+        skipTlsVerify: true
+        namespace: "namespace"
+        jenkinsUrl: "jenkinsUrl"
+        jenkinsTunnel: "jenkinsTunnel"
+        containerCapStr: 42
+        retentionTimeout: 5
+        connectTimeout: 10
+        readTimeout: 20
+
+        templates:
+          - name: "test"
+            image: "image"
+            serviceAccount: "serviceAccount"
+            instanceCap: 1234
+            idleMinutes: 0
+            label: "label"
+            volumes:
+              - hostPathVolume:
+                  mountPath: "mountPath"
+                  hostPath: "hostPath"
+
+            containers:
+              - name: "name"
+                image: "image"
+                privileged: true
+                alwaysPullImage: true
+                command: "command"
+                args: "args"
+                workingDir: "workingDir"
+                ttyEnabled: true
+                resourceRequestCpu: "resourceRequestCpu"
+                resourceRequestMemory: "resourceRequestMemory"
+                resourceLimitCpu: "resourceLimitCpu"
+                resourceLimitMemory: "resourceLimitMemory"
+            imagePullSecrets:
+              - name: "imagePullSecrets"

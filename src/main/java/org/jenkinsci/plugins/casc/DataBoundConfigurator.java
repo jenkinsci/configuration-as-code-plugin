@@ -105,8 +105,8 @@ public class DataBoundConfigurator extends BaseConfigurator<Object> {
              }
              throw new ConfiguratorException(this,
                      "Failed to construct instance of " + target +
-                    ". Constructor: " + constructor.toString() +
-                    ". Arguments: " + argumentTypes, ex);
+                    ".\n Constructor: " + constructor.toString() +
+                    ".\n Arguments: " + argumentTypes, ex);
         }
 
         final Set<Attribute> attributes = describe();

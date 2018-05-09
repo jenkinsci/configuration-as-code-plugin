@@ -262,6 +262,14 @@
       <version>6.1.2</version>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.csanchez.jenkins.plugins</groupId>
+      <artifactId>kubernetes</artifactId>
+      <version>1.6.0</version>
+      <scope>test</scope>
+    </dependency>
+
     <!-- https://mvnrepository.com/artifact/com.github.stefanbirkner/system-rules -->
     <dependency>
       <groupId>com.github.stefanbirkner</groupId>
@@ -305,6 +313,9 @@
             </configuration>
           </execution>
         </executions>
+        <configuration>
+          <fail>false</fail>
+        </configuration>
       </plugin>
     </plugins>
   </build>
