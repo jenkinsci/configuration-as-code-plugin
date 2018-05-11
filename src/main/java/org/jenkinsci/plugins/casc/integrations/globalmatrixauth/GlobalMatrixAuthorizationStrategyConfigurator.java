@@ -20,7 +20,7 @@ import java.util.*;
  */
 @Extension(optional = true)
 @Restricted(NoExternalUse.class)
-public class GlobalMatrixAuthorizationStrategyConfigurator extends Configurator<GlobalMatrixAuthorizationStrategy> implements RootElementConfigurator<GlobalMatrixAuthorizationStrategy> {
+public class GlobalMatrixAuthorizationStrategyConfigurator extends Configurator<GlobalMatrixAuthorizationStrategy> {
 
     @Override
     public String getName() {

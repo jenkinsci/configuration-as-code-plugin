@@ -30,8 +30,7 @@ import java.util.TreeMap;
  */
 @Extension(optional = true)
 @Restricted({NoExternalUse.class})
-public class RoleBasedAuthorizationStrategyConfigurator extends Configurator<RoleBasedAuthorizationStrategy>
-        implements RootElementConfigurator<RoleBasedAuthorizationStrategy> {
+public class RoleBasedAuthorizationStrategyConfigurator extends Configurator<RoleBasedAuthorizationStrategy> {
 
     @Override
     public String getName() {

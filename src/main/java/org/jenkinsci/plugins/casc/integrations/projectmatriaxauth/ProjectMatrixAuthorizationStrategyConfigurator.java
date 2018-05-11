@@ -16,7 +16,7 @@ import java.util.*;
 
 @Extension(optional = true)
 @Restricted(NoExternalUse.class)
-public class ProjectMatrixAuthorizationStrategyConfigurator extends Configurator<ProjectMatrixAuthorizationStrategy> implements RootElementConfigurator<ProjectMatrixAuthorizationStrategy> {
+public class ProjectMatrixAuthorizationStrategyConfigurator extends Configurator<ProjectMatrixAuthorizationStrategy> {
 
     @Override
     public String getName() {
