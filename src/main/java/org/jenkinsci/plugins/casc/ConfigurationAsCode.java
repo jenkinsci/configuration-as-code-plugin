@@ -137,6 +137,16 @@ public class ConfigurationAsCode extends ManagementLink {
         configure(configParameter);
     }
 
+    /**
+     * Export live jenkins instance configuration as Yaml
+     * @param req
+     * @param res
+     * @throws Exception
+     */
+    public void doExport(StaplerRequest req, StaplerResponse res) throws Exception {
+        res.setContentType("application/x-yaml");
+    }
+
 
     public void configure(String ... configParameters) throws ConfiguratorException {
 
