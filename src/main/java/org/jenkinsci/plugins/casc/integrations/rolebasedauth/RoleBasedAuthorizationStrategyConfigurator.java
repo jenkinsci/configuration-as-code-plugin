@@ -9,6 +9,7 @@ import hudson.Extension;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.Configurator;
 import org.jenkinsci.plugins.casc.ConfiguratorException;
+import org.jenkinsci.plugins.casc.MultivaluedAttribute;
 import org.jenkinsci.plugins.casc.RootElementConfigurator;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
@@ -85,11 +86,10 @@ public class RoleBasedAuthorizationStrategyConfigurator extends Configurator<Rol
     @Override
     @SuppressFBWarnings(value = "DM_NEW_FOR_GETCLASS", justification = "We need a fully qualified type to do proper attribute binding")
     public Set<Attribute> describe() {
-        Class<?> groupType = new HashSet<RoleDefinition>().getClass();
         return new HashSet<>(Arrays.asList(
-                new Attribute("global", groupType),
-                new Attribute("items", groupType),
-                new Attribute("agents", groupType)
+                new MultivaluedAttribute<RoleDefinition, RoleBasedAuthorizationStrategy>("global", RoleDefinition.class),
+                new MultivaluedAttribute<RoleDefinition, RoleBasedAuthorizationStrategy>("items", RoleDefinition.class),
+                new MultivaluedAttribute<RoleDefinition, RoleBasedAuthorizationStrategy>("agents", RoleDefinition.class)
         ));
     }
 

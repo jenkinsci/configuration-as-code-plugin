@@ -28,13 +28,13 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-public class DataBoundConfigurator extends BaseConfigurator<Object> {
+public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
 
     private final static Logger logger = Logger.getLogger(DataBoundConfigurator.class.getName());
 
     private final Class target;
 
-    public DataBoundConfigurator(Class clazz) {
+    public DataBoundConfigurator(Class<T> clazz) {
         this.target = clazz;
     }
 
@@ -44,7 +44,7 @@ public class DataBoundConfigurator extends BaseConfigurator<Object> {
     }
 
     @Override
-    public Object configure(Object c) throws ConfiguratorException {
+    public T configure(Object c) throws ConfiguratorException {
 
         Map config = c instanceof Map ? (Map) c : Collections.EMPTY_MAP;
 
@@ -144,7 +144,7 @@ public class DataBoundConfigurator extends BaseConfigurator<Object> {
             }
         }
 
-        return object;
+        return (T) object;
     }
 
     public String getName() {

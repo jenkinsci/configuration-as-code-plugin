@@ -35,7 +35,7 @@ public class GlobalMatrixAuthorizationStrategyConfigurator extends Configurator<
     @Override
     @SuppressFBWarnings(value = "DM_NEW_FOR_GETCLASS", justification = "We need a fully qualified type to do proper attribute binding")
     public Set<Attribute> describe() {
-        return Collections.singleton(new Attribute<GroupPermissionDefinition>("grantedPermissions", new HashSet<GroupPermissionDefinition>().getClass()));
+        return Collections.singleton(new Attribute<GroupPermissionDefinition, GlobalMatrixAuthorizationStrategy>("grantedPermissions", new HashSet<GroupPermissionDefinition>().getClass()));
     }
 
     @Override
