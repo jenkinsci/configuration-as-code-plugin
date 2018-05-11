@@ -256,13 +256,13 @@ public abstract class Configurator<T> implements ExtensionPoint, ElementConfigur
      */
     @Nonnull
     public List<Attribute> getAttributes() {
-        final ArrayList<Attribute> attributes = new ArrayList<>(describe());
+        final List<Attribute> attributes = new ArrayList<>(describe());
         Collections.sort(attributes, (a,b) -> a.name.compareTo(b.name));
         return attributes;
     }
 
     @CheckForNull
-    public Attribute getAttribute(@Nonnull String name) {
+    public <V> Attribute<V,T> getAttribute(@Nonnull String name) {
         Set<Attribute> attrs = describe();
         for (Attribute attr : attrs) {
             if (attr.name.equalsIgnoreCase(name)) {

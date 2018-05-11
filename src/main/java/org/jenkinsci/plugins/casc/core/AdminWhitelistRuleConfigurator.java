@@ -65,26 +65,9 @@ public class AdminWhitelistRuleConfigurator extends BaseConfigurator<AdminWhitel
     @Override
     public Set<Attribute> describe() {
         return new HashSet<>(Arrays.asList(
-                new Attribute<>("enabled", Boolean.class).setter(new EnableSwitch())
+                new Attribute<Boolean, AdminWhitelistRule>("enabled", Boolean.class)
+                        .getter(target -> !target.getMasterKillSwitch())
+                        .setter((target, value) -> target.setMasterKillSwitch(!(Boolean)value))
         ));
-    }
-
-    private static final class EnableSwitch extends AdminWhitelistRuleSetter<Boolean> {
-
-        @Override
-        public void set(AdminWhitelistRule instance, Boolean value) {
-            instance.setMasterKillSwitch(!value);
-        }
-    }
-
-    private abstract static class AdminWhitelistRuleSetter<TValue> implements Attribute.Setter {
-        @Override
-        public void setValue(Object target, Attribute attribute, Object value) throws Exception {
-            Injector injector = Jenkins.getInstance().getInjector();
-            AdminWhitelistRule instance = injector.getInstance(AdminWhitelistRule.class);
-            set(instance, (TValue) value);
-        }
-
-        public abstract void set(AdminWhitelistRule instance, TValue value);
     }
 }

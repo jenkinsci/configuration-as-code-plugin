@@ -1,9 +1,11 @@
 package org.jenkinsci.plugins.casc;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,19 +23,22 @@ import java.util.stream.Collectors;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  * @see Configurator#describe()
  */
-public class Attribute<T> {
-
+public class Attribute<T,O> {
+    
     private final static Logger logger = Logger.getLogger(Attribute.class.getName());
 
     protected final String name;
     protected final Class type;
-    private boolean multiple;
+    protected boolean multiple;
     protected String preferredName;
-    private Setter setter = DEFAULT_SETTER;
+    private Setter<O,T> setter;
+    private Getter<O,T> getter;
 
     public Attribute(String name, Class type) {
         this.name = name;
         this.type = type;
+        this.getter = this::_getValue;
+        this.setter = this::_setValue;
     }
 
     @Override
@@ -57,23 +62,32 @@ public class Attribute<T> {
         return multiple;
     }
 
-    public Attribute<T> multiple(boolean multiple) {
+    public Attribute<T,O> multiple(boolean multiple) {
         this.multiple = multiple;
         return this;
     }
 
-    public Attribute<T> preferredName(String preferredName) {
+    public Attribute<T,O> preferredName(String preferredName) {
         this.preferredName = preferredName;
         return this;
     }
 
-    public Attribute<T> setter(Setter setter) {
+    public Attribute<T,O> setter(Setter<O,T> setter) {
         this.setter = setter;
         return this;
     }
 
-    public Setter getSetter() {
+    public Attribute<T,O> getter(Getter<O,T> getter) {
+        this.getter = getter;
+        return this;
+    }
+
+    public Setter<O,T> getSetter() {
         return setter;
+    }
+
+    public Getter<O,T> getGetter() {
+        return getter;
     }
 
     /**
@@ -90,33 +104,53 @@ public class Attribute<T> {
     }
 
 
-    public void setValue(T target, Object value) throws Exception {
-        setter.setValue(target, this, value);
+    public void setValue(O target, T value) throws Exception {
+        setter.setValue(target, value);
+    }
+
+    public T getValue(O target) throws Exception {
+        return getter.getValue(target);
     }
 
     /**
      * Abstracts away how to assign a value to a 'target' Jenkins object.
      */
     @FunctionalInterface
-    public interface Setter {
-        void setValue(Object target, Attribute attribute, Object value) throws Exception;
+    public interface Setter<O,T> {
+        void setValue(O target, T value) throws Exception;
+    }
+
+    /**
+     * Abstracts away how to retrieve attribute value from a 'target' Jenkins object.
+     */
+    @FunctionalInterface
+    public interface Getter<O,T> {
+        T getValue(O target) throws Exception;
+    }
+
+    private T _getValue(O target) throws Exception {
+        final PropertyDescriptor property = PropertyUtils.getPropertyDescriptor(target, name);
+        if (property == null) return null;
+        final Method readMethod = property.getReadMethod();
+        if (readMethod == null) return null;
+        return (T) readMethod.invoke(target);
     }
 
     /**
      * Default Setter implementation based on JavaBean property write method.
      *
      */
-    private static final Setter DEFAULT_SETTER = (target, attribute, value) -> {
-        final String setterId = target.getClass().getCanonicalName()+'#'+attribute.name;
+    private void _setValue(O target, T value) throws Exception {
+        final String setterId = target.getClass().getCanonicalName()+'#'+name;
         logger.info("Setting " + setterId + " = " + value);
-        final PropertyDescriptor property = PropertyUtils.getPropertyDescriptor(target, attribute.name);
+        final PropertyDescriptor property = PropertyUtils.getPropertyDescriptor(target, name);
         if (property == null) {
             throw new Exception("Default value setter cannot find Property Descriptor for " + setterId);
         }
         final Method writeMethod = property.getWriteMethod();
 
         Object o = value;
-        if (attribute.multiple) {
+        if (multiple) {
             if (!(value instanceof Collection)) {
                 throw new IllegalArgumentException(setterId + " should be a list.");
             }
@@ -126,7 +160,7 @@ public class Attribute<T> {
             final Class c = writeMethod.getParameterTypes()[0];
             if (c.isArray()) {
                 Collection collection = (Collection) value;
-                o = collection.toArray((Object[]) Array.newInstance(attribute.type, collection.size()));
+                o = collection.toArray((Object[]) Array.newInstance(type, collection.size()));
 
                 // if setter expect a Set, convert Collection to Set
                 // see jenkins.agentProtocols
@@ -136,13 +170,13 @@ public class Attribute<T> {
         }
 
         writeMethod.invoke(target, o);
-    };
+    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Attribute<?> attribute = (Attribute<?>) o;
+        Attribute<?,?> attribute = (Attribute<?,?>) o;
         return Objects.equals(name, attribute.name);
     }
 
@@ -150,4 +184,11 @@ public class Attribute<T> {
     public int hashCode() {
         return name.hashCode();
     }
+
+
+    /** For pseudo-attributes which are actually managed directly as singletons, not set on some owner component */
+    public static final Setter NOOP = (target, value) -> {
+        // Nop
+    };
+
 }

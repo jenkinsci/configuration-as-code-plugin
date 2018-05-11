@@ -56,7 +56,7 @@ public class JenkinsConfiguratorTest {
         assertNotNull(attr);
         // Apparently Java always thinks that labmdas are equal
         //assertTrue("The operation should not be NOOP", JenkinsConfigurator.NOOP != attr.getSetter());
-        attr.getSetter().setValue(j.jenkins, attr, new AuthorizationStrategy.Unsecured());
+        attr.setValue(j.jenkins, new AuthorizationStrategy.Unsecured());
 
         assertThat("Authorization strategy has not been set",
                 j.jenkins.getAuthorizationStrategy(),

@@ -13,7 +13,7 @@ import static org.jenkinsci.plugins.casc.Configurator.normalize;
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-public class DescribableAttribute<T> extends Attribute<T> {
+public class DescribableAttribute<T,O> extends Attribute<T,O> {
 
     public DescribableAttribute(String name, Class<? extends Describable> type) {
         super(name, type);
@@ -55,5 +55,7 @@ public class DescribableAttribute<T> extends Attribute<T> {
         // Fall back to simple class name
         return normalize(target.getSimpleName());
     }
+
+
 
 }

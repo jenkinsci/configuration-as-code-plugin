@@ -4,9 +4,9 @@ import hudson.Extension;
 import hudson.security.HudsonPrivateSecurityRealm;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.DataBoundConfigurator;
+import org.jenkinsci.plugins.casc.MultivaluedAttribute;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -22,11 +22,10 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
     @Override
     public Set<Attribute> describe() {
         final Set<Attribute> describe = super.describe();
-        describe.add(new Attribute("users", UserWithPassword.class).multiple(true).setter((target, attribute, value) -> {
-            HudsonPrivateSecurityRealm realm = (HudsonPrivateSecurityRealm) target;
-            final List<UserWithPassword> users = (List<UserWithPassword>) value;
-            for (UserWithPassword user : users) {
-                realm.createAccount(user.id, user.password);
+        describe.add(new MultivaluedAttribute<UserWithPassword, HudsonPrivateSecurityRealm>("users", UserWithPassword.class)
+                .setter((target, value) -> {
+            for (UserWithPassword user : value) {
+                target.createAccount(user.id, user.password);
             }
         }));
         return describe;

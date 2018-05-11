@@ -157,9 +157,9 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
                 // Not a Describable, so probably not an attribute expected to be selected as sub-component
                 return null;
             }
-            attribute = new DescribableAttribute<T>(name, c);
+            attribute = new DescribableAttribute(name, c);
         } else {
-            attribute = new Attribute<T>(name, c);
+            attribute = new Attribute(name, c);
         }
         attribute.multiple(multiple);
         return attribute;
