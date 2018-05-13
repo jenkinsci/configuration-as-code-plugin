@@ -248,7 +248,16 @@ public abstract class Configurator<T> implements ExtensionPoint, ElementConfigur
      * {@inheritDoc}
      * @param config
      */
+    @Nonnull
     public abstract T configure(CNode config) throws ConfiguratorException;
+
+    /**
+     * Describe a component as a Configuration Nodes {@link CNode} to be exported as yaml.
+     * Only export attributes which are <b>not</b> set to default value.
+    @CheckForNull
+    public abstract CNode describe(T instance) throws Exception;
+     */
+
 
     /**
      * Ordered version of {@link #describe()} for documentation generation

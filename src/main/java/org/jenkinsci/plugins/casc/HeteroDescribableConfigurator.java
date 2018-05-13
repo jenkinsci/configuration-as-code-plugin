@@ -9,6 +9,7 @@ import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
 
+import javax.annotation.CheckForNull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -103,5 +104,15 @@ public class HeteroDescribableConfigurator extends Configurator<Describable> {
     @Override
     public Set<Attribute> describe() {
         return Collections.EMPTY_SET;
+    }
+
+    @CheckForNull
+    @Override
+    public CNode describe(Describable instance) throws Exception {
+        final String symbol = DescribableAttribute.getSymbolName(instance.getDescriptor(), getTarget(), instance.getClass());
+        final Configurator c = Configurator.lookup(instance.getClass());
+        Mapping mapping = new Mapping();
+        mapping.put(symbol, c.describe(instance));
+        return mapping;
     }
 }

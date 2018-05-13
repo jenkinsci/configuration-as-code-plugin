@@ -1,8 +1,10 @@
 package org.jenkinsci.plugins.casc;
 
 import org.jenkinsci.plugins.casc.model.CNode;
+import org.jenkinsci.plugins.casc.model.Scalar;
 import org.kohsuke.stapler.Stapler;
 
+import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -32,6 +34,12 @@ public class PrimitiveConfigurator extends Configurator {
     @Override
     public Object configure(CNode config) throws ConfiguratorException {
         return Stapler.lookupConverter(target).convert(target, config);
+    }
+
+    @CheckForNull
+    @Override
+    public CNode describe(Object instance) {
+        return new Scalar(String.valueOf(instance));
     }
 
     @Override

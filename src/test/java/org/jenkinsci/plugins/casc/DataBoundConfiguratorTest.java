@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.casc;
 
+import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
 import org.jenkinsci.plugins.casc.model.Scalar;
 import org.junit.Rule;
@@ -13,8 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -40,12 +40,29 @@ public class DataBoundConfiguratorTest {
     }
 
 
+    @Test
+    public void exportYaml() throws Exception {
+        Foo foo = new Foo("foo", true, 42);
+        foo.setZot("zot");
+        final Configurator c = Configurator.lookup(Foo.class);
+        final CNode node = c.describe(foo);
+        assertTrue(node instanceof Mapping);
+        Mapping map = (Mapping) node;
+        assertEquals(map.get("foo").toString(), "foo");
+        assertEquals(map.get("bar").toString(), "true");
+        assertEquals(map.get("qix").toString(), "42");
+        assertEquals(map.get("zot").toString(), "zot");
+        assertFalse(map.containsKey("other"));
+    }
+
+
     public static class Foo {
 
         final String foo;
         final boolean bar;
         final int qix;
         String zot;
+        String other;
         boolean intialized;
 
         @DataBoundConstructor
@@ -60,9 +77,34 @@ public class DataBoundConfiguratorTest {
             this.zot = zot;
         }
 
+        @DataBoundSetter
+        public void setOther(String other) {
+            this.other = other;
+        }
+
         @PostConstruct
         public void init() {
             this.intialized = true;
+        }
+
+        public String getFoo() {
+            return foo;
+        }
+
+        public boolean isBar() {
+            return bar;
+        }
+
+        public int getQix() {
+            return qix;
+        }
+
+        public String getZot() {
+            return zot;
+        }
+
+        public String getOther() {
+            return other;
         }
     }
 

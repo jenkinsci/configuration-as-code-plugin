@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.casc.integrations.projectmatriaxauth;
 
+import com.cloudbees.plugins.credentials.CredentialsStore;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import hudson.security.Permission;
@@ -14,6 +15,7 @@ import org.jenkinsci.plugins.casc.model.Sequence;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
+import javax.annotation.CheckForNull;
 import java.util.*;
 
 @Extension(optional = true)
@@ -37,7 +39,7 @@ public class ProjectMatrixAuthorizationStrategyConfigurator extends Configurator
         Configurator<GroupPermissionDefinition> permissionConfigurator = Configurator.lookupOrFail(GroupPermissionDefinition.class);
         Map<Permission,Set<String>> grantedPermissions = new HashMap<>();
         for(CNode entry : o) {
-            GroupPermissionDefinition gpd = permissionConfigurator.configureNonNull(entry);
+            GroupPermissionDefinition gpd = permissionConfigurator.configure(entry);
             //We transform the linear list to a matrix (Where permission is the key instead)
             gpd.grantPermission(grantedPermissions);
         }
@@ -57,5 +59,13 @@ public class ProjectMatrixAuthorizationStrategyConfigurator extends Configurator
     public Set<Attribute> describe() {
         return Collections.singleton(new Attribute<GroupPermissionDefinition, ProjectMatrixAuthorizationStrategy>("grantedPermissions", new HashSet<GroupPermissionDefinition>().getClass()));
     }
+
+    @CheckForNull
+    @Override
+    public CNode describe(ProjectMatrixAuthorizationStrategy instance) {
+        // FIXME
+        return null;
+    }
+
 
 }

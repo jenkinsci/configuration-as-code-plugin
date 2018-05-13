@@ -15,6 +15,7 @@ import jenkins.security.s2m.AdminWhitelistRule;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
 
+import javax.annotation.CheckForNull;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -75,6 +76,15 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
         return attributes;
     }
 
+
+    @CheckForNull
+    @Override
+    public CNode describe(Jenkins instance) {
+
+        // we can't generate a fresh new Jenkins object as constructor is mixed with init and check for `theInstance` singleton 
+
+        return null; // FIXME
+    }
 
     @Override
     public String getName() {

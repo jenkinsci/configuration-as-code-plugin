@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.casc.integrations.globalmatrixauth;
 
+import com.cloudbees.plugins.credentials.CredentialsStore;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import hudson.security.GlobalMatrixAuthorizationStrategy;
@@ -13,6 +14,7 @@ import org.jenkinsci.plugins.casc.model.Sequence;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
+import javax.annotation.CheckForNull;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -46,7 +48,7 @@ public class GlobalMatrixAuthorizationStrategyConfigurator extends Configurator<
         Configurator<GroupPermissionDefinition> permissionConfigurator = Configurator.lookupOrFail(GroupPermissionDefinition.class);
         Map<Permission,Set<String>> grantedPermissions = new HashMap<>();
         for (CNode entry : map.get("grantedPermissions").asSequence()) {
-            GroupPermissionDefinition gpd = permissionConfigurator.configureNonNull(entry);
+            GroupPermissionDefinition gpd = permissionConfigurator.configure(entry);
             //We transform the linear list to a matrix (Where permission is the key instead)
             gpd.grantPermission(grantedPermissions);
         }
@@ -62,4 +64,12 @@ public class GlobalMatrixAuthorizationStrategyConfigurator extends Configurator<
         }
         return gms;
     }
+
+    @CheckForNull
+    @Override
+    public CNode describe(GlobalMatrixAuthorizationStrategy instance) {
+        // FIXME
+        return null;
+    }
+
 }
