@@ -1,5 +1,7 @@
 package org.jenkinsci.plugins.casc;
 
+import org.jenkinsci.plugins.casc.model.Mapping;
+import org.jenkinsci.plugins.casc.model.Scalar;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -24,11 +26,11 @@ public class DataBoundConfiguratorTest {
 
     @Test
     public void configure_databound() throws Exception {
-        Map<String, Object> config = new HashMap<>();
-        config.put("foo", "foo");
-        config.put("bar", true);
-        config.put("qix", 123);
-        config.put("zot", "DataBoundSetter");
+        Mapping config = new Mapping();
+        config.put("foo", new Scalar("foo"));
+        config.put("bar", new Scalar("true"));
+        config.put("qix", new Scalar("123"));
+        config.put("zot", new Scalar("DataBoundSetter"));
         final Foo configured = (Foo) Configurator.lookup(Foo.class).configure(config);
         assertEquals("foo", configured.foo);
         assertEquals(true, configured.bar);

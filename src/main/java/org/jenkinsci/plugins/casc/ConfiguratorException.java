@@ -21,6 +21,8 @@
 
 package org.jenkinsci.plugins.casc;
 
+import org.jenkinsci.plugins.casc.model.CNode;
+
 import javax.annotation.CheckForNull;
 import java.io.IOException;
 
@@ -28,7 +30,7 @@ import java.io.IOException;
  * Exception type for {@link Configurator} issues.
  * @author Oleg Nenashev
  * @since TODO
- * @see Configurator#configure(Object)
+ * @see ElementConfigurator#configure(CNode)
  * @see ElementConfigurator
  */
 public class ConfiguratorException extends IOException {

@@ -12,10 +12,9 @@ import javaposse.jobdsl.plugin.LookupStrategy;
 import jenkins.model.GlobalConfigurationCategory;
 import jenkins.model.Jenkins;
 import jenkins.security.s2m.AdminWhitelistRule;
+import org.jenkinsci.plugins.casc.model.CNode;
+import org.jenkinsci.plugins.casc.model.Mapping;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -35,8 +34,8 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
     }
 
     @Override
-    public Jenkins configure(Object c) throws ConfiguratorException {
-        Map config = (Map) c;
+    public Jenkins configure(CNode c) throws ConfiguratorException {
+        Mapping config = c.asMapping();
         Jenkins jenkins = Jenkins.getInstance();
 
         configure(config, jenkins);

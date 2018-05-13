@@ -3,6 +3,8 @@ package org.jenkinsci.plugins.casc;
 import hudson.model.TopLevelItem;
 import hudson.model.TopLevelItemDescriptor;
 import jenkins.model.Jenkins;
+import org.jenkinsci.plugins.casc.model.CNode;
+import org.jenkinsci.plugins.casc.model.Mapping;
 
 import java.util.Map;
 
@@ -23,13 +25,13 @@ public class TopLevelItemConfigurator extends BaseConfigurator<TopLevelItem> {
     }
 
     @Override
-    public TopLevelItem configure(Object c) throws ConfiguratorException {
+    public TopLevelItem configure(CNode c) throws ConfiguratorException {
 
-        Map config = (Map) c;
+        Mapping config = c.asMapping();
 
         final Jenkins jenkins = Jenkins.getInstance();
         final TopLevelItemDescriptor descriptor = (TopLevelItemDescriptor) jenkins.getDescriptorOrDie(target);
-        final String name = (String) config.remove("name");
+        final String name = config.remove("name").asScalar().toString();
         final TopLevelItem item = descriptor.newInstance(jenkins, name);
         configure(config, item);
         return item;

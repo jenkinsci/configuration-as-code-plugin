@@ -2,6 +2,8 @@ package org.jenkinsci.plugins.casc;
 
 import hudson.ExtensionList;
 import jenkins.model.Jenkins;
+import org.jenkinsci.plugins.casc.model.CNode;
+import org.jenkinsci.plugins.casc.model.Mapping;
 
 import java.util.Map;
 import java.util.Set;
@@ -10,31 +12,31 @@ import java.util.Set;
  * A generic {@link Configurator} for {@link hudson.Extension} singletons
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-public class ExtensionConfigurator extends BaseConfigurator {
+public class ExtensionConfigurator<T> extends BaseConfigurator<T> {
 
-    private final Class target;
+    private final Class<T> target;
 
-    public ExtensionConfigurator(Class clazz) {
+    public ExtensionConfigurator(Class<T> clazz) {
         this.target = clazz;
     }
 
 
     @Override
-    public Class getTarget() {
+    public Class<T> getTarget() {
         return target;
     }
 
 
     @Override
-    public Object configure(Object c) throws ConfiguratorException {
-        final ExtensionList list = Jenkins.getInstance().getExtensionList(target);
+    public T configure(CNode c) throws ConfiguratorException {
+        final ExtensionList<T> list = Jenkins.getInstance().getExtensionList(target);
         if (list.size() != 1) {
             throw new IllegalStateException();
         }
-        final Object o = list.get(0);
+        final T o = list.get(0);
 
         if (c instanceof Map) {
-            Map config = (Map) c;
+            Mapping config = c.asMapping();
             final Set<Attribute> attributes = describe();
             for (Attribute attribute : attributes) {
                 final String name = attribute.getName();

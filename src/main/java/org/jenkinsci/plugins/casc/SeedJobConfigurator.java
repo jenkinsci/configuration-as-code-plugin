@@ -5,6 +5,7 @@ import hudson.Extension;
 import javaposse.jobdsl.plugin.JenkinsDslScriptLoader;
 import javaposse.jobdsl.plugin.JenkinsJobManagement;
 import javaposse.jobdsl.plugin.LookupStrategy;
+import org.jenkinsci.plugins.casc.model.CNode;
 
 import java.util.Collections;
 import java.util.List;
@@ -28,7 +29,7 @@ public class SeedJobConfigurator implements RootElementConfigurator {
     }
 
     @Override
-    public Object configure(Object config) throws ConfiguratorException {
+    public Object configure(CNode config) throws ConfiguratorException {
         JenkinsJobManagement mng = new JenkinsJobManagement(System.out, new EnvVars(), null, null, LookupStrategy.JENKINS_ROOT);
         for (String script : (List<String>) config) {
             try {

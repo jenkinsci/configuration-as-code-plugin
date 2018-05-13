@@ -5,7 +5,9 @@ import hudson.init.InitMilestone;
 import hudson.init.Initializer;
 import hudson.model.ManagementLink;
 import jenkins.model.Jenkins;
-import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.plugins.casc.model.CNode;
+import org.jenkinsci.plugins.casc.model.Mapping;
+import org.jenkinsci.plugins.casc.yaml.ModelConstructor;
 import org.jenkinsci.plugins.casc.yaml.YamlReader;
 import org.jenkinsci.plugins.casc.yaml.YamlSource;
 import org.jenkinsci.plugins.casc.yaml.YamlUtils;
@@ -39,7 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
@@ -187,14 +188,14 @@ public class ConfigurationAsCode extends ManagementLink {
 
     private void configureWith(List<YamlSource> configs) throws ConfiguratorException {
         final Node merged = YamlUtils.merge(configs);
-        final Map<String, Object> map = loadAs(merged);
-        for (Map.Entry<String, Object> entry : map.entrySet()) {
+        final Mapping map = loadAs(merged);
+        for (Map.Entry<String, CNode> entry : map.entrySet()) {
             configureWith(entry);
         }
     }
 
-    private Map<String, Object> loadAs(Node node) {
-        final Constructor constructor = new Constructor();
+    private Mapping loadAs(Node node) {
+        final ModelConstructor constructor = new ModelConstructor();
         constructor.setComposer(new Composer(null, null) {
 
             @Override
@@ -202,7 +203,7 @@ public class ConfigurationAsCode extends ManagementLink {
                 return node;
             }
         });
-        return (Map<String, Object>) constructor.getSingleData(Map.class);
+        return (Mapping) constructor.getSingleData(Mapping.class);
     }
 
 
@@ -237,7 +238,7 @@ public class ConfigurationAsCode extends ManagementLink {
      * @param entry key-value pair, where key should match to root configurator and value have all required properties
      * @throws ConfiguratorException configuration error
      */
-    public static void configureWith(Map.Entry<String, Object> entry) throws ConfiguratorException {
+    public static void configureWith(Map.Entry<String, CNode> entry) throws ConfiguratorException {
 
         RootElementConfigurator configurator = Configurator.lookupRootElement(entry.getKey());
         if (configurator == null) {
