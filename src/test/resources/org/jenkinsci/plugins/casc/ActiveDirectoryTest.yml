@@ -16,4 +16,5 @@ jenkins:
         ttl: 30
       startTls: true
       tlsConfiguration: JDK_TRUSTSTORE
-      internalUsersDatabase: "jenkins"
+      internalUsersDatabase:
+        jenkinsInternalUser: "jenkins"
