@@ -27,6 +27,10 @@ public final class Scalar implements CNode, CharSequence {
         return this;
     }
 
+    public String getValue() {
+        return value;
+    }
+
     @Override
     public String toString() {
         String s = value;

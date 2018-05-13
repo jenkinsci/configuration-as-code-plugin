@@ -31,7 +31,7 @@ public class TopLevelItemConfigurator extends BaseConfigurator<TopLevelItem> {
 
         final Jenkins jenkins = Jenkins.getInstance();
         final TopLevelItemDescriptor descriptor = (TopLevelItemDescriptor) jenkins.getDescriptorOrDie(target);
-        final String name = config.remove("name").asScalar().toString();
+        final String name = config.remove("name").asScalar().getValue();
         final TopLevelItem item = descriptor.newInstance(jenkins, name);
         configure(config, item);
         return item;

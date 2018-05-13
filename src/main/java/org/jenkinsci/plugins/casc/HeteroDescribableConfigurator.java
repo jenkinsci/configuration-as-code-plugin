@@ -56,7 +56,7 @@ public class HeteroDescribableConfigurator extends Configurator<Describable> {
         CNode subconfig = null;
         switch (config.getType()) {
             case SCALAR:
-                shortname = config.asScalar().toString();
+                shortname = config.asScalar().getValue();
                 break;
             case MAPPING:
                 Mapping map = config.asMapping();
