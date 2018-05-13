@@ -31,9 +31,9 @@ public class SeedJobConfigurator implements RootElementConfigurator {
     @Override
     public Object configure(CNode config) throws ConfiguratorException {
         JenkinsJobManagement mng = new JenkinsJobManagement(System.out, new EnvVars(), null, null, LookupStrategy.JENKINS_ROOT);
-        for (String script : (List<String>) config) {
+        for (CNode script : config.asSequence()) {
             try {
-                new JenkinsDslScriptLoader(mng).runScript(script);
+                new JenkinsDslScriptLoader(mng).runScript(script.asScalar().getValue());
             } catch (Exception ex) {
                 throw new ConfiguratorException(this, "Failed to execute script with hash " + script.hashCode(), ex);
             }
