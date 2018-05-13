@@ -111,7 +111,7 @@ public class ConfigurationAsCode extends ManagementLink {
      *
      * @throws Exception when the file provided cannot be found or parsed
      */
-    @Initializer(after = InitMilestone.EXTENSIONS_AUGMENTED)
+    @Initializer(after = InitMilestone.EXTENSIONS_AUGMENTED, before = InitMilestone.JOB_LOADED)
     public static void init() throws Exception {
         get().configure();
     }
