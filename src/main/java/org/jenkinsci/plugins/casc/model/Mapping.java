@@ -18,4 +18,17 @@ public final class Mapping extends HashMap<String, CNode> implements CNode {
     public Mapping asMapping() {
         return this;
     }
+
+
+    public void put(String key, String value) {
+        super.put(key, new Scalar(value));
+    }
+
+    public void put(String key, Number value) {
+        super.put(key, new Scalar(String.valueOf(value)));
+    }
+
+    public void put(String key, Boolean value) {
+        super.put(key, new Scalar(String.valueOf(value)));
+    }
 }
