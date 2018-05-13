@@ -14,7 +14,6 @@
         <p>Master has no configuration as code file set.</p>
         <p><a href="yaml">Produce equivalent yaml configuration for current instance</a></p>
       </j:when>
-      </j:when>
       <j:otherwise>
         Configuration loaded from :
         <ul>
