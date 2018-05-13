@@ -6,7 +6,9 @@ import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
 import org.kohsuke.stapler.ClassDescriptor;
+import org.w3c.dom.Attr;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.PostConstruct;
 import java.lang.reflect.Constructor;
@@ -197,6 +199,41 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
         return attributes;
     }
 
+    @CheckForNull
+    @Override
+    public CNode describe(T instance) throws Exception {
+
+        // Here we assume a correctly designed DataBound Object will have required attributes set by DataBoundConstructor
+        // and all others using DataBoundSetters. So constructor parameters for sure are part of the description, others
+        // need to be compared with default values.
+
+        // Build same object with only constructor parameters
+        final Constructor constructor = getDataBoundConstructor(target);
+
+        final Parameter[] parameters = constructor.getParameters();
+        final String[] names = ClassDescriptor.loadParameterNames(constructor);
+        final Attribute[] attributes = new Attribute[parameters.length];
+        final Object[] args = new Object[parameters.length];
+        for (int i = 0; i < parameters.length; i++) {
+            final Parameter p = parameters[i];
+            final Attribute a = detectActualType(names[i], p.getParameterizedType());
+            args[i] = a.getValue(instance);
+            attributes[i] = a;
+        }
+
+        T ref = (T) constructor.newInstance(args);
+
+        // compare instance with this "default" object
+        Mapping mapping = compare(instance, ref);
+
+        // add constructor parameters
+        for (int i = 0; i < parameters.length; i++) {
+            final Configurator c = Configurator.lookup(attributes[i].getType());
+            mapping.put(names[i], c.describe(args[i]));
+        }
+
+        return mapping;
+    }
 
     public String getDisplayName() {
         final Descriptor descriptor = getDescriptor();

@@ -4,6 +4,8 @@ import hudson.model.Descriptor;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.casc.model.CNode;
 
+import javax.annotation.CheckForNull;
+
 /**
  * Define a Configurator for a Descriptor
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -44,5 +46,13 @@ public class DescriptorConfigurator extends BaseConfigurator<Descriptor> impleme
         configure(config.asMapping(), descriptor);
         return descriptor;
     }
+
+    @CheckForNull
+    @Override
+    public CNode describe(Descriptor instance) throws Exception {
+        final Descriptor ref = (Descriptor) target.newInstance();
+        return compare(instance, ref);
+    }
+
 
 }

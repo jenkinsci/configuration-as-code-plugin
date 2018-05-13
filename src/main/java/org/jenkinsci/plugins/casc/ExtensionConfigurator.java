@@ -5,6 +5,7 @@ import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
 
+import javax.annotation.CheckForNull;
 import java.util.Map;
 import java.util.Set;
 
@@ -55,6 +56,13 @@ public class ExtensionConfigurator<T> extends BaseConfigurator<T> {
         }
 
         return o;
+    }
+
+    @CheckForNull
+    @Override
+    public CNode describe(T instance) throws Exception {
+        final T ref = target.newInstance();
+        return compare(instance, ref);
     }
 
 }

@@ -7,6 +7,8 @@ import org.jenkinsci.plugins.casc.BaseConfigurator;
 import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.model.CNode;
 
+import javax.annotation.CheckForNull;
+
 /**
  * Handles {@link AuthorizationStrategy.Unsecured} that requires a special treatment due to its singleton semantics.
  *
@@ -22,5 +24,11 @@ public class UnsecuredAuthorizationStrategyConfigurator extends BaseConfigurator
     @Override
     public Unsecured configure(CNode config) throws ConfiguratorException {
         return (Unsecured)AuthorizationStrategy.UNSECURED;
+    }
+
+    @CheckForNull
+    @Override
+    public CNode describe(Unsecured instance) {
+        return null; // FIXME
     }
 }

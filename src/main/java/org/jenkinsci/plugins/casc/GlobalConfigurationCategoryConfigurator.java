@@ -8,6 +8,7 @@ import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.casc.model.CNode;
 
+import javax.annotation.CheckForNull;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -66,4 +67,9 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
         return attributes;
     }
 
+    @CheckForNull
+    @Override
+    public CNode describe(GlobalConfigurationCategory instance) {
+        return null; // FIXME
+    }
 }

@@ -1,6 +1,7 @@
 package org.jenkinsci.plugins.casc.integrations.rolebasedauth;
 
 
+import com.cloudbees.plugins.credentials.CredentialsStore;
 import com.michelin.cio.hudson.plugins.rolestrategy.Role;
 import com.michelin.cio.hudson.plugins.rolestrategy.RoleBasedAuthorizationStrategy;
 import com.michelin.cio.hudson.plugins.rolestrategy.RoleMap;
@@ -16,6 +17,7 @@ import org.jenkinsci.plugins.casc.model.Sequence;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.Collection;
@@ -77,7 +79,7 @@ public class RoleBasedAuthorizationStrategyConfigurator extends Configurator<Rol
         }
 
         for (CNode entry : c) {
-            RoleDefinition definition = configurator.configureNonNull(entry);
+            RoleDefinition definition = configurator.configure(entry);
             resMap.put(definition.getRole(), definition.getAssignments());
         }
 
@@ -92,6 +94,13 @@ public class RoleBasedAuthorizationStrategyConfigurator extends Configurator<Rol
                 new MultivaluedAttribute<RoleDefinition, RoleBasedAuthorizationStrategy>("items", RoleDefinition.class),
                 new MultivaluedAttribute<RoleDefinition, RoleBasedAuthorizationStrategy>("agents", RoleDefinition.class)
         ));
+    }
+
+    @CheckForNull
+    @Override
+    public CNode describe(RoleBasedAuthorizationStrategy instance) {
+        // FIXME
+        return null;
     }
 
 
