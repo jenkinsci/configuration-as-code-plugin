@@ -4,6 +4,8 @@ import hudson.model.Describable;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
+import org.jenkinsci.plugins.casc.model.CNode;
+import org.jenkinsci.plugins.casc.model.Mapping;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.stapler.export.Exported;
 
@@ -19,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -165,12 +166,12 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
         return attribute;
     }
 
-    protected void configure(Map config, T instance) throws ConfiguratorException {
+    protected void configure(Mapping config, T instance) throws ConfiguratorException {
         final Set<Attribute> attributes = describe();
 
         for (Attribute attribute : attributes) {
             final String name = attribute.getName();
-            final Object sub = removeIgnoreCase(config, name);
+            final CNode sub = removeIgnoreCase(config, name);
             if (sub != null) {
                 final Class k = attribute.getType();
                 final Configurator configurator = Configurator.lookup(k);
@@ -178,8 +179,8 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
 
                 final Object valueToSet;
                 if (attribute.isMultiple()) {
-                    List values = new ArrayList<>();
-                    for (Object o : (List) sub) {
+                    List<Object> values = new ArrayList<>();
+                    for (CNode o : sub.asSequence()) {
                         Object value = configurator.configure(o);
                         values.add(value);
                     }
@@ -201,9 +202,9 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
         }
     }
 
-    private Object removeIgnoreCase(Map config, String name) {
-        for (Object k : config.keySet()) {
-            if (name.equalsIgnoreCase(k.toString())) {
+    private CNode removeIgnoreCase(Mapping config, String name) {
+        for (String k : config.keySet()) {
+            if (name.equalsIgnoreCase(k)) {
                 return config.remove(k);
             }
         }

@@ -3,11 +3,12 @@ package org.jenkinsci.plugins.casc;
 import com.google.common.base.Defaults;
 import hudson.model.Descriptor;
 import jenkins.model.Jenkins;
+import org.jenkinsci.plugins.casc.model.CNode;
+import org.jenkinsci.plugins.casc.model.Mapping;
 import org.kohsuke.stapler.ClassDescriptor;
 
 import javax.annotation.Nonnull;
 import javax.annotation.PostConstruct;
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -44,9 +45,10 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
     }
 
     @Override
-    public T configure(Object c) throws ConfiguratorException {
+    public T configure(CNode c) throws ConfiguratorException {
 
-        Map config = c instanceof Map ? (Map) c : Collections.EMPTY_MAP;
+        // c can be null for component with no-arg constructor and no extra property to be set
+        Mapping config = c != null ? c.asMapping() : Mapping.EMPTY;
 
         final Constructor constructor = getDataBoundConstructor(target);
         if (constructor == null) {
@@ -62,21 +64,18 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
             // as a result it might be valid to reference a describable without parameters
 
             for (int i = 0; i < names.length; i++) {
-                final Object value = config.remove(names[i]);
+                final CNode value = config.remove(names[i]);
                 if (value == null && parameters[i].getAnnotation(Nonnull.class) != null) {
                     throw new IllegalArgumentException(names[i] + " is required to configure " + target);
                 }
                 final Class t = parameters[i].getType();
                 if (value != null) {
                     if (Collection.class.isAssignableFrom(t)) {
-                        if (!(value instanceof List)) {
-                            throw new IllegalArgumentException(names[i] + " should be a list");
-                        }
                         final Type pt = parameters[i].getParameterizedType();
                         final Configurator lookup = Configurator.lookup(pt);
 
                         final ArrayList<Object> list = new ArrayList<>();
-                        for (Object o : (List) value) {
+                        for (CNode o : value.asSequence()) {
                             list.add(lookup.configure(o));
                         }
                         args[i] = list;
@@ -115,11 +114,11 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
             final String name = attribute.getName();
             final Configurator lookup = Configurator.lookup(attribute.getType());
             if (config.containsKey(name)) {
-                final Object yaml = config.get(name);
+                final CNode yaml = config.get(name);
                 Object value;
                 if (attribute.isMultiple()) {
                     List l = new ArrayList<>();
-                    for (Object o : (List) yaml) {
+                    for (CNode o : yaml.asSequence()) {
                         l.add(lookup.configure(o));
                     }
                     value = l;

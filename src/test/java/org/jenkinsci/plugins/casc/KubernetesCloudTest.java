@@ -1,24 +1,17 @@
 package org.jenkinsci.plugins.casc;
 
-import com.nirima.jenkins.plugins.docker.DockerCloud;
-import com.nirima.jenkins.plugins.docker.DockerTemplate;
-import hudson.model.Label;
-import io.jenkins.docker.connector.DockerComputerAttachConnector;
 import org.csanchez.jenkins.plugins.kubernetes.KubernetesCloud;
 import org.csanchez.jenkins.plugins.kubernetes.PodTemplate;
 import org.csanchez.jenkins.plugins.kubernetes.volumes.HostPathVolume;
 import org.csanchez.jenkins.plugins.kubernetes.volumes.PodVolume;
 import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
 import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
-import org.jenkinsci.plugins.casc.misc.TestConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>

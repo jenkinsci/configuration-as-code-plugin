@@ -11,6 +11,7 @@ import jenkins.model.Jenkins;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
+import org.jenkinsci.plugins.casc.model.CNode;
 import org.jvnet.tiger_types.Types;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.Stapler;
@@ -245,8 +246,9 @@ public abstract class Configurator<T> implements ExtensionPoint, ElementConfigur
 
     /**
      * {@inheritDoc}
+     * @param config
      */
-    public abstract T configure(Object config) throws ConfiguratorException;
+    public abstract T configure(CNode config) throws ConfiguratorException;
 
     /**
      * Ordered version of {@link #describe()} for documentation generation

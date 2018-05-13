@@ -6,6 +6,8 @@ import hudson.security.HudsonPrivateSecurityRealm;
 import hudson.security.SecurityRealm;
 import jenkins.model.Jenkins;
 import org.jenkinsci.Symbol;
+import org.jenkinsci.plugins.casc.model.CNode;
+import org.jenkinsci.plugins.casc.model.Mapping;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,9 +31,9 @@ import java.util.stream.Collectors;
  */
 public class HeteroDescribableConfigurator extends Configurator<Describable> {
 
-    private final Class target;
+    private final Class<Describable> target;
 
-    public HeteroDescribableConfigurator(Class clazz) {
+    public HeteroDescribableConfigurator(Class<Describable> clazz) {
         this.target = clazz;
     }
 
@@ -49,21 +51,24 @@ public class HeteroDescribableConfigurator extends Configurator<Describable> {
     }
 
     @Override
-    public Describable configure(Object config) throws ConfiguratorException {
+    public Describable configure(CNode config) throws ConfiguratorException {
         String shortname;
-        Object subconfig = null;
-        if (config instanceof String) {
-            shortname = (String) config;
-        } else if (config instanceof Map) {
-            Map<String, ?> map = (Map) config;
-            if (map.size() != 1) {
-                throw new IllegalArgumentException("single entry map expected to configure a "+target.getName());
-            }
-            final Map.Entry<String, ?> next = map.entrySet().iterator().next();
-            shortname = next.getKey();
-            subconfig = next.getValue();
-        } else {
-            throw new IllegalArgumentException("Unexpected configuration type "+config);
+        CNode subconfig = null;
+        switch (config.getType()) {
+            case SCALAR:
+                shortname = config.asScalar().toString();
+                break;
+            case MAPPING:
+                Mapping map = config.asMapping();
+                if (map.size() != 1) {
+                    throw new IllegalArgumentException("single entry map expected to configure a "+target.getName());
+                }
+                final Map.Entry<String, CNode> next = map.entrySet().iterator().next();
+                shortname = next.getKey();
+                subconfig = next.getValue();
+                break;
+            default:
+                throw new IllegalArgumentException("Unexpected configuration type "+config);
         }
 
         final List<Descriptor> candidates = Jenkins.getInstance().getDescriptorList(target);

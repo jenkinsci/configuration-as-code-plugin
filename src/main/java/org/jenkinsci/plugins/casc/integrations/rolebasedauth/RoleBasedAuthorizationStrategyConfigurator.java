@@ -10,12 +10,13 @@ import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.Configurator;
 import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.MultivaluedAttribute;
-import org.jenkinsci.plugins.casc.RootElementConfigurator;
+import org.jenkinsci.plugins.casc.model.CNode;
+import org.jenkinsci.plugins.casc.model.Mapping;
+import org.jenkinsci.plugins.casc.model.Sequence;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import javax.annotation.Nonnull;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -44,15 +45,15 @@ public class RoleBasedAuthorizationStrategyConfigurator extends Configurator<Rol
     }
 
     @Override
-    public RoleBasedAuthorizationStrategy configure(Object config) throws ConfiguratorException {
+    public RoleBasedAuthorizationStrategy configure(CNode config) throws ConfiguratorException {
         //TODO: API should return a qualified type
         final Configurator<RoleDefinition> roleDefinitionConfigurator =
                 (Configurator<RoleDefinition>) Configurator.lookupOrFail(RoleDefinition.class);
 
-        Map map = (Map) config;
+        Mapping map = config.asMapping();
         Map<String, RoleMap> grantedRoles = new HashMap<>();
 
-        Object rolesConfig = map.get("roles");
+        CNode rolesConfig = map.get("roles");
         if (rolesConfig != null) {
             grantedRoles.put(RoleBasedAuthorizationStrategy.GLOBAL,
                     retrieveRoleMap(rolesConfig, "global", roleDefinitionConfigurator));
@@ -65,9 +66,9 @@ public class RoleBasedAuthorizationStrategyConfigurator extends Configurator<Rol
     }
 
     @Nonnull
-    private static RoleMap retrieveRoleMap(@Nonnull Object config, @Nonnull String name, Configurator<RoleDefinition> configurator) throws ConfiguratorException {
-        Map map = (Map) config;
-        final Collection<?> c = (Collection<?>) map.get(name);
+    private static RoleMap retrieveRoleMap(@Nonnull CNode config, @Nonnull String name, Configurator<RoleDefinition> configurator) throws ConfiguratorException {
+        Mapping map = config.asMapping();
+        final Sequence c = map.get(name).asSequence();
 
         TreeMap<Role, Set<String>> resMap = new TreeMap<>();
         if (c == null) {
@@ -75,7 +76,7 @@ public class RoleBasedAuthorizationStrategyConfigurator extends Configurator<Rol
             return new RoleMap(resMap);
         }
 
-        for (Object entry : c) {
+        for (CNode entry : c) {
             RoleDefinition definition = configurator.configureNonNull(entry);
             resMap.put(definition.getRole(), definition.getAssignments());
         }

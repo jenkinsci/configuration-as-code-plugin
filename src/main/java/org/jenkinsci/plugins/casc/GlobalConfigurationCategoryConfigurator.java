@@ -6,15 +6,15 @@ import jenkins.model.GlobalConfigurationCategory;
 import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
+import org.jenkinsci.plugins.casc.model.CNode;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator implements RootElementConfigurator {
+public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<GlobalConfigurationCategory> implements RootElementConfigurator<GlobalConfigurationCategory> {
 
     private final GlobalConfigurationCategory category;
 
@@ -41,8 +41,8 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator im
     }
 
     @Override
-    public Object configure(Object config) throws ConfiguratorException {
-        configure((Map) config, category);
+    public GlobalConfigurationCategory configure(CNode config) throws ConfiguratorException {
+        configure(config.asMapping(), category);
         return category;
     }
 

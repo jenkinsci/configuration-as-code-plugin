@@ -2,8 +2,7 @@ package org.jenkinsci.plugins.casc;
 
 import hudson.model.Descriptor;
 import org.jenkinsci.Symbol;
-
-import java.util.Map;
+import org.jenkinsci.plugins.casc.model.CNode;
 
 /**
  * Define a Configurator for a Descriptor
@@ -41,8 +40,8 @@ public class DescriptorConfigurator extends BaseConfigurator<Descriptor> impleme
     }
 
     @Override
-    public Descriptor configure(Object config) throws ConfiguratorException {
-        configure((Map) config, descriptor);
+    public Descriptor configure(CNode config) throws ConfiguratorException {
+        configure(config.asMapping(), descriptor);
         return descriptor;
     }
 

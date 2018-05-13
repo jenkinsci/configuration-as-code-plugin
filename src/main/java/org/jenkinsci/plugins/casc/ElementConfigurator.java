@@ -21,6 +21,8 @@
 
 package org.jenkinsci.plugins.casc;
 
+import org.jenkinsci.plugins.casc.model.CNode;
+
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import java.util.Set;
@@ -60,7 +62,7 @@ public interface ElementConfigurator<T> {
      * @throws ConfiguratorException if something went wrong, depends on the concrete implementation
      */
     @CheckForNull
-    T configure(Object config) throws ConfiguratorException;
+    T configure(CNode config) throws ConfiguratorException;
 
     /**
      * Configures/creates a Jenkins object based on a tree.
@@ -74,7 +76,7 @@ public interface ElementConfigurator<T> {
      *      Also throws exception if the converted object is {@code null}
      */
     @Nonnull
-    default T configureNonNull(Object config) throws ConfiguratorException {
+    default T configureNonNull(CNode config) throws ConfiguratorException {
         T converted = configure(config);
         if (converted == null) {
             throw new ConfiguratorException(this, "Converted object is null, but a non-null object is required");
