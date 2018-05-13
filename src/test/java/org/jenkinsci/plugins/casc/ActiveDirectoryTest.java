@@ -34,6 +34,7 @@ public class ActiveDirectoryTest {
         assertEquals("admin", domain.bindName);
         assertEquals("ADMIN123", domain.bindPassword.getPlainText());
         assertEquals("ad1.acme.com:123,ad2.acme.com:456", domain.servers);
+        assertEquals("jenkins", realm.getJenkinsInternalUser());
 
         assertTrue(realm.removeIrrelevantGroups);
         assertTrue(realm.startTls);

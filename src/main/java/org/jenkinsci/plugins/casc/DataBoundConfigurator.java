@@ -48,7 +48,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
     public T configure(CNode c) throws ConfiguratorException {
 
         // c can be null for component with no-arg constructor and no extra property to be set
-        Mapping config = c != null ? c.asMapping() : Mapping.EMPTY;
+        Mapping config = (c != null ? c.asMapping() : Mapping.EMPTY);
 
         final Constructor constructor = getDataBoundConstructor(target);
         if (constructor == null) {
