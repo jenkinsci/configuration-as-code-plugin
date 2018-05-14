@@ -125,11 +125,13 @@ public class ConfigurationAsCode extends ManagementLink {
                 CASC_JENKINS_CONFIG_PROPERTY,
                 System.getenv(CASC_JENKINS_CONFIG_ENV)
         );
-        if (configParameter == null  && Files.exists(Paths.get(DEFAULT_JENKINS_YAML_PATH))) {
-            configParameter = DEFAULT_JENKINS_YAML_PATH;
-        } else {
-            // No configuration set nor default config file
-            return;
+        if (configParameter == null) {
+            if (Files.exists(Paths.get(DEFAULT_JENKINS_YAML_PATH))) {
+                configParameter = DEFAULT_JENKINS_YAML_PATH;
+            } else {
+                // No configuration set nor default config file
+                return;
+            }
         }
 
         configure(configParameter);
