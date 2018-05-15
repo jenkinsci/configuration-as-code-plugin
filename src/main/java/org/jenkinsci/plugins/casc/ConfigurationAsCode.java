@@ -7,6 +7,7 @@ import hudson.model.ManagementLink;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
+import org.jenkinsci.plugins.casc.model.Scalar;
 import org.jenkinsci.plugins.casc.model.Sequence;
 import org.jenkinsci.plugins.casc.yaml.ModelConstructor;
 import org.jenkinsci.plugins.casc.yaml.YamlReader;
@@ -201,6 +202,7 @@ public class ConfigurationAsCode extends ManagementLink {
                             valueNode));
 
                 }
+                if (tuples.isEmpty()) return null;
 
                 return new MappingNode(Tag.MAP, tuples, BLOCK.getStyleBoolean());
 
@@ -212,13 +214,16 @@ public class ConfigurationAsCode extends ManagementLink {
                     if (valueNode == null) continue;
                     nodes.add(valueNode);
                 }
+                if (nodes.isEmpty()) return null;
                 return new SequenceNode(Tag.SEQ, nodes, BLOCK.getStyleBoolean());
 
             case SCALAR:
             default:
-                final String value = config.asScalar().getValue();
-                if (value == null) return null;
-                return new ScalarNode(Tag.STR, value, null, null, DOUBLE_QUOTED.getChar());
+                final Scalar scalar = config.asScalar();
+                final String value = scalar.getValue();
+                if (value == null || value.length() == 0) return null;
+                return new ScalarNode(scalar.getTag(), value, null, null,
+                        scalar.isRaw() ? PLAIN.getChar() : DOUBLE_QUOTED.getChar());
 
         }
     }

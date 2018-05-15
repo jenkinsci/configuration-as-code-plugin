@@ -1,6 +1,7 @@
 package org.jenkinsci.plugins.casc.model;
 
 import org.jenkinsci.plugins.casc.SecretSource;
+import org.yaml.snakeyaml.nodes.Tag;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -12,14 +13,44 @@ import java.util.stream.IntStream;
 public final class Scalar implements CNode, CharSequence {
 
     private String value;
+    private Tag tag;
+    private boolean raw;
 
     public Scalar(String value) {
         this.value = value;
+        this.tag = Tag.STR;
+        this.raw = false;
+    }
+
+    public Scalar(Enum instance) {
+        this.value = instance.name();
+        this.tag = Tag.STR;
+        this.raw = true;
+    }
+
+    public Scalar(Boolean instance) {
+        this.value = String.valueOf(instance);
+        this.tag = Tag.BOOL;
+        this.raw = true;
+    }
+
+    public Scalar(Number instance) {
+        this.value = String.valueOf(instance);
+        this.tag = Tag.INT;
+        this.raw = true;
     }
 
     @Override
     public Type getType() {
         return Type.SCALAR;
+    }
+
+    public Tag getTag() {
+        return tag;
+    }
+
+    public boolean isRaw() {
+        return raw;
     }
 
     @Override
@@ -30,6 +61,8 @@ public final class Scalar implements CNode, CharSequence {
     public String getValue() {
         return value;
     }
+
+
 
     @Override
     public String toString() {

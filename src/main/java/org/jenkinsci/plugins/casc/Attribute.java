@@ -120,7 +120,7 @@ public class Attribute<T,O> {
         final Configurator c = Configurator.lookupOrFail(type);
         Object o = getValue(instance);
         if (o == null) {
-            return new Scalar(null);
+            return null;
         }
         if (multiple) {
             Sequence seq = new Sequence();
