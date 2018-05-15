@@ -16,6 +16,7 @@ import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
 
 import javax.annotation.CheckForNull;
+import java.util.Collection;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -60,16 +61,6 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
         attributes.add(new PersistedListAttribute<NodeProperty, Jenkins>("nodeProperties", NodeProperty.class));
         attributes.add(new PersistedListAttribute<NodeProperty, Jenkins>("globalNodeProperties", NodeProperty.class));
 
-        
-        // Check for unclassified Descriptors
-        final ExtensionList<Descriptor> descriptors = jenkins.getExtensionList(Descriptor.class);
-        for (Descriptor descriptor : descriptors) {
-            if (descriptor.getGlobalConfigPage() != null && descriptor.getCategory() instanceof GlobalConfigurationCategory.Unclassified) {
-                final DescriptorConfigurator configurator = new DescriptorConfigurator(descriptor);
-                attributes.add(new Attribute<Descriptor, Jenkins>(configurator.getName(), configurator.getTarget()).setter(NOOP));
-            }
-        }
-
         // Add remoting security, all legwork will be done by a configurator
         attributes.add(new Attribute<AdminWhitelistRule, Jenkins>("remotingSecurity", AdminWhitelistRule.class).setter(NOOP));
 
@@ -79,11 +70,14 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
 
     @CheckForNull
     @Override
-    public CNode describe(Jenkins instance) {
+    public CNode describe(Jenkins instance) throws Exception {
 
         // we can't generate a fresh new Jenkins object as constructor is mixed with init and check for `theInstance` singleton 
-
-        return null; // FIXME
+        Mapping mapping = new Mapping();
+        for (Attribute attribute : describe()) {
+            mapping.put(attribute.getName(), attribute.describe(instance));
+        }
+        return mapping;
     }
 
     @Override

@@ -1,7 +1,11 @@
 package org.jenkinsci.plugins.casc;
 
+import jenkins.model.Jenkins;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
+import org.jenkinsci.plugins.casc.model.CNode;
+import org.jenkinsci.plugins.casc.model.Scalar;
+import org.jenkinsci.plugins.casc.model.Sequence;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Array;
@@ -110,6 +114,29 @@ public class Attribute<T,O> {
 
     public T getValue(O target) throws Exception {
         return getter.getValue(target);
+    }
+
+    public CNode describe(O instance) throws Exception {
+        final Configurator c = Configurator.lookupOrFail(type);
+        Object o = getValue(instance);
+        if (o == null) {
+            return new Scalar(null);
+        }
+        if (multiple) {
+            Sequence seq = new Sequence();
+            for (Object value : (Iterable) o) {
+                seq.add(c.describe(value));
+            }
+            return seq;
+        }
+        return c.describe(o);
+    }
+
+    public boolean equals(O o1, O o2) throws Exception {
+        final Object v1 = getValue(o1);
+        final Object v2 = getValue(o2);
+        if (v1 == null && v2 == null) return true;
+        return (v1.equals(v2));
     }
 
     /**

@@ -31,6 +31,7 @@ import org.jenkinsci.plugins.casc.model.CNode;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
+import javax.annotation.CheckForNull;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
@@ -70,5 +71,11 @@ public class AdminWhitelistRuleConfigurator extends BaseConfigurator<AdminWhitel
                         .getter(target -> !target.getMasterKillSwitch())
                         .setter((target, value) -> target.setMasterKillSwitch(!(Boolean)value))
         ));
+    }
+
+    @CheckForNull
+    @Override
+    public CNode describe(AdminWhitelistRule instance) {
+        return null; // FIXME
     }
 }

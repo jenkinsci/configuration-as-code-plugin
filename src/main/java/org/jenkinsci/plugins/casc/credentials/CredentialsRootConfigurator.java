@@ -17,6 +17,7 @@ import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
 import org.jenkinsci.plugins.casc.model.Sequence;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 
 import javax.annotation.CheckForNull;
 import java.util.ArrayList;
@@ -84,13 +85,17 @@ public class CredentialsRootConfigurator extends Configurator<CredentialsStore> 
 
     public static class DomainWithCredentials {
 
-        private Domain domain;
+        private Domain domain = Domain.global();
         private List<Credentials> credentials;
 
         @DataBoundConstructor
-        public DomainWithCredentials(Domain domain, List<Credentials> credentials) {
-            this.domain = domain;
+        public DomainWithCredentials(List<Credentials> credentials) {
             this.credentials = credentials;
+        }
+
+        @DataBoundSetter
+        public void setDomain(Domain domain) {
+            this.domain = domain;
         }
     }
 }

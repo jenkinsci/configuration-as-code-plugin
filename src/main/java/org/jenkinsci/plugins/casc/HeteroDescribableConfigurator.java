@@ -110,7 +110,7 @@ public class HeteroDescribableConfigurator extends Configurator<Describable> {
     @Override
     public CNode describe(Describable instance) throws Exception {
         final String symbol = DescribableAttribute.getSymbolName(instance.getDescriptor(), getTarget(), instance.getClass());
-        final Configurator c = Configurator.lookup(instance.getClass());
+        final Configurator c = Configurator.lookupOrFail(instance.getClass());
         Mapping mapping = new Mapping();
         mapping.put(symbol, c.describe(instance));
         return mapping;

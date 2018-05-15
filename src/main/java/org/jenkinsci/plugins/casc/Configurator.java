@@ -11,6 +11,7 @@ import jenkins.model.Jenkins;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
+import org.jenkinsci.plugins.casc.core.NoneSecurityRealmConfigurator;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jvnet.tiger_types.Types;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -87,7 +88,7 @@ public abstract class Configurator<T> implements ExtensionPoint, ElementConfigur
         final Jenkins jenkins = Jenkins.getInstance();
         final ExtensionList<Configurator> l = jenkins.getExtensionList(Configurator.class);
         for (Configurator c : l) {
-            if (clazz == c.getTarget()) {
+            if (c.match(clazz)) {
                 // this type has a dedicated Configurator implementation
                 return c;
             }
@@ -120,11 +121,7 @@ public abstract class Configurator<T> implements ExtensionPoint, ElementConfigur
             // this is a jenkins Describable component, with various implementations
             return new HeteroDescribableConfigurator(clazz);
         }
-
-        if (TopLevelItem.class.isAssignableFrom(clazz)) {
-            return new TopLevelItemConfigurator(clazz);
-        }
-
+        
         if (Extension.class.isAssignableFrom(clazz)) {
             return new ExtensionConfigurator(clazz);
         }
@@ -200,6 +197,10 @@ public abstract class Configurator<T> implements ExtensionPoint, ElementConfigur
      * {@inheritDoc}
      */
     public abstract Class<T> getTarget();
+
+    public boolean match(Class clazz) {
+        return clazz == getTarget();
+    }
 
     /**
      * The extension point being implemented by this configurator.
