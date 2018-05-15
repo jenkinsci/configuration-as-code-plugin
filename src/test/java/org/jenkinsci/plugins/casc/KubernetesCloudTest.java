@@ -2,6 +2,8 @@ package org.jenkinsci.plugins.casc;
 
 import org.csanchez.jenkins.plugins.kubernetes.KubernetesCloud;
 import org.csanchez.jenkins.plugins.kubernetes.PodTemplate;
+import org.csanchez.jenkins.plugins.kubernetes.model.KeyValueEnvVar;
+import org.csanchez.jenkins.plugins.kubernetes.model.TemplateEnvVar;
 import org.csanchez.jenkins.plugins.kubernetes.volumes.HostPathVolume;
 import org.csanchez.jenkins.plugins.kubernetes.volumes.PodVolume;
 import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
@@ -52,6 +54,12 @@ public class KubernetesCloudTest {
         assertTrue(volume instanceof HostPathVolume);
         assertEquals("mountPath", volume.getMountPath());
         assertEquals("hostPath", ((HostPathVolume)volume).getHostPath());
+
+        final List<TemplateEnvVar> envVars = template.getEnvVars();
+        assertEquals(1, envVars.size());
+        final KeyValueEnvVar envVar = (KeyValueEnvVar) envVars.get(0);
+        assertEquals("FOO", envVar.getKey());
+        assertEquals("BAR", envVar.getValue());
     }
 }
 

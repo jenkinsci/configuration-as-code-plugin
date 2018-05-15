@@ -40,3 +40,8 @@ jenkins:
                 resourceLimitMemory: "resourceLimitMemory"
             imagePullSecrets:
               - name: "imagePullSecrets"
+
+            envVars:
+              - KeyValueEnvVar:
+                  key: "FOO"
+                  value: "BAR"
