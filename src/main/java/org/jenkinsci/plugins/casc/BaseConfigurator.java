@@ -9,7 +9,6 @@ import org.jenkinsci.plugins.casc.model.Mapping;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.stapler.export.Exported;
 
-import javax.annotation.CheckForNull;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
@@ -20,10 +19,8 @@ import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;

@@ -3,25 +3,24 @@ package org.jenkinsci.plugins.casc;
 import hudson.util.PersistedList;
 
 import java.util.Collection;
-import java.util.Collections;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-public class PersistedListAttribute<T,O> extends Attribute<Collection<T>,O> {
+public class PersistedListAttribute<Owner, Type> extends Attribute<Owner, Collection<Type>> {
 
-    public PersistedListAttribute(String name, Class<T> type) {
+    public PersistedListAttribute(String name, Class<Type> type) {
         super(name, type);
         multiple(true);
     }
 
     @Override
-    public void setValue(O target, Collection<T> o) throws Exception {
+    public void setValue(Owner target, Collection<Type> o) throws Exception {
         getValue(target).replaceBy(o);
     }
 
     @Override
-    public PersistedList getValue(O o) throws Exception {
+    public PersistedList getValue(Owner o) throws Exception {
         return (PersistedList) super.getValue(o);
     }
 

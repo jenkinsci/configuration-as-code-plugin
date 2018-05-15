@@ -34,7 +34,6 @@ import org.kohsuke.accmod.restrictions.NoExternalUse;
 import javax.annotation.CheckForNull;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -67,7 +66,7 @@ public class AdminWhitelistRuleConfigurator extends BaseConfigurator<AdminWhitel
     @Override
     public Set<Attribute> describe() {
         return new HashSet<>(Arrays.asList(
-                new Attribute<Boolean, AdminWhitelistRule>("enabled", Boolean.class)
+                new Attribute<AdminWhitelistRule, Boolean>("enabled", Boolean.class)
                         .getter(target -> !target.getMasterKillSwitch())
                         .setter((target, value) -> target.setMasterKillSwitch(!(Boolean)value))
         ));

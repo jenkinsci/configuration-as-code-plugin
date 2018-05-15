@@ -1,6 +1,5 @@
 package org.jenkinsci.plugins.casc.integrations.projectmatriaxauth;
 
-import com.cloudbees.plugins.credentials.CredentialsStore;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import hudson.security.Permission;
@@ -16,7 +15,11 @@ import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import javax.annotation.CheckForNull;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 @Extension(optional = true)
 @Restricted(NoExternalUse.class)
@@ -57,7 +60,7 @@ public class ProjectMatrixAuthorizationStrategyConfigurator extends Configurator
     @Override
     @SuppressFBWarnings(value = "DM_NEW_FOR_GETCLASS", justification = "We need a fully qualified type to do proper attribute binding")
     public Set<Attribute> describe() {
-        return Collections.singleton(new Attribute<GroupPermissionDefinition, ProjectMatrixAuthorizationStrategy>("grantedPermissions", new HashSet<GroupPermissionDefinition>().getClass()));
+        return Collections.singleton(new Attribute<ProjectMatrixAuthorizationStrategy, GroupPermissionDefinition>("grantedPermissions", new HashSet<GroupPermissionDefinition>().getClass()));
     }
 
     @CheckForNull

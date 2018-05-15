@@ -5,10 +5,8 @@ import org.jenkinsci.plugins.casc.model.Scalar;
 import org.kohsuke.stapler.Stapler;
 
 import javax.annotation.CheckForNull;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 /**

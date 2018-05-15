@@ -6,7 +6,6 @@ import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.Configurator;
 import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.model.CNode;
-import org.jenkinsci.plugins.casc.model.Scalar;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;

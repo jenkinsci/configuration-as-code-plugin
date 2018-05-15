@@ -5,7 +5,7 @@ import java.util.Collection;
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-public class MultivaluedAttribute<T,O> extends Attribute<Collection<T>, O> {
+public class MultivaluedAttribute<Owner, Type> extends Attribute<Owner, Collection<Type>> {
 
 
     public MultivaluedAttribute(String name, Class type) {

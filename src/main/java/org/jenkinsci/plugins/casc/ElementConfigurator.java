@@ -22,7 +22,6 @@
 package org.jenkinsci.plugins.casc;
 
 import org.jenkinsci.plugins.casc.model.CNode;
-import org.jenkinsci.plugins.casc.model.Scalar;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;

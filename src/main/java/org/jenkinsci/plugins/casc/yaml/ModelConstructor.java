@@ -14,7 +14,6 @@ import org.yaml.snakeyaml.nodes.Tag;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>

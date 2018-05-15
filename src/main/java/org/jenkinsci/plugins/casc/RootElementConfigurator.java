@@ -1,13 +1,10 @@
 package org.jenkinsci.plugins.casc;
 
-import hudson.ExtensionList;
-import hudson.model.Descriptor;
 import jenkins.model.GlobalConfigurationCategory;
 import jenkins.model.Jenkins;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Define a {@link Configurator} which handles a root configuration element, identified by name.

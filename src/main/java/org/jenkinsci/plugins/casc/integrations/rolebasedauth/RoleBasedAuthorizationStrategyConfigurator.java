@@ -1,7 +1,6 @@
 package org.jenkinsci.plugins.casc.integrations.rolebasedauth;
 
 
-import com.cloudbees.plugins.credentials.CredentialsStore;
 import com.michelin.cio.hudson.plugins.rolestrategy.Role;
 import com.michelin.cio.hudson.plugins.rolestrategy.RoleBasedAuthorizationStrategy;
 import com.michelin.cio.hudson.plugins.rolestrategy.RoleMap;
@@ -20,7 +19,6 @@ import org.kohsuke.accmod.restrictions.NoExternalUse;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -90,9 +88,9 @@ public class RoleBasedAuthorizationStrategyConfigurator extends Configurator<Rol
     @SuppressFBWarnings(value = "DM_NEW_FOR_GETCLASS", justification = "We need a fully qualified type to do proper attribute binding")
     public Set<Attribute> describe() {
         return new HashSet<>(Arrays.asList(
-                new MultivaluedAttribute<RoleDefinition, RoleBasedAuthorizationStrategy>("global", RoleDefinition.class),
-                new MultivaluedAttribute<RoleDefinition, RoleBasedAuthorizationStrategy>("items", RoleDefinition.class),
-                new MultivaluedAttribute<RoleDefinition, RoleBasedAuthorizationStrategy>("agents", RoleDefinition.class)
+                new MultivaluedAttribute<RoleBasedAuthorizationStrategy, RoleDefinition>("global", RoleDefinition.class),
+                new MultivaluedAttribute<RoleBasedAuthorizationStrategy, RoleDefinition>("items", RoleDefinition.class),
+                new MultivaluedAttribute<RoleBasedAuthorizationStrategy, RoleDefinition>("agents", RoleDefinition.class)
         ));
     }
 
