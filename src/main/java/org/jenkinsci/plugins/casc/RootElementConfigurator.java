@@ -27,4 +27,10 @@ public interface RootElementConfigurator<T> extends ElementConfigurator<T> {
 
         return configurators;
     }
+
+    /**
+     * Retrieve the target component managed by this RootElementConfigurator
+     * @return
+     */
+    T getTargetComponent();
 }

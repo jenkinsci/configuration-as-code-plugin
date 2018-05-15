@@ -36,6 +36,11 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
     }
 
     @Override
+    public Jenkins getTargetComponent() {
+        return Jenkins.getInstance();
+    }
+
+    @Override
     public Jenkins configure(CNode c) throws ConfiguratorException {
         Mapping config = c.asMapping();
         Jenkins jenkins = Jenkins.getInstance();

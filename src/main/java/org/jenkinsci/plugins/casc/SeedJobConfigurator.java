@@ -11,6 +11,7 @@ import org.jenkinsci.plugins.casc.model.Sequence;
 
 import javax.annotation.CheckForNull;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -30,6 +31,11 @@ public class SeedJobConfigurator implements RootElementConfigurator<List<Generat
     public Set<Attribute> describe() {
         // no attribute this is a raw list
         return Collections.EMPTY_SET;
+    }
+
+    @Override
+    public List<GeneratedItems> getTargetComponent() {
+        return Collections.EMPTY_LIST; // Doesn't really make sense
     }
 
     @Override

@@ -167,10 +167,14 @@ public class ConfigurationAsCode extends ManagementLink {
 
         final List<NodeTuple> tuples = new ArrayList<>();
 
-        final CNode config = new JenkinsConfigurator().describe(Jenkins.getInstance());
-        tuples.add(new NodeTuple(
-                new ScalarNode(Tag.STR, "jenkins", null, null, PLAIN.getChar()),
-                toYaml(config)));
+        for (RootElementConfigurator root : RootElementConfigurator.all()) {
+            final CNode config = root.describe(root.getTargetComponent());
+            final Node valueNode = toYaml(config);
+            if (valueNode == null) continue;
+            tuples.add(new NodeTuple(
+                    new ScalarNode(Tag.STR, root.getName(), null, null, PLAIN.getChar()),
+                    valueNode));
+        }
 
         MappingNode root = new MappingNode(Tag.MAP, tuples, BLOCK.getStyleBoolean());
         DumperOptions options = new DumperOptions();

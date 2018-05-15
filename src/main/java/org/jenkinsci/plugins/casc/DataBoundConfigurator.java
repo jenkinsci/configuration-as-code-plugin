@@ -229,7 +229,8 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
         // add constructor parameters
         for (int i = 0; i < parameters.length; i++) {
             final Configurator c = Configurator.lookup(attributes[i].getType());
-            mapping.put(names[i], c.describe(args[i]));
+            if (args[i] == null) continue;
+            mapping.put(names[i], attributes[i].describe(args[i]));
         }
 
         return mapping;
