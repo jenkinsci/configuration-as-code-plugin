@@ -136,7 +136,7 @@ public class Attribute<T,O> {
         final Object v1 = getValue(o1);
         final Object v2 = getValue(o2);
         if (v1 == null && v2 == null) return true;
-        return (v1.equals(v2));
+        return (v1 != null && v1.equals(v2));
     }
 
     /**

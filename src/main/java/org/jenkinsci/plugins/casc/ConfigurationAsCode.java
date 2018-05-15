@@ -39,6 +39,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -162,7 +163,7 @@ public class ConfigurationAsCode extends ManagementLink {
      * @throws Exception
      */
     public void doExport(StaplerRequest req, StaplerResponse res) throws Exception {
-        res.setContentType("application/x-yaml");
+        res.setContentType("application/x-yaml; charset=utf-8");
         res.addHeader("Content-Disposition", "attachment; filename=jenkins.yaml");
 
         final List<NodeTuple> tuples = new ArrayList<>();
@@ -181,7 +182,7 @@ public class ConfigurationAsCode extends ManagementLink {
         options.setDefaultFlowStyle(BLOCK);
         options.setDefaultScalarStyle(PLAIN);
         options.setPrettyFlow(true);
-        try (Writer w = new OutputStreamWriter(res.getOutputStream())) {
+        try (Writer w = new OutputStreamWriter(res.getOutputStream(), StandardCharsets.UTF_8)) {
                 Serializer serializer = new Serializer(new Emitter(w, options), new Resolver(),
                                 options, null);
                 serializer.open();

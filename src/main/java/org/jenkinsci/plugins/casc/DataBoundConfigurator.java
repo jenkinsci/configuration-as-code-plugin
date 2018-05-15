@@ -6,7 +6,6 @@ import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
 import org.kohsuke.stapler.ClassDescriptor;
-import org.w3c.dom.Attr;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -19,9 +18,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -52,10 +49,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
         // c can be null for component with no-arg constructor and no extra property to be set
         Mapping config = (c != null ? c.asMapping() : Mapping.EMPTY);
 
-        final Constructor constructor = getDataBoundConstructor(target);
-        if (constructor == null) {
-            throw new IllegalStateException(target.getName() + " is missing a @DataBoundConstructor");
-        }
+        final Constructor constructor = getDataBoundConstructor();
 
         final Parameter[] parameters = constructor.getParameters();
         final String[] names = ClassDescriptor.loadParameterNames(constructor);
@@ -208,7 +202,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
         // need to be compared with default values.
 
         // Build same object with only constructor parameters
-        final Constructor constructor = getDataBoundConstructor(target);
+        final Constructor constructor = getDataBoundConstructor();
 
         final Parameter[] parameters = constructor.getParameters();
         final String[] names = ClassDescriptor.loadParameterNames(constructor);
@@ -234,6 +228,14 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
         }
 
         return mapping;
+    }
+
+    private Constructor getDataBoundConstructor() {
+        final Constructor constructor = getDataBoundConstructor(target);
+        if (constructor == null) {
+            throw new IllegalStateException(target.getName() + " is missing a @DataBoundConstructor");
+        }
+        return constructor;
     }
 
     public String getDisplayName() {

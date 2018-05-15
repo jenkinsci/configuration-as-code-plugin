@@ -53,7 +53,6 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
     public Set<Attribute> describe() {
         final Set<Attribute> attributes = super.describe();
 
-        final Jenkins jenkins = Jenkins.getInstance();
         attributes.add(new PersistedListAttribute<Cloud, Jenkins>("clouds", Cloud.class)
             .getter(target -> target.clouds));
         attributes.add(new MultivaluedAttribute<String, Jenkins>("jobs", String.class)
