@@ -46,6 +46,7 @@ public class DataBoundConfiguratorTest {
         foo.setZot("zot");
         final Configurator c = Configurator.lookup(Foo.class);
         final CNode node = c.describe(foo);
+        assertNotNull(node);
         assertTrue(node instanceof Mapping);
         Mapping map = (Mapping) node;
         assertEquals(map.get("foo").toString(), "foo");
