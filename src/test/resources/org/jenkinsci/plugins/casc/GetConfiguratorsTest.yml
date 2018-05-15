@@ -4,22 +4,6 @@ jenkins:
   scmCheckoutRetryCount: 2
   mode: NORMAL
   scmCheckoutRetryCount: 4
-
-  globalLibraries:
-    libraries:
-      - name: "awesome-lib"
-        retriever:
-          modernSCM:
-            scm:
-              git:
-                remote: "https://github.com/jenkins-infra/pipeline-library.git"
-
-  mailer:
-    adminAddress: admin@acme.org
-    replyToAddress: do-not-reply@acme.org
-    smtpHost: smtp.acme.org
-    smtpPort: 4441
-
   clouds:
     - docker:
         name: "docker"
@@ -35,6 +19,21 @@ jenkins:
               attach:
                 user: "jenkins"
             instanceCapStr: "10"
+
+unclassified:
+  mailer:
+    adminAddress: admin@acme.org
+    replyToAddress: do-not-reply@acme.org
+    smtpHost: smtp.acme.org
+    smtpPort: 4441
+  globalLibraries:
+    libraries:
+      - name: "awesome-lib"
+        retriever:
+          modernSCM:
+            scm:
+              git:
+                remote: "https://github.com/jenkins-infra/pipeline-library.git"
 
 tool:
   git:
