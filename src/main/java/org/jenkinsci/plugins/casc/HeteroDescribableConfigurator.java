@@ -8,6 +8,7 @@ import jenkins.model.Jenkins;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
+import org.jenkinsci.plugins.casc.model.Scalar;
 
 import javax.annotation.CheckForNull;
 import java.util.Collections;
@@ -111,8 +112,16 @@ public class HeteroDescribableConfigurator extends Configurator<Describable> {
     public CNode describe(Describable instance) throws Exception {
         final String symbol = DescribableAttribute.getSymbolName(instance.getDescriptor(), getTarget(), instance.getClass());
         final Configurator c = Configurator.lookupOrFail(instance.getClass());
+        final CNode describe = c.describe(instance);
+        if (describe == null) {
+            return null;
+        }
+        if (describe.getType() == CNode.Type.MAPPING && describe.asMapping().size() == 0) {
+            return new Scalar(symbol);
+        }
+
         Mapping mapping = new Mapping();
-        mapping.put(symbol, c.describe(instance));
+        mapping.put(symbol, describe);
         return mapping;
     }
 }

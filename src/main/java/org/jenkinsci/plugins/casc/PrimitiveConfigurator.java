@@ -39,6 +39,19 @@ public class PrimitiveConfigurator extends Configurator {
     @CheckForNull
     @Override
     public CNode describe(Object instance) {
+
+        if (instance == null) return null;
+
+        if (instance instanceof Number) {
+            return new Scalar((Number) instance);
+        }
+        if (instance instanceof Boolean) {
+            return new Scalar((Boolean) instance);
+        }
+        if (target.isEnum()) {
+            return new Scalar((Enum) instance);
+        }
+
         return new Scalar(String.valueOf(instance));
     }
 
