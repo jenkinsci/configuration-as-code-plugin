@@ -42,6 +42,11 @@ public class DescriptorConfigurator extends BaseConfigurator<Descriptor> impleme
     }
 
     @Override
+    public Descriptor getTargetComponent() {
+        return descriptor;
+    }
+
+    @Override
     public Descriptor configure(CNode config) throws ConfiguratorException {
         configure(config.asMapping(), descriptor);
         return descriptor;

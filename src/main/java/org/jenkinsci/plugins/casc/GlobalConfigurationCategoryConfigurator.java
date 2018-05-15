@@ -42,6 +42,11 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
     }
 
     @Override
+    public GlobalConfigurationCategory getTargetComponent() {
+        return category;
+    }
+
+    @Override
     public GlobalConfigurationCategory configure(CNode config) throws ConfiguratorException {
         configure(config.asMapping(), category);
         return category;

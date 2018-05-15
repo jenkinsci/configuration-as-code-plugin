@@ -37,7 +37,6 @@ public class CredentialsRootConfigurator extends Configurator<CredentialsStore> 
 
     private final static Logger logger = Logger.getLogger(CredentialsRootConfigurator.class.getName());
 
-
     @Override
     public String getName() {
         return "credentials";
@@ -46,6 +45,15 @@ public class CredentialsRootConfigurator extends Configurator<CredentialsStore> 
     @Override
     public Class<CredentialsStore> getTarget() {
         return CredentialsStore.class;
+    }
+
+    @Override
+    public CredentialsStore getTargetComponent() {
+        final SystemCredentialsProvider.ProviderImpl p = Jenkins.getInstance().getExtensionList(SystemCredentialsProvider.ProviderImpl.class).get(0);
+        // provider.getStore() is unfortunately private
+        final CredentialsStore store = p.getStore(Jenkins.getInstance());
+        if (store == null) throw new IllegalStateException("SystemCredentialsProvider.getStore returned null");
+        return store;
     }
 
     @Override
@@ -63,11 +71,7 @@ public class CredentialsRootConfigurator extends Configurator<CredentialsStore> 
             target.put(domainWithCredentials.domain, domainWithCredentials.credentials);
         }
 
-        // provider.getStore() is unfortunately private
-        final SystemCredentialsProvider.ProviderImpl p = Jenkins.getInstance().getExtensionList(SystemCredentialsProvider.ProviderImpl.class).get(0);
-        final CredentialsStore store = p.getStore(Jenkins.getInstance());
-        if (store == null) throw new IllegalStateException("SystemCredentialsProvider.getStore returned null");
-        return store;
+        return getTargetComponent();
     }
 
     @Override
