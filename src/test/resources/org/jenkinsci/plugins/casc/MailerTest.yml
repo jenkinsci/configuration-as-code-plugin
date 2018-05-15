@@ -1,4 +1,4 @@
-jenkins:
+unclassified:
   mailer:
     adminAddress: admin@acme.org
     replyToAddress: do-not-reply@acme.org
