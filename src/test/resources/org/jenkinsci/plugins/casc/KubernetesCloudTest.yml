@@ -42,6 +42,6 @@ jenkins:
               - name: "imagePullSecrets"
 
             envVars:
-              - KeyValueEnvVar:
+              - envVar:
                   key: "FOO"
                   value: "BAR"
