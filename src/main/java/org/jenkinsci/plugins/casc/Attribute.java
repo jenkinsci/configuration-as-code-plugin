@@ -1,15 +1,11 @@
 package org.jenkinsci.plugins.casc;
 
-import jenkins.model.Jenkins;
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.jenkinsci.plugins.casc.model.CNode;
-import org.jenkinsci.plugins.casc.model.Scalar;
 import org.jenkinsci.plugins.casc.model.Sequence;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Array;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,7 +23,7 @@ import java.util.stream.Collectors;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  * @see Configurator#describe()
  */
-public class Attribute<T,O> {
+public class Attribute<Owner, Type> {
     
     private final static Logger logger = Logger.getLogger(Attribute.class.getName());
 
@@ -35,8 +31,8 @@ public class Attribute<T,O> {
     protected final Class type;
     protected boolean multiple;
     protected String preferredName;
-    private Setter<O,T> setter;
-    private Getter<O,T> getter;
+    private Setter<Owner, Type> setter;
+    private Getter<Owner, Type> getter;
 
     public Attribute(String name, Class type) {
         this.name = name;
@@ -66,31 +62,31 @@ public class Attribute<T,O> {
         return multiple;
     }
 
-    public Attribute<T,O> multiple(boolean multiple) {
+    public Attribute<Owner, Type> multiple(boolean multiple) {
         this.multiple = multiple;
         return this;
     }
 
-    public Attribute<T,O> preferredName(String preferredName) {
+    public Attribute<Owner, Type> preferredName(String preferredName) {
         this.preferredName = preferredName;
         return this;
     }
 
-    public Attribute<T,O> setter(Setter<O,T> setter) {
+    public Attribute<Owner, Type> setter(Setter<Owner, Type> setter) {
         this.setter = setter;
         return this;
     }
 
-    public Attribute<T,O> getter(Getter<O,T> getter) {
+    public Attribute<Owner, Type> getter(Getter<Owner, Type> getter) {
         this.getter = getter;
         return this;
     }
 
-    public Setter<O,T> getSetter() {
+    public Setter<Owner, Type> getSetter() {
         return setter;
     }
 
-    public Getter<O,T> getGetter() {
+    public Getter<Owner, Type> getGetter() {
         return getter;
     }
 
@@ -108,15 +104,15 @@ public class Attribute<T,O> {
     }
 
 
-    public void setValue(O target, T value) throws Exception {
+    public void setValue(Owner target, Type value) throws Exception {
         setter.setValue(target, value);
     }
 
-    public T getValue(O target) throws Exception {
+    public Type getValue(Owner target) throws Exception {
         return getter.getValue(target);
     }
 
-    public CNode describe(O instance) throws Exception {
+    public CNode describe(Owner instance) throws Exception {
         final Configurator c = Configurator.lookupOrFail(type);
         Object o = getValue(instance);
         if (o == null) {
@@ -132,7 +128,7 @@ public class Attribute<T,O> {
         return c.describe(o);
     }
 
-    public boolean equals(O o1, O o2) throws Exception {
+    public boolean equals(Owner o1, Owner o2) throws Exception {
         final Object v1 = getValue(o1);
         final Object v2 = getValue(o2);
         if (v1 == null && v2 == null) return true;
@@ -155,19 +151,19 @@ public class Attribute<T,O> {
         T getValue(O target) throws Exception;
     }
 
-    private T _getValue(O target) throws Exception {
+    private Type _getValue(Owner target) throws Exception {
         final PropertyDescriptor property = PropertyUtils.getPropertyDescriptor(target, name);
         if (property == null) return null;
         final Method readMethod = property.getReadMethod();
         if (readMethod == null) return null;
-        return (T) readMethod.invoke(target);
+        return (Type) readMethod.invoke(target);
     }
 
     /**
      * Default Setter implementation based on JavaBean property write method.
      *
      */
-    private void _setValue(O target, T value) throws Exception {
+    private void _setValue(Owner target, Type value) throws Exception {
         final String setterId = target.getClass().getCanonicalName()+'#'+name;
         logger.info("Setting " + setterId + " = " + value);
         final PropertyDescriptor property = PropertyUtils.getPropertyDescriptor(target, name);
@@ -203,7 +199,7 @@ public class Attribute<T,O> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Attribute<?,?> attribute = (Attribute<?,?>) o;
+        Attribute<?, ?> attribute = (Attribute<?, ?>) o;
         return Objects.equals(name, attribute.name);
     }
 

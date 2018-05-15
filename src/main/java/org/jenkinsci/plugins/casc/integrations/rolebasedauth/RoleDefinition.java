@@ -1,8 +1,6 @@
 package org.jenkinsci.plugins.casc.integrations.rolebasedauth;
 
 import com.michelin.cio.hudson.plugins.rolestrategy.Role;
-import hudson.security.AccessControlled;
-import hudson.security.Permission;
 import org.jenkinsci.plugins.casc.util.PermissionFinder;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
@@ -14,7 +12,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 /**
  * Role definition.

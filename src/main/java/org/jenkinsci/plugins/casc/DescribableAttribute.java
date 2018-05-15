@@ -13,7 +13,7 @@ import static org.jenkinsci.plugins.casc.Configurator.normalize;
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-public class DescribableAttribute<T,O> extends Attribute<T,O> {
+public class DescribableAttribute<Owner, Type> extends Attribute<Owner, Type> {
 
     public DescribableAttribute(String name, Class<? extends Describable> type) {
         super(name, type);

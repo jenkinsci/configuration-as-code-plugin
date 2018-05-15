@@ -22,7 +22,7 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
     @Override
     public Set<Attribute> describe() {
         final Set<Attribute> describe = super.describe();
-        describe.add(new MultivaluedAttribute<UserWithPassword, HudsonPrivateSecurityRealm>("users", UserWithPassword.class)
+        describe.add(new MultivaluedAttribute<HudsonPrivateSecurityRealm, UserWithPassword>("users", UserWithPassword.class)
                 .setter((target, value) -> {
             for (UserWithPassword user : value) {
                 target.createAccount(user.id, user.password);

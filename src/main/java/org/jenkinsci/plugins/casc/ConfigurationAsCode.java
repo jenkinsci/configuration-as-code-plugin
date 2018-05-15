@@ -19,7 +19,6 @@ import org.kohsuke.stapler.interceptor.RequirePOST;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.composer.Composer;
-import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.emitter.Emitter;
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.nodes.MappingNode;

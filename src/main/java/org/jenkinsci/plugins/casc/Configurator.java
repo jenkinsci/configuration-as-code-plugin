@@ -5,13 +5,11 @@ import hudson.ExtensionList;
 import hudson.ExtensionPoint;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
-import hudson.model.TopLevelItem;
 import hudson.remoting.Which;
 import jenkins.model.Jenkins;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
-import org.jenkinsci.plugins.casc.core.NoneSecurityRealmConfigurator;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jvnet.tiger_types.Types;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -274,7 +272,7 @@ public abstract class Configurator<T> implements ExtensionPoint, ElementConfigur
     }
 
     @CheckForNull
-    public <V> Attribute<V,T> getAttribute(@Nonnull String name) {
+    public <V> Attribute<T, V> getAttribute(@Nonnull String name) {
         Set<Attribute> attrs = describe();
         for (Attribute attr : attrs) {
             if (attr.name.equalsIgnoreCase(name)) {

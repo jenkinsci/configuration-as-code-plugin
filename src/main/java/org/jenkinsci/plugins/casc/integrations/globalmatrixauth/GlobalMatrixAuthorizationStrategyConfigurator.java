@@ -1,6 +1,5 @@
 package org.jenkinsci.plugins.casc.integrations.globalmatrixauth;
 
-import com.cloudbees.plugins.credentials.CredentialsStore;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import hudson.security.GlobalMatrixAuthorizationStrategy;
@@ -10,13 +9,16 @@ import org.jenkinsci.plugins.casc.Configurator;
 import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
-import org.jenkinsci.plugins.casc.model.Sequence;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import javax.annotation.CheckForNull;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Mads Nielsen
@@ -39,7 +41,7 @@ public class GlobalMatrixAuthorizationStrategyConfigurator extends Configurator<
     @Override
     @SuppressFBWarnings(value = "DM_NEW_FOR_GETCLASS", justification = "We need a fully qualified type to do proper attribute binding")
     public Set<Attribute> describe() {
-        return Collections.singleton(new Attribute<GroupPermissionDefinition, GlobalMatrixAuthorizationStrategy>("grantedPermissions", new HashSet<GroupPermissionDefinition>().getClass()));
+        return Collections.singleton(new Attribute<GlobalMatrixAuthorizationStrategy, GroupPermissionDefinition>("grantedPermissions", new HashSet<GroupPermissionDefinition>().getClass()));
     }
 
     @Override

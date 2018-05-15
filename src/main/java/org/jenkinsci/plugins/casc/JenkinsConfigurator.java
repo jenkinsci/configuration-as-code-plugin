@@ -2,21 +2,17 @@ package org.jenkinsci.plugins.casc;
 
 import hudson.EnvVars;
 import hudson.Extension;
-import hudson.ExtensionList;
-import hudson.model.Descriptor;
 import hudson.slaves.Cloud;
 import hudson.slaves.NodeProperty;
 import javaposse.jobdsl.plugin.JenkinsDslScriptLoader;
 import javaposse.jobdsl.plugin.JenkinsJobManagement;
 import javaposse.jobdsl.plugin.LookupStrategy;
-import jenkins.model.GlobalConfigurationCategory;
 import jenkins.model.Jenkins;
 import jenkins.security.s2m.AdminWhitelistRule;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
 
 import javax.annotation.CheckForNull;
-import java.util.Collection;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -53,20 +49,20 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
     public Set<Attribute> describe() {
         final Set<Attribute> attributes = super.describe();
 
-        attributes.add(new PersistedListAttribute<Cloud, Jenkins>("clouds", Cloud.class)
+        attributes.add(new PersistedListAttribute<Jenkins, Cloud>("clouds", Cloud.class)
             .getter(target -> target.clouds));
-        attributes.add(new MultivaluedAttribute<String, Jenkins>("jobs", String.class)
+        attributes.add(new MultivaluedAttribute<Jenkins, String>("jobs", String.class)
             .setter((target, value) -> {
                 JenkinsJobManagement mng = new JenkinsJobManagement(System.out, new EnvVars(), null, null, LookupStrategy.JENKINS_ROOT);
                 for (String script : value) {
                     new JenkinsDslScriptLoader(mng).runScript(script);
                 }
             }));
-        attributes.add(new PersistedListAttribute<NodeProperty, Jenkins>("nodeProperties", NodeProperty.class));
-        attributes.add(new PersistedListAttribute<NodeProperty, Jenkins>("globalNodeProperties", NodeProperty.class));
+        attributes.add(new PersistedListAttribute<Jenkins, NodeProperty>("nodeProperties", NodeProperty.class));
+        attributes.add(new PersistedListAttribute<Jenkins, NodeProperty>("globalNodeProperties", NodeProperty.class));
 
         // Add remoting security, all legwork will be done by a configurator
-        attributes.add(new Attribute<AdminWhitelistRule, Jenkins>("remotingSecurity", AdminWhitelistRule.class).setter(NOOP));
+        attributes.add(new Attribute<Jenkins, AdminWhitelistRule>("remotingSecurity", AdminWhitelistRule.class).setter(NOOP));
 
         return attributes;
     }
