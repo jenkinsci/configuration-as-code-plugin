@@ -7,6 +7,7 @@ import hudson.model.ManagementLink;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
+import org.jenkinsci.plugins.casc.model.Sequence;
 import org.jenkinsci.plugins.casc.yaml.ModelConstructor;
 import org.jenkinsci.plugins.casc.yaml.YamlReader;
 import org.jenkinsci.plugins.casc.yaml.YamlSource;
@@ -14,15 +15,27 @@ import org.jenkinsci.plugins.casc.yaml.YamlUtils;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.interceptor.RequirePOST;
+import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.composer.Composer;
 import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.emitter.Emitter;
+import org.yaml.snakeyaml.error.YAMLException;
+import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
+import org.yaml.snakeyaml.nodes.NodeTuple;
+import org.yaml.snakeyaml.nodes.ScalarNode;
+import org.yaml.snakeyaml.nodes.SequenceNode;
+import org.yaml.snakeyaml.nodes.Tag;
+import org.yaml.snakeyaml.resolver.Resolver;
+import org.yaml.snakeyaml.serializer.Serializer;
 
 import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.Writer;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.FileSystems;
@@ -45,6 +58,9 @@ import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static org.yaml.snakeyaml.DumperOptions.FlowStyle.BLOCK;
+import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.DOUBLE_QUOTED;
+import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.PLAIN;
 
 /**
  * {@linkplain #configure() Main entry point of the logic}.
@@ -146,6 +162,67 @@ public class ConfigurationAsCode extends ManagementLink {
      */
     public void doExport(StaplerRequest req, StaplerResponse res) throws Exception {
         res.setContentType("application/x-yaml");
+        res.addHeader("Content-Disposition", "attachment; filename=jenkins.yaml");
+
+        final List<NodeTuple> tuples = new ArrayList<>();
+
+        final CNode config = new JenkinsConfigurator().describe(Jenkins.getInstance());
+        tuples.add(new NodeTuple(
+                new ScalarNode(Tag.STR, "jenkins", null, null, PLAIN.getChar()),
+                toYaml(config)));
+
+        MappingNode root = new MappingNode(Tag.MAP, tuples, BLOCK.getStyleBoolean());
+        DumperOptions options = new DumperOptions();
+        options.setDefaultFlowStyle(BLOCK);
+        options.setDefaultScalarStyle(PLAIN);
+        options.setPrettyFlow(true);
+        try (Writer w = new OutputStreamWriter(res.getOutputStream())) {
+                Serializer serializer = new Serializer(new Emitter(w, options), new Resolver(),
+                                options, null);
+                serializer.open();
+                serializer.serialize(root);
+                serializer.close();
+            } catch (IOException e) {
+                throw new YAMLException(e);
+            }
+    }
+
+    private @CheckForNull Node toYaml(CNode config) throws ConfiguratorException {
+
+        if (config == null) return null;
+
+        switch (config.getType()) {
+            case MAPPING:
+                final Mapping mapping = config.asMapping();
+                final List<NodeTuple> tuples = new ArrayList<>();
+                for (Map.Entry<String, CNode> entry : mapping.entrySet()) {
+                    final Node valueNode = toYaml(entry.getValue());
+                    if (valueNode == null) continue;
+                    tuples.add(new NodeTuple(
+                            new ScalarNode(Tag.STR, entry.getKey(), null, null, PLAIN.getChar()),
+                            valueNode));
+
+                }
+
+                return new MappingNode(Tag.MAP, tuples, BLOCK.getStyleBoolean());
+
+            case SEQUENCE:
+                final Sequence sequence = config.asSequence();
+                List<Node> nodes = new ArrayList<>();
+                for (CNode cNode : sequence) {
+                    final Node valueNode = toYaml(cNode);
+                    if (valueNode == null) continue;
+                    nodes.add(valueNode);
+                }
+                return new SequenceNode(Tag.SEQ, nodes, BLOCK.getStyleBoolean());
+
+            case SCALAR:
+            default:
+                final String value = config.asScalar().getValue();
+                if (value == null) return null;
+                return new ScalarNode(Tag.STR, value, null, null, DOUBLE_QUOTED.getChar());
+
+        }
     }
 
 

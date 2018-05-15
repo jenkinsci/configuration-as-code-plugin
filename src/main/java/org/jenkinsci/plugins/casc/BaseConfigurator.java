@@ -177,8 +177,7 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
             final CNode sub = removeIgnoreCase(config, name);
             if (sub != null) {
                 final Class k = attribute.getType();
-                final Configurator configurator = Configurator.lookup(k);
-                if (configurator == null) throw new IllegalStateException("No configurator implementation to manage "+k);
+                final Configurator configurator = Configurator.lookupOrFail(k);
 
                 final Object valueToSet;
                 if (attribute.isMultiple()) {
@@ -209,13 +208,8 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
 
         Mapping mapping = new Mapping();
         for (Attribute attribute : describe()) {
-            final Object v1 = attribute.getValue(o1);
-            final Object v2 = attribute.getValue(o2);
-            if (v1 == null && v2 == null) continue;
-            if (v1.equals(v2)) continue;
-
-            Configurator c = Configurator.lookup(attribute.getType());
-            mapping.put(attribute.getName(), c.describe(v1));
+            if (attribute.equals(o1, o2)) continue;
+            mapping.put(attribute.getName(), attribute.describe(o1));
         }
         return mapping;
     }
