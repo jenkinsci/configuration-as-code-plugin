@@ -2,12 +2,17 @@ package org.jenkinsci.plugins.casc.credentials;
 
 import com.cloudbees.plugins.credentials.Credentials;
 import com.cloudbees.plugins.credentials.CredentialsStore;
+import com.cloudbees.plugins.credentials.GlobalCredentialsConfiguration;
 import com.cloudbees.plugins.credentials.SystemCredentialsProvider;
 import com.cloudbees.plugins.credentials.domains.Domain;
+import com.cloudbees.plugins.credentials.domains.DomainCredentials;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
+import hudson.ExtensionList;
+import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.casc.Attribute;
+import org.jenkinsci.plugins.casc.BaseConfigurator;
 import org.jenkinsci.plugins.casc.Configurator;
 import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.MultivaluedAttribute;
@@ -30,7 +35,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Extension(optional = true)
-public class CredentialsRootConfigurator extends Configurator<CredentialsStore> implements RootElementConfigurator<CredentialsStore> {
+public class CredentialsRootConfigurator extends BaseConfigurator<GlobalCredentialsConfiguration> implements RootElementConfigurator<GlobalCredentialsConfiguration> {
 
     private final static Logger logger = Logger.getLogger(CredentialsRootConfigurator.class.getName());
 
@@ -40,63 +45,37 @@ public class CredentialsRootConfigurator extends Configurator<CredentialsStore> 
     }
 
     @Override
-    public Class<CredentialsStore> getTarget() {
-        return CredentialsStore.class;
+    public Class<GlobalCredentialsConfiguration> getTarget() {
+        return GlobalCredentialsConfiguration.class;
     }
 
     @Override
-    public CredentialsStore getTargetComponent() {
-        final SystemCredentialsProvider.ProviderImpl p = Jenkins.getInstance().getExtensionList(SystemCredentialsProvider.ProviderImpl.class).get(0);
-        // provider.getStore() is unfortunately private
-        final CredentialsStore store = p.getStore(Jenkins.getInstance());
-        if (store == null) throw new IllegalStateException("SystemCredentialsProvider.getStore returned null");
-        return store;
+    public GlobalCredentialsConfiguration getTargetComponent() {
+        return GlobalCredentialsConfiguration.all().get(GlobalCredentialsConfiguration.class);
     }
 
     @Override
-    public CredentialsStore configure(CNode config) throws ConfiguratorException {
-        Mapping map = config.asMapping();
-        final Sequence system = map.get("system").asSequence();
-
-        final SystemCredentialsProvider provider = SystemCredentialsProvider.getInstance();
-        final Map<Domain, List<Credentials>> target = provider.getDomainCredentialsMap();
-        target.clear();
-
-        final Configurator<DomainWithCredentials> c = Configurator.lookup(DomainWithCredentials.class);
-        for (CNode cNode : system) {
-            final DomainWithCredentials domainWithCredentials = c.configure(cNode);
-            target.put(domainWithCredentials.domain, domainWithCredentials.credentials);
-        }
-
-        return getTargetComponent();
+    public GlobalCredentialsConfiguration configure(CNode config) throws ConfiguratorException {
+        final GlobalCredentialsConfiguration target = getTargetComponent();
+        configure(config.asMapping(), target);
+        return target;
     }
 
     @Override
-    @SuppressFBWarnings(value="DM_NEW_FOR_GETCLASS", justification="one can't get a parameterized type .class")
     public Set<Attribute> describe() {
-        return Collections.singleton(new MultivaluedAttribute("system", DomainWithCredentials.class));
+        return Collections.singleton(new Attribute<Jenkins, SystemCredentialsProvider>("system", SystemCredentialsProvider.class)
+            .getter( t -> SystemCredentialsProvider.getInstance() )
+            .setter( Attribute.NOOP ));
     }
 
     @CheckForNull
     @Override
-    public CNode describe(CredentialsStore instance) {
-        // FIXME
-        return null;
+    public CNode describe(GlobalCredentialsConfiguration instance) throws Exception {
+        Mapping mapping = new Mapping();
+        for (Attribute attribute : describe()) {
+            mapping.put(attribute.getName(), attribute.describe(instance));
+        }
+        return mapping;
     }
 
-    public static class DomainWithCredentials {
-
-        private Domain domain = Domain.global();
-        private List<Credentials> credentials;
-
-        @DataBoundConstructor
-        public DomainWithCredentials(List<Credentials> credentials) {
-            this.credentials = credentials;
-        }
-
-        @DataBoundSetter
-        public void setDomain(Domain domain) {
-            this.domain = domain;
-        }
-    }
 }

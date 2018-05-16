@@ -6,33 +6,28 @@
 ```yaml
 credentials:
   system:
-    - domain:
-        name: "test.com"
-        description: "test.com domain"
-        specifications:
-          - hostnameSpecification:
-              includes: "*.test.com, *.example.com"
-      credentials:          
-        - usernamePassword:
-            scope:    SYSTEM
-            id:       sudo_password
-            username: root
-            password: ${SUDO_PASSWORD}
-      # global
-      credentials:
-        - certificate:
-            scope:    SYSTEM
-            id:       ssh_private_key
-            password: ${SSH_KEY_PASSWORD}
-            keyStoreSource: 
-              fileOnMaster:
-                privateKeyFile: /docker/secret/id_rsa
+    domainCredentials:
+      - domain :
+          name: "test.com"
+          description: "test.com domain"
+          specifications:
+            - hostnameSpecification:
+                includes:
+                  - "*.test.com"
+        credentials:
+          - usernamePassword:
+              scope:    SYSTEM
+              id:       sudo_password
+              username: root
+              password: ${SUDO_PASSWORD}
 
 ```
 
 ## implementation note
 
-credentials plugin support relies on a custom adaptor component `CredentialsRootConfigurator`.
+Credentials plugin support relies on a custom adaptor components `CredentialsRootConfigurator` and `SystemCredentialsProviderConfigurator`.
+
+Global credentials can be registered by just not providing a domain (i.e `null`).
 
 Credentials symbol name is inferred from implementation class simple name: `UsernamePasswordCredentialsImpl`
 descriptor's clazz is `Credentials` 
@@ -51,23 +46,24 @@ Example that uses the [SSH credentials plugin](https://plugins.jenkins.io/ssh-cr
 ```yaml
 credentials:
   system:
-    - credentials:
-        - basicSSHUserPrivateKey:
-            scope: SYSTEM
-            id: ssh_with_passprase
-            username: ssh_root
-            passphrase: ${SSH_KEY_PASSWORD}
-            description: "SSH passphrase with private key file"
-            privateKeySource:
-              fileOnMaster:
-                privateKeyFile: /docker/secret/id_rsa_2
-        - basicSSHUserPrivateKey:
-            scope: SYSTEM
-            id: ssh_with_passprase_provided
-            username: ssh_root
-            passphrase: ${SSH_KEY_PASSWORD}
-            description: "SSH passphrase with private key file. Private key provided"
-            privateKeySource:
-              directEntry:
-                privateKey: ${SSH_PRIVATE_KEY}
+    domainCredentials:
+      - credentials:
+          - basicSSHUserPrivateKey:
+              scope: SYSTEM
+              id: ssh_with_passprase
+              username: ssh_root
+              passphrase: ${SSH_KEY_PASSWORD}
+              description: "SSH passphrase with private key file"
+              privateKeySource:
+                fileOnMaster:
+                  privateKeyFile: /docker/secret/id_rsa_2
+          - basicSSHUserPrivateKey:
+              scope: SYSTEM
+              id: ssh_with_passprase_provided
+              username: ssh_root
+              passphrase: ${SSH_KEY_PASSWORD}
+              description: "SSH passphrase with private key file. Private key provided"
+              privateKeySource:
+                directEntry:
+                  privateKey: ${SSH_PRIVATE_KEY}
 ```
