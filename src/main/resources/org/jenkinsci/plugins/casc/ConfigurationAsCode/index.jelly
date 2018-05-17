@@ -12,7 +12,6 @@
     <j:choose>
       <j:when test="${empty it.sources}">
         <p>Master has no configuration as code file set.</p>
-        <p><a href="export">Produce equivalent yaml configuration for current instance</a></p>
       </j:when>
       <j:otherwise>
         Configuration loaded from :
@@ -29,6 +28,7 @@
         </form>
 
       </j:otherwise>
+      <p><a href="export">Produce equivalent yaml configuration for current instance</a></p>
     </j:choose>
 
 
