@@ -247,6 +247,7 @@ public class ConfigurationAsCode extends ManagementLink {
                         .map(s -> new YamlSource<>(s, READ_FROM_PATH))
                         .collect(toList()));
             }
+            sources = Collections.singletonList(p);
         }
         configureWith(configs);
         lastTimeLoaded = System.currentTimeMillis();
