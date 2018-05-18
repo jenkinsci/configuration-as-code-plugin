@@ -73,7 +73,7 @@ public class CredentialsRootConfigurator extends BaseConfigurator<GlobalCredenti
     public CNode describe(GlobalCredentialsConfiguration instance) throws Exception {
         Mapping mapping = new Mapping();
         for (Attribute attribute : describe()) {
-            mapping.put(attribute.getName(), attribute.describe(instance));
+            mapping.put(attribute.getName(), attribute.describe(Jenkins.getInstance()));
         }
         return mapping;
     }
