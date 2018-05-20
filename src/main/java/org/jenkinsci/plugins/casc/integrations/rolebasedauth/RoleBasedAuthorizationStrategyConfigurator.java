@@ -68,15 +68,15 @@ public class RoleBasedAuthorizationStrategyConfigurator extends Configurator<Rol
     @Nonnull
     private static RoleMap retrieveRoleMap(@Nonnull CNode config, @Nonnull String name, Configurator<RoleDefinition> configurator) throws ConfiguratorException {
         Mapping map = config.asMapping();
-        final Sequence c = map.get(name).asSequence();
+        final CNode c = map.get(name);
 
         TreeMap<Role, Set<String>> resMap = new TreeMap<>();
-        if (c == null) {
+        if (c == null || c.asSequence() == null) {
             // we cannot return emptyMap here due to the Role Strategy code
             return new RoleMap(resMap);
         }
 
-        for (CNode entry : c) {
+        for (CNode entry : c.asSequence()) {
             RoleDefinition definition = configurator.configure(entry);
             resMap.put(definition.getRole(), definition.getAssignments());
         }

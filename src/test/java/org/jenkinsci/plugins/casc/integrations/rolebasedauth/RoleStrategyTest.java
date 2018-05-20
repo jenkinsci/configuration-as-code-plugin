@@ -104,4 +104,17 @@ public class RoleStrategyTest {
         // Same user still cannot build on agent2
         assertHasNoPermission(user1, agent2, Computer.BUILD);
     }
+
+    @Test
+    @Issue("Issue #214")
+    @ConfiguredWithCode("RoleStrategy2.yml")
+    public void shouldHandleNullItemsAndAgentsCorrectly() throws Exception {
+        AuthorizationStrategy s = j.jenkins.getAuthorizationStrategy();
+        assertThat("Authorization Strategy has been read incorrectly",
+            s, instanceOf(RoleBasedAuthorizationStrategy.class));
+        RoleBasedAuthorizationStrategy rbas = (RoleBasedAuthorizationStrategy) s;
+
+        Map<Role, Set<String>> globalRoles = rbas.getGrantedRoles(RoleBasedAuthorizationStrategy.GLOBAL);
+        assertThat(globalRoles.size(), equalTo(2));
+    }
 }
