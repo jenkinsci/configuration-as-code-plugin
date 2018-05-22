@@ -9,14 +9,23 @@ import java.util.Optional;
 
 /**
  * {@link SecretSource} implementation relying on <a href="https://docs.docker.com/engine/swarm/secrets">docker secrets</a>.
+ * The path to secret directory can be overridden by setting environment variable <tt>SECRET</tt>.
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Extension
 public class DockerSecretSource extends SecretSource {
 
+    public static final String DOCKER_SECRETS = "/run/secrets/";
+    private final File secrets;
+
+    public DockerSecretSource() {
+        String s = System.getenv("SECRETS");
+        secrets = s != null ? new File(s) : new File(DOCKER_SECRETS);
+    }
+
     @Override
     public Optional<String> reveal(String secret) throws IOException {
-        final File file = new File("/run/secrets/" + secret);
+        final File file = new File(secrets, secret);
         if (file.exists()) {
             return Optional.of(FileUtils.readFileToString(file).trim());
         }
