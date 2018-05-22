@@ -1,0 +1,43 @@
+jenkins:
+
+  authorizationStrategy:
+    roleStrategy:
+      roles:
+        global:
+          - name: "admin"
+            description: "Jenkins administrators"
+            permissions:
+              - "Overall/Administer"
+            assignments:
+              - "admin"
+          - name: "readonly"
+            description: "Read-only users"
+            permissions:
+              - "Overall/Read"
+              - "Job/Read"
+            assignments:
+              - "authenticated"
+
+  # System for test
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "admin"
+          password: "1234"
+        - id: "user1"
+          password: ""
+
+  nodes:
+    - dumb:
+        mode: NORMAL
+        name: "agent1"
+        remoteFS: "/home/user1"
+        launcher:
+          jnlp:
+    - dumb:
+        mode: NORMAL
+        name: "agent2"
+        remoteFS: "/home/user1"
+        launcher:
+          jnlp:
