@@ -286,6 +286,14 @@
       <version>3.0.0</version>
     </dependency>
 
+    <!-- Used by Essentials -->
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>metrics</artifactId>
+      <version>3.1.2.12</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
   <build>

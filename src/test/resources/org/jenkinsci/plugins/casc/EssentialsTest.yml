@@ -1,0 +1,13 @@
+---
+jenkins:
+  systemMessage: "Welcome to Jenkins Essentials!"
+  numExecutors: 0
+  metricsaccesskey:
+    accessKeys:
+      - key: "evergreen"
+        description: "Key for evergreen health-check"
+        canHealthCheck: true
+        canPing: false
+        canThreadDump: false
+        canMetrics: false
+        origins: "*"
