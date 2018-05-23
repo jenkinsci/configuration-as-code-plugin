@@ -1,13 +1,18 @@
 ---
+# NOTE: THIS FILE IS A COPY OF THE ONE USED IN JENKINS ESSENTIALS
+# DO NOT JUST ADAPT IF SOMETHING HAS TO CHANGE, PLEASE PING THE ESSENTIALS TEAM
+# IF THIS HAPPENS. Thanks!
 jenkins:
   systemMessage: "Welcome to Jenkins Essentials!"
   numExecutors: 0
+
+unclassified:
   metricsaccesskey:
     accessKeys:
-      - key: "evergreen"
-        description: "Key for evergreen health-check"
+      - key:            "evergreen"
+        description:    "Key for evergreen health-check"
         canHealthCheck: true
-        canPing: false
-        canThreadDump: false
-        canMetrics: false
-        origins: "*"
+        canPing:        false
+        canThreadDump:  false
+        canMetrics:     false
+        origins:        "*"
