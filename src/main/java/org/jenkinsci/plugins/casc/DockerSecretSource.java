@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.casc;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import org.apache.commons.io.FileUtils;
 
@@ -18,6 +19,7 @@ public class DockerSecretSource extends SecretSource {
     public static final String DOCKER_SECRETS = "/run/secrets/";
     private final File secrets;
 
+    @SuppressFBWarnings("DMI_HARDCODED_ABSOLUTE_FILENAME")
     public DockerSecretSource() {
         String s = System.getenv("SECRETS");
         secrets = s != null ? new File(s) : new File(DOCKER_SECRETS);
