@@ -10,7 +10,7 @@ import java.util.Optional;
 
 /**
  * {@link SecretSource} implementation relying on <a href="https://docs.docker.com/engine/swarm/secrets">docker secrets</a>.
- * The path to secret directory can be overridden by setting environment variable <tt>SECRET</tt>.
+ * The path to secret directory can be overridden by setting environment variable <tt>SECRETS</tt>.
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Extension
