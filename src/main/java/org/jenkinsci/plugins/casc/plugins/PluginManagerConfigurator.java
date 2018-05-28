@@ -141,7 +141,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
                         json.accumulate("dependencies", new JSONArray());
                         final UpdateSite.Plugin installable = updateSite.new Plugin(updateSite.getId(), json);
                         try {
-                            final UpdateCenter.UpdateCenterJob job = installable.deploy().get();
+                            final UpdateCenter.UpdateCenterJob job = installable.deploy(true).get();
                             if (job.getError() != null) throw job.getError();
                             installed.add(p.shortname);
 
@@ -178,6 +178,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
                 throw new ConfiguratorException("failed to write plugins.txt shrinkwrap file", e);
             }
 
+        /* FIXME Can wa always install plugin dynamically ? Some might require a restart to run a clean init
             if (!installed.isEmpty()) {
                 try {
                     Lifecycle.get().restart();
@@ -185,6 +186,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
                     throw new ConfiguratorException("Can't restart master after plugins installation", e);
                 }
             }
+        */
         }
 
         try {
