@@ -44,6 +44,8 @@ import java.util.jar.JarFile;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
@@ -107,7 +109,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
         File shrinkwrap = new File("./plugins.txt");
         if (shrinkwrap.exists()) {
             try {
-                final List<String> lines = FileUtils.readLines(shrinkwrap, StandardCharsets.UTF_8);
+                final List<String> lines = FileUtils.readLines(shrinkwrap, UTF_8);
                 for (String line : lines) {
                     int i = line.indexOf(':');
                     plugins.add(new PluginToInstall(line.substring(0,i), line.substring(i+1)));
@@ -157,13 +159,15 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
                         installed.add(p.shortname);
 
                         final File jpi = new File(pluginManager.rootDir, p.shortname + ".jpi");
-                        String dependencySpec = new JarFile(jpi).getManifest().getMainAttributes().getValue("Plugin-Dependencies");
-                        if (dependencySpec != null) {
-                            plugins.addAll(Arrays.stream(dependencySpec.split(","))
-                                    .filter(t -> !t.endsWith(";resolution:=optional"))
-                                    .map(t -> t.substring(0, t.indexOf(':')))
-                                    .map(a -> new PluginToInstall(a, "latest"))
-                                    .collect(Collectors.toList()));
+                        try (JarFile jar = new JarFile(jpi)) {
+                            String dependencySpec = jar.getManifest().getMainAttributes().getValue("Plugin-Dependencies");
+                            if (dependencySpec != null) {
+                                plugins.addAll(Arrays.stream(dependencySpec.split(","))
+                                        .filter(t -> !t.endsWith(";resolution:=optional"))
+                                        .map(t -> t.substring(0, t.indexOf(':')))
+                                        .map(a -> new PluginToInstall(a, "latest"))
+                                        .collect(Collectors.toList()));
+                            }
                         }
                         downloaded = true;
                         break install;
@@ -180,7 +184,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
             }
         }
 
-        try (PrintWriter w = new PrintWriter(shrinkwrap)) {
+        try (PrintWriter w = new PrintWriter(shrinkwrap, UTF_8.name())) {
             for (PluginWrapper pw : pluginManager.getPlugins()) {
                 if (pw.getShortName().equals("configuration-as-code")) continue;
                 w.println(pw.getShortName() + ":" + pw.getVersionNumber().toString());
@@ -268,7 +272,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
         return null;
     }
 
-    private class PluginToInstall {
+    private static class PluginToInstall {
         String shortname;
         String version;
 
