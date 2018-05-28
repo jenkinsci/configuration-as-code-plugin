@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.jar.JarFile;
 import java.util.logging.Logger;
@@ -119,74 +120,82 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
         final PluginManager pluginManager = getTargetComponent();
         if (!plugins.isEmpty()) {
 
+            boolean requireRestart = false;
+
+            UUID correlationId = UUID.randomUUID();
+
             Set<String> installed = new HashSet<>();
 
             // Install a plugin from the plugins list.
             // For each installed plugin, get the dependency list and update the plugins list accordingly
             install: while(!plugins.isEmpty()) {
-                PluginToInstall p = plugins.pop();
-                if (installed.contains(p.shortname)) continue;
+            PluginToInstall p = plugins.pop();
+            if (installed.contains(p.shortname)) continue;
 
-                final Plugin plugin = jenkins.getPlugin(p.shortname);
-                if (plugin == null || !plugin.getWrapper().getVersion().equals(p.version)) { // Need to install
+            final Plugin plugin = jenkins.getPlugin(p.shortname);
+            if (plugin == null || !plugin.getWrapper().getVersion().equals(p.version)) { // Need to install
 
-                    // FIXME update sites don't give us metadata about hosted plugins but "latest"
-                    // So we need to assume the URL layout to bake download metadata
-                    boolean downloaded = false;
-                    for (UpdateSite updateSite : updateCenter.getSites()) {
-                        JSONObject json = new JSONObject();
-                        json.accumulate("name", p.shortname);
-                        json.accumulate("version", p.version);
-                        json.accumulate("url", "download/plugins/"+p.shortname+"/"+p.version+"/"+p.shortname+".hpi");
-                        json.accumulate("dependencies", new JSONArray());
-                        final UpdateSite.Plugin installable = updateSite.new Plugin(updateSite.getId(), json);
-                        try {
-                            final UpdateCenter.UpdateCenterJob job = installable.deploy(true).get();
-                            if (job.getError() != null) throw job.getError();
-                            installed.add(p.shortname);
-
-                            final File jpi = new File(pluginManager.rootDir, p.shortname + ".jpi");
-                            String dependencySpec = new JarFile(jpi).getManifest().getMainAttributes().getValue("Plugin-Dependencies");
-                            if (dependencySpec != null) {
-                                plugins.addAll(Arrays.stream(dependencySpec.split(","))
-                                        .filter(t -> !t.endsWith(";resolution:=optional"))
-                                        .map(t -> t.substring(0, t.indexOf(':')))
-                                        .map(a -> new PluginToInstall(a, "latest"))
-                                        .collect(Collectors.toList()));
+                // FIXME update sites don't give us metadata about hosted plugins but "latest"
+                // So we need to assume the URL layout to bake download metadata
+                boolean downloaded = false;
+                for (UpdateSite updateSite : updateCenter.getSites()) {
+                    JSONObject json = new JSONObject();
+                    json.accumulate("name", p.shortname);
+                    json.accumulate("version", p.version);
+                    json.accumulate("url", "download/plugins/"+p.shortname+"/"+p.version+"/"+p.shortname+".hpi");
+                    json.accumulate("dependencies", new JSONArray());
+                    final UpdateSite.Plugin installable = updateSite.new Plugin(updateSite.getId(), json);
+                    try {
+                        final UpdateCenter.UpdateCenterJob job = installable.deploy(true, correlationId).get();
+                        if (job.getError() != null) {
+                            if (job.getError() instanceof UpdateCenter.DownloadJob.SuccessButRequiresRestart) {
+                                requireRestart = true;
+                            } else {
+                                throw job.getError();
                             }
-                            downloaded = true;
-                            break install;
-                        } catch (InterruptedException | ExecutionException ex) {
-                            logger.info("Failed to download plugin "+p.shortname+':'+p.version+ "from update site "+updateSite.getId());
-                        } catch (Throwable ex) {
-                            throw new ConfiguratorException("Failed to download plugin "+p.shortname+':'+p.version, ex);
                         }
-                    }
+                        installed.add(p.shortname);
 
-                    if (!downloaded) {
-                        throw new ConfiguratorException("Failed to install plugin "+p.shortname+':'+p.version);
+                        final File jpi = new File(pluginManager.rootDir, p.shortname + ".jpi");
+                        String dependencySpec = new JarFile(jpi).getManifest().getMainAttributes().getValue("Plugin-Dependencies");
+                        if (dependencySpec != null) {
+                            plugins.addAll(Arrays.stream(dependencySpec.split(","))
+                                    .filter(t -> !t.endsWith(";resolution:=optional"))
+                                    .map(t -> t.substring(0, t.indexOf(':')))
+                                    .map(a -> new PluginToInstall(a, "latest"))
+                                    .collect(Collectors.toList()));
+                        }
+                        downloaded = true;
+                        break install;
+                    } catch (InterruptedException | ExecutionException ex) {
+                        logger.info("Failed to download plugin "+p.shortname+':'+p.version+ "from update site "+updateSite.getId());
+                    } catch (Throwable ex) {
+                        throw new ConfiguratorException("Failed to download plugin "+p.shortname+':'+p.version, ex);
                     }
                 }
-            }
 
-            try (PrintWriter w = new PrintWriter(shrinkwrap)) {
-                for (PluginWrapper pw : pluginManager.getPlugins()) {
-                    if (pw.getShortName().equals("configuration-as-code")) continue;
-                    w.println(pw.getShortName() + ":" + pw.getVersionNumber().toString());
+                if (!downloaded) {
+                    throw new ConfiguratorException("Failed to install plugin "+p.shortname+':'+p.version);
                 }
-            } catch (IOException e) {
-                throw new ConfiguratorException("failed to write plugins.txt shrinkwrap file", e);
             }
+        }
 
-        /* FIXME Can wa always install plugin dynamically ? Some might require a restart to run a clean init
-            if (!installed.isEmpty()) {
-                try {
+        try (PrintWriter w = new PrintWriter(shrinkwrap)) {
+            for (PluginWrapper pw : pluginManager.getPlugins()) {
+                if (pw.getShortName().equals("configuration-as-code")) continue;
+                w.println(pw.getShortName() + ":" + pw.getVersionNumber().toString());
+            }
+        } catch (IOException e) {
+            throw new ConfiguratorException("failed to write plugins.txt shrinkwrap file", e);
+        }
+
+        if (requireRestart) {
+            try {
                     Lifecycle.get().restart();
                 } catch (InterruptedException | IOException e) {
                     throw new ConfiguratorException("Can't restart master after plugins installation", e);
                 }
             }
-        */
         }
 
         try {
