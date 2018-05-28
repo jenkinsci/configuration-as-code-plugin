@@ -1,4 +1,4 @@
-# Configure gitscm
+# Configure GitHub
 
 Basic configuration of the [GitHub plugin](https://wiki.jenkins.io/display/JENKINS/GitHub+Plugin)
 
