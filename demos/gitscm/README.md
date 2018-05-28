@@ -1,16 +1,13 @@
-# Configure activeDirectory Security Realm
+# Configure gitscm
 
-Basic configuration of the [Active Directory plugin](https://wiki.jenkins.io/display/JENKINS/Active+Directory+Plugin)
+Basic configuration of gitscm
 
 ## sample configuration
 
 ```yaml
-jenkins:
-  SecurityRealm:
-    activeDirectory:
-      groupLookupStrategy: AUTO
-      startTls: true
-      tlsConfiguration: TRUST_ALL_CERTIFICATES
-      domains:
-        - name: "domain.local"
+unknown:
+  gitscm:
+    globalConfigName: jenkins
+    globalConfigEmail: jenkins@domain.local
+    createAccountBasedOnEmail: true
 ```
