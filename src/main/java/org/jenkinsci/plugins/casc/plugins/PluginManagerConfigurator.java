@@ -18,9 +18,11 @@ import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.BaseConfigurator;
 import org.jenkinsci.plugins.casc.Configurator;
 import org.jenkinsci.plugins.casc.ConfiguratorException;
+import org.jenkinsci.plugins.casc.MultivaluedAttribute;
 import org.jenkinsci.plugins.casc.RootElementConfigurator;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
+import org.jenkinsci.plugins.casc.model.Sequence;
 
 import javax.annotation.CheckForNull;
 import java.io.File;
@@ -75,7 +77,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
             jenkins.proxy = pcc;
         }
 
-        final CNode sites = map.get("updateSites");
+        final CNode sites = map.get("sites");
         final UpdateCenter updateCenter = jenkins.getUpdateCenter();
         if (sites != null) {
             Configurator<UpdateSite> usc = Configurator.lookup(UpdateSite.class);
@@ -254,17 +256,24 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
     @Override
     public Set<Attribute> describe() {
         Set<Attribute> attr =  new HashSet<>();
-        attr.add(new Attribute("proxy", ProxyConfiguration.class));
-        attr.add(new Attribute("updateSites", UpdateSite.class).multiple(true));
-        attr.add(new Attribute("required", Plugins.class).multiple(true));
+        attr.add(new Attribute<PluginManager, ProxyConfiguration>("proxy", ProxyConfiguration.class));
+        attr.add(new MultivaluedAttribute<PluginManager, UpdateSite>("sites", UpdateSite.class));
+        attr.add(new MultivaluedAttribute<PluginManager, Plugins>("required", Plugins.class));
         return attr;
     }
 
     @CheckForNull
     @Override
-    public CNode describe(PluginManager instance) {
-        // FIXME
-        return null;
+    public CNode describe(PluginManager instance) throws Exception {
+        final Mapping mapping = new Mapping();
+        mapping.putIfNotNull("proxy", Configurator.lookup(ProxyConfiguration.class).describe(Jenkins.getInstance().proxy));
+        Sequence seq = new Sequence();
+        final Configurator cs = Configurator.lookup(UpdateSite.class);
+        for (UpdateSite site : Jenkins.getInstance().getUpdateCenter().getSiteList()) {
+            seq.add(cs.describe(site));
+        }
+        mapping.putIfNotEmpry("sites", seq);
+        return mapping;
     }
 
     private static class PluginToInstall {
