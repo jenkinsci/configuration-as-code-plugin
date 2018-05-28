@@ -20,8 +20,8 @@ public class PluginManagerConfiguratorTest {
     @Test
     @ConfiguredWithCode("PluginManagerConfiguratorTest.yml")
     public void testInstallPlugins() {
-        final Plugin git = j.jenkins.getPlugin("git");
-        assertNotNull(git);
-        assertEquals("3.8.0", git.getWrapper().getVersion());
+        final Plugin chucknorris = j.jenkins.getPlugin("chucknorris");
+        assertNotNull(chucknorris);
+        assertEquals("1.0", chucknorris.getWrapper().getVersion());
     }
 }

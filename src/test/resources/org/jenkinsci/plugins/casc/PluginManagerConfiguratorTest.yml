@@ -1,3 +1,3 @@
 plugins:
   required:
-    git: 3.8.0
+    chucknorris: 1.0
