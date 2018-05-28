@@ -1,3 +1,4 @@
 .git
 target
+work
 !target/configuration-as-code.hpi
