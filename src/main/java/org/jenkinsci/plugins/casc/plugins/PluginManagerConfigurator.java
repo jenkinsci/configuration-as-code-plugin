@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
@@ -38,7 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.jar.JarFile;
 import java.util.logging.Logger;
@@ -123,9 +121,6 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
         if (!plugins.isEmpty()) {
 
             boolean requireRestart = false;
-
-            UUID correlationId = UUID.randomUUID();
-
             Set<String> installed = new HashSet<>();
 
             // Install a plugin from the plugins list.
@@ -148,7 +143,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
                     json.accumulate("dependencies", new JSONArray());
                     final UpdateSite.Plugin installable = updateSite.new Plugin(updateSite.getId(), json);
                     try {
-                        final UpdateCenter.UpdateCenterJob job = installable.deploy(true, correlationId).get();
+                        final UpdateCenter.UpdateCenterJob job = installable.deploy(true).get();
                         if (job.getError() != null) {
                             if (job.getError() instanceof UpdateCenter.DownloadJob.SuccessButRequiresRestart) {
                                 requireRestart = true;
