@@ -4,7 +4,7 @@
 Sample configuration for the SonarQube plugin
 
 ```yaml
-jenkins:
+unclassified:
 
   sonarglobalconfiguration:     # mandatory
     installations:              # mandatory
