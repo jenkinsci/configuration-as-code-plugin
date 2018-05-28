@@ -266,9 +266,10 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
     @Override
     public CNode describe(PluginManager instance) throws Exception {
         final Mapping mapping = new Mapping();
-        mapping.putIfNotNull("proxy", Configurator.lookup(ProxyConfiguration.class).describe(Jenkins.getInstance().proxy));
+        final Configurator cp = Configurator.lookupOrFail(ProxyConfiguration.class);
+        mapping.putIfNotNull("proxy", cp.describe(Jenkins.getInstance().proxy));
         Sequence seq = new Sequence();
-        final Configurator cs = Configurator.lookup(UpdateSite.class);
+        final Configurator cs = Configurator.lookupOrFail(UpdateSite.class);
         for (UpdateSite site : Jenkins.getInstance().getUpdateCenter().getSiteList()) {
             seq.add(cs.describe(site));
         }
