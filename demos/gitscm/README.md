@@ -5,7 +5,7 @@ Basic configuration of gitscm
 ## sample configuration
 
 ```yaml
-unknown:
+unclassified:
   gitscm:
     globalConfigName: jenkins
     globalConfigEmail: jenkins@domain.local
