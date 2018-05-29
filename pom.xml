@@ -249,7 +249,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>jackson2-api</artifactId>
-      <version>2.7.3</version>
+      <version>2.8.11.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -268,7 +268,7 @@
     <dependency>
       <groupId>org.csanchez.jenkins.plugins</groupId>
       <artifactId>kubernetes</artifactId>
-      <version>1.6.0</version>
+      <version>1.6.4-20180529.133056-1</version>
       <scope>test</scope>
     </dependency>
 
@@ -323,9 +323,6 @@
             </configuration>
           </execution>
         </executions>
-        <configuration>
-          <fail>false</fail>
-        </configuration>
       </plugin>
     </plugins>
   </build>
