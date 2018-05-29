@@ -122,6 +122,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                     value = lookup.configure(config.get(name));
                 }
                 try {
+                    logger.info("Setting " + object + '.' + name + " = " + (yaml.isSensibleData() ? "****" : value));
                     attribute.setValue(object, value);
                 } catch (Exception e) {
                     throw new ConfiguratorException(this, "Failed to set attribute " + attribute, e);

@@ -165,7 +165,6 @@ public class Attribute<Owner, Type> {
      */
     private void _setValue(Owner target, Type value) throws Exception {
         final String setterId = target.getClass().getCanonicalName()+'#'+name;
-        logger.info("Setting " + setterId + " = " + value);
         final PropertyDescriptor property = PropertyUtils.getPropertyDescriptor(target, name);
         if (property == null) {
             throw new Exception("Default value setter cannot find Property Descriptor for " + setterId);
