@@ -140,6 +140,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
 
                 boolean downloaded = false;
                 UpdateSite updateSite = updateCenter.getSite(p.site);
+                if (updateSite == null) throw new ConfiguratorException("Can't install "+p+": no update site "+p.site);
                 final UpdateSite.Plugin installable = updateSite.new Plugin(updateSite.getId(), json);
                 try {
                     final UpdateCenter.UpdateCenterJob job = installable.deploy(true).get();

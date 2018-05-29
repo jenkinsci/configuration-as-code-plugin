@@ -20,6 +20,13 @@ class PluginToInstall {
     }
 
     @Override
+    public String toString() {
+        return new StringBuilder(shortname)
+                .append(':').append(version)
+                .append('@').append(site).toString();
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
