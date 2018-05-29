@@ -6,6 +6,7 @@ import hudson.PluginManager;
 import hudson.PluginWrapper;
 import hudson.ProxyConfiguration;
 import hudson.lifecycle.Lifecycle;
+import hudson.lifecycle.RestartNotSupportedException;
 import hudson.model.DownloadService;
 import hudson.model.UpdateCenter;
 import hudson.model.UpdateSite;
@@ -123,81 +124,86 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
 
             // Install a plugin from the plugins list.
             // For each installed plugin, get the dependency list and update the plugins list accordingly
-            install: while(!plugins.isEmpty()) {
-            PluginToInstall p = plugins.pop();
-            if (installed.contains(p.shortname)) continue;
+            install:
+            while (!plugins.isEmpty()) {
+                PluginToInstall p = plugins.pop();
+                if (installed.contains(p.shortname)) continue;
 
-            final Plugin plugin = jenkins.getPlugin(p.shortname);
-            if (plugin == null || !plugin.getWrapper().getVersion().equals(p.version)) { // Need to install
+                final Plugin plugin = jenkins.getPlugin(p.shortname);
+                if (plugin == null || !plugin.getWrapper().getVersion().equals(p.version)) { // Need to install
 
-                // FIXME update sites don't give us metadata about hosted plugins but "latest"
-                // So we need to assume the URL layout to bake download metadata
-                JSONObject json = new JSONObject();
-                json.accumulate("name", p.shortname);
-                json.accumulate("version", p.version);
-                json.accumulate("url", "download/plugins/"+p.shortname+"/"+p.version+"/"+p.shortname+".hpi");
-                json.accumulate("dependencies", new JSONArray());
+                    // if plugin is being _upgraded_, not just installed, we NEED to restart
+                    requireRestart |= (plugin != null);
 
-                boolean downloaded = false;
-                UpdateSite updateSite = updateCenter.getSite(p.site);
-                if (updateSite == null) throw new ConfiguratorException("Can't install "+p+": no update site "+p.site);
-                final UpdateSite.Plugin installable = updateSite.new Plugin(updateSite.getId(), json);
+                    // FIXME update sites don't give us metadata about hosted plugins but "latest"
+                    // So we need to assume the URL layout to bake download metadata
+                    JSONObject json = new JSONObject();
+                    json.accumulate("name", p.shortname);
+                    json.accumulate("version", p.version);
+                    json.accumulate("url", "download/plugins/" + p.shortname + "/" + p.version + "/" + p.shortname + ".hpi");
+                    json.accumulate("dependencies", new JSONArray());
+
+                    boolean downloaded = false;
+                    UpdateSite updateSite = updateCenter.getSite(p.site);
+                    if (updateSite == null)
+                        throw new ConfiguratorException("Can't install " + p + ": no update site " + p.site);
+                    final UpdateSite.Plugin installable = updateSite.new Plugin(updateSite.getId(), json);
+                    try {
+                        final UpdateCenter.UpdateCenterJob job = installable.deploy(true).get();
+                        if (job.getError() != null) {
+                            if (job.getError() instanceof UpdateCenter.DownloadJob.SuccessButRequiresRestart) {
+                                requireRestart = true;
+                            } else {
+                                throw job.getError();
+                            }
+                        }
+                        installed.add(p.shortname);
+
+                        final File jpi = new File(pluginManager.rootDir, p.shortname + ".jpi");
+                        try (JarFile jar = new JarFile(jpi)) {
+                            String dependencySpec = jar.getManifest().getMainAttributes().getValue("Plugin-Dependencies");
+                            if (dependencySpec != null) {
+                                plugins.addAll(Arrays.stream(dependencySpec.split(","))
+                                        .filter(t -> !t.endsWith(";resolution:=optional"))
+                                        .map(t -> t.substring(0, t.indexOf(':')))
+                                        .map(a -> new PluginToInstall(a, "latest"))
+                                        .collect(Collectors.toList()));
+                            }
+                        }
+                        downloaded = true;
+                        break install;
+                    } catch (InterruptedException | ExecutionException ex) {
+                        logger.info("Failed to download plugin " + p.shortname + ':' + p.version + "from update site " + updateSite.getId());
+                    } catch (Throwable ex) {
+                        throw new ConfiguratorException("Failed to download plugin " + p.shortname + ':' + p.version, ex);
+                    }
+
+                    if (!downloaded) {
+                        throw new ConfiguratorException("Failed to install plugin " + p.shortname + ':' + p.version);
+                    }
+                }
+            }
+
+            try (PrintWriter w = new PrintWriter(shrinkwrap, UTF_8.name())) {
+                for (PluginWrapper pw : pluginManager.getPlugins()) {
+                    if (pw.getShortName().equals("configuration-as-code")) continue;
+                    String from = UpdateCenter.PREDEFINED_UPDATE_SITE_ID;
+                    for (UpdateSite site : jenkins.getUpdateCenter().getSites()) {
+                        if (site.getPlugin(pw.getShortName()) != null) {
+                            from = site.getId();
+                            break;
+                        }
+                    }
+                    w.println(pw.getShortName() + ':' + pw.getVersionNumber().toString() + '@' + from);
+                }
+            } catch (IOException e) {
+                throw new ConfiguratorException("failed to write plugins.txt shrinkwrap file", e);
+            }
+
+            if (requireRestart) {
                 try {
-                    final UpdateCenter.UpdateCenterJob job = installable.deploy(true).get();
-                    if (job.getError() != null) {
-                        if (job.getError() instanceof UpdateCenter.DownloadJob.SuccessButRequiresRestart) {
-                            requireRestart = true;
-                        } else {
-                            throw job.getError();
-                        }
-                    }
-                    installed.add(p.shortname);
-
-                    final File jpi = new File(pluginManager.rootDir, p.shortname + ".jpi");
-                    try (JarFile jar = new JarFile(jpi)) {
-                        String dependencySpec = jar.getManifest().getMainAttributes().getValue("Plugin-Dependencies");
-                        if (dependencySpec != null) {
-                            plugins.addAll(Arrays.stream(dependencySpec.split(","))
-                                    .filter(t -> !t.endsWith(";resolution:=optional"))
-                                    .map(t -> t.substring(0, t.indexOf(':')))
-                                    .map(a -> new PluginToInstall(a, "latest"))
-                                    .collect(Collectors.toList()));
-                        }
-                    }
-                    downloaded = true;
-                    break install;
-                } catch (InterruptedException | ExecutionException ex) {
-                    logger.info("Failed to download plugin "+p.shortname+':'+p.version+ "from update site "+updateSite.getId());
-                } catch (Throwable ex) {
-                    throw new ConfiguratorException("Failed to download plugin "+p.shortname+':'+p.version, ex);
-                }
-
-                if (!downloaded) {
-                    throw new ConfiguratorException("Failed to install plugin "+p.shortname+':'+p.version);
-                }
-            }
-        }
-
-        try (PrintWriter w = new PrintWriter(shrinkwrap, UTF_8.name())) {
-            for (PluginWrapper pw : pluginManager.getPlugins()) {
-                if (pw.getShortName().equals("configuration-as-code")) continue;
-                String from = UpdateCenter.PREDEFINED_UPDATE_SITE_ID;
-                for (UpdateSite site : jenkins.getUpdateCenter().getSites()) {
-                    if (site.getPlugin(pw.getShortName()) != null) {
-                        from = site.getId();
-                        break;
-                    }
-                }
-                w.println(pw.getShortName() + ':' + pw.getVersionNumber().toString() + '@' + from);
-            }
-        } catch (IOException e) {
-            throw new ConfiguratorException("failed to write plugins.txt shrinkwrap file", e);
-        }
-
-        if (requireRestart) {
-            try {
-                    Lifecycle.get().restart();
-                } catch (InterruptedException | IOException e) {
+                    jenkins.restart();
+                } catch (RestartNotSupportedException e) {
                     throw new ConfiguratorException("Can't restart master after plugins installation", e);
                 }
             }
