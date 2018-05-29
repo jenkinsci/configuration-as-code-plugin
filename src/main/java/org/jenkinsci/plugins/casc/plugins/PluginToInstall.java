@@ -31,12 +31,14 @@ class PluginToInstall {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PluginToInstall that = (PluginToInstall) o;
-        return Objects.equals(shortname, that.shortname);
+        return Objects.equals(site, that.site) &&
+                Objects.equals(shortname, that.shortname) &&
+                Objects.equals(version, that.version);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(shortname);
+        return Objects.hash(site, shortname, version);
     }
 }

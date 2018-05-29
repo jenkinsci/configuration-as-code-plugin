@@ -5,7 +5,6 @@ import hudson.Plugin;
 import hudson.PluginManager;
 import hudson.PluginWrapper;
 import hudson.ProxyConfiguration;
-import hudson.lifecycle.Lifecycle;
 import hudson.lifecycle.RestartNotSupportedException;
 import hudson.model.DownloadService;
 import hudson.model.UpdateCenter;
@@ -30,11 +29,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Deque;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.jar.JarFile;
@@ -95,7 +95,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
         }
 
 
-        Deque<PluginToInstall> plugins = new LinkedList<>();
+        Queue<PluginToInstall> plugins = new LinkedList<>();
         final CNode required = map.get("required");
         if (required != null) {
             for (Map.Entry<String, CNode> entry : required.asMapping().entrySet()) {
@@ -104,17 +104,32 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
         }
 
         File shrinkwrap = new File("./plugins.txt");
+        Map<String, PluginToInstall> shrinkwrapped = new HashMap<>();
         if (shrinkwrap.exists()) {
             try {
                 final List<String> lines = FileUtils.readLines(shrinkwrap, UTF_8);
                 for (String line : lines) {
                     int i = line.indexOf(':');
-                    plugins.add(new PluginToInstall(line.substring(0,i), line.substring(i+1)));
+                    final String shortname = line.substring(0, i);
+                    shrinkwrapped.put(shortname, new PluginToInstall(shortname, line.substring(i+1)));
                 }
             } catch (IOException e) {
                 throw new ConfiguratorException("failed to load plugins.txt shrinkwrap file", e);
             }
+
+            // Check if required plugin list has been updated, in which case the shrinkwrap file is obsolete
+            boolean outdated = false;
+            for (PluginToInstall plugin : plugins) {
+                final PluginToInstall other = shrinkwrapped.get(plugin.shortname);
+                if (other == null || !other.equals(plugin)) {
+                    // plugins was added or version updates, so shrinkwrap isn't relevant anymore
+                    outdated = true;
+                    break;
+                }
+            }
+            if (!outdated) plugins.addAll(shrinkwrapped.values());
         }
+
 
         final PluginManager pluginManager = getTargetComponent();
         if (!plugins.isEmpty()) {
@@ -126,7 +141,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
             // For each installed plugin, get the dependency list and update the plugins list accordingly
             install:
             while (!plugins.isEmpty()) {
-                PluginToInstall p = plugins.pop();
+                PluginToInstall p = plugins.remove();
                 if (installed.contains(p.shortname)) continue;
 
                 final Plugin plugin = jenkins.getPlugin(p.shortname);
