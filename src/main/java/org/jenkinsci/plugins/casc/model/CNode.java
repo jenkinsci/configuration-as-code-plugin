@@ -25,4 +25,6 @@ public interface CNode {
         throw new ConfiguratorException("Item isn't a Scalar");
     }
 
+    default boolean isSensibleData() { return false; }
+
 }

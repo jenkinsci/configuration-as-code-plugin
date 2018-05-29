@@ -188,6 +188,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
         }
 
         return object;
+                    logger.info("Setting " + object + '.' + name + " = " + (yaml.isSensibleData() ? "****" : value));
     }
 
     public String getName() {

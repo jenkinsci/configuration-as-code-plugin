@@ -189,6 +189,7 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
                 }
 
                 try {
+                    LOGGER.info("Setting " + instance + '.' + name + " = " + (sub.isSensibleData() ? "****" : valueToSet));
                     attribute.setValue(instance, valueToSet);
                 } catch (Exception ex) {
                     throw new ConfiguratorException(configurator, "Failed to set attribute " + attribute, ex);

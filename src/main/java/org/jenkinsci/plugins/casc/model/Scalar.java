@@ -62,7 +62,9 @@ public final class Scalar implements CNode, CharSequence {
         return value;
     }
 
-
+    public boolean isSensibleData() {
+        return SecretSource.requiresReveal(value).isPresent();
+    }
 
     @Override
     public String toString() {

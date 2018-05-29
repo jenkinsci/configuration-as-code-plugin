@@ -8,12 +8,15 @@ import org.jenkinsci.plugins.casc.model.Mapping;
 import javax.annotation.CheckForNull;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * A generic {@link Configurator} for {@link hudson.Extension} singletons
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 public class ExtensionConfigurator<T> extends BaseConfigurator<T> {
+
+    private final static Logger logger = Logger.getLogger(ExtensionConfigurator.class.getName());
 
     private final Class<T> target;
 
@@ -45,8 +48,10 @@ public class ExtensionConfigurator<T> extends BaseConfigurator<T> {
                     final Class k = attribute.getType();
                     final Configurator configurator = Configurator.lookup(k);
                     if (configurator == null) throw new IllegalStateException("No configurator implementation to manage "+ k);
-                    final Object value = configurator.configure(config.get(name));
+                    final CNode yaml = config.get(name);
+                    final Object value = configurator.configure(yaml);
                     try {
+                        logger.info("Setting " + o + '.' + name + " = " + (yaml.isSensibleData() ? "****" : value));
                         attribute.setValue(o, value);
                     } catch (Exception e) {
                         throw new ConfiguratorException(this, "Failed to set attribute " + attribute, e);
