@@ -83,7 +83,13 @@ public final class Scalar implements CNode, CharSequence {
                     break;
                 }
             }
-            if(!reveal.isPresent()) {
+
+            Optional<String> defaultValue = SecretSource.defaultValue(value);
+            if(defaultValue.isPresent() && !reveal.isPresent()) {
+                s = defaultValue.get();
+            }
+
+            if(!reveal.isPresent() && !defaultValue.isPresent()) {
                 throw new RuntimeException("Unable to reveal variable with key: "+s);
             }
         }
