@@ -268,7 +268,7 @@
     <dependency>
       <groupId>org.csanchez.jenkins.plugins</groupId>
       <artifactId>kubernetes</artifactId>
-      <version>1.6.4-20180529.133056-1</version>
+      <version>1.6.4</version>
       <scope>test</scope>
     </dependency>
 
