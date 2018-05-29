@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
  */
 public abstract class SecretSource implements ExtensionPoint {
 
-    public static final Pattern SECRET_PATTERN = Pattern.compile("\\$\\{(.*)\\}");
+    public static final Pattern SECRET_PATTERN = Pattern.compile("\\$\\{([^:\\s]*)(?::-)?([^}\\s]*)?\\}");
 
     //We need to compile the matcher once for every key we examine.
     public static Optional<String> requiresReveal(String key) {
@@ -35,6 +35,14 @@ public abstract class SecretSource implements ExtensionPoint {
         List<SecretSource> all = new ArrayList<>();
         all.addAll(Jenkins.getInstance().getExtensionList(SecretSource.class));
         return all;
+    }
+
+    public static Optional<String> defaultValue(String key) {
+        Matcher m = SECRET_PATTERN.matcher(key);
+        if(m.matches() && m.groupCount() == 2) {
+            return Optional.ofNullable(m.group(2));
+        }
+        return Optional.empty();
     }
 
 }
