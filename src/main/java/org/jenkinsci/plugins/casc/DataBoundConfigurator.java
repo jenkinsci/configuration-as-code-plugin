@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.casc;
 
 import com.google.common.base.Defaults;
 import hudson.model.Descriptor;
+import javafx.collections.transformation.SortedList;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
@@ -17,9 +18,12 @@ import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -49,59 +53,35 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
         // c can be null for component with no-arg constructor and no extra property to be set
         Mapping config = (c != null ? c.asMapping() : Mapping.EMPTY);
 
-        final Constructor constructor = getDataBoundConstructor();
-
-        final Parameter[] parameters = constructor.getParameters();
-        final String[] names = ClassDescriptor.loadParameterNames(constructor);
-        Object[] args = new Object[names.length];
-
-        if (parameters.length > 0) {
-            // Many jenkins components haven't been migrated to @DataBoundSetter vs @NotNull constructor parameters
-            // as a result it might be valid to reference a describable without parameters
-
-            for (int i = 0; i < names.length; i++) {
-                final CNode value = config.remove(names[i]);
-                if (value == null && parameters[i].getAnnotation(Nonnull.class) != null) {
-                    throw new IllegalArgumentException(names[i] + " is required to configure " + target);
+        // TODO: The fallback resolution may end up resolving empty constructors
+        // Ideally we need an annotation or whatever other logic that old constructors are acceptable
+        final Constructor dataBoundConstructor = getDataBoundConstructor();
+        T object = null;
+        try {
+            logger.log(Level.INFO, "Trying @DataBoundConstructor for target {0}: {1}",
+                    new Object[] {target, dataBoundConstructor} );
+            object = tryConstructor((Constructor<T>) dataBoundConstructor, config);
+        } catch (ConfiguratorException ex) {
+            logger.log(Level.INFO, "Default databound constructor does not work, " +
+                    "will try other constructors just in case there was a config change", ex);
+            for (Constructor constructor : getSortedConstructorsList()) {
+                if (constructor == dataBoundConstructor) {
+                    continue; // Already tried it
                 }
-                final Class t = parameters[i].getType();
-                if (value != null) {
-                    if (Collection.class.isAssignableFrom(t)) {
-                        final Type pt = parameters[i].getParameterizedType();
-                        final Configurator lookup = Configurator.lookup(pt);
+                logger.log(Level.INFO, "Trying constructor {0} for target {1}",
+                        new Object[] {constructor, target});
 
-                        final ArrayList<Object> list = new ArrayList<>();
-                        for (CNode o : value.asSequence()) {
-                            list.add(lookup.configure(o));
-                        }
-                        args[i] = list;
+                try {
+                    object = tryConstructor((Constructor<T>) constructor, config);
+                } catch (ConfiguratorException ex2) {
+                    logger.log(Level.INFO, "Constructor {0} didn't work for target {1}",
+                            new Object[] {constructor, target});
+                }
 
-                    } else {
-                        final Type pt = parameters[i].getParameterizedType();
-                        final Type k = pt != null ? pt : t;
-                        final Configurator configurator = Configurator.lookup(k);
-                        if (configurator == null) throw new IllegalStateException("No configurator implementation to manage "+k);
-                        args[i] = configurator.configure(value);
-                    }
-                    logger.info("Setting " + target + "." + names[i] + " = " + value);
-                } else if (t.isPrimitive()) {
-                    args[i] = Defaults.defaultValue(t);
+                if (object != null) {
+                    break;
                 }
             }
-        }
-
-        final Object object;
-        try {
-            object = constructor.newInstance(args);
-        } catch (IllegalArgumentException | InstantiationException | InvocationTargetException | IllegalAccessException ex) {
-             List<String> argumentTypes = new ArrayList<>(args.length);
-             for (Object arg : args) {
-                argumentTypes.add(arg != null ? arg.getClass().getName() : "null");
-             }
-             throw new ConfiguratorException(this,
-                     "Failed to construct instance of " + target +
-                    ".\n Constructor: " + constructor.toString() +
-                    ".\n Arguments: " + argumentTypes, ex);
         }
 
         final Set<Attribute> attributes = describe();
@@ -139,7 +119,75 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
             }
         }
 
-        return (T) object;
+        return object;
+    }
+
+    private List<Constructor<T>> getSortedConstructorsList() {
+        Constructor[] constructorsArray = target.getConstructors();
+        ArrayList<Constructor<T>> list = new ArrayList<>(constructorsArray.length);
+        for (Constructor c : constructorsArray) {
+            list.add((Constructor<T>) c);
+        }
+
+        list.sort((o1, o2) -> Integer.compare(o1.getParameterCount(), o2.getParameterCount()));
+        return list;
+    }
+
+    private T tryConstructor(Constructor<T> constructor, Mapping config) throws ConfiguratorException {
+        final Parameter[] parameters = constructor.getParameters();
+        final String[] names = ClassDescriptor.loadParameterNames(constructor);
+        Object[] args = new Object[names.length];
+
+        if (parameters.length > 0) {
+            // Many jenkins components haven't been migrated to @DataBoundSetter vs @NotNull constructor parameters
+            // as a result it might be valid to reference a describable without parameters
+
+            for (int i = 0; i < names.length; i++) {
+                final CNode value = config.remove(names[i]);
+                if (value == null && parameters[i].getAnnotation(Nonnull.class) != null) {
+                    throw new ConfiguratorException(names[i] + " is required to configure " + target);
+                }
+                final Class t = parameters[i].getType();
+                if (value != null) {
+                    if (Collection.class.isAssignableFrom(t)) {
+                        final Type pt = parameters[i].getParameterizedType();
+                        final Configurator lookup = Configurator.lookup(pt);
+
+                        final ArrayList<Object> list = new ArrayList<>();
+                        for (CNode o : value.asSequence()) {
+                            list.add(lookup.configure(o));
+                        }
+                        args[i] = list;
+
+                    } else {
+                        final Type pt = parameters[i].getParameterizedType();
+                        final Type k = pt != null ? pt : t;
+                        final Configurator configurator = Configurator.lookup(k);
+                        if (configurator == null) throw new ConfiguratorException("No configurator implementation to manage "+k);
+                        args[i] = configurator.configure(value);
+                    }
+                    logger.info("Setting " + target + "." + names[i] + " = " + value);
+                } else if (t.isPrimitive()) {
+                    args[i] = Defaults.defaultValue(t);
+                }
+            }
+        }
+
+        final T object;
+        try {
+            object = constructor.newInstance(args);
+        } catch (IllegalArgumentException | InstantiationException | InvocationTargetException | IllegalAccessException ex) {
+            List<String> argumentTypes = new ArrayList<>(args.length);
+            for (Object arg : args) {
+                argumentTypes.add(arg != null ? arg.getClass().getName() : "null");
+            }
+            throw new ConfiguratorException(this,
+                    "Failed to construct instance of " + target +
+                            ".\n Constructor: " + constructor.toString() +
+                            ".\n Arguments: " + argumentTypes, ex);
+        }
+
+        return object;
     }
 
     public String getName() {
