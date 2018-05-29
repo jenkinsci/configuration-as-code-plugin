@@ -5,3 +5,4 @@ work/
 
 # ignore jenkins.yaml from root folder (used by many for testing)
 /jenkins.yaml
+plugins.txt
