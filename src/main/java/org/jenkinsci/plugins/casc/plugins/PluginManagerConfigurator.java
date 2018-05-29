@@ -13,7 +13,6 @@ import jenkins.model.Jenkins;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.BaseConfigurator;
 import org.jenkinsci.plugins.casc.Configurator;
@@ -27,9 +26,7 @@ import org.jenkinsci.plugins.casc.model.Sequence;
 import javax.annotation.CheckForNull;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
@@ -37,7 +34,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.jar.JarFile;
@@ -136,43 +132,43 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
 
                 // FIXME update sites don't give us metadata about hosted plugins but "latest"
                 // So we need to assume the URL layout to bake download metadata
-                boolean downloaded = false;
-                for (UpdateSite updateSite : updateCenter.getSites()) {
-                    JSONObject json = new JSONObject();
-                    json.accumulate("name", p.shortname);
-                    json.accumulate("version", p.version);
-                    json.accumulate("url", "download/plugins/"+p.shortname+"/"+p.version+"/"+p.shortname+".hpi");
-                    json.accumulate("dependencies", new JSONArray());
-                    final UpdateSite.Plugin installable = updateSite.new Plugin(updateSite.getId(), json);
-                    try {
-                        final UpdateCenter.UpdateCenterJob job = installable.deploy(true).get();
-                        if (job.getError() != null) {
-                            if (job.getError() instanceof UpdateCenter.DownloadJob.SuccessButRequiresRestart) {
-                                requireRestart = true;
-                            } else {
-                                throw job.getError();
-                            }
-                        }
-                        installed.add(p.shortname);
+                JSONObject json = new JSONObject();
+                json.accumulate("name", p.shortname);
+                json.accumulate("version", p.version);
+                json.accumulate("url", "download/plugins/"+p.shortname+"/"+p.version+"/"+p.shortname+".hpi");
+                json.accumulate("dependencies", new JSONArray());
 
-                        final File jpi = new File(pluginManager.rootDir, p.shortname + ".jpi");
-                        try (JarFile jar = new JarFile(jpi)) {
-                            String dependencySpec = jar.getManifest().getMainAttributes().getValue("Plugin-Dependencies");
-                            if (dependencySpec != null) {
-                                plugins.addAll(Arrays.stream(dependencySpec.split(","))
-                                        .filter(t -> !t.endsWith(";resolution:=optional"))
-                                        .map(t -> t.substring(0, t.indexOf(':')))
-                                        .map(a -> new PluginToInstall(a, "latest"))
-                                        .collect(Collectors.toList()));
-                            }
+                boolean downloaded = false;
+                UpdateSite updateSite = updateCenter.getSite(p.site);
+                final UpdateSite.Plugin installable = updateSite.new Plugin(updateSite.getId(), json);
+                try {
+                    final UpdateCenter.UpdateCenterJob job = installable.deploy(true).get();
+                    if (job.getError() != null) {
+                        if (job.getError() instanceof UpdateCenter.DownloadJob.SuccessButRequiresRestart) {
+                            requireRestart = true;
+                        } else {
+                            throw job.getError();
                         }
-                        downloaded = true;
-                        break install;
-                    } catch (InterruptedException | ExecutionException ex) {
-                        logger.info("Failed to download plugin "+p.shortname+':'+p.version+ "from update site "+updateSite.getId());
-                    } catch (Throwable ex) {
-                        throw new ConfiguratorException("Failed to download plugin "+p.shortname+':'+p.version, ex);
                     }
+                    installed.add(p.shortname);
+
+                    final File jpi = new File(pluginManager.rootDir, p.shortname + ".jpi");
+                    try (JarFile jar = new JarFile(jpi)) {
+                        String dependencySpec = jar.getManifest().getMainAttributes().getValue("Plugin-Dependencies");
+                        if (dependencySpec != null) {
+                            plugins.addAll(Arrays.stream(dependencySpec.split(","))
+                                    .filter(t -> !t.endsWith(";resolution:=optional"))
+                                    .map(t -> t.substring(0, t.indexOf(':')))
+                                    .map(a -> new PluginToInstall(a, "latest"))
+                                    .collect(Collectors.toList()));
+                        }
+                    }
+                    downloaded = true;
+                    break install;
+                } catch (InterruptedException | ExecutionException ex) {
+                    logger.info("Failed to download plugin "+p.shortname+':'+p.version+ "from update site "+updateSite.getId());
+                } catch (Throwable ex) {
+                    throw new ConfiguratorException("Failed to download plugin "+p.shortname+':'+p.version, ex);
                 }
 
                 if (!downloaded) {
@@ -207,47 +203,6 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
         return pluginManager;
     }
 
-    /**
-     * Collect required plugins as {@link UpdateSite.Plugin} so we can trigger installation if required
-     */
-    private List<UpdateSite.Plugin> getRequiredPlugins(Map<String, String> plugins, Jenkins jenkins, UpdateCenter updateCenter) throws ConfiguratorException {
-        List<UpdateSite.Plugin> installations = new ArrayList<>();
-        if (plugins != null) {
-            for (Map.Entry<String, String> e : plugins.entrySet()) {
-                String shortname = e.getKey();
-                String version = e.getValue();
-                final Plugin plugin = jenkins.getPlugin(shortname);
-                if (plugin == null || !plugin.getWrapper().getVersion().equals(e.getValue())) { // Need to install
-
-                    boolean found = false;
-                    for (UpdateSite updateSite : updateCenter.getSites()) {
-
-                        final UpdateSite.Plugin latest = updateSite.getPlugin(shortname);
-
-
-                        // FIXME see https://github.com/jenkins-infra/update-center2/pull/192
-                        // get plugin metadata for this specific version of the target plugin
-                        final URI metadata = URI.create(updateSite.getUrl()).resolve("download/plugins/" + shortname + "/" + version + "/metadata.json");
-                        try (InputStream open = ProxyConfiguration.open(metadata.toURL()).getInputStream()) {
-                            final JSONObject json = JSONObject.fromObject(IOUtils.toString(open));
-                            final UpdateSite.Plugin installable = updateSite.new Plugin(updateSite.getId(), json);
-                            installations.add(installable);
-                            found = true;
-                            break;
-                        } catch (IOException io) {
-                            // Not published by this update site
-                        }
-                    }
-
-                    if (!found) {
-                        throw new ConfiguratorException("Can't find plugin "+shortname+" in configured update sites");
-                    }
-                }
-            }
-        }
-        return installations;
-    }
-
     @Override
     public String getName() {
         return "plugins";
@@ -277,27 +232,4 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
         return mapping;
     }
 
-    private static class PluginToInstall {
-        String shortname;
-        String version;
-
-        public PluginToInstall(String shortname, String version) {
-            this.shortname = shortname;
-            this.version = version;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            PluginToInstall that = (PluginToInstall) o;
-            return Objects.equals(shortname, that.shortname);
-        }
-
-        @Override
-        public int hashCode() {
-
-            return Objects.hash(shortname);
-        }
-    }
 }
