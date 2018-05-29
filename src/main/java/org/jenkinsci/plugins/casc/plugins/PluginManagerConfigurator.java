@@ -180,7 +180,14 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
         try (PrintWriter w = new PrintWriter(shrinkwrap, UTF_8.name())) {
             for (PluginWrapper pw : pluginManager.getPlugins()) {
                 if (pw.getShortName().equals("configuration-as-code")) continue;
-                w.println(pw.getShortName() + ":" + pw.getVersionNumber().toString());
+                String from = UpdateCenter.PREDEFINED_UPDATE_SITE_ID;
+                for (UpdateSite site : jenkins.getUpdateCenter().getSites()) {
+                    if (site.getPlugin(pw.getShortName()) != null) {
+                        from = site.getId();
+                        break;
+                    }
+                }
+                w.println(pw.getShortName() + ':' + pw.getVersionNumber().toString() + '@' + from);
             }
         } catch (IOException e) {
             throw new ConfiguratorException("failed to write plugins.txt shrinkwrap file", e);
