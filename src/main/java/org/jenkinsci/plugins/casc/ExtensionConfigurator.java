@@ -51,7 +51,7 @@ public class ExtensionConfigurator<T> extends BaseConfigurator<T> {
                     final CNode yaml = config.get(name);
                     final Object value = configurator.configure(yaml);
                     try {
-                        logger.info("Setting " + o + '.' + name + " = " + (yaml.isSensibleData() ? "****" : value));
+                        logger.info("Setting " + o + '.' + name + " = " + (yaml.isSensitiveData() ? "****" : value));
                         attribute.setValue(o, value);
                     } catch (Exception e) {
                         throw new ConfiguratorException(this, "Failed to set attribute " + attribute, e);
