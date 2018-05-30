@@ -83,6 +83,9 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                 }
             }
         }
+        if (object == null) {
+            throw new ConfiguratorException("Failed to find a compatible constructor for target " + target);
+        }
 
         final Set<Attribute> attributes = describe();
 

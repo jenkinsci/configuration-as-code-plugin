@@ -59,7 +59,8 @@ public abstract class LegacyDataBoundConstructorProvider<TTarget> implements Ext
      * @return List of Legacy constructors defined by extension points.
      *         The list is ordered depending on Extension point ordinals.
      */
-    public static <T> Set<Constructor<T>> getLegacyDataBoundConstructors(Class<T> targetClazz) {
+    @Nonnull
+    public static <T> Set<Constructor<T>> getLegacyDataBoundConstructors(@Nonnull Class<T> targetClazz) {
         HashSet<Constructor<T>> constructors = new HashSet<>();
         for (LegacyDataBoundConstructorProvider<?> provider : all()) {
             final Set<? extends Constructor<?>> provided = provider.getConstructorsFor(targetClazz);
@@ -74,6 +75,7 @@ public abstract class LegacyDataBoundConstructorProvider<TTarget> implements Ext
         return constructors;
     }
 
+    @Nonnull
     public static ExtensionList<LegacyDataBoundConstructorProvider> all() {
         return ExtensionList.lookup(LegacyDataBoundConstructorProvider.class);
     }
