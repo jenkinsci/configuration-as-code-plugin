@@ -50,6 +50,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -276,9 +277,7 @@ public class ConfigurationAsCode extends ManagementLink {
     private void configureWith(List<YamlSource> configs) throws ConfiguratorException {
         final Node merged = YamlUtils.merge(configs);
         final Mapping map = loadAs(merged);
-        for (Map.Entry<String, CNode> entry : map.entrySet()) {
-            configureWith(entry);
-        }
+        configureWith(map.entrySet());
     }
 
     private Mapping loadAs(Node node) {
@@ -322,24 +321,39 @@ public class ConfigurationAsCode extends ManagementLink {
      * Configuration with help of {@link RootElementConfigurator}s.
      * Corresponding configurator is searched by entry key, passing entry value as object with all required properties.
      *
-     * @param entry key-value pair, where key should match to root configurator and value have all required properties
+     * @param entries key-value pairs, where key should match to root configurator and value have all required properties
      * @throws ConfiguratorException configuration error
      */
-    public static void configureWith(Map.Entry<String, CNode> entry) throws ConfiguratorException {
+    public static void configureWith(Set<Map.Entry<String, CNode>> entries) throws ConfiguratorException {
 
-        RootElementConfigurator configurator = Configurator.lookupRootElement(entry.getKey());
-        if (configurator == null) {
-            throw new ConfiguratorException(format("no configurator for root element <%s>", entry.getKey()));
+        // Run configurators by order, consuming entries until all have found a matching configurator
+        // configurators order is important so that org.jenkinsci.plugins.casc.plugins.PluginManagerConfigurator run
+        // before any other, and can install plugins required by other configuration to successfully parse yaml data
+        for (RootElementConfigurator configurator : RootElementConfigurator.all()) {
+            final Iterator<Map.Entry<String, CNode>> it = entries.iterator();
+            while (it.hasNext()) {
+                Map.Entry<String, CNode> entry = it.next();
+                if (! entry.getKey().equalsIgnoreCase(configurator.getName())) {
+                    continue;
+                }
+                try {
+                    configurator.configure(entry.getValue());
+                    it.remove();
+                    break;
+                } catch (ConfiguratorException e) {
+                    throw new ConfiguratorException(
+                            configurator,
+                            format("error configuring <%s> with <%s> configurator", entry.getKey(), configurator.getName()), e
+                    );
+                }
+            }
         }
-        try {
-            configurator.configure(entry.getValue());
-        } catch (ConfiguratorException e) {
-            throw new ConfiguratorException(
-                    configurator,
-                    format("error configuring <%s> with <%s> configurator", entry.getKey(), configurator.getName()),
-                    e
-            );
+
+        if (!entries.isEmpty()) {
+            final Map.Entry<String, CNode> next = entries.iterator().next();
+            throw new ConfiguratorException(format("No configurator for root element <%s>", next.getKey()));
         }
+
     }
 
 
