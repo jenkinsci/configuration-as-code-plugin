@@ -102,7 +102,10 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
                 plugins.add(new PluginToInstall(entry.getKey(), entry.getValue().asScalar().getValue()));
             }
         }
+
         File shrinkwrap = new File(jenkins.getRootDir(), "plugins.txt");
+        logger.log(java.util.logging.Level.CONFIG, String.format("Using shrinkwrap file: '%s'", shrinkwrap.getAbsoluteFile()));
+
         Map<String, PluginToInstall> shrinkwrapped = new HashMap<>();
         if (shrinkwrap.exists()) {
             try {
@@ -132,7 +135,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
 
         final PluginManager pluginManager = getTargetComponent();
         if (!plugins.isEmpty()) {
-
+            logger.log(java.util.logging.Level.CONFIG, String.format("Using plugin root dir: '%s'", pluginManager.rootDir));
             boolean requireRestart = false;
             Set<String> installed = new HashSet<>();
 
@@ -172,7 +175,6 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
                             }
                         }
                         installed.add(p.shortname);
-
                         final File jpi = new File(pluginManager.rootDir, p.shortname + ".jpi");
                         try (JarFile jar = new JarFile(jpi)) {
                             String dependencySpec = jar.getManifest().getMainAttributes().getValue("Plugin-Dependencies");
