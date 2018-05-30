@@ -1,5 +1,7 @@
 package org.jenkinsci.plugins.casc.model;
 
+import org.jenkinsci.plugins.casc.ConfiguratorException;
+
 import java.util.HashMap;
 
 /**
@@ -30,5 +32,17 @@ public final class Mapping extends HashMap<String, CNode> implements CNode {
 
     public void put(String key, Boolean value) {
         super.put(key, new Scalar(String.valueOf(value)));
+    }
+
+    public void putIfNotNull(String key, CNode node) {
+        if (node != null) super.put(key, node);
+    }
+
+    public void putIfNotEmpry(String key, Sequence seq) {
+        if (!seq.isEmpty()) super.put(key, seq);
+    }
+
+    public String getScalarValue(String key) throws ConfiguratorException {
+        return get(key).asScalar().getValue();
     }
 }

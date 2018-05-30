@@ -7,6 +7,7 @@ import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import javax.annotation.CheckForNull;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,11 +50,11 @@ public class PermissionFinder {
                     continue;
                 }
 
-                //TODO: this logic uses a localizable field for resolution. It may blow up at any moment
+                //TODO: Support PermissionGroupIDs (JENKINS-51598)
                 //How do we do this properly, we want to mimic the UI as best as possible. So the logic conclusion is
                 //That when you want admin to be Overall/Administer you put that in. Overall being the group title...
                 //Name being the Permission you want to set in the matrix.
-                if(pg.title.toString().equals(owner)) {
+                if(pg.title.toString(Locale.US).equals(owner)) {
                     return pg.owner.getName() + "." + name;
                 }
             }

@@ -63,4 +63,19 @@ public class PrimitiveConfiguratorTest {
         final Object value = c.configure(new Scalar("${ENV_FOR_TEST}"));
         assertEquals("abc", value);
     }
+
+    @Test
+    public void _string_env_default() throws Exception {
+        environment.set("NOT_THERE", "abc");
+        Configurator c = Configurator.lookup(String.class);
+        final Object value = c.configure(new Scalar("${ENV_FOR_TEST:-unsecured-token}"));
+        assertEquals("unsecured-token", value);
+    }
+
+    @Test
+    public void _int_env_default() throws Exception {
+        Configurator c = Configurator.lookup(Integer.class);
+        final Object value = c.configure(new Scalar("${ENV_FOR_TEST:-123}"));
+        assertEquals(123, value);
+    }
 }

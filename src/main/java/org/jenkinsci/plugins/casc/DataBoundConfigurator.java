@@ -268,10 +268,15 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
         return mapping;
     }
 
-    private Constructor getDataBoundConstructor() {
+    /**
+     * Gets DataBoundConstructor or fails.
+     * @return constructor with {@link org.kohsuke.stapler.DataBoundConstructor} annotation
+     * @throws ConfiguratorException Constructor not found
+     */
+    private Constructor getDataBoundConstructor() throws ConfiguratorException {
         final Constructor constructor = getDataBoundConstructor(target);
         if (constructor == null) {
-            throw new IllegalStateException(target.getName() + " is missing a @DataBoundConstructor");
+            throw new ConfiguratorException(target.getName() + " is missing a @DataBoundConstructor");
         }
         return constructor;
     }
