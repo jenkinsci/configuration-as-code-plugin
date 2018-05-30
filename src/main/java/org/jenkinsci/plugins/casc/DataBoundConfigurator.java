@@ -36,7 +36,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
 
     private final static Logger logger = Logger.getLogger(DataBoundConfigurator.class.getName());
 
-    private final Class target;
+    private final Class<T> target;
 
     public DataBoundConfigurator(Class<T> clazz) {
         this.target = clazz;
@@ -62,13 +62,13 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                     new Object[] {target, dataBoundConstructor} );
             object = tryConstructor((Constructor<T>) dataBoundConstructor, config);
         } catch (ConfiguratorException ex) {
-            logger.log(Level.INFO, "Default databound constructor does not work, " +
-                    "will try other constructors just in case there was a config change", ex);
-            for (Constructor constructor : getSortedConstructorsList()) {
+            logger.log(Level.INFO, "Default databound constructor cannot be applied, " +
+                    "will consult with Legacy DataBoundConstructor providers", ex);
+            for (Constructor constructor : LegacyDataBoundConstructorProvider.getLegacyDataBoundConstructors(target)) {
                 if (constructor == dataBoundConstructor) {
                     continue; // Already tried it
                 }
-                logger.log(Level.INFO, "Trying constructor {0} for target {1}",
+                logger.log(Level.INFO, "Trying legacy constructor {0} for target {1}",
                         new Object[] {constructor, target});
 
                 try {
@@ -121,17 +121,6 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
         }
 
         return object;
-    }
-
-    private List<Constructor<T>> getSortedConstructorsList() {
-        Constructor[] constructorsArray = target.getConstructors();
-        ArrayList<Constructor<T>> list = new ArrayList<>(constructorsArray.length);
-        for (Constructor c : constructorsArray) {
-            list.add((Constructor<T>) c);
-        }
-
-        list.sort((o1, o2) -> Integer.compare(o1.getParameterCount(), o2.getParameterCount()));
-        return list;
     }
 
     private T tryConstructor(Constructor<T> constructor, Mapping config) throws ConfiguratorException {
