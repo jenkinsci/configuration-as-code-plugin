@@ -7,7 +7,7 @@
 
 ## Release information
 
-Release notes can be found here: https://wiki.jenkins.io/display/JENKINS/configuration+as+code+plugin
+Release notes of the latest release can be found here: https://wiki.jenkins.io/display/JENKINS/configuration+as+code+plugin
 
 ## Introduction
 
@@ -48,9 +48,17 @@ so end-users have full guidance in using this toolset and don't have to search s
 
 Have a look at [this presentation](https://docs.google.com/presentation/d/1-irLGTAvMe8Fz1md1zkJtpIpYo9NItZKnsgTYnIqbZU/edit?usp=sharing) for more details.
 
-## Demo
+## Getting started
 
-Switch to `milestone1` branch and run `./demo.sh` script to build a containter and run Jenkins locally with basic setup (jenkins.yaml available on that branch in `milestone-1` folder)
+To get started you must have a running Jenkins instance with the plugin installed.
+
+The only other requirement is that your Jenkins instance has an environment variable set that points to the current configuration location for configuration as code. So the plugin requires the environment variable `CASC_JENKINS_CONFIG` to be set. The variable can point to the following:
+
+- Path to a folder containing a set of config files I.E `/var/jenkins_home/casc_configs`
+- A full path to a single file I.E `/var/jenkins_home/casc_configs/jenkins.yaml`
+- A URL pointing to a file served on the web I.E `https://mysite.com/jenkins.yaml`
+
+If everything was setup correctly you should now be able to browse the Configuration as Code management link in `Manage Jenkins -> Configuration as Code`.
 
 ## Jenkins Enhancement Proposal
 
@@ -59,10 +67,6 @@ As Configuration-as-code is demonstrated to be a highly requested topic in Jenki
 of the Jenkins project.
 
 Current status : proposal accepted.
-
-## Releases
-
-There's no release yet.
 
 ## Examples
 
