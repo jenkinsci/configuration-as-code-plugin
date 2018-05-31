@@ -7,8 +7,7 @@
 
 ## Release information
 
-### 0.1-alpha
-Version **0.1-alpha** available. For more information go to [Release notes](docs/RELEASE_NOTES.md) available under `docs` folder
+Release notes can be found here: https://wiki.jenkins.io/display/JENKINS/configuration+as+code+plugin
 
 ## Introduction
 
@@ -31,7 +30,6 @@ with this :
 
 ```yaml
 jenkins:
-
   securityRealm:
     ldap:
       configurations:
@@ -85,28 +83,27 @@ jenkins:
   slaveAgentPort: 50000
   agentProtocols:
     - "jnlp2"
-
 tool:
   git:
     installations:
       - name: git
         home: /usr/local/bin/git
-
-mailer:
-  adminAddress: admin@acme.org
-  replyToAddress: do-not-reply@acme.org
-  smtpHost: smtp.acme.org
-  smtpPort: 4441
-
+unclassified:
+  mailer:
+    adminAddress: admin@acme.org
+    replyToAddress: do-not-reply@acme.org
+    smtpHost: smtp.acme.org
+    smtpPort: 4441
 credentials:
   system:
-    ? # "global"
-    : - certificate:
-          scope:    SYSTEM
-          id:       ssh_private_key
-          keyStoreSource:
-            fileOnMaster:
-              keyStoreFile: /docker/secret/id_rsa
+    domainCredentials:
+      credentials:
+        - certificate:
+            scope:    SYSTEM
+            id:       ssh_private_key
+            keyStoreSource:
+              fileOnMaster:
+                keyStoreFile: /docker/secret/id_rsa
 ```
 
 Also see [demos](demos) folder with various samples.
@@ -167,7 +164,6 @@ the following ways:
 If all those 4 are present, Configuration-as-Code will try to gather initial secrets from Vault. Requires read access for the configured user.
 
 **TODO** provide a dockerfile to 'build' this documentation from specified jenkins-core release and plugins.
-
 
 ## Supported plugins
 
