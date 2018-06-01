@@ -31,6 +31,7 @@ import org.yaml.snakeyaml.resolver.Resolver;
 import org.yaml.snakeyaml.serializer.Serializer;
 
 import javax.annotation.CheckForNull;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -115,6 +116,7 @@ public class ConfigurationAsCode extends ManagementLink {
     @RequirePOST
     public void doReload(StaplerRequest request, StaplerResponse response) throws Exception {
         if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
 
@@ -158,11 +160,16 @@ public class ConfigurationAsCode extends ManagementLink {
 
     /**
      * Export live jenkins instance configuration as Yaml
-     * @param req
-     * @param res
      * @throws Exception
      */
+    @RequirePOST
     public void doExport(StaplerRequest req, StaplerResponse res) throws Exception {
+
+        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+            res.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+
         res.setContentType("application/x-yaml; charset=utf-8");
         res.addHeader("Content-Disposition", "attachment; filename=jenkins.yaml");
 
