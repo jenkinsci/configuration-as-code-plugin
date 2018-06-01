@@ -83,7 +83,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                         if (configurator == null) throw new IllegalStateException("No configurator implementation to manage "+k);
                         args[i] = configurator.configure(value);
                     }
-                    logger.info("Setting " + target + "." + names[i] + " = " + value);
+                    logger.info("Setting " + target + "." + names[i] + " = " + (value.isSensitiveData() ? "****" : value));
                 } else if (t.isPrimitive()) {
                     args[i] = Defaults.defaultValue(t);
                 }
