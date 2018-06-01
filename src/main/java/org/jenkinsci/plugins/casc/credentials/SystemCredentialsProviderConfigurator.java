@@ -18,7 +18,7 @@ import java.util.Set;
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-@Extension
+@Extension(optional = true)
 public class SystemCredentialsProviderConfigurator extends BaseConfigurator<SystemCredentialsProvider> {
 
     @Override
