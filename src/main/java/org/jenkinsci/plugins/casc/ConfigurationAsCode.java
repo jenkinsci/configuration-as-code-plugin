@@ -31,6 +31,7 @@ import org.yaml.snakeyaml.resolver.Resolver;
 import org.yaml.snakeyaml.serializer.Serializer;
 
 import javax.annotation.CheckForNull;
+import javax.servlet.ServletContext;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -56,9 +57,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
+import static java.util.logging.Level.WARNING;
 import static java.util.stream.Collectors.toList;
 import static org.yaml.snakeyaml.DumperOptions.FlowStyle.BLOCK;
 import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.DOUBLE_QUOTED;
@@ -76,6 +81,8 @@ public class ConfigurationAsCode extends ManagementLink {
     public static final String CASC_JENKINS_CONFIG_ENV = "CASC_JENKINS_CONFIG";
     public static final String DEFAULT_JENKINS_YAML_PATH = "./jenkins.yaml";
     public static final String YAML_FILES_PATTERN = "glob:**.{yml,yaml,YAML,YML}";
+
+    public static final Logger LOGGER = Logger.getLogger(ConfigurationAsCode.class.getName());
 
     @CheckForNull
     @Override
@@ -136,10 +143,15 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     /**
-     * Main entry point to start configuration process
+     * Main entry point to start configuration process.
      * @throws ConfiguratorException Configuration error
      */
     public void configure() throws ConfiguratorException {
+        List<String> configParameters = getBundledCasCURIs();
+        if (!configParameters.isEmpty()) {
+            LOGGER.log(Level.FINE, "Located bundled config YAMLs: {0}", configParameters);
+        }
+
         String configParameter = System.getProperty(
                 CASC_JENKINS_CONFIG_PROPERTY,
                 System.getenv(CASC_JENKINS_CONFIG_ENV)
@@ -147,13 +159,51 @@ public class ConfigurationAsCode extends ManagementLink {
         if (configParameter == null) {
             if (Files.exists(Paths.get(DEFAULT_JENKINS_YAML_PATH))) {
                 configParameter = DEFAULT_JENKINS_YAML_PATH;
-            } else {
-                // No configuration set nor default config file
-                return;
             }
         }
 
-        configure(configParameter);
+        if (configParameter != null) {
+            // Add external config parameter
+            configParameters.add(configParameter);
+        }
+        if (configParameters.isEmpty()) {
+            LOGGER.log(Level.FINE, "No configuration set nor default config file");
+            return;
+        }
+        configure(configParameters);
+    }
+
+    public List<String> getBundledCasCURIs() {
+        final String cascFile = "casc.yml";
+        final String cascDirectory = "casc.yml.d";
+        List<String> res = new ArrayList<>();
+
+        final ServletContext servletContext = Jenkins.getInstance().servletContext;
+        try {
+            URL bundled = servletContext.getResource("/WEB-INF/"+ cascFile);
+            if (bundled != null) {
+                res.add(bundled.toString());
+            }
+        } catch (IOException e) {
+            LOGGER.log(WARNING, "Failed to load /WEB-INF/" + cascFile, e);
+        }
+
+        Set<String> resources = servletContext.getResourcePaths("/WEB-INF/"+ cascDirectory +"/");
+        if (resources!=null) {
+            // sort to execute them in a deterministic order
+            for (String cascItem : new TreeSet<>(resources)) {
+                try {
+                    URL bundled = servletContext.getResource(cascItem);
+                    if (bundled != null) {
+                        res.add(bundled.toString());
+                    } //TODO: else do some handling?
+                } catch (IOException e) {
+                    LOGGER.log(WARNING, "Failed to execute " + res, e);
+                }
+            }
+        }
+
+        return res;
     }
 
     /**
@@ -235,8 +285,11 @@ public class ConfigurationAsCode extends ManagementLink {
         }
     }
 
-
     public void configure(String ... configParameters) throws ConfiguratorException {
+        configure(Arrays.asList(configParameters));
+    }
+
+    public void configure(Collection<String> configParameters) throws ConfiguratorException {
 
         List<YamlSource> configs = new ArrayList<>();
 
