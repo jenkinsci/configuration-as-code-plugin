@@ -27,7 +27,15 @@ import javax.annotation.CheckForNull;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.jar.JarFile;
 import java.util.logging.Logger;
@@ -94,9 +102,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
                 plugins.add(new PluginToInstall(entry.getKey(), entry.getValue().asScalar().getValue()));
             }
         }
-        
-        Optional<String> jenkinsRoot = Optional.ofNullable(System.getProperty("JENKINS_HOME", System.getenv("JENKINS_HOME")));
-        File shrinkwrap = new File(jenkinsRoot.orElse("."), "plugins.txt");
+        File shrinkwrap = new File(jenkins.getRootDir(), "plugins.txt");
         Map<String, PluginToInstall> shrinkwrapped = new HashMap<>();
         if (shrinkwrap.exists()) {
             try {
