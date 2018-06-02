@@ -1,0 +1,8 @@
+jenkins:
+  nodes:
+    - slave:
+        name: "foo"
+    - dumb:
+        name: "bar"
+    - DumbSlave:
+        name: "qix"

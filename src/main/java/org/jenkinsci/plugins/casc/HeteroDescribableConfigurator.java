@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -32,6 +33,9 @@ import java.util.stream.Collectors;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 public class HeteroDescribableConfigurator extends Configurator<Describable> {
+
+    private static final Logger LOGGER = Logger.getLogger(HeteroDescribableConfigurator.class.getName());
+
 
     private final Class<Describable> target;
 
@@ -75,18 +79,28 @@ public class HeteroDescribableConfigurator extends Configurator<Describable> {
 
         final List<Descriptor> candidates = Jenkins.getInstance().getDescriptorList(target);
 
-        Class<? extends Describable> k = findDescribableBySymbol(shortname, candidates);
+        Class<? extends Describable> k = findDescribableBySymbol(config, shortname, candidates);
         final Configurator configurator = Configurator.lookup(k);
         if (configurator == null) throw new IllegalStateException("No configurator implementation to manage "+k);
         return (Describable) configurator.configure(subconfig);
     }
 
-    private Class findDescribableBySymbol(String shortname, List<Descriptor> candidates) {
+    private Class findDescribableBySymbol(CNode node, String shortname, List<Descriptor> candidates) {
 
         // Search for @Symbol annotation on Descriptor to match shortName
         for (Descriptor d : candidates) {
-            final String symbol = DescribableAttribute.getSymbolName(d, getExtensionPoint(), target);
-            if (symbol.equalsIgnoreCase(shortname)) return d.getKlass().toJavaClass();
+            final List<String> symbols = DescribableAttribute.getSymbols(d, getExtensionPoint(), target);
+            final String preferred = symbols.get(0);
+            if (preferred.equalsIgnoreCase(shortname)) {
+                return d.getKlass().toJavaClass();
+            } else {
+                for (String symbol : symbols) {
+                    if (symbol.equalsIgnoreCase(shortname)) {
+                        LOGGER.warning(node.source() + ": '"+shortname+"' is obsolete, please use '" + preferred + "'");
+                        return d.getKlass().toJavaClass();
+                    }
+                }
+            }
         }
 
         // Not all Describable classes have symbols, give a chance to custom configurators in standalone plugins
@@ -110,7 +124,7 @@ public class HeteroDescribableConfigurator extends Configurator<Describable> {
     @CheckForNull
     @Override
     public CNode describe(Describable instance) throws Exception {
-        final String symbol = DescribableAttribute.getSymbolName(instance.getDescriptor(), getTarget(), instance.getClass());
+        final String symbol = DescribableAttribute.getPreferredSymbol(instance.getDescriptor(), getTarget(), instance.getClass());
         final Configurator c = Configurator.lookupOrFail(instance.getClass());
         final CNode describe = c.describe(instance);
         if (describe == null) {

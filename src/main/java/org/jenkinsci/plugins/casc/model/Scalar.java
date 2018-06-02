@@ -15,6 +15,12 @@ public final class Scalar implements CNode, CharSequence {
     private String value;
     private Tag tag;
     private boolean raw;
+    private String source;
+
+    public Scalar(String value, String source) {
+        this(value);
+        this.source = source;
+    }
 
     public Scalar(String value) {
         this.value = value;
@@ -120,4 +126,9 @@ public final class Scalar implements CNode, CharSequence {
     public CharSequence subSequence(int start, int end) {
         return value.subSequence(start, end);
     }
+
+    public String source() {
+        return source;
+    }
+
 }

@@ -7,13 +7,17 @@ import org.jenkinsci.plugins.casc.model.Sequence;
 import org.yaml.snakeyaml.constructor.AbstractConstruct;
 import org.yaml.snakeyaml.constructor.Construct;
 import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.error.Mark;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.ScalarNode;
+import org.yaml.snakeyaml.nodes.SequenceNode;
 import org.yaml.snakeyaml.nodes.Tag;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -31,9 +35,15 @@ public class ModelConstructor extends Constructor {
     private final static Construct ConstructScalar = new AbstractConstruct() {
         @Override
         public Object construct(Node node) {
-            return new Scalar(((ScalarNode) node).getValue());
+            final String value = ((ScalarNode) node).getValue();
+            return new Scalar(value, getSource(node));
         }
     };
+
+    private static String getSource(Node node) {
+        final Mark mark = node.getStartMark();
+        return mark.getName() + " (line "+ (mark.getLine()+ 1) + ")";
+    }
 
     @Override
     protected Object constructScalar(ScalarNode node) {
@@ -50,7 +60,8 @@ public class ModelConstructor extends Constructor {
     /**
      * Enforce Map keys are only Scalars and can be used as {@link String} keys in {@link Mapping}
      */
-    protected void constructMapping2ndStep(MappingNode node, final Map<Object, Object> mapping) {
+    protected void constructMapping2ndStep(MappingNode node, final Map mapping) {
+        ((Mapping) mapping).setSource(getSource(node));
         super.constructMapping2ndStep(node,
                 new AbstractMapDecorator(mapping) {
             @Override
@@ -71,4 +82,9 @@ public class ModelConstructor extends Constructor {
         return new Sequence(initSize);
     }
 
+    @Override
+    protected void constructSequenceStep2(SequenceNode node, Collection collection) {
+        ((Sequence) collection).setSource(getSource(node));
+        super.constructSequenceStep2(node, collection);
+    }
 }
