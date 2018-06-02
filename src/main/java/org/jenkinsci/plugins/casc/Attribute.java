@@ -7,6 +7,7 @@ import org.jenkinsci.plugins.casc.model.Sequence;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -34,11 +35,15 @@ public class Attribute<Owner, Type> {
     private Setter<Owner, Type> setter;
     private Getter<Owner, Type> getter;
 
+    protected List<String> aliases;
+
     public Attribute(String name, Class type) {
         this.name = name;
         this.type = type;
         this.getter = this::_getValue;
         this.setter = this::_setValue;
+        this.aliases = new ArrayList<>();
+        this.aliases.add(name);
     }
 
     @Override
@@ -77,6 +82,11 @@ public class Attribute<Owner, Type> {
         return this;
     }
 
+    public Attribute<Owner, Type> alias(String alias) {
+        this.aliases.add(alias);
+        return this;
+    }
+
     public Attribute<Owner, Type> getter(Getter<Owner, Type> getter) {
         this.getter = getter;
         return this;
@@ -88,6 +98,10 @@ public class Attribute<Owner, Type> {
 
     public Getter<Owner, Type> getGetter() {
         return getter;
+    }
+
+    public List<String> getAliases() {
+        return aliases;
     }
 
     /**

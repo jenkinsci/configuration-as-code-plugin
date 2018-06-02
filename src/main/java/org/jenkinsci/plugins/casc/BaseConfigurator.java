@@ -78,7 +78,14 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
             // See https://github.com/jenkinsci/structs-plugin/pull/18
             final Symbol s = setter.getAnnotation(Symbol.class);
             if (s != null) {
-                attribute.preferredName(s.value()[0]);
+                final String[] values = s.value();
+                final int last = values.length - 1;
+                // we assume preferred name is the last added as @Symbol value
+                attribute.preferredName(values[last]);
+                for (int i = 0; i < last; i++) {
+                    attribute.alias(values[i]);
+                }
+
             }
         }
         return attributes;
@@ -169,9 +176,19 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
     protected void configure(Mapping config, T instance) throws ConfiguratorException {
         final Set<Attribute> attributes = describe();
 
-        for (Attribute attribute : attributes) {
+        for (Attribute<T,Object> attribute : attributes) {
             final String name = attribute.getName();
-            final CNode sub = removeIgnoreCase(config, name);
+            CNode sub = removeIgnoreCase(config, name);
+            if (sub == null) {
+                for (String alias : attribute.aliases) {
+                    sub = removeIgnoreCase(config, alias);
+                    if (sub != null) {
+                        LOGGER.warning(sub.source() + ": '"+alias+"' is an obsolete attribute name, please use '" + name + "'");
+                        break;
+                    }
+                }
+            }
+
             if (sub != null) {
                 final Class k = attribute.getType();
                 final Configurator configurator = Configurator.lookupOrFail(k);

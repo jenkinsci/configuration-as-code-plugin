@@ -7,6 +7,8 @@ import java.util.ArrayList;
  */
 public final class Sequence extends ArrayList<CNode> implements CNode {
 
+    private String source;
+
     public Sequence() {
     }
 
@@ -25,4 +27,12 @@ public final class Sequence extends ArrayList<CNode> implements CNode {
         return this;
     }
 
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    @Override
+    public String source() {
+        return source;
+    }
 }
