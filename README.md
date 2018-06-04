@@ -24,7 +24,7 @@ expert, just translating into _code_ a configuration process one is used to exec
 
 So, we are trying to replace this :
 
-![configuration form](sample_form.png)
+![configuration form](images/sample_form.png)
 
 with this :
 
@@ -60,13 +60,20 @@ The only other requirement is that your Jenkins instance has an environment vari
 
 If everything was setup correctly you should now be able to browse the Configuration as Code management link in `Manage Jenkins -> Configuration as Code`.
 
-## Jenkins Enhancement Proposal
+## How to configure your first instance
 
-As Configuration-as-code is demonstrated to be a highly requested topic in Jenkins community, we have published
-[JEP 201](https://github.com/jenkinsci/jep/tree/master/jep/201) as proposal to make this a standard component
-of the Jenkins project.
+Generally when you are about to configure your first instance you want to first browse the examples shown in the [demos](demos) 
+section of this repository. If you've got a plugin, that we do not have an example for, you can consult the reference 
+help document by pressing the `Documentation` link on the Configuration as Code management link page. What you'll get a
+web page like this:
 
-Current status : proposal accepted.
+![refence page](images/reference.png)
+ 
+If you've got a specific plugin you might wish to configure, search the page for the name of the plugin. The page will
+show you which root element the configuration belongs to. Most plugins you install belong in the `unclassifed` root 
+element. 
+
+![unclassified](images/unclassified.png)
 
 ## Examples
 
@@ -187,3 +194,11 @@ Here is a list of plugin we have successfully tested to support configuration-as
  - [x] warnings-plugin (>= 4.66) ([details](demos/warnings/README.md))
  - [x] kubernetes plugin ([details](demos/kubernetes/README.md))
  - [ ] more to come soon...
+
+## Jenkins Enhancement Proposal
+
+As Configuration-as-code is demonstrated to be a highly requested topic in Jenkins community, we have published
+[JEP 201](https://github.com/jenkinsci/jep/tree/master/jep/201) as proposal to make this a standard component
+of the Jenkins project.
+
+Current status : proposal accepted.
