@@ -5,6 +5,7 @@ Basic configuration of the [GitHub plugin](https://wiki.jenkins.io/display/JENKI
 ## sample configuration
 
 ```yaml
+jenkins: [...]
 unclassified:
   githubpluginconfig:
     configs:

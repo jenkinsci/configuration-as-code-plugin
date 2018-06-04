@@ -5,6 +5,7 @@ Basic configuration of gitscm
 ## sample configuration
 
 ```yaml
+jenkins: [...]
 unclassified:
   gitscm:
     globalConfigName: jenkins

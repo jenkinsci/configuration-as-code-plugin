@@ -7,8 +7,7 @@
 
 ## Release information
 
-### 0.1-alpha
-Version **0.1-alpha** available. For more information go to [Release notes](docs/RELEASE_NOTES.md) available under `docs` folder
+Release notes of the latest release can be found here: https://wiki.jenkins.io/display/JENKINS/configuration+as+code+plugin
 
 ## Introduction
 
@@ -25,13 +24,12 @@ expert, just translating into _code_ a configuration process one is used to exec
 
 So, we are trying to replace this :
 
-![configuration form](sample_form.png)
+![configuration form](images/sample_form.png)
 
 with this :
 
 ```yaml
 jenkins:
-
   securityRealm:
     ldap:
       configurations:
@@ -50,21 +48,32 @@ so end-users have full guidance in using this toolset and don't have to search s
 
 Have a look at [this presentation](https://docs.google.com/presentation/d/1-irLGTAvMe8Fz1md1zkJtpIpYo9NItZKnsgTYnIqbZU/edit?usp=sharing) for more details.
 
-## Demo
+## Getting started
 
-Switch to `milestone1` branch and run `./demo.sh` script to build a containter and run Jenkins locally with basic setup (jenkins.yaml available on that branch in `milestone-1` folder)
+To get started you must have a running Jenkins instance with the plugin installed.
 
-## Jenkins Enhancement Proposal
+The only other requirement is that your Jenkins instance has an environment variable set that points to the current configuration location for configuration as code. So the plugin requires the environment variable `CASC_JENKINS_CONFIG` to be set. The variable can point to the following:
 
-As Configuration-as-code is demonstrated to be a highly requested topic in Jenkins community, we have published
-[JEP 201](https://github.com/jenkinsci/jep/tree/master/jep/201) as proposal to make this a standard component
-of the Jenkins project.
+- Path to a folder containing a set of config files I.E `/var/jenkins_home/casc_configs`
+- A full path to a single file I.E `/var/jenkins_home/casc_configs/jenkins.yaml`
+- A URL pointing to a file served on the web I.E `https://mysite.com/jenkins.yaml`
 
-Current status : proposal accepted.
+If everything was setup correctly you should now be able to browse the Configuration as Code management link in `Manage Jenkins -> Configuration as Code`.
 
-## Releases
+## How to configure your first instance
 
-There's no release yet.
+Generally when you are about to configure your first instance you want to first browse the examples shown in the [demos](demos) 
+section of this repository. If you've got a plugin, that we do not have an example for, you can consult the reference 
+help document by pressing the `Documentation` link on the Configuration as Code management link page. What you'll get a
+web page like this:
+
+![refence page](images/reference.png)
+ 
+If you've got a specific plugin you might wish to configure, search the page for the name of the plugin. The page will
+show you which root element the configuration belongs to. Most plugins you install belong in the `unclassifed` root 
+element. 
+
+![unclassified](images/unclassified.png)
 
 ## Examples
 
@@ -85,28 +94,27 @@ jenkins:
   slaveAgentPort: 50000
   agentProtocols:
     - "jnlp2"
-
 tool:
   git:
     installations:
       - name: git
         home: /usr/local/bin/git
-
-mailer:
-  adminAddress: admin@acme.org
-  replyToAddress: do-not-reply@acme.org
-  smtpHost: smtp.acme.org
-  smtpPort: 4441
-
+unclassified:
+  mailer:
+    adminAddress: admin@acme.org
+    replyToAddress: do-not-reply@acme.org
+    smtpHost: smtp.acme.org
+    smtpPort: 4441
 credentials:
   system:
-    ? # "global"
-    : - certificate:
-          scope:    SYSTEM
-          id:       ssh_private_key
-          keyStoreSource:
-            fileOnMaster:
-              keyStoreFile: /docker/secret/id_rsa
+    domainCredentials:
+      credentials:
+        - certificate:
+            scope:    SYSTEM
+            id:       ssh_private_key
+            keyStoreSource:
+              fileOnMaster:
+                keyStoreFile: /docker/secret/id_rsa
 ```
 
 Also see [demos](demos) folder with various samples.
@@ -168,7 +176,6 @@ If all those 4 are present, Configuration-as-Code will try to gather initial sec
 
 **TODO** provide a dockerfile to 'build' this documentation from specified jenkins-core release and plugins.
 
-
 ## Supported plugins
 
 Here is a list of plugin we have successfully tested to support configuration-as-code approach :
@@ -187,3 +194,11 @@ Here is a list of plugin we have successfully tested to support configuration-as
  - [x] warnings-plugin (>= 4.66) ([details](demos/warnings/README.md))
  - [x] kubernetes plugin ([details](demos/kubernetes/README.md))
  - [ ] more to come soon...
+
+## Jenkins Enhancement Proposal
+
+As Configuration-as-code is demonstrated to be a highly requested topic in Jenkins community, we have published
+[JEP 201](https://github.com/jenkinsci/jep/tree/master/jep/201) as proposal to make this a standard component
+of the Jenkins project.
+
+Current status : proposal accepted.

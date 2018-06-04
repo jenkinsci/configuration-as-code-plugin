@@ -62,7 +62,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
             for (int i = 0; i < names.length; i++) {
                 final CNode value = config.remove(names[i]);
                 if (value == null && parameters[i].getAnnotation(Nonnull.class) != null) {
-                    throw new IllegalArgumentException(names[i] + " is required to configure " + target);
+                    throw new ConfiguratorException(names[i] + " is required to configure " + target);
                 }
                 final Class t = parameters[i].getType();
                 if (value != null) {
@@ -83,7 +83,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                         if (configurator == null) throw new IllegalStateException("No configurator implementation to manage "+k);
                         args[i] = configurator.configure(value);
                     }
-                    logger.info("Setting " + target + "." + names[i] + " = " + value);
+                    logger.info("Setting " + target + "." + names[i] + " = " + (value.isSensitiveData() ? "****" : value));
                 } else if (t.isPrimitive()) {
                     args[i] = Defaults.defaultValue(t);
                 }
@@ -231,10 +231,15 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
         return mapping;
     }
 
-    private Constructor getDataBoundConstructor() {
+    /**
+     * Gets DataBoundConstructor or fails.
+     * @return constructor with {@link org.kohsuke.stapler.DataBoundConstructor} annotation
+     * @throws ConfiguratorException Constructor not found
+     */
+    private Constructor getDataBoundConstructor() throws ConfiguratorException {
         final Constructor constructor = getDataBoundConstructor(target);
         if (constructor == null) {
-            throw new IllegalStateException(target.getName() + " is missing a @DataBoundConstructor");
+            throw new ConfiguratorException(target.getName() + " is missing a @DataBoundConstructor");
         }
         return constructor;
     }

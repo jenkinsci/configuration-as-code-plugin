@@ -5,8 +5,8 @@ Global Pipeline Libraries plugin configuration belongs under `jenkins` root elem
 ## sample configuration
 
 ```yaml
-jenkins:
-  [...]
+jenkins: [...]
+unclassified:
   globalLibraries:
     libraries:
       - name: "awesome-lib"

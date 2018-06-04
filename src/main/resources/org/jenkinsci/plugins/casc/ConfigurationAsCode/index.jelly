@@ -28,7 +28,7 @@
         </form>
 
       </j:otherwise>
-      <p><a href="export">Produce equivalent yaml configuration for current instance</a></p>
+      <p><f:link post="true" href="export">Produce equivalent yaml configuration for current instance</f:link></p>
     </j:choose>
 
 

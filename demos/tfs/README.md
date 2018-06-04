@@ -5,8 +5,8 @@ TFS plugin configuration belongs under `jenkins` root element
 ## sample configuration
 
 ```yaml
-jenkins:
-  [...]
+jenkins: [...]
+unclassified:
   teampluginglobalconfig:
     collectionConfigurations:
       - collectionUrl: http://test.com
