@@ -3,6 +3,7 @@
 ## sample configuration
 
 ```yaml
+jenkins: [...]
 credentials:
   system:
     ? # "global"

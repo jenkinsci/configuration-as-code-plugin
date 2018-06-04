@@ -5,6 +5,7 @@ Artifactory plugin configuration belongs under `jenkins` root element
 ## sample configuration
 
 ```yaml
+jenkins: [...]
 unclassified:
   [...]
   artifactorybuilder:
