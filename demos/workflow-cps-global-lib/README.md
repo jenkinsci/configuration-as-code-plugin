@@ -5,15 +5,13 @@ Global Pipeline Libraries plugin configuration belongs under `jenkins` root elem
 ## sample configuration
 
 ```yaml
-jenkins:
-  [...]
-  unclassified:
-    globalLibraries:
-      libraries:
-        - name: "awesome-lib"
-          retriever:
-            modernSCM:
-              scm:
-                git:
-                  remote: "https://github.com/jenkins-infra/pipeline-library.git"
+unclassified:
+  globalLibraries:
+    libraries:
+      - name: "awesome-lib"
+        retriever:
+          modernSCM:
+            scm:
+              git:
+                remote: "https://github.com/jenkins-infra/pipeline-library.git"
 ```
