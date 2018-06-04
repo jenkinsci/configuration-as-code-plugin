@@ -37,6 +37,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.io.File;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -174,27 +175,29 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     public List<String> getBundledCasCURIs() {
-        final String cascFile = "casc.yml";
-        final String cascDirectory = "casc.yml.d";
+        final String cascFile = "/WEB-INF/" + DEFAULT_JENKINS_YAML_PATH;
+        final String cascDirectory = "/WEB-INF/" + DEFAULT_JENKINS_YAML_PATH + ".d/";
         List<String> res = new ArrayList<>();
 
         final ServletContext servletContext = Jenkins.getInstance().servletContext;
         try {
-            URL bundled = servletContext.getResource("/WEB-INF/"+ cascFile);
+            URL bundled = servletContext.getResource(cascFile);
             if (bundled != null) {
                 res.add(bundled.toString());
             }
         } catch (IOException e) {
-            LOGGER.log(WARNING, "Failed to load /WEB-INF/" + cascFile, e);
+            LOGGER.log(WARNING, "Failed to load " + cascFile, e);
         }
 
-        Set<String> resources = servletContext.getResourcePaths("/WEB-INF/"+ cascDirectory +"/");
+        PathMatcher matcher = FileSystems.getDefault().getPathMatcher(YAML_FILES_PATTERN);
+        Set<String> resources = servletContext.getResourcePaths(cascDirectory);
         if (resources!=null) {
             // sort to execute them in a deterministic order
             for (String cascItem : new TreeSet<>(resources)) {
                 try {
                     URL bundled = servletContext.getResource(cascItem);
-                    if (bundled != null) {
+                    if (bundled != null && matcher.matches(
+                            new File(bundled.getPath()).toPath())) {
                         res.add(bundled.toString());
                     } //TODO: else do some handling?
                 } catch (IOException e) {
