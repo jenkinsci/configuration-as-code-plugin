@@ -48,18 +48,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -238,22 +227,26 @@ public class ConfigurationAsCode extends ManagementLink {
         }
 
         MappingNode root = new MappingNode(Tag.MAP, tuples, BLOCK.getStyleBoolean());
+        try (Writer writer = new OutputStreamWriter(res.getOutputStream(), StandardCharsets.UTF_8)) {
+            serializeYamlNode(root, writer);
+        } catch (IOException e) {
+            throw new YAMLException(e);
+        }
+    }
+
+    static void serializeYamlNode(Node root, Writer writer) throws IOException {
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(BLOCK);
         options.setDefaultScalarStyle(PLAIN);
         options.setPrettyFlow(true);
-        try (Writer w = new OutputStreamWriter(res.getOutputStream(), StandardCharsets.UTF_8)) {
-                Serializer serializer = new Serializer(new Emitter(w, options), new Resolver(),
-                                options, null);
-                serializer.open();
-                serializer.serialize(root);
-                serializer.close();
-            } catch (IOException e) {
-                throw new YAMLException(e);
-            }
+        Serializer serializer = new Serializer(new Emitter(writer, options), new Resolver(),
+                options, null);
+        serializer.open();
+        serializer.serialize(root);
+        serializer.close();
     }
 
-    private @CheckForNull Node toYaml(CNode config) throws ConfiguratorException {
+    @CheckForNull Node toYaml(CNode config) throws ConfiguratorException {
 
         if (config == null) return null;
 
@@ -261,7 +254,9 @@ public class ConfigurationAsCode extends ManagementLink {
             case MAPPING:
                 final Mapping mapping = config.asMapping();
                 final List<NodeTuple> tuples = new ArrayList<>();
-                for (Map.Entry<String, CNode> entry : mapping.entrySet()) {
+                final List<Map.Entry<String, CNode>> entries = new ArrayList<>(mapping.entrySet());
+                entries.sort(Comparator.comparing(Map.Entry::getKey));
+                for (Map.Entry<String, CNode> entry : entries) {
                     final Node valueNode = toYaml(entry.getValue());
                     if (valueNode == null) continue;
                     tuples.add(new NodeTuple(

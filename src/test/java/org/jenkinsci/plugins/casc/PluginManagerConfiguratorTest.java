@@ -9,7 +9,12 @@ import org.jenkinsci.plugins.casc.model.Sequence;
 import org.jenkinsci.plugins.casc.plugins.PluginManagerConfigurator;
 import org.junit.Rule;
 import org.junit.Test;
+import org.yaml.snakeyaml.nodes.Node;
 
+import java.io.IOException;
+import java.io.StringWriter;
+
+import static org.jenkinsci.plugins.casc.ConfigurationAsCode.serializeYamlNode;
 import static org.junit.Assert.*;
 
 /**
@@ -29,19 +34,49 @@ public class PluginManagerConfiguratorTest {
     }
 
     @Test
-    public void describeConfig() throws Exception {
-        final PluginManagerConfigurator root = j.jenkins.getExtensionList(PluginManagerConfigurator.class).get(0);
+    public void describeDefaultConfig() throws Exception {
+        final PluginManagerConfigurator root = getPluginManagerConfigurator();
         final CNode node = root.describe(root.getTargetComponent());
         assertNotNull(node);
         assertTrue(node instanceof Mapping);
         final Object sites = ((Mapping) node).get("sites");
         assertNotNull(sites);
         assertTrue(sites instanceof Sequence);
-        assertEquals(1, ((Sequence)sites).size());
-        final Object site = ((Sequence)sites).get(0);
+        assertEquals(1, ((Sequence) sites).size());
+        final Object site = ((Sequence) sites).get(0);
         assertNotNull(site);
         assertTrue(site instanceof Mapping);
-        assertEquals("default", ((Mapping)site).get("id").toString());
-        assertTrue(((Mapping)site).containsKey("url"));
+        assertEquals("default", ((Mapping) site).get("id").toString());
+        assertTrue(((Mapping) site).containsKey("url"));
+    }
+
+    @Test
+    @ConfiguredWithCode("ProxyConfigTest.yml")
+    public void describeProxyConfig() throws Exception {
+        final PluginManagerConfigurator root = getPluginManagerConfigurator();
+        final CNode configNode = root.describe(root.getTargetComponent());
+        ((Mapping) configNode).remove("sites");
+        final String yamlConfig = toYamlString(configNode);
+        assertEquals(String.join("\n",
+                "proxy:",
+                "  name: \"proxyhost\"",
+                "  noProxyHost: \"externalhost\"",
+                "  password: \"password\"",
+                "  port: 80",
+                "  testUrl: \"http://google.com\"",
+                "  userName: \"login\"",
+                ""
+        ), yamlConfig);
+    }
+
+    private PluginManagerConfigurator getPluginManagerConfigurator() {
+        return j.jenkins.getExtensionList(PluginManagerConfigurator.class).get(0);
+    }
+
+    private static String toYamlString(CNode rootNode) throws IOException {
+        Node yamlRoot = ConfigurationAsCode.get().toYaml(rootNode);
+        StringWriter buffer = new StringWriter();
+        serializeYamlNode(yamlRoot, buffer);
+        return buffer.toString();
     }
 }
