@@ -6,3 +6,6 @@ jenkins:
         name: "bar"
     - DumbSlave:
         name: "qix"
+# require 2.109+
+#    - agent:
+#        name: "zot"

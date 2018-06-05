@@ -6,6 +6,7 @@ import jenkins.model.Jenkins;
 import org.jenkinsci.Symbol;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,14 +47,11 @@ public class DescribableAttribute<Owner, Type> extends Attribute<Owner, Type> {
         if (d != null) {
             List<String> symbols = new ArrayList<>();
             // explicit @Symbol annotation on descriptor
-            // last value on descriptor is the preferred one
-            // see hudson.slaves.DumbSlave.DescriptorImpl for sample
+            // first is the preferred one as by Symbol contract
+            // "The first one is used as the primary identifier for reverse-mapping."
             Symbol s = d.getClass().getAnnotation(Symbol.class);
             if (s != null) {
-                final String[] values = s.value();
-                for (int i = values.length-1; i >= 0 ; i--) {
-                    symbols.add(values[i]);
-                }
+                symbols.addAll(Arrays.asList(s.value()));
             }
 
             // extension type Foo is implemented as SomeFoo. => "some"
