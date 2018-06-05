@@ -28,6 +28,7 @@ public class BackwardCompatibilityTest {
         assertNotNull(j.jenkins.getNode("foo"));
         assertNotNull(j.jenkins.getNode("bar"));
         assertNotNull(j.jenkins.getNode("qix"));
+        // require 2.109+ assertNotNull(j.jenkins.getNode("zot"));
     }
 
 }
