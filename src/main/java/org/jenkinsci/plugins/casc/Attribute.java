@@ -180,7 +180,7 @@ public class Attribute<Owner, Type> {
                 throw new ConfiguratorException("Can't read attribute '" + name + "' from "+ target);
             }
             return (Type) field.get(target);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+        } catch (NoSuchMethodException | IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
             throw new ConfiguratorException("Can't read attribute '" + name + "' from "+ target, e);
         }
     }
