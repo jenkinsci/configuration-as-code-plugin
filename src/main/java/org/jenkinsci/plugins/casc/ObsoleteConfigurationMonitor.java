@@ -51,7 +51,8 @@ public class ObsoleteConfigurationMonitor extends AdministrativeMonitor {
     }
 
     public String getCss() {
-        if (Jenkins.getVersion().isNewerThan(new VersionNumber("2.103"))) {
+        final VersionNumber version = Jenkins.getVersion();
+        if (version == null || version.isNewerThan(new VersionNumber("2.103"))) {
             return "alert alert-warning";
         }
         return "warning";
