@@ -8,6 +8,7 @@ import org.jenkinsci.plugins.casc.model.Sequence;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -167,17 +168,21 @@ public class Attribute<Owner, Type> {
         T getValue(O target) throws Exception;
     }
 
-    private Type _getValue(Owner target) throws Exception {
-        final PropertyDescriptor property = PropertyUtils.getPropertyDescriptor(target, name);
-        if (property == null) {
+    private Type _getValue(Owner target) throws ConfiguratorException {
+        try {
+            final PropertyDescriptor property = PropertyUtils.getPropertyDescriptor(target, name);
+            if (property != null && property.getReadMethod() != null) {
+                return (Type) property.getReadMethod().invoke(target);
+            }
             // If this is a public final field, developers don't define getters as jelly can use them as-is
             final Field field = FieldUtils.getField(target.getClass(), name);
-            if (field != null) return (Type) field.get(target);
-            return null;
+            if (field == null) {
+                throw new ConfiguratorException("Can't read attribute '" + name + "' from "+ target);
+            }
+            return (Type) field.get(target);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            throw new ConfiguratorException("Can't read attribute '" + name + "' from "+ target, e);
         }
-        final Method readMethod = property.getReadMethod();
-        if (readMethod == null) return null;
-        return (Type) readMethod.invoke(target);
     }
 
     /**
