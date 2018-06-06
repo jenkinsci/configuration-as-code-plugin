@@ -9,6 +9,7 @@ import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -29,7 +30,8 @@ public class DockerCloudTest {
         assertNotNull(docker.getDockerApi().getDockerHost());
         assertEquals("unix:///var/run/docker.sock", docker.getDockerApi().getDockerHost().getUri());
         final DockerTemplate template = docker.getTemplate("jenkins/slave");
-        checkTemplate(template, "docker-agent", "jenkins", "/home/jenkins/agent", "10");
+        checkTemplate(template, "docker-agent", "jenkins", "/home/jenkins/agent", "10",
+                new String[] { "hello:/hello", "world:/world"}, "hello=world\nfoo=bar");
     }
 
     @Test
@@ -42,7 +44,8 @@ public class DockerCloudTest {
         assertEquals("unix:///var/run/docker.sock", docker.getDockerApi().getDockerHost().getUri());
 
         DockerTemplate template = docker.getTemplate(Label.get("docker-agent"));
-        checkTemplate(template, "docker-agent", "jenkins", "/home/jenkins/agent", "10");
+        checkTemplate(template, "docker-agent", "jenkins", "/home/jenkins/agent", "10",
+                new String[] { "hello:/hello", "world:/world"}, "hello=world\nfoo=bar");
 
         ConfigurationAsCode.get().configure(getClass().getResource("DockerCloudTest/update_docker_cloud/DockerCloudTest2.yml").toExternalForm());
 
@@ -53,19 +56,23 @@ public class DockerCloudTest {
         assertEquals("unix:///var/run/docker.sock", docker.getDockerApi().getDockerHost().getUri());
 
         template = docker.getTemplate(Label.get("docker-agent"));
-        checkTemplate(template, "docker-agent", "jenkins", "/home/jenkins/agent", "10");
+        checkTemplate(template, "docker-agent", "jenkins", "/home/jenkins/agent", "10",
+                new String[] { "hello:/hello", "world:/world"}, "hello=world\nfoo=bar");
 
         template = docker.getTemplate(Label.get("generic"));
-        checkTemplate(template, "generic", "jenkins", "/home/jenkins/agent2", "5");
+        checkTemplate(template, "generic", "jenkins", "/home/jenkins/agent2", "5",
+                new String[] { "hello:/hello", "world:/world"}, "hello=world\nfoo=bar");
 
     }
 
     private void checkTemplate(DockerTemplate template, String labelString, String user, String remoteFs,
-                               String instanceCapStr) {
+                               String instanceCapStr, String[] volumes, String environmentsString) {
         assertNotNull(template);
         assertEquals(labelString, template.getLabelString());
         assertEquals(user, ((DockerComputerAttachConnector) template.getConnector()).getUser());
         assertEquals(remoteFs, template.getRemoteFs());
         assertEquals(instanceCapStr, template.getInstanceCapStr());
+        assertArrayEquals(volumes, template.getVolumes());
+        assertEquals(environmentsString, template.getEnvironmentsString());
     }
 }
