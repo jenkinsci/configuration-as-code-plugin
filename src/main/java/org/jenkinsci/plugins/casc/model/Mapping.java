@@ -10,7 +10,7 @@ import java.util.HashMap;
 public final class Mapping extends HashMap<String, CNode> implements CNode {
 
     public static final Mapping EMPTY = new Mapping();
-    private String source;
+    private Source source;
 
     @Override
     public Type getType() {
@@ -47,12 +47,12 @@ public final class Mapping extends HashMap<String, CNode> implements CNode {
         return get(key).asScalar().getValue();
     }
 
-    public void setSource(String source) {
+    public void setSource(Source source) {
         this.source = source;
     }
 
     @Override
-    public String source() {
+    public Source getSource() {
         return source;
     }
 }

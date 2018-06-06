@@ -9,7 +9,6 @@ import org.jenkinsci.plugins.casc.model.Mapping;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.stapler.export.Exported;
 
-import javax.inject.Inject;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
@@ -184,7 +183,7 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
                 for (String alias : attribute.aliases) {
                     sub = removeIgnoreCase(config, alias);
                     if (sub != null) {
-                        ObsoleteConfigurationFormat.get().record(sub, "'"+alias+"' is an obsolete attribute name, please use '" + name + "'");
+                        ObsoleteConfigurationMonitor.get().record(sub, "'"+alias+"' is an obsolete attribute name, please use '" + name + "'");
                         break;
                     }
                 }
