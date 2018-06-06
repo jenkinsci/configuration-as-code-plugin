@@ -2,12 +2,16 @@ package org.jenkinsci.plugins.casc.yaml;
 
 import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.composer.Composer;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.NodeId;
 import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.ScalarNode;
 import org.yaml.snakeyaml.nodes.SequenceNode;
+import org.yaml.snakeyaml.parser.ParserImpl;
+import org.yaml.snakeyaml.reader.StreamReader;
+import org.yaml.snakeyaml.resolver.Resolver;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -23,7 +27,10 @@ public final class YamlUtils {
         Node root = null;
         for (YamlSource source : configs) {
             try (Reader r = source.read()) {
-                final Node node = new Yaml().compose(r);
+
+                Composer composer = new Composer(new ParserImpl(new StreamReaderWithSource(source)), new Resolver());
+                final Node node =  composer.getSingleNode();
+
                 if (root == null) {
                     root = node;
                 } else {
