@@ -1,11 +1,14 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
-  <div class="error">
+
+  <div class="${it.css}">
+    <form method="post" >
     ${%Configuration as Code obsolete file format}:
     <ul>
       <j:forEach items="${it.errors}" var="error">
-        <li>${error.source}: ${error.message}</li>
+        <li>${error.source.file} (line ${error.source.line}): ${error.message}</li>
       </j:forEach>
     </ul>
+    </form>
   </div>
 </j:jelly>

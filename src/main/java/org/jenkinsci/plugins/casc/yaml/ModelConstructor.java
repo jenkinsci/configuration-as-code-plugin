@@ -4,6 +4,7 @@ import org.apache.commons.collections.map.AbstractMapDecorator;
 import org.jenkinsci.plugins.casc.model.Mapping;
 import org.jenkinsci.plugins.casc.model.Scalar;
 import org.jenkinsci.plugins.casc.model.Sequence;
+import org.jenkinsci.plugins.casc.model.Source;
 import org.yaml.snakeyaml.constructor.AbstractConstruct;
 import org.yaml.snakeyaml.constructor.Construct;
 import org.yaml.snakeyaml.constructor.Constructor;
@@ -40,9 +41,9 @@ public class ModelConstructor extends Constructor {
         }
     };
 
-    private static String getSource(Node node) {
+    private static Source getSource(Node node) {
         final Mark mark = node.getStartMark();
-        return mark.getName() + " (line "+ (mark.getLine()+ 1) + ")";
+        return new Source(mark.getName(), mark.getLine()+ 1);
     }
 
     @Override

@@ -384,7 +384,7 @@ public class ConfigurationAsCode extends ManagementLink {
      */
     public static void configureWith(Set<Map.Entry<String, CNode>> entries) throws ConfiguratorException {
 
-        ObsoleteConfigurationFormat.get().reset();
+        ObsoleteConfigurationMonitor.get().reset();
 
         // Run configurators by order, consuming entries until all have found a matching configurator
         // configurators order is important so that org.jenkinsci.plugins.casc.plugins.PluginManagerConfigurator run

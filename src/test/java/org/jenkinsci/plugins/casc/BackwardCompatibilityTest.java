@@ -5,7 +5,6 @@ import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
 import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.jvnet.hudson.test.JenkinsRule;
 
 import java.util.List;
 
@@ -33,7 +32,7 @@ public class BackwardCompatibilityTest {
         // see # see https://github.com/jenkinsci/jenkins/pull/3475
         // assertNotNull(j.jenkins.getNode("zot"));
 
-        final List<ObsoleteConfigurationFormat.Error> errors = ObsoleteConfigurationFormat.get().getErrors();
+        final List<ObsoleteConfigurationMonitor.Error> errors = ObsoleteConfigurationMonitor.get().getErrors();
         assertEquals("'DumbSlave' is obsolete, please use 'dumb'", errors.get(0).message);
     }
 

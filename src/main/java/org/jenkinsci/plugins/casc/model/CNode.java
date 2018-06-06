@@ -31,6 +31,6 @@ public interface CNode {
      * Indicate the source (file, line number) this specific configuration node comes from.
      * This is used to offer relevant diagnostic messages
      */
-    String source();
+    Source getSource();
 
 }
