@@ -1,11 +1,13 @@
 package org.jenkinsci.plugins.casc;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang.reflect.FieldUtils;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Sequence;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -167,7 +169,12 @@ public class Attribute<Owner, Type> {
 
     private Type _getValue(Owner target) throws Exception {
         final PropertyDescriptor property = PropertyUtils.getPropertyDescriptor(target, name);
-        if (property == null) return null;
+        if (property == null) {
+            // If this is a public final field, developers don't define getters as jelly can use them as-is
+            final Field field = FieldUtils.getField(target.getClass(), name);
+            if (field != null) return (Type) field.get(target);
+            return null;
+        }
         final Method readMethod = property.getReadMethod();
         if (readMethod == null) return null;
         return (Type) readMethod.invoke(target);
