@@ -9,7 +9,9 @@ import org.jvnet.hudson.test.JenkinsRule;
 
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -28,7 +30,11 @@ public class BackwardCompatibilityTest {
         assertNotNull(j.jenkins.getNode("foo"));
         assertNotNull(j.jenkins.getNode("bar"));
         assertNotNull(j.jenkins.getNode("qix"));
-        // require 2.109+ assertNotNull(j.jenkins.getNode("zot"));
+        // see # see https://github.com/jenkinsci/jenkins/pull/3475
+        // assertNotNull(j.jenkins.getNode("zot"));
+
+        final List<ObsoleteConfigurationFormat.Error> errors = ObsoleteConfigurationFormat.get().getErrors();
+        assertEquals("'DumbSlave' is obsolete, please use 'dumb'", errors.get(0).message);
     }
 
 }

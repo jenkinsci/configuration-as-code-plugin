@@ -384,6 +384,8 @@ public class ConfigurationAsCode extends ManagementLink {
      */
     public static void configureWith(Set<Map.Entry<String, CNode>> entries) throws ConfiguratorException {
 
+        ObsoleteConfigurationFormat.get().reset();
+
         // Run configurators by order, consuming entries until all have found a matching configurator
         // configurators order is important so that org.jenkinsci.plugins.casc.plugins.PluginManagerConfigurator run
         // before any other, and can install plugins required by other configuration to successfully parse yaml data

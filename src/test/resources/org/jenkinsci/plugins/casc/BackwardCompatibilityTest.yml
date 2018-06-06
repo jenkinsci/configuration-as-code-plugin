@@ -1,11 +1,11 @@
 jenkins:
   nodes:
-    - slave:
+    - DumbSlave:
         name: "foo"
     - dumb:
         name: "bar"
-    - DumbSlave:
+    - slave:
         name: "qix"
-# require 2.109+
-#    - agent:
+# see https://github.com/jenkinsci/jenkins/pull/3475
+#    - permanent:
 #        name: "zot"
