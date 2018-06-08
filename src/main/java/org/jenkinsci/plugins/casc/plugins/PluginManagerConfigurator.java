@@ -142,9 +142,9 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
             install:
             while (!plugins.isEmpty()) {
                 PluginToInstall p = plugins.remove();
-                logger.info("Preparing to install "+ p.shortname);
+                logger.fine("Preparing to install "+ p.shortname);
                 if (installed.contains(p.shortname)) {
-                    logger.info("Plugin "+p.shortname +" is already installed. Skipping");
+                    logger.fine("Plugin "+p.shortname +" is already installed. Skipping");
                     continue;
                 }
 
@@ -168,7 +168,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
                         throw new ConfiguratorException("Can't install " + p + ": no update site " + p.site);
                     final UpdateSite.Plugin installable = updateSite.new Plugin(updateSite.getId(), json);
                     try {
-                        logger.info("Installing plugin: "+p.shortname);
+                        logger.fine("Installing plugin: "+p.shortname);
                         final UpdateCenter.UpdateCenterJob job = installable.deploy(false).get();
                         if (job.getError() != null) {
                             if (job.getError() instanceof UpdateCenter.DownloadJob.SuccessButRequiresRestart) {
@@ -187,8 +187,8 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
                                         .map(t -> t.substring(0, t.indexOf(':')))
                                         .map(a -> new PluginToInstall(a, "latest"))
                                         .collect(Collectors.toList());
-                                pti.forEach( s -> logger.info("Installing dependant plugin: "+s));
-                                logger.info("Adding "+pti.size()+" plugin(s) to install queue.");
+                                pti.forEach( s -> logger.finest("Installing dependant plugin: "+s));
+                                logger.finest("Adding "+pti.size()+" plugin(s) to install queue.");
                                 plugins.addAll(pti);
                             }
                         }
@@ -203,10 +203,10 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
                     if (!downloaded) {
                         throw new ConfiguratorException("Failed to install plugin " + p.shortname + ':' + p.version);
                     }
-                    logger.info("Done installing plugins");
+                    logger.fine("Done installing plugins");
                 }
             }
-            logger.info("Writing shrinkwrap file: "+shrinkwrap);
+            logger.fine("Writing shrinkwrap file: "+shrinkwrap);
             try (PrintWriter w = new PrintWriter(shrinkwrap, UTF_8.name())) {
                 for (PluginWrapper pw : pluginManager.getPlugins()) {
                     if (pw.getShortName().equals("configuration-as-code")) continue;
