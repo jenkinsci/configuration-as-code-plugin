@@ -86,14 +86,12 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
                 }
                 updateSites.add(in);
             }
-
             try {
                 updateCenter.getSites().replaceBy(updateSites);
             } catch (IOException e) {
                 throw new ConfiguratorException("failed to reconfigure updateCenter.sites", e);
             }
         }
-
 
         Queue<PluginToInstall> plugins = new LinkedList<>();
         final CNode required = map.get("required");
@@ -144,7 +142,11 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
             install:
             while (!plugins.isEmpty()) {
                 PluginToInstall p = plugins.remove();
-                if (installed.contains(p.shortname)) continue;
+                logger.fine("Preparing to install "+ p.shortname);
+                if (installed.contains(p.shortname)) {
+                    logger.fine("Plugin "+p.shortname +" is already installed. Skipping");
+                    continue;
+                }
 
                 final Plugin plugin = jenkins.getPlugin(p.shortname);
                 if (plugin == null || !plugin.getWrapper().getVersion().equals(p.version)) { // Need to install
@@ -166,7 +168,8 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
                         throw new ConfiguratorException("Can't install " + p + ": no update site " + p.site);
                     final UpdateSite.Plugin installable = updateSite.new Plugin(updateSite.getId(), json);
                     try {
-                        final UpdateCenter.UpdateCenterJob job = installable.deploy(true).get();
+                        logger.fine("Installing plugin: "+p.shortname);
+                        final UpdateCenter.UpdateCenterJob job = installable.deploy(false).get();
                         if (job.getError() != null) {
                             if (job.getError() instanceof UpdateCenter.DownloadJob.SuccessButRequiresRestart) {
                                 requireRestart = true;
@@ -179,15 +182,18 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
                         try (JarFile jar = new JarFile(jpi)) {
                             String dependencySpec = jar.getManifest().getMainAttributes().getValue("Plugin-Dependencies");
                             if (dependencySpec != null) {
-                                plugins.addAll(Arrays.stream(dependencySpec.split(","))
+                                List<PluginToInstall> pti = Arrays.stream(dependencySpec.split(","))
                                         .filter(t -> !t.endsWith(";resolution:=optional"))
                                         .map(t -> t.substring(0, t.indexOf(':')))
                                         .map(a -> new PluginToInstall(a, "latest"))
-                                        .collect(Collectors.toList()));
+                                        .collect(Collectors.toList());
+                                pti.forEach( s -> logger.finest("Installing dependant plugin: "+s));
+                                logger.finest("Adding "+pti.size()+" plugin(s) to install queue.");
+                                plugins.addAll(pti);
                             }
                         }
                         downloaded = true;
-                        break install;
+                        continue install;
                     } catch (InterruptedException | ExecutionException ex) {
                         logger.info("Failed to download plugin " + p.shortname + ':' + p.version + "from update site " + updateSite.getId());
                     } catch (Throwable ex) {
@@ -197,9 +203,10 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
                     if (!downloaded) {
                         throw new ConfiguratorException("Failed to install plugin " + p.shortname + ':' + p.version);
                     }
+                    logger.fine("Done installing plugins");
                 }
             }
-
+            logger.fine("Writing shrinkwrap file: "+shrinkwrap);
             try (PrintWriter w = new PrintWriter(shrinkwrap, UTF_8.name())) {
                 for (PluginWrapper pw : pluginManager.getPlugins()) {
                     if (pw.getShortName().equals("configuration-as-code")) continue;
