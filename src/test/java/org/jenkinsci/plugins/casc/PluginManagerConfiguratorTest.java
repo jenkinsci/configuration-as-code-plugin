@@ -7,8 +7,7 @@ import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
 import org.jenkinsci.plugins.casc.model.Sequence;
 import org.jenkinsci.plugins.casc.plugins.PluginManagerConfigurator;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.yaml.snakeyaml.nodes.Node;
 
 import java.io.IOException;
@@ -26,8 +25,9 @@ public class PluginManagerConfiguratorTest {
     public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 
     @Test
+    @Ignore //TODO: This needs to be re-enabled once we can actually dynamically load plugins
     @ConfiguredWithCode("PluginManagerConfiguratorTest.yml")
-    public void testInstallPlugins() {
+    public void testInstallPlugins() throws Exception {
         final Plugin chucknorris = j.jenkins.getPlugin("chucknorris");
         assertNotNull(chucknorris);
         assertEquals("1.0", chucknorris.getWrapper().getVersion());
