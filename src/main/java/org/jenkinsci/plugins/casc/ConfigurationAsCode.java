@@ -33,12 +33,12 @@ import org.yaml.snakeyaml.serializer.Serializer;
 import javax.annotation.CheckForNull;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
-import java.io.File;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -48,7 +48,19 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -74,6 +86,7 @@ public class ConfigurationAsCode extends ManagementLink {
     public static final String YAML_FILES_PATTERN = "glob:**.{yml,yaml,YAML,YML}";
 
     public static final Logger LOGGER = Logger.getLogger(ConfigurationAsCode.class.getName());
+
 
     @CheckForNull
     @Override
@@ -456,5 +469,42 @@ public class ConfigurationAsCode extends ManagementLink {
                     elements.addAll(configurator.getConfigurators());
                     listElements(elements, configurator.describe());
                 });
+    }
+
+
+    Version version;
+
+    public void setVersion(Version version) {
+        this.version = version;
+    }
+
+    public Version getVersion() {
+        return version == null ? Version.ONE : version;
+    }
+
+    // Once we introduce some breaking change on the model inference mechanism, we will introduce `TWO` and so on
+    // And this new mechanism will only get enabled when configuration file uses this version or later
+    enum Version { ONE("1");
+
+        private final String value;
+
+        Version(String value) {
+            this.value = value;
+        }
+
+        public static Version of(String version) throws ConfiguratorException {
+            switch (version) {
+                case "1": return Version.ONE;
+                default: throw new ConfiguratorException("unsupported version "+version);
+            }
+        }
+
+        public String value() {
+            return value;
+        }
+    }
+
+    public boolean isAtLeast(Version version) {
+        return this.version.ordinal() >= version.ordinal();
     }
 }
