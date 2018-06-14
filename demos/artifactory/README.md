@@ -1,11 +1,12 @@
 # artifactory plugin
 
-Artifactory plugin configuration belongs under `jenkins` root element
+Artifactory plugin configuration belongs under `unclassified` root element
 
 ## sample configuration
 
 ```yaml
-jenkins: [...]
+jenkins: 
+  [...]
 unclassified:
   [...]
   artifactorybuilder:

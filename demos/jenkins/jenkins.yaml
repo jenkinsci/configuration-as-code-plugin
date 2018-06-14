@@ -20,15 +20,7 @@ jenkins:
                 user: "jenkins"
             instanceCapStr: "10"
 
-  artifactorybuilder:
-    useCredentialsPlugin: true
-    artifactoryServers:
-      - name: foo
-        serverId: artifactory
-        artifactoryUrl: http://acme.com/artifactory
-        resolverCredentialsConfig:
-          username: artifactory_user
-          password: ${ARTIFACTORY_PASSWORD}
+  
 
 tool:
   git:
@@ -41,6 +33,17 @@ security:
           enabled: false
 
 unclassified:
+  
+  artifactorybuilder:
+    useCredentialsPlugin: true
+    artifactoryServers:
+      - name: foo
+        serverId: artifactory
+        artifactoryUrl: http://acme.com/artifactory
+        resolverCredentialsConfig:
+          username: artifactory_user
+          password: ${ARTIFACTORY_PASSWORD}
+          
   globalLibraries:
     libraries:
       - name: "awesome-lib"
@@ -56,7 +59,6 @@ unclassified:
         credentialsId: tfsCredentials
     enableTeamPushTriggerForAllJobs: true
     enableTeamStatusForAllJobs: true
-    #userAccountMapper:
     configFolderPerNode: true
 
   mailer:

@@ -1,11 +1,12 @@
 # TFS/Team Services plugin
 
-TFS plugin configuration belongs under `jenkins` root element
+TFS plugin configuration belongs under `unclassified` root element
 
 ## sample configuration
 
 ```yaml
-jenkins: [...]
+jenkins: 
+  [...]
 unclassified:
   teampluginglobalconfig:
     collectionConfigurations:
