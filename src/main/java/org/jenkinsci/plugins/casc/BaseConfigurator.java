@@ -177,26 +177,6 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
 
         for (Attribute<T,Object> attribute : attributes) {
 
-            if (attribute.isDeprecated()) {
-                ObsoleteConfigurationMonitor.get().record(config, "'"+attribute.getName()+"' is deprecated");
-                if (casc.getDeprecation() == ConfigurationAsCode.Deprecation.reject) {
-                    throw new ConfiguratorException("'"+attribute.getName()+"' is deprecated");
-                }
-            }
-
-            for (Class<? extends AccessRestriction> r : attribute.getRestrictions()) {
-                if (r == None.class) continue;
-                if (r == Beta.class && casc.getRestricted() == ConfigurationAsCode.Restricted.beta) {
-                    continue;
-                }
-                ObsoleteConfigurationMonitor.get().record(config, "'"+attribute.getName()+"' is restricted:" + r.getSimpleName());
-                if (casc.getRestricted() == ConfigurationAsCode.Restricted.reject) {
-                    throw new ConfiguratorException("'"+attribute.getName()+"' is restricted:" + r.getSimpleName());
-                }
-            }
-
-
-
             final String name = attribute.getName();
             CNode sub = removeIgnoreCase(config, name);
             if (sub == null) {
@@ -210,6 +190,25 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
             }
 
             if (sub != null) {
+
+                if (attribute.isDeprecated()) {
+                    ObsoleteConfigurationMonitor.get().record(config, "'"+attribute.getName()+"' is deprecated");
+                    if (casc.getDeprecation() == ConfigurationAsCode.Deprecation.reject) {
+                        throw new ConfiguratorException("'"+attribute.getName()+"' is deprecated");
+                    }
+                }
+
+                for (Class<? extends AccessRestriction> r : attribute.getRestrictions()) {
+                    if (r == None.class) continue;
+                    if (r == Beta.class && casc.getRestricted() == ConfigurationAsCode.Restricted.beta) {
+                        continue;
+                    }
+                    ObsoleteConfigurationMonitor.get().record(config, "'"+attribute.getName()+"' is restricted:" + r.getSimpleName());
+                    if (casc.getRestricted() == ConfigurationAsCode.Restricted.reject) {
+                        throw new ConfiguratorException("'"+attribute.getName()+"' is restricted:" + r.getSimpleName());
+                    }
+                }
+
                 final Class k = attribute.getType();
                 final Configurator configurator = Configurator.lookupOrFail(k);
 
