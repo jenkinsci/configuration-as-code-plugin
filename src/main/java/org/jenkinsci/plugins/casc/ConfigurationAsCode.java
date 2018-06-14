@@ -478,14 +478,14 @@ public class ConfigurationAsCode extends ManagementLink {
      * configurable data model from live jenkins instance. At this time, 'new' mechanism will
      * only be enabled if yaml source do include adequate 'version: x'.
      */
-    Version version;
+    private Version version = Version.ONE;
 
     public void setVersion(Version version) {
         this.version = version;
     }
 
     public Version getVersion() {
-        return version == null ? Version.ONE : version;
+        return version;
     }
 
     // Once we introduce some breaking change on the model inference mechanism, we will introduce `TWO` and so on
@@ -521,7 +521,7 @@ public class ConfigurationAsCode extends ManagementLink {
      */
     enum Deprecation { reject, warn }
 
-    Deprecation deprecation = Deprecation.reject;
+    private Deprecation deprecation = Deprecation.reject;
 
     public Deprecation getDeprecation() {
         return deprecation;
@@ -531,12 +531,13 @@ public class ConfigurationAsCode extends ManagementLink {
         this.deprecation = deprecation;
     }
 
+
     /**
      * Policy regarding {@link org.kohsuke.accmod.Restricted} attributes.
      */
     enum Restricted { reject, beta, warn }
 
-    Restricted restricted = Restricted.reject;
+    private Restricted restricted = Restricted.reject;
 
     public Restricted getRestricted() {
         return restricted;

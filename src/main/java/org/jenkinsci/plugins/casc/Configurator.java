@@ -27,11 +27,14 @@ import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 
 /**
@@ -260,16 +263,20 @@ public abstract class Configurator<T> implements ExtensionPoint, ElementConfigur
 
 
     /**
-     * Ordered version of {@link #describe()} for documentation generation
+     * Ordered version of {@link #describe()} for documentation generation.
+     * Only include non-deprecated, non-restricted attribute
      *
      * @return
      *      A list of {@link Attribute}s
      */
     @Nonnull
     public List<Attribute> getAttributes() {
-        final List<Attribute> attributes = new ArrayList<>(describe());
-        Collections.sort(attributes, (a,b) -> a.name.compareTo(b.name));
-        return attributes;
+        return describe().stream()
+                .filter(Attribute::isDeprecated)
+                .filter(Attribute::isRestricted)
+                .sorted(Comparator.comparing(a -> a.name))
+                .collect(Collectors.toList());
+
     }
 
     @CheckForNull

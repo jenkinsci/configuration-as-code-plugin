@@ -1,6 +1,5 @@
 package org.jenkinsci.plugins.casc;
 
-import com.google.common.annotations.Beta;
 import hudson.model.Describable;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
@@ -9,6 +8,8 @@ import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
 import org.kohsuke.accmod.AccessRestriction;
 import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.Beta;
+import org.kohsuke.accmod.restrictions.None;
 import org.kohsuke.stapler.export.Exported;
 
 import java.beans.PropertyDescriptor;
@@ -54,29 +55,6 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
                 LOGGER.log(Level.FINE, "Ignored {0} property: read only", name);
                 continue; // read only
             }
-            if (setter.getAnnotation(Deprecated.class) != null) {
-                switch (ConfigurationAsCode.get().getDeprecation()) {
-                    case reject:
-                        LOGGER.log(Level.WARNING, "Ignored {0} property: deprecated", name);
-                        continue; // not actually public
-                    case warn:
-                        LOGGER.log(Level.WARNING, "Ignored {0} property: deprecated", name);
-                }
-            }
-            final Restricted r = setter.getAnnotation(Restricted.class);
-            if (r != null) {
-                switch (ConfigurationAsCode.get().getRestricted()) {
-                    case beta:
-                        for (Class aClass : r.value()) {
-                            if (aClass == Beta.class) break;
-                        }
-                    case reject:
-                        LOGGER.log(Level.WARNING, "Ignored {0} property: restricted", name);
-                        continue; // not actually public     - require access-modifier 1.12
-                    case warn:
-                        LOGGER.log(Level.WARNING, "Ignored {0} property: restricted", name);
-                }
-            }
 
             // FIXME move this all into cleaner logic to discover property type
             Type type = setter.getGenericParameterTypes()[0];
@@ -102,8 +80,11 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
                 for (int i = 0; i < last; i++) {
                     attribute.alias(values[i]);
                 }
-
             }
+
+            attribute.deprecated(setter.getAnnotation(Deprecated.class) != null);
+            final Restricted r = setter.getAnnotation(Restricted.class);
+            if (r != null) attribute.restrictions(r.value());
         }
         return attributes;
     }
@@ -192,8 +173,30 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
 
     protected void configure(Mapping config, T instance) throws ConfiguratorException {
         final Set<Attribute> attributes = describe();
+        final ConfigurationAsCode casc = ConfigurationAsCode.get();
 
         for (Attribute<T,Object> attribute : attributes) {
+
+            if (attribute.isDeprecated()) {
+                ObsoleteConfigurationMonitor.get().record(config, "'"+attribute.getName()+"' is deprecated");
+                if (casc.getDeprecation() == ConfigurationAsCode.Deprecation.reject) {
+                    throw new ConfiguratorException("'"+attribute.getName()+"' is deprecated");
+                }
+            }
+
+            for (Class<? extends AccessRestriction> r : attribute.getRestrictions()) {
+                if (r == None.class) continue;
+                if (r == Beta.class && casc.getRestricted() == ConfigurationAsCode.Restricted.beta) {
+                    continue;
+                }
+                ObsoleteConfigurationMonitor.get().record(config, "'"+attribute.getName()+"' is restricted:" + r.getSimpleName());
+                if (casc.getRestricted() == ConfigurationAsCode.Restricted.reject) {
+                    throw new ConfiguratorException("'"+attribute.getName()+"' is restricted:" + r.getSimpleName());
+                }
+            }
+
+
+
             final String name = attribute.getName();
             CNode sub = removeIgnoreCase(config, name);
             if (sub == null) {
