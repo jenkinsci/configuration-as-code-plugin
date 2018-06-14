@@ -203,9 +203,9 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
                     if (r == Beta.class && casc.getRestricted() == ConfigurationAsCode.Restricted.beta) {
                         continue;
                     }
-                    ObsoleteConfigurationMonitor.get().record(config, "'"+attribute.getName()+"' is restricted:" + r.getSimpleName());
+                    ObsoleteConfigurationMonitor.get().record(config, "'"+attribute.getName()+"' is restricted: " + r.getSimpleName());
                     if (casc.getRestricted() == ConfigurationAsCode.Restricted.reject) {
-                        throw new ConfiguratorException("'"+attribute.getName()+"' is restricted:" + r.getSimpleName());
+                        throw new ConfiguratorException("'"+attribute.getName()+"' is restricted: " + r.getSimpleName());
                     }
                 }
 
