@@ -472,6 +472,12 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
 
+    /**
+     * the model-introspection model to be applied by configuration-as-code.
+     * as we move forward, we might need to introduce some breaking change in the way we discover
+     * configurable data model from live jenkins instance. At this time, 'new' mechanism will
+     * only be enabled if yaml source do include adequate 'version: x'.
+     */
     Version version;
 
     public void setVersion(Version version) {
@@ -502,9 +508,41 @@ public class ConfigurationAsCode extends ManagementLink {
         public String value() {
             return value;
         }
+
     }
 
     public boolean isAtLeast(Version version) {
         return this.version.ordinal() >= version.ordinal();
+    }
+
+
+    /**
+     * Policy regarding {@link Deprecated} attributes.
+     */
+    enum Deprecation { reject, warn }
+
+    Deprecation deprecation = Deprecation.reject;
+
+    public Deprecation getDeprecation() {
+        return deprecation;
+    }
+
+    public void setDeprecation(Deprecation deprecation) {
+        this.deprecation = deprecation;
+    }
+
+    /**
+     * Policy regarding {@link org.kohsuke.accmod.Restricted} attributes.
+     */
+    enum Restricted { reject, beta, warn }
+
+    Restricted restricted = Restricted.reject;
+
+    public Restricted getRestricted() {
+        return restricted;
+    }
+
+    public void setRestricted(Restricted restricted) {
+        this.restricted = restricted;
     }
 }

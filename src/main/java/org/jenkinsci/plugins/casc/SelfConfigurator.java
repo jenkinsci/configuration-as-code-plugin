@@ -6,8 +6,6 @@ import org.jenkinsci.plugins.casc.model.Mapping;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,7 +13,7 @@ import java.util.Set;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Extension(ordinal = Double.MAX_VALUE)
-public class SelfConfigurator extends Configurator<ConfigurationAsCode> implements RootElementConfigurator<ConfigurationAsCode> {
+public class SelfConfigurator extends BaseConfigurator<ConfigurationAsCode> implements RootElementConfigurator<ConfigurationAsCode> {
 
     @Override
     public String getName() {
@@ -32,22 +30,24 @@ public class SelfConfigurator extends Configurator<ConfigurationAsCode> implemen
         return ConfigurationAsCode.get();
     }
 
-
     @Nonnull
     @Override
     public Set<Attribute> describe() {
         Set<Attribute> attributes = new HashSet<>();
-        attributes.add(new Attribute<ConfigurationAsCode, String>("version", String.class));
+        attributes.add(new Attribute<ConfigurationAsCode, String>("version", String.class)
+                .getter(t -> t.getVersion().value())
+                .setter((t,v)->t.setVersion(ConfigurationAsCode.Version.of(v))));
+        attributes.add(new Attribute("deprecation", ConfigurationAsCode.Deprecation.class));
+        attributes.add(new Attribute("restricted", ConfigurationAsCode.Restricted.class));
         return attributes;
     }
 
     @Nonnull
     @Override
     public ConfigurationAsCode configure(CNode config) throws ConfiguratorException {
-        final ConfigurationAsCode t = getTargetComponent();
-        final Mapping mapping = config.asMapping();
-        t.setVersion(ConfigurationAsCode.Version.of(mapping.getScalarValue("version")));
-        return t;
+        final ConfigurationAsCode c = getTargetComponent();
+        configure(config.asMapping(), c);
+        return c;
     }
 
     @CheckForNull

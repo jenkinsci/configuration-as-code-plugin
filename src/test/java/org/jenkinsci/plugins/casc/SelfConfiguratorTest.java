@@ -23,7 +23,9 @@ public class SelfConfiguratorTest {
 
     @Test
     @ConfiguredWithCode(value = "SelfConfiguratorTest.yml")
-    public void configure_version() throws Exception {
+    public void self_configure() {
         assertEquals(ConfigurationAsCode.Version.ONE, ConfigurationAsCode.get().version);
+        assertEquals(ConfigurationAsCode.Deprecation.warn, ConfigurationAsCode.get().getDeprecation());
+        assertEquals(ConfigurationAsCode.Restricted.beta, ConfigurationAsCode.get().getRestricted());
     }
 }
