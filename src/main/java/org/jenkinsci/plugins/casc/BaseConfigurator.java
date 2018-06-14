@@ -1,11 +1,13 @@
 package org.jenkinsci.plugins.casc;
 
+import com.google.common.annotations.Beta;
 import hudson.model.Describable;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
+import org.kohsuke.accmod.AccessRestriction;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.stapler.export.Exported;
 
@@ -53,12 +55,27 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
                 continue; // read only
             }
             if (setter.getAnnotation(Deprecated.class) != null) {
-                LOGGER.log(Level.FINE, "Ignored {0} property: deprecated", name);
-                continue; // not actually public
+                switch (ConfigurationAsCode.get().getDeprecation()) {
+                    case reject:
+                        LOGGER.log(Level.WARNING, "Ignored {0} property: deprecated", name);
+                        continue; // not actually public
+                    case warn:
+                        LOGGER.log(Level.WARNING, "Ignored {0} property: deprecated", name);
+                }
             }
-            if (setter.getAnnotation(Restricted.class) != null) {
-                LOGGER.log(Level.FINE, "Ignored {0} property: restricted", name);
-                continue; // not actually public     - require access-modifier 1.12
+            final Restricted r = setter.getAnnotation(Restricted.class);
+            if (r != null) {
+                switch (ConfigurationAsCode.get().getRestricted()) {
+                    case beta:
+                        for (Class aClass : r.value()) {
+                            if (aClass == Beta.class) break;
+                        }
+                    case reject:
+                        LOGGER.log(Level.WARNING, "Ignored {0} property: restricted", name);
+                        continue; // not actually public     - require access-modifier 1.12
+                    case warn:
+                        LOGGER.log(Level.WARNING, "Ignored {0} property: restricted", name);
+                }
             }
 
             // FIXME move this all into cleaner logic to discover property type
