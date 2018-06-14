@@ -1,6 +1,7 @@
 package org.jenkinsci.plugins.casc;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.reflect.FieldUtils;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Sequence;
@@ -121,7 +122,7 @@ public class Attribute<Owner, Type> {
     }
 
     public Attribute restrictions(Class<? extends AccessRestriction>[] restrictions) {
-        this.restrictions = restrictions;
+        this.restrictions = restrictions.clone();
         return this;
     }
 
