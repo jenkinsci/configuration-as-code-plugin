@@ -4,6 +4,7 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.reflect.FieldUtils;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Sequence;
+import org.kohsuke.accmod.AccessRestriction;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Array;
@@ -28,7 +29,7 @@ import java.util.stream.Collectors;
  * @see Configurator#describe()
  */
 public class Attribute<Owner, Type> {
-    
+
     private final static Logger logger = Logger.getLogger(Attribute.class.getName());
 
     protected final String name;
@@ -37,6 +38,10 @@ public class Attribute<Owner, Type> {
     protected String preferredName;
     private Setter<Owner, Type> setter;
     private Getter<Owner, Type> getter;
+
+    private boolean deprecated;
+
+    private Class<? extends AccessRestriction>[] restrictions;
 
     protected List<String> aliases;
 
@@ -60,6 +65,21 @@ public class Attribute<Owner, Type> {
 
     public Class getType() {
         return type;
+    }
+
+    public boolean isDeprecated() {
+        return deprecated;
+    }
+
+
+    private static final Class[] EMPTY = new Class[0];
+
+    public Class<? extends AccessRestriction>[] getRestrictions() {
+        return restrictions != null ? restrictions : EMPTY;
+    }
+
+    public boolean isRestricted() {
+        return restrictions != null;
     }
 
     /**
@@ -94,6 +114,17 @@ public class Attribute<Owner, Type> {
         this.getter = getter;
         return this;
     }
+
+    public Attribute deprecated(boolean deprecated) {
+        this.deprecated = deprecated;
+        return this;
+    }
+
+    public Attribute restrictions(Class<? extends AccessRestriction>[] restrictions) {
+        this.restrictions = restrictions;
+        return this;
+    }
+
 
     public Setter<Owner, Type> getSetter() {
         return setter;
