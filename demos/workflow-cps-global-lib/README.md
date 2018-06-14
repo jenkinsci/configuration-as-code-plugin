@@ -1,11 +1,12 @@
 # configure global libraries plugin
 
-Global Pipeline Libraries plugin configuration belongs under `jenkins` root element
+Global Pipeline Libraries plugin configuration belongs under `unclassified` root element
 
 ## sample configuration
 
 ```yaml
-jenkins: [...]
+jenkins: 
+  [...]
 unclassified:
   globalLibraries:
     libraries:

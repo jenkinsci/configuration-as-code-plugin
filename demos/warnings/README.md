@@ -5,7 +5,8 @@ Supported in plugin **version >= 4.66**
 ## sample-configuration (Example parser from help)
 
 ```yaml
-jenkins: [...]
+jenkins: 
+  [...]
 unclassified:
   warnings:
     parsers:

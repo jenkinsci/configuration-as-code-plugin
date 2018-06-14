@@ -1,11 +1,12 @@
 # mailer plugin
 
-Mailer plugin configuration belongs under `jenkins` root element
+Mailer plugin configuration belongs under `unclassified` root element
 
 ## sample configuration
 
 ```yaml
-jenkins: [...]
+jenkins: 
+  [...]
 unclassified:  
   mailer:
     adminAddress: admin@acme.org
