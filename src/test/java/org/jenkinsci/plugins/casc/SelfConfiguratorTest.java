@@ -26,6 +26,7 @@ public class SelfConfiguratorTest {
     public void self_configure() {
         assertEquals(ConfigurationAsCode.Version.ONE, ConfigurationAsCode.get().version);
         assertEquals(ConfigurationAsCode.Deprecation.warn, ConfigurationAsCode.get().getDeprecation());
-        assertEquals(ConfigurationAsCode.Restricted.beta, ConfigurationAsCode.get().getRestricted());
+        assertEquals(ConfigurationAsCode.Restricted.warn, ConfigurationAsCode.get().getRestricted());
+        assertEquals("/tmp", Jenkins.getInstance().getRawBuildsDir());
     }
 }
