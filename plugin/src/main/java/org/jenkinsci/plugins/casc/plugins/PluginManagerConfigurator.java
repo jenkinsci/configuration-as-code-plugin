@@ -23,6 +23,8 @@ import org.jenkinsci.plugins.casc.RootElementConfigurator;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
 import org.jenkinsci.plugins.casc.model.Sequence;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import javax.annotation.CheckForNull;
 import java.io.File;
@@ -48,6 +50,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Extension(ordinal = 999)
+@Restricted(NoExternalUse.class)
 public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> implements RootElementConfigurator<PluginManager> {
 
     private final static Logger logger = Logger.getLogger(PluginManagerConfigurator.class.getName());

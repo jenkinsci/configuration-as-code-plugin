@@ -178,6 +178,25 @@ If all those 4 are present, Configuration-as-Code will try to gather initial sec
 
 **TODO** provide a dockerfile to 'build' this documentation from specified jenkins-core release and plugins.
 
+## Plugin Management
+
+Status: `BETA` 
+
+We currently do support plugin installation but will remain in `beta` for the forseeable feature. Generally
+we recommend that you package your plugins with your Jenkins distribution as plugin installation often requires a
+restart and can cause problems with plugin dependencies. So if you want to try it, you can. 
+
+Current implementation do require a restart if you add a plugin. 
+
+Example: (Requires Configuration as Code Plugin version > 0.7-alpha)
+
+```yaml
+plugins:
+  required:
+    git: 3.9.0
+    warnings: 4.67
+``` 
+
 ## Supported plugins
 
 Here is a list of plugin we have successfully tested to support configuration-as-code approach :
