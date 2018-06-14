@@ -6,15 +6,18 @@ import org.jenkinsci.plugins.casc.BaseConfigurator;
 import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
+import org.kohsuke.accmod.Restricted;
 
 import javax.annotation.CheckForNull;
-import java.util.Map;
+
 
 /**
  * TODO would  not be required if UpdateSite had a DataBoundConstructor
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Extension
+@Restricted(NoExternalUse.class)
 public class UpdateSiteConfigurator extends BaseConfigurator<UpdateSite> {
 
     @Override
