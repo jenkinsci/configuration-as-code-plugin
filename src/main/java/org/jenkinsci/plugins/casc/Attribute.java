@@ -221,11 +221,13 @@ public class Attribute<Owner, Type> {
             }
 
             // If this is a public final field, developers don't define getters as jelly can use them as-is
-            final Field field = FieldUtils.getField(clazz, name);
+            final Field field = FieldUtils.getField(clazz, name, true);
             if (field == null) {
                 throw new ConfiguratorException("Can't read attribute '" + name + "' from "+ target);
             }
+
             return (Type) field.get(target);
+
         } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
             throw new ConfiguratorException("Can't read attribute '" + name + "' from "+ target, e);
         }
