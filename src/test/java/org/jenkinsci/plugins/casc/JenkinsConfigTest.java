@@ -23,5 +23,6 @@ public class JenkinsConfigTest {
     @Test
     public void loadFromCASC_JENKINS_CONFIG() {
         assertEquals("configuration as code - JenkinsConfigTest", Jenkins.getInstance().getSystemMessage());
+        assertEquals(10, Jenkins.getInstance().getQuietPeriod());
     }
 }

@@ -74,7 +74,7 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
 
         // we can't generate a fresh new Jenkins object as constructor is mixed with init and check for `theInstance` singleton 
         Mapping mapping = new Mapping();
-        for (Attribute attribute : describe()) {
+        for (Attribute attribute : getAttributes()) {
             mapping.put(attribute.getName(), attribute.describe(instance));
         }
         return mapping;

@@ -3,8 +3,8 @@
 <j:choose>
   <j:when test="${it.type.enum}">
     "type": "string",
-    "enum": [
-<j:forEach items="${it.type.values()}" var="v" varStatus="st">
+    "enum": [ 
+<j:forEach items="${it.type.getEnumConstants()}" var="v" varStatus="st">
     "${v}"<j:if test="${!st.last}">,</j:if>
 </j:forEach>
     ]
