@@ -54,7 +54,6 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
             final String name = StringUtils.uncapitalize(sm);
             LOGGER.log(Level.FINER, "Processing {0} property", name);
 
-            // FIXME move this all into cleaner logic to discover property type
             Type type = method.getGenericParameterTypes()[0];
             Attribute attribute = detectActualType(name, type);
             if (attribute == null) continue;
