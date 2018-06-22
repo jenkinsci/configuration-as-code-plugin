@@ -62,7 +62,9 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
         attributes.add(new PersistedListAttribute<Jenkins, NodeProperty>("globalNodeProperties", NodeProperty.class));
 
         // Add remoting security, all legwork will be done by a configurator
-        attributes.add(new Attribute<Jenkins, AdminWhitelistRule>("remotingSecurity", AdminWhitelistRule.class).setter(NOOP));
+        attributes.add(new Attribute<Jenkins, AdminWhitelistRule>("remotingSecurity", AdminWhitelistRule.class)
+                .setter(NOOP)
+                .getter(j -> Jenkins.getInstance().getInjector().getInstance(AdminWhitelistRule.class) ));
 
         return attributes;
     }
