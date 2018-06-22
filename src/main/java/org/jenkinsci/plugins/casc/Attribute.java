@@ -1,11 +1,12 @@
 package org.jenkinsci.plugins.casc;
 
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.reflect.FieldUtils;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Sequence;
 import org.kohsuke.accmod.AccessRestriction;
+import org.kohsuke.stapler.export.Exported;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Array;
@@ -80,7 +81,7 @@ public class Attribute<Owner, Type> {
     }
 
     public boolean isRestricted() {
-        return restrictions != null;
+        return restrictions != null && restrictions.length > 0;
     }
 
     /**
@@ -169,6 +170,7 @@ public class Attribute<Owner, Type> {
         }
         if (multiple) {
             Sequence seq = new Sequence();
+            if (o.getClass().isArray()) o = Arrays.asList((Object[]) o);
             for (Object value : (Iterable) o) {
                 seq.add(c.describe(value));
             }
@@ -202,17 +204,29 @@ public class Attribute<Owner, Type> {
 
     private Type _getValue(Owner target) throws ConfiguratorException {
         try {
-            final PropertyDescriptor property = PropertyUtils.getPropertyDescriptor(target, name);
-            if (property != null && property.getReadMethod() != null) {
-                return (Type) property.getReadMethod().invoke(target);
+            final Class<?> clazz = target.getClass();
+            final String upname = StringUtils.capitalize(name);
+            final List<String> accessors = Arrays.asList("get" + upname, "is" + upname);
+
+            for (Method method : clazz.getMethods()) {
+                if (method.getParameterCount() != 0) continue;
+                if (accessors.contains(method.getName())) {
+                    return (Type) method.invoke(target);
+                }
+
+                final Exported exported = method.getAnnotation(Exported.class);
+                if (exported != null && exported.name().equalsIgnoreCase(name)) {
+                    return (Type) method.invoke(target);
+                }
             }
+
             // If this is a public final field, developers don't define getters as jelly can use them as-is
-            final Field field = FieldUtils.getField(target.getClass(), name);
+            final Field field = FieldUtils.getField(clazz, name);
             if (field == null) {
                 throw new ConfiguratorException("Can't read attribute '" + name + "' from "+ target);
             }
             return (Type) field.get(target);
-        } catch (NoSuchMethodException | IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
+        } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
             throw new ConfiguratorException("Can't read attribute '" + name + "' from "+ target, e);
         }
     }
@@ -223,11 +237,17 @@ public class Attribute<Owner, Type> {
      */
     private void _setValue(Owner target, Type value) throws Exception {
         final String setterId = target.getClass().getCanonicalName()+'#'+name;
-        final PropertyDescriptor property = PropertyUtils.getPropertyDescriptor(target, name);
-        if (property == null) {
-            throw new Exception("Default value setter cannot find Property Descriptor for " + setterId);
+
+        Method writeMethod = null;
+        for (Method method : target.getClass().getMethods()) {
+            if (method.getName().equals("set"+StringUtils.capitalize(name))) {
+                writeMethod = method;
+                break;
+            }
         }
-        final Method writeMethod = property.getWriteMethod();
+
+        if (writeMethod == null)
+            throw new Exception("Default value setter cannot find Property Descriptor for " + setterId);
 
         Object o = value;
         if (multiple) {

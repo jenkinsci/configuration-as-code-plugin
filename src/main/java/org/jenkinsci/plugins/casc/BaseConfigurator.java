@@ -12,6 +12,7 @@ import org.kohsuke.accmod.restrictions.Beta;
 import org.kohsuke.accmod.restrictions.None;
 import org.kohsuke.stapler.export.Exported;
 
+import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
@@ -22,8 +23,10 @@ import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,48 +47,24 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
         Set<Attribute> attributes = new HashSet<>();
 
         final Class<T> target = getTarget();
-        final PropertyDescriptor[] properties = PropertyUtils.getPropertyDescriptors(target);
-        LOGGER.log(Level.FINE, "Found {0} properties for {1}", new Object[]{properties.length, target});
-        for (PropertyDescriptor p : properties) {
-            final String name = p.getName();
+        for (Method method : target.getMethods()) {
+            if (method.getParameterCount() != 1 || !method.getName().startsWith("set")) continue;
+
+            final String sm = method.getName().substring(3);
+            final String name = StringUtils.uncapitalize(sm);
             LOGGER.log(Level.FINER, "Processing {0} property", name);
 
-            final Method setter = p.getWriteMethod();
-            if (setter == null) {
-                LOGGER.log(Level.FINE, "Ignored {0} property: read only", name);
-                continue; // read only
-            }
-
             // FIXME move this all into cleaner logic to discover property type
-            Type type = setter.getGenericParameterTypes()[0];
+            Type type = method.getGenericParameterTypes()[0];
             Attribute attribute = detectActualType(name, type);
             if (attribute == null) continue;
             attributes.add(attribute);
 
-            final Method getter = p.getReadMethod();
-            if (getter != null) {
-                final Exported annotation = getter.getAnnotation(Exported.class);
-                if (annotation != null && isNotBlank(annotation.name())) {
-                    attribute.preferredName(annotation.name());
-                }
-            }
-
-            // See https://github.com/jenkinsci/structs-plugin/pull/18
-            final Symbol s = setter.getAnnotation(Symbol.class);
-            if (s != null) {
-                final String[] values = s.value();
-                final int last = values.length - 1;
-                // we assume preferred name is the last added as @Symbol value
-                attribute.preferredName(values[last]);
-                for (int i = 0; i < last; i++) {
-                    attribute.alias(values[i]);
-                }
-            }
-
-            attribute.deprecated(setter.getAnnotation(Deprecated.class) != null);
-            final Restricted r = setter.getAnnotation(Restricted.class);
+            attribute.deprecated(method.getAnnotation(Deprecated.class) != null);
+            final Restricted r = method.getAnnotation(Restricted.class);
             if (r != null) attribute.restrictions(r.value());
         }
+
         return attributes;
     }
 

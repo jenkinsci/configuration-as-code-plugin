@@ -272,11 +272,10 @@ public abstract class Configurator<T> implements ExtensionPoint, ElementConfigur
     @Nonnull
     public List<Attribute> getAttributes() {
         return describe().stream()
-                .filter(Attribute::isDeprecated)
-                .filter(Attribute::isRestricted)
+                .filter(a -> !a.isRestricted())
+                .filter(a -> !a.isDeprecated())
                 .sorted(Comparator.comparing(a -> a.name))
                 .collect(Collectors.toList());
-
     }
 
     @CheckForNull
