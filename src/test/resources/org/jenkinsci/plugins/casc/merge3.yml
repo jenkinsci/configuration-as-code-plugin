@@ -1,8 +1,0 @@
-jenkins:
-  systemMessage: "Configured by configuration-as-code-plugin"
-
-tool:
-  git:
-    installations:
-      - name: anothergit
-        home: /usr/local/bin/git.sh
