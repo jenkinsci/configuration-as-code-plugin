@@ -1,0 +1,7 @@
+jenkins:
+  numExecutors: 0
+
+  nodes:
+    - dumb:
+        mode: NORMAL
+        name: "agent1"
