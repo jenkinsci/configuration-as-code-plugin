@@ -4,6 +4,52 @@ jenkins:
   scmCheckoutRetryCount: 2
   mode: NORMAL
 
+  clouds:
+    - docker:
+        name: "docker"
+        dockerApi:
+          dockerHost:
+            uri: "unix:///var/run/docker.sock"
+        templates:
+          - labelString: "docker-agent"
+            dockerTemplateBase:
+              image: "jenkins/slave"
+              volumes:
+                - hello:/hello
+                - world:/world
+              environmentsString: |
+                hello=world
+                foo=bar
+            remoteFs: "/home/jenkins/agent"
+            connector:
+              attach:
+                user: "jenkins"
+            instanceCapStr: "10"
+
+  
+
+tool:
+  git:
+    installations:
+      - name: git
+        home: /usr/local/bin/git
+
+security:
+    remotingCLI:
+          enabled: false
+
+unclassified:
+  
+  artifactorybuilder:
+    useCredentialsPlugin: true
+    artifactoryServers:
+      - name: foo
+        serverId: artifactory
+        artifactoryUrl: http://acme.com/artifactory
+        resolverCredentialsConfig:
+          username: artifactory_user
+          password: ${ARTIFACTORY_PASSWORD}
+          
   globalLibraries:
     libraries:
       - name: "awesome-lib"
@@ -19,7 +65,6 @@ jenkins:
         credentialsId: tfsCredentials
     enableTeamPushTriggerForAllJobs: true
     enableTeamStatusForAllJobs: true
-    #userAccountMapper:
     configFolderPerNode: true
 
   mailer:
@@ -27,39 +72,3 @@ jenkins:
     replyToAddress: do-not-reply@acme.org
     smtpHost: smtp.acme.org
     smtpPort: 4441
-
-  clouds:
-    - docker:
-        name: "docker"
-        dockerApi:
-          dockerHost:
-            uri: "unix:///var/run/docker.sock"
-        templates:
-          - labelString: "docker-agent"
-            dockerTemplateBase:
-              image: "jenkins/slave"
-            remoteFs: "/home/jenkins/agent"
-            connector:
-              attach:
-                user: "jenkins"
-            instanceCapStr: "10"
-
-  artifactorybuilder:
-    useCredentialsPlugin: true
-    artifactoryServers:
-      - name: foo
-        serverId: artifactory
-        artifactoryUrl: http://acme.com/artifactory
-        resolverCredentialsConfig:
-          username: artifactory_user
-          password: ${ARTIFACTORY_PASSWORD}
-
-tool:
-  git:
-    installations:
-      - name: git
-        home: /usr/local/bin/git
-
-security:
-    remotingCLI:
-          enabled: false

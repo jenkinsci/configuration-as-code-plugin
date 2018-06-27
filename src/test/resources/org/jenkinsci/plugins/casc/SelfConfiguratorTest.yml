@@ -1,0 +1,7 @@
+configuration-as-code:
+  version: 1
+  deprecation: warn
+  restricted: warn
+
+jenkins:
+  rawBuildsDir: /tmp

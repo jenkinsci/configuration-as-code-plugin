@@ -20,4 +20,8 @@ public class YamlSource<T> {
     public Reader read() throws IOException {
         return reader.open(source);
     }
+
+    public String source() {
+        return source.toString();
+    }
 }

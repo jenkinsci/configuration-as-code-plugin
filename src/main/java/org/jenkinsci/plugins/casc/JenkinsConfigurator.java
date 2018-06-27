@@ -1,12 +1,8 @@
 package org.jenkinsci.plugins.casc;
 
-import hudson.EnvVars;
 import hudson.Extension;
 import hudson.slaves.Cloud;
 import hudson.slaves.NodeProperty;
-import javaposse.jobdsl.plugin.JenkinsDslScriptLoader;
-import javaposse.jobdsl.plugin.JenkinsJobManagement;
-import javaposse.jobdsl.plugin.LookupStrategy;
 import jenkins.model.Jenkins;
 import jenkins.security.s2m.AdminWhitelistRule;
 import org.jenkinsci.plugins.casc.model.CNode;
@@ -51,18 +47,13 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
 
         attributes.add(new PersistedListAttribute<Jenkins, Cloud>("clouds", Cloud.class)
             .getter(target -> target.clouds));
-        attributes.add(new MultivaluedAttribute<Jenkins, String>("jobs", String.class)
-            .setter((target, value) -> {
-                JenkinsJobManagement mng = new JenkinsJobManagement(System.out, new EnvVars(), null, null, LookupStrategy.JENKINS_ROOT);
-                for (String script : value) {
-                    new JenkinsDslScriptLoader(mng).runScript(script);
-                }
-            }));
         attributes.add(new PersistedListAttribute<Jenkins, NodeProperty>("nodeProperties", NodeProperty.class));
         attributes.add(new PersistedListAttribute<Jenkins, NodeProperty>("globalNodeProperties", NodeProperty.class));
 
         // Add remoting security, all legwork will be done by a configurator
-        attributes.add(new Attribute<Jenkins, AdminWhitelistRule>("remotingSecurity", AdminWhitelistRule.class).setter(NOOP));
+        attributes.add(new Attribute<Jenkins, AdminWhitelistRule>("remotingSecurity", AdminWhitelistRule.class)
+                .setter(NOOP)
+                .getter(j -> Jenkins.getInstance().getInjector().getInstance(AdminWhitelistRule.class) ));
 
         return attributes;
     }
@@ -74,7 +65,7 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
 
         // we can't generate a fresh new Jenkins object as constructor is mixed with init and check for `theInstance` singleton 
         Mapping mapping = new Mapping();
-        for (Attribute attribute : describe()) {
+        for (Attribute attribute : getAttributes()) {
             mapping.put(attribute.getName(), attribute.describe(instance));
         }
         return mapping;

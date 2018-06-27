@@ -31,6 +31,9 @@ import org.yaml.snakeyaml.resolver.Resolver;
 import org.yaml.snakeyaml.serializer.Serializer;
 
 import javax.annotation.CheckForNull;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -49,6 +52,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -56,9 +60,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
+import static java.util.logging.Level.WARNING;
 import static java.util.stream.Collectors.toList;
 import static org.yaml.snakeyaml.DumperOptions.FlowStyle.BLOCK;
 import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.DOUBLE_QUOTED;
@@ -76,6 +84,9 @@ public class ConfigurationAsCode extends ManagementLink {
     public static final String CASC_JENKINS_CONFIG_ENV = "CASC_JENKINS_CONFIG";
     public static final String DEFAULT_JENKINS_YAML_PATH = "./jenkins.yaml";
     public static final String YAML_FILES_PATTERN = "glob:**.{yml,yaml,YAML,YML}";
+
+    public static final Logger LOGGER = Logger.getLogger(ConfigurationAsCode.class.getName());
+
 
     @CheckForNull
     @Override
@@ -115,6 +126,7 @@ public class ConfigurationAsCode extends ManagementLink {
     @RequirePOST
     public void doReload(StaplerRequest request, StaplerResponse response) throws Exception {
         if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
 
@@ -136,10 +148,15 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     /**
-     * Main entry point to start configuration process
+     * Main entry point to start configuration process.
      * @throws ConfiguratorException Configuration error
      */
     public void configure() throws ConfiguratorException {
+        List<String> configParameters = getBundledCasCURIs();
+        if (!configParameters.isEmpty()) {
+            LOGGER.log(Level.FINE, "Located bundled config YAMLs: {0}", configParameters);
+        }
+
         String configParameter = System.getProperty(
                 CASC_JENKINS_CONFIG_PROPERTY,
                 System.getenv(CASC_JENKINS_CONFIG_ENV)
@@ -147,22 +164,67 @@ public class ConfigurationAsCode extends ManagementLink {
         if (configParameter == null) {
             if (Files.exists(Paths.get(DEFAULT_JENKINS_YAML_PATH))) {
                 configParameter = DEFAULT_JENKINS_YAML_PATH;
-            } else {
-                // No configuration set nor default config file
-                return;
             }
         }
 
-        configure(configParameter);
+        if (configParameter != null) {
+            // Add external config parameter
+            configParameters.add(configParameter);
+        }
+        if (configParameters.isEmpty()) {
+            LOGGER.log(Level.FINE, "No configuration set nor default config file");
+            return;
+        }
+        configure(configParameters);
+    }
+
+    public List<String> getBundledCasCURIs() {
+        final String cascFile = "/WEB-INF/" + DEFAULT_JENKINS_YAML_PATH;
+        final String cascDirectory = "/WEB-INF/" + DEFAULT_JENKINS_YAML_PATH + ".d/";
+        List<String> res = new ArrayList<>();
+
+        final ServletContext servletContext = Jenkins.getInstance().servletContext;
+        try {
+            URL bundled = servletContext.getResource(cascFile);
+            if (bundled != null) {
+                res.add(bundled.toString());
+            }
+        } catch (IOException e) {
+            LOGGER.log(WARNING, "Failed to load " + cascFile, e);
+        }
+
+        PathMatcher matcher = FileSystems.getDefault().getPathMatcher(YAML_FILES_PATTERN);
+        Set<String> resources = servletContext.getResourcePaths(cascDirectory);
+        if (resources!=null) {
+            // sort to execute them in a deterministic order
+            for (String cascItem : new TreeSet<>(resources)) {
+                try {
+                    URL bundled = servletContext.getResource(cascItem);
+                    if (bundled != null && matcher.matches(
+                            new File(bundled.getPath()).toPath())) {
+                        res.add(bundled.toString());
+                    } //TODO: else do some handling?
+                } catch (IOException e) {
+                    LOGGER.log(WARNING, "Failed to execute " + res, e);
+                }
+            }
+        }
+
+        return res;
     }
 
     /**
      * Export live jenkins instance configuration as Yaml
-     * @param req
-     * @param res
      * @throws Exception
      */
+    @RequirePOST
     public void doExport(StaplerRequest req, StaplerResponse res) throws Exception {
+
+        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+            res.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+
         res.setContentType("application/x-yaml; charset=utf-8");
         res.addHeader("Content-Disposition", "attachment; filename=jenkins.yaml");
 
@@ -178,22 +240,26 @@ public class ConfigurationAsCode extends ManagementLink {
         }
 
         MappingNode root = new MappingNode(Tag.MAP, tuples, BLOCK.getStyleBoolean());
+        try (Writer writer = new OutputStreamWriter(res.getOutputStream(), StandardCharsets.UTF_8)) {
+            serializeYamlNode(root, writer);
+        } catch (IOException e) {
+            throw new YAMLException(e);
+        }
+    }
+
+    static void serializeYamlNode(Node root, Writer writer) throws IOException {
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(BLOCK);
         options.setDefaultScalarStyle(PLAIN);
         options.setPrettyFlow(true);
-        try (Writer w = new OutputStreamWriter(res.getOutputStream(), StandardCharsets.UTF_8)) {
-                Serializer serializer = new Serializer(new Emitter(w, options), new Resolver(),
-                                options, null);
-                serializer.open();
-                serializer.serialize(root);
-                serializer.close();
-            } catch (IOException e) {
-                throw new YAMLException(e);
-            }
+        Serializer serializer = new Serializer(new Emitter(writer, options), new Resolver(),
+                options, null);
+        serializer.open();
+        serializer.serialize(root);
+        serializer.close();
     }
 
-    private @CheckForNull Node toYaml(CNode config) throws ConfiguratorException {
+    @CheckForNull Node toYaml(CNode config) throws ConfiguratorException {
 
         if (config == null) return null;
 
@@ -201,7 +267,9 @@ public class ConfigurationAsCode extends ManagementLink {
             case MAPPING:
                 final Mapping mapping = config.asMapping();
                 final List<NodeTuple> tuples = new ArrayList<>();
-                for (Map.Entry<String, CNode> entry : mapping.entrySet()) {
+                final List<Map.Entry<String, CNode>> entries = new ArrayList<>(mapping.entrySet());
+                entries.sort(Comparator.comparing(Map.Entry::getKey));
+                for (Map.Entry<String, CNode> entry : entries) {
                     final Node valueNode = toYaml(entry.getValue());
                     if (valueNode == null) continue;
                     tuples.add(new NodeTuple(
@@ -235,8 +303,11 @@ public class ConfigurationAsCode extends ManagementLink {
         }
     }
 
-
     public void configure(String ... configParameters) throws ConfiguratorException {
+        configure(Arrays.asList(configParameters));
+    }
+
+    public void configure(Collection<String> configParameters) throws ConfiguratorException {
 
         List<YamlSource> configs = new ArrayList<>();
 
@@ -326,6 +397,8 @@ public class ConfigurationAsCode extends ManagementLink {
      */
     public static void configureWith(Set<Map.Entry<String, CNode>> entries) throws ConfiguratorException {
 
+        ObsoleteConfigurationMonitor.get().reset();
+
         // Run configurators by order, consuming entries until all have found a matching configurator
         // configurators order is important so that org.jenkinsci.plugins.casc.plugins.PluginManagerConfigurator run
         // before any other, and can install plugins required by other configuration to successfully parse yaml data
@@ -396,5 +469,81 @@ public class ConfigurationAsCode extends ManagementLink {
                     elements.addAll(configurator.getConfigurators());
                     listElements(elements, configurator.describe());
                 });
+    }
+
+
+    /**
+     * the model-introspection model to be applied by configuration-as-code.
+     * as we move forward, we might need to introduce some breaking change in the way we discover
+     * configurable data model from live jenkins instance. At this time, 'new' mechanism will
+     * only be enabled if yaml source do include adequate 'version: x'.
+     */
+    private Version version = Version.ONE;
+
+    public void setVersion(Version version) {
+        this.version = version;
+    }
+
+    public Version getVersion() {
+        return version;
+    }
+
+    // Once we introduce some breaking change on the model inference mechanism, we will introduce `TWO` and so on
+    // And this new mechanism will only get enabled when configuration file uses this version or later
+    enum Version { ONE("1");
+
+        private final String value;
+
+        Version(String value) {
+            this.value = value;
+        }
+
+        public static Version of(String version) throws ConfiguratorException {
+            switch (version) {
+                case "1": return Version.ONE;
+                default: throw new ConfiguratorException("unsupported version "+version);
+            }
+        }
+
+        public String value() {
+            return value;
+        }
+
+    }
+
+    public boolean isAtLeast(Version version) {
+        return this.version.ordinal() >= version.ordinal();
+    }
+
+
+    /**
+     * Policy regarding {@link Deprecated} attributes.
+     */
+    enum Deprecation { reject, warn }
+
+    private Deprecation deprecation = Deprecation.reject;
+
+    public Deprecation getDeprecation() {
+        return deprecation;
+    }
+
+    public void setDeprecation(Deprecation deprecation) {
+        this.deprecation = deprecation;
+    }
+
+
+    /**
+     * Policy regarding {@link org.kohsuke.accmod.Restricted} attributes.
+     */
+    enum Restricted { reject, beta, warn }
+
+    private Restricted restricted = Restricted.reject;
+
+    public Restricted getRestricted() {
+        return restricted;
+    }
+
+    public void setRestricted(Restricted restricted) {
+        this.restricted = restricted;
     }
 }

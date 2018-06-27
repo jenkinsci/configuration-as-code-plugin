@@ -12,12 +12,17 @@ import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
+import org.jvnet.hudson.test.LoggerRule;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -26,16 +31,23 @@ import static org.junit.Assert.assertThat;
 public class SystemCredentialsTest {
 
     @Rule
+    public LoggerRule log = new LoggerRule()
+        .recordPackage(DataBoundConfigurator.class, Level.INFO)
+        .capture(100);
+
+    @Rule
     public RuleChain chain = RuleChain.outerRule(new EnvVarsRule()
             .env("SUDO_PASSWORD", "1234")
             .env("SSH_PRIVATE_KEY", "s3cr3t")
             .env("SSH_KEY_PASSWORD", "ABCD"))
+            .around(log)
             .around(new JenkinsConfiguredWithCodeRule());
 
     @Test
     @ConfiguredWithCode("SystemCredentialsTest.yml")
     public void configure_system_credentials() throws Exception {
         Jenkins jenkins = Jenkins.getInstance();
+
         List<UsernamePasswordCredentials> ups = CredentialsProvider.lookupCredentials(
                 UsernamePasswordCredentials.class, jenkins, ACL.SYSTEM, Collections.emptyList()
         );
@@ -53,5 +65,11 @@ public class SystemCredentialsTest {
         );
         assertThat(sshPrivateKeys, hasSize(2));
         assertThat(sshPrivateKeys.get(0).getPassphrase().getPlainText(), equalTo("ABCD"));
+
+        // credentials should not appear in plain text in log
+        for (LogRecord logRecord : log.getRecords()) {
+            assertThat(logRecord.getMessage(), not(containsString("1234")));
+            assertThat(logRecord.getMessage(), not(containsString("ABCD")));
+        }
     }
 }

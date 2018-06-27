@@ -1,12 +1,19 @@
 package org.jenkinsci.plugins.casc;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.reflect.FieldUtils;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Sequence;
+import org.kohsuke.accmod.AccessRestriction;
+import org.kohsuke.stapler.export.Exported;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -24,7 +31,7 @@ import java.util.stream.Collectors;
  * @see Configurator#describe()
  */
 public class Attribute<Owner, Type> {
-    
+
     private final static Logger logger = Logger.getLogger(Attribute.class.getName());
 
     protected final String name;
@@ -34,11 +41,19 @@ public class Attribute<Owner, Type> {
     private Setter<Owner, Type> setter;
     private Getter<Owner, Type> getter;
 
+    private boolean deprecated;
+
+    private Class<? extends AccessRestriction>[] restrictions;
+
+    protected List<String> aliases;
+
     public Attribute(String name, Class type) {
         this.name = name;
         this.type = type;
         this.getter = this::_getValue;
         this.setter = this::_setValue;
+        this.aliases = new ArrayList<>();
+        this.aliases.add(name);
     }
 
     @Override
@@ -52,6 +67,21 @@ public class Attribute<Owner, Type> {
 
     public Class getType() {
         return type;
+    }
+
+    public boolean isDeprecated() {
+        return deprecated;
+    }
+
+
+    private static final Class[] EMPTY = new Class[0];
+
+    public Class<? extends AccessRestriction>[] getRestrictions() {
+        return restrictions != null ? restrictions : EMPTY;
+    }
+
+    public boolean isRestricted() {
+        return restrictions != null && restrictions.length > 0;
     }
 
     /**
@@ -77,10 +107,26 @@ public class Attribute<Owner, Type> {
         return this;
     }
 
+    public Attribute<Owner, Type> alias(String alias) {
+        this.aliases.add(alias);
+        return this;
+    }
+
     public Attribute<Owner, Type> getter(Getter<Owner, Type> getter) {
         this.getter = getter;
         return this;
     }
+
+    public Attribute deprecated(boolean deprecated) {
+        this.deprecated = deprecated;
+        return this;
+    }
+
+    public Attribute restrictions(Class<? extends AccessRestriction>[] restrictions) {
+        this.restrictions = restrictions.clone();
+        return this;
+    }
+
 
     public Setter<Owner, Type> getSetter() {
         return setter;
@@ -88,6 +134,10 @@ public class Attribute<Owner, Type> {
 
     public Getter<Owner, Type> getGetter() {
         return getter;
+    }
+
+    public List<String> getAliases() {
+        return aliases;
     }
 
     /**
@@ -120,6 +170,7 @@ public class Attribute<Owner, Type> {
         }
         if (multiple) {
             Sequence seq = new Sequence();
+            if (o.getClass().isArray()) o = Arrays.asList((Object[]) o);
             for (Object value : (Iterable) o) {
                 seq.add(c.describe(value));
             }
@@ -151,12 +202,35 @@ public class Attribute<Owner, Type> {
         T getValue(O target) throws Exception;
     }
 
-    private Type _getValue(Owner target) throws Exception {
-        final PropertyDescriptor property = PropertyUtils.getPropertyDescriptor(target, name);
-        if (property == null) return null;
-        final Method readMethod = property.getReadMethod();
-        if (readMethod == null) return null;
-        return (Type) readMethod.invoke(target);
+    private Type _getValue(Owner target) throws ConfiguratorException {
+        try {
+            final Class<?> clazz = target.getClass();
+            final String upname = StringUtils.capitalize(name);
+            final List<String> accessors = Arrays.asList("get" + upname, "is" + upname);
+
+            for (Method method : clazz.getMethods()) {
+                if (method.getParameterCount() != 0) continue;
+                if (accessors.contains(method.getName())) {
+                    return (Type) method.invoke(target);
+                }
+
+                final Exported exported = method.getAnnotation(Exported.class);
+                if (exported != null && exported.name().equalsIgnoreCase(name)) {
+                    return (Type) method.invoke(target);
+                }
+            }
+
+            // If this is a public final field, developers don't define getters as jelly can use them as-is
+            final Field field = FieldUtils.getField(clazz, name, true);
+            if (field == null) {
+                throw new ConfiguratorException("Can't read attribute '" + name + "' from "+ target);
+            }
+
+            return (Type) field.get(target);
+
+        } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
+            throw new ConfiguratorException("Can't read attribute '" + name + "' from "+ target, e);
+        }
     }
 
     /**
@@ -165,11 +239,17 @@ public class Attribute<Owner, Type> {
      */
     private void _setValue(Owner target, Type value) throws Exception {
         final String setterId = target.getClass().getCanonicalName()+'#'+name;
-        final PropertyDescriptor property = PropertyUtils.getPropertyDescriptor(target, name);
-        if (property == null) {
-            throw new Exception("Default value setter cannot find Property Descriptor for " + setterId);
+
+        Method writeMethod = null;
+        for (Method method : target.getClass().getMethods()) {
+            if (method.getName().equals("set"+StringUtils.capitalize(name))) {
+                writeMethod = method;
+                break;
+            }
         }
-        final Method writeMethod = property.getWriteMethod();
+
+        if (writeMethod == null)
+            throw new Exception("Default value setter cannot find Property Descriptor for " + setterId);
 
         Object o = value;
         if (multiple) {

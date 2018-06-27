@@ -7,13 +7,11 @@ jenkins:
   authorizationStrategy:
     globalMatrix:
       grantedPermissions:
-       - group:
-           name: "anonymous"
-           permissions:
+        - name: "anonymous"
+          permissions:
             - "Overall/Read"
-       - group
-           name: "authenticated"
-           permissions:
+        - name: "authenticated"
+          permissions:
             - "Overall/Administer"
 ```
 
@@ -25,12 +23,10 @@ jenkins:
   authorizationStrategy:
     projectMatrix:
       grantedPermissions:
-       - group:
-           name: "anonymous"
-           permissions:
+        - name: "anonymous"
+          permissions:
             - "Overall/Read"
-       - group
-           name: "authenticated"
-           permissions:
+        - name: "authenticated"
+          permissions:
             - "Overall/Administer"
 ```

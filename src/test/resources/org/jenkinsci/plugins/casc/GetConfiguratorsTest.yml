@@ -14,6 +14,12 @@ jenkins:
           - labelString: "docker-agent"
             dockerTemplateBase:
               image: "jenkins/slave"
+              volumes:
+                - hello:/hello
+                - world:/world
+              environmentsString: |
+                hello=world
+                foo=bar
             remoteFs: "/home/jenkins/agent"
             connector:
               attach:

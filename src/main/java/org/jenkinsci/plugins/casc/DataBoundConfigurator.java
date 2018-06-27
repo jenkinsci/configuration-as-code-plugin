@@ -1,6 +1,5 @@
 package org.jenkinsci.plugins.casc;
 
-import com.google.common.base.Defaults;
 import hudson.model.Descriptor;
 import javafx.collections.transformation.SortedList;
 import jenkins.model.Jenkins;
@@ -11,12 +10,7 @@ import org.kohsuke.stapler.ClassDescriptor;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.PostConstruct;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,6 +19,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static com.google.common.base.Defaults.defaultValue;
 
 /**
  * A generic {@link Configurator} to configure components which offer a
@@ -159,9 +155,9 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                         if (configurator == null) throw new ConfiguratorException("No configurator implementation to manage "+k);
                         args[i] = configurator.configure(value);
                     }
-                    logger.info("Setting " + target + "." + names[i] + " = " + value);
+                    logger.info("Setting " + target + "." + names[i] + " = " + (value.isSensitiveData() ? "****" : value));
                 } else if (t.isPrimitive()) {
-                    args[i] = Defaults.defaultValue(t);
+                    args[i] = defaultValue(t);
                 }
             }
         }
@@ -185,7 +181,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
 
     public String getName() {
         final Descriptor d = getDescriptor();
-        return DescribableAttribute.getSymbolName(d, getExtensionPoint(), getTarget());
+        return DescribableAttribute.getPreferredSymbol(d, getExtensionPoint(), getTarget());
     }
 
     private Descriptor getDescriptor() {
@@ -253,6 +249,9 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
             final Parameter p = parameters[i];
             final Attribute a = detectActualType(names[i], p.getParameterizedType());
             args[i] = a.getValue(instance);
+            if (args[i] == null && p.getType().isPrimitive()) {
+                args[i] = defaultValue(p.getType());
+            }
             attributes[i] = a;
         }
 

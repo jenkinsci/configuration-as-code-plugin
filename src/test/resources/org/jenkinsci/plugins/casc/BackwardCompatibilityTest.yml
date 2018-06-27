@@ -1,0 +1,11 @@
+jenkins:
+  nodes:
+    - DumbSlave:
+        name: "foo"
+    - dumb:
+        name: "bar"
+    - slave:
+        name: "qix"
+# see https://github.com/jenkinsci/jenkins/pull/3475
+#    - permanent:
+#        name: "zot"

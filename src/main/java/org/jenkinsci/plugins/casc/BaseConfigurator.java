@@ -6,9 +6,13 @@ import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
+import org.kohsuke.accmod.AccessRestriction;
 import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.Beta;
+import org.kohsuke.accmod.restrictions.None;
 import org.kohsuke.stapler.export.Exported;
 
+import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
@@ -19,8 +23,10 @@ import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,46 +47,23 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
         Set<Attribute> attributes = new HashSet<>();
 
         final Class<T> target = getTarget();
-        final PropertyDescriptor[] properties = PropertyUtils.getPropertyDescriptors(target);
-        LOGGER.log(Level.FINE, "Found {0} properties for {1}", new Object[]{properties.length, target});
-        for (PropertyDescriptor p : properties) {
-            final String name = p.getName();
+        for (Method method : target.getMethods()) {
+            if (method.getParameterCount() != 1 || !method.getName().startsWith("set")) continue;
+
+            final String sm = method.getName().substring(3);
+            final String name = StringUtils.uncapitalize(sm);
             LOGGER.log(Level.FINER, "Processing {0} property", name);
 
-            final Method setter = p.getWriteMethod();
-            if (setter == null) {
-                LOGGER.log(Level.FINE, "Ignored {0} property: read only", name);
-                continue; // read only
-            }
-            if (setter.getAnnotation(Deprecated.class) != null) {
-                LOGGER.log(Level.FINE, "Ignored {0} property: deprecated", name);
-                continue; // not actually public
-            }
-            if (setter.getAnnotation(Restricted.class) != null) {
-                LOGGER.log(Level.FINE, "Ignored {0} property: restricted", name);
-                continue; // not actually public     - require access-modifier 1.12
-            }
-
-            // FIXME move this all into cleaner logic to discover property type
-            Type type = setter.getGenericParameterTypes()[0];
+            Type type = method.getGenericParameterTypes()[0];
             Attribute attribute = detectActualType(name, type);
             if (attribute == null) continue;
             attributes.add(attribute);
 
-            final Method getter = p.getReadMethod();
-            if (getter != null) {
-                final Exported annotation = getter.getAnnotation(Exported.class);
-                if (annotation != null && isNotBlank(annotation.name())) {
-                    attribute.preferredName(annotation.name());
-                }
-            }
-
-            // See https://github.com/jenkinsci/structs-plugin/pull/18
-            final Symbol s = setter.getAnnotation(Symbol.class);
-            if (s != null) {
-                attribute.preferredName(s.value()[0]);
-            }
+            attribute.deprecated(method.getAnnotation(Deprecated.class) != null);
+            final Restricted r = method.getAnnotation(Restricted.class);
+            if (r != null) attribute.restrictions(r.value());
         }
+
         return attributes;
     }
 
@@ -168,11 +151,42 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
 
     protected void configure(Mapping config, T instance) throws ConfiguratorException {
         final Set<Attribute> attributes = describe();
+        final ConfigurationAsCode casc = ConfigurationAsCode.get();
 
-        for (Attribute attribute : attributes) {
+        for (Attribute<T,Object> attribute : attributes) {
+
             final String name = attribute.getName();
-            final CNode sub = removeIgnoreCase(config, name);
+            CNode sub = removeIgnoreCase(config, name);
+            if (sub == null) {
+                for (String alias : attribute.aliases) {
+                    sub = removeIgnoreCase(config, alias);
+                    if (sub != null) {
+                        ObsoleteConfigurationMonitor.get().record(sub, "'"+alias+"' is an obsolete attribute name, please use '" + name + "'");
+                        break;
+                    }
+                }
+            }
+
             if (sub != null) {
+
+                if (attribute.isDeprecated()) {
+                    ObsoleteConfigurationMonitor.get().record(config, "'"+attribute.getName()+"' is deprecated");
+                    if (casc.getDeprecation() == ConfigurationAsCode.Deprecation.reject) {
+                        throw new ConfiguratorException("'"+attribute.getName()+"' is deprecated");
+                    }
+                }
+
+                for (Class<? extends AccessRestriction> r : attribute.getRestrictions()) {
+                    if (r == None.class) continue;
+                    if (r == Beta.class && casc.getRestricted() == ConfigurationAsCode.Restricted.beta) {
+                        continue;
+                    }
+                    ObsoleteConfigurationMonitor.get().record(config, "'"+attribute.getName()+"' is restricted: " + r.getSimpleName());
+                    if (casc.getRestricted() == ConfigurationAsCode.Restricted.reject) {
+                        throw new ConfiguratorException("'"+attribute.getName()+"' is restricted: " + r.getSimpleName());
+                    }
+                }
+
                 final Class k = attribute.getType();
                 final Configurator configurator = Configurator.lookupOrFail(k);
 
