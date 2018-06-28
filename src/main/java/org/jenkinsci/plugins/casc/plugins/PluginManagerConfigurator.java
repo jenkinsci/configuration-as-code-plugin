@@ -110,8 +110,9 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
                 final List<String> lines = FileUtils.readLines(shrinkwrap, UTF_8);
                 for (String line : lines) {
                     int i = line.indexOf(':');
-                    final String shortname = line.substring(0, i);
-                    shrinkwrapped.put(shortname, new PluginToInstall(shortname, line.substring(i+1)));
+                    final String shortname = i < 0 ? line : line.substring(0, i);
+                    final String version = i < 0 ? "latest" : line.substring(i+1);
+                    shrinkwrapped.put(shortname, new PluginToInstall(shortname, version));
                 }
             } catch (IOException e) {
                 throw new ConfiguratorException("failed to load plugins.txt shrinkwrap file", e);
