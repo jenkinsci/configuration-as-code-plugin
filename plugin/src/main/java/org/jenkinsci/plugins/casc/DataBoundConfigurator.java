@@ -1,7 +1,6 @@
 package org.jenkinsci.plugins.casc;
 
 import hudson.model.Descriptor;
-import javafx.collections.transformation.SortedList;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
@@ -10,11 +9,14 @@ import org.kohsuke.stapler.ClassDescriptor;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.PostConstruct;
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -220,8 +222,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
             final String[] names = ClassDescriptor.loadParameterNames(constructor);
             for (int i = 0; i < parameters.length; i++) {
                 final Parameter p = parameters[i];
-
-                final Attribute a = detectActualType(names[i], p.getParameterizedType());
+                final Attribute a = detectActualType(names[i], TypePair.of(p));
                 if (a == null) continue;
                 attributes.add(a);
             }
@@ -247,7 +248,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
         final Object[] args = new Object[parameters.length];
         for (int i = 0; i < parameters.length; i++) {
             final Parameter p = parameters[i];
-            final Attribute a = detectActualType(names[i], p.getParameterizedType());
+            final Attribute a = detectActualType(names[i], TypePair.of(p));
             args[i] = a.getValue(instance);
             if (args[i] == null && p.getType().isPrimitive()) {
                 args[i] = defaultValue(p.getType());
