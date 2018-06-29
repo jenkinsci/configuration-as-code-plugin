@@ -52,15 +52,6 @@ credentials:
       - credentials:
           - basicSSHUserPrivateKey:
               scope: SYSTEM
-              id: ssh_with_passprase
-              username: ssh_root
-              passphrase: ${SSH_KEY_PASSWORD}
-              description: "SSH passphrase with private key file"
-              privateKeySource:
-                fileOnMaster:
-                  privateKeyFile: /docker/secret/id_rsa_2
-          - basicSSHUserPrivateKey:
-              scope: SYSTEM
               id: ssh_with_passprase_provided
               username: ssh_root
               passphrase: ${SSH_KEY_PASSWORD}
