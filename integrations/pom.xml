@@ -234,6 +234,12 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>ec2</artifactId>
+      <version>1.39</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
 </project>
