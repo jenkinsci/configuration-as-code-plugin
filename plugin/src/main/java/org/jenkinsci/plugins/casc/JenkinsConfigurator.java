@@ -1,8 +1,6 @@
 package org.jenkinsci.plugins.casc;
 
 import hudson.Extension;
-import hudson.slaves.Cloud;
-import hudson.slaves.NodeProperty;
 import jenkins.model.Jenkins;
 import jenkins.security.s2m.AdminWhitelistRule;
 import org.jenkinsci.plugins.casc.model.CNode;
@@ -44,11 +42,6 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
     @Override
     public Set<Attribute> describe() {
         final Set<Attribute> attributes = super.describe();
-
-        attributes.add(new PersistedListAttribute<Jenkins, Cloud>("clouds", Cloud.class)
-            .getter(target -> target.clouds));
-        attributes.add(new PersistedListAttribute<Jenkins, NodeProperty>("nodeProperties", NodeProperty.class));
-        attributes.add(new PersistedListAttribute<Jenkins, NodeProperty>("globalNodeProperties", NodeProperty.class));
 
         // Add remoting security, all legwork will be done by a configurator
         attributes.add(new Attribute<Jenkins, AdminWhitelistRule>("remotingSecurity", AdminWhitelistRule.class)

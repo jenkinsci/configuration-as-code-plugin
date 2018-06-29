@@ -1,37 +1,31 @@
 package org.jenkinsci.plugins.casc;
 
 import hudson.model.Describable;
-import org.apache.commons.beanutils.PropertyUtils;
+import hudson.util.PersistedList;
 import org.apache.commons.lang.StringUtils;
-import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
 import org.kohsuke.accmod.AccessRestriction;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.Beta;
 import org.kohsuke.accmod.restrictions.None;
-import org.kohsuke.stapler.export.Exported;
 
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
+import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 /**
  * {@link Configurator} that uses Java Beans pattern to the target object.
@@ -46,15 +40,35 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
 
         Set<Attribute> attributes = new HashSet<>();
 
+        for (Field field : getTarget().getFields()) {
+            if (Modifier.isFinal(field.getModifiers())) {
+                if (PersistedList.class.isAssignableFrom(field.getType())) {
+                    // see Jenkins#clouds
+                    Attribute attribute = detectActualType(field.getName(), TypePair.of(field));
+                    attributes.add(attribute);
+                }
+            }
+        }
+
         final Class<T> target = getTarget();
         for (Method method : target.getMethods()) {
-            if (method.getParameterCount() != 1 || !method.getName().startsWith("set")) continue;
 
-            final String sm = method.getName().substring(3);
-            final String name = StringUtils.uncapitalize(sm);
+            final String methodName = method.getName();
+            TypePair type;
+            if (method.getParameterCount() == 0 && methodName.startsWith("get")
+                && PersistedList.class.isAssignableFrom(method.getReturnType())) {
+
+                type = TypePair.ofReturnType(method);
+            } else if (method.getParameterCount() != 1 || !methodName.startsWith("set")) {
+                // Not an accessor, ignore
+                continue;
+            } else {
+                type = TypePair.ofParameter(method, 0);
+            }
+
+            final String name = StringUtils.uncapitalize(methodName.substring(3));
             LOGGER.log(Level.FINER, "Processing {0} property", name);
 
-            Type type = method.getGenericParameterTypes()[0];
             Attribute attribute = detectActualType(name, type);
             if (attribute == null) continue;
             attributes.add(attribute);
@@ -67,86 +81,101 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
         return attributes;
     }
 
-    protected Attribute detectActualType(String name, Type type) {
-        Class c = null;
-        boolean multiple = false;
-
-        if (type instanceof GenericArrayType) {
-            // type is a parameterized array: <Foo>[]
-            multiple = true;
-            GenericArrayType at = (GenericArrayType) type;
-            type = at.getGenericComponentType();
-        }
-        while (type instanceof ParameterizedType) {
-            // type is parameterized `Some<Foo>`
-            ParameterizedType pt = (ParameterizedType) type;
-
-            Class rawType = (Class) pt.getRawType();
-            if (Collection.class.isAssignableFrom(rawType)) {
-                // type is `Collection<Foo>`
-                multiple = true;
-            }
-
-            type = pt.getActualTypeArguments()[0];
-            if (type instanceof WildcardType) {
-                // pt is Some<? extends Foo>
-                Type t = ((WildcardType) type).getUpperBounds()[0];
-                if (t == Object.class) {
-                    // pt is Some<?>, so we actually want "Some"
-                    type = pt.getRawType();
-                } else {
-                    type = t;
-                }
-            }
-        }
-
-        if (type instanceof ParameterizedType) {
-            final Type[] arguments = ((ParameterizedType) type).getActualTypeArguments();
-            type = ((ParameterizedType) type).getRawType();
-        }
-
-        while (c == null) {
-            if (type instanceof Class) {
-                c = (Class) type;
-            } else if (type instanceof TypeVariable) {
-
-                // type is declared as parameterized type
-                // unfortunately, java reflection doesn't allow to get the actual parameter type
-                // so, if superclass it parameterized, we assume parameter type match
-                // i.e target is Foo extends AbtractFoo<Bar> with
-                // public abstract class AbtractFoo<T> { void setBar(T bar) }
-                final Type superclass = getTarget().getGenericSuperclass();
-                if (superclass instanceof ParameterizedType) {
-                    final ParameterizedType psc = (ParameterizedType) superclass;
-                    type = psc.getActualTypeArguments()[0];
-                    continue;
-                } else {
-                    c = (Class) ((TypeVariable) type).getBounds()[0];
-                }
-
-                TypeVariable tv = (TypeVariable) type;
-            } else {
-                throw new IllegalStateException("Unable to detect type of attribute " + getTarget() + '#' + name);
-            }
-        }
-
-        if (c.isArray()) {
-            multiple = true;
-            c = c.getComponentType();
+    protected Attribute detectActualType(String name, final TypePair type) {
+        Class c = introspectActualClass(type);
+        if (c == null) {
+            throw new IllegalStateException("Unable to detect type of attribute " + getTarget() + '#' + name);
         }
 
         Attribute attribute;
-        if (!c.isPrimitive() && !c.isEnum() && Modifier.isAbstract(c.getModifiers())) {
+        if (PersistedList.class.isAssignableFrom(type.rawType)) {
+            return new PersistedListAttribute(name, c);
+        } else if (!c.isPrimitive() && !c.isEnum() && Modifier.isAbstract(c.getModifiers())) {
             if (!Describable.class.isAssignableFrom(c)) {
-                // Not a Describable, so probably not an attribute expected to be selected as sub-component
+                // Not a Describable, so we don't know how to detect concrete implementation type
                 return null;
             }
             attribute = new DescribableAttribute(name, c);
         } else {
             attribute = new Attribute(name, c);
         }
+
+        boolean multiple =
+                type.rawType.isArray()
+            ||  Collection.class.isAssignableFrom(type.rawType);
+
         attribute.multiple(multiple);
+
         return attribute;
+    }
+
+    private Class introspectActualClass(TypePair type) {
+        Class c = null;
+        Type t = type.type;
+        Class raw = type.rawType;
+
+        // for Hudson.CloudList extends Jenkins.CloudList extends DescribableList<Cloud,Descriptor<Cloud>>
+        // we need to check if generic superclass is owning the parameter infos
+        while (t instanceof Class) {
+            final Type superclass = ((Class) t).getGenericSuperclass();
+            if (superclass == null) {
+                // No parameterized type in class hierarchy
+                t = raw;
+                break;
+            }
+            t = superclass;
+        }
+
+        if (t instanceof GenericArrayType) {
+            // t is a parameterized array: <Foo>[]
+            GenericArrayType at = (GenericArrayType) t;
+            t = at.getGenericComponentType();
+        }
+        while (t instanceof ParameterizedType) {
+            // t is parameterized `Some<Foo>`
+            ParameterizedType pt = (ParameterizedType) t;
+
+            t = pt.getActualTypeArguments()[0];
+            if (t instanceof WildcardType) {
+                // pt is Some<? extends Foo>
+                t = ((WildcardType) t).getUpperBounds()[0];
+                if (t == Object.class) {
+                    // pt is Some<?>, so we actually want "Some"
+                    t = pt.getRawType();
+                }
+            }
+        }
+        
+
+        while (c == null) {
+            if (t instanceof Class) {
+                c = (Class) t;
+            } else if (t instanceof TypeVariable) {
+
+                // t is declared as parameterized t
+                // unfortunately, java reflection doesn't allow to get the actual parameter t
+                // so, if superclass it parameterized, we assume parameter t match
+                // i.e target is Foo extends AbtractFoo<Bar> with
+                // public abstract class AbtractFoo<T> { void setBar(T bar) }
+                final Type superclass = getTarget().getGenericSuperclass();
+                if (superclass instanceof ParameterizedType) {
+                    final ParameterizedType psc = (ParameterizedType) superclass;
+                    t = psc.getActualTypeArguments()[0];
+                    continue;
+                } else {
+                    c = (Class) ((TypeVariable) t).getBounds()[0];
+                }
+                TypeVariable tv = (TypeVariable) t;
+            } else {
+                return null;
+            }
+        }
+
+        if (c.isArray()) {
+            c = c.getComponentType();
+        }
+
+        return c;
     }
 
     protected void configure(Mapping config, T instance) throws ConfiguratorException {
@@ -234,4 +263,36 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
         }
         return null;
     }
+
+    static final class TypePair {
+
+        final Type type;
+
+        /**
+         * Erasure of {@link #type}
+         */
+        final Class rawType;
+
+        public TypePair(Type type, Class rawType) {
+            this.rawType = rawType;
+            this.type = type;
+        }
+
+        static TypePair ofReturnType(Method method) {
+            return new TypePair(method.getGenericReturnType(), method.getReturnType());
+        }
+
+        static TypePair ofParameter(Method method, int index) {
+            assert method.getParameterCount() > index;
+            return new TypePair(method.getGenericParameterTypes()[index], method.getParameterTypes()[index]);
+        }
+
+        public static TypePair of(Parameter parameter) {
+            return new TypePair(parameter.getParameterizedType(), parameter.getType());        }
+
+        public static TypePair of(Field field) {
+            return new TypePair(field.getGenericType(), field.getType());
+        }
+    }
+
 }
