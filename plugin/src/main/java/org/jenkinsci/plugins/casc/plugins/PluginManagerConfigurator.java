@@ -13,6 +13,7 @@ import jenkins.model.Jenkins;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.BaseConfigurator;
 import org.jenkinsci.plugins.casc.Configurator;
@@ -159,18 +160,43 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
                     // if plugin is being _upgraded_, not just installed, we NEED to restart
                     requireRestart |= (plugin != null);
 
-                    // FIXME update sites don't give us metadata about hosted plugins but "latest"
-                    // So we need to assume the URL layout to bake download metadata
+                    boolean downloaded = false;
+                    String url;
+                    UpdateSite updateSite;
+                    if (!Character.isDigit(p.version.charAt(0))) {
+                        // This is not a version number
+                        // We also support plain download URL for custom plugins
+                        url = p.version;
+                        updateSite = updateCenter.getSite(UpdateCenter.PREDEFINED_UPDATE_SITE_ID);
+                        if (updateSite == null)
+                            throw new ConfiguratorException("Can't install " + p + ": no default update site");
+
+                    } else {
+                        updateSite = updateCenter.getSite(p.site);
+                        if (updateSite == null)
+                            throw new ConfiguratorException("Can't install " + p + ": unknown update site " + p.site);
+
+                        // FIXME update sites don't give us metadata about hosted plugins but "latest"
+                        // see https://issues.jenkins-ci.org/browse/INFRA-1696
+                        // So here we search update site for plugin (latest version)
+                        // and we baked specific version URL based on it.
+
+                        final UpdateSite.Plugin hostedPlugin = updateSite.getPlugin(p.shortname);
+                        if (hostedPlugin == null)
+                            throw new ConfiguratorException("Can't install " + p + ": " + p.site + " does not host requested plugin");
+
+                        final int i = hostedPlugin.url.lastIndexOf(hostedPlugin.version);
+                        url = hostedPlugin.url.substring(0, i)
+                                + p.version
+                                + hostedPlugin.url.substring(i + hostedPlugin.version.length() + 1);
+                    }
+
                     JSONObject json = new JSONObject();
                     json.accumulate("name", p.shortname);
                     json.accumulate("version", p.version);
-                    json.accumulate("url", "download/plugins/" + p.shortname + "/" + p.version + "/" + p.shortname + ".hpi");
+                    json.accumulate("url", url);
                     json.accumulate("dependencies", new JSONArray());
 
-                    boolean downloaded = false;
-                    UpdateSite updateSite = updateCenter.getSite(p.site);
-                    if (updateSite == null)
-                        throw new ConfiguratorException("Can't install " + p + ": no update site " + p.site);
                     final UpdateSite.Plugin installable = updateSite.new Plugin(updateSite.getId(), json);
                     try {
                         logger.fine("Installing plugin: "+p.shortname);
@@ -200,7 +226,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
                         downloaded = true;
                         continue install;
                     } catch (InterruptedException | ExecutionException ex) {
-                        logger.info("Failed to download plugin " + p.shortname + ':' + p.version + "from update site " + updateSite.getId());
+                        logger.info("Failed to download plugin " + p.shortname + ':' + p.version + " from " + p.site);
                     } catch (Throwable ex) {
                         throw new ConfiguratorException("Failed to download plugin " + p.shortname + ':' + p.version, ex);
                     }
