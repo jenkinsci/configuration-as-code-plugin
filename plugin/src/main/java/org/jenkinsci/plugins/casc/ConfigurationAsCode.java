@@ -32,10 +32,12 @@ import org.yaml.snakeyaml.serializer.Serializer;
 
 import javax.annotation.CheckForNull;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
@@ -70,6 +72,7 @@ import static java.util.logging.Level.WARNING;
 import static java.util.stream.Collectors.toList;
 import static org.yaml.snakeyaml.DumperOptions.FlowStyle.BLOCK;
 import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.DOUBLE_QUOTED;
+import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.LITERAL;
 import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.PLAIN;
 
 /**
@@ -227,6 +230,10 @@ public class ConfigurationAsCode extends ManagementLink {
 
         res.setContentType("application/x-yaml; charset=utf-8");
         res.addHeader("Content-Disposition", "attachment; filename=jenkins.yaml");
+        export(res.getOutputStream());
+    }
+
+    protected void export(OutputStream out) throws Exception {
 
         final List<NodeTuple> tuples = new ArrayList<>();
 
@@ -240,7 +247,7 @@ public class ConfigurationAsCode extends ManagementLink {
         }
 
         MappingNode root = new MappingNode(Tag.MAP, tuples, BLOCK.getStyleBoolean());
-        try (Writer writer = new OutputStreamWriter(res.getOutputStream(), StandardCharsets.UTF_8)) {
+        try (Writer writer = new OutputStreamWriter(out, StandardCharsets.UTF_8)) {
             serializeYamlNode(root, writer);
         } catch (IOException e) {
             throw new YAMLException(e);
@@ -251,6 +258,7 @@ public class ConfigurationAsCode extends ManagementLink {
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(BLOCK);
         options.setDefaultScalarStyle(PLAIN);
+        options.setSplitLines(true);
         options.setPrettyFlow(true);
         Serializer serializer = new Serializer(new Emitter(writer, options), new Resolver(),
                 options, null);
@@ -297,8 +305,10 @@ public class ConfigurationAsCode extends ManagementLink {
                 final Scalar scalar = config.asScalar();
                 final String value = scalar.getValue();
                 if (value == null || value.length() == 0) return null;
-                return new ScalarNode(scalar.getTag(), value, null, null,
-                        scalar.isRaw() ? PLAIN.getChar() : DOUBLE_QUOTED.getChar());
+
+                final Character style = scalar.isRaw() ? PLAIN.getChar() : DOUBLE_QUOTED.getChar();
+
+                return new ScalarNode(scalar.getTag(), value, null, null, style);
 
         }
     }

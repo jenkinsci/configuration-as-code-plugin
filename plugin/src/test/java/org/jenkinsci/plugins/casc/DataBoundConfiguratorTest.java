@@ -2,7 +2,6 @@ package org.jenkinsci.plugins.casc;
 
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
-import org.jenkinsci.plugins.casc.model.Scalar;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -10,8 +9,6 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
 import javax.annotation.PostConstruct;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
