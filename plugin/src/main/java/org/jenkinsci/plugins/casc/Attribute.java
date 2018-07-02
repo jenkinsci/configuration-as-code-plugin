@@ -1,14 +1,15 @@
 package org.jenkinsci.plugins.casc;
 
-import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.reflect.FieldUtils;
 import org.jenkinsci.plugins.casc.model.CNode;
+import org.jenkinsci.plugins.casc.model.Scalar;
 import org.jenkinsci.plugins.casc.model.Sequence;
 import org.kohsuke.accmod.AccessRestriction;
 import org.kohsuke.stapler.export.Exported;
 
-import java.beans.PropertyDescriptor;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -162,21 +163,28 @@ public class Attribute<Owner, Type> {
         return getter.getValue(target);
     }
 
-    public CNode describe(Owner instance) throws Exception {
+    public CNode describe(Owner instance) throws ConfiguratorException {
         final Configurator c = Configurator.lookupOrFail(type);
-        Object o = getValue(instance);
-        if (o == null) {
-            return null;
-        }
-        if (multiple) {
-            Sequence seq = new Sequence();
-            if (o.getClass().isArray()) o = Arrays.asList((Object[]) o);
-            for (Object value : (Iterable) o) {
-                seq.add(c.describe(value));
+        try {
+            Object o = getValue(instance);
+            if (o == null) {
+                return null;
             }
-            return seq;
+            if (multiple) {
+                Sequence seq = new Sequence();
+                if (o.getClass().isArray()) o = Arrays.asList((Object[]) o);
+                for (Object value : (Iterable) o) {
+                    seq.add(c.describe(value));
+                }
+                return seq;
+            }
+            return c.describe(o);
+        } catch (Exception e) {
+            // Don't fail the whole export, prefer logging this error
+            final StringWriter w = new StringWriter();
+            e.printStackTrace(new PrintWriter(w));
+            return new Scalar("FAILED TO EXPORT " + instance.getClass().getName()+"#"+name + ": \n"+w.toString());
         }
-        return c.describe(o);
     }
 
     public boolean equals(Owner o1, Owner o2) throws Exception {
