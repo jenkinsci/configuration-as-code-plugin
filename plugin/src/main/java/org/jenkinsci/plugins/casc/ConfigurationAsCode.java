@@ -426,7 +426,7 @@ public class ConfigurationAsCode extends ManagementLink {
                 } catch (ConfiguratorException e) {
                     throw new ConfiguratorException(
                             configurator,
-                            format("error configuring <%s> with <%s> configurator", entry.getKey(), configurator.getName()), e
+                            format("error configuring '%s' with %s configurator", entry.getKey(), configurator.getClass()), e
                     );
                 }
             }
