@@ -60,9 +60,12 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                     new Object[] {target, dataBoundConstructor} );
             object = tryConstructor((Constructor<T>) dataBoundConstructor, config);
         } catch (ConfiguratorException ex) {
+            final Set<Constructor<T>> altConstructors = LegacyDataBoundConstructorProvider.getLegacyDataBoundConstructors(target);
+            if (altConstructors.isEmpty()) throw ex;
+
             logger.log(Level.INFO, "Default databound constructor cannot be applied, " +
-                    "will consult with Legacy DataBoundConstructor providers", ex);
-            for (Constructor constructor : LegacyDataBoundConstructorProvider.getLegacyDataBoundConstructors(target)) {
+                "will consult with Legacy DataBoundConstructor providers", ex);
+            for (Constructor constructor : altConstructors) {
                 if (constructor == dataBoundConstructor) {
                     continue; // Already tried it
                 }
@@ -80,9 +83,9 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                     break;
                 }
             }
-        }
-        if (object == null) {
-            throw new ConfiguratorException("Failed to find a compatible constructor for target " + target);
+            if (object == null) {
+                throw new ConfiguratorException("Failed to find a compatible constructor for target " + target);
+            }
         }
 
         final Set<Attribute> attributes = describe();
