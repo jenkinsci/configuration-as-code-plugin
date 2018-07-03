@@ -31,7 +31,7 @@ public class PrimitiveConfigurator extends Configurator {
 
     @Override
     public Object configure(CNode config) throws ConfiguratorException {
-        return Stapler.lookupConverter(target).convert(target, config);
+        return Stapler.lookupConverter(target).convert(target, config.asScalar().getValue());
     }
 
     @CheckForNull
