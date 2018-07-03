@@ -4,8 +4,10 @@ Supported in plugin **version >= 4.66**
 
 ## sample-configuration (Example parser from help)
 
-```
-jenkins:
+```yaml
+jenkins: 
+  [...]
+unclassified:
   warnings:
     parsers:
       - name: "Example parser"

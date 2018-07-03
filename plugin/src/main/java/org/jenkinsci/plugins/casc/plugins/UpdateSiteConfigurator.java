@@ -1,0 +1,41 @@
+package org.jenkinsci.plugins.casc.plugins;
+
+import hudson.Extension;
+import hudson.model.UpdateSite;
+import org.jenkinsci.plugins.casc.BaseConfigurator;
+import org.jenkinsci.plugins.casc.ConfiguratorException;
+import org.jenkinsci.plugins.casc.model.CNode;
+import org.jenkinsci.plugins.casc.model.Mapping;
+
+import javax.annotation.CheckForNull;
+import java.util.Map;
+
+/**
+ * TODO would  not be required if UpdateSite had a DataBoundConstructor
+ * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
+ */
+@Extension
+public class UpdateSiteConfigurator extends BaseConfigurator<UpdateSite> {
+
+    @Override
+    public Class<UpdateSite> getTarget() {
+        return UpdateSite.class;
+    }
+
+    @Override
+    public UpdateSite configure(CNode config) throws ConfiguratorException {
+        Mapping map = config.asMapping();
+        return new UpdateSite(map.getScalarValue("id"), map.getScalarValue("url"));
+    }
+
+    @CheckForNull
+    @Override
+    public CNode describe(UpdateSite instance) throws Exception {
+        final Mapping mapping = new Mapping();
+        // TODO would need to compare with hudson.model.UpdateCenter.createDefaultUpdateSite
+        // so we return null if default update site is in use.
+        mapping.put("id", instance.getId());
+        mapping.put("url", instance.getUrl());
+        return mapping;
+    }
+}
