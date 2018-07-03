@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.casc;
 
+import hudson.model.labels.LabelAtom;
 import hudson.plugins.ec2.AmazonEC2Cloud;
 import hudson.plugins.ec2.SlaveTemplate;
 import jenkins.model.Jenkins;
@@ -12,6 +13,8 @@ import java.util.List;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertNotNull;
@@ -36,6 +39,11 @@ public class EC2CloudTest {
 
         assertThat(slaveTemplate.getLabelString(), containsString("test"));
         assertThat(slaveTemplate.getLabelString(), containsString("yey"));
+
+        assertThat(slaveTemplate.getLabelSet(), is(notNullValue()));
+
+        // fails here without mode specified
+        assertTrue(ec2Cloud.canProvision(new LabelAtom("test")));
     }
 
 
