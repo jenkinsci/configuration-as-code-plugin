@@ -65,15 +65,6 @@ public final class Scalar implements CNode, CharSequence {
     }
 
     public String getValue() {
-        return value;
-    }
-
-    public boolean isSensitiveData() {
-        return SecretSource.requiresReveal(value).isPresent();
-    }
-
-    @Override
-    public String toString() {
         String s = value;
         Optional<String> r = SecretSource.requiresReveal(value);
         if(r.isPresent()) {
@@ -100,6 +91,15 @@ public final class Scalar implements CNode, CharSequence {
             }
         }
         return s;
+    }
+
+    public boolean isSensitiveData() {
+        return SecretSource.requiresReveal(value).isPresent();
+    }
+
+    @Override
+    public String toString() {
+        return value;
     }
 
     @Override
