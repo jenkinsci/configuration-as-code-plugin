@@ -72,6 +72,21 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
         Mapping map = config.asMapping();
         final Jenkins jenkins = Jenkins.getInstance();
 
+        configureProxy(map, jenkins);
+
+        final UpdateCenter updateCenter = configureUpdateSites(map, jenkins);
+
+        final PluginManager pluginManager = configurePlugins(map, jenkins, updateCenter);
+
+        try {
+            jenkins.save();
+        } catch (IOException e) {
+            throw new ConfiguratorException("failed to save Jenkins configuration", e);
+        }
+        return pluginManager;
+    }
+
+    private void configureProxy(Mapping map, Jenkins jenkins) throws ConfiguratorException {
         final CNode proxy = map.get("proxy");
         if (proxy != null) {
             Configurator<ProxyConfiguration> pc = Configurator.lookup(ProxyConfiguration.class);
@@ -79,7 +94,9 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
             ProxyConfiguration pcc = pc.configure(proxy);
             jenkins.proxy = pcc;
         }
+    }
 
+    private UpdateCenter configureUpdateSites(Mapping map, Jenkins jenkins) throws ConfiguratorException {
         final CNode sites = map.get("sites");
         final UpdateCenter updateCenter = jenkins.getUpdateCenter();
         if (sites != null) {
@@ -98,7 +115,10 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
                 throw new ConfiguratorException("failed to reconfigure updateCenter.sites", e);
             }
         }
+        return updateCenter;
+    }
 
+    private PluginManager configurePlugins(Mapping map, Jenkins jenkins, UpdateCenter updateCenter) throws ConfiguratorException {
         Queue<PluginToInstall> plugins = new LinkedList<>();
         final CNode required = map.get("required");
         if (required != null) {
@@ -107,34 +127,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
             }
         }
 
-        File shrinkwrap = new File(jenkins.getRootDir(), "plugins.txt");
-        logger.log(java.util.logging.Level.CONFIG, String.format("Using shrinkwrap file: '%s'", shrinkwrap.getAbsoluteFile()));
-
-        Map<String, PluginToInstall> shrinkwrapped = new HashMap<>();
-        if (shrinkwrap.exists()) {
-            try {
-                final List<String> lines = FileUtils.readLines(shrinkwrap, UTF_8);
-                for (String line : lines) {
-                    int i = line.indexOf(':');
-                    final String shortname = line.substring(0, i);
-                    shrinkwrapped.put(shortname, new PluginToInstall(shortname, line.substring(i+1)));
-                }
-            } catch (IOException e) {
-                throw new ConfiguratorException("failed to load plugins.txt shrinkwrap file", e);
-            }
-
-            // Check if required plugin list has been updated, in which case the shrinkwrap file is obsolete
-            boolean outdated = false;
-            for (PluginToInstall plugin : plugins) {
-                final PluginToInstall other = shrinkwrapped.get(plugin.shortname);
-                if (other == null || !other.equals(plugin)) {
-                    // plugins was added or version updates, so shrinkwrap isn't relevant anymore
-                    outdated = true;
-                    break;
-                }
-            }
-            if (!outdated) plugins.addAll(shrinkwrapped.values());
-        }
+        File shrinkwrap = readShrinkwrapFile(jenkins, plugins);
 
 
         final PluginManager pluginManager = getTargetComponent();
@@ -161,43 +154,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
                     requireRestart |= (plugin != null);
 
                     boolean downloaded = false;
-                    String url;
-                    UpdateSite updateSite;
-                    if (!Character.isDigit(p.version.charAt(0))) {
-                        // This is not a version number
-                        // We also support plain download URL for custom plugins
-                        url = p.version;
-                        updateSite = updateCenter.getSite(UpdateCenter.PREDEFINED_UPDATE_SITE_ID);
-                        if (updateSite == null)
-                            throw new ConfiguratorException("Can't install " + p + ": no default update site");
-
-                    } else {
-                        updateSite = updateCenter.getSite(p.site);
-                        if (updateSite == null)
-                            throw new ConfiguratorException("Can't install " + p + ": unknown update site " + p.site);
-
-                        // FIXME update sites don't give us metadata about hosted plugins but "latest"
-                        // see https://issues.jenkins-ci.org/browse/INFRA-1696
-                        // So here we search update site for plugin (latest version)
-                        // and we baked specific version URL based on it.
-
-                        final UpdateSite.Plugin hostedPlugin = updateSite.getPlugin(p.shortname);
-                        if (hostedPlugin == null)
-                            throw new ConfiguratorException("Can't install " + p + ": " + p.site + " does not host requested plugin");
-
-                        final int i = hostedPlugin.url.lastIndexOf(hostedPlugin.version);
-                        url = hostedPlugin.url.substring(0, i)
-                                + p.version
-                                + hostedPlugin.url.substring(i + hostedPlugin.version.length() + 1);
-                    }
-
-                    JSONObject json = new JSONObject();
-                    json.accumulate("name", p.shortname);
-                    json.accumulate("version", p.version);
-                    json.accumulate("url", url);
-                    json.accumulate("dependencies", new JSONArray());
-
-                    final UpdateSite.Plugin installable = updateSite.new Plugin(updateSite.getId(), json);
+                    final UpdateSite.Plugin installable = getPluginMetadata(updateCenter, p);
                     try {
                         logger.fine("Installing plugin: "+p.shortname);
                         final UpdateCenter.UpdateCenterJob job = installable.deploy(false).get();
@@ -237,22 +194,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
                     logger.fine("Done installing plugins");
                 }
             }
-            logger.fine("Writing shrinkwrap file: "+shrinkwrap);
-            try (PrintWriter w = new PrintWriter(shrinkwrap, UTF_8.name())) {
-                for (PluginWrapper pw : pluginManager.getPlugins()) {
-                    if (pw.getShortName().equals("configuration-as-code")) continue;
-                    String from = UpdateCenter.PREDEFINED_UPDATE_SITE_ID;
-                    for (UpdateSite site : jenkins.getUpdateCenter().getSites()) {
-                        if (site.getPlugin(pw.getShortName()) != null) {
-                            from = site.getId();
-                            break;
-                        }
-                    }
-                    w.println(pw.getShortName() + ':' + pw.getVersionNumber().toString() + '@' + from);
-                }
-            } catch (IOException e) {
-                throw new ConfiguratorException("failed to write plugins.txt shrinkwrap file", e);
-            }
+            writeShrinkwrapFile(jenkins, shrinkwrap, pluginManager);
 
             if (requireRestart) {
                 try {
@@ -262,13 +204,105 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
                 }
             }
         }
-
-        try {
-            jenkins.save();
-        } catch (IOException e) {
-            throw new ConfiguratorException("failed to save Jenkins configuration", e);
-        }
         return pluginManager;
+    }
+
+    /**
+     * Resolve specific plugin and version metadata and download URL.
+     * Update sites doesn't give us metadata about hosted plugins, but "latest" version. So here we workaround this by
+     * searching update site for plugin shortname and we bake specific version's URL based on this URL, assuming this
+     * will be the same but version part in the path. This is a bit fragile but we don't have a better way so far.
+     * see <a href="https://issues.jenkins-ci.org/browse/INFRA-1696">INFRA-1696</a> for status
+     *
+     * @param updateCenter
+     * @param p
+     * @return
+     * @throws ConfiguratorException
+     */
+    private UpdateSite.Plugin getPluginMetadata(UpdateCenter updateCenter, PluginToInstall p) throws ConfiguratorException {
+        String url;
+        UpdateSite updateSite;
+        if (!Character.isDigit(p.version.charAt(0))) {
+            // This is not a version number
+            // We also support plain download URL for custom plugins
+            url = p.version;
+            updateSite = updateCenter.getSite(UpdateCenter.PREDEFINED_UPDATE_SITE_ID);
+            if (updateSite == null)
+                throw new ConfiguratorException("Can't install " + p + ": no default update site");
+
+        } else {
+            updateSite = updateCenter.getSite(p.site);
+            if (updateSite == null)
+                throw new ConfiguratorException("Can't install " + p + ": unknown update site " + p.site);
+
+            final UpdateSite.Plugin hostedPlugin = updateSite.getPlugin(p.shortname);
+            if (hostedPlugin == null)
+                throw new ConfiguratorException("Can't install " + p + ": " + p.site + " does not host requested plugin");
+
+            final int i = hostedPlugin.url.lastIndexOf(hostedPlugin.version);
+            url = hostedPlugin.url.substring(0, i)
+                    + p.version
+                    + hostedPlugin.url.substring(i + hostedPlugin.version.length() + 1);
+        }
+
+        JSONObject json = new JSONObject();
+        json.accumulate("name", p.shortname);
+        json.accumulate("version", p.version);
+        json.accumulate("url", url);
+        json.accumulate("dependencies", new JSONArray());
+
+        return updateSite.new Plugin(updateSite.getId(), json);
+    }
+
+    private File readShrinkwrapFile(Jenkins jenkins, Queue<PluginToInstall> plugins) throws ConfiguratorException {
+        File shrinkwrap = new File(jenkins.getRootDir(), "plugins.txt");
+        logger.log(java.util.logging.Level.CONFIG, String.format("Using shrinkwrap file: '%s'", shrinkwrap.getAbsoluteFile()));
+
+        Map<String, PluginToInstall> shrinkwrapped = new HashMap<>();
+        if (shrinkwrap.exists()) {
+            try {
+                final List<String> lines = FileUtils.readLines(shrinkwrap, UTF_8);
+                for (String line : lines) {
+                    int i = line.indexOf(':');
+                    final String shortname = line.substring(0, i);
+                    shrinkwrapped.put(shortname, new PluginToInstall(shortname, line.substring(i+1)));
+                }
+            } catch (IOException e) {
+                throw new ConfiguratorException("failed to load plugins.txt shrinkwrap file", e);
+            }
+
+            // Check if required plugin list has been updated, in which case the shrinkwrap file is obsolete
+            boolean outdated = false;
+            for (PluginToInstall plugin : plugins) {
+                final PluginToInstall other = shrinkwrapped.get(plugin.shortname);
+                if (other == null || !other.equals(plugin)) {
+                    // plugins was added or version updates, so shrinkwrap isn't relevant anymore
+                    outdated = true;
+                    break;
+                }
+            }
+            if (!outdated) plugins.addAll(shrinkwrapped.values());
+        }
+        return shrinkwrap;
+    }
+
+    private void writeShrinkwrapFile(Jenkins jenkins, File shrinkwrap, PluginManager pluginManager) throws ConfiguratorException {
+        logger.fine("Writing shrinkwrap file: "+shrinkwrap);
+        try (PrintWriter w = new PrintWriter(shrinkwrap, UTF_8.name())) {
+            for (PluginWrapper pw : pluginManager.getPlugins()) {
+                if (pw.getShortName().equals("configuration-as-code")) continue;
+                String from = UpdateCenter.PREDEFINED_UPDATE_SITE_ID;
+                for (UpdateSite site : jenkins.getUpdateCenter().getSites()) {
+                    if (site.getPlugin(pw.getShortName()) != null) {
+                        from = site.getId();
+                        break;
+                    }
+                }
+                w.println(pw.getShortName() + ':' + pw.getVersionNumber().toString() + '@' + from);
+            }
+        } catch (IOException e) {
+            throw new ConfiguratorException("failed to write plugins.txt shrinkwrap file", e);
+        }
     }
 
     @Override
