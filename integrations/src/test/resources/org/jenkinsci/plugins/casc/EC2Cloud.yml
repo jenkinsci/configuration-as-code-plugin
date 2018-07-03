@@ -15,7 +15,7 @@ jenkins:
             ami: "ami-0c6bb742864ffa3f3"
             labelString: "test yey"
             type: "T2Xlarge"
-            # FIXME: create dedicated secu group?
-            securityGroups: "jenkins-22-and-8080-and-50000-from-anywhere"
+            securityGroups: "some-group"
             remoteFS: "/home/ec2-user"
             remoteAdmin: "ec2-user"
+            mode: "NORMAL"
