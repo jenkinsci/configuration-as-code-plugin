@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.casc;
 
 import hudson.model.Descriptor;
 import jenkins.model.Jenkins;
+import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
 import org.kohsuke.stapler.ClassDescriptor;
@@ -94,7 +95,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
             final String name = attribute.getName();
             final Configurator lookup = Configurator.lookup(attribute.getType());
             if (config.containsKey(name)) {
-                final CNode yaml = config.get(name);
+                final CNode yaml = config.remove(name);
                 Object value;
                 if (attribute.isMultiple()) {
                     List l = new ArrayList<>();
@@ -122,6 +123,11 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                     throw new ConfiguratorException(this, "Failed to invoke configurator method " + method, e);
                 }
             }
+        }
+
+        if (!config.isEmpty()) {
+            final String invalid = StringUtils.join(config.keySet(), ',');
+            throw new ConfiguratorException("Invalid configuration elements for type " + target + " : " + invalid);
         }
 
         return object;
