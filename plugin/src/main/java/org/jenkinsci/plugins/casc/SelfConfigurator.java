@@ -39,6 +39,7 @@ public class SelfConfigurator extends BaseConfigurator<ConfigurationAsCode> impl
                 .setter((t,v)->t.setVersion(ConfigurationAsCode.Version.of(v))));
         attributes.add(new Attribute("deprecation", ConfigurationAsCode.Deprecation.class));
         attributes.add(new Attribute("restricted", ConfigurationAsCode.Restricted.class));
+        attributes.add(new Attribute("unknown", ConfigurationAsCode.Unknown.class));
         return attributes;
     }
 

@@ -34,7 +34,7 @@ import java.util.logging.Logger;
  */
 public abstract class BaseConfigurator<T> extends Configurator<T> {
 
-    private static final Logger LOGGER = Logger.getLogger(BaseConfigurator.class.getName());
+    private static final Logger logger = Logger.getLogger(BaseConfigurator.class.getName());
 
     public Set<Attribute> describe() {
 
@@ -67,7 +67,7 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
             }
 
             final String name = StringUtils.uncapitalize(methodName.substring(3));
-            LOGGER.log(Level.FINER, "Processing {0} property", name);
+            logger.log(Level.FINER, "Processing {0} property", name);
 
             Attribute attribute = detectActualType(name, type);
             if (attribute == null) continue;
@@ -232,16 +232,29 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
                 }
 
                 try {
-                    LOGGER.info("Setting " + instance + '.' + name + " = " + (sub.isSensitiveData() ? "****" : valueToSet));
+                    logger.info("Setting " + instance + '.' + name + " = " + (sub.isSensitiveData() ? "****" : valueToSet));
                     attribute.setValue(instance, valueToSet);
                 } catch (Exception ex) {
                     throw new ConfiguratorException(configurator, "Failed to set attribute " + attribute, ex);
                 }
             }
         }
+
+        handleUnknown(config);
+    }
+
+    protected final void handleUnknown(Mapping config) throws ConfiguratorException {
         if (!config.isEmpty()) {
             final String invalid = StringUtils.join(config.keySet(), ',');
-            throw new ConfiguratorException("Invalid configuration elements for type " + instance.getClass() + " : " + invalid);
+            final String message = "Invalid configuration elements for type " + getTarget() + " : " + invalid;
+            ObsoleteConfigurationMonitor.get().record(config, message);
+            switch (ConfigurationAsCode.get().getUnknown()) {
+                case reject:
+                    throw new ConfiguratorException(message);
+
+                case warn:
+                    logger.warning(message);
+            }
         }
     }
 

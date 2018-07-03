@@ -93,8 +93,8 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
 
         for (Attribute attribute : attributes) {
             final String name = attribute.getName();
-            final Configurator lookup = Configurator.lookup(attribute.getType());
             if (config.containsKey(name)) {
+                final Configurator lookup = Configurator.lookup(attribute.getType());
                 final CNode yaml = config.remove(name);
                 Object value;
                 if (attribute.isMultiple()) {
@@ -104,7 +104,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                     }
                     value = l;
                 } else {
-                    value = lookup.configure(config.get(name));
+                    value = lookup.configure(yaml);
                 }
                 try {
                     logger.info("Setting " + object + '.' + name + " = " + (yaml.isSensitiveData() ? "****" : value));
@@ -125,10 +125,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
             }
         }
 
-        if (!config.isEmpty()) {
-            final String invalid = StringUtils.join(config.keySet(), ',');
-            throw new ConfiguratorException("Invalid configuration elements for type " + target + " : " + invalid);
-        }
+        handleUnknown(config);
 
         return object;
     }
