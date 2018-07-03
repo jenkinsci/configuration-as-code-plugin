@@ -556,4 +556,21 @@ public class ConfigurationAsCode extends ManagementLink {
     public void setRestricted(Restricted restricted) {
         this.restricted = restricted;
     }
+
+
+    /**
+     * Policy regarding unknown attributes.
+     */
+    enum Unknown { reject, warn }
+
+    private Unknown unknown = Unknown.reject;
+
+    public Unknown getUnknown() {
+        return unknown;
+    }
+
+    public void setUnknown(Unknown unknown) {
+        this.unknown = unknown;
+    }
+
 }

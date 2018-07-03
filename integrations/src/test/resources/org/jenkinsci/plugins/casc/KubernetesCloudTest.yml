@@ -15,7 +15,6 @@ jenkins:
 
         templates:
           - name: "test"
-            image: "image"
             serviceAccount: "serviceAccount"
             instanceCap: 1234
             idleMinutes: 0
