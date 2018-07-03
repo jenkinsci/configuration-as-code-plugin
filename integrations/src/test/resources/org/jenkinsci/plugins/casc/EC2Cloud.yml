@@ -13,7 +13,7 @@ jenkins:
         templates:
           - description: "Auto configured EC2 Agent, yay again"
             ami: "ami-0c6bb742864ffa3f3"
-            labels: "test yey"
+            labelString: "test yey"
             type: "T2Xlarge"
             # FIXME: create dedicated secu group?
             securityGroups: "jenkins-22-and-8080-and-50000-from-anywhere"
