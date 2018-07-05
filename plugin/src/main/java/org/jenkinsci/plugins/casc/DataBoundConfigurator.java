@@ -110,7 +110,9 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
 
     @Override
     public T check(CNode config) throws ConfiguratorException {
-        return configure(config);
+        // As DataBound objets are replaced in jenkins model we can build one from configuration without side-effets
+        // BUT we don't invoke @PostConstruct methods which might un some post-build registration into jenkins APIs.
+        return super.configure(config);
     }
 
     private T tryConstructor(Constructor<T> constructor, Mapping config) throws ConfiguratorException {
