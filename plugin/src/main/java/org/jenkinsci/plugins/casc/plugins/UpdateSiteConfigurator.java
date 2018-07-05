@@ -23,9 +23,8 @@ public class UpdateSiteConfigurator extends BaseConfigurator<UpdateSite> {
     }
 
     @Override
-    public UpdateSite configure(CNode config) throws ConfiguratorException {
-        Mapping map = config.asMapping();
-        return new UpdateSite(map.getScalarValue("id"), map.getScalarValue("url"));
+    protected UpdateSite instance(Mapping mapping) throws ConfiguratorException {
+        return new UpdateSite(mapping.getScalarValue("id"), mapping.getScalarValue("url"));
     }
 
     @CheckForNull

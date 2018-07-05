@@ -28,6 +28,7 @@ import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.BaseConfigurator;
 import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.model.CNode;
+import org.jenkinsci.plugins.casc.model.Mapping;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
@@ -56,11 +57,9 @@ public class AdminWhitelistRuleConfigurator extends BaseConfigurator<AdminWhitel
     }
 
     @Override
-    public AdminWhitelistRule configure(CNode config) throws ConfiguratorException {
+    protected AdminWhitelistRule instance(Mapping mapping) {
         Injector injector = Jenkins.getInstance().getInjector();
-        AdminWhitelistRule instance = injector.getInstance(AdminWhitelistRule.class);
-        configure(config.asMapping(), instance);
-        return instance;
+        return injector.getInstance(AdminWhitelistRule.class);
     }
 
     @Override

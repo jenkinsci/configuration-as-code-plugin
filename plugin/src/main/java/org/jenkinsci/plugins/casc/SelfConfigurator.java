@@ -30,6 +30,11 @@ public class SelfConfigurator extends BaseConfigurator<ConfigurationAsCode> impl
         return ConfigurationAsCode.get();
     }
 
+    @Override
+    protected ConfigurationAsCode instance(Mapping mapping) {
+        return getTargetComponent();
+    }
+
     @Nonnull
     @Override
     public Set<Attribute> describe() {
@@ -41,14 +46,6 @@ public class SelfConfigurator extends BaseConfigurator<ConfigurationAsCode> impl
         attributes.add(new Attribute("restricted", ConfigurationAsCode.Restricted.class));
         attributes.add(new Attribute("unknown", ConfigurationAsCode.Unknown.class));
         return attributes;
-    }
-
-    @Nonnull
-    @Override
-    public ConfigurationAsCode configure(CNode config) throws ConfiguratorException {
-        final ConfigurationAsCode c = getTargetComponent();
-        configure(config.asMapping(), c);
-        return c;
     }
 
     @CheckForNull
