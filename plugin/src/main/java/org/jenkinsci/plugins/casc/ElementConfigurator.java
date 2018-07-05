@@ -64,6 +64,14 @@ public interface ElementConfigurator<T> {
     @Nonnull
     T configure(CNode config) throws ConfiguratorException;
 
+    /**
+     * Run the same logic as {@link #configure(CNode)} in dry-run mode.
+     * Used to verify configuration is fine before being acutally applied to a live jenkins master.
+     * @param config
+     * @throws ConfiguratorException
+     */
+    T check(CNode config) throws ConfiguratorException;
+
 
     /**
      * Describe a component as a Configuration Nodes {@link CNode} to be exported as yaml.
