@@ -16,10 +16,36 @@ Once the plugin is installed you can use yaml file to configure your Jenkins ins
 
 `CASC_JENKINS_CONFIG` can be configured as a location on disk or direct url to the yaml file.
 
+If you don't configure the variable it will look for `jenkins.yaml` in $JENKINS_HOME
+
 ### Documentation
 
-### Plugin self-configuration
+Documentation is automatically generated, based on your Jenkins version and installed plugins. It is available under `Manage Jenkins` -> `Configuration as Code` -> `Documentation`
+ 
+## JCasC self-configuration
+
+Plugins allows you to configure its behaviour regarding the usage of deprecated and restricted attributes. By default you can configure plugins' using deprecated/restricted methods/attributes but you can alter the behaviour, e.g.:
+
+```
+configuration-as-code:
+  version: 1
+  deprecation: warn
+  restricted: warn
+```
+
+## Plugins installation
+
+Use `plugins` root element in your yaml to provide a list of required plugins
+If you're using docker you can still use existing solution with `install-plugins.sh` script
 
 ## Tips & Tricks
 
+If the plugin you want to configure is installed but you can't see it in generated documentation or you can see configurator, but it has no attributes it most probably means the plugin is not compatible with JcasC. 
+
+Have a look at [PLUGINS.md](PLUGINS.md) to find more information about what is required from a plugin to be compatible with JcasC, and to fix it if needed.
+
 ## How to report issues
+
+Github issues are used to track plugin development, also bugs can be reported that way.
+
+If you prefer [issues.jenkins-ci.org](issues.jenkins-ci.org) please use _configuration-as-code-plugin_ component.
