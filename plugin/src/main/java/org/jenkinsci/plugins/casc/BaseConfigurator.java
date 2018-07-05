@@ -10,6 +10,7 @@ import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.Beta;
 import org.kohsuke.accmod.restrictions.None;
 
+import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
@@ -178,7 +179,33 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
         return c;
     }
 
-    protected void configure(Mapping config, T instance) throws ConfiguratorException {
+    /**
+     * Build or identify the target component this configurator has to handle based on the provided configuration node.
+     * @param mapping
+     * @return
+     * @throws ConfiguratorException
+     */
+    protected abstract T instance(Mapping mapping) throws ConfiguratorException;
+
+    @Nonnull
+    @Override
+    public T configure(CNode c) throws ConfiguratorException {
+        final Mapping mapping = (c != null ? c.asMapping() : Mapping.EMPTY);
+        final T instance = instance(mapping);
+        configure(mapping, instance, false);
+        return instance;
+    }
+
+
+    @Override
+    public T check(CNode c) throws ConfiguratorException {
+        final Mapping mapping = (c != null ? c.asMapping() : Mapping.EMPTY);
+        final T instance = instance(mapping);
+        configure(mapping, instance, true);
+        return instance;
+    }
+
+    protected void configure(Mapping config, T instance, boolean dryrun) throws ConfiguratorException {
         final Set<Attribute> attributes = describe();
         final ConfigurationAsCode casc = ConfigurationAsCode.get();
 
@@ -231,11 +258,13 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
                     valueToSet = configurator.configure(sub);
                 }
 
-                try {
-                    logger.info("Setting " + instance + '.' + name + " = " + (sub.isSensitiveData() ? "****" : valueToSet));
-                    attribute.setValue(instance, valueToSet);
-                } catch (Exception ex) {
-                    throw new ConfiguratorException(configurator, "Failed to set attribute " + attribute, ex);
+                if (!dryrun) {
+                    try {
+                        logger.info("Setting " + instance + '.' + name + " = " + (sub.isSensitiveData() ? "****" : valueToSet));
+                        attribute.setValue(instance, valueToSet);
+                    } catch (Exception ex) {
+                        throw new ConfiguratorException(configurator, "Failed to set attribute " + attribute, ex);
+                    }
                 }
             }
         }
