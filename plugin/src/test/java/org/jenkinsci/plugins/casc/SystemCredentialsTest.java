@@ -9,6 +9,7 @@ import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
 import org.jenkinsci.plugins.casc.misc.EnvVarsRule;
 import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import org.jenkinsci.plugins.casc.model.CNode;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -23,6 +24,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -52,7 +54,11 @@ public class SystemCredentialsTest {
                 UsernamePasswordCredentials.class, jenkins, ACL.SYSTEM, Collections.emptyList()
         );
         assertThat(ups, hasSize(1));
-        assertThat(ups.get(0).getPassword().getPlainText(), equalTo("1234"));
+        final UsernamePasswordCredentials up = ups.get(0);
+        assertThat(up.getPassword().getPlainText(), equalTo("1234"));
+        final CNode node = Configurator.lookup(up.getClass()).describe(up);
+        assertEquals("1234", node.asMapping().getScalarValue("password"));
+
 
         List<CertificateCredentials> certs = CredentialsProvider.lookupCredentials(
                 CertificateCredentials.class, jenkins, ACL.SYSTEM, Collections.emptyList()
@@ -71,5 +77,7 @@ public class SystemCredentialsTest {
             assertThat(logRecord.getMessage(), not(containsString("1234")));
             assertThat(logRecord.getMessage(), not(containsString("ABCD")));
         }
+
+
     }
 }
