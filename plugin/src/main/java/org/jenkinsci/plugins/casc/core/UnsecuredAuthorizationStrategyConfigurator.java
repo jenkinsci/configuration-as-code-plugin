@@ -6,6 +6,7 @@ import hudson.security.AuthorizationStrategy.Unsecured;
 import org.jenkinsci.plugins.casc.BaseConfigurator;
 import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.model.CNode;
+import org.jenkinsci.plugins.casc.model.Mapping;
 
 import javax.annotation.CheckForNull;
 
@@ -22,7 +23,7 @@ public class UnsecuredAuthorizationStrategyConfigurator extends BaseConfigurator
     }
 
     @Override
-    public Unsecured configure(CNode config) throws ConfiguratorException {
+    protected Unsecured instance(Mapping mapping) {
         return (Unsecured)AuthorizationStrategy.UNSECURED;
     }
 

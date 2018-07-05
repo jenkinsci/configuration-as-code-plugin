@@ -3,6 +3,7 @@ package org.jenkinsci.plugins.casc;
 import hudson.model.Descriptor;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.casc.model.CNode;
+import org.jenkinsci.plugins.casc.model.Mapping;
 
 import javax.annotation.CheckForNull;
 
@@ -47,9 +48,7 @@ public class DescriptorConfigurator extends BaseConfigurator<Descriptor> impleme
     }
 
     @Override
-    public Descriptor configure(CNode config) throws ConfiguratorException {
-        configure(config.asMapping(), descriptor);
-        descriptor.save();
+    protected Descriptor instance(Mapping mapping) {
         return descriptor;
     }
 

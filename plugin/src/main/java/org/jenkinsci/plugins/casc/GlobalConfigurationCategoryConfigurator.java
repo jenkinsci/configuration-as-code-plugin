@@ -7,6 +7,7 @@ import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.casc.model.CNode;
+import org.jenkinsci.plugins.casc.model.Mapping;
 
 import javax.annotation.CheckForNull;
 import java.util.HashSet;
@@ -47,8 +48,7 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
     }
 
     @Override
-    public GlobalConfigurationCategory configure(CNode config) throws ConfiguratorException {
-        configure(config.asMapping(), category);
+    protected GlobalConfigurationCategory instance(Mapping mapping) {
         return category;
     }
 
