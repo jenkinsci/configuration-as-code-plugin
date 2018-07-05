@@ -85,6 +85,11 @@ public class HeteroDescribableConfigurator extends Configurator<Describable> {
         return (Describable) configurator.configure(subconfig);
     }
 
+    @Override
+    public Describable check(CNode config) throws ConfiguratorException {
+        return configure(config);
+    }
+
     private Class findDescribableBySymbol(CNode node, String shortname, List<Descriptor> candidates) {
 
         // Search for @Symbol annotation on Descriptor to match shortName

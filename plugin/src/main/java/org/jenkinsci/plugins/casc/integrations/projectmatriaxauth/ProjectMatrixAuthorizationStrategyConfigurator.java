@@ -58,6 +58,12 @@ public class ProjectMatrixAuthorizationStrategyConfigurator extends Configurator
     }
 
     @Override
+    public ProjectMatrixAuthorizationStrategy check(CNode config) throws ConfiguratorException {
+        // FIXME
+        return null;
+    }
+
+    @Override
     @SuppressFBWarnings(value = "DM_NEW_FOR_GETCLASS", justification = "We need a fully qualified type to do proper attribute binding")
     public Set<Attribute> describe() {
         return Collections.singleton(new Attribute<ProjectMatrixAuthorizationStrategy, GroupPermissionDefinition>("grantedPermissions", new HashSet<GroupPermissionDefinition>().getClass()));

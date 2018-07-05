@@ -35,6 +35,11 @@ public class NoneSecurityRealmConfigurator extends Configurator<SecurityRealm> {
         return SecurityRealm.NO_AUTHENTICATION;
     }
 
+    @Override
+    public SecurityRealm check(CNode config) {
+        return SecurityRealm.NO_AUTHENTICATION;
+    }
+
     @CheckForNull
     @Override
     public CNode describe(SecurityRealm instance) throws Exception {

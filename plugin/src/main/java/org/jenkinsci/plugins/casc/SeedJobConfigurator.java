@@ -52,6 +52,12 @@ public class SeedJobConfigurator implements RootElementConfigurator<List<Generat
         return generated;
     }
 
+    @Override
+    public List<GeneratedItems> check(CNode config) throws ConfiguratorException {
+        // Any way to dry-run a job-dsl script ?
+        return Collections.emptyList();
+    }
+
     @CheckForNull
     @Override
     public CNode describe(List<GeneratedItems> instance) {

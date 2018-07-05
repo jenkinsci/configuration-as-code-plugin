@@ -67,6 +67,12 @@ public class GlobalMatrixAuthorizationStrategyConfigurator extends Configurator<
         return gms;
     }
 
+    @Override
+    public GlobalMatrixAuthorizationStrategy check(CNode config) throws ConfiguratorException {
+        // FIXME
+        return null;
+    }
+
     @CheckForNull
     @Override
     public CNode describe(GlobalMatrixAuthorizationStrategy instance) {
