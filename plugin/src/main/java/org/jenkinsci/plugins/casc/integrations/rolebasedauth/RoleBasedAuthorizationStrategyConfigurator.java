@@ -65,6 +65,12 @@ public class RoleBasedAuthorizationStrategyConfigurator extends Configurator<Rol
         return new RoleBasedAuthorizationStrategy(grantedRoles);
     }
 
+    @Override
+    public RoleBasedAuthorizationStrategy check(CNode config) {
+        // FIXME
+        return null;
+    }
+
     @Nonnull
     private static RoleMap retrieveRoleMap(@Nonnull CNode config, @Nonnull String name, Configurator<RoleDefinition> configurator) throws ConfiguratorException {
         Mapping map = config.asMapping();
