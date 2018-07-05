@@ -6,6 +6,7 @@ import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
 import org.kohsuke.stapler.ClassDescriptor;
+import org.kohsuke.stapler.Stapler;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -245,7 +246,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
         for (int i = 0; i < parameters.length; i++) {
             final Parameter p = parameters[i];
             final Attribute a = detectActualType(names[i], TypePair.of(p));
-            args[i] = a.getValue(instance);
+            args[i] = Stapler.CONVERT_UTILS.convert(a.getValue(instance), a.type);
             if (args[i] == null && p.getType().isPrimitive()) {
                 args[i] = defaultValue(p.getType());
             }
