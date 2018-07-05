@@ -8,6 +8,7 @@ import org.jenkinsci.plugins.casc.MultivaluedAttribute;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -23,11 +24,16 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
     public Set<Attribute> describe() {
         final Set<Attribute> describe = super.describe();
         describe.add(new MultivaluedAttribute<HudsonPrivateSecurityRealm, UserWithPassword>("users", UserWithPassword.class)
-                .setter((target, value) -> {
-            for (UserWithPassword user : value) {
-                target.createAccount(user.id, user.password);
+            .getter(target ->
+                target.getAllUsers().stream()
+                    .map(u -> new UserWithPassword(u.getId(), null))    // password isn't actually stored, only hashed
+                    .collect(Collectors.toList()))
+            .setter((target, value) -> {
+                for (UserWithPassword user : value) {
+                    target.createAccount(user.id, user.password);
+                }
             }
-        }));
+        ));
         return describe;
     }
 
