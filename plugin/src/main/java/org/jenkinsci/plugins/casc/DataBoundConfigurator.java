@@ -24,10 +24,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.google.common.base.Defaults.defaultValue;
+import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.INFO;
 
 /**
- * A generic {@link Configurator} to configure components which offer a
- * {@link org.kohsuke.stapler.DataBoundConstructor}
+ * A generic {@link Configurator} to configure components whith a {@link org.kohsuke.stapler.DataBoundConstructor}.
+ * Indented to replicate Stapler's request-to-instance lifecycle, including {@link PostConstruct} init methods.
+ * Will rely on <a href="https://github.com/jenkinsci/jep/tree/master/jep/205">JEP-205</a> once implemented
  *
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
@@ -46,37 +49,34 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
         return target;
     }
 
+    /**
+     * Build a fresh new component based on provided configuration and {@link org.kohsuke.stapler.DataBoundConstructor}
+     */
     @Override
-    public T configure(CNode c) throws ConfiguratorException {
-
-        // c can be null for component with no-arg constructor and no extra property to be set
-        Mapping config = (c != null ? c.asMapping() : Mapping.EMPTY);
-
-        // TODO: The fallback resolution may end up resolving empty constructors
-        // Ideally we need an annotation or whatever other logic that old constructors are acceptable
+    protected T instance(Mapping config) throws ConfiguratorException {
         final Constructor dataBoundConstructor = getDataBoundConstructor();
         T object = null;
         try {
-            logger.log(Level.INFO, "Trying @DataBoundConstructor for target {0}: {1}",
+            logger.log(FINE, "Trying @DataBoundConstructor for target {0}: {1}",
                     new Object[] {target, dataBoundConstructor} );
             object = tryConstructor((Constructor<T>) dataBoundConstructor, config);
         } catch (ConfiguratorException ex) {
             final Set<Constructor<T>> altConstructors = LegacyDataBoundConstructorProvider.getLegacyDataBoundConstructors(target);
             if (altConstructors.isEmpty()) throw ex;
 
-            logger.log(Level.INFO, "Default databound constructor cannot be applied, " +
-                "will consult with Legacy DataBoundConstructor providers", ex);
+            logger.log(INFO, "Default databound constructor cannot be applied, " +
+                    "will consult with Legacy DataBoundConstructor providers", ex);
             for (Constructor constructor : altConstructors) {
                 if (constructor == dataBoundConstructor) {
                     continue; // Already tried it
                 }
-                logger.log(Level.INFO, "Trying legacy constructor {0} for target {1}",
+                logger.log(FINE, "Trying legacy constructor {0} for target {1}",
                         new Object[] {constructor, target});
 
                 try {
                     object = tryConstructor((Constructor<T>) constructor, config);
                 } catch (ConfiguratorException ex2) {
-                    logger.log(Level.INFO, "Constructor {0} didn't work for target {1}",
+                    logger.log(FINE, "Constructor {0} didn't work for target {1}",
                             new Object[] {constructor, target});
                 }
 
@@ -88,32 +88,13 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                 throw new ConfiguratorException("Failed to find a compatible constructor for target " + target);
             }
         }
+        return object;
+    }
 
-        final Set<Attribute> attributes = describe();
-
-        for (Attribute attribute : attributes) {
-            final String name = attribute.getName();
-            if (config.containsKey(name)) {
-                final Configurator lookup = Configurator.lookup(attribute.getType());
-                final CNode yaml = config.remove(name);
-                Object value;
-                if (attribute.isMultiple()) {
-                    List l = new ArrayList<>();
-                    for (CNode o : yaml.asSequence()) {
-                        l.add(lookup.configure(o));
-                    }
-                    value = l;
-                } else {
-                    value = lookup.configure(yaml);
-                }
-                try {
-                    logger.info("Setting " + object + '.' + name + " = " + (yaml.isSensitiveData() ? "****" : value));
-                    attribute.setValue(object, value);
-                } catch (Exception e) {
-                    throw new ConfiguratorException(this, "Failed to set attribute " + attribute, e);
-                }
-            }
-        }
+    @Nonnull
+    @Override
+    public T configure(CNode c) throws ConfiguratorException {
+        T object = super.configure(c);
 
         for (Method method : target.getMethods()) {
             if (method.getParameterCount() == 0 && method.getAnnotation(PostConstruct.class) != null) {
@@ -124,10 +105,12 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                 }
             }
         }
-
-        handleUnknown(config);
-
         return object;
+    }
+
+    @Override
+    public T check(CNode config) throws ConfiguratorException {
+        return configure(config);
     }
 
     private T tryConstructor(Constructor<T> constructor, Mapping config) throws ConfiguratorException {
@@ -140,7 +123,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
             // as a result it might be valid to reference a describable without parameters
 
             for (int i = 0; i < names.length; i++) {
-                final CNode value = config.remove(names[i]);
+                final CNode value = config.get(names[i]);
                 if (value == null && parameters[i].getAnnotation(Nonnull.class) != null) {
                     throw new ConfiguratorException(names[i] + " is required to configure " + target);
                 }
@@ -182,6 +165,11 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                     "Failed to construct instance of " + target +
                             ".\n Constructor: " + constructor.toString() +
                             ".\n Arguments: " + argumentTypes, ex);
+        }
+
+        // constructor was successful, so let's removed configuration elements we have consumed doing so.
+        for (int i = 0; i < names.length; i++) {
+            config.remove(names[i]);
         }
 
         return object;
