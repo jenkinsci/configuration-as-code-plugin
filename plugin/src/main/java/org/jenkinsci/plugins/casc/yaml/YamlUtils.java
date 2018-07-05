@@ -1,6 +1,7 @@
 package org.jenkinsci.plugins.casc.yaml;
 
 import org.jenkinsci.plugins.casc.ConfiguratorException;
+import org.kohsuke.accmod.Restricted;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.composer.Composer;
 import org.yaml.snakeyaml.nodes.MappingNode;
@@ -28,8 +29,7 @@ public final class YamlUtils {
         for (YamlSource source : configs) {
             try (Reader r = source.read()) {
 
-                Composer composer = new Composer(new ParserImpl(new StreamReaderWithSource(source)), new Resolver());
-                final Node node =  composer.getSingleNode();
+                final Node node = read(source);
 
                 if (root == null) {
                     root = node;
@@ -42,6 +42,11 @@ public final class YamlUtils {
         }
 
         return root;
+    }
+
+    public static Node read(YamlSource source) throws IOException {
+        Composer composer = new Composer(new ParserImpl(new StreamReaderWithSource(source)), new Resolver());
+        return composer.getSingleNode();
     }
 
     private static void merge(Node root, Node node, String source) throws ConfiguratorException {
