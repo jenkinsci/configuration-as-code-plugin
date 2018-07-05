@@ -32,7 +32,7 @@ import org.yaml.snakeyaml.serializer.Serializer;
 
 import javax.annotation.CheckForNull;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
@@ -72,7 +72,6 @@ import static java.util.logging.Level.WARNING;
 import static java.util.stream.Collectors.toList;
 import static org.yaml.snakeyaml.DumperOptions.FlowStyle.BLOCK;
 import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.DOUBLE_QUOTED;
-import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.LITERAL;
 import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.PLAIN;
 
 /**
@@ -216,6 +215,30 @@ public class ConfigurationAsCode extends ManagementLink {
         return res;
     }
 
+    @RequirePOST
+    public void doCheck(StaplerRequest req, StaplerResponse res) throws Exception {
+
+        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+            res.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+
+        final Node yaml = YamlUtils.read(new YamlSource<HttpServletRequest>(req, READ_FROM_REQUEST));
+        checkWith(loadAs(yaml).entrySet());
+    }
+
+    @RequirePOST
+    public void doApply(StaplerRequest req, StaplerResponse res) throws Exception {
+
+        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+            res.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+
+        final Node yaml = YamlUtils.read(new YamlSource<HttpServletRequest>(req, READ_FROM_REQUEST));
+        configureWith(loadAs(yaml).entrySet());
+    }
+
     /**
      * Export live jenkins instance configuration as Yaml
      * @throws Exception
@@ -342,6 +365,10 @@ public class ConfigurationAsCode extends ManagementLink {
 
     private static final YamlReader<Path> READ_FROM_PATH = Files::newBufferedReader;
 
+    private static final YamlReader<HttpServletRequest> READ_FROM_REQUEST = req -> {
+        // TODO get encoding from req.getContentType()
+        return new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8);
+    };
 
     public static boolean isSupportedURI(String configurationParameter) {
         if(configurationParameter == null) {
@@ -398,6 +425,13 @@ public class ConfigurationAsCode extends ManagementLink {
         return ((Map<String, Object>) new Yaml().loadAs(config, Map.class)).entrySet().stream();
     }
 
+
+    @FunctionalInterface
+    private static interface ConfigratorOperation {
+
+        Object apply(RootElementConfigurator configurator, CNode node) throws ConfiguratorException;
+    }
+
     /**
      * Configuration with help of {@link RootElementConfigurator}s.
      * Corresponding configurator is searched by entry key, passing entry value as object with all required properties.
@@ -405,9 +439,7 @@ public class ConfigurationAsCode extends ManagementLink {
      * @param entries key-value pairs, where key should match to root configurator and value have all required properties
      * @throws ConfiguratorException configuration error
      */
-    public static void configureWith(Set<Map.Entry<String, CNode>> entries) throws ConfiguratorException {
-
-        ObsoleteConfigurationMonitor.get().reset();
+    private static void invokeWith(Set<Map.Entry<String, CNode>> entries, ConfigratorOperation function) throws ConfiguratorException {
 
         // Run configurators by order, consuming entries until all have found a matching configurator
         // configurators order is important so that org.jenkinsci.plugins.casc.plugins.PluginManagerConfigurator run
@@ -420,7 +452,7 @@ public class ConfigurationAsCode extends ManagementLink {
                     continue;
                 }
                 try {
-                    configurator.configure(entry.getValue());
+                    function.apply(configurator, entry.getValue());
                     it.remove();
                     break;
                 } catch (ConfiguratorException e) {
@@ -436,7 +468,16 @@ public class ConfigurationAsCode extends ManagementLink {
             final Map.Entry<String, CNode> next = entries.iterator().next();
             throw new ConfiguratorException(format("No configurator for root element <%s>", next.getKey()));
         }
+    }
 
+    private static void configureWith(Set<Map.Entry<String, CNode>> entries) throws ConfiguratorException {
+        ObsoleteConfigurationMonitor.get().reset();
+        invokeWith(entries, ElementConfigurator::configure);
+    }
+
+    private static void checkWith(Set<Map.Entry<String, CNode>> entries) throws ConfiguratorException {
+        ObsoleteConfigurationMonitor.get().reset();
+        invokeWith(entries, ElementConfigurator::check);
     }
 
 
