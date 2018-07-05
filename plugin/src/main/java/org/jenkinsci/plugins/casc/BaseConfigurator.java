@@ -29,7 +29,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * {@link Configurator} that uses Java Beans pattern to the target object.
+ * a General purpose abstract {@link Configurator} implementation.
+ * Target component is identified by implementing {@link #instance(Mapping)} then configuration is applied on
+ * {@link Attribute}s as defined by {@link #describe()}.
+ * This base implementation uses JavaBean convention to identify configurable attributes.
  *
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
@@ -181,8 +184,8 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
 
     /**
      * Build or identify the target component this configurator has to handle based on the provided configuration node.
-     * @param mapping
-     * @return
+     * @param mapping configuration for target component. Implementation may consume some entries to create a fresh new instance.
+     * @return instance to be configured, but not yet fully configured, see {@link #configure(Mapping, Object, boolean)}
      * @throws ConfiguratorException
      */
     protected abstract T instance(Mapping mapping) throws ConfiguratorException;
@@ -205,7 +208,14 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
         return instance;
     }
 
-    protected void configure(Mapping config, T instance, boolean dryrun) throws ConfiguratorException {
+    /**
+     * Run configuration process on the target instance
+     * @param config configuration to apply. Can be partial if {@link #instance(Mapping)} did already used some entries
+     * @param instance target instance to configure
+     * @param dryrun only check configuration is valid regarding target component. Don't actually apply changes to jenkins master instance
+     * @throws ConfiguratorException something went wrong...
+     */
+    protected final void configure(Mapping config, T instance, boolean dryrun) throws ConfiguratorException {
         final Set<Attribute> attributes = describe();
         final ConfigurationAsCode casc = ConfigurationAsCode.get();
 
