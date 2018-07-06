@@ -290,14 +290,6 @@ public abstract class Configurator<T> implements ExtensionPoint, ElementConfigur
     }
 
     /**
-     * Determine the list of Attribute available for configuration of the managed component.
-     *
-     * @return A set of {@link Attribute}s that describes this object
-     */
-    @Nonnull
-    public abstract Set<Attribute> describe();
-
-    /**
      * Retrieve the html help tip associated to an attribute.
      * FIXME would prefer &lt;st:include page="help-${a.name}.html" class="${c.target}" optional="true"/&gt;
      * @param attribute to get help for
