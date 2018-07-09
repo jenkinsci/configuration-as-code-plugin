@@ -2,6 +2,7 @@ node("jenkinsubuntu") {
     checkout([$class: 'GitSCM', branches: [[name: 'master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'LocalBranch', localBranch: 'master']], gitTool: 'linux-git', submoduleCfg: [], userRemoteConfigs: [[credentialsId: '100247a2-70f4-4a4e-a9f6-266d139da9db', url: 'git@github.com:jenkinsci/configuration-as-code-plugin.git']]])
     sh 'mvn release:prepare release:perform -B'
     sh 'mvn incrementals:reincrementalify'
+    env.PATH="${tool 'linux-git'}:${env.PATH}"
     sh 'git add pom.xml'
     sh 'git commit -m "reincrementalify"'
     sh 'git push'
