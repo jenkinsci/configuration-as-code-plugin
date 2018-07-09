@@ -13,6 +13,8 @@ import org.jenkinsci.plugins.casc.yaml.ModelConstructor;
 import org.jenkinsci.plugins.casc.yaml.YamlReader;
 import org.jenkinsci.plugins.casc.yaml.YamlSource;
 import org.jenkinsci.plugins.casc.yaml.YamlUtils;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.interceptor.RequirePOST;
@@ -223,7 +225,7 @@ public class ConfigurationAsCode extends ManagementLink {
             return;
         }
 
-        final Node yaml = YamlUtils.read(new YamlSource<HttpServletRequest>(req, READ_FROM_REQUEST));
+        final Node yaml = YamlUtils.read(new YamlSource<HttpServletRequest>(req, YamlSource.READ_FROM_REQUEST));
         checkWith(loadAs(yaml).entrySet());
     }
 
@@ -235,7 +237,7 @@ public class ConfigurationAsCode extends ManagementLink {
             return;
         }
 
-        final Node yaml = YamlUtils.read(new YamlSource<HttpServletRequest>(req, READ_FROM_REQUEST));
+        final Node yaml = YamlUtils.read(new YamlSource<HttpServletRequest>(req, YamlSource.READ_FROM_REQUEST));
         configureWith(loadAs(yaml).entrySet());
     }
 
@@ -256,7 +258,8 @@ public class ConfigurationAsCode extends ManagementLink {
         export(res.getOutputStream());
     }
 
-    protected void export(OutputStream out) throws Exception {
+    @org.kohsuke.accmod.Restricted(NoExternalUse.class)
+    public void export(OutputStream out) throws Exception {
 
         final List<NodeTuple> tuples = new ArrayList<>();
 
@@ -346,10 +349,10 @@ public class ConfigurationAsCode extends ManagementLink {
 
         for (String p : configParameters) {
             if (isSupportedURI(p)) {
-                configs.add(new YamlSource<>(p, READ_FROM_URL));
+                configs.add(new YamlSource<>(p, YamlSource.READ_FROM_URL));
             } else {
                 configs.addAll(configs(p).stream()
-                        .map(s -> new YamlSource<>(s, READ_FROM_PATH))
+                        .map(s -> new YamlSource<>(s, YamlSource.READ_FROM_PATH))
                         .collect(toList()));
             }
             sources = Collections.singletonList(p);
@@ -357,18 +360,6 @@ public class ConfigurationAsCode extends ManagementLink {
         configureWith(configs);
         lastTimeLoaded = System.currentTimeMillis();
     }
-
-    private static final YamlReader<String> READ_FROM_URL = config -> {
-        final URL url = URI.create(config).toURL();
-        return new InputStreamReader(url.openStream(), "UTF-8");
-    };
-
-    private static final YamlReader<Path> READ_FROM_PATH = Files::newBufferedReader;
-
-    private static final YamlReader<HttpServletRequest> READ_FROM_REQUEST = req -> {
-        // TODO get encoding from req.getContentType()
-        return new InputStreamReader(req.getInputStream(), StandardCharsets.UTF_8);
-    };
 
     public static boolean isSupportedURI(String configurationParameter) {
         if(configurationParameter == null) {
@@ -382,11 +373,20 @@ public class ConfigurationAsCode extends ManagementLink {
         return supportedProtocols.contains(uri.getScheme());
     }
 
-    private void configureWith(List<YamlSource> configs) throws ConfiguratorException {
+    @org.kohsuke.accmod.Restricted(NoExternalUse.class)
+    public void configureWith(List<YamlSource> configs) throws ConfiguratorException {
         final Node merged = YamlUtils.merge(configs);
         final Mapping map = loadAs(merged);
         configureWith(map.entrySet());
     }
+
+    @org.kohsuke.accmod.Restricted(NoExternalUse.class)
+    public void checkWith(List<YamlSource> configs) throws ConfiguratorException {
+        final Node merged = YamlUtils.merge(configs);
+        final Mapping map = loadAs(merged);
+        checkWith(map.entrySet());
+    }
+
 
     private Mapping loadAs(Node node) {
         final ModelConstructor constructor = new ModelConstructor();
@@ -475,7 +475,7 @@ public class ConfigurationAsCode extends ManagementLink {
         invokeWith(entries, ElementConfigurator::configure);
     }
 
-    private static void checkWith(Set<Map.Entry<String, CNode>> entries) throws ConfiguratorException {
+    public static void checkWith(Set<Map.Entry<String, CNode>> entries) throws ConfiguratorException {
         ObsoleteConfigurationMonitor.get().reset();
         invokeWith(entries, ElementConfigurator::check);
     }
