@@ -58,15 +58,15 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
         Set<Attribute> attributes = new HashSet<>();
         final ExtensionList<Descriptor> descriptors = Jenkins.getInstance().getExtensionList(Descriptor.class);
         for (Descriptor descriptor : descriptors) {
-            if (descriptor.getCategory() == category && descriptor.getGlobalConfigPage() != null) {
+            if (descriptor.getGlobalConfigPage() != null) {
 
                 final DescriptorConfigurator configurator = new DescriptorConfigurator(descriptor);
-                attributes.add(new Attribute(configurator.getName(), configurator.getTarget()) {
-                    @Override
-                    public void setValue(Object target, Object value) throws Exception {
-                        // No actual attribute to set, DescriptorRootElementConfigurator manages singleton Descriptor components
-                    }
-                });
+
+                attributes.add(new Attribute(configurator.getName(), configurator.getTarget())
+                        .setter((t,v) -> { return; } )
+                        .getter(t -> descriptor)
+                        .deprecated(descriptor.getCategory() != category)
+                );
             }
         }
         return attributes;
