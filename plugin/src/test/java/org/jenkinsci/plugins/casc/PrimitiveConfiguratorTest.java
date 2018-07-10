@@ -1,10 +1,13 @@
 package org.jenkinsci.plugins.casc;
 
+import hudson.model.Node;
 import org.jenkinsci.plugins.casc.model.Scalar;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.jvnet.hudson.test.JenkinsRule;
+
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -46,6 +49,24 @@ public class PrimitiveConfiguratorTest {
         Configurator c = Configurator.lookup(String.class);
         final Object value = c.configure(new Scalar("abc"));
         assertEquals("abc", value);
+    }
+
+    @Test
+    public void _enum() throws Exception {
+        // Jenkins do register a StaplerConverter for it.
+        Configurator<Node.Mode> c = Configurator.lookupOrFail(Node.Mode.class);
+        final Node.Mode value = c.configure(new Scalar("NORMAL"));
+        assertEquals(Node.Mode.NORMAL, value);
+
+    }
+
+    @Test
+    public void _enum2() throws Exception {
+        // No explicit converter set by jenkins
+        Configurator<TimeUnit> c = Configurator.lookupOrFail(TimeUnit.class);
+        final TimeUnit value = c.configure(new Scalar("DAYS"));
+        assertEquals(TimeUnit.DAYS, value);
+
     }
 
     @Test

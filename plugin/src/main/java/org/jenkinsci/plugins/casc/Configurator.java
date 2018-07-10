@@ -132,6 +132,10 @@ public abstract class Configurator<T> implements ExtensionPoint, ElementConfigur
             return new PrimitiveConfigurator(clazz);
         }
 
+        if (clazz.isEnum()) {
+            return new EnumConfigurator(clazz);
+        }
+
         logger.warning("Configuration-as-Code can't handle type "+ type);
         return null;
     }

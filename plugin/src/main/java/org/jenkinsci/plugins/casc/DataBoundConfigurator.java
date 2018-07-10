@@ -134,7 +134,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                 if (value != null) {
                     if (Collection.class.isAssignableFrom(t)) {
                         final Type pt = parameters[i].getParameterizedType();
-                        final Configurator lookup = Configurator.lookup(pt);
+                        final Configurator lookup = Configurator.lookupOrFail(pt);
 
                         final ArrayList<Object> list = new ArrayList<>();
                         for (CNode o : value.asSequence()) {
@@ -145,8 +145,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                     } else {
                         final Type pt = parameters[i].getParameterizedType();
                         final Type k = pt != null ? pt : t;
-                        final Configurator configurator = Configurator.lookup(k);
-                        if (configurator == null) throw new ConfiguratorException("No configurator implementation to manage "+k);
+                        final Configurator configurator = Configurator.lookupOrFail(k);
                         args[i] = configurator.configure(value);
                     }
                     logger.info("Setting " + target + "." + names[i] + " = " + (value.isSensitiveData() ? "****" : value));
