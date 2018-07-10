@@ -7,10 +7,13 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>io.jenkins.configuration-as-code</groupId>
   <artifactId>integrations</artifactId>
 
   <name>Configuration as Code Integration tests</name>
+
+  <properties>
+    <jenkins.version>2.121.1</jenkins.version> <!-- For artifact-manager-S3. Remove when parent base is updated. -->
+  </properties>
 
   <dependencies>
     <dependency>
@@ -82,6 +85,12 @@
       <version>1.6.4</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.jenkinsci.plugins</groupId>
+      <artifactId>pipeline-model-extensions</artifactId>
+      <version>1.1.2</version>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
@@ -126,7 +135,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>apache-httpcomponents-client-4-api</artifactId>
-      <version>4.5.3-2.1</version>
+      <version>4.5.5-3.0</version>
       <scope>test</scope>
     </dependency>
 
@@ -159,7 +168,19 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>artifact-manager-s3</artifactId>
+      <version>1.0</version>
+      <scope>test</scope>
+    </dependency>
 
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>jdk-tool</artifactId>
+      <version>1.0</version>
+      <scope>test</scope>
+    </dependency>
     <!-- required to satisfy upper bound dependencies -->
 
     <dependency>
@@ -175,7 +196,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>structs</artifactId>
-      <version>1.10</version>
+      <version>1.14</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -185,9 +206,27 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>credentials</artifactId>
+      <version>2.1.16</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>credentials-binding</artifactId>
+      <version>1.12</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>aws-credentials</artifactId>
+      <version>1.23</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-api</artifactId>
-      <version>2.23.1</version>
+      <version>2.28</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -211,7 +250,12 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-job</artifactId>
-      <version>2.6</version>
+      <version>2.9</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins.workflow</groupId>
+      <artifactId>workflow-cps</artifactId>
+      <version>2.30</version>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
@@ -229,6 +273,18 @@
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>junit</artifactId>
       <version>1.21</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-handler</artifactId>
+      <version>4.1.17.Final</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-codec-http</artifactId>
+      <version>4.1.17.Final</version>
       <scope>test</scope>
     </dependency>
 

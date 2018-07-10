@@ -1,0 +1,12 @@
+---
+unclassified:
+  s3blobstoreconfig:
+    container: "${ARTIFACT_MANAGER_S3_BUCKET_NAME}"
+    region: "us-east-1"
+    prefix: "jenkins_data/"
+
+# FIXME JENKINS-52304: wasn't able to configure the following via CasC,
+# so it's done though init.groovy.d for now.
+# artifactManager:
+#  artifactManagerFactories:
+#    JCloudsArtifactManagerFactory:
