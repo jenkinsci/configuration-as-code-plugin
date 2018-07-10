@@ -32,7 +32,7 @@ public class JenkinsConfiguredWithCodeRule extends JenkinsRule {
                     .collect(Collectors.toList());
 
             try {
-                ConfigurationAsCode.get().configure(configs.toArray(new String[configs.size()]));
+                ConfigurationAsCode.get().configure(configs);
             } catch (Throwable t) {
                 if (!configuredWithCode.expected().isInstance(t)) {
                     throw new AssertionError("Unexpected exception ", t);

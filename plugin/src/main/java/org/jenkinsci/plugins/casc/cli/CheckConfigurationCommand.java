@@ -27,7 +27,7 @@ public class CheckConfigurationCommand extends CLICommand {
             return -1;
         }
 
-        ConfigurationAsCode.get().checkWith(Collections.singletonList(new YamlSource<InputStream>(stdin, YamlSource.READ_FROM_INPUTSTREAM)));
+        ConfigurationAsCode.get().checkWith(new YamlSource<InputStream>(stdin, YamlSource.READ_FROM_INPUTSTREAM));
         return 0;
     }
 }

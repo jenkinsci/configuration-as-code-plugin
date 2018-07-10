@@ -10,10 +10,8 @@ import org.jenkinsci.plugins.casc.model.Mapping;
 import org.jenkinsci.plugins.casc.model.Scalar;
 import org.jenkinsci.plugins.casc.model.Sequence;
 import org.jenkinsci.plugins.casc.yaml.ModelConstructor;
-import org.jenkinsci.plugins.casc.yaml.YamlReader;
 import org.jenkinsci.plugins.casc.yaml.YamlSource;
 import org.jenkinsci.plugins.casc.yaml.YamlUtils;
-import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -38,7 +36,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
@@ -156,6 +153,26 @@ public class ConfigurationAsCode extends ManagementLink {
      * @throws ConfiguratorException Configuration error
      */
     public void configure() throws ConfiguratorException {
+        configureWith(getStandardConfigSources());
+    }
+
+    private List<YamlSource> getStandardConfigSources() throws ConfiguratorException {
+        List<YamlSource> configs = new ArrayList<>();
+
+        for (String p : getStandardConfig()) {
+            if (isSupportedURI(p)) {
+                configs.add(new YamlSource<>(p, YamlSource.READ_FROM_URL));
+            } else {
+                configs.addAll(configs(p).stream()
+                        .map(s -> new YamlSource<>(s, YamlSource.READ_FROM_PATH))
+                        .collect(toList()));
+            }
+            sources = Collections.singletonList(p);
+        }
+        return configs;
+    }
+
+    private List<String> getStandardConfig() {
         List<String> configParameters = getBundledCasCURIs();
         if (!configParameters.isEmpty()) {
             LOGGER.log(Level.FINE, "Located bundled config YAMLs: {0}", configParameters);
@@ -177,9 +194,8 @@ public class ConfigurationAsCode extends ManagementLink {
         }
         if (configParameters.isEmpty()) {
             LOGGER.log(Level.FINE, "No configuration set nor default config file");
-            return;
         }
-        configure(configParameters);
+        return configParameters;
     }
 
     public List<String> getBundledCasCURIs() {
@@ -225,8 +241,7 @@ public class ConfigurationAsCode extends ManagementLink {
             return;
         }
 
-        final Node yaml = YamlUtils.read(new YamlSource<HttpServletRequest>(req, YamlSource.READ_FROM_REQUEST));
-        checkWith(loadAs(yaml).entrySet());
+        checkWith(new YamlSource<HttpServletRequest>(req, YamlSource.READ_FROM_REQUEST));
     }
 
     @RequirePOST
@@ -237,8 +252,7 @@ public class ConfigurationAsCode extends ManagementLink {
             return;
         }
 
-        final Node yaml = YamlUtils.read(new YamlSource<HttpServletRequest>(req, YamlSource.READ_FROM_REQUEST));
-        configureWith(loadAs(yaml).entrySet());
+        configureWith(new YamlSource<HttpServletRequest>(req, YamlSource.READ_FROM_REQUEST));
     }
 
     /**
@@ -374,15 +388,29 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     @org.kohsuke.accmod.Restricted(NoExternalUse.class)
-    public void configureWith(List<YamlSource> configs) throws ConfiguratorException {
-        final Node merged = YamlUtils.merge(configs);
+    public void configureWith(YamlSource source) throws ConfiguratorException {
+        final List<YamlSource> sources = getStandardConfigSources();
+        sources.add(source);
+        configureWith(sources);
+    }
+
+    private void configureWith(List<YamlSource> sources) throws ConfiguratorException {
+        if (sources.isEmpty()) return;
+        final Node merged = YamlUtils.merge(sources);
         final Mapping map = loadAs(merged);
         configureWith(map.entrySet());
     }
 
     @org.kohsuke.accmod.Restricted(NoExternalUse.class)
-    public void checkWith(List<YamlSource> configs) throws ConfiguratorException {
-        final Node merged = YamlUtils.merge(configs);
+    public void checkWith(YamlSource source) throws ConfiguratorException {
+        final List<YamlSource> sources = getStandardConfigSources();
+        sources.add(source);
+        checkWith(sources);
+    }
+
+    private void checkWith(List<YamlSource> sources) throws ConfiguratorException {
+        if (sources.isEmpty()) return;
+        final Node merged = YamlUtils.merge(sources);
         final Mapping map = loadAs(merged);
         checkWith(map.entrySet());
     }
