@@ -1,11 +1,15 @@
 package org.jenkinsci.plugins.casc;
 
+import hudson.DescriptorExtensionList;
 import hudson.model.labels.LabelAtom;
 import hudson.plugins.ec2.AMITypeData;
 import hudson.plugins.ec2.AmazonEC2Cloud;
 import hudson.plugins.ec2.SlaveTemplate;
 import hudson.plugins.ec2.UnixData;
 import io.jenkins.plugins.artifact_manager_jclouds.s3.S3BlobStoreConfig;
+import jenkins.model.ArtifactManager;
+import jenkins.model.ArtifactManagerFactory;
+import jenkins.model.ArtifactManagerFactoryDescriptor;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
 import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
@@ -33,6 +37,9 @@ public class ArtifactManagerS3Test {
     public void configure_artifact_manager() throws Exception {
         assertThat(S3BlobStoreConfig.get().getRegion(), is(equalTo("us-east-1")));
         assertThat(S3BlobStoreConfig.get().getPrefix(), is(equalTo("jenkins_data/")));
+
+        final DescriptorExtensionList<ArtifactManagerFactory, ArtifactManagerFactoryDescriptor> artifactManagers = ArtifactManagerFactoryDescriptor.all();
+        assertThat(artifactManagers, hasSize(1));
 
     }
 }
