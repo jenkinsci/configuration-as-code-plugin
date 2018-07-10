@@ -51,6 +51,7 @@ Have a look at [this presentation](https://docs.google.com/presentation/d/1-irLG
 ## Getting started
 
 To get started you must have a running Jenkins instance with the plugin installed.
+- For those running Jenkins as a [docker container](https://github.com/jenkinsci/docker) (and maybe also [pre-installing plugins](https://github.com/jenkinsci/docker#preinstalling-plugins)), the name of the plugin is `configuration-as-code`.
 
 The only other requirement is that your Jenkins instance has an environment variable set that points to the current configuration location for configuration as code. So the plugin requires the environment variable `CASC_JENKINS_CONFIG` to be set. The variable can point to the following:
 
