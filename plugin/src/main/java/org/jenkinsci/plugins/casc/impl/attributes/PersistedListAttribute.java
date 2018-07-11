@@ -1,12 +1,16 @@
-package org.jenkinsci.plugins.casc;
+package org.jenkinsci.plugins.casc.impl.attributes;
 
 import hudson.util.PersistedList;
+import org.jenkinsci.plugins.casc.Attribute;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.Beta;
 
 import java.util.Collection;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
+@Restricted(Beta.class)
 public class PersistedListAttribute<Owner, Type> extends Attribute<Owner, Collection<Type>> {
 
     public PersistedListAttribute(String name, Class<Type> type) {

@@ -1,7 +1,8 @@
-package org.jenkinsci.plugins.casc;
+package org.jenkinsci.plugins.casc.integrations.jobdsl;
 
 import javaposse.jobdsl.plugin.GlobalJobDslSecurityConfiguration;
 import jenkins.model.GlobalConfiguration;
+import org.jenkinsci.plugins.casc.ConfigurationAsCode;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;

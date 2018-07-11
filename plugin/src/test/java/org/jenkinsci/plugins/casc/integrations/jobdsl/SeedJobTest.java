@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.casc;
+package org.jenkinsci.plugins.casc.integrations.jobdsl;
 
 import hudson.model.TopLevelItem;
 import jenkins.model.Jenkins;

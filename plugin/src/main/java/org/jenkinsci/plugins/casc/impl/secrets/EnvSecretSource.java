@@ -1,10 +1,14 @@
-package org.jenkinsci.plugins.casc;
+package org.jenkinsci.plugins.casc.impl.secrets;
 
 import hudson.Extension;
+import org.jenkinsci.plugins.casc.SecretSource;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import java.util.Optional;
 
 @Extension
+@Restricted(NoExternalUse.class)
 public class EnvSecretSource extends SecretSource {
 
     @Override

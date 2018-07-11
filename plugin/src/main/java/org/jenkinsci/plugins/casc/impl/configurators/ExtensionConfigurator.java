@@ -1,19 +1,23 @@
-package org.jenkinsci.plugins.casc;
+package org.jenkinsci.plugins.casc.impl.configurators;
 
 import hudson.ExtensionList;
 import jenkins.model.Jenkins;
+import org.jenkinsci.plugins.casc.BaseConfigurator;
+import org.jenkinsci.plugins.casc.Configurator;
+import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.Beta;
 
 import javax.annotation.CheckForNull;
-import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 /**
  * A generic {@link Configurator} for {@link hudson.Extension} singletons
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
+@Restricted(Beta.class)
 public class ExtensionConfigurator<T> extends BaseConfigurator<T> {
 
     private final static Logger logger = Logger.getLogger(ExtensionConfigurator.class.getName());

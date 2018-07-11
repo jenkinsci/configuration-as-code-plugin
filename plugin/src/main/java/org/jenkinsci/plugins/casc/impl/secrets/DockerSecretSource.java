@@ -1,8 +1,11 @@
-package org.jenkinsci.plugins.casc;
+package org.jenkinsci.plugins.casc.impl.secrets;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import org.apache.commons.io.FileUtils;
+import org.jenkinsci.plugins.casc.SecretSource;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.Beta;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +17,7 @@ import java.util.Optional;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Extension
+@Restricted(Beta.class)
 public class DockerSecretSource extends SecretSource {
 
     public static final String DOCKER_SECRETS = "/run/secrets/";
