@@ -29,7 +29,7 @@ public class VaultSecretSource extends SecretSource {
         String vaultUrl = System.getenv("CASC_VAULT_URL");
         String vaultMount = System.getenv("CASC_VAULT_MOUNT");
         if(vaultPw != null && vaultUsr != null && vaultPth != null && vaultUrl != null) {
-            LOGGER.log(Level.FINE,"Attempting to connect to Vault: {0}", vaultUrl);
+            LOGGER.log(Level.FINE, "Attempting to connect to Vault: {0}", vaultUrl);
             try {
                 VaultConfig config = new VaultConfig().address(vaultUrl).build();
                 Vault vault = new Vault(config);
