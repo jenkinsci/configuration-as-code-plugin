@@ -8,7 +8,7 @@ import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
 import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.Beta;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import javax.annotation.CheckForNull;
 import java.util.logging.Logger;
@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  * A generic {@link Configurator} for {@link hudson.Extension} singletons
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-@Restricted(Beta.class)
+@Restricted(NoExternalUse.class)
 public class ExtensionConfigurator<T> extends BaseConfigurator<T> {
 
     private final static Logger logger = Logger.getLogger(ExtensionConfigurator.class.getName());

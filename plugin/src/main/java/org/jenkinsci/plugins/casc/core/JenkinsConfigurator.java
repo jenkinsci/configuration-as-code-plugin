@@ -9,7 +9,7 @@ import org.jenkinsci.plugins.casc.RootElementConfigurator;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
 import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.Beta;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import javax.annotation.CheckForNull;
 import java.util.Set;
@@ -21,7 +21,7 @@ import static org.jenkinsci.plugins.casc.Attribute.NOOP;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Extension
-@Restricted(Beta.class)
+@Restricted(NoExternalUse.class)
 public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements RootElementConfigurator<Jenkins> {
 
     private static final Logger LOGGER = Logger.getLogger(JenkinsConfigurator.class.getName());

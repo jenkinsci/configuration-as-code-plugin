@@ -15,7 +15,7 @@ import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
 import org.jenkinsci.plugins.casc.model.Scalar;
 import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.Beta;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import javax.annotation.CheckForNull;
 import java.util.Collections;
@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
  *
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-@Restricted(Beta.class)
+@Restricted(NoExternalUse.class)
 public class HeteroDescribableConfigurator extends Configurator<Describable> {
 
     private static final Logger LOGGER = Logger.getLogger(HeteroDescribableConfigurator.class.getName());

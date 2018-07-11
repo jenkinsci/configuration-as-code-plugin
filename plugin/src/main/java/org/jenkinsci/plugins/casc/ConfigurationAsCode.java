@@ -13,6 +13,7 @@ import org.jenkinsci.plugins.casc.model.Sequence;
 import org.jenkinsci.plugins.casc.yaml.ModelConstructor;
 import org.jenkinsci.plugins.casc.yaml.YamlSource;
 import org.jenkinsci.plugins.casc.yaml.YamlUtils;
+import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
