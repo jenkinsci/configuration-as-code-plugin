@@ -29,11 +29,13 @@ public class VaultSecretSource extends SecretSource {
         String vaultUrl = System.getenv("CASC_VAULT_URL");
         String vaultMount = System.getenv("CASC_VAULT_MOUNT");
         if(vaultPw != null && vaultUsr != null && vaultPth != null && vaultUrl != null) {
+            LOGGER.info("Attempting to connect to Vault: " + vaultUrl);
             try {
                 VaultConfig config = new VaultConfig().address(vaultUrl).build();
                 Vault vault = new Vault(config);
                 //Obtain a login token
                 final String token = vault.auth().loginByUserPass(vaultUsr, vaultPw, vaultMount).getAuthClientToken();
+                LOGGER.log(Level.INFO, "Login to Vault successful");
                 config.token(token).build();
                 secrets = vault.logical().read(vaultPth).getData();
             } catch (VaultException ve) {
