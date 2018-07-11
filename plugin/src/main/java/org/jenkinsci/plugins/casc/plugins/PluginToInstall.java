@@ -1,12 +1,15 @@
 package org.jenkinsci.plugins.casc.plugins;
 
 import hudson.model.UpdateCenter;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import java.util.Objects;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
+@Restricted(NoExternalUse.class)
 class PluginToInstall {
     public final String site;
     public final String shortname;

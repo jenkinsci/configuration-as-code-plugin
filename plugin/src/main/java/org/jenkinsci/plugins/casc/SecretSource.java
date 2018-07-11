@@ -2,6 +2,8 @@ package org.jenkinsci.plugins.casc;
 
 import hudson.ExtensionPoint;
 import jenkins.model.Jenkins;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.Beta;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,6 +18,7 @@ import java.util.regex.Pattern;
  * <p>
  * Variable references are meant to hide secrets from configuration files.
  */
+@Restricted(Beta.class)
 public abstract class SecretSource implements ExtensionPoint {
 
     public static final Pattern SECRET_PATTERN = Pattern.compile("\\$\\{([^:\\s]*)(?::-)?([^}\\s]*)?\\}");

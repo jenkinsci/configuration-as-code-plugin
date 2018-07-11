@@ -6,6 +6,8 @@ import hudson.util.VersionNumber;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Source;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -14,6 +16,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Extension
+@Restricted(NoExternalUse.class)
 public class ObsoleteConfigurationMonitor extends AdministrativeMonitor {
 
     private final List<Error> errors = new CopyOnWriteArrayList<>();

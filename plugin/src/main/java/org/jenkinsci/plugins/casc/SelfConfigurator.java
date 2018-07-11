@@ -3,6 +3,8 @@ package org.jenkinsci.plugins.casc;
 import hudson.Extension;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -13,6 +15,7 @@ import java.util.Set;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Extension(ordinal = Double.MAX_VALUE)
+@Restricted(NoExternalUse.class)
 public class SelfConfigurator extends BaseConfigurator<ConfigurationAsCode> implements RootElementConfigurator<ConfigurationAsCode> {
 
     @Override

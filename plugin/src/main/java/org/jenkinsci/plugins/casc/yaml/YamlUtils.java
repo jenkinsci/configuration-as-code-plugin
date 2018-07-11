@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.casc.yaml;
 
 import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.Beta;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.composer.Composer;
 import org.yaml.snakeyaml.nodes.MappingNode;
@@ -22,6 +23,7 @@ import java.util.List;
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
+@Restricted(Beta.class)
 public final class YamlUtils {
 
     public static Node merge(List<YamlSource> configs) throws ConfiguratorException {

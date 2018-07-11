@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.casc.integrations.rolebasedauth;
+package org.jenkinsci.plugins.casc.integrations.rolestrategy;
 
 import com.michelin.cio.hudson.plugins.rolestrategy.Role;
 import org.jenkinsci.plugins.casc.util.PermissionFinder;

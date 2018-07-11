@@ -2,9 +2,11 @@ package org.jenkinsci.plugins.casc;
 
 import hudson.model.Descriptor;
 import jenkins.model.Jenkins;
-import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.plugins.casc.impl.attributes.DescribableAttribute;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.Beta;
 import org.kohsuke.stapler.ClassDescriptor;
 import org.kohsuke.stapler.Stapler;
 
@@ -21,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.google.common.base.Defaults.defaultValue;
@@ -35,6 +36,7 @@ import static java.util.logging.Level.INFO;
  *
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
+@Restricted(Beta.class)
 public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
 
     private final static Logger logger = Logger.getLogger(DataBoundConfigurator.class.getName());
