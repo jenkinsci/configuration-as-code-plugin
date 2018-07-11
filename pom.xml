@@ -45,9 +45,9 @@
   </developers>
 
   <scm>
-    <connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-plugin.git</connection>
-    <developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection>
-    <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
+    <connection>scm:git:git://github.com/jenkinsci/configuration-as-code-plugin.git</connection>
+    <developerConnection>scm:git:git@github.com:jenkinsci/configuration-as-code-plugin.git</developerConnection>
+    <url>https://github.com/jenkinsci/configuration-as-code-plugin</url>
     <tag>${scmTag}</tag>
   </scm>
 
