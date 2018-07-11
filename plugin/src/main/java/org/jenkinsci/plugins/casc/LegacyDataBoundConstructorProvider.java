@@ -23,6 +23,7 @@ package org.jenkinsci.plugins.casc;
 
 import hudson.ExtensionList;
 import hudson.ExtensionPoint;
+import org.jenkinsci.plugins.casc.impl.configurators.DataBoundConfigurator;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.Beta;
 

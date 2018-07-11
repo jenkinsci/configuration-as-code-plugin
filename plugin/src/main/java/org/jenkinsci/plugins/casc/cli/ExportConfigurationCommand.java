@@ -4,6 +4,8 @@ import hudson.Extension;
 import hudson.cli.CLICommand;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.casc.ConfigurationAsCode;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import java.io.PrintStream;
 
@@ -11,6 +13,7 @@ import java.io.PrintStream;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Extension
+@Restricted(NoExternalUse.class)
 public class ExportConfigurationCommand extends CLICommand {
 
     @Override

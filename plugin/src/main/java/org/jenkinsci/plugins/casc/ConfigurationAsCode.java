@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.casc;
 
+import com.google.common.annotations.VisibleForTesting;
 import hudson.Extension;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
@@ -12,6 +13,7 @@ import org.jenkinsci.plugins.casc.model.Sequence;
 import org.jenkinsci.plugins.casc.yaml.ModelConstructor;
 import org.jenkinsci.plugins.casc.yaml.YamlSource;
 import org.jenkinsci.plugins.casc.yaml.YamlUtils;
+import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -79,6 +81,7 @@ import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.PLAIN;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Extension
+@Restricted(NoExternalUse.class)
 public class ConfigurationAsCode extends ManagementLink {
 
     public static final String CASC_JENKINS_CONFIG_PROPERTY = "casc.jenkins.config";
@@ -294,7 +297,9 @@ public class ConfigurationAsCode extends ManagementLink {
         }
     }
 
-    static void serializeYamlNode(Node root, Writer writer) throws IOException {
+    @VisibleForTesting
+    @org.kohsuke.accmod.Restricted(NoExternalUse.class)
+    public static void serializeYamlNode(Node root, Writer writer) throws IOException {
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(BLOCK);
         options.setDefaultScalarStyle(PLAIN);
@@ -307,7 +312,10 @@ public class ConfigurationAsCode extends ManagementLink {
         serializer.close();
     }
 
-    @CheckForNull Node toYaml(CNode config) throws ConfiguratorException {
+    @CheckForNull
+    @VisibleForTesting
+    @org.kohsuke.accmod.Restricted(NoExternalUse.class)
+    public Node toYaml(CNode config) throws ConfiguratorException {
 
         if (config == null) return null;
 

@@ -10,15 +10,22 @@ import jenkins.model.Jenkins;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
+import org.jenkinsci.plugins.casc.impl.configurators.DataBoundConfigurator;
+import org.jenkinsci.plugins.casc.impl.configurators.DescriptorConfigurator;
+import org.jenkinsci.plugins.casc.impl.configurators.EnumConfigurator;
+import org.jenkinsci.plugins.casc.impl.configurators.ExtensionConfigurator;
+import org.jenkinsci.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
+import org.jenkinsci.plugins.casc.impl.configurators.PrimitiveConfigurator;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jvnet.tiger_types.Types;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.Beta;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.lang.Klass;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
@@ -26,8 +33,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -49,6 +54,7 @@ import java.util.stream.Collectors;
  *
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
+@Restricted(Beta.class)
 public abstract class Configurator<T> implements ExtensionPoint, ElementConfigurator<T> {
 
     private final static Logger logger = Logger.getLogger(Configurator.class.getName());

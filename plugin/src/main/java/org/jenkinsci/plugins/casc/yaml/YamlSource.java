@@ -1,5 +1,8 @@
 package org.jenkinsci.plugins.casc.yaml;
 
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.Beta;
+
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +18,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
+@Restricted(Beta.class)
 public class YamlSource<T> {
 
     public final T source;

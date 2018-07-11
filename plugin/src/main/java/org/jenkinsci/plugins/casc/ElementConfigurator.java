@@ -22,6 +22,8 @@
 package org.jenkinsci.plugins.casc;
 
 import org.jenkinsci.plugins.casc.model.CNode;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.Beta;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -33,6 +35,7 @@ import java.util.Set;
  * @author Oleg Nenashev
  * @see RootElementConfigurator
  */
+@Restricted(Beta.class)
 public interface ElementConfigurator<T> {
 
     /**

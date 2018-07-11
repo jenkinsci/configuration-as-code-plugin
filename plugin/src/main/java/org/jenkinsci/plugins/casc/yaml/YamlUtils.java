@@ -2,7 +2,7 @@ package org.jenkinsci.plugins.casc.yaml;
 
 import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.kohsuke.accmod.Restricted;
-import org.yaml.snakeyaml.Yaml;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.yaml.snakeyaml.composer.Composer;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
@@ -11,7 +11,6 @@ import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.ScalarNode;
 import org.yaml.snakeyaml.nodes.SequenceNode;
 import org.yaml.snakeyaml.parser.ParserImpl;
-import org.yaml.snakeyaml.reader.StreamReader;
 import org.yaml.snakeyaml.resolver.Resolver;
 
 import java.io.IOException;
@@ -22,6 +21,7 @@ import java.util.List;
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
+@Restricted(NoExternalUse.class)
 public final class YamlUtils {
 
     public static Node merge(List<YamlSource> configs) throws ConfiguratorException {

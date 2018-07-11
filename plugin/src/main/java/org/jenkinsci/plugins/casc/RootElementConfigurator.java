@@ -2,6 +2,9 @@ package org.jenkinsci.plugins.casc;
 
 import jenkins.model.GlobalConfigurationCategory;
 import jenkins.model.Jenkins;
+import org.jenkinsci.plugins.casc.impl.configurators.GlobalConfigurationCategoryConfigurator;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.Beta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +14,7 @@ import java.util.List;
  * Note: we assume any configurator here will use a unique name for root element.
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
+@Restricted(Beta.class)
 public interface RootElementConfigurator<T> extends ElementConfigurator<T> {
 
     static List<RootElementConfigurator> all() {

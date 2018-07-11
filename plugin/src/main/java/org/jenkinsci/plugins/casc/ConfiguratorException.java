@@ -22,6 +22,8 @@
 package org.jenkinsci.plugins.casc;
 
 import org.jenkinsci.plugins.casc.model.CNode;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.Beta;
 
 import javax.annotation.CheckForNull;
 import java.io.IOException;
@@ -33,6 +35,7 @@ import java.io.IOException;
  * @see ElementConfigurator#configure(CNode)
  * @see ElementConfigurator
  */
+@Restricted(Beta.class)
 public class ConfiguratorException extends IOException {
 
     @CheckForNull

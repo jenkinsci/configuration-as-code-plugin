@@ -73,7 +73,7 @@ using the other general purpose configuration-as-code component due to internal 
 As we want to reflect web UI user experience, relying on the same configuration mechanisms as the web
 UI is a natural approach.
 
-`org.jenkinsci.plugins.casc.DataBoundConfigurator` can configure arbitrary
+`org.jenkinsci.plugins.casc.impl.configurators.DataBoundConfigurator` can configure arbitrary
 jenkins component to rely on `DataBoundConstructor`
 and `DataBoundSetter`s for UI data-binding. It uses same attributes names as
 the web UI, which are expected to be human friendly.

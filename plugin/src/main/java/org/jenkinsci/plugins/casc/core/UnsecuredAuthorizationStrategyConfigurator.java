@@ -7,6 +7,8 @@ import org.jenkinsci.plugins.casc.BaseConfigurator;
 import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import javax.annotation.CheckForNull;
 
@@ -16,6 +18,7 @@ import javax.annotation.CheckForNull;
  * @author Kohsuke Kawaguchi
  */
 @Extension
+@Restricted(NoExternalUse.class)
 public class UnsecuredAuthorizationStrategyConfigurator extends BaseConfigurator<Unsecured> {
     @Override
     public Class<Unsecured> getTarget() {

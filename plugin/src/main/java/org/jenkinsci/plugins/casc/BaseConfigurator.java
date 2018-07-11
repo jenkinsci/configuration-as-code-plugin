@@ -3,6 +3,8 @@ package org.jenkinsci.plugins.casc;
 import hudson.model.Describable;
 import hudson.util.PersistedList;
 import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.plugins.casc.impl.attributes.DescribableAttribute;
+import org.jenkinsci.plugins.casc.impl.attributes.PersistedListAttribute;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
 import org.kohsuke.accmod.AccessRestriction;
@@ -36,6 +38,7 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
+@Restricted(Beta.class)
 public abstract class BaseConfigurator<T> extends Configurator<T> {
 
     private static final Logger logger = Logger.getLogger(BaseConfigurator.class.getName());
@@ -316,7 +319,8 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
         return null;
     }
 
-    static final class TypePair {
+    @Restricted(Beta.class)
+    public static final class TypePair {
 
         final Type type;
 
