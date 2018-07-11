@@ -1,10 +1,14 @@
 package org.jenkinsci.plugins.casc.model;
 
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.Beta;
+
 import java.util.ArrayList;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
+@Restricted(Beta.class)
 public final class Sequence extends ArrayList<CNode> implements CNode {
 
     private Source source;
