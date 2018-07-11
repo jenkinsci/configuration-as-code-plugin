@@ -1,7 +1,12 @@
-package org.jenkinsci.plugins.casc;
+package org.jenkinsci.plugins.casc.impl.configurators;
 
 import hudson.model.Descriptor;
 import jenkins.model.Jenkins;
+import org.jenkinsci.plugins.casc.Attribute;
+import org.jenkinsci.plugins.casc.BaseConfigurator;
+import org.jenkinsci.plugins.casc.Configurator;
+import org.jenkinsci.plugins.casc.ConfiguratorException;
+import org.jenkinsci.plugins.casc.LegacyDataBoundConstructorProvider;
 import org.jenkinsci.plugins.casc.impl.attributes.DescribableAttribute;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
@@ -247,7 +252,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
         for (int i = 0; i < parameters.length; i++) {
             final Parameter p = parameters[i];
             final Attribute a = detectActualType(names[i], TypePair.of(p));
-            args[i] = Stapler.CONVERT_UTILS.convert(a.getValue(instance), a.type);
+            args[i] = Stapler.CONVERT_UTILS.convert(a.getValue(instance), a.getType());
             if (args[i] == null && p.getType().isPrimitive()) {
                 args[i] = defaultValue(p.getType());
             }

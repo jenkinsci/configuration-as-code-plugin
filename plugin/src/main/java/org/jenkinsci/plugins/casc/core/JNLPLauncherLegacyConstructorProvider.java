@@ -24,6 +24,7 @@ package org.jenkinsci.plugins.casc.core;
 import hudson.Extension;
 import hudson.slaves.JNLPLauncher;
 import org.jenkinsci.plugins.casc.LegacyDataBoundConstructorProvider;
+import org.jenkinsci.plugins.casc.impl.configurators.DataBoundConfigurator;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
@@ -34,7 +35,7 @@ import java.util.Set;
 
 /**
  * Provides information about Legacy constructors for {@link JNLPLauncher}.
- * @see org.jenkinsci.plugins.casc.DataBoundConfigurator
+ * @see DataBoundConfigurator
  * @author Oleg Nenashev
  * @since TODO
  */

@@ -3,7 +3,7 @@ package org.jenkinsci.plugins.casc.core;
 import hudson.Extension;
 import hudson.security.HudsonPrivateSecurityRealm;
 import org.jenkinsci.plugins.casc.Attribute;
-import org.jenkinsci.plugins.casc.DataBoundConfigurator;
+import org.jenkinsci.plugins.casc.impl.configurators.DataBoundConfigurator;
 import org.jenkinsci.plugins.casc.impl.attributes.MultivaluedAttribute;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;

@@ -10,6 +10,7 @@ import jenkins.model.Jenkins;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
+import org.jenkinsci.plugins.casc.impl.configurators.DataBoundConfigurator;
 import org.jenkinsci.plugins.casc.impl.configurators.DescriptorConfigurator;
 import org.jenkinsci.plugins.casc.impl.configurators.EnumConfigurator;
 import org.jenkinsci.plugins.casc.impl.configurators.ExtensionConfigurator;

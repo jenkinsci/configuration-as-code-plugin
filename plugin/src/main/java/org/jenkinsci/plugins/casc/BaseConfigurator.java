@@ -319,7 +319,8 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
         return null;
     }
 
-    static final class TypePair {
+    @Restricted(Beta.class)
+    public static final class TypePair {
 
         final Type type;
 

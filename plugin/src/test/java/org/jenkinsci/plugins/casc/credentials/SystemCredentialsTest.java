@@ -7,7 +7,7 @@ import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
 import hudson.security.ACL;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.casc.Configurator;
-import org.jenkinsci.plugins.casc.DataBoundConfigurator;
+import org.jenkinsci.plugins.casc.impl.configurators.DataBoundConfigurator;
 import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
 import org.jenkinsci.plugins.casc.misc.EnvVarsRule;
 import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
