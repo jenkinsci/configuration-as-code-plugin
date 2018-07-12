@@ -26,5 +26,8 @@ public class SeedJobTest {
         final TopLevelItem test = jenkins.getItem("configuration-as-code");
         assertNotNull(test);
         assertTrue(test instanceof WorkflowMultiBranchProject);
+        final TopLevelItem test2 = jenkins.getItem("configuration-as-code2");
+        assertNotNull(test2);
+        assertTrue(test2 instanceof WorkflowMultiBranchProject);
     }
 }

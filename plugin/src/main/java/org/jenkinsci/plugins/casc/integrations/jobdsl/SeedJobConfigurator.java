@@ -9,16 +9,21 @@ import javaposse.jobdsl.plugin.LookupStrategy;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.RootElementConfigurator;
+import org.apache.commons.io.FileUtils;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Sequence;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import javax.annotation.CheckForNull;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 // TODO: Move outside the plugin?
 /**
@@ -27,6 +32,8 @@ import java.util.Set;
 @Extension(optional = true)
 @Restricted(NoExternalUse.class)
 public class SeedJobConfigurator implements RootElementConfigurator<List<GeneratedItems>> {
+
+    private static final Pattern FILE_SRC = Pattern.compile("\\$\\{file:([^}]*)\\}");
 
     @Override
     public String getName() {
@@ -51,12 +58,22 @@ public class SeedJobConfigurator implements RootElementConfigurator<List<Generat
         List<GeneratedItems> generated = new ArrayList<>();
         for (CNode script : scripts) {
             try {
-                generated.add(new JenkinsDslScriptLoader(mng).runScript(script.asScalar().getValue()));
+                generated.add(new JenkinsDslScriptLoader(mng).runScript(loadFromFile(script.asScalar().getValue())));
             } catch (Exception ex) {
                 throw new ConfiguratorException(this, "Failed to execute script with hash " + script.hashCode(), ex);
             }
         }
         return generated;
+    }
+
+    private String loadFromFile(String value) throws IOException {
+        Matcher m = FILE_SRC.matcher(value);
+        if(m.matches()) {
+            String fileName = m.group(1);
+            return FileUtils.readFileToString(new File(fileName));
+        } else {
+            return value;
+        }
     }
 
     @Override
