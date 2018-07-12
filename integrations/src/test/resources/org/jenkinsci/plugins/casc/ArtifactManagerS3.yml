@@ -9,4 +9,4 @@ unclassified:
   artifactManager:
     artifactManagerFactories:
       - JCloudsArtifactManagerFactory:
-        - s3blobstoreconfig
+          provider: s3blobstore
