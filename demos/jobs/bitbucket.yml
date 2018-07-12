@@ -1,0 +1,74 @@
+jenkins:
+  systemMessage: "Jenkins configured automatically by Jenkins Configuration as Code Plugin\n\n"
+
+jobs:
+  - >
+      organizationFolder('Bitbucket Organization Folder') {
+        description("Bitbucket orga folder configured with JCasC")
+        displayName('My Project')
+        
+        // "Projects"
+        organizations {
+          bitbucket {
+            bitbucketServerUrl("https://$BITBUCKET_URL")
+            repoOwner("OWN")
+            credentialsId("bitbucket-http")
+
+            // "Traits" ("Behaviours" in the GUI) that are "declarative-compatible" 
+            traits {        
+              webhookRegistrationTrait {
+                mode('ITEM')
+              } 
+              submoduleOptionTrait {
+                extension {
+                  disableSubmodules(false)
+                  recursiveSubmodules(true)
+                  trackingSubmodules(false)
+                  reference(null)
+                  timeout(null)
+                  parentCredentials(true)
+                }
+              }
+            }
+          }
+
+        }
+
+        // "Traits" ("Behaviours" in the GUI) that are NOT "declarative-compatible" 
+        // For some 'traits, we need to configure this stuff by hand until JobDSL handles it
+        // https://issues.jenkins-ci.org/browse/JENKINS-45504
+        configure { node ->
+            def traits = node / navigators / 'com.cloudbees.jenkins.plugins.bitbucket.BitbucketSCMNavigator' / traits
+            traits << 'com.cloudbees.jenkins.plugins.bitbucket.BranchDiscoveryTrait' {
+                strategyId('3')   
+            }
+            traits << 'com.cloudbees.jenkins.plugins.bitbucket.SSHCheckoutTrait' {
+                credentialsId('bitbucket-ssh')   
+            }
+
+        }    
+        
+        // "Project Recognizers"
+        projectFactories {
+            workflowMultiBranchProjectFactory {
+                scriptPath 'ValidationJenkinsfile'
+            }
+        }
+
+        // "Orphaned Item Strategy"
+        orphanedItemStrategy {
+          discardOldItems {
+            daysToKeep(-1)
+            numToKeep(-1)
+          }
+        }
+
+        // "Scan Organization Folder Triggers" : 1 day
+        // We need to configure this stuff by hand because JobDSL only allow 'periodic(int min)' for now
+        configure { node ->
+          node / triggers / 'com.cloudbees.hudson.plugins.folder.computed.PeriodicFolderTrigger' {
+            spec('H H * * *')
+            interval(86400000)
+          }
+        }
+      }
