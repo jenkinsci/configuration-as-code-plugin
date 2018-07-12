@@ -303,7 +303,7 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
     protected Mapping compare(T o1, T o2) throws Exception {
 
         Mapping mapping = new Mapping();
-        for (Attribute attribute : describe()) {
+        for (Attribute attribute : getAttributes()) {
             if (attribute.equals(o1, o2)) continue;
             mapping.put(attribute.getName(), attribute.describe(o1));
         }
