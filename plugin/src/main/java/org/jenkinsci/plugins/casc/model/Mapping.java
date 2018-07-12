@@ -47,7 +47,7 @@ public final class Mapping extends HashMap<String, CNode> implements CNode {
     }
 
     public String getScalarValue(String key) throws ConfiguratorException {
-        return get(key).asScalar().getValue();
+        return remove(key).asScalar().getValue();
     }
 
     public void setSource(Source source) {
