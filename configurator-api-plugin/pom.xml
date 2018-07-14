@@ -50,33 +50,7 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <configuration>
-          <failOnError>false</failOnError>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>display-info</id>
-            <configuration>
-              <rules>
-                <requireUpperBoundDeps>
-                  <excludes combine.children="append">
-                    <!-- Safe, https://github.com/jenkinsci/active-directory-plugin/pull/84 -->
-                    <exclude>org.jvnet.com4j:com4j</exclude>
-                    <!-- Docker Java API Plugin issues, https://issues.jenkins-ci.org/browse/JENKINS-49369 -->
-                    <exclude>org.apache.commons:commons-compress</exclude>
-                  </excludes>
-                </requireUpperBoundDeps>
-              </rules>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
+     </plugins>
   </build>
 
 </project>
