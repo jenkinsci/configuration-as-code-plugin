@@ -158,8 +158,9 @@ jobs:
 ## How to provide initial secrets for Configuration-as-Code
 
 Currently you can provide initial secrets to Configuration-as-Code that all rely on <key,value>
-substitution of strings in configuration. Just like in Jenkins: `${some_var}`. We can provide these initial secrets in
-the following ways:
+substitution of strings in configuration. Just like in Jenkins: `${some_var}`. Default variable substitution
+using the `:-` operator from `bash` is also available:
+`key: ${VALUE:-defaultvalue}` will evaluate to `defaultvalue` if `$VALUE` is unset. We can provide these initial secrets in the following ways:
 
  - Using environment variables
  - Using docker-secrets, where files on path `/run/secrets/${KEY}` will be replaced by `${KEY}` in configuration
