@@ -70,7 +70,7 @@ public interface ElementConfigurator<T> {
     /**
      * Run the same logic as {@link #configure(CNode)} in dry-run mode.
      * Used to verify configuration is fine before being acutally applied to a live jenkins master.
-     * @param config
+     * @param config Configuration to be applied
      * @throws ConfiguratorException
      */
     T check(CNode config) throws ConfiguratorException;

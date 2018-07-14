@@ -15,12 +15,16 @@
 
   <name>Configuration as Code Plugin</name>
 
+  <properties>
+    <jenkins.version>2.60.3</jenkins.version>
+    <useBeta>true</useBeta>
+  </properties>
 
   <dependencies>
     <dependency>
-      <groupId>org.yaml</groupId>
-      <artifactId>snakeyaml</artifactId>
-      <version>1.18</version>
+      <groupId>io.jenkins.configuration-as-code</groupId>
+      <artifactId>configurator-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <!-- plugin adapters-->

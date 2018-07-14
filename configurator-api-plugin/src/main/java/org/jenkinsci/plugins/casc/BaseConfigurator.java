@@ -3,10 +3,13 @@ package org.jenkinsci.plugins.casc;
 import hudson.model.Describable;
 import hudson.util.PersistedList;
 import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.plugins.casc.settings.ConfiguratorSettings;
 import org.jenkinsci.plugins.casc.impl.attributes.DescribableAttribute;
 import org.jenkinsci.plugins.casc.impl.attributes.PersistedListAttribute;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
+import org.jenkinsci.plugins.casc.settings.Deprecation;
+import org.jenkinsci.plugins.casc.settings.Restriction;
 import org.kohsuke.accmod.AccessRestriction;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.Beta;
@@ -220,7 +223,9 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
      */
     protected final void configure(Mapping config, T instance, boolean dryrun) throws ConfiguratorException {
         final Set<Attribute> attributes = describe();
-        final ConfigurationAsCode casc = ConfigurationAsCode.get();
+        final ConfiguratorContext context = getContext();
+
+        final ConfiguratorSettings casc =  context.getSettings();
 
         for (Attribute<T,Object> attribute : attributes) {
 
@@ -230,7 +235,7 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
                 for (String alias : attribute.aliases) {
                     sub = removeIgnoreCase(config, alias);
                     if (sub != null) {
-                        ObsoleteConfigurationMonitor.get().record(sub, "'"+alias+"' is an obsolete attribute name, please use '" + name + "'");
+                        context.getListener().onError(sub, "'"+alias+"' is an obsolete attribute name, please use '" + name + "'");
                         break;
                     }
                 }
@@ -239,19 +244,19 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
             if (sub != null) {
 
                 if (attribute.isDeprecated()) {
-                    ObsoleteConfigurationMonitor.get().record(config, "'"+attribute.getName()+"' is deprecated");
-                    if (casc.getDeprecation() == ConfigurationAsCode.Deprecation.reject) {
+                    context.getListener().onError(config, "'"+attribute.getName()+"' is deprecated");
+                    if (casc.getDeprecation() == Deprecation.reject) {
                         throw new ConfiguratorException("'"+attribute.getName()+"' is deprecated");
                     }
                 }
 
                 for (Class<? extends AccessRestriction> r : attribute.getRestrictions()) {
                     if (r == None.class) continue;
-                    if (r == Beta.class && casc.getRestricted() == ConfigurationAsCode.Restricted.beta) {
+                    if (r == Beta.class && casc.getRestricted() == Restriction.beta) {
                         continue;
                     }
-                    ObsoleteConfigurationMonitor.get().record(config, "'"+attribute.getName()+"' is restricted: " + r.getSimpleName());
-                    if (casc.getRestricted() == ConfigurationAsCode.Restricted.reject) {
+                    context.getListener().onError(config, "'"+attribute.getName()+"' is restricted: " + r.getSimpleName());
+                    if (casc.getRestricted() == Restriction.reject) {
                         throw new ConfiguratorException("'"+attribute.getName()+"' is restricted: " + r.getSimpleName());
                     }
                 }
@@ -282,20 +287,23 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
             }
         }
 
-        handleUnknown(config);
+        handleUnknown(context, config);
     }
 
-    protected final void handleUnknown(Mapping config) throws ConfiguratorException {
+    protected final void handleUnknown(ConfiguratorContext context, Mapping config) throws ConfiguratorException {
         if (!config.isEmpty()) {
             final String invalid = StringUtils.join(config.keySet(), ',');
             final String message = "Invalid configuration elements for type " + getTarget() + " : " + invalid;
-            ObsoleteConfigurationMonitor.get().record(config, message);
-            switch (ConfigurationAsCode.get().getUnknown()) {
+            context.getListener().onError(config, message);
+            switch (context.getSettings().getUnknown()) {
                 case reject:
                     throw new ConfiguratorException(message);
-
                 case warn:
                     logger.warning(message);
+                    break;
+                default:
+                    throw new ConfiguratorException("Unsupported Unknown handling mode: "
+                            + context.getSettings().getUnknown());
             }
         }
     }

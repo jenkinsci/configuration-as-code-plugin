@@ -41,9 +41,14 @@ public class ConfiguratorException extends IOException {
     @CheckForNull
     private final ElementConfigurator configurator;
 
+    @CheckForNull
+    private final ConfiguratorContext context;
+
     public ConfiguratorException(@CheckForNull ElementConfigurator configurator, @CheckForNull String message, @CheckForNull Throwable cause) {
         super(message, cause);
         this.configurator = configurator;
+        // Capture context from TLS if possible
+        this.context = ConfiguratorContext.get();
     }
 
     public ConfiguratorException(@CheckForNull String message, @CheckForNull Throwable cause) {
@@ -67,8 +72,14 @@ public class ConfiguratorException extends IOException {
         return configurator;
     }
 
+    @CheckForNull
+    public ConfiguratorContext getContext() {
+        return context;
+    }
+
     @Override
     public String getMessage() {
+        //TODO: add information about Context if possible
         if (configurator != null) {
             return String.format("%s: %s", configurator.getName(), super.getMessage());
         }

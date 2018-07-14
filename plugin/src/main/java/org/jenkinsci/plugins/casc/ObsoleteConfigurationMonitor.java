@@ -17,7 +17,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 @Extension
 @Restricted(NoExternalUse.class)
-public class ObsoleteConfigurationMonitor extends AdministrativeMonitor {
+public class ObsoleteConfigurationMonitor extends AdministrativeMonitor implements ConfiguratorListener {
 
     private final List<Error> errors = new CopyOnWriteArrayList<>();
 
@@ -35,7 +35,8 @@ public class ObsoleteConfigurationMonitor extends AdministrativeMonitor {
         errors.clear();
     }
 
-    public void record(CNode node, String error) {
+    @Override
+    public void onError(CNode node, String error) {
         errors.add(new Error(node.getSource(), error));
     }
 

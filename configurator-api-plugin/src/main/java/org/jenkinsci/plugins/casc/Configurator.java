@@ -59,6 +59,21 @@ public abstract class Configurator<T> implements ExtensionPoint, ElementConfigur
 
     private final static Logger logger = Logger.getLogger(Configurator.class.getName());
 
+    /**
+     * Gets current Configurator context or fails.
+     * @return Configurator context
+     * @throws ConfiguratorException Configurator context is not passed in TLS.
+     * @see ConfiguratorContext
+     */
+    @Nonnull
+    protected ConfiguratorContext getContext() throws ConfiguratorException {
+        ConfiguratorContext context = ConfiguratorContext.get();
+        if (context == null) {
+            throw new ConfiguratorException("API Usage Error: Configurator is invoked without context. Please report a defect");
+        }
+        return context;
+    }
+
     @CheckForNull
     public static RootElementConfigurator lookupRootElement(String name) {
         for (RootElementConfigurator c : RootElementConfigurator.all()) {

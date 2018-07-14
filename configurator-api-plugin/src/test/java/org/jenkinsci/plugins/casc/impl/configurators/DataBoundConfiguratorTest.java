@@ -1,8 +1,10 @@
 package org.jenkinsci.plugins.casc.impl.configurators;
 
 import org.jenkinsci.plugins.casc.Configurator;
+import org.jenkinsci.plugins.casc.ConfiguratorContext;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
+import org.jenkinsci.plugins.casc.test.ConfiguratorContextTestRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -21,6 +23,9 @@ public class DataBoundConfiguratorTest {
 
     @Rule
     public JenkinsRule j = new JenkinsRule();
+
+    @Rule
+    public ConfiguratorContextTestRule context = new ConfiguratorContextTestRule();
 
     @Test
     public void configure_databound() throws Exception {

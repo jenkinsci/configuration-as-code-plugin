@@ -6,10 +6,14 @@ import hudson.init.InitMilestone;
 import hudson.init.Initializer;
 import hudson.model.ManagementLink;
 import jenkins.model.Jenkins;
+import org.jenkinsci.plugins.casc.settings.ConfiguratorSettings;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
 import org.jenkinsci.plugins.casc.model.Scalar;
 import org.jenkinsci.plugins.casc.model.Sequence;
+import org.jenkinsci.plugins.casc.settings.Deprecation;
+import org.jenkinsci.plugins.casc.settings.Restriction;
+import org.jenkinsci.plugins.casc.settings.Unknown;
 import org.jenkinsci.plugins.casc.yaml.ModelConstructor;
 import org.jenkinsci.plugins.casc.yaml.YamlSource;
 import org.jenkinsci.plugins.casc.yaml.YamlUtils;
@@ -82,7 +86,7 @@ import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.PLAIN;
  */
 @Extension
 @Restricted(NoExternalUse.class)
-public class ConfigurationAsCode extends ManagementLink {
+public class ConfigurationAsCode extends ManagementLink implements ConfiguratorSettings {
 
     public static final String CASC_JENKINS_CONFIG_PROPERTY = "casc.jenkins.config";
     public static final String CASC_JENKINS_CONFIG_ENV = "CASC_JENKINS_CONFIG";
@@ -475,43 +479,48 @@ public class ConfigurationAsCode extends ManagementLink {
      * @param entries key-value pairs, where key should match to root configurator and value have all required properties
      * @throws ConfiguratorException configuration error
      */
-    private static void invokeWith(Set<Map.Entry<String, CNode>> entries, ConfigratorOperation function) throws ConfiguratorException {
+    private void invokeWith(Set<Map.Entry<String, CNode>> entries, ConfigratorOperation function) throws ConfiguratorException {
 
         // Run configurators by order, consuming entries until all have found a matching configurator
         // configurators order is important so that org.jenkinsci.plugins.casc.plugins.PluginManagerConfigurator run
         // before any other, and can install plugins required by other configuration to successfully parse yaml data
-        for (RootElementConfigurator configurator : RootElementConfigurator.all()) {
-            final Iterator<Map.Entry<String, CNode>> it = entries.iterator();
-            while (it.hasNext()) {
-                Map.Entry<String, CNode> entry = it.next();
-                if (! entry.getKey().equalsIgnoreCase(configurator.getName())) {
-                    continue;
-                }
-                try {
-                    function.apply(configurator, entry.getValue());
-                    it.remove();
-                    break;
-                } catch (ConfiguratorException e) {
-                    throw new ConfiguratorException(
-                            configurator,
-                            format("error configuring '%s' with %s configurator", entry.getKey(), configurator.getClass()), e
-                    );
+        try(ConfiguratorContext.ConfiguratorContextHolder c = ConfiguratorContext.withContext(
+                new ConfiguratorContext(this, ObsoleteConfigurationMonitor.get()))) {
+            for (RootElementConfigurator configurator : RootElementConfigurator.all()) {
+                final Iterator<Map.Entry<String, CNode>> it = entries.iterator();
+                while (it.hasNext()) {
+                    Map.Entry<String, CNode> entry = it.next();
+                    if (!entry.getKey().equalsIgnoreCase(configurator.getName())) {
+                        continue;
+                    }
+                    try {
+                        function.apply(configurator, entry.getValue());
+                        it.remove();
+                        break;
+                    } catch (ConfiguratorException e) {
+                        throw new ConfiguratorException(
+                                configurator,
+                                format("error configuring '%s' with %s configurator", entry.getKey(), configurator.getClass()), e
+                        );
+                    }
                 }
             }
-        }
 
-        if (!entries.isEmpty()) {
-            final Map.Entry<String, CNode> next = entries.iterator().next();
-            throw new ConfiguratorException(format("No configurator for root element <%s>", next.getKey()));
+            if (!entries.isEmpty()) {
+                final Map.Entry<String, CNode> next = entries.iterator().next();
+                throw new ConfiguratorException(format("No configurator for root element <%s>", next.getKey()));
+            }
+        } catch (IOException ex) {
+            throw new ConfiguratorException("Failed to reset the configuration context", ex);
         }
     }
 
-    private static void configureWith(Set<Map.Entry<String, CNode>> entries) throws ConfiguratorException {
+    private void configureWith(Set<Map.Entry<String, CNode>> entries) throws ConfiguratorException {
         ObsoleteConfigurationMonitor.get().reset();
         invokeWith(entries, ElementConfigurator::configure);
     }
 
-    public static void checkWith(Set<Map.Entry<String, CNode>> entries) throws ConfiguratorException {
+    private void checkWith(Set<Map.Entry<String, CNode>> entries) throws ConfiguratorException {
         ObsoleteConfigurationMonitor.get().reset();
         invokeWith(entries, ElementConfigurator::check);
     }
@@ -602,14 +611,9 @@ public class ConfigurationAsCode extends ManagementLink {
         return this.version.ordinal() >= version.ordinal();
     }
 
+    private Deprecation deprecation = ConfiguratorSettings.DEFAULTS.getDeprecation();
 
-    /**
-     * Policy regarding {@link Deprecated} attributes.
-     */
-    enum Deprecation { reject, warn }
-
-    private Deprecation deprecation = Deprecation.reject;
-
+    @Override
     public Deprecation getDeprecation() {
         return deprecation;
     }
@@ -618,30 +622,20 @@ public class ConfigurationAsCode extends ManagementLink {
         this.deprecation = deprecation;
     }
 
+    private Restriction restricted = ConfiguratorSettings.DEFAULTS.getRestricted();
 
-    /**
-     * Policy regarding {@link org.kohsuke.accmod.Restricted} attributes.
-     */
-    enum Restricted { reject, beta, warn }
-
-    private Restricted restricted = Restricted.reject;
-
-    public Restricted getRestricted() {
+    @Override
+    public Restriction getRestricted() {
         return restricted;
     }
 
-    public void setRestricted(Restricted restricted) {
+    public void setRestricted(Restriction restricted) {
         this.restricted = restricted;
     }
 
+    private Unknown unknown = ConfiguratorSettings.DEFAULTS.getUnknown();
 
-    /**
-     * Policy regarding unknown attributes.
-     */
-    enum Unknown { reject, warn }
-
-    private Unknown unknown = Unknown.reject;
-
+    @Override
     public Unknown getUnknown() {
         return unknown;
     }

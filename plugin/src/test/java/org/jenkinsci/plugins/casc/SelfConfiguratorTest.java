@@ -3,6 +3,8 @@ package org.jenkinsci.plugins.casc;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
 import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import org.jenkinsci.plugins.casc.settings.Deprecation;
+import org.jenkinsci.plugins.casc.settings.Restriction;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -19,8 +21,8 @@ public class SelfConfiguratorTest {
     @Test
     @ConfiguredWithCode(value = "SelfConfiguratorTest.yml")
     public void self_configure() {
-        assertEquals(ConfigurationAsCode.Deprecation.warn, ConfigurationAsCode.get().getDeprecation());
-        assertEquals(ConfigurationAsCode.Restricted.warn, ConfigurationAsCode.get().getRestricted());
+        assertEquals(Deprecation.warn, ConfigurationAsCode.get().getDeprecation());
+        assertEquals(Restriction.warn, ConfigurationAsCode.get().getRestricted());
         assertEquals("/tmp", Jenkins.getInstance().getRawBuildsDir());
     }
 

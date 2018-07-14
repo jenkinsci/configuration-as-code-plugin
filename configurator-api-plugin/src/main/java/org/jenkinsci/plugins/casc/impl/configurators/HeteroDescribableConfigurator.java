@@ -9,7 +9,6 @@ import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.Configurator;
 import org.jenkinsci.plugins.casc.ConfiguratorException;
-import org.jenkinsci.plugins.casc.ObsoleteConfigurationMonitor;
 import org.jenkinsci.plugins.casc.impl.attributes.DescribableAttribute;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
@@ -98,7 +97,8 @@ public class HeteroDescribableConfigurator extends Configurator<Describable> {
         return configure(config);
     }
 
-    private Class findDescribableBySymbol(CNode node, String shortname, List<Descriptor> candidates) {
+    private Class findDescribableBySymbol(CNode node, String shortname, List<Descriptor> candidates)
+            throws ConfiguratorException {
 
         // Search for @Symbol annotation on Descriptor to match shortName
         for (Descriptor d : candidates) {
@@ -109,7 +109,7 @@ public class HeteroDescribableConfigurator extends Configurator<Describable> {
             } else {
                 for (String symbol : symbols) {
                     if (symbol.equalsIgnoreCase(shortname)) {
-                        ObsoleteConfigurationMonitor.get().record(node, "'"+shortname+"' is obsolete, please use '" + preferred + "'");
+                        getContext().getListener().onError(node, "'"+shortname+"' is obsolete, please use '" + preferred + "'");
                         return d.getKlass().toJavaClass();
                     }
                 }

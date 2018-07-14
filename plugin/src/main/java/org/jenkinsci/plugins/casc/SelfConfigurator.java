@@ -3,6 +3,9 @@ package org.jenkinsci.plugins.casc;
 import hudson.Extension;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
+import org.jenkinsci.plugins.casc.settings.Deprecation;
+import org.jenkinsci.plugins.casc.settings.Restriction;
+import org.jenkinsci.plugins.casc.settings.Unknown;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
@@ -45,9 +48,9 @@ public class SelfConfigurator extends BaseConfigurator<ConfigurationAsCode> impl
         attributes.add(new Attribute<ConfigurationAsCode, String>("version", String.class)
                 .getter(t -> t.getVersion().value())
                 .setter((t,v)->t.setVersion(ConfigurationAsCode.Version.of(v))));
-        attributes.add(new Attribute("deprecation", ConfigurationAsCode.Deprecation.class));
-        attributes.add(new Attribute("restricted", ConfigurationAsCode.Restricted.class));
-        attributes.add(new Attribute("unknown", ConfigurationAsCode.Unknown.class));
+        attributes.add(new Attribute("deprecation", Deprecation.class));
+        attributes.add(new Attribute("restricted", Restriction.class));
+        attributes.add(new Attribute("unknown", Unknown.class));
         return attributes;
     }
 

@@ -5,6 +5,7 @@ import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.BaseConfigurator;
 import org.jenkinsci.plugins.casc.Configurator;
+import org.jenkinsci.plugins.casc.ConfiguratorContext;
 import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.LegacyDataBoundConstructorProvider;
 import org.jenkinsci.plugins.casc.impl.attributes.DescribableAttribute;
@@ -218,7 +219,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
     public Set<Attribute> describe() {
         final Set<Attribute> attributes = super.describe();
 
-        final Constructor constructor = getDataBoundConstructor(target);
+        final Constructor constructor = Configurator.getDataBoundConstructor(target);
 
         if (constructor != null) {
             final Parameter[] parameters = constructor.getParameters();
@@ -280,7 +281,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
      * @throws ConfiguratorException Constructor not found
      */
     private Constructor getDataBoundConstructor() throws ConfiguratorException {
-        final Constructor constructor = getDataBoundConstructor(target);
+        final Constructor constructor = Configurator.getDataBoundConstructor(target);
         if (constructor == null) {
             throw new ConfiguratorException(target.getName() + " is missing a @DataBoundConstructor");
         }
