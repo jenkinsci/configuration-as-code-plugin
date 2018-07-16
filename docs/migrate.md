@@ -14,6 +14,8 @@ http://[your_jenkins_url]/configuration-as-code/
 
 Various samples of plugins' configuration can be found in [demos](../demos) folder
 
-## [NOT SUPPORTED YET] Export existing configuration
+## Export existing configuration
 
-To be able to do that - once it becomes supported feature - you need to install the plugin manually on your working Jenkins instance and use export function.
+To be able to do that you need to install the plugin manually on your working Jenkins instance and use export function under http://[your_jenkins_url]/configuration-as-code/. Please note that, at this time, the produced yaml output might not be usable as-is
+as input for Configuration-as-Code. A strict roundtrip between export and configure is under consideration but might require some 
+changes in jenkins-core and few plugins.
