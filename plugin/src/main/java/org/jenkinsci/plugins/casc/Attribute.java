@@ -194,6 +194,9 @@ public class Attribute<Owner, Type> {
         final Object v1 = getValue(o1);
         final Object v2 = getValue(o2);
         if (v1 == null && v2 == null) return true;
+        if (multiple) {
+            // FIXME need to compare collection1  and collection2 contain same elements...
+        }
         return (v1 != null && v1.equals(v2));
     }
 
@@ -203,6 +206,8 @@ public class Attribute<Owner, Type> {
     @FunctionalInterface
     public interface Setter<O,T> {
         void setValue(O target, T value) throws Exception;
+
+        Setter NOP =  (o,v) -> {};
     }
 
     /**
