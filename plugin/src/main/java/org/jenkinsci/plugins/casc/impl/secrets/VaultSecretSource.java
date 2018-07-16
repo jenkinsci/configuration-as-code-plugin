@@ -28,11 +28,10 @@ public class VaultSecretSource extends SecretSource {
 
     private final static Logger LOGGER = Logger.getLogger(VaultSecretSource.class.getName());
     private Map<String, String> secrets = new HashMap<>();
-    private Properties prop;
 
     public VaultSecretSource() {
         String vaultFile = System.getenv("CASC_VAULT_FILE");
-        prop = new Properties();
+        Properties prop = new Properties();
         if (vaultFile != null) {
             try (FileInputStream input = new FileInputStream(vaultFile)) {
                 prop.load(input);
@@ -43,11 +42,11 @@ public class VaultSecretSource extends SecretSource {
                 LOGGER.log(Level.WARNING, "Failed to load Vault secrets from file", ex);
             }
         }
-        String vaultPw = getVariable("CASC_VAULT_PW");
-        String vaultUsr = getVariable("CASC_VAULT_USER");
-        String vaultPth = getVariable("CASC_VAULT_PATH");
-        String vaultUrl = getVariable("CASC_VAULT_URL");
-        String vaultMount = getVariable("CASC_VAULT_MOUNT");
+        String vaultPw = getVariable("CASC_VAULT_PW", prop);
+        String vaultUsr = getVariable("CASC_VAULT_USER", prop);
+        String vaultPth = getVariable("CASC_VAULT_PATH", prop);
+        String vaultUrl = getVariable("CASC_VAULT_URL", prop);
+        String vaultMount = getVariable("CASC_VAULT_MOUNT", prop);
 
         if(vaultPw != null && vaultUsr != null && vaultPth != null && vaultUrl != null) {
             LOGGER.log(Level.FINE, "Attempting to connect to Vault: {0}", vaultUrl);
@@ -63,7 +62,6 @@ public class VaultSecretSource extends SecretSource {
                 LOGGER.log(Level.WARNING, "Unable to fetch password from vault", ve);
             }
         }
-        prop = null;
     }
 
     @Override
@@ -83,7 +81,7 @@ public class VaultSecretSource extends SecretSource {
         this.secrets = secrets;
     }
 
-    private String getVariable(String key) {
+    private String getVariable(String key, Properties prop) {
         if (prop != null && !prop.isEmpty()) {
             return prop.getProperty(key, System.getenv(key));
         } else {
