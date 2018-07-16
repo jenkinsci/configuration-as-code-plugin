@@ -271,7 +271,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
             mapping.put(names[i], attributes[i].describe(instance));
         }
 
-        return mapping;
+        return mapping.isEmpty() ? null : mapping;
     }
 
     /**

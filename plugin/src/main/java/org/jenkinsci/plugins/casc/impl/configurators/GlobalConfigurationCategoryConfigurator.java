@@ -1,6 +1,5 @@
 package org.jenkinsci.plugins.casc.impl.configurators;
 
-import hudson.ExtensionList;
 import hudson.model.Descriptor;
 import jenkins.model.GlobalConfigurationCategory;
 import jenkins.model.Jenkins;
@@ -11,18 +10,26 @@ import org.jenkinsci.plugins.casc.BaseConfigurator;
 import org.jenkinsci.plugins.casc.RootElementConfigurator;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
+import org.jenkinsci.plugins.casc.model.Scalar;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import javax.annotation.CheckForNull;
-import java.util.HashSet;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Set;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
+import static org.jenkinsci.plugins.casc.Attribute.Setter.NOP;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Restricted(NoExternalUse.class)
 public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<GlobalConfigurationCategory> implements RootElementConfigurator<GlobalConfigurationCategory> {
+
+    private final static Logger logger = Logger.getLogger(GlobalConfigurationCategoryConfigurator.class.getName());
 
     private final GlobalConfigurationCategory category;
 
@@ -40,7 +47,7 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
         name = StringUtils.remove(name, "Global");
         name = StringUtils.remove(name, "Configuration");
         name = StringUtils.remove(name, "Category");
-        return name;
+        return name.toLowerCase();
     }
 
     @Override
@@ -60,27 +67,37 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
 
     @Override
     public Set<Attribute> describe() {
-
-        Set<Attribute> attributes = new HashSet<>();
-        final ExtensionList<Descriptor> descriptors = Jenkins.getInstance().getExtensionList(Descriptor.class);
-        for (Descriptor descriptor : descriptors) {
-            if (descriptor.getCategory() == category && descriptor.getGlobalConfigPage() != null) {
-
-                final DescriptorConfigurator configurator = new DescriptorConfigurator(descriptor);
-                attributes.add(new Attribute(configurator.getName(), configurator.getTarget()) {
-                    @Override
-                    public void setValue(Object target, Object value) throws Exception {
-                        // No actual attribute to set, DescriptorRootElementConfigurator manages singleton Descriptor components
-                    }
-                });
-            }
-        }
-        return attributes;
+        return Jenkins.getInstance().getExtensionList(Descriptor.class).stream()
+                .filter(d -> d.getCategory() == category)
+                .filter(d -> d.getGlobalConfigPage() != null)
+                .map(d -> new DescriptorConfigurator(d))
+                .map(c -> new Attribute(c.getName(), c.getTarget()).setter(NOP))
+                .collect(Collectors.toSet());
     }
 
     @CheckForNull
     @Override
     public CNode describe(GlobalConfigurationCategory instance) {
-        return null; // FIXME
+
+        final Mapping mapping = new Mapping();
+        Jenkins.getInstance().getExtensionList(Descriptor.class).stream()
+            .filter(d -> d.getCategory() == category)
+            .filter(d -> d.getGlobalConfigPage() != null)
+            .forEach(d -> describe(d, mapping));
+        return mapping;
     }
+
+    private void describe(Descriptor d, Mapping mapping) {
+        final DescriptorConfigurator c = new DescriptorConfigurator(d);
+        try {
+            final CNode node = c.describe(d);
+            if (node != null) mapping.put(c.getName(), node);
+        } catch (Exception e) {
+            final StringWriter w = new StringWriter();
+            e.printStackTrace(new PrintWriter(w));
+            final Scalar scalar = new Scalar("FAILED TO EXPORT " + d.getClass().getName() + " : \n" + w.toString());
+            mapping.put(c.getName(), scalar);
+        }
+    }
+
 }

@@ -300,7 +300,7 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
         }
     }
 
-    protected Mapping compare(T o1, T o2) throws Exception {
+    protected @Nonnull Mapping compare(T o1, T o2) throws Exception {
 
         Mapping mapping = new Mapping();
         for (Attribute attribute : getAttributes()) {
