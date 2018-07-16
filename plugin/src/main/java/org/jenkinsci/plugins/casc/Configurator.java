@@ -10,6 +10,7 @@ import jenkins.model.Jenkins;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
+import org.jenkinsci.plugins.casc.impl.configurators.ConfigurableConfigurator;
 import org.jenkinsci.plugins.casc.impl.configurators.DataBoundConfigurator;
 import org.jenkinsci.plugins.casc.impl.configurators.DescriptorConfigurator;
 import org.jenkinsci.plugins.casc.impl.configurators.EnumConfigurator;
@@ -115,6 +116,10 @@ public abstract class Configurator<T> implements ExtensionPoint, ElementConfigur
                 }
                 return lookup(actualType);
             }
+        }
+
+        if (Configurable.class.isAssignableFrom(clazz)) {
+            return new ConfigurableConfigurator(clazz);
         }
 
         if (Descriptor.class.isAssignableFrom(clazz)) {
