@@ -63,16 +63,16 @@ If everything was setup correctly you should now be able to browse the Configura
 
 ## How to configure your first instance
 
-Generally when you are about to configure your first instance you want to first browse the examples shown in the [demos](demos) 
-section of this repository. If you've got a plugin, that we do not have an example for, you can consult the reference 
+Generally when you are about to configure your first instance you want to first browse the examples shown in the [demos](demos)
+section of this repository. If you've got a plugin, that we do not have an example for, you can consult the reference
 help document by pressing the `Documentation` link on the Configuration as Code management link page. What you'll get a
 web page like this:
 
 ![refence page](images/reference.png)
- 
+
 If you've got a specific plugin you might wish to configure, search the page for the name of the plugin. The page will
-show you which root element the configuration belongs to. Most plugins you install belong in the `unclassifed` root 
-element. 
+show you which root element the configuration belongs to. Most plugins you install belong in the `unclassifed` root
+element.
 
 ![unclassified](images/unclassified.png)
 
@@ -189,7 +189,7 @@ CASC_VAULT_URL=https://vault.dot.com
 CASC_VAULT_MOUNT=ldap
 ```
 
-Intended use for `CASC_VAULT_FILE`
+A good use for `CASC_VAULT_FILE` would be together with docker secrets.
 
 ```yaml
 version: '3.6'
@@ -221,13 +221,13 @@ secrets:
 
 ## Plugin Management
 
-Status: `BETA` 
+Status: `BETA`
 
 We currently do support plugin installation but will remain in `beta` for the forseeable feature. Generally
 we recommend that you package your plugins with your Jenkins distribution as plugin installation often requires a
-restart and can cause problems with plugin dependencies. So if you want to try it, you can. 
+restart and can cause problems with plugin dependencies. So if you want to try it, you can.
 
-Current implementation do require a restart if you add a plugin. 
+Current implementation do require a restart if you add a plugin.
 
 Example: (Requires Configuration as Code Plugin version > 0.7-alpha)
 
@@ -236,7 +236,7 @@ plugins:
   required:
     git: 3.9.0
     warnings: 4.67
-``` 
+```
 
 ## Supported plugins
 
