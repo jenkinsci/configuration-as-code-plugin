@@ -6,7 +6,6 @@ import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.BaseConfigurator;
 import org.jenkinsci.plugins.casc.Configurator;
 import org.jenkinsci.plugins.casc.ConfiguratorException;
-import org.jenkinsci.plugins.casc.LegacyDataBoundConstructorProvider;
 import org.jenkinsci.plugins.casc.impl.attributes.DescribableAttribute;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
@@ -31,8 +30,6 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import static com.google.common.base.Defaults.defaultValue;
-import static java.util.logging.Level.FINE;
-import static java.util.logging.Level.INFO;
 
 /**
  * A generic {@link Configurator} to configure components whith a {@link org.kohsuke.stapler.DataBoundConstructor}.
@@ -63,40 +60,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
     @Override
     protected T instance(Mapping config) throws ConfiguratorException {
         final Constructor dataBoundConstructor = getDataBoundConstructor();
-        T object = null;
-        try {
-            logger.log(FINE, "Trying @DataBoundConstructor for target {0}: {1}",
-                    new Object[] {target, dataBoundConstructor} );
-            object = tryConstructor((Constructor<T>) dataBoundConstructor, config);
-        } catch (ConfiguratorException ex) {
-            final Set<Constructor<T>> altConstructors = LegacyDataBoundConstructorProvider.getLegacyDataBoundConstructors(target);
-            if (altConstructors.isEmpty()) throw ex;
-
-            logger.log(INFO, "Default databound constructor cannot be applied, " +
-                    "will consult with Legacy DataBoundConstructor providers", ex);
-            for (Constructor constructor : altConstructors) {
-                if (constructor == dataBoundConstructor) {
-                    continue; // Already tried it
-                }
-                logger.log(FINE, "Trying legacy constructor {0} for target {1}",
-                        new Object[] {constructor, target});
-
-                try {
-                    object = tryConstructor((Constructor<T>) constructor, config);
-                } catch (ConfiguratorException ex2) {
-                    logger.log(FINE, "Constructor {0} didn't work for target {1}",
-                            new Object[] {constructor, target});
-                }
-
-                if (object != null) {
-                    break;
-                }
-            }
-            if (object == null) {
-                throw new ConfiguratorException("Failed to find a compatible constructor for target " + target);
-            }
-        }
-        return object;
+        return tryConstructor((Constructor<T>) dataBoundConstructor, config);
     }
 
     @Nonnull
