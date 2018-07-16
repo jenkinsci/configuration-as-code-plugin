@@ -1,5 +1,5 @@
 jobs:
-  - >
+  - script: >
       multibranchPipelineJob('configuration-as-code') {
           branchSources {
               git {
@@ -8,3 +8,5 @@ jobs:
               }
           }
       }
+
+  - file: ./src/test/resources/org/jenkinsci/plugins/casc/integrations/jobdsl/multibranch.groovy
