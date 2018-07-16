@@ -4,14 +4,14 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>3.10</version>
+    <version>3.18</version>
     <relativePath />
   </parent>
   <groupId>io.jenkins.configuration-as-code</groupId>
   <artifactId>parent</artifactId>
   <version>${revision}${changelist}</version>
   <packaging>pom</packaging>
-  
+
   <modules>
     <module>plugin</module>
     <module>integrations</module>
@@ -22,7 +22,6 @@
     <changelist>-SNAPSHOT</changelist>
     <jenkins.version>2.60.3</jenkins.version>
     <java.level>8</java.level>
-    <completionGoals>incrementals:reincrementalify</completionGoals>
   </properties>
 
   <name>Configuration as Code Parent</name>
