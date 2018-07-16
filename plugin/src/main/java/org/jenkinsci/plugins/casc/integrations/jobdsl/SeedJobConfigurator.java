@@ -7,6 +7,7 @@ import javaposse.jobdsl.plugin.JenkinsDslScriptLoader;
 import javaposse.jobdsl.plugin.JenkinsJobManagement;
 import javaposse.jobdsl.plugin.LookupStrategy;
 import org.jenkinsci.plugins.casc.Attribute;
+import org.jenkinsci.plugins.casc.Configurator;
 import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.RootElementConfigurator;
 import org.jenkinsci.plugins.casc.model.CNode;
@@ -15,6 +16,7 @@ import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import javax.annotation.CheckForNull;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -47,11 +49,18 @@ public class SeedJobConfigurator implements RootElementConfigurator<List<Generat
     @Override
     public List<GeneratedItems> configure(CNode config) throws ConfiguratorException {
         JenkinsJobManagement mng = new JenkinsJobManagement(System.out, new EnvVars(), null, null, LookupStrategy.JENKINS_ROOT);
-        final Sequence scripts = config.asSequence();
+        final Sequence sources = config.asSequence();
+        final Configurator<ScriptSource> con = Configurator.lookup(ScriptSource.class);
         List<GeneratedItems> generated = new ArrayList<>();
-        for (CNode script : scripts) {
+        for (CNode source : sources) {
+            final String script;
             try {
-                generated.add(new JenkinsDslScriptLoader(mng).runScript(script.asScalar().getValue()));
+                script = con.configure(source).getScript();
+            } catch (IOException e) {
+                throw new ConfiguratorException(this, "Failed to retrieve job-dsl script", e);
+            }
+            try {
+                generated.add(new JenkinsDslScriptLoader(mng).runScript(script));
             } catch (Exception ex) {
                 throw new ConfiguratorException(this, "Failed to execute script with hash " + script.hashCode(), ex);
             }
@@ -70,4 +79,6 @@ public class SeedJobConfigurator implements RootElementConfigurator<List<Generat
     public CNode describe(List<GeneratedItems> instance) {
         return null; // FIXME
     }
+
+
 }
