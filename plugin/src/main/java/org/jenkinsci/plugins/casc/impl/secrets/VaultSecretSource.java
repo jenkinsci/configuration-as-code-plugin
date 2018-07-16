@@ -8,9 +8,12 @@ import org.jenkinsci.plugins.casc.SecretSource;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.Beta;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,13 +28,27 @@ public class VaultSecretSource extends SecretSource {
 
     private final static Logger LOGGER = Logger.getLogger(VaultSecretSource.class.getName());
     private Map<String, String> secrets = new HashMap<>();
+    private Properties prop;
 
     public VaultSecretSource() {
-        String vaultPw = System.getenv("CASC_VAULT_PW");
-        String vaultUsr = System.getenv("CASC_VAULT_USER");
-        String vaultPth = System.getenv("CASC_VAULT_PATH");
-        String vaultUrl = System.getenv("CASC_VAULT_URL");
-        String vaultMount = System.getenv("CASC_VAULT_MOUNT");
+        String vaultFile = System.getenv("CASC_VAULT_FILE");
+        prop = new Properties();
+        if (vaultFile != null) {
+            try (FileInputStream input = new FileInputStream(vaultFile)) {
+                prop.load(input);
+                if (prop.isEmpty()) {
+                    LOGGER.log(Level.WARNING, "Vault secret file is empty");
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, "Failed to load Vault secrets from file", ex);
+            }
+        }
+        String vaultPw = getVariable("CASC_VAULT_PW");
+        String vaultUsr = getVariable("CASC_VAULT_USER");
+        String vaultPth = getVariable("CASC_VAULT_PATH");
+        String vaultUrl = getVariable("CASC_VAULT_URL");
+        String vaultMount = getVariable("CASC_VAULT_MOUNT");
+
         if(vaultPw != null && vaultUsr != null && vaultPth != null && vaultUrl != null) {
             LOGGER.log(Level.FINE, "Attempting to connect to Vault: {0}", vaultUrl);
             try {
@@ -46,6 +63,7 @@ public class VaultSecretSource extends SecretSource {
                 LOGGER.log(Level.WARNING, "Unable to fetch password from vault", ve);
             }
         }
+        prop = null;
     }
 
     @Override
@@ -63,5 +81,13 @@ public class VaultSecretSource extends SecretSource {
 
     public void setSecrets(Map<String, String> secrets) {
         this.secrets = secrets;
+    }
+
+    private String getVariable(String key) {
+        if (prop != null && !prop.isEmpty()) {
+            return prop.getProperty(key, System.getenv(key));
+        } else {
+            return System.getenv(key);
+        }
     }
 }
