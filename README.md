@@ -174,8 +174,48 @@ the following ways:
  - The environment variable `CASC_VAULT_PATH` must be present (Vault key path, I.E /secrets/jenkins)
  - The environment variable `CASC_VAULT_URL` must be present (Vault url, including port)
  - The environment variable `CASC_VAULT_MOUNT` is optional (Vault auth mount, I.E `ldap` or another username & password authentication type, defaults to `userpass`)
+ - The environment variable `CASC_VAULT_FILE` is optional, provides a way for the other variables to be read from a file instead of environment variables.
 
 If all those 4 are present, Configuration-as-Code will try to gather initial secrets from Vault. Requires read access for the configured user.
+
+You can also provide a `CASC_VAULT_FILE` environment variable where you load the secrets from file.
+
+File should be in a Java Properties format
+```properties
+CASC_VAULT_PW=PASSWORD
+CASC_VAULT_USER=USER
+CASC_VAULT_PATH=secret/jenkins/master
+CASC_VAULT_URL=https://vault.dot.com
+CASC_VAULT_MOUNT=ldap
+```
+
+Intended use for `CASC_VAULT_FILE`
+
+```yaml
+version: '3.6'
+
+services:
+  jenkins:
+    environment:
+      CASC_VAULT_FILE: /run/secrets/jcasc_vault
+    restart: always
+    build: .
+    image: jenkins.master:v1.0
+    ports:
+      - 8080:8080
+      - 50000:50000
+    volumes:
+      - jenkins-home:/var/jenkins_home
+    secrets:
+      - jcasc_vault
+
+volumes:
+  jenkins-home:
+
+secrets:
+  jcasc_vault:
+    file: ./secrets/jcasc_vault
+```
 
 **TODO** provide a dockerfile to 'build' this documentation from specified jenkins-core release and plugins.
 
