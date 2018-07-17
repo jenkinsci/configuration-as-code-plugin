@@ -14,6 +14,6 @@ configuration-as-code file.
 ## implementation note
 
 - The main issue in `jobs` declaration for now concerns the difference in 'Traits' declaration due to https://issues.jenkins-ci.org/browse/JENKINS-45504.
-When is is resolved, the workaround using `configure` part will no longer be needed and all traits will be declared under the  organizations section.
+When is is resolved, the workaround using `configure` part will no longer be needed and all traits will be declared under the organizations section.
 
 - JobDSL only allow 'periodic(int min)' for configuring trigger for now. So to configure "1 day" for example, we need to use the `configure` workaround as shown in [bitbucket.yaml](bitbucket.yaml#L68) 
