@@ -244,7 +244,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
             final int i = hostedPlugin.url.lastIndexOf(hostedPlugin.version);
             url = hostedPlugin.url.substring(0, i)
                     + p.version
-                    + hostedPlugin.url.substring(i + hostedPlugin.version.length() + 1);
+                    + hostedPlugin.url.substring(i + hostedPlugin.version.length());
         }
 
         JSONObject json = new JSONObject();
