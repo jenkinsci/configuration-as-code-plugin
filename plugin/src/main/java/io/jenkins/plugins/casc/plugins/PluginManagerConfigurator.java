@@ -1,5 +1,7 @@
 package io.jenkins.plugins.casc.plugins;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import hudson.Extension;
 import hudson.Plugin;
 import hudson.PluginManager;
@@ -9,27 +11,29 @@ import hudson.lifecycle.RestartNotSupportedException;
 import hudson.model.DownloadService;
 import hudson.model.UpdateCenter;
 import hudson.model.UpdateSite;
+import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.BaseConfigurator;
+import io.jenkins.plugins.casc.ConfigurationContext;
+import io.jenkins.plugins.casc.Configurator;
 import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.RootElementConfigurator;
 import io.jenkins.plugins.casc.impl.attributes.MultivaluedAttribute;
+import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import io.jenkins.plugins.casc.model.Sequence;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.io.FileUtils;
-import io.jenkins.plugins.casc.Attribute;
-import io.jenkins.plugins.casc.ConfigurationContext;
-import io.jenkins.plugins.casc.Configurator;
-import io.jenkins.plugins.casc.model.CNode;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import javax.annotation.CheckForNull;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -40,7 +44,9 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.jar.JarFile;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -233,32 +239,67 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
             if (updateSite == null)
                 throw new ConfiguratorException("Can't install " + p + ": no default update site");
 
+            JSONObject json = new JSONObject();
+            json.accumulate("name", p.shortname);
+            json.accumulate("version", p.version);
+            json.accumulate("url", url);
+            json.accumulate("dependencies", new JSONArray());
+
+            return updateSite.new Plugin(updateSite.getId(), json);
+
         } else {
             updateSite = updateCenter.getSite(p.site);
             if (updateSite == null)
                 throw new ConfiguratorException("Can't install " + p + ": unknown update site " + p.site);
 
-            final UpdateSite.Plugin hostedPlugin = updateSite.getPlugin(p.shortname);
-            if (hostedPlugin == null)
-                throw new ConfiguratorException("Can't install " + p + ": " + p.site + " does not host requested plugin");
-
-            if ("latest".equals(p.version)) {
-                url = hostedPlugin.url;
-            } else {
-                final int i = hostedPlugin.url.lastIndexOf(hostedPlugin.version);
-                url = hostedPlugin.url.substring(0, i)
-                        + p.version
-                        + hostedPlugin.url.substring(i + hostedPlugin.version.length());
+            final JSONObject versions = getPluginVersions(updateSite);
+            if (versions == null) {
+                throw new ConfiguratorException("update site " + p.site + " doesn't host plugin-versions.json metadata. Use plain download URL as 'version'");
             }
+
+            final JSONObject plugin = versions.getJSONObject(p.shortname);
+            if (plugin == null) {
+                throw new ConfiguratorException("update site " + p.site + " isn't hosting plugin " + p.shortname);
+            }
+            final JSONObject version = plugin.getJSONObject(p.version);
+            if (version == null) {
+                throw new ConfiguratorException("update site " + p.site + " isn't hosting plugin " + p.shortname + " version " + p.version);
+            }
+            return updateSite.new Plugin(updateSite.getId(), version);
         }
 
-        JSONObject json = new JSONObject();
-        json.accumulate("name", p.shortname);
-        json.accumulate("version", p.version);
-        json.accumulate("url", url);
-        json.accumulate("dependencies", new JSONArray());
+    }
 
-        return updateSite.new Plugin(updateSite.getId(), json);
+    Cache<String, JSONObject> pluginVersions = CacheBuilder.newBuilder().build();
+
+    private JSONObject getPluginVersions(UpdateSite updateSite) {
+
+        // TODO use jenkins-core API for this once UpdateSite offers.
+        try {
+            return pluginVersions.get(updateSite.getId(), () -> {
+                final File file = new File(Jenkins.getInstance().getRootDir(),
+                        "updates/" + updateSite.getId() + "plugin-versions.json");
+
+                boolean needUpdate = !file.exists() || System.currentTimeMillis() - file.lastModified() > TimeUnit.DAYS.toMillis(1);
+                if (needUpdate) {
+
+                    final URI metadata = new URI(updateSite.getUrl()).resolve("./plugin-versions.json");
+                    try (InputStream is = ProxyConfiguration.open(metadata.toURL()).getInputStream()) {
+                        FileUtils.copyInputStreamToFile(is, file);
+                    } catch (IOException e) {
+                        logger.log(Level.WARNING, "Failed to download plugin-versions metadata from "+updateSite.getUrl(), e);
+                    }
+                }
+
+                try {
+                    return JSONObject.fromObject(FileUtils.readFileToString(file)).getJSONObject("plugins");
+                } catch (IOException e) {
+                    return null;
+                }
+            });
+        } catch (ExecutionException e) {
+            return null;
+        }
     }
 
     private File readShrinkwrapFile(Jenkins jenkins, Queue<PluginToInstall> plugins) throws ConfiguratorException {
