@@ -4,17 +4,15 @@
 Sample configuration for the SonarQube plugin
 
 ```yaml
-jenkins: 
+jenkins:
   [...]
 unclassified:
   sonarglobalconfiguration:     # mandatory
     installations:              # mandatory
-      - Sonar566:
-        name: Sonar566          # id of the SonarQube configuration - to be used in jobs
+      - name: Sonar          # id of the SonarQube configuration - to be used in jobs
         serverUrl: http://SERVER_URL/
-        serverVersion: 5.3      # id of the combobox of sonar version
+        serverAuthenticationToken: sonarAuthenticationToken # Authentication token for SonarQube
 ```
 
 ## notes
 You can add multiple installations.
-
