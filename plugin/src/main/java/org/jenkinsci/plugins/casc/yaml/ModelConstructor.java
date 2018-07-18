@@ -33,6 +33,7 @@ public class ModelConstructor extends Constructor {
 
         this.yamlConstructors.put(Tag.BOOL, ConstructScalar);
         this.yamlConstructors.put(Tag.INT, ConstructScalar);
+        this.yamlConstructors.put(Tag.STR, ConstructScalar);
 
     }
 
@@ -49,15 +50,9 @@ public class ModelConstructor extends Constructor {
         return new Source(mark.getName(), mark.getLine()+ 1);
     }
 
-    @Override
-    protected Object constructScalar(ScalarNode node) {
-        return new Scalar(node.getValue());
-    }
-
-    @Override
-    protected Map createDefaultMap() {
+    protected Map createDefaultMap(int initSize) {
         // respect order from YAML document
-        return new Mapping();
+        return new Mapping(initSize);
     }
 
     @Override

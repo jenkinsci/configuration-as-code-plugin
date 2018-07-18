@@ -285,11 +285,11 @@ public class ConfigurationAsCode extends ManagementLink {
             final Node valueNode = toYaml(config);
             if (valueNode == null) continue;
             tuples.add(new NodeTuple(
-                    new ScalarNode(Tag.STR, root.getName(), null, null, PLAIN.getChar()),
+                    new ScalarNode(Tag.STR, root.getName(), null, null, PLAIN),
                     valueNode));
         }
 
-        MappingNode root = new MappingNode(Tag.MAP, tuples, BLOCK.getStyleBoolean());
+        MappingNode root = new MappingNode(Tag.MAP, tuples, BLOCK);
         try (Writer writer = new OutputStreamWriter(out, StandardCharsets.UTF_8)) {
             serializeYamlNode(root, writer);
         } catch (IOException e) {
@@ -329,13 +329,13 @@ public class ConfigurationAsCode extends ManagementLink {
                     final Node valueNode = toYaml(entry.getValue());
                     if (valueNode == null) continue;
                     tuples.add(new NodeTuple(
-                            new ScalarNode(Tag.STR, entry.getKey(), null, null, PLAIN.getChar()),
+                            new ScalarNode(Tag.STR, entry.getKey(), null, null, PLAIN),
                             valueNode));
 
                 }
                 if (tuples.isEmpty()) return null;
 
-                return new MappingNode(Tag.MAP, tuples, BLOCK.getStyleBoolean());
+                return new MappingNode(Tag.MAP, tuples, BLOCK);
 
             case SEQUENCE:
                 final Sequence sequence = config.asSequence();
@@ -346,7 +346,7 @@ public class ConfigurationAsCode extends ManagementLink {
                     nodes.add(valueNode);
                 }
                 if (nodes.isEmpty()) return null;
-                return new SequenceNode(Tag.SEQ, nodes, BLOCK.getStyleBoolean());
+                return new SequenceNode(Tag.SEQ, nodes, BLOCK);
 
             case SCALAR:
             default:
@@ -354,7 +354,7 @@ public class ConfigurationAsCode extends ManagementLink {
                 final String value = scalar.getValue();
                 if (value == null || value.length() == 0) return null;
 
-                final Character style = scalar.isRaw() ? PLAIN.getChar() : DOUBLE_QUOTED.getChar();
+                final DumperOptions.ScalarStyle style = scalar.isRaw() ? PLAIN : DOUBLE_QUOTED;
 
                 return new ScalarNode(scalar.getTag(), value, null, null, style);
 
