@@ -18,7 +18,7 @@ jenkins:
 ```
 
 ### Multiline system message
-There are (too) many ways to write multi-line strings in yalm, but one of the most readable solutions
+There are (too) many ways to write multi-line strings in yaml, but one of the most readable solutions
 is to use the following syntax, that doesn't need escaped newlines and other shenanigans:
 
 ```yaml
