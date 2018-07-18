@@ -15,6 +15,14 @@ public final class Mapping extends HashMap<String, CNode> implements CNode {
     public static final Mapping EMPTY = new Mapping();
     private Source source;
 
+    public Mapping() {
+        super();
+    }
+
+    public Mapping(int initialCapacity) {
+        super(initialCapacity);
+    }
+
     @Override
     public Type getType() {
         return Type.MAPPING;
