@@ -20,7 +20,8 @@ import java.util.logging.Logger;
 /**
  * Replaces secrets from .yaml files with the ${vault.*} prefix
  *
- * For now requires 4 environment variables set.
+ * Requires either CASC_VAULT_USER and CASC_VAULT_PW, or CASC_VAULT_TOKEN environment variables set
+ * alongside with CASC_VAULT_PATH and CASC_VAULT_URL
  */
 @Extension
 @Restricted(Beta.class)
@@ -47,19 +48,27 @@ public class VaultSecretSource extends SecretSource {
         String vaultPth = getVariable("CASC_VAULT_PATH", prop);
         String vaultUrl = getVariable("CASC_VAULT_URL", prop);
         String vaultMount = getVariable("CASC_VAULT_MOUNT", prop);
+        String vaultToken = getVariable("CASC_VAULT_TOKEN", prop);
 
-        if(vaultPw != null && vaultUsr != null && vaultPth != null && vaultUrl != null) {
+        //if(vaultPw != null && vaultUsr != null && vaultPth != null && vaultUrl != null) {
+        if(((vaultPw != null && vaultUsr != null) || vaultToken != null) && vaultPth != null && vaultUrl != null) {
             LOGGER.log(Level.FINE, "Attempting to connect to Vault: {0}", vaultUrl);
             try {
                 VaultConfig config = new VaultConfig().address(vaultUrl).build();
                 Vault vault = new Vault(config);
                 //Obtain a login token
-                final String token = vault.auth().loginByUserPass(vaultUsr, vaultPw, vaultMount).getAuthClientToken();
-                LOGGER.log(Level.FINE, "Login to Vault successful");
+                final String token;
+                if (vaultToken != null) {
+                    token = vaultToken;
+                    LOGGER.log(Level.FINE, "Using supplied token to access Vault");
+                } else {
+                    token = vault.auth().loginByUserPass(vaultUsr, vaultPw, vaultMount).getAuthClientToken();
+                    LOGGER.log(Level.FINE, "Login to Vault using U/P successful");
+                }
                 config.token(token).build();
                 secrets = vault.logical().read(vaultPth).getData();
             } catch (VaultException ve) {
-                LOGGER.log(Level.WARNING, "Unable to fetch password from vault", ve);
+                LOGGER.log(Level.WARNING, "Unable to connect to Vault", ve);
             }
         }
     }
