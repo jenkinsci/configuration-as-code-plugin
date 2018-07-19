@@ -12,8 +12,7 @@ unclassified:
   artifactorybuilder:
     useCredentialsPlugin: true
     artifactoryServers:
-      - name: foo
-        serverId: artifactory
+      - serverId: artifactory
         artifactoryUrl: http://acme.com/artifactory
         resolverCredentialsConfig:
           username: artifactory_user
