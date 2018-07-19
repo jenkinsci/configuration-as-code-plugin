@@ -50,7 +50,6 @@ public class VaultSecretSource extends SecretSource {
         String vaultMount = getVariable("CASC_VAULT_MOUNT", prop);
         String vaultToken = getVariable("CASC_VAULT_TOKEN", prop);
 
-        //if(vaultPw != null && vaultUsr != null && vaultPth != null && vaultUrl != null) {
         if(((vaultPw != null && vaultUsr != null) || vaultToken != null) && vaultPth != null && vaultUrl != null) {
             LOGGER.log(Level.FINE, "Attempting to connect to Vault: {0}", vaultUrl);
             try {
