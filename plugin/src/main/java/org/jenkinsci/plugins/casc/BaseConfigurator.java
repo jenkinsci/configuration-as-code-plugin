@@ -1,6 +1,7 @@
 package org.jenkinsci.plugins.casc;
 
 import hudson.model.Describable;
+import hudson.model.Saveable;
 import hudson.util.PersistedList;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.casc.impl.attributes.DescribableAttribute;
@@ -13,6 +14,7 @@ import org.kohsuke.accmod.restrictions.Beta;
 import org.kohsuke.accmod.restrictions.None;
 
 import javax.annotation.Nonnull;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
@@ -199,6 +201,13 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
         final Mapping mapping = (c != null ? c.asMapping() : Mapping.EMPTY);
         final T instance = instance(mapping);
         configure(mapping, instance, false);
+        if (instance instanceof Saveable) {
+            try {
+                ((Saveable) instance).save();
+            } catch (IOException e) {
+                throw new ConfiguratorException("Failed to save "+instance, e);
+            }
+        }
         return instance;
     }
 
