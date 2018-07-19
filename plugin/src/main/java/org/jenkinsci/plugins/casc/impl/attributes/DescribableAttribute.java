@@ -6,7 +6,7 @@ import jenkins.model.Jenkins;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.Beta;
+import org.kohsuke.accmod.restrictions.None;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,7 +19,7 @@ import static org.jenkinsci.plugins.casc.Configurator.normalize;
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-@Restricted(Beta.class)
+@Restricted(None.class /** should be Beta, see #322 */)
 public class DescribableAttribute<Owner, Type> extends Attribute<Owner, Type> {
 
     public DescribableAttribute(String name, Class<? extends Describable> type) {

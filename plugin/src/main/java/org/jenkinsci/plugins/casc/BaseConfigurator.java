@@ -11,6 +11,7 @@ import org.kohsuke.accmod.AccessRestriction;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.Beta;
 import org.kohsuke.accmod.restrictions.None;
+import org.kohsuke.accmod.restrictions.None;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
@@ -38,7 +39,7 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-@Restricted(Beta.class)
+@Restricted(None.class /** should be Beta, see #322 */)
 public abstract class BaseConfigurator<T> extends Configurator<T> {
 
     private static final Logger logger = Logger.getLogger(BaseConfigurator.class.getName());
@@ -319,7 +320,7 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
         return null;
     }
 
-    @Restricted(Beta.class)
+    @Restricted(None.class /** should be Beta, see #322 */)
     public static final class TypePair {
 
         final Type type;

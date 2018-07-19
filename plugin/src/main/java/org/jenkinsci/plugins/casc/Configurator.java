@@ -20,7 +20,7 @@ import org.jenkinsci.plugins.casc.impl.configurators.PrimitiveConfigurator;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jvnet.tiger_types.Types;
 import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.Beta;
+import org.kohsuke.accmod.restrictions.None;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.lang.Klass;
@@ -55,7 +55,7 @@ import java.util.stream.Collectors;
  *
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-@Restricted(Beta.class)
+@Restricted(None.class /** should be Beta, see #322 */)
 public abstract class Configurator<T> implements ExtensionPoint, ElementConfigurator<T> {
 
     private final static Logger logger = Logger.getLogger(Configurator.class.getName());
