@@ -6,10 +6,13 @@ import hudson.init.InitMilestone;
 import hudson.init.Initializer;
 import hudson.model.ManagementLink;
 import jenkins.model.Jenkins;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
 import org.jenkinsci.plugins.casc.model.Scalar;
 import org.jenkinsci.plugins.casc.model.Sequence;
+import org.jenkinsci.plugins.casc.model.Source;
 import org.jenkinsci.plugins.casc.yaml.ModelConstructor;
 import org.jenkinsci.plugins.casc.yaml.YamlSource;
 import org.jenkinsci.plugins.casc.yaml.YamlUtils;
@@ -57,6 +60,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -244,7 +248,12 @@ public class ConfigurationAsCode extends ManagementLink {
             return;
         }
 
-        checkWith(new YamlSource<HttpServletRequest>(req, YamlSource.READ_FROM_REQUEST));
+        final Map<Source, String> issues = checkWith(new YamlSource<HttpServletRequest>(req, YamlSource.READ_FROM_REQUEST));
+        res.setContentType("application/json");
+        final JSONArray warnings = new JSONArray();
+        issues.entrySet().stream().map(e -> new JSONObject().accumulate("line", e.getKey().line).accumulate("warning", e.getValue()))
+                .forEach(warnings::add);
+        warnings.write(res.getWriter());
     }
 
     @RequirePOST
@@ -280,8 +289,9 @@ public class ConfigurationAsCode extends ManagementLink {
 
         final List<NodeTuple> tuples = new ArrayList<>();
 
+        final ConfigurationContext context = new ConfigurationContext();
         for (RootElementConfigurator root : RootElementConfigurator.all()) {
-            final CNode config = root.describe(root.getTargetComponent());
+            final CNode config = root.describe(root.getTargetComponent(context));
             final Node valueNode = toYaml(config);
             if (valueNode == null) continue;
             tuples.add(new NodeTuple(
@@ -410,17 +420,17 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     @org.kohsuke.accmod.Restricted(NoExternalUse.class)
-    public void checkWith(YamlSource source) throws ConfiguratorException {
+    public Map<Source, String> checkWith(YamlSource source) throws ConfiguratorException {
         final List<YamlSource> sources = getStandardConfigSources();
         sources.add(source);
-        checkWith(sources);
+        return checkWith(sources);
     }
 
-    private void checkWith(List<YamlSource> sources) throws ConfiguratorException {
-        if (sources.isEmpty()) return;
+    private Map<Source, String> checkWith(List<YamlSource> sources) throws ConfiguratorException {
+        if (sources.isEmpty()) return null;
         final Node merged = YamlUtils.merge(sources);
         final Mapping map = loadAs(merged);
-        checkWith(map.entrySet());
+        return checkWith(map.entrySet());
     }
 
 
@@ -463,7 +473,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
 
     @FunctionalInterface
-    private static interface ConfigratorOperation {
+    private interface ConfigratorOperation {
 
         Object apply(RootElementConfigurator configurator, CNode node) throws ConfiguratorException;
     }
@@ -507,13 +517,19 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     private static void configureWith(Set<Map.Entry<String, CNode>> entries) throws ConfiguratorException {
-        ObsoleteConfigurationMonitor.get().reset();
-        invokeWith(entries, ElementConfigurator::configure);
+        final ObsoleteConfigurationMonitor monitor = ObsoleteConfigurationMonitor.get();
+        monitor.reset();
+        ConfigurationContext context = new ConfigurationContext();
+        context.addListener(monitor::record);
+        invokeWith(entries, (configurator, config) -> configurator.configure(config, context));
     }
 
-    public static void checkWith(Set<Map.Entry<String, CNode>> entries) throws ConfiguratorException {
-        ObsoleteConfigurationMonitor.get().reset();
-        invokeWith(entries, ElementConfigurator::check);
+    public static Map<Source, String> checkWith(Set<Map.Entry<String, CNode>> entries) throws ConfiguratorException {
+        Map<Source, String> issues = new HashMap<>();
+        ConfigurationContext context = new ConfigurationContext();
+        context.addListener( (node,message) -> issues.put(node.getSource(), message) );
+        invokeWith(entries, (configurator, config) -> configurator.check(config, context));
+        return issues;
     }
 
 
@@ -558,96 +574,5 @@ public class ConfigurationAsCode extends ManagementLink {
                 });
     }
 
-
-    /**
-     * the model-introspection model to be applied by configuration-as-code.
-     * as we move forward, we might need to introduce some breaking change in the way we discover
-     * configurable data model from live jenkins instance. At this time, 'new' mechanism will
-     * only be enabled if yaml source do include adequate 'version: x'.
-     */
-    private Version version = Version.ONE;
-
-    public void setVersion(Version version) {
-        this.version = version;
-    }
-
-    public Version getVersion() {
-        return version;
-    }
-
-    // Once we introduce some breaking change on the model inference mechanism, we will introduce `TWO` and so on
-    // And this new mechanism will only get enabled when configuration file uses this version or later
-    enum Version { ONE("1");
-
-        private final String value;
-
-        Version(String value) {
-            this.value = value;
-        }
-
-        public static Version of(String version) throws ConfiguratorException {
-            switch (version) {
-                case "1": return Version.ONE;
-                default: throw new ConfiguratorException("unsupported version "+version);
-            }
-        }
-
-        public String value() {
-            return value;
-        }
-
-    }
-
-    public boolean isAtLeast(Version version) {
-        return this.version.ordinal() >= version.ordinal();
-    }
-
-
-    /**
-     * Policy regarding {@link Deprecated} attributes.
-     */
-    enum Deprecation { reject, warn }
-
-    private Deprecation deprecation = Deprecation.reject;
-
-    public Deprecation getDeprecation() {
-        return deprecation;
-    }
-
-    public void setDeprecation(Deprecation deprecation) {
-        this.deprecation = deprecation;
-    }
-
-
-    /**
-     * Policy regarding {@link org.kohsuke.accmod.Restricted} attributes.
-     */
-    enum Restricted { reject, beta, warn }
-
-    private Restricted restricted = Restricted.reject;
-
-    public Restricted getRestricted() {
-        return restricted;
-    }
-
-    public void setRestricted(Restricted restricted) {
-        this.restricted = restricted;
-    }
-
-
-    /**
-     * Policy regarding unknown attributes.
-     */
-    enum Unknown { reject, warn }
-
-    private Unknown unknown = Unknown.reject;
-
-    public Unknown getUnknown() {
-        return unknown;
-    }
-
-    public void setUnknown(Unknown unknown) {
-        this.unknown = unknown;
-    }
 
 }

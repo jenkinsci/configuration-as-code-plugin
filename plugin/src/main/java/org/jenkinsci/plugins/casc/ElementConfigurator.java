@@ -59,21 +59,23 @@ public interface ElementConfigurator<T> {
      * @param config
      *      Map/List/primitive objects (think YAML) that represents the configuration from which
      *      a Jenkins object is configured.
+     * @param context
      * @return
      *      Fully configured Jenkins object that results from this configuration.
      *      if no new objects got created, but some existing objects may have been modified, return updated target object.
      * @throws ConfiguratorException if something went wrong, depends on the concrete implementation
      */
     @Nonnull
-    T configure(CNode config) throws ConfiguratorException;
+    T configure(CNode config, ConfigurationContext context) throws ConfiguratorException;
 
     /**
-     * Run the same logic as {@link #configure(CNode)} in dry-run mode.
+     * Run the same logic as {@link #configure(CNode, ConfigurationContext)} in dry-run mode.
      * Used to verify configuration is fine before being acutally applied to a live jenkins master.
      * @param config
+     * @param context
      * @throws ConfiguratorException
      */
-    T check(CNode config) throws ConfiguratorException;
+    T check(CNode config, ConfigurationContext context) throws ConfiguratorException;
 
 
     /**

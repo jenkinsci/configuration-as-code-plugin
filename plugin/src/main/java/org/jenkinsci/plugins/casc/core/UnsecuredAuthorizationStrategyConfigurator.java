@@ -4,7 +4,7 @@ import hudson.Extension;
 import hudson.security.AuthorizationStrategy;
 import hudson.security.AuthorizationStrategy.Unsecured;
 import org.jenkinsci.plugins.casc.BaseConfigurator;
-import org.jenkinsci.plugins.casc.ConfiguratorException;
+import org.jenkinsci.plugins.casc.ConfigurationContext;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
 import org.kohsuke.accmod.Restricted;
@@ -26,7 +26,7 @@ public class UnsecuredAuthorizationStrategyConfigurator extends BaseConfigurator
     }
 
     @Override
-    protected Unsecured instance(Mapping mapping) {
+    protected Unsecured instance(Mapping mapping, ConfigurationContext context) {
         return (Unsecured)AuthorizationStrategy.UNSECURED;
     }
 

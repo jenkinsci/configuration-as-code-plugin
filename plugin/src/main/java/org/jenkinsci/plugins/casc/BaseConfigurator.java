@@ -34,7 +34,7 @@ import java.util.logging.Logger;
 
 /**
  * a General purpose abstract {@link Configurator} implementation.
- * Target component is identified by implementing {@link #instance(Mapping)} then configuration is applied on
+ * Target component is identified by implementing {@link #instance(Mapping, ConfigurationContext)} then configuration is applied on
  * {@link Attribute}s as defined by {@link #describe()}.
  * This base implementation uses JavaBean convention to identify configurable attributes.
  *
@@ -190,17 +190,18 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
     /**
      * Build or identify the target component this configurator has to handle based on the provided configuration node.
      * @param mapping configuration for target component. Implementation may consume some entries to create a fresh new instance.
-     * @return instance to be configured, but not yet fully configured, see {@link #configure(Mapping, Object, boolean)}
+     * @param context
+     * @return instance to be configured, but not yet fully configured, see {@link #configure(Mapping, Object, boolean, ConfigurationContext)}
      * @throws ConfiguratorException
      */
-    protected abstract T instance(Mapping mapping) throws ConfiguratorException;
+    protected abstract T instance(Mapping mapping, ConfigurationContext context) throws ConfiguratorException;
 
     @Nonnull
     @Override
-    public T configure(CNode c) throws ConfiguratorException {
+    public T configure(CNode c, ConfigurationContext context) throws ConfiguratorException {
         final Mapping mapping = (c != null ? c.asMapping() : Mapping.EMPTY);
-        final T instance = instance(mapping);
-        configure(mapping, instance, false);
+        final T instance = instance(mapping, context);
+        configure(mapping, instance, false, context);
         if (instance instanceof Saveable) {
             try {
                 ((Saveable) instance).save();
@@ -213,24 +214,23 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
 
 
     @Override
-    public T check(CNode c) throws ConfiguratorException {
+    public T check(CNode c, ConfigurationContext context) throws ConfiguratorException {
         final Mapping mapping = (c != null ? c.asMapping() : Mapping.EMPTY);
-        final T instance = instance(mapping);
-        configure(mapping, instance, true);
+        final T instance = instance(mapping, context);
+        configure(mapping, instance, true, context);
         return instance;
     }
 
     /**
      * Run configuration process on the target instance
-     * @param config configuration to apply. Can be partial if {@link #instance(Mapping)} did already used some entries
+     * @param config configuration to apply. Can be partial if {@link #instance(Mapping, ConfigurationContext)} did already used some entries
      * @param instance target instance to configure
      * @param dryrun only check configuration is valid regarding target component. Don't actually apply changes to jenkins master instance
+     * @param context
      * @throws ConfiguratorException something went wrong...
      */
-    protected final void configure(Mapping config, T instance, boolean dryrun) throws ConfiguratorException {
+    protected final void configure(Mapping config, T instance, boolean dryrun, ConfigurationContext context) throws ConfiguratorException {
         final Set<Attribute> attributes = describe();
-        final ConfigurationAsCode casc = ConfigurationAsCode.get();
-
         for (Attribute<T,Object> attribute : attributes) {
 
             final String name = attribute.getName();
@@ -239,7 +239,7 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
                 for (String alias : attribute.aliases) {
                     sub = removeIgnoreCase(config, alias);
                     if (sub != null) {
-                        ObsoleteConfigurationMonitor.get().record(sub, "'"+alias+"' is an obsolete attribute name, please use '" + name + "'");
+                        context.warning(sub, "'"+alias+"' is an obsolete attribute name, please use '" + name + "'");
                         break;
                     }
                 }
@@ -248,19 +248,19 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
             if (sub != null) {
 
                 if (attribute.isDeprecated()) {
-                    ObsoleteConfigurationMonitor.get().record(config, "'"+attribute.getName()+"' is deprecated");
-                    if (casc.getDeprecation() == ConfigurationAsCode.Deprecation.reject) {
+                    context.warning(config, "'"+attribute.getName()+"' is deprecated");
+                    if (context.getDeprecated() == ConfigurationContext.Deprecation.reject) {
                         throw new ConfiguratorException("'"+attribute.getName()+"' is deprecated");
                     }
                 }
 
                 for (Class<? extends AccessRestriction> r : attribute.getRestrictions()) {
                     if (r == None.class) continue;
-                    if (r == Beta.class && casc.getRestricted() == ConfigurationAsCode.Restricted.beta) {
+                    if (r == Beta.class && context.getRestricted() == ConfigurationContext.Restriction.beta) {
                         continue;
                     }
-                    ObsoleteConfigurationMonitor.get().record(config, "'"+attribute.getName()+"' is restricted: " + r.getSimpleName());
-                    if (casc.getRestricted() == ConfigurationAsCode.Restricted.reject) {
+                    context.warning(config, "'"+attribute.getName()+"' is restricted: " + r.getSimpleName());
+                    if (context.getRestricted() == ConfigurationContext.Restriction.reject) {
                         throw new ConfiguratorException("'"+attribute.getName()+"' is restricted: " + r.getSimpleName());
                     }
                 }
@@ -272,12 +272,12 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
                 if (attribute.isMultiple()) {
                     List<Object> values = new ArrayList<>();
                     for (CNode o : sub.asSequence()) {
-                        Object value = configurator.configure(o);
+                        Object value = configurator.configure(o, context);
                         values.add(value);
                     }
                     valueToSet= values;
                 } else {
-                    valueToSet = configurator.configure(sub);
+                    valueToSet = configurator.configure(sub, context);
                 }
 
                 if (!dryrun) {
@@ -291,15 +291,15 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
             }
         }
 
-        handleUnknown(config);
+        handleUnknown(config, context);
     }
 
-    protected final void handleUnknown(Mapping config) throws ConfiguratorException {
+    protected final void handleUnknown(Mapping config, ConfigurationContext context) throws ConfiguratorException {
         if (!config.isEmpty()) {
             final String invalid = StringUtils.join(config.keySet(), ',');
             final String message = "Invalid configuration elements for type " + getTarget() + " : " + invalid;
-            ObsoleteConfigurationMonitor.get().record(config, message);
-            switch (ConfigurationAsCode.get().getUnknown()) {
+            context.warning(config, message);
+            switch (context.getUnknown()) {
                 case reject:
                     throw new ConfiguratorException(message);
 

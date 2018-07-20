@@ -1,6 +1,7 @@
 package org.jenkinsci.plugins.casc.impl.configurators;
 
 import org.jenkinsci.plugins.casc.Attribute;
+import org.jenkinsci.plugins.casc.ConfigurationContext;
 import org.jenkinsci.plugins.casc.Configurator;
 import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.model.CNode;
@@ -36,13 +37,13 @@ public class PrimitiveConfigurator extends Configurator {
     }
 
     @Override
-    public Object configure(CNode config) throws ConfiguratorException {
+    public Object configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
         return Stapler.lookupConverter(target).convert(target, config);
     }
 
     @Override
-    public Object check(CNode config) throws ConfiguratorException {
-        return configure(config);
+    public Object check(CNode config, ConfigurationContext context) throws ConfiguratorException {
+        return configure(config, context);
     }
 
     @CheckForNull

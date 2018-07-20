@@ -7,6 +7,7 @@ import javaposse.jobdsl.plugin.JenkinsDslScriptLoader;
 import javaposse.jobdsl.plugin.JenkinsJobManagement;
 import javaposse.jobdsl.plugin.LookupStrategy;
 import org.jenkinsci.plugins.casc.Attribute;
+import org.jenkinsci.plugins.casc.ConfigurationContext;
 import org.jenkinsci.plugins.casc.Configurator;
 import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.RootElementConfigurator;
@@ -42,12 +43,12 @@ public class SeedJobConfigurator implements RootElementConfigurator<List<Generat
     }
 
     @Override
-    public List<GeneratedItems> getTargetComponent() {
+    public List<GeneratedItems> getTargetComponent(ConfigurationContext context) {
         return Collections.EMPTY_LIST; // Doesn't really make sense
     }
 
     @Override
-    public List<GeneratedItems> configure(CNode config) throws ConfiguratorException {
+    public List<GeneratedItems> configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
         JenkinsJobManagement mng = new JenkinsJobManagement(System.out, new EnvVars(), null, null, LookupStrategy.JENKINS_ROOT);
         final Sequence sources = config.asSequence();
         final Configurator<ScriptSource> con = Configurator.lookup(ScriptSource.class);
@@ -55,7 +56,7 @@ public class SeedJobConfigurator implements RootElementConfigurator<List<Generat
         for (CNode source : sources) {
             final String script;
             try {
-                script = con.configure(source).getScript();
+                script = con.configure(source, context).getScript();
             } catch (IOException e) {
                 throw new ConfiguratorException(this, "Failed to retrieve job-dsl script", e);
             }
@@ -69,7 +70,7 @@ public class SeedJobConfigurator implements RootElementConfigurator<List<Generat
     }
 
     @Override
-    public List<GeneratedItems> check(CNode config) throws ConfiguratorException {
+    public List<GeneratedItems> check(CNode config, ConfigurationContext context) throws ConfiguratorException {
         // Any way to dry-run a job-dsl script ?
         return Collections.emptyList();
     }

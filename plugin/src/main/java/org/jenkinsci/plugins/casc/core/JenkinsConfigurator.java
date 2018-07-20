@@ -5,6 +5,7 @@ import jenkins.model.Jenkins;
 import jenkins.security.s2m.AdminWhitelistRule;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.BaseConfigurator;
+import org.jenkinsci.plugins.casc.ConfigurationContext;
 import org.jenkinsci.plugins.casc.RootElementConfigurator;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
@@ -32,13 +33,13 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
     }
 
     @Override
-    public Jenkins getTargetComponent() {
+    public Jenkins getTargetComponent(ConfigurationContext context) {
         return Jenkins.getInstance();
     }
 
     @Override
-    protected Jenkins instance(Mapping mapping) {
-        return getTargetComponent();
+    protected Jenkins instance(Mapping mapping, ConfigurationContext context) {
+        return getTargetComponent(context);
     }
 
     @Override

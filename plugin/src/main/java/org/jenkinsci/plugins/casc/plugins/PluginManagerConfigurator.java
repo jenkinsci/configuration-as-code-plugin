@@ -15,6 +15,7 @@ import net.sf.json.JSONObject;
 import org.apache.commons.io.FileUtils;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.BaseConfigurator;
+import org.jenkinsci.plugins.casc.ConfigurationContext;
 import org.jenkinsci.plugins.casc.Configurator;
 import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.impl.attributes.MultivaluedAttribute;
@@ -60,25 +61,25 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
     }
 
     @Override
-    public PluginManager getTargetComponent() {
+    public PluginManager getTargetComponent(ConfigurationContext context) {
         return Jenkins.getInstance().getPluginManager();
     }
 
     @Override
-    protected PluginManager instance(Mapping mapping) {
-        return getTargetComponent();
+    protected PluginManager instance(Mapping mapping, ConfigurationContext context) {
+        return getTargetComponent(context);
     }
 
     @Override
-    public PluginManager configure(CNode config) throws ConfiguratorException {
+    public PluginManager configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
         Mapping map = config.asMapping();
         final Jenkins jenkins = Jenkins.getInstance();
 
-        configureProxy(map, jenkins);
+        configureProxy(map, jenkins, context);
 
-        final UpdateCenter updateCenter = configureUpdateSites(map, jenkins);
+        final UpdateCenter updateCenter = configureUpdateSites(map, jenkins, context);
 
-        final PluginManager pluginManager = configurePlugins(map, jenkins, updateCenter);
+        final PluginManager pluginManager = configurePlugins(map, jenkins, updateCenter, context);
 
         try {
             jenkins.save();
@@ -88,24 +89,24 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
         return pluginManager;
     }
 
-    private void configureProxy(Mapping map, Jenkins jenkins) throws ConfiguratorException {
+    private void configureProxy(Mapping map, Jenkins jenkins, ConfigurationContext context) throws ConfiguratorException {
         final CNode proxy = map.get("proxy");
         if (proxy != null) {
             Configurator<ProxyConfiguration> pc = Configurator.lookup(ProxyConfiguration.class);
             if (pc == null) throw new ConfiguratorException("ProxyConfiguration not well registered");
-            ProxyConfiguration pcc = pc.configure(proxy);
+            ProxyConfiguration pcc = pc.configure(proxy, context);
             jenkins.proxy = pcc;
         }
     }
 
-    private UpdateCenter configureUpdateSites(Mapping map, Jenkins jenkins) throws ConfiguratorException {
+    private UpdateCenter configureUpdateSites(Mapping map, Jenkins jenkins, ConfigurationContext context) throws ConfiguratorException {
         final CNode sites = map.get("sites");
         final UpdateCenter updateCenter = jenkins.getUpdateCenter();
         if (sites != null) {
             Configurator<UpdateSite> usc = Configurator.lookup(UpdateSite.class);
             List<UpdateSite> updateSites = new ArrayList<>();
             for (CNode data : sites.asSequence()) {
-                UpdateSite in = usc.configure(data);
+                UpdateSite in = usc.configure(data, context);
                 if (in.isDue()) {
                     in.updateDirectly(DownloadService.signatureCheck);
                 }
@@ -120,7 +121,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
         return updateCenter;
     }
 
-    private PluginManager configurePlugins(Mapping map, Jenkins jenkins, UpdateCenter updateCenter) throws ConfiguratorException {
+    private PluginManager configurePlugins(Mapping map, Jenkins jenkins, UpdateCenter updateCenter, ConfigurationContext context) throws ConfiguratorException {
         Queue<PluginToInstall> plugins = new LinkedList<>();
         final CNode required = map.get("required");
         if (required != null) {
@@ -132,7 +133,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
         File shrinkwrap = readShrinkwrapFile(jenkins, plugins);
 
 
-        final PluginManager pluginManager = getTargetComponent();
+        final PluginManager pluginManager = getTargetComponent(context);
         if (!plugins.isEmpty()) {
             logger.log(java.util.logging.Level.CONFIG, String.format("Using plugin root dir: '%s'", pluginManager.rootDir));
             boolean requireRestart = false;

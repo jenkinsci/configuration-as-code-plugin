@@ -6,6 +6,7 @@ import hudson.Extension;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.BaseConfigurator;
+import org.jenkinsci.plugins.casc.ConfigurationContext;
 import org.jenkinsci.plugins.casc.RootElementConfigurator;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
@@ -38,13 +39,13 @@ public class CredentialsRootConfigurator extends BaseConfigurator<GlobalCredenti
     }
 
     @Override
-    public GlobalCredentialsConfiguration getTargetComponent() {
+    public GlobalCredentialsConfiguration getTargetComponent(ConfigurationContext context) {
         return GlobalCredentialsConfiguration.all().get(GlobalCredentialsConfiguration.class);
     }
 
     @Override
-    public GlobalCredentialsConfiguration instance(Mapping mapping) {
-        return getTargetComponent();
+    public GlobalCredentialsConfiguration instance(Mapping mapping, ConfigurationContext context) {
+        return getTargetComponent(context);
     }
 
     @Override

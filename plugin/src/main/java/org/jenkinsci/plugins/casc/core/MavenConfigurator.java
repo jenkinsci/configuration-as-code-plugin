@@ -7,6 +7,7 @@ import jenkins.model.Jenkins;
 import jenkins.mvn.GlobalMavenConfig;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.BaseConfigurator;
+import org.jenkinsci.plugins.casc.ConfigurationContext;
 import org.jenkinsci.plugins.casc.Configurator;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
@@ -31,7 +32,7 @@ public class MavenConfigurator extends BaseConfigurator<GlobalMavenConfig> {
     }
 
     @Override
-    protected GlobalMavenConfig instance(Mapping mapping) {
+    protected GlobalMavenConfig instance(Mapping mapping, ConfigurationContext context) {
         return GlobalMavenConfig.get();
     }
 
