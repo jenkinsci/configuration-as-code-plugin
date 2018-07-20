@@ -141,8 +141,9 @@ using the `:-` operator from `bash` is also available:
 
 **Prerequisites**
 
- - The environment variable `CASC_VAULT_PW` must be present (Vault password)
- - The environment variable `CASC_VAULT_USER` must be present (Vault username)
+ - The environment variable `CASC_VAULT_PW` must be present, if token is not used (Vault password)
+ - The environment variable `CASC_VAULT_USER` must be present, if token is not used (Vault username)
+ - The environment variable `CASC_VAULT_TOKEN` must be present, if U/P is not used (Vault token)
  - The environment variable `CASC_VAULT_PATH` must be present (Vault key path, I.E /secrets/jenkins)
  - The environment variable `CASC_VAULT_URL` must be present (Vault url, including port)
  - The environment variable `CASC_VAULT_MOUNT` is optional (Vault auth mount, I.E `ldap` or another username & password authentication type, defaults to `userpass`)
@@ -156,6 +157,7 @@ File should be in a Java Properties format
 ```properties
 CASC_VAULT_PW=PASSWORD
 CASC_VAULT_USER=USER
+CASC_VAULT_TOKEN=TOKEN
 CASC_VAULT_PATH=secret/jenkins/master
 CASC_VAULT_URL=https://vault.dot.com
 CASC_VAULT_MOUNT=ldap
