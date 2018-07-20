@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.casc.core;
 
 import hudson.Extension;
 import hudson.slaves.JNLPLauncher;
+import org.jenkinsci.plugins.casc.ConfigurationContext;
 import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.impl.configurators.DataBoundConfigurator;
 import org.jenkinsci.plugins.casc.model.CNode;
@@ -21,9 +22,9 @@ public class JNLPLauncherConfigurator extends DataBoundConfigurator<JNLPLauncher
     }
 
     @Override
-    protected JNLPLauncher instance(Mapping config) throws ConfiguratorException {
+    protected JNLPLauncher instance(Mapping config, ConfigurationContext context) throws ConfiguratorException {
         try {
-            return super.instance(config);
+            return super.instance(config, context);
         } catch (ConfiguratorException e) {
             // see https://issues.jenkins-ci.org/browse/JENKINS-51603
             final CNode tunnel = config.get("tunnel");

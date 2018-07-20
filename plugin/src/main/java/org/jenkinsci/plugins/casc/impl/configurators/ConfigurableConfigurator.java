@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.casc.impl.configurators;
 
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.Configurable;
+import org.jenkinsci.plugins.casc.ConfigurationContext;
 import org.jenkinsci.plugins.casc.Configurator;
 import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.model.CNode;
@@ -35,7 +36,7 @@ public class ConfigurableConfigurator<T extends Configurable> extends Configurat
 
     @Nonnull
     @Override
-    public T configure(CNode config) throws ConfiguratorException {
+    public T configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
         try {
             final T instance = target.newInstance();
             instance.configure(config);
@@ -46,7 +47,7 @@ public class ConfigurableConfigurator<T extends Configurable> extends Configurat
     }
 
     @Override
-    public T check(CNode config) throws ConfiguratorException {
+    public T check(CNode config, ConfigurationContext context) throws ConfiguratorException {
         try {
             final T instance = target.newInstance();
             instance.check(config);

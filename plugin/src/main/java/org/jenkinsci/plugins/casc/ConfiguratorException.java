@@ -32,7 +32,7 @@ import java.io.IOException;
  * Exception type for {@link Configurator} issues.
  * @author Oleg Nenashev
  * @since TODO
- * @see ElementConfigurator#configure(CNode)
+ * @see ElementConfigurator#configure(CNode, ConfigurationContext)
  * @see ElementConfigurator
  */
 @Restricted(Beta.class)

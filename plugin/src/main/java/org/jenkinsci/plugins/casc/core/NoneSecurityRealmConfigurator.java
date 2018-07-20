@@ -3,6 +3,7 @@ package org.jenkinsci.plugins.casc.core;
 import hudson.Extension;
 import hudson.security.SecurityRealm;
 import org.jenkinsci.plugins.casc.Attribute;
+import org.jenkinsci.plugins.casc.ConfigurationContext;
 import org.jenkinsci.plugins.casc.Configurator;
 import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.model.CNode;
@@ -34,12 +35,12 @@ public class NoneSecurityRealmConfigurator extends Configurator<SecurityRealm> {
 
     @Nonnull
     @Override
-    public SecurityRealm configure(CNode config) throws ConfiguratorException {
+    public SecurityRealm configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
         return SecurityRealm.NO_AUTHENTICATION;
     }
 
     @Override
-    public SecurityRealm check(CNode config) {
+    public SecurityRealm check(CNode config, ConfigurationContext context) {
         return SecurityRealm.NO_AUTHENTICATION;
     }
 

@@ -5,6 +5,7 @@ import com.cloudbees.plugins.credentials.domains.DomainCredentials;
 import hudson.Extension;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.BaseConfigurator;
+import org.jenkinsci.plugins.casc.ConfigurationContext;
 import org.jenkinsci.plugins.casc.impl.attributes.MultivaluedAttribute;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
@@ -29,7 +30,7 @@ public class SystemCredentialsProviderConfigurator extends BaseConfigurator<Syst
     }
 
     @Override
-    protected SystemCredentialsProvider instance(Mapping mapping) {
+    protected SystemCredentialsProvider instance(Mapping mapping, ConfigurationContext context) {
         return SystemCredentialsProvider.getInstance();
     }
 

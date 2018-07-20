@@ -1,6 +1,6 @@
 configuration-as-code:
   version: 1
-  deprecation: warn
+  deprecated: warn
   restricted: warn
   unknown: warn
 

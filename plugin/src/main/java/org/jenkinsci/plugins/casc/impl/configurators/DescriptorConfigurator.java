@@ -3,6 +3,7 @@ package org.jenkinsci.plugins.casc.impl.configurators;
 import hudson.model.Descriptor;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.casc.BaseConfigurator;
+import org.jenkinsci.plugins.casc.ConfigurationContext;
 import org.jenkinsci.plugins.casc.RootElementConfigurator;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
@@ -48,12 +49,12 @@ public class DescriptorConfigurator extends BaseConfigurator<Descriptor> impleme
     }
 
     @Override
-    public Descriptor getTargetComponent() {
+    public Descriptor getTargetComponent(ConfigurationContext context) {
         return descriptor;
     }
 
     @Override
-    protected Descriptor instance(Mapping mapping) {
+    protected Descriptor instance(Mapping mapping, ConfigurationContext context) {
         return descriptor;
     }
 

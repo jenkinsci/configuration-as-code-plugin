@@ -1,6 +1,7 @@
 package org.jenkinsci.plugins.casc.impl.configurators;
 
 import org.jenkinsci.plugins.casc.Attribute;
+import org.jenkinsci.plugins.casc.ConfigurationContext;
 import org.jenkinsci.plugins.casc.Configurator;
 import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.model.CNode;
@@ -38,13 +39,13 @@ public class EnumConfigurator<T extends Enum<T>> extends Configurator<T> {
 
     @Nonnull
     @Override
-    public T configure(CNode config) throws ConfiguratorException {
+    public T configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
         return Enum.valueOf(clazz, config.asScalar().getValue());
     }
 
     @Override
-    public T check(CNode config) throws ConfiguratorException {
-        return configure(config);
+    public T check(CNode config, ConfigurationContext context) throws ConfiguratorException {
+        return configure(config, context);
     }
 
     @CheckForNull

@@ -32,6 +32,7 @@ public interface RootElementConfigurator<T> extends ElementConfigurator<T> {
     /**
      * Retrieve the target component managed by this RootElementConfigurator
      * @return
+     * @param context
      */
-    T getTargetComponent();
+    T getTargetComponent(ConfigurationContext context);
 }

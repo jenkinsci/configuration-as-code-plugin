@@ -7,6 +7,7 @@ import com.michelin.cio.hudson.plugins.rolestrategy.RoleMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import org.jenkinsci.plugins.casc.Attribute;
+import org.jenkinsci.plugins.casc.ConfigurationContext;
 import org.jenkinsci.plugins.casc.Configurator;
 import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.impl.attributes.MultivaluedAttribute;
@@ -44,7 +45,7 @@ public class RoleBasedAuthorizationStrategyConfigurator extends Configurator<Rol
     }
 
     @Override
-    public RoleBasedAuthorizationStrategy configure(CNode config) throws ConfiguratorException {
+    public RoleBasedAuthorizationStrategy configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
         //TODO: API should return a qualified type
         final Configurator<RoleDefinition> roleDefinitionConfigurator =
                 (Configurator<RoleDefinition>) Configurator.lookupOrFail(RoleDefinition.class);
@@ -55,23 +56,23 @@ public class RoleBasedAuthorizationStrategyConfigurator extends Configurator<Rol
         CNode rolesConfig = map.get("roles");
         if (rolesConfig != null) {
             grantedRoles.put(RoleBasedAuthorizationStrategy.GLOBAL,
-                    retrieveRoleMap(rolesConfig, "global", roleDefinitionConfigurator));
+                    retrieveRoleMap(rolesConfig, "global", roleDefinitionConfigurator, context));
             grantedRoles.put(RoleBasedAuthorizationStrategy.PROJECT,
-                    retrieveRoleMap(rolesConfig, "items", roleDefinitionConfigurator));
+                    retrieveRoleMap(rolesConfig, "items", roleDefinitionConfigurator, context));
             grantedRoles.put(RoleBasedAuthorizationStrategy.SLAVE,
-                    retrieveRoleMap(rolesConfig, "agents", roleDefinitionConfigurator));
+                    retrieveRoleMap(rolesConfig, "agents", roleDefinitionConfigurator, context));
         }
         return new RoleBasedAuthorizationStrategy(grantedRoles);
     }
 
     @Override
-    public RoleBasedAuthorizationStrategy check(CNode config) {
+    public RoleBasedAuthorizationStrategy check(CNode config, ConfigurationContext context) {
         // FIXME
         return null;
     }
 
     @Nonnull
-    private static RoleMap retrieveRoleMap(@Nonnull CNode config, @Nonnull String name, Configurator<RoleDefinition> configurator) throws ConfiguratorException {
+    private static RoleMap retrieveRoleMap(@Nonnull CNode config, @Nonnull String name, Configurator<RoleDefinition> configurator, ConfigurationContext context) throws ConfiguratorException {
         Mapping map = config.asMapping();
         final CNode c = map.get(name);
 
@@ -82,7 +83,7 @@ public class RoleBasedAuthorizationStrategyConfigurator extends Configurator<Rol
         }
 
         for (CNode entry : c.asSequence()) {
-            RoleDefinition definition = configurator.configure(entry);
+            RoleDefinition definition = configurator.configure(entry, context);
             resMap.put(definition.getRole(), definition.getAssignments());
         }
 

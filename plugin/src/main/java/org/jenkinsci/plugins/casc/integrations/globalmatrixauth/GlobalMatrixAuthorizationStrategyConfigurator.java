@@ -5,6 +5,7 @@ import hudson.Extension;
 import hudson.security.GlobalMatrixAuthorizationStrategy;
 import hudson.security.Permission;
 import org.jenkinsci.plugins.casc.Attribute;
+import org.jenkinsci.plugins.casc.ConfigurationContext;
 import org.jenkinsci.plugins.casc.Configurator;
 import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.model.CNode;
@@ -45,12 +46,12 @@ public class GlobalMatrixAuthorizationStrategyConfigurator extends Configurator<
     }
 
     @Override
-    public GlobalMatrixAuthorizationStrategy configure(CNode config) throws ConfiguratorException {
+    public GlobalMatrixAuthorizationStrategy configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
         Mapping map = config.asMapping();
         Configurator<GroupPermissionDefinition> permissionConfigurator = Configurator.lookupOrFail(GroupPermissionDefinition.class);
         Map<Permission,Set<String>> grantedPermissions = new HashMap<>();
         for (CNode entry : map.get("grantedPermissions").asSequence()) {
-            GroupPermissionDefinition gpd = permissionConfigurator.configure(entry);
+            GroupPermissionDefinition gpd = permissionConfigurator.configure(entry, context);
             //We transform the linear list to a matrix (Where permission is the key instead)
             gpd.grantPermission(grantedPermissions);
         }
@@ -68,7 +69,7 @@ public class GlobalMatrixAuthorizationStrategyConfigurator extends Configurator<
     }
 
     @Override
-    public GlobalMatrixAuthorizationStrategy check(CNode config) throws ConfiguratorException {
+    public GlobalMatrixAuthorizationStrategy check(CNode config, ConfigurationContext context) throws ConfiguratorException {
         // FIXME
         return null;
     }

@@ -3,6 +3,7 @@ package org.jenkinsci.plugins.casc.plugins;
 import hudson.Extension;
 import hudson.model.UpdateSite;
 import org.jenkinsci.plugins.casc.BaseConfigurator;
+import org.jenkinsci.plugins.casc.ConfigurationContext;
 import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
@@ -26,7 +27,7 @@ public class UpdateSiteConfigurator extends BaseConfigurator<UpdateSite> {
     }
 
     @Override
-    protected UpdateSite instance(Mapping mapping) throws ConfiguratorException {
+    protected UpdateSite instance(Mapping mapping, ConfigurationContext context) throws ConfiguratorException {
         return new UpdateSite(mapping.getScalarValue("id"), mapping.getScalarValue("url"));
     }
 

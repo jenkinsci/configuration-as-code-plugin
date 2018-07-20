@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.casc.impl.configurators;
 
+import org.jenkinsci.plugins.casc.ConfigurationContext;
 import org.jenkinsci.plugins.casc.Configurator;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
@@ -29,7 +30,7 @@ public class DataBoundConfiguratorTest {
         config.put("bar", "true");
         config.put("qix", "123");
         config.put("zot", "DataBoundSetter");
-        final Foo configured = (Foo) Configurator.lookup(Foo.class).configure(config);
+        final Foo configured = (Foo) Configurator.lookup(Foo.class).configure(config, new ConfigurationContext());
         assertEquals("foo", configured.foo);
         assertEquals(true, configured.bar);
         assertEquals(123, configured.qix);

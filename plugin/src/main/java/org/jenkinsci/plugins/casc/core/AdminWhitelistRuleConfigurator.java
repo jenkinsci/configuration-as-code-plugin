@@ -26,7 +26,7 @@ import jenkins.model.Jenkins;
 import jenkins.security.s2m.AdminWhitelistRule;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.BaseConfigurator;
-import org.jenkinsci.plugins.casc.ConfiguratorException;
+import org.jenkinsci.plugins.casc.ConfigurationContext;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
 import org.kohsuke.accmod.Restricted;
@@ -57,7 +57,7 @@ public class AdminWhitelistRuleConfigurator extends BaseConfigurator<AdminWhitel
     }
 
     @Override
-    protected AdminWhitelistRule instance(Mapping mapping) {
+    protected AdminWhitelistRule instance(Mapping mapping, ConfigurationContext context) {
         Injector injector = Jenkins.getInstance().getInjector();
         return injector.getInstance(AdminWhitelistRule.class);
     }

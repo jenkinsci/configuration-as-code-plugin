@@ -3,6 +3,7 @@ package org.jenkinsci.plugins.casc.impl.configurators;
 import hudson.ExtensionList;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.casc.BaseConfigurator;
+import org.jenkinsci.plugins.casc.ConfigurationContext;
 import org.jenkinsci.plugins.casc.Configurator;
 import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.model.CNode;
@@ -35,7 +36,7 @@ public class ExtensionConfigurator<T> extends BaseConfigurator<T> {
     }
 
     @Override
-    protected T instance(Mapping mapping) throws ConfiguratorException {
+    protected T instance(Mapping mapping, ConfigurationContext context) throws ConfiguratorException {
         final ExtensionList<T> list = Jenkins.getInstance().getExtensionList(target);
         if (list.size() != 1) {
             throw new ConfiguratorException("Expected a unique instance of extension "+target);

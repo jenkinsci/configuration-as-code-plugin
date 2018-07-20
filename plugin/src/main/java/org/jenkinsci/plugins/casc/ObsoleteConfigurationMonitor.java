@@ -35,8 +35,8 @@ public class ObsoleteConfigurationMonitor extends AdministrativeMonitor {
         errors.clear();
     }
 
-    public void record(CNode node, String error) {
-        errors.add(new Error(node.getSource(), error));
+    public void record(CNode node, String message) {
+        errors.add(new Error(node.getSource(), message));
     }
 
     public static ObsoleteConfigurationMonitor get() {

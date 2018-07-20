@@ -7,6 +7,7 @@ import hudson.security.SecurityRealm;
 import jenkins.model.Jenkins;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.casc.Attribute;
+import org.jenkinsci.plugins.casc.ConfigurationContext;
 import org.jenkinsci.plugins.casc.Configurator;
 import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.ObsoleteConfigurationMonitor;
@@ -65,7 +66,7 @@ public class HeteroDescribableConfigurator extends Configurator<Describable> {
     }
 
     @Override
-    public Describable configure(CNode config) throws ConfiguratorException {
+    public Describable configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
         String shortname;
         CNode subconfig = null;
         switch (config.getType()) {
@@ -90,12 +91,12 @@ public class HeteroDescribableConfigurator extends Configurator<Describable> {
         Class<? extends Describable> k = findDescribableBySymbol(config, shortname, candidates);
         final Configurator configurator = Configurator.lookup(k);
         if (configurator == null) throw new IllegalStateException("No configurator implementation to manage "+k);
-        return (Describable) configurator.configure(subconfig);
+        return (Describable) configurator.configure(subconfig, context);
     }
 
     @Override
-    public Describable check(CNode config) throws ConfiguratorException {
-        return configure(config);
+    public Describable check(CNode config, ConfigurationContext context) throws ConfiguratorException {
+        return configure(config, context);
     }
 
     private Class findDescribableBySymbol(CNode node, String shortname, List<Descriptor> candidates) {

@@ -4,6 +4,7 @@ import hudson.model.Descriptor;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.BaseConfigurator;
+import org.jenkinsci.plugins.casc.ConfigurationContext;
 import org.jenkinsci.plugins.casc.Configurator;
 import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.impl.attributes.DescribableAttribute;
@@ -58,15 +59,15 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
      * Build a fresh new component based on provided configuration and {@link org.kohsuke.stapler.DataBoundConstructor}
      */
     @Override
-    protected T instance(Mapping config) throws ConfiguratorException {
+    protected T instance(Mapping config, ConfigurationContext context) throws ConfiguratorException {
         final Constructor dataBoundConstructor = getDataBoundConstructor();
-        return tryConstructor((Constructor<T>) dataBoundConstructor, config);
+        return tryConstructor((Constructor<T>) dataBoundConstructor, config, context);
     }
 
     @Nonnull
     @Override
-    public T configure(CNode c) throws ConfiguratorException {
-        T object = super.configure(c);
+    public T configure(CNode c, ConfigurationContext context) throws ConfiguratorException {
+        T object = super.configure(c, context);
 
         for (Method method : target.getMethods()) {
             if (method.getParameterCount() == 0 && method.getAnnotation(PostConstruct.class) != null) {
@@ -81,13 +82,13 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
     }
 
     @Override
-    public T check(CNode config) throws ConfiguratorException {
+    public T check(CNode config, ConfigurationContext context) throws ConfiguratorException {
         // As DataBound objets are replaced in jenkins model we can build one from configuration without side-effets
         // BUT we don't invoke @PostConstruct methods which might un some post-build registration into jenkins APIs.
-        return super.configure(config);
+        return super.configure(config, context);
     }
 
-    private T tryConstructor(Constructor<T> constructor, Mapping config) throws ConfiguratorException {
+    private T tryConstructor(Constructor<T> constructor, Mapping config, ConfigurationContext context) throws ConfiguratorException {
         final Parameter[] parameters = constructor.getParameters();
         final String[] names = ClassDescriptor.loadParameterNames(constructor);
         Object[] args = new Object[names.length];
@@ -109,7 +110,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
 
                         final ArrayList<Object> list = new ArrayList<>();
                         for (CNode o : value.asSequence()) {
-                            list.add(lookup.configure(o));
+                            list.add(lookup.configure(o, context));
                         }
                         args[i] = list;
 
@@ -117,7 +118,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                         final Type pt = parameters[i].getParameterizedType();
                         final Type k = pt != null ? pt : t;
                         final Configurator configurator = Configurator.lookupOrFail(k);
-                        args[i] = configurator.configure(value);
+                        args[i] = configurator.configure(value, context);
                     }
                     logger.info("Setting " + target + "." + names[i] + " = " + (value.isSensitiveData() ? "****" : value));
                 } else if (t.isPrimitive()) {

@@ -7,6 +7,7 @@ import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.BaseConfigurator;
+import org.jenkinsci.plugins.casc.ConfigurationContext;
 import org.jenkinsci.plugins.casc.RootElementConfigurator;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
@@ -56,12 +57,12 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
     }
 
     @Override
-    public GlobalConfigurationCategory getTargetComponent() {
+    public GlobalConfigurationCategory getTargetComponent(ConfigurationContext context) {
         return category;
     }
 
     @Override
-    protected GlobalConfigurationCategory instance(Mapping mapping) {
+    protected GlobalConfigurationCategory instance(Mapping mapping, ConfigurationContext context) {
         return category;
     }
 
