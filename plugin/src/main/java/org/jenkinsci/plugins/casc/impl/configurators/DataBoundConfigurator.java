@@ -162,8 +162,15 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
 
         final Descriptor descriptor = getDescriptor();
         if (descriptor != null) {
-            // detect common pattern DescriptorImpl extends Descriptor<ExtensionPoint>
-            final Type superclass = descriptor.getClass().getGenericSuperclass();
+            // traverse Descriptor's class hierarchy until we found "extends Descriptor<ExtensionPoint>"
+            Class c = descriptor.getClass();
+            Type superclass;
+            do {
+                superclass = c.getGenericSuperclass();
+                c = c.getSuperclass();
+            } while (c != Descriptor.class);
+
+
             if (superclass instanceof ParameterizedType) {
                 final ParameterizedType genericSuperclass = (ParameterizedType) superclass;
                 Type type = genericSuperclass.getActualTypeArguments()[0];
