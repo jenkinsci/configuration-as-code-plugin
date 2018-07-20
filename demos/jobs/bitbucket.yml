@@ -2,7 +2,7 @@ jenkins:
   systemMessage: "Jenkins configured automatically by Jenkins Configuration as Code Plugin\n\n"
 
 jobs:
-  - >
+  - script: >
       organizationFolder('Bitbucket Organization Folder') {
         description("Bitbucket orga folder configured with JCasC")
         displayName('My Project')
