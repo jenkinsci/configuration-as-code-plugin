@@ -568,9 +568,12 @@ public class ConfigurationAsCode extends ManagementLink {
                 .map(Attribute::getType)
                 .map(Configurator::lookup)
                 .filter(Objects::nonNull)
+                .map(Configurator::getConfigurators)
+                .flatMap(Collection::stream)
                 .forEach(configurator -> {
-                    elements.addAll(configurator.getConfigurators());
-                    listElements(elements, configurator.describe());
+                    if (elements.add(configurator)) {
+                        listElements(elements, ((Configurator<?>) configurator).describe());
+                    }
                 });
     }
 
