@@ -8,7 +8,7 @@ jenkins:
     - envVars:
         env:
           - key: FOO
-            value: BAR
+            value: BARZ
 
   clouds:
     - docker:

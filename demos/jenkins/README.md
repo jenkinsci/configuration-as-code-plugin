@@ -15,6 +15,11 @@ jenkins:
   numExecutors: 5
   scmCheckoutRetryCount: 2
   mode: NORMAL
+  globalNodeProperties:
+    - envVars:
+        env:
+          - key: FOO
+            value: BAR
 ```
 
 ### Multiline system message
