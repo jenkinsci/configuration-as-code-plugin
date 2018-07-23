@@ -230,6 +230,10 @@ Here is a list of plugin we have successfully tested to support configuration-as
  - [x] warnings-plugin (>= 4.66) ([details](demos/warnings/README.md))
  - [x] kubernetes plugin ([details](demos/kubernetes/README.md))
  - [ ] more to come soon...
+ 
+### Known compatibility issues
+
+[Plugins compatibility with Jenkins Configuration-as-Code plugin](https://wiki.jenkins.io/display/JENKINS/Plugins+compatibility+with+Jenkins+Configuration-as-Code+plugin) is being used to track known compatibility issues.
 
 ## Jenkins Enhancement Proposal
 
