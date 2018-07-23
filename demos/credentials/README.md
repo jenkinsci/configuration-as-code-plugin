@@ -6,37 +6,28 @@
 ```yaml
 credentials:
   system:
-    ? name: "test.com"
-      description: "test.com domain"
-      specifications:
-        - hostnameSpecification:
-            includes:
-              - "*.test.com"
-    : - usernamePassword:
-          scope:    SYSTEM
-          id:       sudo_password
-          username: root
-          password: ${SUDO_PASSWORD}
-    ? # "global"
-    : - certificate:
-          scope:    SYSTEM
-          id:       ssh_private_key
-          password: ${SSH_KEY_PASSWORD}
-          keyStoreSource: 
-            fileOnMaster:
-              privateKeyFile: /docker/secret/id_rsa
+    domainCredentials:
+      - domain :
+          name: "test.com"
+          description: "test.com domain"
+          specifications:
+            - hostnameSpecification:
+                includes:
+                  - "*.test.com"
+        credentials:
+          - usernamePassword:
+              scope:    SYSTEM
+              id:       sudo_password
+              username: root
+              password: ${SUDO_PASSWORD}
 
 ```
 
 ## implementation note
 
-credentials plugin support relies on a custom adaptor component `CredentialsRootConfigurator`.
+Credentials plugin support relies on a custom adaptor components `CredentialsRootConfigurator` and `SystemCredentialsProviderConfigurator`.
 
-CredentialsStore uses as internal data model a `Map<Domain, List<Credentials>>`, so the yaml syntax (`? `) to define a 
-complex mapping key. In previous sample, a Domain key is configured for `*.test.com` domain. 
-
-Associated to this key, a list of credentials is defined based on hetero-describable symbol name (note the extra indent
-after `usernamePassword` This guy is a single entry map 'usernamePassword' => map of attributes to build target type).
+Global credentials can be registered by just not providing a domain (i.e `null`).
 
 Credentials symbol name is inferred from implementation class simple name: `UsernamePasswordCredentialsImpl`
 descriptor's clazz is `Credentials` 
@@ -50,39 +41,22 @@ A list of some of the more common credentials.
 
 ### SSH Credentials
 
-Example that uses the [SSH credentials plugin](https://plugins.jenkins.io/ssh-credentials)
+Example that uses the [SSH credentials plugin](https://plugins.jenkins.io/ssh-credentials).
+
+As of version 1.14, it is no longer possible to load a ssh key from a file. It has been deprecated due to [CVE-2018-1000601](https://jenkins.io/security/advisory/2018-06-25/#SECURITY-440).
 
 ```yaml
 credentials:
   system:
-    ? name: "test.com"
-      description: "test.com domain"
-      specifications:
-        - hostnameSpecification:
-            includes:
-              - "*.test.com"
-    : - usernamePassword:
-          scope:    SYSTEM
-          id:       sudo_password
-          username: root
-          password: ${SUDO_PASSWORD}
-    ? # "global"
-      - basicSSHUserPrivateKey:
-          scope: SYSTEM
-          id: ssh_with_passprase
-          username: ssh_root
-          passphrase: ${SSH_KEY_PASSWORD}
-          description: "SSH passphrase with private key file"
-          privateKeySource:
-            fileOnMaster:
-              privateKeyFile: /docker/secret/id_rsa_2
-      - basicSSHUserPrivateKey:
-          scope: SYSTEM
-          id: ssh_with_passprase_provided
-          username: ssh_root
-          passphrase: ${SSH_KEY_PASSWORD}
-          description: "SSH passphrase with private key file. Private key provided"
-          privateKeySource:
-            directEntry:
-              privateKey: ${SSH_PRIVATE_KEY}
+    domainCredentials:
+      - credentials:
+          - basicSSHUserPrivateKey:
+              scope: SYSTEM
+              id: ssh_with_passprase_provided
+              username: ssh_root
+              passphrase: ${SSH_KEY_PASSWORD}
+              description: "SSH passphrase with private key file. Private key provided"
+              privateKeySource:
+                directEntry:
+                  privateKey: ${SSH_PRIVATE_KEY}
 ```

@@ -1,0 +1,3 @@
+plugins:
+  required:
+    chucknorris: 1.0

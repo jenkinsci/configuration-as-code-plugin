@@ -1,0 +1,9 @@
+configuration-as-code:
+  version: 1
+  deprecated: warn
+  restricted: warn
+  unknown: warn
+
+jenkins:
+  rawBuildsDir: /tmp
+  doesntexist: foo
