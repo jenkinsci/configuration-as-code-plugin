@@ -19,6 +19,8 @@ Every second Wednesday we meet at JcasC office hours meeting, where we discuss:
 You can join via Hangout on Air link shared 10 minutes before the meeting on our [Gitter](https://gitter.im/jenkinsci/configuration-as-code-plugin) channel.
 If no link is shared we'll use the link from the [invitation](https://calendar.google.com/event?action=TEMPLATE&tmeid=MmdwdTE1cTFvaGw1NGUycGxqdWUwcXExaWFfMjAxODA3MjVUMDcwMDAwWiBld2VAcHJhcW1hLm5ldA&tmsrc=ewe%40praqma.net&scp=ALL).
 
+Minutes of meeting are available [here](https://docs.google.com/document/d/1Hm07Q1egWL6VVAqNgu27bcMnqNZhYJmXKRvknVw4Y84/edit?usp=sharing).
+
 ## Introduction
 
 Setting up Jenkins is a complex process, as both Jenkins and its plugins require some tuning and configuration,
