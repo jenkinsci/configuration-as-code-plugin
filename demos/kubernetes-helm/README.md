@@ -82,6 +82,27 @@ Downloading plugins...
 Downloading plugin: kubernetes from https://updates.jenkins.io/download/plugins/kubernetes/latest/kubernetes.hpi
 Downloading plugin: kubernetes-credentials from https://updates.jenkins.io/download/plugins/kubernetes-credentials/latest/kubernetes-credentials.hpi
 ...
+Installed plugins:
+ace-editor:1.1
+apache-httpcomponents-client-4-api:4.5.5-3.0
+authentication-tokens:1.3
+cloudbees-folder:6.5.1
+config-file-provider:2.18
+configuration-as-code:0.10-alpha
+credentials-binding:1.16
+credentials:2.1.18
+display-url-api:2.2.0
+docker-commons:1.13
+docker-workflow:1.17
+durable-task:1.22
+...
 ```
 
-Done :) 
+Done :)
+
+## Next?
+
+You can extend the Jenkins Helm Chart to make use of a Custom Config map.
+This would enable you to mount in some additional files.
+
+Check [`this`](https://github.com/helm/charts/tree/master/stable/jenkins#custom-configmap) link on how to do so.
