@@ -9,6 +9,16 @@
 
 Release notes of the latest release can be found here: https://wiki.jenkins.io/display/JENKINS/configuration+as+code+plugin
 
+## Jenkins Configuration as Code office hours
+
+Every second Wednesday we meet at JcasC office hours meeting, where we discuss:
+* current issues
+* hot topics
+* plans for the future
+
+You can join via Hangout on Air link shared 10 minutes before the meeting on our [Gitter](https://gitter.im/jenkinsci/configuration-as-code-plugin) channel.
+If no link is shared we'll use the link from the [invitation](https://calendar.google.com/event?action=TEMPLATE&tmeid=MmdwdTE1cTFvaGw1NGUycGxqdWUwcXExaWFfMjAxODA3MjVUMDcwMDAwWiBld2VAcHJhcW1hLm5ldA&tmsrc=ewe%40praqma.net&scp=ALL).
+
 ## Introduction
 
 Setting up Jenkins is a complex process, as both Jenkins and its plugins require some tuning and configuration,
