@@ -20,7 +20,7 @@ If needed, enter the docker container: `docker exec -it library/vault /bin/sh`
 
 Execute the following to put data in vault.
 
-```bash
+```sh
 vault write -address=$VAULT_SERVER_URL secret/jenkins/master \
 AWS_ACCESS_KEY_ID="[Your AWS ACCESS KEY]" \
 AWS_SECRET_ACCESS_KEY="[YOUR AWS SECRET ACCESS KEY]" \
