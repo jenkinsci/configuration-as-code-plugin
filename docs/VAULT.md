@@ -16,7 +16,7 @@ The below example assume that you have the following environment variables:
 - `$VAULT_TOKEN` containing the token to use as access credentials
 - `$VAULT_SERVER_URL` containing the URL to your vault server, i.e. `http://vault.domain.local:8200`
 
-If needed, enter the docker container: `docker exec -it vault /bin/sh`
+If needed, enter the docker container: `docker exec -it library/vault /bin/sh`
 
 Execute the following to put data in vault.
 
