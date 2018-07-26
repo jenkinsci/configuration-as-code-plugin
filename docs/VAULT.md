@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- An instance of [Hashcorps Vault](https://www.vaultproject.io/) running
+- An instance of [Hashicorps Vault](https://www.vaultproject.io/) running
   - Using a docker-based approach is described [here](vault/setup-vault-using-docker.md)
 - A Token (or Username and Password) as credentials for accessing Vault
 
