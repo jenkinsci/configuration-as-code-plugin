@@ -7,7 +7,7 @@ The latest stable helm chart can be found [`here`](https://github.com/helm/chart
 
 To have the latest Version of JCASC installed we need to enable Jenkins to make use of the [`Experimental Update Center`](https://jenkins.io/doc/developer/publishing/releasing-experimental-updates/).
 
-The [`official docker image`](https://github.com/jenkinsci/docker/blob/master/Dockerfile#L60) allows you to specify the experimental update center configuration using ENV variables:  
+The [`Official Jenkins Docker image`](https://github.com/jenkinsci/docker/blob/master/Dockerfile#L60) allows you to specify the experimental update center configuration using ENV variables:  
 
 ```
 ENV JENKINS_UC https://updates.jenkins.io
@@ -61,8 +61,7 @@ Master:
 Now, deploy the Helm chart with those customized values:
 
 ```
-helm install --name jenkins stable/jenkins \
--f values.yml
+helm install --name jenkins stable/jenkins -f values.yml
 ```
 
 Watch the init-container creating the stuff:
