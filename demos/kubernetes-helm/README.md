@@ -101,7 +101,6 @@ Done :)
 
 ## Next?
 
-You can extend the Jenkins Helm Chart to make use of a custom ConfigMap.
-This would enable you to mount in some additional files (like a )
+You can extend the Jenkins Helm Chart to make use of a custom ConfigMap.  
 
-Check [`this`](https://github.com/helm/charts/tree/master/stable/jenkins#custom-configmap) link on how to do so.
+Check the [`custom ConfigMap`](https://github.com/helm/charts/tree/master/stable/jenkins#custom-configmap) section in the Jenkins Helm Chart repo.
