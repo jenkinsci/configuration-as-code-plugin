@@ -8,7 +8,7 @@
 
 ## Put stuff into Vault
 
-Creating content in Vault can be done either using curl (not recommended) og using Vault as a client.
+Creating content in Vault can be done either using curl (not recommended) or using Vault as a client.
 A simple curl example can be found [here](vault/setup-vault-using-docker.md). Use a native vault application whenever possible. They are available for download [here](https://www.vaultproject.io/downloads.html). Using vault via docker requires you to be inside a running vault docker container. Otherwise the steps are the same.
 
 The below example assume that you have the following environment variables:
