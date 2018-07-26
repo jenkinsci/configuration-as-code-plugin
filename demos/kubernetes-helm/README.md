@@ -7,7 +7,7 @@ The latest stable helm chart can be found [`here`](https://github.com/helm/chart
 
 To have the latest Version of JCASC installed we need to enable Jenkins to make use of the [`Experimental Update Center`](https://jenkins.io/doc/developer/publishing/releasing-experimental-updates/).
 
-The [`official docker image`](https://github.com/jenkinsci/docker/blob/master/Dockerfile#L60) provides enabling the Experimental Update Center via ENV vars:  
+The [`official docker image`](https://github.com/jenkinsci/docker/blob/master/Dockerfile#L60) allows you to specify the experimental update center configuration using ENV variables:  
 
 ```
 ENV JENKINS_UC https://updates.jenkins.io
@@ -17,7 +17,7 @@ ENV JENKINS_INCREMENTALS_REPO_MIRROR=https://repo.jenkins-ci.org/incrementals
 
 Now grab a copy of the helm chart [`values file`](https://github.com/helm/charts/blob/master/stable/jenkins/values.yaml) and adjust the Master part a little bit:
 
-```
+```yaml
 Master:
   Name: jenkins-master
   Image: "jenkins/jenkins"
@@ -53,13 +53,12 @@ Master:
       - workflow-job:latest
       - credentials-binding:latest
       - git:latest
-      - configuration-as-code:0.10-alpha       
-...      
+      - configuration-as-code:0.10-alpha            
 ```
 
 ## Installations
 
-Now just deploy the helm chart with those customized values:
+Now, deploy the Helm chart with those customized values:
 
 ```
 helm install --name jenkins stable/jenkins \
@@ -102,7 +101,7 @@ Done :)
 
 ## Next?
 
-You can extend the Jenkins Helm Chart to make use of a Custom Config map.
-This would enable you to mount in some additional files.
+You can extend the Jenkins Helm Chart to make use of a custom ConfigMap.
+This would enable you to mount in some additional files (like a )
 
 Check [`this`](https://github.com/helm/charts/tree/master/stable/jenkins#custom-configmap) link on how to do so.
