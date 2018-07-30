@@ -226,22 +226,8 @@ plugins:
 
 ## Supported plugins
 
-Here is a list of plugin we have successfully tested to support configuration-as-code approach :
-
- - [x] active directory plugin ([details](demos/active-directory/README.md))
- - [x] artifactory plugin ([details](demos/artifactory/README.md))
- - [x] credentials plugin ([details](demos/credentials/README.md))
- - [x] docker plugin ([details](demos/docker/README.md))
- - [x] git plugin ([details](demos/git/README.md))
- - [x] ldap plugin ([details](demos/ldap/README.md))
- - [x] mailer plugin with some limitations ([details](demos/mailer/README.md))
- - [x] tfs plugin with some limitations ([details](demos/tfs/README.md))
- - [x] workflow-cps-global-lib _aka_ "global libraries" ([details](demos/workflow-cps-global-lib/README.md))
- - [x] matrix-auth-plugin ([details](demos/global-matrix-auth/README.md))
- - [ ] role-strategy-plugin ([details](demos/role-strategy-auth/README.md))
- - [x] warnings-plugin (>= 4.66) ([details](demos/warnings/README.md))
- - [x] kubernetes plugin ([details](demos/kubernetes/README.md))
- - [ ] more to come soon...
+Most plugins should be supported out-of-the-box, or maybe require some minimal changes.
+You can check [this dashboard](https://issues.jenkins-ci.org/secure/Dashboard.jspa?selectPageId=17346) for known compatibility issues.
 
 ## Jenkins Enhancement Proposal
 
