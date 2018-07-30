@@ -13,6 +13,7 @@ import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import javax.annotation.CheckForNull;
+import java.util.Collections;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -54,6 +55,10 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
         return attributes;
     }
 
+    @Override
+    protected Set<String> exclusions() {
+        return Collections.singleton("installState");
+    }
 
     @CheckForNull
     @Override

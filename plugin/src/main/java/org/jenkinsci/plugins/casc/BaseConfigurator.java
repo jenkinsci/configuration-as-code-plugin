@@ -26,6 +26,7 @@ import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -48,9 +49,11 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
     public Set<Attribute> describe() {
 
         Set<Attribute> attributes = new HashSet<>();
+        final Set<String> exclusions = exclusions();
 
         for (Field field : getTarget().getFields()) {
             if (Modifier.isFinal(field.getModifiers())) {
+                if (exclusions.contains(field.getName())) continue;
                 if (PersistedList.class.isAssignableFrom(field.getType())) {
                     // see Jenkins#clouds
                     Attribute attribute = detectActualType(field.getName(), TypePair.of(field));
@@ -76,6 +79,7 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
             }
 
             final String name = StringUtils.uncapitalize(methodName.substring(3));
+            if (exclusions.contains(name)) continue;
             logger.log(Level.FINER, "Processing {0} property", name);
 
             Attribute attribute = detectActualType(name, type);
@@ -88,6 +92,13 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
         }
 
         return attributes;
+    }
+
+    /**
+     * Attribute names that are detected by introspection but should be excluded
+     */
+    protected Set<String> exclusions() {
+        return Collections.emptySet();
     }
 
     protected Attribute detectActualType(String name, final TypePair type) {
