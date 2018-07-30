@@ -225,7 +225,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
     private UpdateSite.Plugin getPluginMetadata(UpdateCenter updateCenter, PluginToInstall p) throws ConfiguratorException {
         String url;
         UpdateSite updateSite;
-        if (!Character.isDigit(p.version.charAt(0))) {
+        if (!"latest".equals(p.version) && !Character.isDigit(p.version.charAt(0))) {
             // This is not a version number
             // We also support plain download URL for custom plugins
             url = p.version;
@@ -242,10 +242,14 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
             if (hostedPlugin == null)
                 throw new ConfiguratorException("Can't install " + p + ": " + p.site + " does not host requested plugin");
 
-            final int i = hostedPlugin.url.lastIndexOf(hostedPlugin.version);
-            url = hostedPlugin.url.substring(0, i)
-                    + p.version
-                    + hostedPlugin.url.substring(i + hostedPlugin.version.length());
+            if ("latest".equals(p.version)) {
+                url = hostedPlugin.url;
+            } else {
+                final int i = hostedPlugin.url.lastIndexOf(hostedPlugin.version);
+                url = hostedPlugin.url.substring(0, i)
+                        + p.version
+                        + hostedPlugin.url.substring(i + hostedPlugin.version.length());
+            }
         }
 
         JSONObject json = new JSONObject();
