@@ -159,6 +159,13 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>locale</artifactId>
+      <version>1.4-20180730.163012-2</version>
+      <scope>test</scope>
+    </dependency>
+
 
     <!-- required to satisfy upper bound dependencies -->
 
