@@ -167,7 +167,11 @@ public class Attribute<Owner, Type> {
     }
 
     public CNode describe(Owner instance) throws ConfiguratorException {
-        final Configurator c = Configurator.lookupOrFail(type);
+        final Configurator c = Configurator.lookup(type);
+        if (c == null) {
+            return new Scalar("FAILED TO EXPORT " + instance.getClass().getName()+"#"+name +
+                    ": No configurator found for type " + type);
+        }
         try {
             Object o = getValue(instance);
             if (o == null) {
