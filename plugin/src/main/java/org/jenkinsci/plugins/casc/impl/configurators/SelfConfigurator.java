@@ -1,7 +1,6 @@
 package org.jenkinsci.plugins.casc.impl.configurators;
 
 import hudson.Extension;
-import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.BaseConfigurator;
 import org.jenkinsci.plugins.casc.ConfigurationContext;
 import org.jenkinsci.plugins.casc.RootElementConfigurator;

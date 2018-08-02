@@ -1,6 +1,5 @@
 package org.jenkinsci.plugins.casc;
 
-import org.apache.commons.beanutils.Converter;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.Beta;

@@ -10,7 +10,6 @@ import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import java.io.InputStream;
-import java.util.Collections;
 import java.util.Map;
 
 /**
