@@ -1,5 +1,9 @@
 package org.jenkinsci.plugins.casc;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.ExtensionPoint;
@@ -39,6 +43,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -78,11 +84,11 @@ public abstract class Configurator<T> implements ExtensionPoint, ElementConfigur
      */
     @Nonnull
     public static Configurator lookupOrFail(Type type) throws ConfiguratorException {
-        Configurator cfg = lookup(type);
-        if (cfg == null) {
-            throw new ConfiguratorException("Cannot find configurator for type " + type);
+        try {
+            return cache.get(type);
+        } catch (ExecutionException e) {
+            throw (ConfiguratorException) e.getCause();
         }
-        return cfg;
     }
 
     /**
@@ -92,6 +98,27 @@ public abstract class Configurator<T> implements ExtensionPoint, ElementConfigur
      */
     @CheckForNull
     public static Configurator lookup(Type type) {
+        try {
+            return cache.get(type);
+        } catch (ExecutionException e) {
+            return null;
+        }
+    }
+
+    private static LoadingCache<Type, Configurator> cache = CacheBuilder.newBuilder()
+            .expireAfterAccess(10, TimeUnit.SECONDS)
+            .build(new CacheLoader<Type, Configurator>() {
+        @Override
+        public Configurator load(Type type) throws Exception {
+            final Configurator configurator = internalLookup(type);
+            if (configurator == null) throw new ConfiguratorException("Cannot find configurator for type " + type);
+            return configurator;
+        }
+    });
+
+
+
+    private static Configurator internalLookup(Type type) {
         Class clazz = Types.erasure(type);
 
         final Jenkins jenkins = Jenkins.getInstance();
