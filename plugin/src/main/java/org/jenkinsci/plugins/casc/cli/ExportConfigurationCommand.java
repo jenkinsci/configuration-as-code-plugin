@@ -7,8 +7,6 @@ import org.jenkinsci.plugins.casc.ConfigurationAsCode;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
-import java.io.PrintStream;
-
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
