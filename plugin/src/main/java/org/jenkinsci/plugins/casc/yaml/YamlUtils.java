@@ -1,6 +1,7 @@
 package org.jenkinsci.plugins.casc.yaml;
 
 import org.jenkinsci.plugins.casc.ConfiguratorException;
+import org.jenkinsci.plugins.casc.model.Mapping;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.yaml.snakeyaml.composer.Composer;
@@ -93,5 +94,29 @@ public final class YamlUtils {
                         String.format("Found conflicting configuration at %s %s", source.toString(), node.getStartMark()));
         }
 
+    }
+
+    /**
+     * Load configuration-as-code model from a set of Yaml sources, merging documents
+     */
+    public static Mapping loadFrom(List<YamlSource> sources) throws ConfiguratorException {
+        if (sources.isEmpty()) return Mapping.EMPTY;
+        final Node merged = merge(sources);
+        return loadFrom(merged);
+    }
+
+    /**
+     * Load configuration-as-code model from a snakeyaml Node
+     */
+    private static Mapping loadFrom(Node node) {
+        final ModelConstructor constructor = new ModelConstructor();
+        constructor.setComposer(new Composer(null, null) {
+
+            @Override
+            public Node getSingleNode() {
+                return node;
+            }
+        });
+        return (Mapping) constructor.getSingleData(Mapping.class);
     }
 }

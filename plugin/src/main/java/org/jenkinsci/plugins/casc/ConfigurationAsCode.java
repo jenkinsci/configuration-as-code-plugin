@@ -13,7 +13,6 @@ import org.jenkinsci.plugins.casc.model.Mapping;
 import org.jenkinsci.plugins.casc.model.Scalar;
 import org.jenkinsci.plugins.casc.model.Sequence;
 import org.jenkinsci.plugins.casc.model.Source;
-import org.jenkinsci.plugins.casc.yaml.ModelConstructor;
 import org.jenkinsci.plugins.casc.yaml.YamlSource;
 import org.jenkinsci.plugins.casc.yaml.YamlUtils;
 import org.kohsuke.accmod.Restricted;
@@ -23,7 +22,6 @@ import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.interceptor.RequirePOST;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.composer.Composer;
 import org.yaml.snakeyaml.emitter.Emitter;
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.nodes.MappingNode;
@@ -413,9 +411,7 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     private void configureWith(List<YamlSource> sources) throws ConfiguratorException {
-        if (sources.isEmpty()) return;
-        final Node merged = YamlUtils.merge(sources);
-        final Mapping map = loadAs(merged);
+        final Mapping map = YamlUtils.loadFrom(sources);
         configureWith(map.entrySet());
     }
 
@@ -428,24 +424,9 @@ public class ConfigurationAsCode extends ManagementLink {
 
     private Map<Source, String> checkWith(List<YamlSource> sources) throws ConfiguratorException {
         if (sources.isEmpty()) return null;
-        final Node merged = YamlUtils.merge(sources);
-        final Mapping map = loadAs(merged);
+        final Mapping map = YamlUtils.loadFrom(sources);
         return checkWith(map.entrySet());
     }
-
-
-    private Mapping loadAs(Node node) {
-        final ModelConstructor constructor = new ModelConstructor();
-        constructor.setComposer(new Composer(null, null) {
-
-            @Override
-            public Node getSingleNode() {
-                return node;
-            }
-        });
-        return (Mapping) constructor.getSingleData(Mapping.class);
-    }
-
 
 
     /**
