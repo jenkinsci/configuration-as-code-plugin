@@ -5,8 +5,6 @@ import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.Beta;
 import org.yaml.snakeyaml.nodes.Tag;
 
-import java.io.IOException;
-import java.util.Optional;
 import java.util.stream.IntStream;
 
 /**
@@ -77,32 +75,7 @@ public final class Scalar implements CNode, CharSequence {
 
     @Override
     public String toString() {
-        String s = value;
-        Optional<String> r = SecretSource.requiresReveal(value);
-        if(r.isPresent()) {
-            Optional<String> reveal = Optional.empty();
-            for (SecretSource secretSource : SecretSource.all()) {
-                try {
-                    reveal = secretSource.reveal(r.get());
-                } catch (IOException ex) {
-                    throw new RuntimeException("Cannot reveal secret source for variable with key: " + s, ex);
-                }
-                if(reveal.isPresent()) {
-                    s = reveal.get();
-                    break;
-                }
-            }
-
-            Optional<String> defaultValue = SecretSource.defaultValue(value);
-            if(defaultValue.isPresent() && !reveal.isPresent()) {
-                s = defaultValue.get();
-            }
-
-            if(!reveal.isPresent() && !defaultValue.isPresent()) {
-                throw new RuntimeException("Unable to reveal variable with key: "+s);
-            }
-        }
-        return s;
+        return value;
     }
 
     @Override

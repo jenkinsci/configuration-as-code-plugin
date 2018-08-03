@@ -4,6 +4,7 @@ import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.ConfigurationContext;
 import org.jenkinsci.plugins.casc.Configurator;
 import org.jenkinsci.plugins.casc.ConfiguratorException;
+import org.jenkinsci.plugins.casc.SecretSource;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Scalar;
 import org.kohsuke.accmod.Restricted;
@@ -11,8 +12,10 @@ import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.Stapler;
 
 import javax.annotation.CheckForNull;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -38,7 +41,36 @@ public class PrimitiveConfigurator extends Configurator {
 
     @Override
     public Object configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
-        return Stapler.lookupConverter(target).convert(target, config);
+
+        final String value = config.asScalar().getValue();
+        String s = value;
+        Optional<String> r = SecretSource.requiresReveal(value);
+        if (r.isPresent()) {
+            final String expr = r.get();
+            Optional<String> reveal = Optional.empty();
+            for (SecretSource secretSource : context.getSecretSources()) {
+                try {
+                    reveal = secretSource.reveal(expr);
+                } catch (IOException ex) {
+                    throw new RuntimeException("Cannot reveal secret source for variable with key: " + s, ex);
+                }
+                if (reveal.isPresent()) {
+                    s = reveal.get();
+                    break;
+                }
+            }
+
+            Optional<String> defaultValue = SecretSource.defaultValue(value);
+            if (defaultValue.isPresent() && !reveal.isPresent()) {
+                s = defaultValue.get();
+            }
+
+            if (!reveal.isPresent() && !defaultValue.isPresent()) {
+                throw new RuntimeException("Unable to reveal variable with key: " + s);
+            }
+        }
+
+        return Stapler.lookupConverter(target).convert(target, s);
     }
 
     @Override
