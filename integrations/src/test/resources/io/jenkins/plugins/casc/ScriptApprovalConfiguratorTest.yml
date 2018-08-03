@@ -1,0 +1,5 @@
+scriptApproval:
+  approvedSignatures:
+    - method java.net.URI getHost
+    - method java.net.URI getPort
+    - new java.net.URI java.lang.String
