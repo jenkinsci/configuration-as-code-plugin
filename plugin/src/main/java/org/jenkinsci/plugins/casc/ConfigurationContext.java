@@ -96,6 +96,13 @@ public class ConfigurationContext implements ConfiguratorRegistry {
         return version;
     }
 
+    /**
+     * Get the {@link SecretSource}s used to substitute <code>${XX}</code> test used as yaml values with sensitive data.
+     */
+    public List<SecretSource> getSecretSources() {
+        return SecretSource.all();
+    }
+
     // Once we introduce some breaking change on the model inference mechanism, we will introduce `TWO` and so on
     // And this new mechanism will only get enabled when configuration file uses this version or later
     enum Version { ONE("1");
