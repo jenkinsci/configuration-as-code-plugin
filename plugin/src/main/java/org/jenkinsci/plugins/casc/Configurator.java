@@ -111,6 +111,9 @@ public abstract class Configurator<T> implements ExtensionPoint, ElementConfigur
                 if (actualType instanceof WildcardType) {
                     actualType = ((WildcardType) actualType).getUpperBounds()[0];
                 }
+                if(actualType instanceof ParameterizedType){
+                    actualType = ((ParameterizedType)actualType).getRawType();
+                }
                 if (!(actualType instanceof Class)) {
                     throw new IllegalStateException("Can't handle " + type);
                 }
