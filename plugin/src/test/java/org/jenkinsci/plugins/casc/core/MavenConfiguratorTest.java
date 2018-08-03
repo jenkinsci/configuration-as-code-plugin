@@ -1,6 +1,7 @@
 package org.jenkinsci.plugins.casc.core;
 
 import hudson.tasks.Maven;
+import hudson.tools.InstallSourceProperty;
 import jenkins.mvn.FilePathSettingsProvider;
 import jenkins.mvn.GlobalMavenConfig;
 import jenkins.mvn.SettingsProvider;
@@ -25,6 +26,8 @@ public class MavenConfiguratorTest {
         Assert.assertEquals(1, descriptor.getInstallations().length);
         Assert.assertEquals("/usr/share/maven", descriptor.getInstallations()[0].getHome());
 
+        InstallSourceProperty installSourceProperty = descriptor.getInstallations()[0].getProperties().get(InstallSourceProperty.class);
+        Assert.assertEquals("3.5.0", installSourceProperty.installers.get(Maven.MavenInstaller.class).id);
 
         final SettingsProvider provider = GlobalMavenConfig.get().getSettingsProvider();
         Assert.assertTrue(provider instanceof FilePathSettingsProvider);

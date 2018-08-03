@@ -6,3 +6,8 @@ tool:
     installations:
       - name: maven
         home: /usr/share/maven
+        properties:
+          - installSourceProperty:
+              installers:
+              - mavenInstaller:
+                  id: '3.5.0'
