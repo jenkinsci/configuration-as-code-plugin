@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
+         xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:local="local" xmlns:c="/lib/credentials">
+    <f:section title="Configuration loaded from ">
+         <f:entry title="${%Path or URL:}" field="configurationPath">
+            <f:textbox field="configurationPath" add="Add new path to *.yaml files"/>
+        </f:entry>
+    </f:section>
+</j:jelly>

@@ -2,10 +2,12 @@ package io.jenkins.plugins.casc;
 
 import com.google.common.annotations.VisibleForTesting;
 import hudson.Extension;
+import hudson.Util;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
 import hudson.model.ManagementLink;
 import hudson.remoting.Which;
+import hudson.util.FormValidation;
 import io.jenkins.plugins.casc.impl.DefaultConfiguratorRegistry;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
@@ -14,12 +16,14 @@ import io.jenkins.plugins.casc.model.Sequence;
 import io.jenkins.plugins.casc.model.Source;
 import io.jenkins.plugins.casc.yaml.YamlSource;
 import io.jenkins.plugins.casc.yaml.YamlUtils;
+import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
+import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.interceptor.RequirePOST;
@@ -148,6 +152,54 @@ public class ConfigurationAsCode extends ManagementLink {
         response.sendRedirect("");
     }
 
+    @RequirePOST
+    public void doReplace(StaplerRequest request, StaplerResponse response) throws Exception {
+        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+        String newSource = request.getParameter("_.newSource");
+        File file = new File(newSource);
+        if (file.exists()) {
+            sources = Collections.singletonList(newSource);
+            //TODO: here should be dry run
+            configureWith(getConfigFromSources(getSources()));
+            CasCGlobalConfig config = GlobalConfiguration.all().get(CasCGlobalConfig.class);
+            // TODO: check and clean, is it right place?
+            config.setConfigurationPath(newSource);
+            config.save();
+            LOGGER.log(Level.FINE, "Replace configuration with: " + file.getAbsolutePath());
+        } else {
+            LOGGER.log(Level.FINE, "There is no such source exist, applying default");
+            configure();
+        }
+        response.sendRedirect("");
+    }
+
+    public FormValidation doCheckNewSource(@QueryParameter String newSource){
+        if (Util.fixEmptyAndTrim(newSource) != null && !new File(newSource).exists()) {
+            // Can be a warning instead
+            return FormValidation.error("File does not exist");
+        }
+
+        return FormValidation.ok();
+    }
+
+    private List<YamlSource> getConfigFromSources(List<String> newSources) throws ConfiguratorException {
+        List<YamlSource> ret = new ArrayList<>();
+
+        for (String p : newSources) {
+            if (isSupportedURI(p)) {
+                ret.add(new YamlSource<>(p, YamlSource.READ_FROM_URL));
+            } else {
+                ret.addAll(configs(p).stream()
+                        .map(s -> new YamlSource<>(s, YamlSource.READ_FROM_PATH))
+                        .collect(toList()));
+            }
+        }
+        return ret;
+    }
+
     /**
      * Defaults to use a file in the current working directory with the name 'jenkins.yaml'
      *
@@ -187,14 +239,20 @@ public class ConfigurationAsCode extends ManagementLink {
 
     private List<String> getStandardConfig() {
         List<String> configParameters = getBundledCasCURIs();
-        if (!configParameters.isEmpty()) {
-            LOGGER.log(Level.FINE, "Located bundled config YAMLs: {0}", configParameters);
+        CasCGlobalConfig casc = new CasCGlobalConfig();
+        String cascPath = casc.getConfigurationPath();
+
+        // Prioritization loaded files:
+        if (cascPath != null) {
+            configParameters.add(cascPath);
+            return configParameters;
         }
 
         String configParameter = System.getProperty(
                 CASC_JENKINS_CONFIG_PROPERTY,
                 System.getenv(CASC_JENKINS_CONFIG_ENV)
         );
+
         if (configParameter == null) {
             if (Files.exists(Paths.get(DEFAULT_JENKINS_YAML_PATH))) {
                 configParameter = DEFAULT_JENKINS_YAML_PATH;
