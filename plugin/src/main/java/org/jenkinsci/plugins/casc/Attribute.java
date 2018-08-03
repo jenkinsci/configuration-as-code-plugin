@@ -7,7 +7,7 @@ import org.jenkinsci.plugins.casc.model.Scalar;
 import org.jenkinsci.plugins.casc.model.Sequence;
 import org.kohsuke.accmod.AccessRestriction;
 import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.Beta;
+import org.kohsuke.accmod.restrictions.None;
 import org.kohsuke.stapler.export.Exported;
 
 import java.io.PrintWriter;
@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  * @see Configurator#describe()
  */
-@Restricted(Beta.class)
+@Restricted(None.class /** should be Beta, see #322 */)
 public class Attribute<Owner, Type> {
 
     private final static Logger logger = Logger.getLogger(Attribute.class.getName());

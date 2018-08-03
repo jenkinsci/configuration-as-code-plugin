@@ -11,7 +11,7 @@ import org.jenkinsci.plugins.casc.impl.attributes.DescribableAttribute;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
 import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.Beta;
+import org.kohsuke.accmod.restrictions.None;
 import org.kohsuke.stapler.ClassDescriptor;
 import org.kohsuke.stapler.Stapler;
 
@@ -39,7 +39,7 @@ import static com.google.common.base.Defaults.defaultValue;
  *
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-@Restricted(Beta.class)
+@Restricted(None.class /** should be Beta, see #322 */)
 public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
 
     private final static Logger logger = Logger.getLogger(DataBoundConfigurator.class.getName());

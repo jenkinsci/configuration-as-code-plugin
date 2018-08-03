@@ -2,14 +2,14 @@ package org.jenkinsci.plugins.casc.model;
 
 import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.Beta;
+import org.kohsuke.accmod.restrictions.None;
 
 /**
  * A configuration Node in yaml tree.
  * (We didn't used <em>Node</em> as class name to avoid collision with commonly used Jenkins class hudson.model.Node
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-@Restricted(Beta.class)
+@Restricted(None.class /** should be Beta, see #322 */)
 public interface CNode {
 
     enum Type { MAPPING, SEQUENCE, SCALAR }

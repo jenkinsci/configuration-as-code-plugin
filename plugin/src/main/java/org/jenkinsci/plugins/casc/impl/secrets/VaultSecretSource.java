@@ -6,7 +6,7 @@ import com.bettercloud.vault.VaultException;
 import hudson.Extension;
 import org.jenkinsci.plugins.casc.SecretSource;
 import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.Beta;
+import org.kohsuke.accmod.restrictions.None;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -24,7 +24,7 @@ import java.util.logging.Logger;
  * alongside with CASC_VAULT_PATH and CASC_VAULT_URL
  */
 @Extension
-@Restricted(Beta.class)
+@Restricted(None.class /** should be Beta, see #322 */)
 public class VaultSecretSource extends SecretSource {
 
     private final static Logger LOGGER = Logger.getLogger(VaultSecretSource.class.getName());

@@ -1,14 +1,14 @@
 package org.jenkinsci.plugins.casc.model;
 
 import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.Beta;
+import org.kohsuke.accmod.restrictions.None;
 
 import java.io.Serializable;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-@Restricted(Beta.class)
+@Restricted(None.class /** should be Beta, see #322 */)
 public class Source implements Serializable {
 
     static final long serialVersionUID = 1L;

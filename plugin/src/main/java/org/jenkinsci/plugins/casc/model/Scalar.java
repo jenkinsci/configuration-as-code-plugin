@@ -2,7 +2,7 @@ package org.jenkinsci.plugins.casc.model;
 
 import org.jenkinsci.plugins.casc.SecretSource;
 import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.Beta;
+import org.kohsuke.accmod.restrictions.None;
 import org.yaml.snakeyaml.nodes.Tag;
 
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.util.stream.IntStream;
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-@Restricted(Beta.class)
+@Restricted(None.class /** should be Beta, see #322 */)
 public final class Scalar implements CNode, CharSequence {
 
     private String value;
