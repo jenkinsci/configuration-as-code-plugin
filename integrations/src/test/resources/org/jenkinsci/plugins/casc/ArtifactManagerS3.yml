@@ -1,12 +1,13 @@
 ---
 unclassified:
-  s3blobstoreconfig:
-    container: "${ARTIFACT_MANAGER_S3_BUCKET_NAME}"
-    region: "us-east-1"
-    prefix: "jenkins_data/"
-
-  # JENKINS-52304
   artifactManager:
     artifactManagerFactories:
-      - JCloudsArtifactManagerFactory:
-          provider: s3blobstore
+      - jclouds:
+          provider: s3
+
+aws:
+  awsCredentials:
+    region: "us-east-1"
+  s3:
+    container: "${ARTIFACT_MANAGER_S3_BUCKET_NAME}"
+    prefix: "jenkins_data/"

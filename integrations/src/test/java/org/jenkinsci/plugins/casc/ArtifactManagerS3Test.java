@@ -7,6 +7,7 @@ import hudson.plugins.ec2.AmazonEC2Cloud;
 import hudson.plugins.ec2.SlaveTemplate;
 import hudson.plugins.ec2.UnixData;
 import io.jenkins.plugins.artifact_manager_jclouds.s3.S3BlobStoreConfig;
+import io.jenkins.plugins.aws.global_configuration.CredentialsAwsGlobalConfiguration;
 import jenkins.model.ArtifactManager;
 import jenkins.model.ArtifactManagerFactory;
 import jenkins.model.ArtifactManagerFactoryDescriptor;
@@ -35,7 +36,7 @@ public class ArtifactManagerS3Test {
     @Test
     @ConfiguredWithCode("ArtifactManagerS3.yml")
     public void configure_artifact_manager() throws Exception {
-        assertThat(S3BlobStoreConfig.get().getRegion(), is(equalTo("us-east-1")));
+        assertThat(CredentialsAwsGlobalConfiguration.get().getRegion(), is(equalTo("us-east-1")));
         assertThat(S3BlobStoreConfig.get().getPrefix(), is(equalTo("jenkins_data/")));
 
         final DescriptorExtensionList<ArtifactManagerFactory, ArtifactManagerFactoryDescriptor> artifactManagers = ArtifactManagerFactoryDescriptor.all();
