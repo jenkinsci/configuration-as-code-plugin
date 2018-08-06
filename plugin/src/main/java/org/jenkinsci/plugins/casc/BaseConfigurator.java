@@ -52,7 +52,8 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
         final Set<String> exclusions = exclusions();
 
         for (Field field : getTarget().getFields()) {
-            if (Modifier.isFinal(field.getModifiers())) {
+            final int mod = field.getModifiers();
+            if (Modifier.isFinal(mod) && !Modifier.isTransient(mod)) {
                 if (exclusions.contains(field.getName())) continue;
                 if (PersistedList.class.isAssignableFrom(field.getType())) {
                     // see Jenkins#clouds
