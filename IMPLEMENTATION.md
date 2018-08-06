@@ -6,7 +6,7 @@ to apply the adequate configuration on Jenkins live instance.
 
 ## Configurator
 
-A [`Configurator`](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/src/main/java/org/jenkinsci/plugins/casc/Configurator.java)
+A [`Configurator`](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/plugin/src/main/java/org/jenkinsci/plugins/casc/Configurator.java)
 is managing a specific Jenkins Component, and as such knows
 about data this component exposes to end-user for configuration.
 It has:
@@ -22,7 +22,7 @@ child node in YAML structure based on current node's `Attribute`s, as described 
 ## Root Configurator selection
 
 Root elements are identified by YAML entry name, and a matching
-[`RootElementConfigurator`](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/src/main/java/org/jenkinsci/plugins/casc/RootElementConfigurator.java) is selected.
+[`RootElementConfigurator`](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/plugin/src/main/java/org/jenkinsci/plugins/casc/RootElementConfigurator.java) is selected.
 
 `RootElementConfigurator` is a special interface used to identify a `Configurator` which manages a top level
 configuration element in the yaml document.
@@ -33,7 +33,7 @@ as well as generic `RootElementConfigurator`s to model [global configuration cat
 ### Attributes
 
 Configurator do document the target component by implementing `describe` method. This one do returl a set
-of [`Attribute`](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/src/main/java/org/jenkinsci/plugins/casc/Attribute.java)s
+of [`Attribute`](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/plugin/src/main/java/org/jenkinsci/plugins/casc/Attribute.java)s
 to document both name _AND_ type for a configurable attribute.
 
 We don't want to expose the whole Jenkins Java API to configuration-as-code. Many components do define setter
@@ -62,7 +62,7 @@ custom "glue-code" can also be provided as a (temporary) workaround, or to expos
 which doesn't reflect the internal data model, but better matches the end-user experience.
 
 A typical sample for this scenario is credentials-plugin.
-[CredentialsRootConfigurator](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/src/main/java/org/jenkinsci/plugins/casc/credentials/CredentialsRootConfigurator.java)
+[CredentialsRootConfigurator](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/plugin/src/main/java/org/jenkinsci/plugins/casc/credentials/CredentialsRootConfigurator.java)
 do expose a simplified configuration API for `system` credentials store, which is hardly configurable
 using the other general purpose configuration-as-code component due to internal design of this plugin.
 
@@ -98,5 +98,5 @@ As a short terms workaround, a custom `Configurator` glue-code implementation ca
 
 ## Initial secrets
 
-Initial secrets are handled by the concrete implementations of the [SecretSource](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/src/main/java/org/jenkinsci/plugins/casc/SecretSource.java). In order to implement a new
+Initial secrets are handled by the concrete implementations of the [SecretSource](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/plugin/src/main/java/org/jenkinsci/plugins/casc/SecretSource.java). In order to implement a new
 secret source, subclass `SecretSource` by extending it, and mark the new class with the `@Extension` annotation.
