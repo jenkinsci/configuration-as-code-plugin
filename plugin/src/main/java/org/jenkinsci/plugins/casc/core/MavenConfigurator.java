@@ -21,6 +21,13 @@ import javax.annotation.Nonnull;
 import java.util.Set;
 
 /**
+ *  A mix-in configurator to support both {@link Maven.DescriptorImpl} and {@link GlobalMavenConfig} which both are are
+ *  {@link Descriptor}s for the "tools" category using a conflicting {@link org.jenkinsci.Symbol}.
+ *  <p>
+ *  We can't blame them for this, as the former is a {@link hudson.tasks.BuildStepDescriptor} while the later is a
+ *  {@link GlobalConfiguration}, so from their point of view the symbol is unique for implemented extension point. Just
+ *  we don't distinguish dreived classes from {@link Descriptor} as distinct APIs.
+ *
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Extension
