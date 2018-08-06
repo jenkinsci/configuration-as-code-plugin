@@ -57,10 +57,10 @@ public class HeteroDescribableConfigurator extends Configurator<Describable> {
         return target;
     }
 
-    public List<Configurator> getConfigurators() {
+    public List<Configurator> getConfigurators(ConfigurationContext context) {
         final List<Descriptor> candidates = Jenkins.getInstance().getDescriptorList(target);
         return candidates.stream()
-                .map(d -> Configurator.lookup(d.getKlass().toJavaClass()))
+                .map(d -> context.lookup(d.getKlass().toJavaClass()))
                 .filter(c -> c != null)
                 .collect(Collectors.toList());
     }
@@ -89,7 +89,7 @@ public class HeteroDescribableConfigurator extends Configurator<Describable> {
         final List<Descriptor> candidates = Jenkins.getInstance().getDescriptorList(target);
 
         Class<? extends Describable> k = findDescribableBySymbol(config, shortname, candidates);
-        final Configurator configurator = Configurator.lookup(k);
+        final Configurator configurator = context.lookup(k);
         if (configurator == null) throw new IllegalStateException("No configurator implementation to manage "+k);
         return (Describable) configurator.configure(subconfig, context);
     }
@@ -116,17 +116,6 @@ public class HeteroDescribableConfigurator extends Configurator<Describable> {
                 }
             }
         }
-
-        // Not all Describable classes have symbols, give a chance to custom configurators in standalone plugins
-        // TODO: probably this logic should have a priority over Symbol so that extensions can override it
-        final Configurator c = Configurator.lookupForBaseType(target, shortname);
-        if (c != null) {
-            Class<?> clazz = c.getTarget();
-            if (Describable.class.isAssignableFrom(clazz)) {
-                return clazz;
-            }
-        }
-
         throw new IllegalArgumentException("No "+target.getName()+ " implementation found for "+shortname);
     }
 
@@ -137,10 +126,10 @@ public class HeteroDescribableConfigurator extends Configurator<Describable> {
 
     @CheckForNull
     @Override
-    public CNode describe(Describable instance) throws Exception {
+    public CNode describe(Describable instance, ConfigurationContext context) throws Exception {
         final String symbol = DescribableAttribute.getPreferredSymbol(instance.getDescriptor(), getTarget(), instance.getClass());
-        final Configurator c = Configurator.lookupOrFail(instance.getClass());
-        final CNode describe = c.describe(instance);
+        final Configurator c = context.lookupOrFail(instance.getClass());
+        final CNode describe = c.describe(instance, context);
         if (describe == null) {
             return null;
         }

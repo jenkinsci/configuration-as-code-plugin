@@ -40,8 +40,8 @@ public class SelfConfigurator extends BaseConfigurator<ConfigurationContext> imp
 
     @CheckForNull
     @Override
-    public CNode describe(ConfigurationContext instance) throws Exception {
-        return compare(instance, new ConfigurationContext());
+    public CNode describe(ConfigurationContext instance, ConfigurationContext context) throws Exception {
+        return compare(instance, new ConfigurationContext(null), context);
     }
 }
 

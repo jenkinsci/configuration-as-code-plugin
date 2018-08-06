@@ -73,7 +73,7 @@ public class AdminWhitelistRuleConfigurator extends BaseConfigurator<AdminWhitel
 
     @CheckForNull
     @Override
-    public CNode describe(AdminWhitelistRule instance) {
+    public CNode describe(AdminWhitelistRule instance, ConfigurationContext context) {
         return null; // FIXME
     }
 }

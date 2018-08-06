@@ -34,7 +34,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * a General purpose abstract {@link Configurator} implementation.
+ * a General purpose abstract {@link Configurator} implementation based on introspection.
  * Target component is identified by implementing {@link #instance(Mapping, ConfigurationContext)} then configuration is applied on
  * {@link Attribute}s as defined by {@link #describe()}.
  * This base implementation uses JavaBean convention to identify configurable attributes.
@@ -277,7 +277,7 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
                 }
 
                 final Class k = attribute.getType();
-                final Configurator configurator = Configurator.lookupOrFail(k);
+                final Configurator configurator = context.lookupOrFail(k);
 
                 final Object valueToSet;
                 if (attribute.isMultiple()) {
@@ -320,12 +320,12 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
         }
     }
 
-    protected @Nonnull Mapping compare(T o1, T o2) throws Exception {
+    protected @Nonnull Mapping compare(T o1, T o2, ConfigurationContext context) throws Exception {
 
         Mapping mapping = new Mapping();
         for (Attribute attribute : getAttributes()) {
             if (attribute.equals(o1, o2)) continue;
-            mapping.put(attribute.getName(), attribute.describe(o1));
+            mapping.put(attribute.getName(), attribute.describe(o1, context));
         }
         return mapping;
     }

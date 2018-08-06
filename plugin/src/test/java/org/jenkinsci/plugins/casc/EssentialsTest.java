@@ -3,7 +3,6 @@ package org.jenkinsci.plugins.casc;
 import hudson.ExtensionList;
 import jenkins.metrics.api.MetricsAccessKey;
 import jenkins.model.Jenkins;
-import org.hamcrest.collection.IsCollectionWithSize;
 import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
 import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import org.junit.Rule;
@@ -13,7 +12,7 @@ import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.collection.IsCollectionWithSize.*;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 

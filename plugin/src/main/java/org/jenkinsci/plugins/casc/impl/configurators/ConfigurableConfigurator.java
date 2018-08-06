@@ -59,7 +59,7 @@ public class ConfigurableConfigurator<T extends Configurable> extends Configurat
 
     @CheckForNull
     @Override
-    public CNode describe(T instance) throws Exception {
+    public CNode describe(T instance, ConfigurationContext context) throws Exception {
         return instance.describe();
     }
 }

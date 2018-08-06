@@ -45,10 +45,10 @@ public class SystemCredentialsProviderConfigurator extends BaseConfigurator<Syst
 
     @CheckForNull
     @Override
-    public CNode describe(SystemCredentialsProvider instance) throws Exception {
+    public CNode describe(SystemCredentialsProvider instance, ConfigurationContext context) throws Exception {
         Mapping mapping = new Mapping();
         for (Attribute attribute : describe()) {
-            mapping.put(attribute.getName(), attribute.describe(instance));
+            mapping.put(attribute.getName(), attribute.describe(instance, context));
         }
         return mapping;
     }

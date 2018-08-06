@@ -40,7 +40,7 @@ public class ProjectMatrixAuthorizationStrategyConfigurator extends Configurator
     public ProjectMatrixAuthorizationStrategy configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
         Mapping map = config.asMapping();
         Sequence o = map.get("grantedPermissions").asSequence();
-        Configurator<GroupPermissionDefinition> permissionConfigurator = Configurator.lookupOrFail(GroupPermissionDefinition.class);
+        Configurator<GroupPermissionDefinition> permissionConfigurator = context.lookupOrFail(GroupPermissionDefinition.class);
         Map<Permission,Set<String>> grantedPermissions = new HashMap<>();
         for(CNode entry : o) {
             GroupPermissionDefinition gpd = permissionConfigurator.configure(entry, context);
@@ -72,7 +72,7 @@ public class ProjectMatrixAuthorizationStrategyConfigurator extends Configurator
 
     @CheckForNull
     @Override
-    public CNode describe(ProjectMatrixAuthorizationStrategy instance) {
+    public CNode describe(ProjectMatrixAuthorizationStrategy instance, ConfigurationContext context) {
         // FIXME
         return null;
     }

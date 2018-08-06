@@ -8,6 +8,7 @@ import hudson.model.ManagementLink;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.jenkinsci.plugins.casc.impl.DefaultConfiguratorRegistry;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
 import org.jenkinsci.plugins.casc.model.Scalar;
@@ -34,6 +35,7 @@ import org.yaml.snakeyaml.resolver.Resolver;
 import org.yaml.snakeyaml.serializer.Serializer;
 
 import javax.annotation.CheckForNull;
+import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -93,6 +95,8 @@ public class ConfigurationAsCode extends ManagementLink {
 
     public static final Logger LOGGER = Logger.getLogger(ConfigurationAsCode.class.getName());
 
+    @Inject
+    private DefaultConfiguratorRegistry registry;
 
     @CheckForNull
     @Override
@@ -287,9 +291,9 @@ public class ConfigurationAsCode extends ManagementLink {
 
         final List<NodeTuple> tuples = new ArrayList<>();
 
-        final ConfigurationContext context = new ConfigurationContext();
+        final ConfigurationContext context = new ConfigurationContext(registry);
         for (RootElementConfigurator root : RootElementConfigurator.all()) {
-            final CNode config = root.describe(root.getTargetComponent(context));
+            final CNode config = root.describe(root.getTargetComponent(context), context);
             final Node valueNode = toYaml(config);
             if (valueNode == null) continue;
             tuples.add(new NodeTuple(
@@ -497,17 +501,17 @@ public class ConfigurationAsCode extends ManagementLink {
         }
     }
 
-    private static void configureWith(Set<Map.Entry<String, CNode>> entries) throws ConfiguratorException {
+    private void configureWith(Set<Map.Entry<String, CNode>> entries) throws ConfiguratorException {
         final ObsoleteConfigurationMonitor monitor = ObsoleteConfigurationMonitor.get();
         monitor.reset();
-        ConfigurationContext context = new ConfigurationContext();
+        ConfigurationContext context = new ConfigurationContext(registry);
         context.addListener(monitor::record);
         invokeWith(entries, (configurator, config) -> configurator.configure(config, context));
     }
 
-    public static Map<Source, String> checkWith(Set<Map.Entry<String, CNode>> entries) throws ConfiguratorException {
+    public Map<Source, String> checkWith(Set<Map.Entry<String, CNode>> entries) throws ConfiguratorException {
         Map<Source, String> issues = new HashMap<>();
-        ConfigurationContext context = new ConfigurationContext();
+        ConfigurationContext context = new ConfigurationContext(registry);
         context.addListener( (node,message) -> issues.put(node.getSource(), message) );
         invokeWith(entries, (configurator, config) -> configurator.check(config, context));
         return issues;
@@ -530,9 +534,10 @@ public class ConfigurationAsCode extends ManagementLink {
      */
     public Collection<?> getConfigurators() {
         List<RootElementConfigurator> roots = RootElementConfigurator.all();
+        final ConfigurationContext context = new ConfigurationContext(registry);
         Set<Object> elements = new LinkedHashSet<>(roots);
         for (RootElementConfigurator root : roots) {
-            listElements(elements, root.describe());
+            listElements(elements, root.describe(), context);
         }
         return elements;
     }
@@ -540,20 +545,20 @@ public class ConfigurationAsCode extends ManagementLink {
     /**
      * Recursive configurators tree walk (DFS).
      * Collects all configurators starting from root ones in {@link #getConfigurators()}
-     *
-     * @param elements   linked set (to save order) of visited elements
+     *  @param elements   linked set (to save order) of visited elements
      * @param attributes siblings to find associated configurators and dive to next tree levels
+     * @param context
      */
-    private void listElements(Set<Object> elements, Set<Attribute> attributes) {
+    private void listElements(Set<Object> elements, Set<Attribute> attributes, ConfigurationContext context) {
         attributes.stream()
                 .map(Attribute::getType)
-                .map(Configurator::lookup)
+                .map(context::lookup)
                 .filter(Objects::nonNull)
-                .map(Configurator::getConfigurators)
+                .map((Configurator configurator1) -> configurator1.getConfigurators(context))
                 .flatMap(Collection::stream)
                 .forEach(configurator -> {
                     if (elements.add(configurator)) {
-                        listElements(elements, ((Configurator<?>) configurator).describe());
+                        listElements(elements, ((Configurator<?>) configurator).describe(), context);
                     }
                 });
     }

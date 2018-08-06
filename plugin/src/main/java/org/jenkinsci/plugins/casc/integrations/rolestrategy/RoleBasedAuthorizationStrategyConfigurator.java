@@ -48,7 +48,7 @@ public class RoleBasedAuthorizationStrategyConfigurator extends Configurator<Rol
     public RoleBasedAuthorizationStrategy configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
         //TODO: API should return a qualified type
         final Configurator<RoleDefinition> roleDefinitionConfigurator =
-                (Configurator<RoleDefinition>) Configurator.lookupOrFail(RoleDefinition.class);
+                (Configurator<RoleDefinition>) context.lookupOrFail(RoleDefinition.class);
 
         Mapping map = config.asMapping();
         Map<String, RoleMap> grantedRoles = new HashMap<>();
@@ -102,7 +102,7 @@ public class RoleBasedAuthorizationStrategyConfigurator extends Configurator<Rol
 
     @CheckForNull
     @Override
-    public CNode describe(RoleBasedAuthorizationStrategy instance) {
+    public CNode describe(RoleBasedAuthorizationStrategy instance, ConfigurationContext context) {
         // FIXME
         return null;
     }

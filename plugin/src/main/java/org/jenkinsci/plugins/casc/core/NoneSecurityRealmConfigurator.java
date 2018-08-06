@@ -46,7 +46,7 @@ public class NoneSecurityRealmConfigurator extends Configurator<SecurityRealm> {
 
     @CheckForNull
     @Override
-    public CNode describe(SecurityRealm instance) throws Exception {
+    public CNode describe(SecurityRealm instance, ConfigurationContext context) throws Exception {
         return null;
     }
 

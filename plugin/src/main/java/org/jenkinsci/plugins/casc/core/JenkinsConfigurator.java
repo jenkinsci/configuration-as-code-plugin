@@ -62,12 +62,12 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
 
     @CheckForNull
     @Override
-    public CNode describe(Jenkins instance) throws Exception {
+    public CNode describe(Jenkins instance, ConfigurationContext context) throws Exception {
 
         // we can't generate a fresh new Jenkins object as constructor is mixed with init and check for `theInstance` singleton 
         Mapping mapping = new Mapping();
         for (Attribute attribute : getAttributes()) {
-            mapping.put(attribute.getName(), attribute.describe(instance));
+            mapping.put(attribute.getName(), attribute.describe(instance, context));
         }
         return mapping;
     }

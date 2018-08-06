@@ -1,5 +1,5 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout">
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler">
   <st:contentType value="text/html;charset=UTF-8"/>
   <html><head>
   <style class='anchorjs'></style><link href='https://jenkins.io/assets/bower/bootstrap/css/bootstrap.min.css' media='screen' rel='stylesheet'/>

@@ -33,7 +33,7 @@ public class UpdateSiteConfigurator extends BaseConfigurator<UpdateSite> {
 
     @CheckForNull
     @Override
-    public CNode describe(UpdateSite instance) throws Exception {
+    public CNode describe(UpdateSite instance, ConfigurationContext context) throws Exception {
         final Mapping mapping = new Mapping();
         // TODO would need to compare with hudson.model.UpdateCenter.createDefaultUpdateSite
         // so we return null if default update site is in use.

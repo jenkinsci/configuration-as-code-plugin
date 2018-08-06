@@ -3,6 +3,7 @@ package org.jenkinsci.plugins.casc;
 import hudson.security.AuthorizationStrategy;
 import hudson.security.GlobalMatrixAuthorizationStrategy;
 import jenkins.model.Jenkins;
+import org.jenkinsci.plugins.casc.impl.DefaultConfiguratorRegistry;
 import org.jenkinsci.plugins.casc.integrations.globalmatrixauth.GlobalMatrixAuthorizationStrategyConfigurator;
 import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
 import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
@@ -27,19 +28,11 @@ public class GlobalMatrixAuthorizationTest {
 
     @Test
     public void shouldReturnCustomConfigurator() {
-        Configurator configurator = Configurator.lookup(GlobalMatrixAuthorizationStrategy.class);
+        Configurator configurator = ConfiguratorRegistry.get().lookup(GlobalMatrixAuthorizationStrategy.class);
         assertNotNull("Failed to find configurator for GlobalMatrixAuthorizationStrategy", configurator);
         assertEquals("Retrieved wrong configurator", GlobalMatrixAuthorizationStrategyConfigurator.class, configurator.getClass());
     }
-
-    @Test
-    public void shouldReturnCustomConfiguratorForBaseType() {
-        Configurator c = Configurator.lookupForBaseType(AuthorizationStrategy.class, "globalMatrix");
-        assertNotNull("Failed to find configurator for GlobalMatrixAuthorizationStrategy", c);
-        assertEquals("Retrieved wrong configurator", GlobalMatrixAuthorizationStrategyConfigurator.class, c.getClass());
-        Configurator.lookup(GlobalMatrixAuthorizationStrategy.class);
-    }
-
+    
     @Test
     @ConfiguredWithCode("GlobalMatrixStrategy.yml")
     public void checkCorrectlyConfiguredPermissions() throws Exception {

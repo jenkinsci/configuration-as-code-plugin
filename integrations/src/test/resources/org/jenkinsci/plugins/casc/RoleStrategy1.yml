@@ -1,7 +1,7 @@
 jenkins:
 
   authorizationStrategy:
-    roleStrategy:
+    roleBased:
       roles:
         global:
           - name: "admin"

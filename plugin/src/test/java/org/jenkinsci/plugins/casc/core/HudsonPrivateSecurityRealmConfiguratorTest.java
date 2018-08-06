@@ -4,7 +4,9 @@ import hudson.model.User;
 import hudson.security.FullControlOnceLoggedInAuthorizationStrategy;
 import hudson.security.HudsonPrivateSecurityRealm;
 import jenkins.model.Jenkins;
+import org.jenkinsci.plugins.casc.ConfigurationContext;
 import org.jenkinsci.plugins.casc.Configurator;
+import org.jenkinsci.plugins.casc.ConfiguratorRegistry;
 import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
 import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import org.jenkinsci.plugins.casc.model.CNode;
@@ -36,9 +38,10 @@ public class HudsonPrivateSecurityRealmConfiguratorTest {
         final FullControlOnceLoggedInAuthorizationStrategy authorizationStrategy = (FullControlOnceLoggedInAuthorizationStrategy) jenkins.getAuthorizationStrategy();
         assertTrue(authorizationStrategy.isAllowAnonymousRead());
 
-
-        final Configurator c = Configurator.lookupOrFail(HudsonPrivateSecurityRealm.class);
-        final CNode node = c.describe(securityRealm);
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        ConfigurationContext context = new ConfigurationContext(registry);
+        final Configurator c = context.lookupOrFail(HudsonPrivateSecurityRealm.class);
+        final CNode node = c.describe(securityRealm, context);
         final Mapping user = node.asMapping().get("users").asSequence().get(0).asMapping();
         assertEquals("admin", user.getScalarValue("id"));
     }

@@ -92,7 +92,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
     private void configureProxy(Mapping map, Jenkins jenkins, ConfigurationContext context) throws ConfiguratorException {
         final CNode proxy = map.get("proxy");
         if (proxy != null) {
-            Configurator<ProxyConfiguration> pc = Configurator.lookup(ProxyConfiguration.class);
+            Configurator<ProxyConfiguration> pc = context.lookup(ProxyConfiguration.class);
             if (pc == null) throw new ConfiguratorException("ProxyConfiguration not well registered");
             ProxyConfiguration pcc = pc.configure(proxy, context);
             jenkins.proxy = pcc;
@@ -103,7 +103,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
         final CNode sites = map.get("sites");
         final UpdateCenter updateCenter = jenkins.getUpdateCenter();
         if (sites != null) {
-            Configurator<UpdateSite> usc = Configurator.lookup(UpdateSite.class);
+            Configurator<UpdateSite> usc = context.lookup(UpdateSite.class);
             List<UpdateSite> updateSites = new ArrayList<>();
             for (CNode data : sites.asSequence()) {
                 UpdateSite in = usc.configure(data, context);
@@ -328,17 +328,17 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
 
     @CheckForNull
     @Override
-    public CNode describe(PluginManager instance) throws Exception {
+    public CNode describe(PluginManager instance, ConfigurationContext context) throws Exception {
         final Mapping mapping = new Mapping();
-        final Configurator cp = Configurator.lookupOrFail(ProxyConfiguration.class);
+        final Configurator cp = context.lookupOrFail(ProxyConfiguration.class);
         final ProxyConfiguration proxy = Jenkins.getInstance().proxy;
         if (proxy != null) {
-            mapping.putIfNotNull("proxy", cp.describe(proxy));
+            mapping.putIfNotNull("proxy", cp.describe(proxy, context));
         }
         Sequence seq = new Sequence();
-        final Configurator cs = Configurator.lookupOrFail(UpdateSite.class);
+        final Configurator cs = context.lookupOrFail(UpdateSite.class);
         for (UpdateSite site : Jenkins.getInstance().getUpdateCenter().getSiteList()) {
-            seq.add(cs.describe(site));
+            seq.add(cs.describe(site, context));
         }
         mapping.putIfNotEmpry("sites", seq);
         return mapping;

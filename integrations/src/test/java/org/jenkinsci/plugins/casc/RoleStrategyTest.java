@@ -9,6 +9,7 @@ import hudson.model.Item;
 import hudson.model.User;
 import hudson.security.AuthorizationStrategy;
 import jenkins.model.Jenkins;
+import org.jenkinsci.plugins.casc.impl.DefaultConfiguratorRegistry;
 import org.jenkinsci.plugins.casc.integrations.rolestrategy.RoleBasedAuthorizationStrategyConfigurator;
 import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
 import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
@@ -36,19 +37,9 @@ public class RoleStrategyTest {
 
     @Test
     public void shouldReturnCustomConfigurator() {
-        Configurator c = Configurator.lookup(RoleBasedAuthorizationStrategy.class);
+        Configurator c = ConfiguratorRegistry.get().lookup(RoleBasedAuthorizationStrategy.class);
         assertNotNull("Failed to find configurator for RoleBasedAuthorizationStrategy", c);
         assertEquals("Retrieved wrong configurator", RoleBasedAuthorizationStrategyConfigurator.class, c.getClass());
-    }
-
-    @Test
-    @Issue("Issue #59")
-    public void shouldReturnCustomConfiguratorForBaseType() {
-        Configurator c = Configurator.lookupForBaseType(AuthorizationStrategy.class, "roleStrategy");
-        assertNotNull("Failed to find configurator for RoleBasedAuthorizationStrategy", c);
-        assertEquals("Retrieved wrong configurator", RoleBasedAuthorizationStrategyConfigurator.class, c.getClass());
-
-        Configurator.lookup(RoleBasedAuthorizationStrategy.class);
     }
 
     @Test

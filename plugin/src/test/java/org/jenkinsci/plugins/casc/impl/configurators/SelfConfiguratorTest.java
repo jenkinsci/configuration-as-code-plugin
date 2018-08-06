@@ -1,8 +1,6 @@
 package org.jenkinsci.plugins.casc.impl.configurators;
 
 import jenkins.model.Jenkins;
-import org.jenkinsci.plugins.casc.ConfigurationAsCode;
-import org.jenkinsci.plugins.casc.ConfigurationContext;
 import org.jenkinsci.plugins.casc.ConfiguratorException;
 import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
 import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;

@@ -13,6 +13,7 @@ import org.jenkinsci.plugins.casc.model.Mapping;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.Beta;
 import org.kohsuke.stapler.ClassDescriptor;
+import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.Stapler;
 
 import javax.annotation.CheckForNull;
@@ -48,6 +49,15 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
 
     public DataBoundConfigurator(Class<T> clazz) {
         this.target = clazz;
+    }
+
+    @CheckForNull
+    public static Constructor getDataBoundConstructor(@Nonnull Class type) {
+        for (Constructor c : type.getConstructors()) {
+            if (c.getAnnotation(DataBoundConstructor.class) != null) return c;
+        }
+        return null;
+
     }
 
     @Override
@@ -106,7 +116,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                 if (value != null) {
                     if (Collection.class.isAssignableFrom(t)) {
                         final Type pt = parameters[i].getParameterizedType();
-                        final Configurator lookup = Configurator.lookupOrFail(pt);
+                        final Configurator lookup = context.lookupOrFail(pt);
 
                         final ArrayList<Object> list = new ArrayList<>();
                         for (CNode o : value.asSequence()) {
@@ -117,7 +127,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                     } else {
                         final Type pt = parameters[i].getParameterizedType();
                         final Type k = pt != null ? pt : t;
-                        final Configurator configurator = Configurator.lookupOrFail(k);
+                        final Configurator configurator = context.lookupOrFail(k);
                         args[i] = configurator.configure(value, context);
                     }
                     logger.info("Setting " + target + "." + names[i] + " = " + (value.isSensitiveData() ? "****" : value));
@@ -208,7 +218,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
 
     @CheckForNull
     @Override
-    public CNode describe(T instance) throws Exception {
+    public CNode describe(T instance, ConfigurationContext context) throws Exception {
 
         // Here we assume a correctly designed DataBound Object will have required attributes set by DataBoundConstructor
         // and all others using DataBoundSetters. So constructor parameters for sure are part of the description, others
@@ -234,13 +244,13 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
         T ref = (T) constructor.newInstance(args);
 
         // compare instance with this "default" object
-        Mapping mapping = compare(instance, ref);
+        Mapping mapping = compare(instance, ref, context);
 
         // add constructor parameters
         for (int i = 0; i < parameters.length; i++) {
-            final Configurator c = Configurator.lookup(attributes[i].getType());
+            final Configurator c = context.lookup(attributes[i].getType());
             if (args[i] == null) continue;
-            mapping.put(names[i], attributes[i].describe(instance));
+            mapping.put(names[i], attributes[i].describe(instance, context));
         }
 
         return mapping.isEmpty() ? null : mapping;

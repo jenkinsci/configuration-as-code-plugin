@@ -83,6 +83,6 @@ public interface ElementConfigurator<T> {
      * Only export attributes which are <b>not</b> set to default value.
      */
     @CheckForNull
-    CNode describe(T instance) throws Exception;
+    CNode describe(T instance, ConfigurationContext context) throws Exception;
 
 }
