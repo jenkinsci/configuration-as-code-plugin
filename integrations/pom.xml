@@ -13,12 +13,19 @@
 
   <properties>
     <jenkins.version>2.121.1</jenkins.version> <!-- For artifact-manager-S3. Remove when parent base is updated. -->
+    <maven.deploy.skip>true</maven.deploy.skip> <!-- no need to be deployed during release, this is a test-only module -->
   </properties>
 
   <dependencies>
     <dependency>
       <groupId>io.jenkins</groupId>
       <artifactId>configuration-as-code</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.jenkins.configuration-as-code</groupId>
+      <artifactId>configuration-as-code-support</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -33,6 +40,13 @@
       <groupId>com.github.stefanbirkner</groupId>
       <artifactId>system-rules</artifactId>
       <version>1.17.1</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>metrics</artifactId>
+      <version>3.1.2.12</version>
       <scope>test</scope>
     </dependency>
 
@@ -187,6 +201,35 @@
       <version>1.0</version>
       <scope>test</scope>
     </dependency>
+
+
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>cloudbees-folder</artifactId>
+      <version>6.1.2</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>ssh-credentials</artifactId>
+      <version>1.13</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>job-dsl</artifactId>
+      <version>1.66</version>
+      <optional>true</optional>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.groovy</groupId>
+          <artifactId>groovy-all</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
     <!-- required to satisfy upper bound dependencies -->
 
     <dependency>

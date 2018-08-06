@@ -15,6 +15,7 @@
   <modules>
     <module>plugin</module>
     <module>integrations</module>
+    <module>support</module>
   </modules>
 
   <properties>

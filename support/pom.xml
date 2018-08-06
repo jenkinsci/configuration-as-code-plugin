@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <parent>
+    <artifactId>parent</artifactId>
+    <groupId>io.jenkins.configuration-as-code</groupId>
+    <version>${revision}${changelist}</version>
+    <relativePath>..</relativePath>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>configuration-as-code-support</artifactId>
+  <packaging>hpi</packaging>
+  <description>Custom configurator to support third-party plugins</description>
+  <!-- This is an incubator for code we expect to get hosted by target plugins -->
+
+  <properties>
+    <useBeta>true</useBeta>
+    <access-modifier-checker.skip>true</access-modifier-checker.skip>
+  </properties>
+
+
+  <dependencies>
+
+    <dependency>
+      <groupId>io.jenkins</groupId>
+      <artifactId>configuration-as-code</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- custom configurators -->
+    
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>credentials</artifactId>
+      <version>2.1.16</version>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>job-dsl</artifactId>
+      <version>1.66</version>
+      <optional>true</optional>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.groovy</groupId>
+          <artifactId>groovy-all</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>role-strategy</artifactId>
+      <version>2.7.0</version>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>matrix-auth</artifactId>
+      <version>2.3</version>
+      <optional>true</optional>
+    </dependency>
+
+    
+  </dependencies>
+
+</project>

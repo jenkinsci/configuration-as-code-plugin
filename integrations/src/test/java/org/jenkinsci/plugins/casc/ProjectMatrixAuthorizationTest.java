@@ -1,12 +1,7 @@
 package org.jenkinsci.plugins.casc;
 
-import hudson.security.AuthorizationStrategy;
 import hudson.security.ProjectMatrixAuthorizationStrategy;
 import jenkins.model.Jenkins;
-import org.jenkinsci.plugins.casc.impl.DefaultConfiguratorRegistry;
-import org.jenkinsci.plugins.casc.impl.attributes.DescribableAttribute;
-import org.jenkinsci.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
-import org.jenkinsci.plugins.casc.integrations.projectmatriaxauth.ProjectMatrixAuthorizationStrategyConfigurator;
 import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
 import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import org.junit.Rule;
@@ -16,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by mads on 2/22/18.
@@ -25,13 +19,6 @@ public class ProjectMatrixAuthorizationTest {
 
     @Rule
     public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
-
-    @Test
-    public void shouldReturnCustomConfigurator() {
-        Configurator configurator = ConfiguratorRegistry.get().lookup(ProjectMatrixAuthorizationStrategy.class);
-        assertNotNull("Failed to find configurator for GlobalMatrixAuthorizationStrategy", configurator);
-        assertEquals("Retrieved wrong configurator", ProjectMatrixAuthorizationStrategyConfigurator.class, configurator.getClass());
-    }
 
     @Test
     @ConfiguredWithCode("ProjectMatrixStrategy.yml")

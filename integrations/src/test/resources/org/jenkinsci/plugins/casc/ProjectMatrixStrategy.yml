@@ -14,10 +14,6 @@ jenkins:
   authorizationStrategy:
     projectMatrix:
       grantedPermissions:
-        - name: "anonymous"
-          permissions:
-           - "Overall/Read"
-        - name: "authenticated"
-          permissions:
-           - "Overall/Administer"
+        - "Overall/Read:anonymous"
+        - "Overall/Administer:authenticated"
 
