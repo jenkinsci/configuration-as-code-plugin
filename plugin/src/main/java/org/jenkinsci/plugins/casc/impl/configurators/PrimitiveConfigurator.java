@@ -48,7 +48,7 @@ public class PrimitiveConfigurator extends Configurator {
 
     @CheckForNull
     @Override
-    public CNode describe(Object instance) {
+    public CNode describe(Object instance, ConfigurationContext context) {
 
         if (instance == null) return null;
 
@@ -66,7 +66,7 @@ public class PrimitiveConfigurator extends Configurator {
     }
 
     @Override
-    public List<Configurator> getConfigurators() {
+    public List<Configurator> getConfigurators(ConfigurationContext context) {
         return Collections.EMPTY_LIST;
     }
 }

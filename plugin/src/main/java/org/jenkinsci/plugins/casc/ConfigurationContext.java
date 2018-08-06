@@ -5,7 +5,9 @@ import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.Beta;
 import org.kohsuke.stapler.Stapler;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,13 +16,19 @@ import java.util.List;
  */
 @Restricted(Beta.class)
 // @Restricted(Beta.class)
-public class ConfigurationContext {
+public class ConfigurationContext implements ConfiguratorRegistry {
 
     private Deprecation deprecation = Deprecation.reject;
     private Restriction restriction = Restriction.reject;
     private Unknown unknown = Unknown.reject;
 
-    private List<Listener> listeners = new ArrayList<>();
+    private transient List<Listener> listeners = new ArrayList<>();
+
+    private transient final ConfiguratorRegistry registry;
+
+    public ConfigurationContext(ConfiguratorRegistry registry) {
+        this.registry = registry;
+    }
 
     public void addListener(Listener listener) {
         listeners.add(listener);
@@ -50,6 +58,27 @@ public class ConfigurationContext {
         this.unknown = unknown;
     }
 
+
+    // --- delegate methods for ConfigurationContext
+
+
+    @Override
+    @CheckForNull
+    public RootElementConfigurator lookupRootElement(String name) {
+        return registry.lookupRootElement(name);
+    }
+
+    @Override
+    @Nonnull
+    public Configurator lookupOrFail(Type type) throws ConfiguratorException {
+        return registry.lookupOrFail(type);
+    }
+
+    @Override
+    @CheckForNull
+    public Configurator lookup(Type type) {
+        return registry.lookup(type);
+    }
 
     /**
      * the model-introspection model to be applied by configuration-as-code.

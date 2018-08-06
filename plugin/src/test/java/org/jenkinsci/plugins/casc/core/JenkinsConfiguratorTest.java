@@ -5,7 +5,6 @@ import hudson.model.TaskListener;
 import hudson.security.AuthorizationStrategy;
 import hudson.security.FullControlOnceLoggedInAuthorizationStrategy;
 import hudson.security.HudsonPrivateSecurityRealm;
-import hudson.slaves.EnvironmentVariablesNodeProperty;
 import hudson.slaves.NodeProperty;
 import hudson.slaves.NodePropertyDescriptor;
 import hudson.util.DescribableList;
@@ -13,17 +12,14 @@ import jenkins.model.Jenkins;
 import org.hamcrest.CoreMatchers;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.Configurator;
+import org.jenkinsci.plugins.casc.ConfiguratorRegistry;
 import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
 import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -53,7 +49,8 @@ public class JenkinsConfiguratorTest {
     @Test
     @Issue("Issue #60")
     public void shouldHaveAuthStrategyConfigurator() throws Exception {
-        Configurator c = Configurator.lookup(Jenkins.class);
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        Configurator c = registry.lookup(Jenkins.class);
         Attribute attr = c.getAttribute("authorizationStrategy");
         assertNotNull(attr);
         // Apparently Java always thinks that labmdas are equal

@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.casc.impl.configurators;
 
 import org.jenkinsci.plugins.casc.ConfigurationContext;
 import org.jenkinsci.plugins.casc.Configurator;
+import org.jenkinsci.plugins.casc.ConfiguratorRegistry;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
 import org.junit.Rule;
@@ -30,7 +31,8 @@ public class DataBoundConfiguratorTest {
         config.put("bar", "true");
         config.put("qix", "123");
         config.put("zot", "DataBoundSetter");
-        final Foo configured = (Foo) Configurator.lookup(Foo.class).configure(config, new ConfigurationContext());
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        final Foo configured = (Foo) registry.lookup(Foo.class).configure(config, new ConfigurationContext(registry));
         assertEquals("foo", configured.foo);
         assertEquals(true, configured.bar);
         assertEquals(123, configured.qix);
@@ -43,8 +45,10 @@ public class DataBoundConfiguratorTest {
     public void exportYaml() throws Exception {
         Foo foo = new Foo("foo", true, 42);
         foo.setZot("zot");
-        final Configurator c = Configurator.lookup(Foo.class);
-        final CNode node = c.describe(foo);
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        final Configurator c = registry.lookup(Foo.class);
+        final ConfigurationContext context = new ConfigurationContext(registry);
+        final CNode node = c.describe(foo, context);
         assertNotNull(node);
         assertTrue(node instanceof Mapping);
         Mapping map = (Mapping) node;

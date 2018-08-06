@@ -3,12 +3,15 @@ package org.jenkinsci.plugins.casc.plugins;
 import hudson.Plugin;
 import org.jenkinsci.plugins.casc.ConfigurationAsCode;
 import org.jenkinsci.plugins.casc.ConfigurationContext;
+import org.jenkinsci.plugins.casc.ConfiguratorRegistry;
 import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
 import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
 import org.jenkinsci.plugins.casc.model.Sequence;
-import org.junit.*;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
 import org.yaml.snakeyaml.nodes.Node;
 
 import java.io.IOException;
@@ -25,8 +28,6 @@ public class PluginManagerConfiguratorTest {
     @Rule
     public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 
-    public final ConfigurationContext context = new ConfigurationContext();
-
     @Test
     @Ignore //TODO: This needs to be re-enabled once we can actually dynamically load plugins
     @ConfiguredWithCode("PluginManagerConfiguratorTest.yml")
@@ -39,7 +40,9 @@ public class PluginManagerConfiguratorTest {
     @Test
     public void describeDefaultConfig() throws Exception {
         final PluginManagerConfigurator root = getPluginManagerConfigurator();
-        final CNode node = root.describe(root.getTargetComponent(context));
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        ConfigurationContext context = new ConfigurationContext(registry);
+        final CNode node = root.describe(root.getTargetComponent(context), context);
         assertNotNull(node);
         assertTrue(node instanceof Mapping);
         final Object sites = ((Mapping) node).get("sites");
@@ -57,7 +60,9 @@ public class PluginManagerConfiguratorTest {
     @ConfiguredWithCode("ProxyConfigTest.yml")
     public void describeProxyConfig() throws Exception {
         final PluginManagerConfigurator root = getPluginManagerConfigurator();
-        final CNode configNode = root.describe(root.getTargetComponent(context));
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        ConfigurationContext context = new ConfigurationContext(registry);
+        final CNode configNode = root.describe(root.getTargetComponent(context), context);
         ((Mapping) configNode).remove("sites");
         final String yamlConfig = toYamlString(configNode);
         assertEquals(String.join("\n",

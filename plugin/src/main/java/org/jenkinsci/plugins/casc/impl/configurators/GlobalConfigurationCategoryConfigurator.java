@@ -78,20 +78,20 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
 
     @CheckForNull
     @Override
-    public CNode describe(GlobalConfigurationCategory instance) {
+    public CNode describe(GlobalConfigurationCategory instance, ConfigurationContext context) {
 
         final Mapping mapping = new Mapping();
         Jenkins.getInstance().getExtensionList(Descriptor.class).stream()
             .filter(d -> d.getCategory() == category)
             .filter(d -> d.getGlobalConfigPage() != null)
-            .forEach(d -> describe(d, mapping));
+            .forEach(d -> describe(d, mapping, context));
         return mapping;
     }
 
-    private void describe(Descriptor d, Mapping mapping) {
+    private void describe(Descriptor d, Mapping mapping, ConfigurationContext context) {
         final DescriptorConfigurator c = new DescriptorConfigurator(d);
         try {
-            final CNode node = c.describe(d);
+            final CNode node = c.describe(d, context);
             if (node != null) mapping.put(c.getName(), node);
         } catch (Exception e) {
             final StringWriter w = new StringWriter();

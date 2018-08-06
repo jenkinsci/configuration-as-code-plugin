@@ -1,50 +1,23 @@
 package org.jenkinsci.plugins.casc;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import hudson.Extension;
-import hudson.ExtensionList;
 import hudson.ExtensionPoint;
-import hudson.model.Describable;
-import hudson.model.Descriptor;
 import hudson.remoting.Which;
-import jenkins.model.Jenkins;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
-import org.jenkinsci.plugins.casc.impl.configurators.ConfigurableConfigurator;
-import org.jenkinsci.plugins.casc.impl.configurators.DataBoundConfigurator;
-import org.jenkinsci.plugins.casc.impl.configurators.DescriptorConfigurator;
-import org.jenkinsci.plugins.casc.impl.configurators.EnumConfigurator;
-import org.jenkinsci.plugins.casc.impl.configurators.ExtensionConfigurator;
-import org.jenkinsci.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
-import org.jenkinsci.plugins.casc.impl.configurators.PrimitiveConfigurator;
 import org.jenkinsci.plugins.casc.model.CNode;
-import org.jvnet.tiger_types.Types;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.Beta;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.lang.Klass;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.WildcardType;
 import java.net.URL;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -66,148 +39,22 @@ public abstract class Configurator<T> implements ExtensionPoint, ElementConfigur
 
     private final static Logger logger = Logger.getLogger(Configurator.class.getName());
 
-    @CheckForNull
-    public static RootElementConfigurator lookupRootElement(String name) {
-        for (RootElementConfigurator c : RootElementConfigurator.all()) {
-            if (c.getName().equalsIgnoreCase(name)) {
-                return c;
-            }
-        }
-        return null;
-    }
-
     /**
-     * Looks for a configurator for exact type.
-     * @param type Type
-     * @return Configurator
-     * @throws ConfiguratorException Configurator is not found
+     *
+     * @return the list of Configurator to be considered so one can fully configure this component.
+     * Typically, an extension point with multiple implementations will return Configurators for available implementations.
+     * @param context
      */
     @Nonnull
-    public static Configurator lookupOrFail(Type type) throws ConfiguratorException {
-        try {
-            return cache.get(type);
-        } catch (ExecutionException e) {
-            throw (ConfiguratorException) e.getCause();
-        }
+    public List<Configurator> getConfigurators(ConfigurationContext context) {
+        return Collections.singletonList(this);
     }
 
-    /**
-     * Looks for a configurator for exact type.
-     * @param type Type
-     * @return Configurator or {@code null} if it is not found
-     */
-    @CheckForNull
-    public static Configurator lookup(Type type) {
-        try {
-            return cache.get(type);
-        } catch (ExecutionException e) {
-            return null;
-        }
-    }
-
-    private static LoadingCache<Type, Configurator> cache = CacheBuilder.newBuilder()
-            .expireAfterAccess(10, TimeUnit.SECONDS)
-            .build(new CacheLoader<Type, Configurator>() {
-        @Override
-        public Configurator load(Type type) throws Exception {
-            final Configurator configurator = internalLookup(type);
-            if (configurator == null) throw new ConfiguratorException("Cannot find configurator for type " + type);
-            return configurator;
-        }
-    });
-
-
-
-    private static Configurator internalLookup(Type type) {
-        Class clazz = Types.erasure(type);
-
-        final Jenkins jenkins = Jenkins.getInstance();
-        final ExtensionList<Configurator> l = jenkins.getExtensionList(Configurator.class);
-        for (Configurator c : l) {
-            if (c.match(clazz)) {
-                // this type has a dedicated Configurator implementation
-                return c;
-            }
-        }
-
-        if (Collection.class.isAssignableFrom(clazz)) {
-            //TODO: Only try to cast if we can actually get the parameterized type
-            if (type instanceof ParameterizedType) {
-                ParameterizedType pt = (ParameterizedType) type;
-                Type actualType = pt.getActualTypeArguments()[0];
-                if (actualType instanceof WildcardType) {
-                    actualType = ((WildcardType) actualType).getUpperBounds()[0];
-                }
-                if(actualType instanceof ParameterizedType){
-                    actualType = ((ParameterizedType)actualType).getRawType();
-                }
-                if (!(actualType instanceof Class)) {
-                    throw new IllegalStateException("Can't handle " + type);
-                }
-                return lookup(actualType);
-            }
-        }
-
-        if (Configurable.class.isAssignableFrom(clazz)) {
-            return new ConfigurableConfigurator(clazz);
-        }
-
-        if (Descriptor.class.isAssignableFrom(clazz)) {
-            return new DescriptorConfigurator((Descriptor) jenkins.getExtensionList(clazz).get(0));
-        }
-
-        if (getDataBoundConstructor(clazz) != null) {
-            return new DataBoundConfigurator(clazz);
-        }
-
-        if (Modifier.isAbstract(clazz.getModifiers()) && Describable.class.isAssignableFrom(clazz)) {
-            // this is a jenkins Describable component, with various implementations
-            return new HeteroDescribableConfigurator(clazz);
-        }
-        
-        if (Extension.class.isAssignableFrom(clazz)) {
-            return new ExtensionConfigurator(clazz);
-        }
-
-        if (Stapler.lookupConverter(clazz) != null) {
-            return new PrimitiveConfigurator(clazz);
-        }
-
-        if (clazz.isEnum()) {
-            return new EnumConfigurator(clazz);
-        }
-
-        logger.warning("Configuration-as-Code can't handle type "+ type);
-        return null;
-    }
-
-    /**
-     * Finds a Configurator for base type and a short name
-     * @param clazz Base class
-     * @param shortname Short name of the implementation
-     * @return Configurator
-     */
-    @CheckForNull
-    public static Configurator lookupForBaseType(Class<?> clazz, @Nonnull String shortname) {
-        final Jenkins jenkins = Jenkins.getInstance();
-        final ExtensionList<Configurator> l = jenkins.getExtensionList(Configurator.class);
-        for (Configurator c : l) {
-            if (shortname.equalsIgnoreCase(c.getName())) { // short name match, ensure that the type is compliant
-                if (clazz.isAssignableFrom(c.getTarget())) { // Implements child class
-                    return c;
-                }
-            }
-        }
-        return null;
-    }
-
-    @CheckForNull
-    public static Constructor getDataBoundConstructor(@Nonnull Class type) {
-        for (Constructor c : type.getConstructors()) {
-            if (c.getAnnotation(DataBoundConstructor.class) != null) return c;
-        }
-        return null;
-
+    @Override
+    public String getName() {
+        final Symbol annotation = getTarget().getAnnotation(Symbol.class);
+        if (annotation != null) return annotation.value()[0];
+        return normalize(getTarget().getSimpleName());
     }
 
     @Nonnull
@@ -218,26 +65,6 @@ public abstract class Configurator<T> implements ExtensionPoint, ElementConfigur
             name = StringUtils.uncapitalize(name);
         }
         return name;
-    }
-
-
-    // ---
-
-    /**
-     *
-     * @return the list of Configurator to be considered so one can fully configure this component.
-     * Typically, an extension point with multiple implementations will return Configurators for available implementations.
-     */
-    @Nonnull
-    public List<Configurator> getConfigurators() {
-        return Collections.singletonList(this);
-    }
-
-    @Override
-    public String getName() {
-        final Symbol annotation = getTarget().getAnnotation(Symbol.class);
-        if (annotation != null) return annotation.value()[0];
-        return normalize(getTarget().getSimpleName());
     }
 
     /**

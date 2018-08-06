@@ -1,5 +1,5 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout">
+<j:jelly xmlns:j="jelly:core">
   "schema" : {
     "oneOf": [
   <j:forEach items="${app.getDescriptorList(it.type)}" var="d" varStatus="st">

@@ -6,7 +6,8 @@ import com.cloudbees.plugins.credentials.common.CertificateCredentials;
 import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
 import hudson.security.ACL;
 import jenkins.model.Jenkins;
-import org.jenkinsci.plugins.casc.Configurator;
+import org.jenkinsci.plugins.casc.ConfigurationContext;
+import org.jenkinsci.plugins.casc.ConfiguratorRegistry;
 import org.jenkinsci.plugins.casc.impl.configurators.DataBoundConfigurator;
 import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
 import org.jenkinsci.plugins.casc.misc.EnvVarsRule;
@@ -22,10 +23,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
@@ -47,6 +45,7 @@ public class SystemCredentialsTest {
             .around(log)
             .around(new JenkinsConfiguredWithCodeRule());
 
+
     @Test
     @ConfiguredWithCode("SystemCredentialsTest.yml")
     public void configure_system_credentials() throws Exception {
@@ -58,7 +57,10 @@ public class SystemCredentialsTest {
         assertThat(ups, hasSize(1));
         final UsernamePasswordCredentials up = ups.get(0);
         assertThat(up.getPassword().getPlainText(), equalTo("1234"));
-        final CNode node = Configurator.lookup(up.getClass()).describe(up);
+
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        final ConfigurationContext context = new ConfigurationContext(registry);
+        final CNode node = context.lookup(up.getClass()).describe(up, context);
         assertEquals("1234", node.asMapping().getScalarValue("password"));
 
 

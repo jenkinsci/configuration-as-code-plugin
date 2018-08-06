@@ -1,5 +1,5 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout">
+<j:jelly xmlns:j="jelly:core">
 
   <div class='configurator'>
     <div id="${it.extensionPoint.simpleName}-${it.name}" class='configurator__name'>${it.name} <sup class='configurator-pointer'>CONFIGURATOR</sup></div>

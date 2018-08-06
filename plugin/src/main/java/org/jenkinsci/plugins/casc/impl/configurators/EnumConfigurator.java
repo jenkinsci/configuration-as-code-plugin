@@ -50,7 +50,7 @@ public class EnumConfigurator<T extends Enum<T>> extends Configurator<T> {
 
     @CheckForNull
     @Override
-    public CNode describe(T instance) throws Exception {
+    public CNode describe(T instance, ConfigurationContext context) throws Exception {
         return new Scalar(instance.name());
     }
 

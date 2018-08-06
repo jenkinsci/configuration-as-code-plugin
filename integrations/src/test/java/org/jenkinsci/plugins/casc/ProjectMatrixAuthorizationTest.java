@@ -3,6 +3,9 @@ package org.jenkinsci.plugins.casc;
 import hudson.security.AuthorizationStrategy;
 import hudson.security.ProjectMatrixAuthorizationStrategy;
 import jenkins.model.Jenkins;
+import org.jenkinsci.plugins.casc.impl.DefaultConfiguratorRegistry;
+import org.jenkinsci.plugins.casc.impl.attributes.DescribableAttribute;
+import org.jenkinsci.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
 import org.jenkinsci.plugins.casc.integrations.projectmatriaxauth.ProjectMatrixAuthorizationStrategyConfigurator;
 import org.jenkinsci.plugins.casc.misc.ConfiguredWithCode;
 import org.jenkinsci.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
@@ -25,17 +28,9 @@ public class ProjectMatrixAuthorizationTest {
 
     @Test
     public void shouldReturnCustomConfigurator() {
-        Configurator configurator = Configurator.lookup(ProjectMatrixAuthorizationStrategy.class);
+        Configurator configurator = ConfiguratorRegistry.get().lookup(ProjectMatrixAuthorizationStrategy.class);
         assertNotNull("Failed to find configurator for GlobalMatrixAuthorizationStrategy", configurator);
         assertEquals("Retrieved wrong configurator", ProjectMatrixAuthorizationStrategyConfigurator.class, configurator.getClass());
-    }
-
-    @Test
-    public void shouldReturnCustomConfiguratorForBaseType() {
-        Configurator c = Configurator.lookupForBaseType(AuthorizationStrategy.class, "projectMatrix");
-        assertNotNull("Failed to find configurator for ProjectMatrixAuthorizationStrategy", c);
-        assertEquals("Retrieved wrong configurator", ProjectMatrixAuthorizationStrategyConfigurator.class, c.getClass());
-        Configurator.lookup(ProjectMatrixAuthorizationStrategy.class);
     }
 
     @Test

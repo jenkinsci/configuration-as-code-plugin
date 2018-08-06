@@ -51,7 +51,7 @@ public class SeedJobConfigurator implements RootElementConfigurator<List<Generat
     public List<GeneratedItems> configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
         JenkinsJobManagement mng = new JenkinsJobManagement(System.out, new EnvVars(), null, null, LookupStrategy.JENKINS_ROOT);
         final Sequence sources = config.asSequence();
-        final Configurator<ScriptSource> con = Configurator.lookup(ScriptSource.class);
+        final Configurator<ScriptSource> con = context.lookup(ScriptSource.class);
         List<GeneratedItems> generated = new ArrayList<>();
         for (CNode source : sources) {
             final String script;
@@ -77,7 +77,7 @@ public class SeedJobConfigurator implements RootElementConfigurator<List<Generat
 
     @CheckForNull
     @Override
-    public CNode describe(List<GeneratedItems> instance) {
+    public CNode describe(List<GeneratedItems> instance, ConfigurationContext context) {
         return null; // FIXME
     }
 

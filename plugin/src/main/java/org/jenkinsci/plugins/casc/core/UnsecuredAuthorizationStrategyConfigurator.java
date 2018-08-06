@@ -32,7 +32,7 @@ public class UnsecuredAuthorizationStrategyConfigurator extends BaseConfigurator
 
     @CheckForNull
     @Override
-    public CNode describe(Unsecured instance) {
+    public CNode describe(Unsecured instance, ConfigurationContext context) {
         return null; // FIXME
     }
 }

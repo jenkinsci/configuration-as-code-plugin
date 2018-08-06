@@ -3,12 +3,14 @@ package org.jenkinsci.plugins.casc.core;
 import hudson.Extension;
 import hudson.model.Descriptor;
 import hudson.tasks.Maven;
+import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
 import jenkins.mvn.GlobalMavenConfig;
 import org.jenkinsci.plugins.casc.Attribute;
 import org.jenkinsci.plugins.casc.BaseConfigurator;
 import org.jenkinsci.plugins.casc.ConfigurationContext;
 import org.jenkinsci.plugins.casc.Configurator;
+import org.jenkinsci.plugins.casc.impl.configurators.DescriptorConfigurator;
 import org.jenkinsci.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.casc.model.Mapping;
 import org.kohsuke.accmod.Restricted;
@@ -41,8 +43,7 @@ public class MavenConfigurator extends BaseConfigurator<GlobalMavenConfig> {
     public Set<Attribute> describe() {
         final Set<Attribute> attributes = super.describe();
         final Descriptor descriptor = Jenkins.getInstance().getDescriptorOrDie(Maven.class);
-        final Configurator<Descriptor> task = Configurator.lookup(descriptor.getClass());
-        if (task == null) return attributes; // ?
+        final Configurator<Descriptor> task = new DescriptorConfigurator(descriptor);
 
         for (Attribute attribute : task.describe()) {
             attributes.add(new Attribute(attribute.getName(), attribute.getType())
@@ -55,7 +56,7 @@ public class MavenConfigurator extends BaseConfigurator<GlobalMavenConfig> {
 
     @CheckForNull
     @Override
-    public CNode describe(GlobalMavenConfig instance) throws Exception {
+    public CNode describe(GlobalMavenConfig instance, ConfigurationContext context) throws Exception {
         return null;
     }
 }

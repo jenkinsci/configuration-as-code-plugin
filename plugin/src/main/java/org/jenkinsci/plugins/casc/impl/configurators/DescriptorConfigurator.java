@@ -60,9 +60,9 @@ public class DescriptorConfigurator extends BaseConfigurator<Descriptor> impleme
 
     @CheckForNull
     @Override
-    public CNode describe(Descriptor instance) throws Exception {
+    public CNode describe(Descriptor instance, ConfigurationContext context) throws Exception {
         final Descriptor ref = (Descriptor) target.newInstance();
-        return compare(instance, ref);
+        return compare(instance, ref, context);
     }
 
 
