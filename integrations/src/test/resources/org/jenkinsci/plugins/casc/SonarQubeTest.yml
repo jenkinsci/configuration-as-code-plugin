@@ -1,0 +1,13 @@
+unclassified:
+  sonarglobalconfiguration:
+    buildWrapperEnabled: true
+    installations:
+      - name: "TEST"
+        serverUrl: "http://url:9000"
+        serverAuthenticationToken: "token"
+        mojoVersion: "mojoVersion"
+        additionalAnalysisProperties: "additionalAnalysisProperties"
+        triggers:
+          skipScmCause: true
+          skipUpstreamCause: true
+          envVar: "envVar"
