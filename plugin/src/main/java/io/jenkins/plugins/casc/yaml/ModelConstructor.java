@@ -25,8 +25,7 @@ import java.util.Map;
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-@Restricted(Beta.class)
-public class ModelConstructor extends Constructor {
+class ModelConstructor extends Constructor {
 
     public ModelConstructor() {
         super(Mapping.class);
