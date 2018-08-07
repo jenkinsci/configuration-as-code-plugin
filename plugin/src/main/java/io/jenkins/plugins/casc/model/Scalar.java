@@ -3,7 +3,6 @@ package io.jenkins.plugins.casc.model;
 import io.jenkins.plugins.casc.SecretSource;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.Beta;
-import org.yaml.snakeyaml.nodes.Tag;
 
 import java.util.stream.IntStream;
 
@@ -14,9 +13,11 @@ import java.util.stream.IntStream;
 public final class Scalar implements CNode, CharSequence {
 
     private String value;
-    private Tag tag;
+    private Format format;
     private boolean raw;
     private Source source;
+
+    public enum Format { STRING, BOOLEAN, NUMBER }
 
     public Scalar(String value, Source source) {
         this(value);
@@ -25,25 +26,25 @@ public final class Scalar implements CNode, CharSequence {
 
     public Scalar(String value) {
         this.value = value;
-        this.tag = Tag.STR;
+        this.format = Format.STRING;
         this.raw = false;
     }
 
     public Scalar(Enum instance) {
         this.value = instance.name();
-        this.tag = Tag.STR;
+        this.format = Format.STRING;
         this.raw = true;
     }
 
     public Scalar(Boolean instance) {
         this.value = String.valueOf(instance);
-        this.tag = Tag.BOOL;
+        this.format = Format.BOOLEAN;
         this.raw = true;
     }
 
     public Scalar(Number instance) {
         this.value = String.valueOf(instance);
-        this.tag = Tag.INT;
+        this.format = Format.NUMBER;
         this.raw = true;
     }
 
@@ -52,8 +53,8 @@ public final class Scalar implements CNode, CharSequence {
         return Type.SCALAR;
     }
 
-    public Tag getTag() {
-        return tag;
+    public Format getFormat() {
+        return format;
     }
 
     public boolean isRaw() {

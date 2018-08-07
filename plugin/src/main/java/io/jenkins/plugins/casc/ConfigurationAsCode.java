@@ -5,7 +5,10 @@ import hudson.Extension;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
 import hudson.model.ManagementLink;
+import io.jenkins.plugins.casc.impl.DefaultConfiguratorRegistry;
+import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
+import io.jenkins.plugins.casc.model.Scalar;
 import io.jenkins.plugins.casc.model.Sequence;
 import io.jenkins.plugins.casc.model.Source;
 import io.jenkins.plugins.casc.yaml.YamlSource;
@@ -13,9 +16,6 @@ import io.jenkins.plugins.casc.yaml.YamlUtils;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import io.jenkins.plugins.casc.impl.DefaultConfiguratorRegistry;
-import io.jenkins.plugins.casc.model.CNode;
-import io.jenkins.plugins.casc.model.Scalar;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.StaplerRequest;
@@ -368,8 +368,19 @@ public class ConfigurationAsCode extends ManagementLink {
 
                 final DumperOptions.ScalarStyle style = scalar.isRaw() ? PLAIN : DOUBLE_QUOTED;
 
-                return new ScalarNode(scalar.getTag(), value, null, null, style);
+                return new ScalarNode(getTag(scalar.getFormat()), value, null, null, style);
+        }
+    }
 
+    private Tag getTag(Scalar.Format format) {
+        switch (format) {
+            case NUMBER:
+                return Tag.INT;
+            case BOOLEAN:
+                return Tag.BOOL;
+            case STRING:
+            default:
+                return Tag.STR;
         }
     }
 
