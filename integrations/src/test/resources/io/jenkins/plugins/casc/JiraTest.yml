@@ -2,3 +2,6 @@ unclassified:
   jiraProjectProperty:
     sites:
       url: "http://jira.codehaus.org/"
+# see https://issues.jenkins-ci.org/browse/JENKINS-52906
+#      - url: "http://jira.codehaus.org/"
+#      - url: "http://issues.jenkins-ci.org/"
