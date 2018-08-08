@@ -2,11 +2,11 @@ package io.jenkins.plugins.casc.core;
 
 import hudson.Extension;
 import hudson.slaves.JNLPLauncher;
+import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.impl.configurators.DataBoundConfigurator;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
-import io.jenkins.plugins.casc.ConfigurationContext;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 

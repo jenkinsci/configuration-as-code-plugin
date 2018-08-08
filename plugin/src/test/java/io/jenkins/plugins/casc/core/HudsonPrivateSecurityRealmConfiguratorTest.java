@@ -3,14 +3,14 @@ package io.jenkins.plugins.casc.core;
 import hudson.model.User;
 import hudson.security.FullControlOnceLoggedInAuthorizationStrategy;
 import hudson.security.HudsonPrivateSecurityRealm;
-import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
-import jenkins.model.Jenkins;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.Configurator;
 import io.jenkins.plugins.casc.ConfiguratorRegistry;
+import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
+import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
 

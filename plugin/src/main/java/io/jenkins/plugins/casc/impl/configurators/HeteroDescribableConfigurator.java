@@ -4,8 +4,6 @@ import hudson.model.Describable;
 import hudson.model.Descriptor;
 import hudson.security.HudsonPrivateSecurityRealm;
 import hudson.security.SecurityRealm;
-import jenkins.model.Jenkins;
-import org.jenkinsci.Symbol;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.Configurator;
@@ -15,6 +13,8 @@ import io.jenkins.plugins.casc.impl.attributes.DescribableAttribute;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import io.jenkins.plugins.casc.model.Scalar;
+import jenkins.model.Jenkins;
+import org.jenkinsci.Symbol;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 

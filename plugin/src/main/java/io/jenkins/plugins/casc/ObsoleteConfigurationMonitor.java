@@ -3,9 +3,9 @@ package io.jenkins.plugins.casc;
 import hudson.Extension;
 import hudson.model.AdministrativeMonitor;
 import hudson.util.VersionNumber;
+import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Source;
 import jenkins.model.Jenkins;
-import io.jenkins.plugins.casc.model.CNode;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 

@@ -1,10 +1,10 @@
 package io.jenkins.plugins.casc;
 
 import hudson.ExtensionList;
-import jenkins.metrics.api.MetricsAccessKey;
-import jenkins.model.Jenkins;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import jenkins.metrics.api.MetricsAccessKey;
+import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
 

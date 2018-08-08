@@ -1,12 +1,12 @@
 package io.jenkins.plugins.casc;
 
 import hudson.security.LDAPSecurityRealm;
-import jenkins.model.IdStrategy;
-import jenkins.model.Jenkins;
-import jenkins.security.plugins.ldap.LDAPConfiguration;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.EnvVarsRule;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import jenkins.model.IdStrategy;
+import jenkins.model.Jenkins;
+import jenkins.security.plugins.ldap.LDAPConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;

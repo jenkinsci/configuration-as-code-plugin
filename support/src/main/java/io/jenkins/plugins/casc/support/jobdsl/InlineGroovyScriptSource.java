@@ -2,8 +2,8 @@ package io.jenkins.plugins.casc.support.jobdsl;
 
 import hudson.Extension;
 import hudson.model.Descriptor;
-import org.jenkinsci.Symbol;
 import io.jenkins.plugins.casc.Configurable;
+import org.jenkinsci.Symbol;
 
 import java.io.IOException;
 

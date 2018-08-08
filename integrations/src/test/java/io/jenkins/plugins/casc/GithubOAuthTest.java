@@ -1,11 +1,11 @@
 package io.jenkins.plugins.casc;
 
 import hudson.security.SecurityRealm;
-import jenkins.model.Jenkins;
-import org.jenkinsci.plugins.GithubSecurityRealm;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.EnvVarsRule;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import jenkins.model.Jenkins;
+import org.jenkinsci.plugins.GithubSecurityRealm;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;

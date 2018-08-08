@@ -1,7 +1,7 @@
 package io.jenkins.plugins.casc.yaml;
 
-import io.jenkins.plugins.casc.model.Mapping;
 import io.jenkins.plugins.casc.ConfiguratorException;
+import io.jenkins.plugins.casc.model.Mapping;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.yaml.snakeyaml.composer.Composer;

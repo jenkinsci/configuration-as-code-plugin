@@ -1,14 +1,14 @@
 package io.jenkins.plugins.casc.core;
 
 import hudson.Extension;
-import io.jenkins.plugins.casc.model.Mapping;
-import jenkins.model.Jenkins;
-import jenkins.security.s2m.AdminWhitelistRule;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.RootElementConfigurator;
 import io.jenkins.plugins.casc.model.CNode;
+import io.jenkins.plugins.casc.model.Mapping;
+import jenkins.model.Jenkins;
+import jenkins.security.s2m.AdminWhitelistRule;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 

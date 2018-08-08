@@ -1,10 +1,10 @@
 package io.jenkins.plugins.casc;
 
 import hudson.model.TopLevelItem;
-import jenkins.branch.OrganizationFolder;
-import jenkins.model.Jenkins;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import jenkins.branch.OrganizationFolder;
+import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.github_branch_source.GitHubSCMNavigator;
 import org.junit.Rule;
 

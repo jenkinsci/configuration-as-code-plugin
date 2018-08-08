@@ -2,10 +2,10 @@ package io.jenkins.plugins.casc.cli;
 
 import hudson.Extension;
 import hudson.cli.CLICommand;
+import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.model.Source;
 import io.jenkins.plugins.casc.yaml.YamlSource;
 import jenkins.model.Jenkins;
-import io.jenkins.plugins.casc.ConfigurationAsCode;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 

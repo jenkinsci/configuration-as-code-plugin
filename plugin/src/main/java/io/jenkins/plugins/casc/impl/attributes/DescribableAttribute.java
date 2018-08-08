@@ -2,9 +2,9 @@ package io.jenkins.plugins.casc.impl.attributes;
 
 import hudson.model.Describable;
 import hudson.model.Descriptor;
+import io.jenkins.plugins.casc.Attribute;
 import jenkins.model.Jenkins;
 import org.jenkinsci.Symbol;
-import io.jenkins.plugins.casc.Attribute;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.Beta;
 

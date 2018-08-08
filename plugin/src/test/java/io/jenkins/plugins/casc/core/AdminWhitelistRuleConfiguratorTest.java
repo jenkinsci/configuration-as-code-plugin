@@ -21,10 +21,10 @@
 package io.jenkins.plugins.casc.core;
 
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
+import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import jenkins.model.Jenkins;
 import jenkins.security.s2m.AdminWhitelistRule;
 import jenkins.security.s2m.MasterKillSwitchConfiguration;
-import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;

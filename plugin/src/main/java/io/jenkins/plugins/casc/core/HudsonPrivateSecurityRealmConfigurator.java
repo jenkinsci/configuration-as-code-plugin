@@ -2,9 +2,9 @@ package io.jenkins.plugins.casc.core;
 
 import hudson.Extension;
 import hudson.security.HudsonPrivateSecurityRealm;
-import io.jenkins.plugins.casc.impl.configurators.DataBoundConfigurator;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.impl.attributes.MultivaluedAttribute;
+import io.jenkins.plugins.casc.impl.configurators.DataBoundConfigurator;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.DataBoundConstructor;

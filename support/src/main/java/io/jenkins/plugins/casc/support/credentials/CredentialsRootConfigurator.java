@@ -3,13 +3,13 @@ package io.jenkins.plugins.casc.support.credentials;
 import com.cloudbees.plugins.credentials.GlobalCredentialsConfiguration;
 import com.cloudbees.plugins.credentials.SystemCredentialsProvider;
 import hudson.Extension;
-import jenkins.model.Jenkins;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.RootElementConfigurator;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
+import jenkins.model.Jenkins;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 

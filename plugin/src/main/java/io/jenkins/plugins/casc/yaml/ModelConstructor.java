@@ -1,12 +1,10 @@
 package io.jenkins.plugins.casc.yaml;
 
 import io.jenkins.plugins.casc.model.Mapping;
+import io.jenkins.plugins.casc.model.Scalar;
 import io.jenkins.plugins.casc.model.Sequence;
 import io.jenkins.plugins.casc.model.Source;
 import org.apache.commons.collections.map.AbstractMapDecorator;
-import io.jenkins.plugins.casc.model.Scalar;
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.Beta;
 import org.yaml.snakeyaml.constructor.AbstractConstruct;
 import org.yaml.snakeyaml.constructor.Construct;
 import org.yaml.snakeyaml.constructor.Constructor;
