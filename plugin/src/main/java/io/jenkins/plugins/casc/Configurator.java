@@ -31,8 +31,10 @@ import org.kohsuke.accmod.restrictions.Beta;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Define a {@link Configurator} which handles a configuration element, identified by name.
@@ -111,6 +113,20 @@ public interface Configurator<T> {
      */
     @Nonnull
     Set<Attribute<T,?>> describe();
+
+
+    /**
+     * @return Ordered version of {@link #describe()} for documentation generation.
+     * Only include non-deprecated, non-restricted attribute
+     */
+    @Nonnull
+    default List<Attribute<T,?>> getAttributes() {
+        return describe().stream()
+                .filter(a -> !a.isRestricted())
+                .filter(a -> !a.isDeprecated())
+                .sorted(Comparator.comparing(a -> a.name))
+                .collect(Collectors.toList());
+    }
 
     /**
      * Configures/creates a Jenkins object based on a tree.

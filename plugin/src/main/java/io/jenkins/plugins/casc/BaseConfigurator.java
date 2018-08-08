@@ -27,12 +27,10 @@ import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import static java.util.logging.Level.FINER;
 
@@ -96,24 +94,6 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
         }
 
         return attributes;
-    }
-
-
-
-    /**
-     * Ordered version of {@link #describe()} for documentation generation.
-     * Only include non-deprecated, non-restricted attribute
-     *
-     * @return
-     *      A list of {@link Attribute}s
-     */
-    @Nonnull
-    public List<Attribute> getAttributes() {
-        return describe().stream()
-                .filter(a -> !a.isRestricted())
-                .filter(a -> !a.isDeprecated())
-                .sorted(Comparator.comparing(a -> a.name))
-                .collect(Collectors.toList());
     }
 
     /**
