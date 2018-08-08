@@ -2,7 +2,6 @@ package io.jenkins.plugins.casc.core;
 
 import hudson.EnvVars;
 import hudson.model.TaskListener;
-import hudson.security.AuthorizationStrategy;
 import hudson.security.FullControlOnceLoggedInAuthorizationStrategy;
 import hudson.security.HudsonPrivateSecurityRealm;
 import hudson.slaves.NodeProperty;
@@ -11,10 +10,6 @@ import hudson.util.DescribableList;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import jenkins.model.Jenkins;
-import org.hamcrest.CoreMatchers;
-import io.jenkins.plugins.casc.Attribute;
-import io.jenkins.plugins.casc.Configurator;
-import io.jenkins.plugins.casc.ConfiguratorRegistry;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
@@ -44,22 +39,6 @@ public class JenkinsConfiguratorTest {
         assertTrue(jenkins.getSecurityRealm() instanceof HudsonPrivateSecurityRealm);
         assertTrue(jenkins.getAuthorizationStrategy() instanceof FullControlOnceLoggedInAuthorizationStrategy);
         assertFalse(((FullControlOnceLoggedInAuthorizationStrategy) jenkins.getAuthorizationStrategy()).isAllowAnonymousRead());
-    }
-
-    @Test
-    @Issue("Issue #60")
-    public void shouldHaveAuthStrategyConfigurator() throws Exception {
-        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
-        Configurator c = registry.lookup(Jenkins.class);
-        Attribute attr = c.getAttribute("authorizationStrategy");
-        assertNotNull(attr);
-        // Apparently Java always thinks that labmdas are equal
-        //assertTrue("The operation should not be NOOP", JenkinsConfigurator.NOOP != attr.getSetter());
-        attr.setValue(j.jenkins, new AuthorizationStrategy.Unsecured());
-
-        assertThat("Authorization strategy has not been set",
-                j.jenkins.getAuthorizationStrategy(),
-                CoreMatchers.instanceOf(AuthorizationStrategy.Unsecured.class));
     }
 
     @Test

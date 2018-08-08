@@ -15,7 +15,7 @@ import java.util.Set;
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-public class ConfigurableConfigurator<T extends Configurable> extends Configurator<T> {
+public class ConfigurableConfigurator<T extends Configurable> implements Configurator<T> {
 
     private final Class<T> target;
 
@@ -30,7 +30,7 @@ public class ConfigurableConfigurator<T extends Configurable> extends Configurat
 
     @Nonnull
     @Override
-    public Set<Attribute> describe() {
+    public Set<Attribute<T,?>> describe() {
         return Collections.emptySet();
     }
 

@@ -1,18 +1,19 @@
 package io.jenkins.plugins.casc.support.jobdsl;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.EnvVars;
 import hudson.Extension;
+import io.jenkins.plugins.casc.Attribute;
+import io.jenkins.plugins.casc.ConfigurationContext;
+import io.jenkins.plugins.casc.ConfiguratorException;
+import io.jenkins.plugins.casc.Configurator;
+import io.jenkins.plugins.casc.RootElementConfigurator;
+import io.jenkins.plugins.casc.model.CNode;
+import io.jenkins.plugins.casc.model.Sequence;
 import javaposse.jobdsl.dsl.GeneratedItems;
 import javaposse.jobdsl.plugin.JenkinsDslScriptLoader;
 import javaposse.jobdsl.plugin.JenkinsJobManagement;
 import javaposse.jobdsl.plugin.LookupStrategy;
-import io.jenkins.plugins.casc.Attribute;
-import io.jenkins.plugins.casc.ConfigurationContext;
-import io.jenkins.plugins.casc.Configurator;
-import io.jenkins.plugins.casc.ConfiguratorException;
-import io.jenkins.plugins.casc.RootElementConfigurator;
-import io.jenkins.plugins.casc.model.CNode;
-import io.jenkins.plugins.casc.model.Sequence;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
@@ -37,14 +38,20 @@ public class SeedJobConfigurator implements RootElementConfigurator<List<Generat
     }
 
     @Override
-    public Set<Attribute> describe() {
+    @SuppressFBWarnings(value = "DM_NEW_FOR_GETCLASS", justification = "We need a parameterized List type")
+    public Class getTarget() {
+        return new ArrayList<GeneratedItems>().getClass();
+    }
+
+    @Override
+    public Set<Attribute<List<GeneratedItems>,?>> describe() {
         // no attribute this is a raw list
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
 
     @Override
     public List<GeneratedItems> getTargetComponent(ConfigurationContext context) {
-        return Collections.EMPTY_LIST; // Doesn't really make sense
+        return Collections.emptyList(); // Doesn't really make sense
     }
 
     @Override

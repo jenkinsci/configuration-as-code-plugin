@@ -18,19 +18,19 @@ import java.util.stream.Collectors;
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-public abstract class MatrixAuthorizationStrategyConfigurator<T> extends BaseConfigurator<T> {
+public abstract class MatrixAuthorizationStrategyConfigurator<T extends AuthorizationContainer> extends BaseConfigurator<T> {
 
     @CheckForNull
     @Override
-    public Class getExtensionPoint() {
+    public Class getImplementedAPI() {
         return AuthorizationStrategy.class;
     }
 
 
     @Override
-    public Set<Attribute> describe() {
+    public Set<Attribute<T, ?>> describe() {
         return Collections.singleton(
-                new MultivaluedAttribute<GlobalMatrixAuthorizationStrategy, String>("grantedPermissions", String.class)
+                new MultivaluedAttribute<T, String>("grantedPermissions", String.class)
                         .getter(MatrixAuthorizationStrategyConfigurator::getGrantedPermissions)
                         .setter(MatrixAuthorizationStrategyConfigurator::setGrantedPermissions)
         );

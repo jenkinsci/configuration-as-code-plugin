@@ -27,11 +27,14 @@ import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
+import static java.util.logging.Level.FINER;
 
 /**
  * a General purpose abstract {@link Configurator} implementation based on introspection.
@@ -42,13 +45,13 @@ import java.util.logging.Logger;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Restricted(Beta.class)
-public abstract class BaseConfigurator<T> extends Configurator<T> {
+public abstract class BaseConfigurator<T> implements Configurator<T> {
 
     private static final Logger logger = Logger.getLogger(BaseConfigurator.class.getName());
 
-    public Set<Attribute> describe() {
+    public Set<Attribute<T, ?>> describe() {
 
-        Set<Attribute> attributes = new HashSet<>();
+        Set<Attribute<T,?>> attributes = new HashSet<>();
         final Set<String> exclusions = exclusions();
 
         for (Field field : getTarget().getFields()) {
@@ -81,7 +84,7 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
 
             final String name = StringUtils.uncapitalize(methodName.substring(3));
             if (exclusions.contains(name)) continue;
-            logger.log(Level.FINER, "Processing {0} property", name);
+            logger.log(FINER, "Processing {0} property", name);
 
             Attribute attribute = detectActualType(name, type);
             if (attribute == null) continue;
@@ -93,6 +96,24 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
         }
 
         return attributes;
+    }
+
+
+
+    /**
+     * Ordered version of {@link #describe()} for documentation generation.
+     * Only include non-deprecated, non-restricted attribute
+     *
+     * @return
+     *      A list of {@link Attribute}s
+     */
+    @Nonnull
+    public List<Attribute> getAttributes() {
+        return describe().stream()
+                .filter(a -> !a.isRestricted())
+                .filter(a -> !a.isDeprecated())
+                .sorted(Comparator.comparing(a -> a.name))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -242,8 +263,8 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
      * @throws ConfiguratorException something went wrong...
      */
     protected final void configure(Mapping config, T instance, boolean dryrun, ConfigurationContext context) throws ConfiguratorException {
-        final Set<Attribute> attributes = describe();
-        for (Attribute<T,Object> attribute : attributes) {
+        final Set<Attribute<T,?>> attributes = describe();
+        for (Attribute<T,?> attribute : attributes) {
 
             final String name = attribute.getName();
             CNode sub = removeIgnoreCase(config, name);
@@ -295,7 +316,7 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
                 if (!dryrun) {
                     try {
                         logger.info("Setting " + instance + '.' + name + " = " + (sub.isSensitiveData() ? "****" : valueToSet));
-                        attribute.setValue(instance, valueToSet);
+                        ((Attribute) attribute).setValue(instance, valueToSet); // require type erasure to set Object vs ?
                     } catch (Exception ex) {
                         throw new ConfiguratorException(configurator, "Failed to set attribute " + attribute, ex);
                     }
@@ -370,6 +391,20 @@ public abstract class BaseConfigurator<T> extends Configurator<T> {
         public static TypePair of(Field field) {
             return new TypePair(field.getGenericType(), field.getType());
         }
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof BaseConfigurator) {
+            return getTarget() == ((BaseConfigurator) obj).getTarget();
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return getTarget().hashCode();
     }
 
 }

@@ -18,7 +18,7 @@ import java.util.Set;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Restricted(NoExternalUse.class)
-public class EnumConfigurator<T extends Enum<T>> extends Configurator<T> {
+public class EnumConfigurator<T extends Enum<T>> implements Configurator<T> {
 
     private final Class<T> clazz;
 
@@ -33,7 +33,7 @@ public class EnumConfigurator<T extends Enum<T>> extends Configurator<T> {
 
     @Nonnull
     @Override
-    public Set<Attribute> describe() {
+    public Set<Attribute<T,?>> describe() {
         return Collections.EMPTY_SET;
     }
 

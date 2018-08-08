@@ -20,7 +20,7 @@ import java.util.Set;
  */
 @Extension
 @Restricted(NoExternalUse.class)
-public class NoneSecurityRealmConfigurator extends Configurator<SecurityRealm> {
+public class NoneSecurityRealmConfigurator implements Configurator<SecurityRealm> {
 
     @Override
     public Class<SecurityRealm> getTarget() {
@@ -28,7 +28,7 @@ public class NoneSecurityRealmConfigurator extends Configurator<SecurityRealm> {
     }
 
     @Override
-    public boolean match(Class clazz) {
+    public boolean canConfigure(Class clazz) {
         // We can't explicitly reference private class SecurityRealm.None
         return clazz.getName().equals("hudson.security.SecurityRealm$None");
     }
@@ -52,7 +52,7 @@ public class NoneSecurityRealmConfigurator extends Configurator<SecurityRealm> {
 
     @Nonnull
     @Override
-    public Set<Attribute> describe() {
+    public Set<Attribute<SecurityRealm,?>> describe() {
         return Collections.emptySet();
     }
 }

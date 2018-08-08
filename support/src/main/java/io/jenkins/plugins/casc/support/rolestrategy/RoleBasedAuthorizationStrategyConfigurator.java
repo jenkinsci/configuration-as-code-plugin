@@ -32,7 +32,7 @@ import java.util.TreeMap;
  */
 @Extension(optional = true)
 @Restricted({NoExternalUse.class})
-public class RoleBasedAuthorizationStrategyConfigurator extends Configurator<RoleBasedAuthorizationStrategy> {
+public class RoleBasedAuthorizationStrategyConfigurator implements Configurator<RoleBasedAuthorizationStrategy> {
 
     @Override
     public String getName() {
@@ -47,8 +47,7 @@ public class RoleBasedAuthorizationStrategyConfigurator extends Configurator<Rol
     @Override
     public RoleBasedAuthorizationStrategy configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
         //TODO: API should return a qualified type
-        final Configurator<RoleDefinition> roleDefinitionConfigurator =
-                (Configurator<RoleDefinition>) context.lookupOrFail(RoleDefinition.class);
+        final Configurator<RoleDefinition> roleDefinitionConfigurator = context.lookupOrFail(RoleDefinition.class);
 
         Mapping map = config.asMapping();
         Map<String, RoleMap> grantedRoles = new HashMap<>();
@@ -91,8 +90,7 @@ public class RoleBasedAuthorizationStrategyConfigurator extends Configurator<Rol
     }
 
     @Override
-    @SuppressFBWarnings(value = "DM_NEW_FOR_GETCLASS", justification = "We need a fully qualified type to do proper attribute binding")
-    public Set<Attribute> describe() {
+    public Set<Attribute<RoleBasedAuthorizationStrategy,?>> describe() {
         return new HashSet<>(Arrays.asList(
                 new MultivaluedAttribute<RoleBasedAuthorizationStrategy, RoleDefinition>("global", RoleDefinition.class),
                 new MultivaluedAttribute<RoleBasedAuthorizationStrategy, RoleDefinition>("items", RoleDefinition.class),

@@ -1,64 +1,50 @@
+/*
+ * Copyright (c) 2018 CloudBees, Inc.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to
+ * whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package io.jenkins.plugins.casc;
 
 import hudson.ExtensionPoint;
-import hudson.remoting.Which;
-import org.apache.commons.io.IOUtils;
+import io.jenkins.plugins.casc.model.CNode;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
-import io.jenkins.plugins.casc.model.CNode;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.Beta;
-import org.kohsuke.stapler.lang.Klass;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
-import java.io.IOException;
-import java.net.URL;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
 
 /**
- * Defines a mapping between a tree that represents user configuration and a Jenkins object produced from it.
- *
- * <p>
- * Different {@link Configurator}s define mapping for different Jenkins objects.
- *
- * <p>
- * This mapping includes not just performing the instantiation of Jenkins objects but also static description
- * of the mapping to enable schema/doc generation.
- *
+ * Define a {@link Configurator} which handles a configuration element, identified by name.
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
+ * @author Oleg Nenashev
+ * @see RootElementConfigurator
  */
 @Restricted(Beta.class)
-public abstract class Configurator<T> implements ExtensionPoint, ElementConfigurator<T> {
-
-    private final static Logger logger = Logger.getLogger(Configurator.class.getName());
-
-    /**
-     *
-     * @return the list of Configurator to be considered so one can fully configure this component.
-     * Typically, an extension point with multiple implementations will return Configurators for available implementations.
-     * @param context
-     */
-    @Nonnull
-    public List<Configurator> getConfigurators(ConfigurationContext context) {
-        return Collections.singletonList(this);
-    }
-
-    @Override
-    public String getName() {
-        final Symbol annotation = getTarget().getAnnotation(Symbol.class);
-        if (annotation != null) return annotation.value()[0];
-        return normalize(getTarget().getSimpleName());
-    }
+public interface Configurator<T> {
 
     @Nonnull
-    public static String normalize(@Nonnull String name) {
+    static String normalize(@Nonnull String name) {
         if (name.toUpperCase().equals(name)) {
             name = name.toLowerCase();
         } else {
@@ -68,126 +54,94 @@ public abstract class Configurator<T> implements ExtensionPoint, ElementConfigur
     }
 
     /**
-     * {@inheritDoc}
+     * Get a configurator name.
+     * @return short name for this component when used in a configuration.yaml file
      */
-    public abstract Class<T> getTarget();
+    @Nonnull
+    default String getName() {
+        final Symbol annotation = getTarget().getAnnotation(Symbol.class);
+        if (annotation != null) return annotation.value()[0];
+        return normalize(getTarget().getSimpleName());
+    }
 
-    public boolean match(Class clazz) {
+    /**
+     * @return Human friendly display name for this component, used in generated documentation.
+     */
+    default String getDisplayName() { return getName(); }
+
+    /**
+     * Target type this configurator can handle.
+     */
+    Class<T> getTarget();
+
+    /**
+     * @return <code>true</code> if this configurator can handle type <code>clazz</code>. Implementation has to be
+     * consistent with {@link #getTarget()}
+     */
+    default boolean canConfigure(Class clazz) {
         return clazz == getTarget();
     }
 
     /**
-     * The extension point being implemented by this configurator.
      *
-     * @return Extension point or {@code null} if undefined
-     */
-    @CheckForNull
-    public Class getExtensionPoint() {
-        Class t = getTarget();
-        if (ExtensionPoint.class.isAssignableFrom(t)) return t;
-        return t;
-    }
-
-
-    /**
-     * Retrieve which plugin do provide this extension point
      *
-     * @return String representation of the extension source, usually artifactId.
-     *         {@code null} if {@link #getExtensionPoint()} returns {@code null}.
-     * @throws IOException if config file cannot be saved
-     */
-    @CheckForNull
-    public String getExtensionSource() throws IOException {
-        final Class e = getExtensionPoint();
-        if (e == null) return null;
-        final String jar = Which.jarFile(e).getName();
-        if (jar.startsWith("jenkins-core-")) return "jenkins-core"; // core jar has version in name
-        return jar.substring(0, jar.lastIndexOf('.'));
-    }
-
-
-    //TODO: replace by a ClassName by default?
-    /**
-     * Human friendly display name for this component.
-     *
-     * @return Display name or empty string
-     */
-    @CheckForNull
-    public String getDisplayName() { return ""; }
-
-    private Klass getKlass() {
-        return Klass.java(getTarget());
-    }
-
-    /**
-     * {@inheritDoc}
-     * @param config
-     * @param context
+     * @return The API implemented by target type, i.e. implemented {@link ExtensionPoint} for components to implement
+     * some jenkins APIs, or raw type for others.
      */
     @Nonnull
-    public abstract T configure(CNode config, ConfigurationContext context) throws ConfiguratorException;
+    default Class getImplementedAPI() {
+        return getTarget();
+    }
+
+
+    /**
+     * @return list of {@link }Configurator}s to be considered so one can fully configure this component.
+     * Typically, configurator for an abstract extension point will return Configurators for available implementations.
+     */
+    @Nonnull
+    default List<Configurator> getConfigurators(ConfigurationContext context) {
+        return Collections.singletonList(this);
+    }
+
+
+    /**
+     * Determine the list of Attribute available for configuration of the managed component.
+     *
+     * @return A set of {@link Attribute}s that describes this object
+     */
+    @Nonnull
+    Set<Attribute<T,?>> describe();
+
+    /**
+     * Configures/creates a Jenkins object based on a tree.
+     *
+     * @param config
+     *      Map/List/primitive objects (think YAML) that represents the configuration from which
+     *      a Jenkins object is configured.
+     * @param context
+     * @return
+     *      Fully configured Jenkins object that results from this configuration.
+     *      if no new objects got created, but some existing objects may have been modified, return updated target object.
+     * @throws ConfiguratorException if something went wrong, depends on the concrete implementation
+     */
+    @Nonnull
+    T configure(CNode config, ConfigurationContext context) throws ConfiguratorException;
+
+    /**
+     * Run the same logic as {@link #configure(CNode, ConfigurationContext)} in dry-run mode.
+     * Used to verify configuration is fine before being acutally applied to a live jenkins master.
+     * @param config
+     * @param context
+     * @throws ConfiguratorException
+     */
+    T check(CNode config, ConfigurationContext context) throws ConfiguratorException;
+
 
     /**
      * Describe a component as a Configuration Nodes {@link CNode} to be exported as yaml.
      * Only export attributes which are <b>not</b> set to default value.
+     */
     @CheckForNull
-    public abstract CNode describe(T instance) throws Exception;
-     */
+    CNode describe(T instance, ConfigurationContext context) throws Exception;
 
-
-    /**
-     * Ordered version of {@link #describe()} for documentation generation.
-     * Only include non-deprecated, non-restricted attribute
-     *
-     * @return
-     *      A list of {@link Attribute}s
-     */
-    @Nonnull
-    public List<Attribute> getAttributes() {
-        return describe().stream()
-                .filter(a -> !a.isRestricted())
-                .filter(a -> !a.isDeprecated())
-                .sorted(Comparator.comparing(a -> a.name))
-                .collect(Collectors.toList());
-    }
-
-    @CheckForNull
-    public <V> Attribute<T, V> getAttribute(@Nonnull String name) {
-        Set<Attribute> attrs = describe();
-        for (Attribute attr : attrs) {
-            if (attr.name.equalsIgnoreCase(name)) {
-                return attr;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Retrieve the html help tip associated to an attribute.
-     * FIXME would prefer &lt;st:include page="help-${a.name}.html" class="${c.target}" optional="true"/&gt;
-     * @param attribute to get help for
-     * @return String that shows help. May be empty
-     * @throws IOException if the resource cannot be read
-     */
-    @Nonnull
-    public String getHtmlHelp(String attribute) throws IOException {
-        final URL resource = getKlass().getResource("help-" + attribute + ".html");
-        if (resource != null) {
-            return IOUtils.toString(resource.openStream());
-        }
-        return "";
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof Configurator) {
-            return getTarget() == ((Configurator) obj).getTarget();
-        }
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return getTarget().hashCode();
-    }
 }

@@ -98,6 +98,7 @@
   <h2>Jenkins Configuration as Code Reference</h2>
 
   <div class='sect3'>
+  <j:set var="casc" value="${it}"/>
   <j:forEach items="${it.configurators}" var="c">
     <st:include page="documentation.jelly" it="${c}" optional="true"/>
   </j:forEach>

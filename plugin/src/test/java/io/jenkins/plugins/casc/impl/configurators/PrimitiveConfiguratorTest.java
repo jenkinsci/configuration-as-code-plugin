@@ -29,7 +29,7 @@ public class PrimitiveConfiguratorTest {
     @Test
     public void _boolean() throws Exception {
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
-        Configurator c = registry.lookup(boolean.class);
+        Configurator c =registry.lookup(boolean.class);
         final Object value = c.configure(new Scalar("true"), new ConfigurationContext(registry));
         assertTrue((Boolean) value);
     }
@@ -37,7 +37,7 @@ public class PrimitiveConfiguratorTest {
     @Test
     public void _int() throws Exception {
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
-        Configurator c = registry.lookup(int.class);
+        Configurator c =registry.lookup(int.class);
         final Object value = c.configure(new Scalar("123"), new ConfigurationContext(registry));
         assertEquals(123, (int) value);
     }
@@ -45,7 +45,7 @@ public class PrimitiveConfiguratorTest {
     @Test
     public void _Integer() throws Exception {
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
-        Configurator c = registry.lookup(Integer.class);
+        Configurator c =registry.lookup(Integer.class);
         final Object value = c.configure(new Scalar("123"), new ConfigurationContext(registry));
         assertTrue(123 == ((Integer) value).intValue());
     }
@@ -53,7 +53,7 @@ public class PrimitiveConfiguratorTest {
     @Test
     public void _string() throws Exception {
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
-        Configurator c = registry.lookup(String.class);
+        Configurator c =registry.lookup(String.class);
         final Object value = c.configure(new Scalar("abc"), new ConfigurationContext(registry));
         assertEquals("abc", value);
     }
@@ -82,7 +82,7 @@ public class PrimitiveConfiguratorTest {
     public void _Integer_env() throws Exception {
         environment.set("ENV_FOR_TEST", "123");
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
-        Configurator c = registry.lookup(Integer.class);
+        Configurator c =registry.lookup(Integer.class);
         final Object value = c.configure(new Scalar("${ENV_FOR_TEST}"), new ConfigurationContext(registry));
         assertTrue(123 == ((Integer) value).intValue());
     }
@@ -91,7 +91,7 @@ public class PrimitiveConfiguratorTest {
     public void _string_env() throws Exception {
         environment.set("ENV_FOR_TEST", "abc");
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
-        Configurator c = registry.lookup(String.class);
+        Configurator c =registry.lookup(String.class);
         final Object value = c.configure(new Scalar("${ENV_FOR_TEST}"), new ConfigurationContext(registry));
         assertEquals("abc", value);
     }
@@ -100,7 +100,7 @@ public class PrimitiveConfiguratorTest {
     public void _string_env_default() throws Exception {
         environment.set("NOT_THERE", "abc");
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
-        Configurator c = registry.lookup(String.class);
+        Configurator c =registry.lookup(String.class);
         final Object value = c.configure(new Scalar("${ENV_FOR_TEST:-unsecured-token}"), new ConfigurationContext(registry));
         assertEquals("unsecured-token", value);
     }
@@ -108,7 +108,7 @@ public class PrimitiveConfiguratorTest {
     @Test
     public void _int_env_default() throws Exception {
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
-        Configurator c = registry.lookup(Integer.class);
+        Configurator c =registry.lookup(Integer.class);
         final Object value = c.configure(new Scalar("${ENV_FOR_TEST:-123}"), new ConfigurationContext(registry));
         assertEquals(123, value);
     }

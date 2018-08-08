@@ -41,19 +41,19 @@ import java.util.stream.Collectors;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Restricted(NoExternalUse.class)
-public class HeteroDescribableConfigurator extends Configurator<Describable> {
+public class HeteroDescribableConfigurator<T extends Describable> implements Configurator<T> {
 
     private static final Logger LOGGER = Logger.getLogger(HeteroDescribableConfigurator.class.getName());
 
 
-    private final Class<Describable> target;
+    private final Class<T> target;
 
-    public HeteroDescribableConfigurator(Class<Describable> clazz) {
+    public HeteroDescribableConfigurator(Class<T> clazz) {
         this.target = clazz;
     }
 
     @Override
-    public Class<Describable> getTarget() {
+    public Class<T> getTarget() {
         return target;
     }
 
@@ -66,7 +66,7 @@ public class HeteroDescribableConfigurator extends Configurator<Describable> {
     }
 
     @Override
-    public Describable configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
+    public T configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
         String shortname;
         CNode subconfig = null;
         switch (config.getType()) {
@@ -88,22 +88,22 @@ public class HeteroDescribableConfigurator extends Configurator<Describable> {
 
         final List<Descriptor> candidates = Jenkins.getInstance().getDescriptorList(target);
 
-        Class<? extends Describable> k = findDescribableBySymbol(config, shortname, candidates);
-        final Configurator configurator = context.lookup(k);
+        Class<? extends T> k = findDescribableBySymbol(config, shortname, candidates);
+        final Configurator<T> configurator = context.lookup(k);
         if (configurator == null) throw new IllegalStateException("No configurator implementation to manage "+k);
-        return (Describable) configurator.configure(subconfig, context);
+        return configurator.configure(subconfig, context);
     }
 
     @Override
-    public Describable check(CNode config, ConfigurationContext context) throws ConfiguratorException {
+    public T check(CNode config, ConfigurationContext context) throws ConfiguratorException {
         return configure(config, context);
     }
 
-    private Class findDescribableBySymbol(CNode node, String shortname, List<Descriptor> candidates) {
+    private Class<T> findDescribableBySymbol(CNode node, String shortname, List<Descriptor> candidates) {
 
         // Search for @Symbol annotation on Descriptor to match shortName
         for (Descriptor d : candidates) {
-            final List<String> symbols = DescribableAttribute.getSymbols(d, getExtensionPoint(), target);
+            final List<String> symbols = DescribableAttribute.getSymbols(d, getImplementedAPI(), target);
             final String preferred = symbols.get(0);
             if (preferred.equalsIgnoreCase(shortname)) {
                 return d.getKlass().toJavaClass();
@@ -120,8 +120,8 @@ public class HeteroDescribableConfigurator extends Configurator<Describable> {
     }
 
     @Override
-    public Set<Attribute> describe() {
-        return Collections.EMPTY_SET;
+    public Set<Attribute<T,?>> describe() {
+        return Collections.emptySet();
     }
 
     @CheckForNull
