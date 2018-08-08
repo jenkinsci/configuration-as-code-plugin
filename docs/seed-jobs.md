@@ -15,7 +15,7 @@ configuration-as-code file:
 jenkins:
   systemMessage: "Simple seed job example"
 jobs:
-  - >
+  - script: >
       multibranchPipelineJob('configuration-as-code') {
           branchSources {
               git {
