@@ -1,8 +1,8 @@
 package io.jenkins.plugins.casc;
 
-import jenkins.model.Jenkins;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
 

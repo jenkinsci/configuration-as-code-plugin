@@ -3,10 +3,10 @@ package io.jenkins.plugins.casc.core;
 import hudson.Extension;
 import hudson.security.AuthorizationStrategy;
 import hudson.security.AuthorizationStrategy.Unsecured;
-import io.jenkins.plugins.casc.model.Mapping;
 import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.model.CNode;
+import io.jenkins.plugins.casc.model.Mapping;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 

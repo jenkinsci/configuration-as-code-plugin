@@ -2,8 +2,8 @@ package io.jenkins.plugins.casc.impl.secrets;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
-import org.apache.commons.io.FileUtils;
 import io.jenkins.plugins.casc.SecretSource;
+import org.apache.commons.io.FileUtils;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.Beta;
 

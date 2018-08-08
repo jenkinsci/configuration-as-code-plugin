@@ -1,9 +1,9 @@
 package io.jenkins.plugins.casc.impl.configurators;
 
-import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
-import jenkins.model.Jenkins;
 import io.jenkins.plugins.casc.ConfiguratorException;
+import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
 

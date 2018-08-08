@@ -1,10 +1,10 @@
 package io.jenkins.plugins.casc;
 
+import io.jenkins.plugins.casc.model.CNode;
+import io.jenkins.plugins.casc.model.Scalar;
 import io.jenkins.plugins.casc.model.Sequence;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.reflect.FieldUtils;
-import io.jenkins.plugins.casc.model.CNode;
-import io.jenkins.plugins.casc.model.Scalar;
 import org.kohsuke.accmod.AccessRestriction;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.Beta;

@@ -14,7 +14,7 @@ import javax.annotation.CheckForNull;
 import java.util.logging.Logger;
 
 /**
- * A generic {@link ElementConfigurator} for {@link hudson.Extension} singletons
+ * A generic {@link io.jenkins.plugins.casc.Configurator} for {@link hudson.Extension} singletons
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Restricted(NoExternalUse.class)

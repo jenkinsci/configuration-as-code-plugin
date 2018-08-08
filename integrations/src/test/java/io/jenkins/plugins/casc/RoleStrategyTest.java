@@ -8,10 +8,10 @@ import hudson.model.FreeStyleProject;
 import hudson.model.Item;
 import hudson.model.User;
 import hudson.security.AuthorizationStrategy;
-import jenkins.model.Jenkins;
-import io.jenkins.plugins.casc.support.rolestrategy.RoleBasedAuthorizationStrategyConfigurator;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.support.rolestrategy.RoleBasedAuthorizationStrategyConfigurator;
+import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
@@ -19,10 +19,10 @@ import org.jvnet.hudson.test.Issue;
 import java.util.Map;
 import java.util.Set;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static io.jenkins.plugins.casc.PermissionAssert.assertHasNoPermission;
 import static io.jenkins.plugins.casc.PermissionAssert.assertHasPermission;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.*;
 
 /**
