@@ -309,8 +309,12 @@ public class Attribute<Owner, Type> {
 
 
     /** For pseudo-attributes which are actually managed directly as singletons, not set on some owner component */
-    public static final Setter NOOP = (target, value) -> {
+    private static final Setter NOOP = (target, value) -> {
         // Nop
     };
+
+    public static final <T,V> Setter<T,V> noop() {
+        return NOOP;
+    }
 
 }

@@ -17,7 +17,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import static io.jenkins.plugins.casc.Attribute.NOOP;
+import static io.jenkins.plugins.casc.Attribute.noop;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -44,13 +44,13 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
     }
 
     @Override
-    public Set<Attribute> describe() {
-        final Set<Attribute> attributes = super.describe();
+    public Set<Attribute<Jenkins,?>> describe() {
+        final Set<Attribute<Jenkins,?>> attributes = super.describe();
 
         // Add remoting security, all legwork will be done by a configurator
         attributes.add(new Attribute<Jenkins, AdminWhitelistRule>("remotingSecurity", AdminWhitelistRule.class)
-                .setter(NOOP)
-                .getter(j -> Jenkins.getInstance().getInjector().getInstance(AdminWhitelistRule.class) ));
+                .getter( j -> Jenkins.getInstance().getInjector().getInstance(AdminWhitelistRule.class) )
+                .setter( noop() ));
 
         return attributes;
     }

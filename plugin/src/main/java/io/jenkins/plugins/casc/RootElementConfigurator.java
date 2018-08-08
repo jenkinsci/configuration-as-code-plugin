@@ -15,7 +15,7 @@ import java.util.List;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Restricted(Beta.class)
-public interface RootElementConfigurator<T> extends ElementConfigurator<T> {
+public interface RootElementConfigurator<T> extends Configurator<T> {
 
     static List<RootElementConfigurator> all() {
         List<RootElementConfigurator> configurators = new ArrayList<>();

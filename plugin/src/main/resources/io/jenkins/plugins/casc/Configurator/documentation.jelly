@@ -4,10 +4,10 @@
   <div class='configurator'>
     <div id="${it.extensionPoint.simpleName}-${it.name}" class='configurator__name'>${it.name} <sup class='configurator-pointer'>CONFIGURATOR</sup></div>
 
-    <j:if test="${it.extensionPoint != c.target}">
+    <j:if test="${it.extensionPoint != it.target}">
         <div class='configurator__implementation'>
             Implementation of
-            <a href="https://jenkins.io/doc/developer/extensions/${it.extensionSource}/#${it.extensionPoint.simpleName.toLowerCase()}">
+            <a href="https://jenkins.io/doc/developer/extensions/${casc.extensionSource}/#${it.extensionPoint.simpleName.toLowerCase()}">
                 ${it.extensionPoint.simpleName}
             </a>
         </div>
@@ -23,7 +23,7 @@
                     <j:if test="${a.multiple}"><span class='attribute-type__list'>list of</span></j:if> <span class='attribute-type__class'>${a.type.simpleName}</span>
                 </div>
                 <div class='attribute-help'>
-                    <j:out value="${it.getHtmlHelp(a.name)}"/>
+                    <j:out value="${casc.getHtmlHelp(it.target, a.name)}"/>
                               <!-- FIXME .html is not a standard facet, stapler only looks for groovy/jelly
                               <st:include page="help-${a.name}.html" class="${it.target}" optional="true"/>
                               -->

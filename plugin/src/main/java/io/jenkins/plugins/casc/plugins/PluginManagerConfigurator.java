@@ -359,8 +359,8 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
     }
 
     @Override
-    public Set<Attribute> describe() {
-        Set<Attribute> attr =  new HashSet<>();
+    public Set<Attribute<PluginManager, ?>> describe() {
+        Set<Attribute<PluginManager, ?>> attr =  new HashSet<>();
         attr.add(new Attribute<PluginManager, ProxyConfiguration>("proxy", ProxyConfiguration.class));
         attr.add(new MultivaluedAttribute<PluginManager, UpdateSite>("sites", UpdateSite.class));
         attr.add(new MultivaluedAttribute<PluginManager, Plugins>("required", Plugins.class));

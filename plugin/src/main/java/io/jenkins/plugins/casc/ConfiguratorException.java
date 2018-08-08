@@ -32,16 +32,16 @@ import java.io.IOException;
  * Exception type for {@link Configurator} issues.
  * @author Oleg Nenashev
  * @since TODO
- * @see ElementConfigurator#configure(CNode, ConfigurationContext)
- * @see ElementConfigurator
+ * @see Configurator#configure(CNode, ConfigurationContext)
+ * @see Configurator
  */
 @Restricted(Beta.class)
 public class ConfiguratorException extends IOException {
 
     @CheckForNull
-    private final ElementConfigurator configurator;
+    private final Configurator configurator;
 
-    public ConfiguratorException(@CheckForNull ElementConfigurator configurator, @CheckForNull String message, @CheckForNull Throwable cause) {
+    public ConfiguratorException(@CheckForNull Configurator configurator, @CheckForNull String message, @CheckForNull Throwable cause) {
         super(message, cause);
         this.configurator = configurator;
     }
@@ -50,7 +50,7 @@ public class ConfiguratorException extends IOException {
         this(null, message, cause);
     }
 
-    public ConfiguratorException(@CheckForNull ElementConfigurator configurator, @CheckForNull String message) {
+    public ConfiguratorException(@CheckForNull Configurator configurator, @CheckForNull String message) {
         this(configurator, message, null);
     }
 
@@ -63,7 +63,7 @@ public class ConfiguratorException extends IOException {
     }
 
     @CheckForNull
-    public ElementConfigurator getConfigurator() {
+    public Configurator getConfigurator() {
         return configurator;
     }
 

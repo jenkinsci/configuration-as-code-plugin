@@ -22,7 +22,7 @@ import java.util.Set;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Restricted(NoExternalUse.class)
-public class PrimitiveConfigurator extends Configurator {
+public class PrimitiveConfigurator implements Configurator {
     private final Class target;
 
     public PrimitiveConfigurator(Class clazz) {
@@ -99,6 +99,6 @@ public class PrimitiveConfigurator extends Configurator {
 
     @Override
     public List<Configurator> getConfigurators(ConfigurationContext context) {
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 }

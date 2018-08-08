@@ -18,6 +18,8 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import static io.jenkins.plugins.casc.Attribute.noop;
+
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -49,10 +51,10 @@ public class CredentialsRootConfigurator extends BaseConfigurator<GlobalCredenti
     }
 
     @Override
-    public Set<Attribute> describe() {
-        return Collections.singleton(new Attribute<Jenkins, SystemCredentialsProvider>("system", SystemCredentialsProvider.class)
+    public Set<Attribute<GlobalCredentialsConfiguration,?>> describe() {
+        return Collections.singleton(new Attribute<GlobalCredentialsConfiguration, SystemCredentialsProvider>("system", SystemCredentialsProvider.class)
             .getter( t -> SystemCredentialsProvider.getInstance() )
-            .setter( Attribute.NOOP ));
+            .setter( noop() ));
     }
 
     @CheckForNull

@@ -63,7 +63,7 @@ public class AdminWhitelistRuleConfigurator extends BaseConfigurator<AdminWhitel
     }
 
     @Override
-    public Set<Attribute> describe() {
+    public Set<Attribute<AdminWhitelistRule,?>> describe() {
         return new HashSet<>(Arrays.asList(
                 new Attribute<AdminWhitelistRule, Boolean>("enabled", Boolean.class)
                         .getter(target -> !target.getMasterKillSwitch())

@@ -36,7 +36,7 @@ public class SystemCredentialsProviderConfigurator extends BaseConfigurator<Syst
 
     @Nonnull
     @Override
-    public Set<Attribute> describe() {
+    public Set<Attribute<SystemCredentialsProvider, ?>> describe() {
         return Collections.singleton(
             new MultivaluedAttribute<SystemCredentialsProvider, DomainCredentials>("domainCredentials", DomainCredentials.class)
                 .setter( (target, value) -> target.setDomainCredentialsMap(DomainCredentials.asMap(value)))

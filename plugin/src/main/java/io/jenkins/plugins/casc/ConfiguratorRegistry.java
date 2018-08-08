@@ -29,7 +29,7 @@ public interface ConfiguratorRegistry {
      * @return <code>null</code> if we don't know any {@link RootElementConfigurator} for requested type
      */
     @CheckForNull
-    Configurator lookup(Type type);
+    <T> Configurator<T> lookup(Type type);
 
     /**
      * null-safe flavour of {@link #lookup(Type)}.
@@ -37,7 +37,7 @@ public interface ConfiguratorRegistry {
      * @throws ConfiguratorException if we don't know any {@link RootElementConfigurator} for requested type
      */
     @Nonnull
-    Configurator lookupOrFail(Type type) throws ConfiguratorException;
+    <T> Configurator<T> lookupOrFail(Type type) throws ConfiguratorException;
 
     /**
      * Retrieve default implementation from Jenkins

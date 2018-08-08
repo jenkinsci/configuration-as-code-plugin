@@ -105,7 +105,7 @@ public class DefaultConfiguratorRegistry implements ConfiguratorRegistry {
         final Jenkins jenkins = Jenkins.getInstance();
         final ExtensionList<Configurator> l = jenkins.getExtensionList(Configurator.class);
         for (Configurator c : l) {
-            if (c.match(clazz)) {
+            if (c.canConfigure(clazz)) {
                 // this type has a dedicated Configurator implementation
                 return c;
             }

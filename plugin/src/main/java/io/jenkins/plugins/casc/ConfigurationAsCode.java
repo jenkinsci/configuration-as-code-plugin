@@ -5,6 +5,7 @@ import hudson.Extension;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
 import hudson.model.ManagementLink;
+import hudson.remoting.Which;
 import io.jenkins.plugins.casc.impl.DefaultConfiguratorRegistry;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
@@ -16,11 +17,13 @@ import io.jenkins.plugins.casc.yaml.YamlUtils;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.apache.commons.io.IOUtils;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.interceptor.RequirePOST;
+import org.kohsuke.stapler.lang.Klass;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.emitter.Emitter;
@@ -35,6 +38,7 @@ import org.yaml.snakeyaml.resolver.Resolver;
 import org.yaml.snakeyaml.serializer.Serializer;
 
 import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -560,19 +564,51 @@ public class ConfigurationAsCode extends ManagementLink {
      * @param attributes siblings to find associated configurators and dive to next tree levels
      * @param context
      */
-    private void listElements(Set<Object> elements, Set<Attribute> attributes, ConfigurationContext context) {
+    private void listElements(Set<Object> elements, Set<Attribute<?,?>> attributes, ConfigurationContext context) {
         attributes.stream()
                 .map(Attribute::getType)
                 .map(context::lookup)
                 .filter(Objects::nonNull)
-                .map((Configurator configurator1) -> configurator1.getConfigurators(context))
+                .map(c -> c.getConfigurators(context))
                 .flatMap(Collection::stream)
                 .forEach(configurator -> {
                     if (elements.add(configurator)) {
-                        listElements(elements, ((Configurator<?>) configurator).describe(), context);
+                        listElements(elements, ((Configurator)configurator).describe(), context);   // some unexpected type erasure force to cast here
                     }
                 });
     }
 
+    // --- UI helper methods
+
+    /**
+     * Retrieve the html help tip associated to an attribute, used in documentation.jelly
+     * FIXME would prefer &lt;st:include page="help-${a.name}.html" class="${c.target}" optional="true"/&gt;
+     * @param attribute to get help for
+     * @return String that shows help. May be empty
+     * @throws IOException if the resource cannot be read
+     */
+    @Nonnull
+    public String getHtmlHelp(Class type, String attribute) throws IOException {
+        final URL resource = Klass.java(type).getResource("help-" + attribute + ".html");
+        if (resource != null) {
+            return IOUtils.toString(resource.openStream());
+        }
+        return "";
+    }
+
+    /**
+     * Retrieve which plugin do provide this extension point, used in documentation.jelly
+     *
+     * @return String representation of the extension source, usually artifactId.
+     */
+    @CheckForNull
+    public String getExtensionSource(Configurator c) throws IOException {
+        final Class e = c.getImplementedAPI();
+        final String jar = Which.jarFile(e).getName();
+        if (jar.startsWith("jenkins-core-")) { // core jar has version in name
+            return "jenkins-core";
+        }
+        return jar.substring(0, jar.lastIndexOf('.'));
+    }
 
 }

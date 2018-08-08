@@ -161,14 +161,14 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
 
     public String getName() {
         final Descriptor d = getDescriptor();
-        return DescribableAttribute.getPreferredSymbol(d, getExtensionPoint(), getTarget());
+        return DescribableAttribute.getPreferredSymbol(d, getImplementedAPI(), getTarget());
     }
 
     private Descriptor getDescriptor() {
         return Jenkins.getInstance().getDescriptor(getTarget());
     }
 
-    public Class getExtensionPoint() {
+    public Class getImplementedAPI() {
 
         final Descriptor descriptor = getDescriptor();
         if (descriptor != null) {
@@ -192,13 +192,13 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                 }
             }
         }
-        return super.getExtensionPoint();
+        return super.getImplementedAPI();
     }
 
 
     @Override
-    public Set<Attribute> describe() {
-        final Set<Attribute> attributes = super.describe();
+    public Set<Attribute<T,?>> describe() {
+        final Set<Attribute<T,?>> attributes = super.describe();
 
         final Constructor constructor = getDataBoundConstructor(target);
 

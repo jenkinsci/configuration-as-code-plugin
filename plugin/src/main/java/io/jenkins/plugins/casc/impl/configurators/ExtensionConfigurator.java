@@ -1,13 +1,12 @@
 package io.jenkins.plugins.casc.impl.configurators;
 
 import hudson.ExtensionList;
-import jenkins.model.Jenkins;
 import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
-import io.jenkins.plugins.casc.Configurator;
 import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
+import jenkins.model.Jenkins;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
@@ -15,7 +14,7 @@ import javax.annotation.CheckForNull;
 import java.util.logging.Logger;
 
 /**
- * A generic {@link Configurator} for {@link hudson.Extension} singletons
+ * A generic {@link ElementConfigurator} for {@link hudson.Extension} singletons
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Restricted(NoExternalUse.class)
