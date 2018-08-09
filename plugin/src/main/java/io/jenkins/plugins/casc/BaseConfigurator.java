@@ -58,7 +58,8 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
                 if (exclusions.contains(field.getName())) continue;
                 if (PersistedList.class.isAssignableFrom(field.getType())) {
                     // see Jenkins#clouds
-                    Attribute attribute = detectActualType(field.getName(), TypePair.of(field));
+                    Attribute attribute = detectActualType(field.getName(), TypePair.of(field))
+                            .getter(field::get); // get value by direct access to public final field
                     attributes.add(attribute);
                 }
             }
