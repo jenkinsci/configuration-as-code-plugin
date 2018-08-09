@@ -143,7 +143,6 @@ public class ConfigurationAsCode extends GlobalConfiguration {
         return super.configure(req, json);
     }
 
-    @CheckForNull
     @Override
     public String getDisplayName() {
         return "Configuration as Code";
