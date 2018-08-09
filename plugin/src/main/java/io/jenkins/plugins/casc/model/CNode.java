@@ -10,7 +10,7 @@ import org.kohsuke.accmod.restrictions.Beta;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Restricted(Beta.class)
-public interface CNode {
+public interface CNode extends Cloneable {
 
     enum Type { MAPPING, SEQUENCE, SCALAR }
 
@@ -35,5 +35,4 @@ public interface CNode {
      * This is used to offer relevant diagnostic messages
      */
     Source getSource();
-
 }
