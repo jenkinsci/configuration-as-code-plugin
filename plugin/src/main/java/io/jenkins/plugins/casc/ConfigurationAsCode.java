@@ -430,8 +430,7 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     private void configureWith(List<YamlSource> sources) throws ConfiguratorException {
-        final Mapping map = YamlUtils.loadFrom(sources);
-        configureWith(map.entrySet());
+        configureWith( YamlUtils.loadFrom(sources) );
     }
 
     @org.kohsuke.accmod.Restricted(NoExternalUse.class)
@@ -443,8 +442,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
     private Map<Source, String> checkWith(List<YamlSource> sources) throws ConfiguratorException {
         if (sources.isEmpty()) return null;
-        final Mapping map = YamlUtils.loadFrom(sources);
-        return checkWith(map.entrySet());
+        return checkWith( YamlUtils.loadFrom(sources) );
     }
 
 
@@ -485,13 +483,13 @@ public class ConfigurationAsCode extends ManagementLink {
      * @param entries key-value pairs, where key should match to root configurator and value have all required properties
      * @throws ConfiguratorException configuration error
      */
-    private static void invokeWith(Set<Map.Entry<String, CNode>> entries, ConfigratorOperation function) throws ConfiguratorException {
+    private static void invokeWith(Mapping entries, ConfigratorOperation function) throws ConfiguratorException {
 
-        // Run configurators by order, consuming entries until all have found a matching configurator
-        // configurators order is important so that org.jenkinsci.plugins.casc.plugins.PluginManagerConfigurator run
+        // Run configurators by order, consuming entries until all have found a matching configurator.
+        // Configurators order is important so that io.jenkins.plugins.casc.plugins.PluginManagerConfigurator run
         // before any other, and can install plugins required by other configuration to successfully parse yaml data
         for (RootElementConfigurator configurator : RootElementConfigurator.all()) {
-            final Iterator<Map.Entry<String, CNode>> it = entries.iterator();
+            final Iterator<Map.Entry<String, CNode>> it = entries.entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry<String, CNode> entry = it.next();
                 if (! entry.getKey().equalsIgnoreCase(configurator.getName())) {
@@ -511,12 +509,17 @@ public class ConfigurationAsCode extends ManagementLink {
         }
 
         if (!entries.isEmpty()) {
-            final Map.Entry<String, CNode> next = entries.iterator().next();
+            final Map.Entry<String, CNode> next = entries.entrySet().iterator().next();
             throw new ConfiguratorException(format("No configurator for root element <%s>", next.getKey()));
         }
     }
 
-    private void configureWith(Set<Map.Entry<String, CNode>> entries) throws ConfiguratorException {
+    private void configureWith(Mapping entries) throws ConfiguratorException {
+        // Check input before actually applying changes,
+        // so we don't let master in a weird state after some ConfiguratorException has been thrown
+        final Mapping clone = (Mapping) entries.clone();
+        checkWith(clone);
+
         final ObsoleteConfigurationMonitor monitor = ObsoleteConfigurationMonitor.get();
         monitor.reset();
         ConfigurationContext context = new ConfigurationContext(registry);
@@ -524,7 +527,7 @@ public class ConfigurationAsCode extends ManagementLink {
         invokeWith(entries, (configurator, config) -> configurator.configure(config, context));
     }
 
-    public Map<Source, String> checkWith(Set<Map.Entry<String, CNode>> entries) throws ConfiguratorException {
+    public Map<Source, String> checkWith(Mapping entries) throws ConfiguratorException {
         Map<Source, String> issues = new HashMap<>();
         ConfigurationContext context = new ConfigurationContext(registry);
         context.addListener( (node,message) -> issues.put(node.getSource(), message) );

@@ -66,4 +66,5 @@ public final class Mapping extends HashMap<String, CNode> implements CNode {
     public Source getSource() {
         return source;
     }
+
 }
