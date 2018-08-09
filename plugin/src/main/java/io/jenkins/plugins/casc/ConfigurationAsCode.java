@@ -102,10 +102,10 @@ public class ConfigurationAsCode extends GlobalConfiguration {
     public static final Logger LOGGER = Logger.getLogger(ConfigurationAsCode.class.getName());
 
     @Inject
-    private DefaultConfiguratorRegistry registry;
+    private transient DefaultConfiguratorRegistry registry;
     private String configurationPath;
 
-    private long lastTimeLoaded;
+    private transient long lastTimeLoaded;
 
     private List<String> sources = Collections.emptyList();
 
