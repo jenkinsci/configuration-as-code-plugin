@@ -6,5 +6,9 @@
      <f:entry title="${%Path or URL:}" field="configurationPath">
          <f:textbox field="configurationPath" add="Add new path to *.yaml files"/>
      </f:entry>
+     <f:validateButton
+         title="${%Test Configuration}" progress="${%Testing...}"
+         method="checkNewSource"
+         with="configurationPath"/>
  </f:section>
 </j:jelly>

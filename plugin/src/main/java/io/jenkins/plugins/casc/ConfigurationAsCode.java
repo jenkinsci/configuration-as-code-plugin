@@ -6,6 +6,7 @@ import hudson.Util;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
 import hudson.remoting.Which;
+import hudson.util.FormValidation;
 import io.jenkins.plugins.casc.impl.DefaultConfiguratorRegistry;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
@@ -22,6 +23,7 @@ import org.apache.commons.io.IOUtils;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.DataBoundSetter;
+import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.interceptor.RequirePOST;
@@ -166,6 +168,40 @@ public class ConfigurationAsCode extends GlobalConfiguration {
 
         configure();
         response.sendRedirect("");
+    }
+
+    @RequirePOST
+    public FormValidation doCheckNewSource(@QueryParameter("configurationPath") final String configurationPath) {
+        if (Util.fixEmptyAndTrim(configurationPath) != null && !new File(configurationPath).exists()) {
+            return FormValidation.error("File does not exist");
+        }
+        try {
+            final Map<Source, String> issues = collectIssues(configurationPath);
+            final JSONArray errors = collectProblems(issues, "error");
+            if (!errors.isEmpty()) {
+                return FormValidation.error(errors.toString());
+            }
+            final JSONArray warnings = collectProblems(issues, "warning");
+            if (!warnings.isEmpty()) {
+                return FormValidation.warning(warnings.toString());
+            }
+            return FormValidation.okWithMarkup("The configuration can be applied");
+        } catch (ConfiguratorException e) {
+            return FormValidation.error(e, e.getCause().getMessage());
+        }
+    }
+
+    private Map<Source, String> collectIssues(String configurationPath) throws ConfiguratorException {
+        List<String> sources = Collections.singletonList(configurationPath);
+        List<YamlSource> yamlSource = getConfigFromSources(sources);
+        return checkWith(yamlSource);
+    }
+
+    private JSONArray collectProblems(Map<Source, String> issues, String severity) {
+        final JSONArray problems = new JSONArray();
+        issues.entrySet().stream().map(e -> new JSONObject().accumulate("line", e.getKey().line).accumulate(severity, e.getValue()))
+                .forEach(problems::add);
+        return problems;
     }
 
     private static List<YamlSource> getConfigFromSources(List<String> newSources) throws ConfiguratorException {
