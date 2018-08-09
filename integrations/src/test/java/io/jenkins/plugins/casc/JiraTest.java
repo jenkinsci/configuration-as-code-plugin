@@ -5,11 +5,8 @@ import hudson.plugins.jira.JiraProjectProperty.DescriptorImpl;
 import hudson.plugins.jira.JiraSite;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
-import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.jvnet.hudson.test.Issue;
 
 import static org.junit.Assert.assertEquals;
 
@@ -27,15 +24,10 @@ public class JiraTest {
 
         final DescriptorImpl descriptor = (DescriptorImpl) j.jenkins.getDescriptor(JiraProjectProperty.class);
 
-        /** JENKINS-52906
-         *  assertEquals(2, descriptor.getSites().length);
-         *  assertEquals("http://jira.codehaus.org/", sites[0].getUrl().toString());
-         *  assertEquals("http://issues.jenkins-ci.org/", sites[1].getUrl().toString());
-         */
-
-        assertEquals(1, descriptor.getSites().length);
-        final JiraSite site = descriptor.getSites()[0];
-        assertEquals("http://jira.codehaus.org/", site.getUrl().toString());
+        final JiraSite[] sites = descriptor.getSites();
+        assertEquals(2, sites.length);
+        assertEquals("http://jira.codehaus.org/", sites[0].getUrl().toString());
+        assertEquals("http://issues.jenkins-ci.org/", sites[1].getUrl().toString());
     }
 
 }
