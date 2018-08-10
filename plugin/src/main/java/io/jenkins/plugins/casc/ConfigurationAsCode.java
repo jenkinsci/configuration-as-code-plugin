@@ -178,10 +178,8 @@ public class ConfigurationAsCode extends ManagementLink {
 
     public FormValidation doCheckNewSource(@QueryParameter String newSource){
         if (Util.fixEmptyAndTrim(newSource) != null && !new File(newSource).exists()) {
-            // Can be a warning instead
             return FormValidation.error("File does not exist");
         }
-
         return FormValidation.ok();
     }
 

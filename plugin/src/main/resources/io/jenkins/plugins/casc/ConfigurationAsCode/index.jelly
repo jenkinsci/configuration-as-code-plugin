@@ -23,6 +23,15 @@
 
         <p>Last time applied : <i:formatDate value="${it.lastTimeLoaded}" type="both" dateStyle="medium" timeStyle="long"/></p>
 
+        <f:form method="post" action="replace" name="replace">
+            <p>Replace configuration with new source</p>
+            <f:entry title="${%Path or URL:}" field="newSource">
+                <f:textbox checkUrl="'checkNewSource?newSource='+this.value" style="width:32em;" />
+            </f:entry>
+            <f:bottomButtonBar>
+                <f:submit name="replace" value="Replace"/>
+            </f:bottomButtonBar>
+        </f:form>
         <f:form method="post" action="reload" name="reload">
           <f:submit name="reload" value="Reload"/>
         </f:form>
