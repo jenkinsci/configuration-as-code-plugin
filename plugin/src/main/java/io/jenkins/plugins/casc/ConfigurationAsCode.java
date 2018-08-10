@@ -161,21 +161,40 @@ public class ConfigurationAsCode extends ManagementLink {
         String newSource = request.getParameter("_.newSource");
         File file = new File(newSource);
         if (file.exists()) {
-            sources = Collections.singletonList(newSource);
-            //TODO: here should be dry run
-            configureWith(getConfigFromSources(getSources()));
-            CasCGlobalConfig config = GlobalConfiguration.all().get(CasCGlobalConfig.class);
-            // TODO: check and clean, is it right place?
-            config.setConfigurationPath(newSource);
-            config.save();
-            LOGGER.log(Level.FINE, "Replace configuration with: " + file.getAbsolutePath());
+            List<String> candidatePaths = Collections.singletonList(newSource);
+            List<YamlSource> candidates = getConfigFromSources(candidatePaths);
+            if (canApplyFrom(candidates)) {
+                sources = candidatePaths;
+                configureWith(getConfigFromSources(getSources()));
+                CasCGlobalConfig config = GlobalConfiguration.all().get(CasCGlobalConfig.class);
+                if(config != null) {
+                    config.setConfigurationPath(newSource);
+                    config.save();
+                }
+                LOGGER.log(Level.FINE, "Replace configuration with: " + newSource);
+            } else {
+                LOGGER.log(Level.INFO, "Provided sources could not be applied");
+                // todo: show message in UI
+            }
         } else {
             LOGGER.log(Level.FINE, "There is no such source exist, applying default");
+            // May be do nothing instead?
             configure();
         }
         response.sendRedirect("");
     }
 
+    private boolean canApplyFrom(List<YamlSource> yamlSources) {
+        try {
+            checkWith(yamlSources);
+            return true;
+        } catch (ConfiguratorException e) {
+            // ignore and return false
+        }
+        return false;
+    }
+
+    // Do something with validation! Make a button instead, that function can not be RequirePost in current configuration
     public FormValidation doCheckNewSource(@QueryParameter String newSource){
         if (Util.fixEmptyAndTrim(newSource) != null && !new File(newSource).exists()) {
             return FormValidation.error("File does not exist");
@@ -200,16 +219,6 @@ public class ConfigurationAsCode extends ManagementLink {
         List<String> sources = Collections.singletonList(configurationPath);
         List<YamlSource> yamlSource = getConfigFromSources(sources);
         return checkWith(yamlSource);
-    }
-
-    private boolean canApplyFrom(List<YamlSource> yamlSources) {
-        try {
-            checkWith(yamlSources);
-            return true;
-        } catch (ConfiguratorException e) {
-            // ignore and return false
-        }
-        return false;
     }
 
     private JSONArray collectProblems(Map<Source, String> issues, String severity) {
