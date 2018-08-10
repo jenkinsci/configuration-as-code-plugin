@@ -10,7 +10,8 @@ jobs:
         // "Projects"
         organizations {
           bitbucket {
-            bitbucketServerUrl("https://$BITBUCKET_URL")
+            // DEPRECATED : bitbucketServerUrl("https://$BITBUCKET_URL")
+            serverUrl("https://$BITBUCKET_URL")
             repoOwner("OWN")
             credentialsId("bitbucket-http")
 
