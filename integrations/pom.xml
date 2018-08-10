@@ -356,6 +356,11 @@
       <version>3.0.0</version>
     </dependency>
 
+    <dependency>
+      <groupId>com.cloudbees.jenkins.plugins</groupId>
+      <artifactId>custom-tools-plugin</artifactId>
+      <version>0.5</version>
+    </dependency>
 
   </dependencies>
 

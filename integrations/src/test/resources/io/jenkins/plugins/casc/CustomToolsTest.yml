@@ -1,0 +1,12 @@
+tool:
+  customtool:
+    installations:
+      - name: "my-tool"
+        home: ""
+        properties:
+          - installSource:
+            - command:
+                toolHome: "/bin/my-tool"
+                command: >
+                  curl -o my-tool.tar.bz2 -L https://github.com/my/tool/releases/download/v0.1.0/linux-amd64-my-tool.tar.bz2
+                  tar -xvjf my-tool.tar.bz2
