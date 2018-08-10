@@ -108,4 +108,15 @@ public final class Scalar implements CNode, CharSequence {
         return source;
     }
 
+    @Override
+    public CNode clone() {
+        return new Scalar(this);
+    }
+
+    private Scalar(Scalar it) {
+        this.value = it.value;
+        this.format = it.format;
+        this.raw = it.raw;
+        this.source = it.source;
+    }
 }

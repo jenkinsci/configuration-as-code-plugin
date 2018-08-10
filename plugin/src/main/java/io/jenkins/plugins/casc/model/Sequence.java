@@ -39,4 +39,11 @@ public final class Sequence extends ArrayList<CNode> implements CNode {
     public Source getSource() {
         return source;
     }
+
+    @Override
+    public Sequence clone() {
+        final Sequence clone = new Sequence();
+        stream().map(CNode::clone).forEach(clone::add);
+        return clone;
+    }
 }
