@@ -243,7 +243,7 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
      * @param context
      * @throws ConfiguratorException something went wrong...
      */
-    protected final void configure(Mapping config, T instance, boolean dryrun, ConfigurationContext context) throws ConfiguratorException {
+    protected void configure(Mapping config, T instance, boolean dryrun, ConfigurationContext context) throws ConfiguratorException {
         final Set<Attribute<T,?>> attributes = describe();
         for (Attribute<T,?> attribute : attributes) {
 
