@@ -35,4 +35,6 @@ public interface CNode extends Cloneable {
      * This is used to offer relevant diagnostic messages
      */
     Source getSource();
+
+    CNode clone();
 }

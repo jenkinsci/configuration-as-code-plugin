@@ -517,7 +517,7 @@ public class ConfigurationAsCode extends ManagementLink {
     private void configureWith(Mapping entries) throws ConfiguratorException {
         // Check input before actually applying changes,
         // so we don't let master in a weird state after some ConfiguratorException has been thrown
-        final Mapping clone = (Mapping) entries.clone();
+        final Mapping clone = entries.clone();
         checkWith(clone);
 
         final ObsoleteConfigurationMonitor monitor = ObsoleteConfigurationMonitor.get();
