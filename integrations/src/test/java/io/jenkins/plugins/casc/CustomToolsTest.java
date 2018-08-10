@@ -11,6 +11,7 @@ import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.EnvVarsRule;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import jenkins.model.Jenkins;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -28,7 +29,7 @@ public class CustomToolsTest {
     @Rule
     public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 
-    @Test @Issue("#97")
+    @Test @Issue("#97") @Ignore
     @ConfiguredWithCode(value = "CustomToolsTest.yml")
     public void configure_custom_tools() throws Exception {
         DescriptorImpl descriptor = (DescriptorImpl) j.jenkins.getDescriptorOrDie(CustomTool.class);
