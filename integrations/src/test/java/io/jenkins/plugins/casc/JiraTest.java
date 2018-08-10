@@ -5,11 +5,8 @@ import hudson.plugins.jira.JiraProjectProperty.DescriptorImpl;
 import hudson.plugins.jira.JiraSite;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
-import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.jvnet.hudson.test.Issue;
 
 import static org.junit.Assert.assertEquals;
 
