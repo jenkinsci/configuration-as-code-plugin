@@ -180,8 +180,45 @@ public class ConfigurationAsCode extends ManagementLink {
         if (Util.fixEmptyAndTrim(newSource) != null && !new File(newSource).exists()) {
             return FormValidation.error("File does not exist");
         }
-        return FormValidation.ok();
+        try {
+            final Map<Source, String> issues = collectIssues(newSource);
+            final JSONArray errors = collectProblems(issues, "error");
+            if (!errors.isEmpty()) {
+                return FormValidation.error(errors.toString());
+            }
+            final JSONArray warnings = collectProblems(issues, "warning");
+            if (!warnings.isEmpty()) {
+                return FormValidation.warning(warnings.toString());
+            }
+            return FormValidation.okWithMarkup("The configuration can be applied");
+        } catch (ConfiguratorException e) {
+            return FormValidation.error(e, e.getCause().getMessage());
+        }
     }
+
+    private Map<Source, String> collectIssues(String configurationPath) throws ConfiguratorException {
+        List<String> sources = Collections.singletonList(configurationPath);
+        List<YamlSource> yamlSource = getConfigFromSources(sources);
+        return checkWith(yamlSource);
+    }
+
+    private boolean canApplyFrom(List<YamlSource> yamlSources) {
+        try {
+            checkWith(yamlSources);
+            return true;
+        } catch (ConfiguratorException e) {
+            // ignore and return false
+        }
+        return false;
+    }
+
+    private JSONArray collectProblems(Map<Source, String> issues, String severity) {
+        final JSONArray problems = new JSONArray();
+        issues.entrySet().stream().map(e -> new JSONObject().accumulate("line", e.getKey().line).accumulate(severity, e.getValue()))
+                .forEach(problems::add);
+        return problems;
+    }
+
 
     private List<YamlSource> getConfigFromSources(List<String> newSources) throws ConfiguratorException {
         List<YamlSource> ret = new ArrayList<>();
