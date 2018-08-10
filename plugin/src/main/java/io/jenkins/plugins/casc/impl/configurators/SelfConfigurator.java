@@ -3,6 +3,7 @@ package io.jenkins.plugins.casc.impl.configurators;
 import hudson.Extension;
 import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
+import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.RootElementConfigurator;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
@@ -36,6 +37,11 @@ public class SelfConfigurator extends BaseConfigurator<ConfigurationContext> imp
     @Override
     protected ConfigurationContext instance(Mapping mapping, ConfigurationContext context) {
         return context;
+    }
+
+    protected void configure(Mapping config, ConfigurationContext instance, boolean dryrun, ConfigurationContext context) throws ConfiguratorException {
+        // ConfigurationContext has to be configured _even_ for dry-run as it determine CasC behaviour
+        super.configure(config, instance, false, context);
     }
 
     @CheckForNull
