@@ -33,11 +33,9 @@ jenkins:
         mode: NORMAL
         name: "agent1"
         remoteFS: "/home/user1"
-        launcher:
-          jnlp:
+        launcher: jnlp
     - dumb:
         mode: NORMAL
         name: "agent2"
         remoteFS: "/home/user1"
-        launcher:
-          jnlp:
+        launcher: jnlp
