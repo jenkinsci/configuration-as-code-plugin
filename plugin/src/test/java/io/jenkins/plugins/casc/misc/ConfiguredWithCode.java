@@ -21,4 +21,6 @@ public @interface ConfiguredWithCode {
     String[] value();
 
     Class<? extends Throwable> expected() default Test.None.class;
+
+    String message() default "";
 }
