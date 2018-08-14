@@ -7,12 +7,8 @@ jenkins:
   authorizationStrategy:
     globalMatrix:
       grantedPermissions:
-        - name: "anonymous"
-          permissions:
-            - "Overall/Read"
-        - name: "authenticated"
-          permissions:
-            - "Overall/Administer"
+        - "Overall/Read:anonymous"
+        - "Overall/Administer:authenticated"
 ```
 
 ## sample-configuration (project based matrix)
@@ -23,10 +19,6 @@ jenkins:
   authorizationStrategy:
     projectMatrix:
       grantedPermissions:
-        - name: "anonymous"
-          permissions:
-            - "Overall/Read"
-        - name: "authenticated"
-          permissions:
-            - "Overall/Administer"
+        - "Overall/Read:anonymous"
+        - "Overall/Administer:authenticated"
 ```
