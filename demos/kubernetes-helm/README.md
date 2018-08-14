@@ -29,13 +29,7 @@ Master:
   AdminPassword: "formetoknowforyoutofindout"
   Cpu: "200m"
   Memory: "1024Mi"
-  ContainerEnv:
-    - name: JENKINS_UC
-      value: https://updates.jenkins.io
-    - name: JENKINS_UC_EXPERIMENTAL
-      value: https://updates.jenkins.io/experimental
-    - name: JENKINS_INCREMENTALS_REPO_MIRROR
-      value: https://repo.jenkins-ci.org/incrementals
+
   InitContainerEnv:
     - name: JENKINS_UC
       value: https://updates.jenkins.io
@@ -44,62 +38,72 @@ Master:
     - name: JENKINS_INCREMENTALS_REPO_MIRROR
       value: https://repo.jenkins-ci.org/incrementals
 
+  ContainerEnv:
+    - name: JENKINS_UC
+      value: https://updates.jenkins.io
+    - name: JENKINS_UC_EXPERIMENTAL
+      value: https://updates.jenkins.io/experimental
+    - name: JENKINS_INCREMENTALS_REPO_MIRROR
+      value: https://repo.jenkins-ci.org/incrementals
+    # Tell the plugin where to find its config. The '..data'
+    # part is needed for now due to this bug:
+    # https://github.com/jenkinsci/configuration-as-code-plugin/issues/425
+    - name: CASC_JENKINS_CONFIG
+    - value: /var/jenkins_home/casc_configs/..data/jenkins.yaml
+
   # List of plugins to be install during Jenkins master start
   # mind the last plugin in the list now ;)
   InstallPlugins:
-      - kubernetes:latest
-      - kubernetes-credentials:latest
-      - workflow-aggregator:latest
-      - workflow-job:latest
-      - credentials-binding:latest
-      - git:latest
-      - configuration-as-code:0.10-alpha            
+    - kubernetes:latest
+    - kubernetes-credentials:latest
+    - workflow-aggregator:latest
+    - workflow-job:latest
+    - credentials-binding:latest
+    - git:latest
+    - configuration-as-code:0.11-alpha
+
+Persistence:
+  volumes:
+  - name: casc-config
+    configMap:
+      name: jenkins-casc-config
+  mounts:
+  - name: casc-config
+    mountPath: /var/jenkins_home/casc_configs
+    readOnly: true
 ```
 
-## Installations
+You will also need to create a Kubernetes ConfigMap that will contain your JCASC config file. Create a new file (below we'll assume you named it `jenkins-casc-config.yaml`) with the following contents:
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jenkins-casc-config
+data:
+  jenkins.yaml: |
+    jenkins:
+      systemMessage: "CASC Jenkins is cool"
+```
+
+## Installation
+
+First, upload your ConfigMap to Kubernetes:
+
+```
+kubectl create -f jenkins-casc-config.yaml
+```
 
 Now, deploy the Helm chart with those customized values:
 
 ```
-helm install --name jenkins stable/jenkins -f values.yml
+helm install --name jenkins stable/jenkins -f values.yaml
 ```
 
-Watch the init-container creating the stuff:
+Once Helm finishes deploying the chart, connect to your Jenkins server in your browser. You should see the `CASC Jenkins is cool` system message displayed at the top. Congratulations, you've installed the plugin and made your first Jenkins configuration change successfully! :)
 
-```
-kubectl logs -f jenkins-{POD_NAME} -c copy-default-config
-```
+## Misc
 
-You should see something like:
+The Jenkins Helm chart can be extended to make use of a custom ConfigMap. If you are already using this facility for other reasons, you can also include your custom JCASC config in that ConfigMap (instead of creating a new ConfigMap outside of the Helm chart as the above installation guide instructs).
 
-```
-Creating initial locks...
-Analyzing war...
-Registering preinstalled plugins...
-Downloading plugins...
-Downloading plugin: kubernetes from https://updates.jenkins.io/download/plugins/kubernetes/latest/kubernetes.hpi
-Downloading plugin: kubernetes-credentials from https://updates.jenkins.io/download/plugins/kubernetes-credentials/latest/kubernetes-credentials.hpi
-...
-Installed plugins:
-ace-editor:1.1
-apache-httpcomponents-client-4-api:4.5.5-3.0
-authentication-tokens:1.3
-cloudbees-folder:6.5.1
-config-file-provider:2.18
-configuration-as-code:0.10-alpha
-credentials-binding:1.16
-credentials:2.1.18
-display-url-api:2.2.0
-docker-commons:1.13
-docker-workflow:1.17
-durable-task:1.22
-...
-```
-
-Done :)
-
-## Next?
-
-You can extend the Jenkins Helm Chart to make use of a custom ConfigMap.  
-
-Check the [`custom ConfigMap`](https://github.com/helm/charts/tree/master/stable/jenkins#custom-configmap) section in the Jenkins Helm Chart repo.
+Check the [`custom ConfigMap`](https://github.com/helm/charts/tree/master/stable/jenkins#custom-configmap) section in the Jenkins Helm chart repo for more information.
