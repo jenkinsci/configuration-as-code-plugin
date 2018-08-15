@@ -12,8 +12,7 @@ credentials:
           description: "test.com domain"
           specifications:
             - hostnameSpecification:
-                includes:
-                  - "*.test.com"
+                includes: "*.test.com"
         credentials:
           - usernamePassword:
               scope:    SYSTEM
