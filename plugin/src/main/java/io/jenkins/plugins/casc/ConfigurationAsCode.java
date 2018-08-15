@@ -289,7 +289,7 @@ public class ConfigurationAsCode extends ManagementLink {
     private List<String> getStandardConfig() {
         List<String> configParameters = getBundledCasCURIs();
         CasCGlobalConfig casc = GlobalConfiguration.all().get(CasCGlobalConfig.class);
-        String cascPath = casc.getConfigurationPath();
+        String cascPath = casc != null ? casc.getConfigurationPath() : null;
 
         // Prioritization loaded files:
         if (!StringUtils.isBlank(cascPath)) {
