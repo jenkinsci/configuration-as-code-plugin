@@ -251,7 +251,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
             if (updateSite == null)
                 throw new ConfiguratorException("Can't install " + p + ": unknown update site " + p.site);
 
-            if ("latest".equals(p.version) {
+            if ("latest".equals(p.version)) {
                 final UpdateSite.Plugin plugin = updateSite.getPlugin(p.shortname);
                 if (plugin == null) {
                     throw new ConfiguratorException("update site " + p.site + " isn't hosting plugin " + p.shortname);
