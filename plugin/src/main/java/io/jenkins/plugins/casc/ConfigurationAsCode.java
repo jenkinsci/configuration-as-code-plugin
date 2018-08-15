@@ -196,7 +196,11 @@ public class ConfigurationAsCode extends ManagementLink {
 
     // Do something with validation! Make a button instead, that function can not be RequirePost in current configuration
     public FormValidation doCheckNewSource(@QueryParameter String newSource){
-        if (Util.fixEmptyAndTrim(newSource) != null && !new File(newSource).exists()) {
+        Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
+        String normalized = Util.fixEmptyAndTrim(newSource);
+        if (normalized == null) {
+            return FormValidation.ok(); // empty, do nothing
+        } else if (!new File(normalized).exists()) {
             return FormValidation.error("File does not exist");
         }
         try {
