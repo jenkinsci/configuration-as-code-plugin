@@ -21,6 +21,7 @@ import jenkins.model.Jenkins;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.QueryParameter;
@@ -147,7 +148,6 @@ public class ConfigurationAsCode extends ManagementLink {
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
-
         configure();
         response.sendRedirect("");
     }
@@ -160,7 +160,7 @@ public class ConfigurationAsCode extends ManagementLink {
         }
         String newSource = request.getParameter("_.newSource");
         File file = new File(newSource);
-        if (file.exists()) {
+        if (file.exists() || ConfigurationAsCode.isSupportedURI(newSource)) {
             List<String> candidatePaths = Collections.singletonList(newSource);
             List<YamlSource> candidates = getConfigFromSources(candidatePaths);
             if (canApplyFrom(candidates)) {
@@ -198,10 +198,11 @@ public class ConfigurationAsCode extends ManagementLink {
     public FormValidation doCheckNewSource(@QueryParameter String newSource){
         Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
         String normalized = Util.fixEmptyAndTrim(newSource);
+        File f = new File(newSource);
         if (normalized == null) {
             return FormValidation.ok(); // empty, do nothing
-        } else if (!new File(normalized).exists()) {
-            return FormValidation.error("File does not exist");
+        } else if (!f.exists() && !ConfigurationAsCode.isSupportedURI(normalized)) {
+            return FormValidation.error("Configuration cannot be applied. File or URL cannot be parsed or do not exist.");
         }
         try {
             final Map<Source, String> issues = collectIssues(newSource);
@@ -287,11 +288,11 @@ public class ConfigurationAsCode extends ManagementLink {
 
     private List<String> getStandardConfig() {
         List<String> configParameters = getBundledCasCURIs();
-        CasCGlobalConfig casc = new CasCGlobalConfig();
+        CasCGlobalConfig casc = GlobalConfiguration.all().get(CasCGlobalConfig.class);
         String cascPath = casc.getConfigurationPath();
 
         // Prioritization loaded files:
-        if (cascPath != null) {
+        if (!StringUtils.isBlank(cascPath)) {
             configParameters.add(cascPath);
             return configParameters;
         }
@@ -339,8 +340,7 @@ public class ConfigurationAsCode extends ManagementLink {
             for (String cascItem : new TreeSet<>(resources)) {
                 try {
                     URL bundled = servletContext.getResource(cascItem);
-                    if (bundled != null && matcher.matches(
-                            new File(bundled.getPath()).toPath())) {
+                    if (bundled != null && matcher.matches(new File(bundled.getPath()).toPath())) {
                         res.add(bundled.toString());
                     } //TODO: else do some handling?
                 } catch (IOException e) {
@@ -536,6 +536,7 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     private void configureWith(List<YamlSource> sources) throws ConfiguratorException {
+        lastTimeLoaded = System.currentTimeMillis();
         configureWith( YamlUtils.loadFrom(sources) );
     }
 

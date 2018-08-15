@@ -16,8 +16,8 @@ public class CasCGlobalConfig extends GlobalConfiguration {
     private String configurationPath;
 
     @DataBoundConstructor
-    public CasCGlobalConfig(String pathToFiles) {
-        this.configurationPath = pathToFiles;
+    public CasCGlobalConfig(String configurationPath) {
+        this.configurationPath = configurationPath;
     }
 
     public CasCGlobalConfig() {
