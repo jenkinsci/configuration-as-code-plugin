@@ -291,16 +291,16 @@ public class ConfigurationAsCode extends ManagementLink {
         CasCGlobalConfig casc = GlobalConfiguration.all().get(CasCGlobalConfig.class);
         String cascPath = casc != null ? casc.getConfigurationPath() : null;
 
-        // Prioritization loaded files:
-        if (!StringUtils.isBlank(cascPath)) {
-            configParameters.add(cascPath);
-            return configParameters;
-        }
-
         String configParameter = System.getProperty(
                 CASC_JENKINS_CONFIG_PROPERTY,
                 System.getenv(CASC_JENKINS_CONFIG_ENV)
         );
+
+        //If no environment variable or property has been set, and there is a setting in the global configuration
+        //configure with that setting
+        if (configParameter != null && !StringUtils.isBlank(cascPath)) {
+            configParameter = cascPath;
+        }
 
         if (configParameter == null) {
             if (Files.exists(Paths.get(DEFAULT_JENKINS_YAML_PATH))) {
@@ -312,6 +312,7 @@ public class ConfigurationAsCode extends ManagementLink {
             // Add external config parameter
             configParameters.add(configParameter);
         }
+
         if (configParameters.isEmpty()) {
             LOGGER.log(Level.FINE, "No configuration set nor default config file");
         }
