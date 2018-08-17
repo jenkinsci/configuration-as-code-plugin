@@ -209,7 +209,7 @@ secrets:
 
 Status: `BETA`
 
-We currently do support plugin installation but will remain in `beta` for the forseeable feature. Generally
+We currently do support plugin installation but it will remain in `beta` for the foreseeable future. Generally
 we recommend that you package your plugins with your Jenkins distribution as plugin installation often requires a
 restart and can cause problems with plugin dependencies. So if you want to try it, you can.
 

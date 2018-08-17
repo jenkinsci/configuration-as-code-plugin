@@ -246,11 +246,18 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
             json.accumulate("dependencies", new JSONArray());
 
             return updateSite.new Plugin(updateSite.getId(), json);
-
         } else {
             updateSite = updateCenter.getSite(p.site);
             if (updateSite == null)
                 throw new ConfiguratorException("Can't install " + p + ": unknown update site " + p.site);
+
+            if ("latest".equals(p.version)) {
+                final UpdateSite.Plugin plugin = updateSite.getPlugin(p.shortname);
+                if (plugin == null) {
+                    throw new ConfiguratorException("update site " + p.site + " isn't hosting plugin " + p.shortname);
+                }
+                return plugin;
+            }
 
             final JSONObject versions = getPluginVersions(updateSite);
             if (versions == null) {
