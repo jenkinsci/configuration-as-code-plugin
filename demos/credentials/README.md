@@ -1,7 +1,6 @@
 # credentials plugin
 
 ## sample configuration
-            
 
 ```yaml
 credentials:
@@ -29,14 +28,13 @@ Credentials plugin support relies on a custom adaptor components `CredentialsRoo
 Global credentials can be registered by just not providing a domain (i.e `null`).
 
 Credentials symbol name is inferred from implementation class simple name: `UsernamePasswordCredentialsImpl`
-descriptor's clazz is `Credentials` 
+descriptor's clazz is `Credentials`
 we consider the `Impl` suffix as a common pattern to flag implementation class.
-=> symbol name is `usernamePassword` 
-
+=> symbol name is `usernamePassword`
 
 ## Examples
 
-A list of some of the more common credentials. 
+A list of some of the more common credentials.
 
 ### SSH Credentials
 
