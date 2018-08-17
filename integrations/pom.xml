@@ -361,6 +361,11 @@
       <artifactId>custom-tools-plugin</artifactId>
       <version>0.5</version>
     </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>gitlab-plugin</artifactId>
+      <version>1.5.9</version>
+    </dependency>
 
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
