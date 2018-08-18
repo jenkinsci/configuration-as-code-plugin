@@ -2,9 +2,9 @@ package io.jenkins.plugins.casc;
 
 import com.google.common.annotations.VisibleForTesting;
 import hudson.Extension;
+import hudson.Util;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
-import hudson.model.ManagementLink;
 import hudson.remoting.Which;
 import io.jenkins.plugins.casc.impl.DefaultConfiguratorRegistry;
 import io.jenkins.plugins.casc.model.CNode;
@@ -14,12 +14,14 @@ import io.jenkins.plugins.casc.model.Sequence;
 import io.jenkins.plugins.casc.model.Source;
 import io.jenkins.plugins.casc.yaml.YamlSource;
 import io.jenkins.plugins.casc.yaml.YamlUtils;
+import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.interceptor.RequirePOST;
@@ -74,11 +76,11 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.util.logging.Level.WARNING;
-import static java.util.stream.Collectors.toList;
 import static org.yaml.snakeyaml.DumperOptions.FlowStyle.BLOCK;
 import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.DOUBLE_QUOTED;
 import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.PLAIN;
@@ -90,7 +92,7 @@ import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.PLAIN;
  */
 @Extension
 @Restricted(NoExternalUse.class)
-public class ConfigurationAsCode extends ManagementLink {
+public class ConfigurationAsCode extends GlobalConfiguration {
 
     public static final String CASC_JENKINS_CONFIG_PROPERTY = "casc.jenkins.config";
     public static final String CASC_JENKINS_CONFIG_ENV = "CASC_JENKINS_CONFIG";
@@ -100,34 +102,51 @@ public class ConfigurationAsCode extends ManagementLink {
     public static final Logger LOGGER = Logger.getLogger(ConfigurationAsCode.class.getName());
 
     @Inject
-    private DefaultConfiguratorRegistry registry;
+    private transient DefaultConfiguratorRegistry registry;
+    private String configurationPath;
 
-    @CheckForNull
-    @Override
-    public String getIconFileName() {
-        return "/plugin/configuration-as-code/img/logo-head.svg";
+    private transient long lastTimeLoaded;
+
+    private List<String> sources = Collections.emptyList();
+
+    public ConfigurationAsCode() {
+        load();
     }
 
-    @CheckForNull
+    public String getConfigurationPath() {
+        return configurationPath;
+    }
+
+    public void setLastTimeLoaded(long lastTimeLoaded) {
+        this.lastTimeLoaded = lastTimeLoaded;
+    }
+
+    @DataBoundSetter
+    public void setConfigurationPath(String configurationPath) throws ConfiguratorException{
+        if(Util.fixEmptyAndTrim(configurationPath) == null) {
+            configure();
+            LOGGER.log(Level.FINE, "Applying default");
+
+        } else {
+            this.configurationPath = configurationPath;
+            //TODO: Validate sources form the path.
+            sources = Collections.singletonList(configurationPath);
+            configureWith(getConfigFromSources(getSources()));
+            LOGGER.log(Level.FINE, "Replace configuration with: " + configurationPath);
+        }
+    }
+
+    @Override
+    public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
+        req.bindJSON(this, json);
+        save();
+        return super.configure(req, json);
+    }
+
     @Override
     public String getDisplayName() {
         return "Configuration as Code";
     }
-
-    @CheckForNull
-    @Override
-    public String getUrlName() {
-        return "configuration-as-code";
-    }
-
-    @Override
-    public String getDescription() {
-        return "An opinionated way to configure jenkins based on human-readable declarative configuration files";
-    }
-
-    private long lastTimeLoaded;
-
-    private List<String> sources = Collections.emptyList();
 
     public Date getLastTimeLoaded() {
         return new Date(lastTimeLoaded);
@@ -137,6 +156,7 @@ public class ConfigurationAsCode extends ManagementLink {
         return sources;
     }
 
+    // TODO: Do we need it?
     @RequirePOST
     public void doReload(StaplerRequest request, StaplerResponse response) throws Exception {
         if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
@@ -146,6 +166,21 @@ public class ConfigurationAsCode extends ManagementLink {
 
         configure();
         response.sendRedirect("");
+    }
+
+    private static List<YamlSource> getConfigFromSources(List<String> newSources) throws ConfiguratorException {
+        List<YamlSource> ret = new ArrayList<>();
+
+        for (String p : newSources) {
+            if (isSupportedURI(p)) {
+                ret.add(new YamlSource<>(p, YamlSource.READ_FROM_URL));
+            } else {
+                ret.addAll(configs(p).stream()
+                        .map(s -> new YamlSource<>(s, YamlSource.READ_FROM_PATH))
+                        .collect(Collectors.toList()));
+            }
+        }
+        return ret;
     }
 
     /**
@@ -170,38 +205,34 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     private List<YamlSource> getStandardConfigSources() throws ConfiguratorException {
-        List<YamlSource> configs = new ArrayList<>();
-
-        for (String p : getStandardConfig()) {
-            if (isSupportedURI(p)) {
-                configs.add(new YamlSource<>(p, YamlSource.READ_FROM_URL));
-            } else {
-                configs.addAll(configs(p).stream()
-                        .map(s -> new YamlSource<>(s, YamlSource.READ_FROM_PATH))
-                        .collect(toList()));
-            }
-            sources = Collections.singletonList(p);
-        }
-        return configs;
+        List<String> standardConfig = getStandardConfig();
+        String last = standardConfig.get(standardConfig.size() - 1);
+        //TODO: remove this side effect from the getter
+        sources = Collections.singletonList(last);
+        return getConfigFromSources(standardConfig);
     }
 
     private List<String> getStandardConfig() {
         List<String> configParameters = getBundledCasCURIs();
-        if (!configParameters.isEmpty()) {
-            LOGGER.log(Level.FINE, "Located bundled config YAMLs: {0}", configParameters);
+
+        // Prioritization loaded files Load from configuration
+        if (configurationPath != null) {
+            configParameters.add(configurationPath);
+            return configParameters;
         }
 
         String configParameter = System.getProperty(
                 CASC_JENKINS_CONFIG_PROPERTY,
                 System.getenv(CASC_JENKINS_CONFIG_ENV)
         );
+
         if (configParameter == null) {
             if (Files.exists(Paths.get(DEFAULT_JENKINS_YAML_PATH))) {
                 configParameter = DEFAULT_JENKINS_YAML_PATH;
             }
         }
 
-        if (configParameter != null) {
+        if (configParameters.isEmpty() && configParameter != null) {
             // Add external config parameter
             configParameters.add(configParameter);
         }
@@ -246,6 +277,7 @@ public class ConfigurationAsCode extends ManagementLink {
         return res;
     }
 
+    // TODO: Do we still need that?
     @RequirePOST
     public void doCheck(StaplerRequest req, StaplerResponse res) throws Exception {
 
@@ -262,6 +294,7 @@ public class ConfigurationAsCode extends ManagementLink {
         warnings.write(res.getWriter());
     }
 
+    // TODO: Do we still need that?
     @RequirePOST
     public void doApply(StaplerRequest req, StaplerResponse res) throws Exception {
 
@@ -277,6 +310,7 @@ public class ConfigurationAsCode extends ManagementLink {
      * Export live jenkins instance configuration as Yaml
      * @throws Exception
      */
+    // TODO: Find a way to process custom buttons from config.jelly
     @RequirePOST
     public void doExport(StaplerRequest req, StaplerResponse res) throws Exception {
 
@@ -402,7 +436,7 @@ public class ConfigurationAsCode extends ManagementLink {
             } else {
                 configs.addAll(configs(p).stream()
                         .map(s -> new YamlSource<>(s, YamlSource.READ_FROM_PATH))
-                        .collect(toList()));
+                        .collect(Collectors.toList()));
             }
             sources = Collections.singletonList(p);
         }
@@ -445,19 +479,18 @@ public class ConfigurationAsCode extends ManagementLink {
         return checkWith( YamlUtils.loadFrom(sources) );
     }
 
-
     /**
      * Recursive search for all {@link #YAML_FILES_PATTERN} in provided base path
      *
      * @param path base path to start (can be file or directory)
      * @return list of all paths matching pattern. Only base file itself if it is a file matching pattern
      */
-    public List<Path> configs(String path) throws ConfiguratorException {
+    public static List<Path> configs(String path) throws ConfiguratorException {
         PathMatcher matcher = FileSystems.getDefault().getPathMatcher(YAML_FILES_PATTERN);
 
         try (Stream<Path> stream = Files.find(Paths.get(path), Integer.MAX_VALUE,
                 (next, attrs) -> attrs.isRegularFile() && matcher.matches(next))) {
-            return stream.collect(toList());
+            return stream.collect(Collectors.toList());
         } catch (NoSuchFileException e) {
             throw new ConfiguratorException("File does not exist: " + path, e);
         } catch (IOException e) {
@@ -541,14 +574,14 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     /**
-     * Used for documentation generation in index.jelly
+     * Used for documentation generation in config.jelly
      */
     public Collection<?> getRootConfigurators() {
         return new LinkedHashSet<>(RootElementConfigurator.all());
     }
 
     /**
-     * Used for documentation generation in index.jelly
+     * Used for documentation generation in config.jelly
      */
     public Collection<?> getConfigurators() {
         List<RootElementConfigurator> roots = RootElementConfigurator.all();
@@ -613,5 +646,4 @@ public class ConfigurationAsCode extends ManagementLink {
         }
         return jar.substring(0, jar.lastIndexOf('.'));
     }
-
 }
