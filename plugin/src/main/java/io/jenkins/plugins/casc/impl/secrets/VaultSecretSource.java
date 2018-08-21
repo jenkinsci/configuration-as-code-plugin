@@ -18,8 +18,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Replaces secrets from .yaml files with the ${vault.*} prefix
- *
  * Requires either CASC_VAULT_USER and CASC_VAULT_PW, or CASC_VAULT_TOKEN environment variables set
  * alongside with CASC_VAULT_PATH and CASC_VAULT_URL
  */

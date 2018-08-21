@@ -47,10 +47,10 @@ credentials:
     domainCredentials:
       - credentials:
           - usernamePassword:
-              scope: GLOBAL
-              id: ${operator_userid}
-              username: ${operator_userid}
-              password: ${operator_pass}
+              scope: "GLOBAL"
+              id: "${operator_userid}"
+              username: "${operator_userid}"
+              password: "${operator_pass}"
               description: "i am catto with doggo pass"
 ```
 
