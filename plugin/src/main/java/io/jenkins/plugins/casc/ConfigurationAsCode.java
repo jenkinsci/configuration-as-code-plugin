@@ -2,10 +2,12 @@ package io.jenkins.plugins.casc;
 
 import com.google.common.annotations.VisibleForTesting;
 import hudson.Extension;
+import hudson.Util;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
 import hudson.model.ManagementLink;
 import hudson.remoting.Which;
+import hudson.util.FormValidation;
 import io.jenkins.plugins.casc.impl.DefaultConfiguratorRegistry;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
@@ -14,12 +16,15 @@ import io.jenkins.plugins.casc.model.Sequence;
 import io.jenkins.plugins.casc.model.Source;
 import io.jenkins.plugins.casc.yaml.YamlSource;
 import io.jenkins.plugins.casc.yaml.YamlUtils;
+import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
+import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.interceptor.RequirePOST;
@@ -143,9 +148,105 @@ public class ConfigurationAsCode extends ManagementLink {
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
-
         configure();
         response.sendRedirect("");
+    }
+
+    @RequirePOST
+    public void doReplace(StaplerRequest request, StaplerResponse response) throws Exception {
+        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+        String newSource = request.getParameter("_.newSource");
+        File file = new File(newSource);
+        if (file.exists() || ConfigurationAsCode.isSupportedURI(newSource)) {
+            List<String> candidatePaths = Collections.singletonList(newSource);
+            List<YamlSource> candidates = getConfigFromSources(candidatePaths);
+            if (canApplyFrom(candidates)) {
+                sources = candidatePaths;
+                configureWith(getConfigFromSources(getSources()));
+                CasCGlobalConfig config = GlobalConfiguration.all().get(CasCGlobalConfig.class);
+                if(config != null) {
+                    config.setConfigurationPath(newSource);
+                    config.save();
+                }
+                LOGGER.log(Level.FINE, "Replace configuration with: " + newSource);
+            } else {
+                LOGGER.log(Level.INFO, "Provided sources could not be applied");
+                // todo: show message in UI
+            }
+        } else {
+            LOGGER.log(Level.FINE, "There is no such source exist, applying default");
+            // May be do nothing instead?
+            configure();
+        }
+        response.sendRedirect("");
+    }
+
+    private boolean canApplyFrom(List<YamlSource> yamlSources) {
+        try {
+            checkWith(yamlSources);
+            return true;
+        } catch (ConfiguratorException e) {
+            // ignore and return false
+        }
+        return false;
+    }
+
+    // Do something with validation! Make a button instead, that function can not be RequirePost in current configuration
+    public FormValidation doCheckNewSource(@QueryParameter String newSource){
+        Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
+        String normalized = Util.fixEmptyAndTrim(newSource);
+        File f = new File(newSource);
+        if (normalized == null) {
+            return FormValidation.ok(); // empty, do nothing
+        } else if (!f.exists() && !ConfigurationAsCode.isSupportedURI(normalized)) {
+            return FormValidation.error("Configuration cannot be applied. File or URL cannot be parsed or do not exist.");
+        }
+        try {
+            final Map<Source, String> issues = collectIssues(newSource);
+            final JSONArray errors = collectProblems(issues, "error");
+            if (!errors.isEmpty()) {
+                return FormValidation.error(errors.toString());
+            }
+            final JSONArray warnings = collectProblems(issues, "warning");
+            if (!warnings.isEmpty()) {
+                return FormValidation.warning(warnings.toString());
+            }
+            return FormValidation.okWithMarkup("The configuration can be applied");
+        } catch (ConfiguratorException e) {
+            return FormValidation.error(e, e.getCause().getMessage());
+        }
+    }
+
+    private Map<Source, String> collectIssues(String configurationPath) throws ConfiguratorException {
+        List<String> sources = Collections.singletonList(configurationPath);
+        List<YamlSource> yamlSource = getConfigFromSources(sources);
+        return checkWith(yamlSource);
+    }
+
+    private JSONArray collectProblems(Map<Source, String> issues, String severity) {
+        final JSONArray problems = new JSONArray();
+        issues.entrySet().stream().map(e -> new JSONObject().accumulate("line", e.getKey().line).accumulate(severity, e.getValue()))
+                .forEach(problems::add);
+        return problems;
+    }
+
+
+    private List<YamlSource> getConfigFromSources(List<String> newSources) throws ConfiguratorException {
+        List<YamlSource> ret = new ArrayList<>();
+
+        for (String p : newSources) {
+            if (isSupportedURI(p)) {
+                ret.add(new YamlSource<>(p, YamlSource.READ_FROM_URL));
+            } else {
+                ret.addAll(configs(p).stream()
+                        .map(s -> new YamlSource<>(s, YamlSource.READ_FROM_PATH))
+                        .collect(toList()));
+            }
+        }
+        return ret;
     }
 
     /**
@@ -187,14 +288,18 @@ public class ConfigurationAsCode extends ManagementLink {
 
     private List<String> getStandardConfig() {
         List<String> configParameters = getBundledCasCURIs();
-        if (!configParameters.isEmpty()) {
-            LOGGER.log(Level.FINE, "Located bundled config YAMLs: {0}", configParameters);
-        }
+        CasCGlobalConfig casc = GlobalConfiguration.all().get(CasCGlobalConfig.class);
+        String cascPath = casc != null ? casc.getConfigurationPath() : null;
 
         String configParameter = System.getProperty(
                 CASC_JENKINS_CONFIG_PROPERTY,
                 System.getenv(CASC_JENKINS_CONFIG_ENV)
         );
+
+        if (!StringUtils.isBlank(cascPath)) {
+            configParameter = cascPath;
+        }
+
         if (configParameter == null) {
             if (Files.exists(Paths.get(DEFAULT_JENKINS_YAML_PATH))) {
                 configParameter = DEFAULT_JENKINS_YAML_PATH;
@@ -205,6 +310,7 @@ public class ConfigurationAsCode extends ManagementLink {
             // Add external config parameter
             configParameters.add(configParameter);
         }
+
         if (configParameters.isEmpty()) {
             LOGGER.log(Level.FINE, "No configuration set nor default config file");
         }
@@ -233,8 +339,7 @@ public class ConfigurationAsCode extends ManagementLink {
             for (String cascItem : new TreeSet<>(resources)) {
                 try {
                     URL bundled = servletContext.getResource(cascItem);
-                    if (bundled != null && matcher.matches(
-                            new File(bundled.getPath()).toPath())) {
+                    if (bundled != null && matcher.matches(new File(bundled.getPath()).toPath())) {
                         res.add(bundled.toString());
                     } //TODO: else do some handling?
                 } catch (IOException e) {
@@ -430,6 +535,7 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     private void configureWith(List<YamlSource> sources) throws ConfiguratorException {
+        lastTimeLoaded = System.currentTimeMillis();
         configureWith( YamlUtils.loadFrom(sources) );
     }
 
