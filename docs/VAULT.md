@@ -28,3 +28,35 @@ SSH_PRIVATE_KEY=@/vault/file/secrets/jenkins_ssh_key
 ```
 
 Essentially, anything can go into a vault, as long as it's KEY=VALUE formatted. If you work inside a docker container, the above example requires you to have the file `/vault/file/secrets/jenkins_ssh_key` exist inside the docker container.
+
+## Usage 
+
+```bash
+$ vault kv get  kv/jenkins/master
+============= Data =============
+Key                        Value
+---                        -----
+operator_pass        doggo
+operator_userid      catto
+```
+and use them in configuration:
+```yaml
+# config truncated
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+          - usernamePassword:
+              scope: "GLOBAL"
+              id: "${operator_userid}"
+              username: "${operator_userid}"
+              password: "${operator_pass}"
+              description: "i am catto with doggo pass"
+```
+
+## Current limitations
+
+Due to dependency on BetterCloud's [vault-java-driver](https://github.com/BetterCloud/vault-java-driver), Vault's change default KV backend from v1 to v2 and HTTP endpoints change it's currently unable to use Vault's KV v2 secret store. ([see issue on BetterCloud project](https://github.com/BetterCloud/vault-java-driver/issues/114))
+Be aware which version you use as default dev Vault server, starting from 0.10, it uses KV v2. [See docs](https://www.vaultproject.io/docs/secrets/kv/kv-v2.html)
+
+
