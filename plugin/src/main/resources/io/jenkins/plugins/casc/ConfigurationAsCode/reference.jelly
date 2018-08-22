@@ -95,7 +95,7 @@
   <div class='container'>
   <div class='row body'>
   <div class='section'>
-  <h2>Jenkins Configuration as Code Reference</h2>
+  <h2>${%Jenkins Configuration as Code Reference}</h2>
 
   <div class='sect3'>
   <j:set var="casc" value="${it}"/>
