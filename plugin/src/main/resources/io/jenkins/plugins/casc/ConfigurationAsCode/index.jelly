@@ -6,21 +6,25 @@
   <div class="container-fluid">
   <div class="row">
   <div class="col-md-24">
-    <h1>Configuration as Code</h1>
+    <h1>${%Configuration as Code}</h1>
 
     <j:choose>
       <j:when test="${empty it.sources}">
-        <p>Master has no configuration as code file set.</p>
+        <p>${%Master has no configuration as code file set.}</p>
       </j:when>
       <j:otherwise>
-        Configuration loaded from :
+        ${%Configuration loaded from :}
         <ul>
           <j:forEach var="source" items="${it.sources}">
             <li>${source}</li>
           </j:forEach>
         </ul>
 
-        <p>Last time applied : <i:formatDate value="${it.lastTimeLoaded}" type="both" dateStyle="medium" timeStyle="long"/></p>
+        <p>${%Last time applied :}<i:formatDate value="${it.lastTimeLoaded}" type="both" dateStyle="medium" timeStyle="long"/></p>
+
+        <f:form method="post" action="reload" name="reload">
+          <f:submit name="reload" value="${%Reload}"/>
+        </f:form>
 
       </j:otherwise>
       <style>
@@ -42,14 +46,14 @@
         <f:submit name="reload" value="Reload existing configuration"/>
       </f:form>
         <f:form method="post" action="export" name="export">
-          <f:submit name="export" value="Export Configuration"/>
+          <f:submit name="export" value="${%Export Configuration}"/>
         </f:form>        
     </j:choose>
 
-    <h2>Reference</h2>
+    <h2>${%Reference}</h2>
     <dt>
-      <dl><a href="reference">Documentation</a></dl>
-      <dl><a href="schema">JSON schema</a></dl>
+      <dl><a href="reference">${%Documentation}</a></dl>
+      <dl><a href="schema">${%JSON schema}</a></dl>
     </dt>
 
   </div>
