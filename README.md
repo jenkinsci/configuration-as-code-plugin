@@ -147,7 +147,7 @@ using the `:-` operator from `bash` is also available:
 
  - Using environment variables
  - Using docker-secrets, where files on path `/run/secrets/${KEY}` will be replaced by `${KEY}` in configuration
- - Using kubernetes secrets, logic is the same as for docker-secretes (see example in [demos](demos) folder)
+ - Using kubernetes secrets, logic is the same as for docker-secrets (see example in [demos](demos) folder)
  - Using vault, see instructions in section below
 
 ### Using Vault initial secrets
