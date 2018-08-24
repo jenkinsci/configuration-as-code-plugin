@@ -60,7 +60,7 @@ jenkins:
                 resourceLimitMemory: "2Gi"
             volumes:
               - emptyDirVolume:
-                  inMemory: false
+                  memory: false
                   mountPath: "/tmp"
             idleMinutes: "1"
             activeDeadlineSeconds: "120"
