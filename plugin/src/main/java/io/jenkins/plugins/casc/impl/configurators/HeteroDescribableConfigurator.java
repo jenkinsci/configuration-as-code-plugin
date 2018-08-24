@@ -99,6 +99,15 @@ public class HeteroDescribableConfigurator<T extends Describable> implements Con
         return configure(config, context);
     }
 
+
+    /**
+     *
+     * @return true if the support plugin is installed, false otherwise.
+     */
+    private boolean _hasSupportPluginInstalled() {
+        return Jenkins.getInstance().getPlugin("configuration-as-code-support") != null;
+    }
+
     private Class<T> findDescribableBySymbol(CNode node, String shortname, List<Descriptor> candidates) {
 
         // Search for @Symbol annotation on Descriptor to match shortName
@@ -116,7 +125,9 @@ public class HeteroDescribableConfigurator<T extends Describable> implements Con
                 }
             }
         }
-        throw new IllegalArgumentException("No "+target.getName()+ " implementation found for "+shortname);
+        final String errSupport = !_hasSupportPluginInstalled() ? "\nPossible solution: Try to install 'configuration-as-code-support' plugin" : "";
+        final String msg = "No "+target.getName()+ " implementation found for "+shortname;
+        throw new IllegalArgumentException(String.format("%s%s", msg, errSupport));
     }
 
     @Override
