@@ -236,4 +236,4 @@ As Configuration-as-code is demonstrated to be a highly requested topic in Jenki
 [JEP 201](https://github.com/jenkinsci/jep/tree/master/jep/201) as proposal to make this a standard component
 of the Jenkins project.
 
-Current status : draft.
+Current status : accepted.
