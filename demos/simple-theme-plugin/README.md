@@ -5,8 +5,13 @@
 ```yaml
 unclassified:
   simple-theme-plugin:
-    cssUrl: "https://cdn.rawgit.com/afonsof/jenkins-material-theme/gh-pages/dist/material-blue.css"
-    cssRules: ""
-    jsUrl: ""
-    faviconUrl: "https://vignette.wikia.nocookie.net/deadpool/images/6/64/Favicon.ico"
+    elements:
+      - cssUrl:
+          url: "https://example.bogus/test.css"
+      - cssText:
+          text: ".testcss { color: red }"
+      - jsUrl:
+          url: "https://example.bogus/test.js"
+      - faviconUrl:
+          url: "https://vignette.wikia.nocookie.net/deadpool/images/6/64/Favicon.ico"
 ```
