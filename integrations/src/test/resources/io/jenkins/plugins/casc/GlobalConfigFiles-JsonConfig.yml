@@ -1,0 +1,8 @@
+globalConfigFiles:
+  configs:
+    - jsonConfig:
+        id: 3c9bc804-3ae8-4026-a3a3-1192bf564422
+        name: DummyJsonConfig
+        comment: dummy json config
+        content: |
+          { "dummydata": {"dummyKey": "dummyValue"} }
