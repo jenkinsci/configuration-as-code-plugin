@@ -85,5 +85,10 @@
       </plugin>
     </plugins>
   </build>
-
+  <scm>
+    <connection>scm:git:git://github.com/jenkinsci/configuration-as-code-plugin.git</connection>
+    <developerConnection>scm:git:git@github.com:jenkinsci/configuration-as-code-plugin.git</developerConnection>
+    <url>https://github.com/jenkinsci/configuration-as-code-plugin</url>
+    <tag>${scmTag}</tag>
+  </scm>
 </project>
