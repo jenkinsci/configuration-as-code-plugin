@@ -49,7 +49,7 @@ Master:
     # part is needed for now due to this bug:
     # https://github.com/jenkinsci/configuration-as-code-plugin/issues/425
     - name: CASC_JENKINS_CONFIG
-    - value: /var/jenkins_home/casc_configs/..data/jenkins.yaml
+      value: /var/jenkins_home/casc_configs/..data/jenkins.yaml
 
   # List of plugins to be install during Jenkins master start
   # mind the last plugin in the list now ;)
