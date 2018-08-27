@@ -1,5 +1,8 @@
 package io.jenkins.plugins.casc;
 
+import hudson.model.Descriptor;
+import hudson.model.ManagementLink;
+import io.jenkins.plugins.casc.impl.configurators.DescriptorConfigurator;
 import io.jenkins.plugins.casc.impl.configurators.GlobalConfigurationCategoryConfigurator;
 import jenkins.model.GlobalConfigurationCategory;
 import jenkins.model.Jenkins;
@@ -24,6 +27,13 @@ public interface RootElementConfigurator<T> extends Configurator<T> {
 
         for (GlobalConfigurationCategory category : GlobalConfigurationCategory.all()) {
             configurators.add(new GlobalConfigurationCategoryConfigurator(category));
+        } 
+
+        for (ManagementLink link : ManagementLink.all()) {
+            final String name = link.getUrlName();
+            final Descriptor descriptor = Jenkins.getInstance().getDescriptor(name);
+            if (descriptor != null)
+                configurators.add(new DescriptorConfigurator(descriptor));
         }
 
         return configurators;
