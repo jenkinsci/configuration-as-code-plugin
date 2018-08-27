@@ -53,16 +53,21 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
         final Set<String> exclusions = exclusions();
 
         for (Field field : getTarget().getFields()) {
-            final int mod = field.getModifiers();
-            if (Modifier.isFinal(mod) && !Modifier.isTransient(mod)) {
-                if (exclusions.contains(field.getName())) continue;
-                if (PersistedList.class.isAssignableFrom(field.getType())) {
-                    // see Jenkins#clouds
-                    Attribute attribute = detectActualType(field.getName(), TypePair.of(field))
-                            .getter(field::get); // get value by direct access to public final field
-                    attributes.add(attribute);
+            final String name = field.getName();
+            if (exclusions.contains(name)) continue;
+
+            if (PersistedList.class.isAssignableFrom(field.getType())) {
+                if (Modifier.isTransient(field.getModifiers())) {
+                    exclusions.add(name);
+                    continue;
                 }
+
+                Attribute attribute = detectActualType(name, TypePair.of(field))
+                        .getter(field::get); // get value by direct access to public final field
+                attributes.add(attribute);
             }
+
+
         }
 
         final Class<T> target = getTarget();
