@@ -29,8 +29,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -51,7 +53,7 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
 
     public Set<Attribute<T, ?>> describe() {
 
-        Set<Attribute<T,?>> attributes = new HashSet<>();
+        Map<String, Attribute<T,?>> attributes = new HashMap<>();
         final Set<String> exclusions = exclusions();
 
         for (Field field : getTarget().getFields()) {
@@ -66,18 +68,19 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
 
                 Attribute attribute = detectActualType(name, TypePair.of(field))
                         .getter(field::get); // get value by direct access to public final field
-                attributes.add(attribute);
+                attributes.put(name, attribute);
             }
         }
 
         final Class<T> target = getTarget();
+        // Resolve the methods and merging overrides to more concretized signatures
+        // because the methods can to have been overridden with concretized type
+        // TODO: Overloaded setters with different types can corrupt this logic
         for (Method method : target.getMethods()) {
-
             final String methodName = method.getName();
             TypePair type;
             if (method.getParameterCount() == 0 && methodName.startsWith("get")
-                && PersistedList.class.isAssignableFrom(method.getReturnType())) {
-
+                    && PersistedList.class.isAssignableFrom(method.getReturnType())) {
                 type = TypePair.ofReturnType(method);
             } else if (method.getParameterCount() != 1 || !methodName.startsWith("set")) {
                 // Not an accessor, ignore
@@ -99,14 +102,19 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
 
             Attribute attribute = detectActualType(name, type);
             if (attribute == null) continue;
-            attributes.add(attribute);
 
             attribute.deprecated(method.getAnnotation(Deprecated.class) != null);
             final Restricted r = method.getAnnotation(Restricted.class);
             if (r != null) attribute.restrictions(r.value());
+
+            Attribute prevAttribute = attributes.get(name);
+            // Replace the method if it have more concretized type
+            if (prevAttribute == null || prevAttribute.type.isAssignableFrom(attribute.type)) {
+                attributes.put(name, attribute);
+            }
         }
 
-        return attributes;
+        return new HashSet<>(attributes.values());
     }
 
     /**
