@@ -29,7 +29,6 @@ public class JenkinsConfiguratorTest {
     public void jenkins_primitive_attributes() throws Exception {
         final Jenkins jenkins = Jenkins.getInstance();
         assertEquals(6666, jenkins.getSlaveAgentPort());
-        assertEquals(false, jenkins.isUsageStatisticsCollected());
     }
 
     @Test

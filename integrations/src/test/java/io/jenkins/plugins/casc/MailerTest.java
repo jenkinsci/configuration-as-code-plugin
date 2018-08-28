@@ -24,6 +24,7 @@ public class MailerTest {
         final Mailer.DescriptorImpl descriptor = (Mailer.DescriptorImpl) jenkins.getDescriptor(Mailer.class);
         assertEquals("4441", descriptor.getSmtpPort());
         assertEquals("do-not-reply@acme.org", descriptor.getReplyToAddress());
+        // assertEquals("smtp.acme.org", descriptor.getSmtpServer() /* getSmtpHost */ );
 
         // FIXME setAdminAddress is deprecated and should NOT be set this way
         // see https://github.com/jenkinsci/mailer-plugin/pull/39

@@ -3,6 +3,7 @@ package io.jenkins.plugins.casc;
 import hudson.model.Describable;
 import hudson.model.Saveable;
 import hudson.util.PersistedList;
+import hudson.util.ReflectionUtils;
 import io.jenkins.plugins.casc.impl.attributes.DescribableAttribute;
 import io.jenkins.plugins.casc.impl.attributes.PersistedListAttribute;
 import io.jenkins.plugins.casc.model.CNode;
@@ -25,6 +26,7 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -66,8 +68,6 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
                         .getter(field::get); // get value by direct access to public final field
                 attributes.add(attribute);
             }
-
-
         }
 
         final Class<T> target = getTarget();
@@ -86,8 +86,15 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
                 type = TypePair.ofParameter(method, 0);
             }
 
-            final String name = StringUtils.uncapitalize(methodName.substring(3));
+            final String s = methodName.substring(3);
+            final String name = StringUtils.uncapitalize(s);
             if (exclusions.contains(name)) continue;
+
+            if (!hasGetter(target, s)) {
+                // Looks like a property but no actual getter method we can use to read value
+                continue;
+            }
+
             logger.log(FINER, "Processing {0} property", name);
 
             Attribute attribute = detectActualType(name, type);
@@ -100,6 +107,17 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
         }
 
         return attributes;
+    }
+
+    /**
+     * Check if target class has a Getter method for property s
+     */
+    private boolean hasGetter(Class<T> c, String s) {
+        List<String> candidates = Arrays.asList("get"+s, "is"+s);
+        for( Method m : c.getMethods() )
+            if (m.getParameterCount() == 0 && candidates.contains(m.getName()))
+                return true;
+        return false;
     }
 
     /**
