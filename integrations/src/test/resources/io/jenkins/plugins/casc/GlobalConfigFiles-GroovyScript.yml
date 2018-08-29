@@ -1,0 +1,7 @@
+globalConfigFiles:
+  configs:
+    - groovyScript:
+        id: ff8503b1-c4e7-4e52-9b8e-2ed774448c88
+        name: DummyGroovyConfig
+        comment: dummy groovy config
+        content: println('dummy hello world')

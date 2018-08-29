@@ -1,0 +1,13 @@
+globalConfigFiles:
+  configs:
+    - customConfig:
+        id: 68168f02-ad9e-4729-b83f-7b59432be774
+        name: DummyCustom1
+        comment: dummy custom 1
+        content: dummy content 1
+
+    - customConfig:
+        id: 7dd3b657-547f-419f-9988-3a53b0cf9db6
+        name: DummyCustom2
+        comment: dummy custom 2
+        content: dummy content 2

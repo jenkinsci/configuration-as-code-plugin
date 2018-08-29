@@ -1,0 +1,7 @@
+globalConfigFiles:
+  configs:
+    - xmlConfig:
+        id: ef61bcee-506a-47e7-9325-73857d7441a3
+        name: DummyXmlConfig
+        comment: dummy xml config
+        content: <root><dummy test="abc"></dummy></root>

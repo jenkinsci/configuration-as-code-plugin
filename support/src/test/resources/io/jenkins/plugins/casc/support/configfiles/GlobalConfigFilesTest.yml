@@ -1,0 +1,44 @@
+globalConfigFiles:
+  configs:
+    - customConfig:
+        id: 68168f02-ad9e-4729-b83f-7b59432be774
+        name: DummyCustom1
+        comment: dummy custom 1
+        content: dummy content 1
+
+    - jsonConfig:
+        id: 3c9bc804-3ae8-4026-a3a3-1192bf564422
+        name: DummyJsonConfig
+        comment: dummy json config
+        content: |
+          { "dummydata": {"dummyKey": "dummyValue"} }
+
+    - xmlConfig:
+        id: ef61bcee-506a-47e7-9325-73857d7441a3
+        name: DummyXmlConfig
+        comment: dummy xml config
+        content: <root><dummy test="abc"></dummy></root>
+
+    - mavenSettingsConfig:
+        id: d40b9db5-3369-4c63-968e-290fd6614009
+        name: DummySettings
+        comment: dummy settings
+        isReplaceAll: true
+        serverCredentialMappings:
+          - serverId: server3
+            credentialsId: credentialsB
+          - serverId: server4
+            credentialsId: credentialsY
+        content: |
+          <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" 
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+                    xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+            <!-- activeProfiles
+             | List of profiles that are active for all builds.
+             |
+            -->
+            <activeProfiles>
+              <activeProfile>alwaysActiveProfile</activeProfile>
+              <activeProfile>anotherAlwaysActiveProfile</activeProfile>
+            </activeProfiles>
+          </settings>
