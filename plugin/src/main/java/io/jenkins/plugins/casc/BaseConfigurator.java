@@ -360,12 +360,12 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
         }
     }
 
-    protected @Nonnull Mapping compare(T o1, T o2, ConfigurationContext context) throws Exception {
+    protected @Nonnull Mapping compare(T instance, T reference, ConfigurationContext context) throws Exception {
 
         Mapping mapping = new Mapping();
         for (Attribute attribute : getAttributes()) {
-            if (attribute.equals(o1, o2)) continue;
-            mapping.put(attribute.getName(), attribute.describe(o1, context));
+            if (attribute.equals(instance, reference)) continue;
+            mapping.put(attribute.getName(), attribute.describe(instance, context));
         }
         return mapping;
     }

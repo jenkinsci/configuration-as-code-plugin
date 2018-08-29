@@ -1,29 +1,21 @@
 package io.jenkins.plugins.casc.support.rolestrategy;
 
 
-import com.michelin.cio.hudson.plugins.rolestrategy.Role;
 import com.michelin.cio.hudson.plugins.rolestrategy.RoleBasedAuthorizationStrategy;
-import com.michelin.cio.hudson.plugins.rolestrategy.RoleMap;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import io.jenkins.plugins.casc.Attribute;
+import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
-import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.Configurator;
-import io.jenkins.plugins.casc.impl.attributes.MultivaluedAttribute;
+import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.Collections;
 import java.util.Set;
-import java.util.TreeMap;
 
 /**
  * Provides the configuration logic for Role Strategy plugin.
@@ -32,7 +24,7 @@ import java.util.TreeMap;
  */
 @Extension(optional = true)
 @Restricted({NoExternalUse.class})
-public class RoleBasedAuthorizationStrategyConfigurator implements Configurator<RoleBasedAuthorizationStrategy> {
+public class RoleBasedAuthorizationStrategyConfigurator extends BaseConfigurator<RoleBasedAuthorizationStrategy> {
 
     @Override
     public String getName() {
@@ -45,64 +37,22 @@ public class RoleBasedAuthorizationStrategyConfigurator implements Configurator<
     }
 
     @Override
-    public RoleBasedAuthorizationStrategy configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
-        //TODO: API should return a qualified type
-        final Configurator<RoleDefinition> roleDefinitionConfigurator = context.lookupOrFail(RoleDefinition.class);
-
-        Mapping map = config.asMapping();
-        Map<String, RoleMap> grantedRoles = new HashMap<>();
-
-        CNode rolesConfig = map.get("roles");
-        if (rolesConfig != null) {
-            grantedRoles.put(RoleBasedAuthorizationStrategy.GLOBAL,
-                    retrieveRoleMap(rolesConfig, "global", roleDefinitionConfigurator, context));
-            grantedRoles.put(RoleBasedAuthorizationStrategy.PROJECT,
-                    retrieveRoleMap(rolesConfig, "items", roleDefinitionConfigurator, context));
-            grantedRoles.put(RoleBasedAuthorizationStrategy.SLAVE,
-                    retrieveRoleMap(rolesConfig, "agents", roleDefinitionConfigurator, context));
-        }
-        return new RoleBasedAuthorizationStrategy(grantedRoles);
-    }
-
-    @Override
-    public RoleBasedAuthorizationStrategy check(CNode config, ConfigurationContext context) {
-        // FIXME
-        return null;
-    }
-
-    @Nonnull
-    private static RoleMap retrieveRoleMap(@Nonnull CNode config, @Nonnull String name, Configurator<RoleDefinition> configurator, ConfigurationContext context) throws ConfiguratorException {
-        Mapping map = config.asMapping();
-        final CNode c = map.get(name);
-
-        TreeMap<Role, Set<String>> resMap = new TreeMap<>();
-        if (c == null || c.asSequence() == null) {
-            // we cannot return emptyMap here due to the Role Strategy code
-            return new RoleMap(resMap);
-        }
-
-        for (CNode entry : c.asSequence()) {
-            RoleDefinition definition = configurator.configure(entry, context);
-            resMap.put(definition.getRole(), definition.getAssignments());
-        }
-
-        return new RoleMap(resMap);
+    protected RoleBasedAuthorizationStrategy instance(Mapping map, ConfigurationContext context) throws ConfiguratorException {
+        final Configurator<GrantedRoles> c = context.lookupOrFail(GrantedRoles.class);
+        final GrantedRoles roles = c.configure(map.remove("roles"), context);
+        return new RoleBasedAuthorizationStrategy(roles.toMap());
     }
 
     @Override
     public Set<Attribute<RoleBasedAuthorizationStrategy,?>> describe() {
-        return new HashSet<>(Arrays.asList(
-                new MultivaluedAttribute<RoleBasedAuthorizationStrategy, RoleDefinition>("global", RoleDefinition.class),
-                new MultivaluedAttribute<RoleBasedAuthorizationStrategy, RoleDefinition>("items", RoleDefinition.class),
-                new MultivaluedAttribute<RoleBasedAuthorizationStrategy, RoleDefinition>("agents", RoleDefinition.class)
-        ));
+        return Collections.singleton(
+                new Attribute<RoleBasedAuthorizationStrategy, GrantedRoles>("roles", GrantedRoles.class));
     }
 
     @CheckForNull
     @Override
-    public CNode describe(RoleBasedAuthorizationStrategy instance, ConfigurationContext context) {
-        // FIXME
-        return null;
+    public CNode describe(RoleBasedAuthorizationStrategy instance, ConfigurationContext context) throws Exception {
+        return compare(instance, new RoleBasedAuthorizationStrategy(Collections.emptyMap()), context);
     }
 
 

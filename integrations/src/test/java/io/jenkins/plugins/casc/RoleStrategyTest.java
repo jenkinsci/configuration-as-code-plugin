@@ -35,13 +35,6 @@ public class RoleStrategyTest {
     public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 
     @Test
-    public void shouldReturnCustomConfigurator() {
-        Configurator c = ConfiguratorRegistry.get().lookup(RoleBasedAuthorizationStrategy.class);
-        assertNotNull("Failed to find configurator for RoleBasedAuthorizationStrategy", c);
-        assertEquals("Retrieved wrong configurator", RoleBasedAuthorizationStrategyConfigurator.class, c.getClass());
-    }
-
-    @Test
     @Issue("Issue #48")
     @ConfiguredWithCode("RoleStrategy1.yml")
     public void shouldReadRolesCorrectly() throws Exception {
