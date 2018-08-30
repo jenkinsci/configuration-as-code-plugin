@@ -59,10 +59,12 @@ public class HeteroDescribableConfigurator<T extends Describable> implements Con
 
     public List<Configurator> getConfigurators(ConfigurationContext context) {
         final List<Descriptor> candidates = Jenkins.getInstance().getDescriptorList(target);
-        return candidates.stream()
+        final List<Configurator> configurators = candidates.stream()
                 .map(d -> context.lookup(d.getKlass().toJavaClass()))
                 .filter(c -> c != null)
                 .collect(Collectors.toList());
+        configurators.add(this);
+        return configurators;
     }
 
     @Override
@@ -99,6 +101,15 @@ public class HeteroDescribableConfigurator<T extends Describable> implements Con
         return configure(config, context);
     }
 
+    public Map<String, Class> getImplementors() {
+        final Class api = getImplementedAPI();
+        final List<Descriptor> descriptors = Jenkins.getInstance().getDescriptorList(target);
+        return descriptors.stream()
+            .collect(Collectors.toMap(
+                    d -> DescribableAttribute.getSymbols(d, api, target).get(0),
+                    d -> d.getKlass().toJavaClass()));
+    }
+
 
     /**
      *
@@ -110,9 +121,10 @@ public class HeteroDescribableConfigurator<T extends Describable> implements Con
 
     private Class<T> findDescribableBySymbol(CNode node, String shortname, List<Descriptor> candidates) {
 
+        final Class api = getImplementedAPI();
         // Search for @Symbol annotation on Descriptor to match shortName
         for (Descriptor d : candidates) {
-            final List<String> symbols = DescribableAttribute.getSymbols(d, getImplementedAPI(), target);
+            final List<String> symbols = DescribableAttribute.getSymbols(d, api, target);
             final String preferred = symbols.get(0);
             if (preferred.equalsIgnoreCase(shortname)) {
                 return d.getKlass().toJavaClass();
