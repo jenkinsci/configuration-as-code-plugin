@@ -77,6 +77,11 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
     }
 
     @Override
+    public PluginManager check(CNode c, ConfigurationContext context) throws ConfiguratorException {
+        return getTargetComponent(context);
+    }
+
+    @Override
     public PluginManager configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
         Mapping map = config.asMapping();
         final Jenkins jenkins = Jenkins.getInstance();
