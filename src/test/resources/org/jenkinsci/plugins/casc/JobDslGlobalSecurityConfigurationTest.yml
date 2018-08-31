@@ -1,0 +1,3 @@
+security:
+  GlobalJobDslSecurityConfiguration:
+    useScriptSecurity: false
