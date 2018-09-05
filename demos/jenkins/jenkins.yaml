@@ -65,6 +65,10 @@ unclassified:
               git:
                 remote: "https://github.com/jenkins-infra/pipeline-library.git"
 
+  location:
+    adminAddress: you@example.com
+    url: https://ci.example.com/
+
   teampluginglobalconfig:
     collectionConfigurations:
       - collectionUrl: http://test.com
