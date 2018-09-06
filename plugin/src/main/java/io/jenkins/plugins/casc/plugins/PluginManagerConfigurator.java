@@ -240,9 +240,10 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
             // This is not a version number
             // We also support plain download URL for custom plugins
             url = p.version;
-            updateSite = updateCenter.getSite(UpdateCenter.PREDEFINED_UPDATE_SITE_ID);
+            // we don't really care about update site, but we need one to create a Plugin instance
+            updateSite = updateCenter.getSites().get(0);
             if (updateSite == null)
-                throw new ConfiguratorException("Can't install " + p + ": no default update site");
+                throw new ConfiguratorException("Can't install " + p + ": no update site declared");
 
             JSONObject json = new JSONObject();
             json.accumulate("name", p.shortname);
