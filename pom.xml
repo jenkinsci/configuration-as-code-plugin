@@ -9,7 +9,7 @@
   </parent>
   <groupId>io.jenkins.configuration-as-code</groupId>
   <artifactId>parent</artifactId>
-  <version>${revision}${changelist}</version>
+  <version>1.0-rc3</version>
   <packaging>pom</packaging>
 
   <modules>
@@ -48,7 +48,7 @@
     <connection>scm:git:git://github.com/jenkinsci/configuration-as-code-plugin.git</connection>
     <developerConnection>scm:git:git@github.com:jenkinsci/configuration-as-code-plugin.git</developerConnection>
     <url>https://github.com/jenkinsci/configuration-as-code-plugin</url>
-    <tag>${scmTag}</tag>
+    <tag>parent-1.0-rc3</tag>
   </scm>
 
   <repositories>
