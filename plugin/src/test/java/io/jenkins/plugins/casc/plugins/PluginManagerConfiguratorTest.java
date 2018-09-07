@@ -12,7 +12,7 @@ import io.jenkins.plugins.casc.model.Sequence;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.yaml.snakeyaml.nodes.Node;
+import io.jenkins.plugins.casc.snakeyaml.nodes.Node;
 
 import java.io.IOException;
 import java.io.StringWriter;

@@ -13,9 +13,10 @@
   <packaging>pom</packaging>
 
   <modules>
+    <module>snakeyaml</module>
     <module>plugin</module>
-    <module>integrations</module>
     <module>support</module>
+    <module>integrations</module>
   </modules>
 
   <properties>
