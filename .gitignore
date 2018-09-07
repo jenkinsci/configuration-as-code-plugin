@@ -2,6 +2,7 @@ target/
 work/
 .idea/
 *.iml
+snakeyaml/src
 
 # ignore jenkins.yaml from root folder (used by many for testing)
 /jenkins.yaml

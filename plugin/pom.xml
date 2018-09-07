@@ -18,9 +18,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.yaml</groupId>
+      <groupId>io.jenkins.configuration-as-code</groupId>
       <artifactId>snakeyaml</artifactId>
-      <version>1.21</version>
+      <version>${project.version}</version>
     </dependency>
 
     <!--TODO: This should be in a seperate plugin at some point -->
