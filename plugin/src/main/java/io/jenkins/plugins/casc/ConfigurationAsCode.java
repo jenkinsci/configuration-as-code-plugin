@@ -127,7 +127,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
     @Override
     public String getDescription() {
-        return "An opinionated way to configure jenkins based on human-readable declarative configuration files";
+        return "Reload your configuration or update configuration source";
     }
 
     private long lastTimeLoaded;
