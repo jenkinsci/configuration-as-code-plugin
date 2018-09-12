@@ -1,6 +1,6 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
-  <l:layout norefresh="true" type="one-column" title="${%about(app.VERSION)}">
+  <l:layout norefresh="true" type="one-column" title="${%Configuration as Code}">
   <l:main-panel>
 
   <div class="container-fluid">
@@ -27,28 +27,36 @@
         </f:form>
 
       </j:otherwise>
-      <style>
-          td {
-              vertical-align: middle;
-          }
-      </style>
-      <f:form method="post" action="replace" name="replace">
-          <h2>Replace configuration source with:</h2>
-          <f:entry title="${%Path or URL}" field="newSource" >
-              <f:textbox checkUrl="'checkNewSource?newSource='+this.value" style="width:32em;" />
-          </f:entry>
-          <f:bottomButtonBar>
-              <f:submit name="replace" value="Apply new configuration"/>
-          </f:bottomButtonBar>
-      </f:form>
-      <h2>Actions</h2>
-      <f:form method="post" action="reload" name="reload">
-        <f:submit name="reload" value="Reload existing configuration"/>
-      </f:form>
-        <f:form method="post" action="export" name="export">
-          <f:submit name="export" value="${%Export Configuration}"/>
-        </f:form>        
     </j:choose>
+
+    <style>
+        td {
+            vertical-align: middle;
+        }
+    </style>
+    <f:form method="post" action="replace" name="replace">
+        <h2>Replace configuration source with:</h2>
+        <f:entry title="${%Path or URL}" field="newSource" >
+            <f:textbox checkUrl="'checkNewSource?newSource='+this.value" style="width:32em;" />
+        </f:entry>
+        <f:bottomButtonBar>
+            <f:submit name="replace" value="Apply new configuration"/>
+        </f:bottomButtonBar>
+    </f:form>
+    <h2>Actions</h2>
+    
+    <f:form method="post" action="reload" name="reload">
+      <f:submit name="reload" value="Reload existing configuration"/>
+    </f:form>
+    <br/>
+    <f:form method="post" action="export" name="export">
+      <f:submit name="export" value="${%Export Configuration}"/>
+      <div class="alert alert-warning">
+        <img src="${rootURL}/images/16x16/warning.png"/>
+        Export is not intended to offer a directly usable jenkins.yaml configuration. It can be used for inspiration
+        writting your own, be aware export can be partial, or fail for some components.
+      </div>
+    </f:form>
 
     <h2>${%Reference}</h2>
     <dt>
