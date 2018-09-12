@@ -1,5 +1,6 @@
 package io.jenkins.plugins.casc;
 
+import hudson.Functions;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Scalar;
 import io.jenkins.plugins.casc.model.Sequence;
@@ -10,8 +11,6 @@ import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.Beta;
 import org.kohsuke.stapler.export.Exported;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -186,11 +185,9 @@ public class Attribute<Owner, Type> {
                 return seq;
             }
             return c.describe(o, context);
-        } catch (Exception e) {
+        } catch (Exception | /* Jenkins.getDescriptorOrDie */AssertionError e) {
             // Don't fail the whole export, prefer logging this error
-            final StringWriter w = new StringWriter();
-            e.printStackTrace(new PrintWriter(w));
-            return new Scalar("FAILED TO EXPORT " + instance.getClass().getName()+"#"+name + ": \n"+w.toString());
+            return new Scalar("FAILED TO EXPORT " + instance.getClass().getName() + "#" + name + ": \n" + Functions.printThrowable(e));
         }
     }
 
