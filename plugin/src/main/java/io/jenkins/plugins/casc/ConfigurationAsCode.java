@@ -99,7 +99,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
     public static final String CASC_JENKINS_CONFIG_PROPERTY = "casc.jenkins.config";
     public static final String CASC_JENKINS_CONFIG_ENV = "CASC_JENKINS_CONFIG";
-    public static final String DEFAULT_JENKINS_YAML_PATH = Jenkins.getInstance().getRootDir() + "/jenkins.yaml";
+    public static final String DEFAULT_JENKINS_YAML_PATH = "jenkins.yaml";
     public static final String YAML_FILES_PATTERN = "glob:**.{yml,yaml,YAML,YML}";
 
     public static final Logger LOGGER = Logger.getLogger(ConfigurationAsCode.class.getName());
@@ -301,8 +301,9 @@ public class ConfigurationAsCode extends ManagementLink {
         }
 
         if (configParameter == null) {
-            if (Files.exists(Paths.get(DEFAULT_JENKINS_YAML_PATH))) {
-                configParameter = DEFAULT_JENKINS_YAML_PATH;
+            String fullPath = Jenkins.getInstance().getRootDir() + File.separator + DEFAULT_JENKINS_YAML_PATH;
+            if (Files.exists(Paths.get(fullPath))) {
+                configParameter = fullPath;
             }
         }
 
