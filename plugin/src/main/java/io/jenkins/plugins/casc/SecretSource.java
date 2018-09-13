@@ -21,7 +21,9 @@ import java.util.regex.Pattern;
 @Restricted(Beta.class)
 public abstract class SecretSource implements ExtensionPoint {
 
-    public static final Pattern SECRET_PATTERN = Pattern.compile("\\$\\{([^:\\s]*)(?::-)?([^}\\s]*)?\\}");
+    // TODO we probably will quickly reach some limits using regexp
+    // Maybe we could adopt https://github.com/AndersDJohnson/brace-expansion-java or implement something comparable
+    public static final Pattern SECRET_PATTERN = Pattern.compile("(?<!\\\\)\\$\\{([^:\\s]*)(?::-)?([^}\\s]*)?\\}");
 
     //We need to compile the matcher once for every key we examine.
     public static Optional<String> requiresReveal(String key) {
