@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -57,6 +58,14 @@ public class Attribute<Owner, Type> {
         this.setter = this::_setValue;
         this.aliases = new ArrayList<>();
         this.aliases.add(name);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <O,T> Optional<Attribute<O,T>> get(Set<Attribute<O,?>> attributes, String name) {
+        return attributes.stream()
+                .filter(a -> a.name.equals(name))
+                .map(a -> (Attribute<O,T>) a)
+                .findFirst();
     }
 
     @Override
