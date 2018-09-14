@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 public class PermissionFinder {
 
     /** For Matrix Auth - Title/Permission **/
-    private static final Pattern PERMISSION_PATTERN = Pattern.compile("(\\w+)/(\\w+)");
+    private static final Pattern PERMISSION_PATTERN = Pattern.compile("^([^\\/]+)\\/(.+)$");
 
     /**
      * Attempt to match a given permission to what is defined in the UI.
