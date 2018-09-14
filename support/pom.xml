@@ -10,7 +10,8 @@
 
   <artifactId>configuration-as-code-support</artifactId>
   <packaging>hpi</packaging>
-  <description>Custom configurator to support third-party plugins</description>
+  <description>Custom configurator to support third-party plugins for the Configuration as Code plugin</description>
+  <name>Configuration as Code Support Plugin</name>
   <!-- This is an incubator for code we expect to get hosted by target plugins -->
 
   <properties>
