@@ -14,33 +14,8 @@ Master:
   AdminPassword: "formetoknowforyoutofindout"
   Cpu: "200m"
   Memory: "1024Mi"
-  # These are the necesarry environment variables to enable the experimental update center
   ContainerEnv:
-    - name: JENKINS_UC
-      value: https://updates.jenkins.io
-    - name: JENKINS_UC_EXPERIMENTAL
-      value: https://updates.jenkins.io/experimental
-    - name: JENKINS_INCREMENTALS_REPO_MIRROR
-      value: https://repo.jenkins-ci.org/incrementals
-  # These are the necesarry environment variables to enable the experimental update center    
   InitContainerEnv:
-    - name: JENKINS_UC
-      value: https://updates.jenkins.io
-    - name: JENKINS_UC_EXPERIMENTAL
-      value: https://updates.jenkins.io/experimental
-    - name: JENKINS_INCREMENTALS_REPO_MIRROR
-      value: https://repo.jenkins-ci.org/incrementals
-
-  # List of plugins to be install during Jenkins master start
-  # mind the last plugin in the list now ;)
-  InstallPlugins:
-      - kubernetes:latest
-      - kubernetes-credentials:latest
-      - workflow-aggregator:latest
-      - workflow-job:latest
-      - credentials-binding:latest
-      - git:latest
-      - configuration-as-code:0.10-alpha
 
 # Set min/max heap here if needed with:
 # JavaOpts: "-Xms512m -Xmx512m"
@@ -52,6 +27,7 @@ Master:
 #   -Dcom.sun.management.jmxremote.ssl=false
 # JMXPort: 4000
 # List of plugins to be install during Jenkins master start
+# mind the last plugin in the list now ;)
   InstallPlugins:
       - kubernetes:latest
       - kubernetes-credentials:latest
@@ -59,7 +35,9 @@ Master:
       - workflow-job:latest
       - credentials-binding:latest
       - git:latest
-      - configuration-as-code:0.10-alpha
+      - configuration-as-code:1.0
+      # You might also need this for a couple of third-party plugins (e.g. for setting credentials)
+      - configuration-as-code-support:1.0
 
       # - saml:1.0.5
       # - docker-custom-build-environment:latest

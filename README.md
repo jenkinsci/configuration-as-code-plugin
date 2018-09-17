@@ -99,10 +99,11 @@ jenkins:
     (...)
 
   nodes:
-    slave:
-      name: "static-slave"
-      remoteFS: "/home/jenkins"
-      launcher: "jnlp"
+    - permanent:
+        name: "static-slave"
+        remoteFS: "/home/jenkins"
+        launcher:
+          jnlp:
 
   slaveAgentPort: 50000
   agentProtocols:
@@ -116,7 +117,8 @@ unclassified:
   mailer:
     adminAddress: admin@acme.org
     replyToAddress: do-not-reply@acme.org
-    smtpHost: smtp.acme.org
+    # Note that this does not work right now
+    #smtpHost: smtp.acme.org
     smtpPort: 4441
 credentials:
   system:

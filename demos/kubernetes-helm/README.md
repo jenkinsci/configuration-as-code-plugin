@@ -5,16 +5,6 @@
 Jenkins can be installed in Kubernetes using [`helm`](https://github.com/helm/helm).
 The latest stable helm chart can be found [`here`](https://github.com/helm/charts/tree/master/stable/jenkins).
 
-To have the latest Version of JCASC installed we need to enable Jenkins to make use of the [`Experimental Update Center`](https://jenkins.io/doc/developer/publishing/releasing-experimental-updates/).
-
-The [`Official Jenkins Docker image`](https://github.com/jenkinsci/docker/blob/master/Dockerfile#L60) allows you to specify the experimental update center configuration using ENV variables:  
-
-```
-ENV JENKINS_UC https://updates.jenkins.io
-ENV JENKINS_UC_EXPERIMENTAL=https://updates.jenkins.io/experimental
-ENV JENKINS_INCREMENTALS_REPO_MIRROR=https://repo.jenkins-ci.org/incrementals
-```
-
 Now grab a copy of the helm chart [`values file`](https://github.com/helm/charts/blob/master/stable/jenkins/values.yaml) and adjust the Master part a little bit:
 
 ```yaml
@@ -31,20 +21,8 @@ Master:
   Memory: "1024Mi"
 
   InitContainerEnv:
-    - name: JENKINS_UC
-      value: https://updates.jenkins.io
-    - name: JENKINS_UC_EXPERIMENTAL
-      value: https://updates.jenkins.io/experimental
-    - name: JENKINS_INCREMENTALS_REPO_MIRROR
-      value: https://repo.jenkins-ci.org/incrementals
 
   ContainerEnv:
-    - name: JENKINS_UC
-      value: https://updates.jenkins.io
-    - name: JENKINS_UC_EXPERIMENTAL
-      value: https://updates.jenkins.io/experimental
-    - name: JENKINS_INCREMENTALS_REPO_MIRROR
-      value: https://repo.jenkins-ci.org/incrementals
     # Tell the plugin where to find its config. The '..data'
     # part is needed for now due to this bug:
     # https://github.com/jenkinsci/configuration-as-code-plugin/issues/425
@@ -60,7 +38,9 @@ Master:
     - workflow-job:latest
     - credentials-binding:latest
     - git:latest
-    - configuration-as-code:0.11-alpha
+    - configuration-as-code:1.0
+    # You might also need this for a couple of third-party plugins (e.g. for setting credentials)
+    - configuration-as-code-support:1.0
 
 Persistence:
   volumes:
