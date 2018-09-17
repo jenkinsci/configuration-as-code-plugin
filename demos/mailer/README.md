@@ -11,7 +11,8 @@ unclassified:
   mailer:
     adminAddress: admin@acme.org
     replyToAddress: do-not-reply@acme.org
-    smtpHost: smtp.acme.org
+    # Note that this does not work right now
+    #smtpHost: smtp.acme.org
     smtpPort: 4441
     charset: UTF-8
     useSsl: false
