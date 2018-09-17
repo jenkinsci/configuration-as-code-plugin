@@ -28,6 +28,8 @@ public interface CNode extends Cloneable {
         throw new ConfiguratorException("Item isn't a Scalar");
     }
 
+    /** @deprecated sensitive data are identified based on target attribute being a ${@link hudson.util.Secret} */
+    @Deprecated
     default boolean isSensitiveData() { return false; }
 
     /**

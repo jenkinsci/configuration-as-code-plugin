@@ -3,7 +3,6 @@ package io.jenkins.plugins.casc;
 import hudson.model.Describable;
 import hudson.model.Saveable;
 import hudson.util.PersistedList;
-import hudson.util.ReflectionUtils;
 import io.jenkins.plugins.casc.impl.attributes.DescribableAttribute;
 import io.jenkins.plugins.casc.impl.attributes.PersistedListAttribute;
 import io.jenkins.plugins.casc.model.CNode;
@@ -333,7 +332,6 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
 
                 if (!dryrun) {
                     try {
-                        logger.info("Setting " + instance + '.' + name + " = " + (sub.isSensitiveData() ? "****" : valueToSet));
                         ((Attribute) attribute).setValue(instance, valueToSet); // require type erasure to set Object vs ?
                     } catch (Exception ex) {
                         throw new ConfiguratorException(configurator, "Failed to set attribute " + attribute, ex);

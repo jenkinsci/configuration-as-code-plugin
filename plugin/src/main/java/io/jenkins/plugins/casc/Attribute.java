@@ -1,6 +1,7 @@
 package io.jenkins.plugins.casc;
 
 import hudson.Functions;
+import hudson.util.Secret;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Scalar;
 import io.jenkins.plugins.casc.model.Sequence;
@@ -167,6 +168,7 @@ public class Attribute<Owner, Type> {
 
 
     public void setValue(Owner target, Type value) throws Exception {
+        logger.info("Setting " + target + '.' + name + " = " + (getType() == Secret.class ? "****" : value));
         setter.setValue(target, value);
     }
 
