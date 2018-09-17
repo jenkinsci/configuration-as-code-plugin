@@ -1,0 +1,30 @@
+= Plugin Compatibility with Configuration-as-code plugin
+
+This document captures the ongoing status of plugins known to be compatible or incompatible.
+
+Because of how the tool was designed, plugins _should_ be expected to work out of the box if they followed the main patterns in place.
+
+There is a list of already known issues in the Jenkins issue tracker, tracked through using the label `jcasc-incompatible` (link:https://issues.jenkins-ci.org/secure/Dashboard.jspa?selectPageId=17346[see dashboard]).
+
+This document is an *ongoing* community effort.
+Hence a missing plugin here and has no existing issue filed in JIRA (see above) does not _necessarily_ mean it won't work.
+If you tested it and know it works, please file a PR to fix the status and inform the other users.
+Thanks!
+
+== SCMs
+
+
+== Build steps and post-build actions
+
+
+== Build wrappers
+
+
+== Triggers
+
+
+== Clouds
+
+* [x] link:https://github.com/jenkinsci/artifact-manager-s3-plugin[S3 Artifact Manager plugin]
+
+== Miscellaneous
