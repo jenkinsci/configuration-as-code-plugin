@@ -164,3 +164,60 @@ public static final class DescriptorImpl extends Descriptor<Foo> {
 ```
 
 See [mailer plugin#39](https://github.com/jenkinsci/mailer-plugin/pull/39) for a sample on required changes.
+
+
+## How to test ?
+
+Simplest option for you to test JCasC compatibility in your plugin is to introduce a simple test-case. 
+
+### Configuration test
+Add configuration-as-code-plugin as a test dependency in your pom.xml:
+```xml
+<dependency>
+      <groupId>io.jenkins</groupId>
+      <artifactId>configuration-as-code</artifactId>
+      <version>1.0</version>
+      <scope>test</scope>
+</dependency>
+```
+
+Add a new test case to load a reference configuration yaml file designed to set configurable properties of your plugin
+```java
+public class ConfigAsCodeTest {
+
+    @Rule public JenkinsRule r = new JenkinsRule();
+
+    @Test public void should_support_configuration_as_code() throws Exception {
+        ConfigurationAsCode.get().configure(ConfigAsCodeTest.class.getResource("configuration-as-code.yml").toString());
+        assertTrue( /* check plugin has been configured as expected */ );
+    }
+```
+
+Doing so, you will confirm JCasC is able to introspect your plugin and build the expected configuration data model, but also detect
+some changes made to your plugin break this configuration model.
+
+### Backward compatibility test
+About the later, in case you need to introduce some breaking changes, you can define a backward-compatibility test case
+```yaml
+    @Test public void should_be_backward_compatible() throws Exception {
+        ConfigurationAsCode.get().configure(ConfigAsCodeTest.class.getResource("obsolete-configuration-as-code.yml").toString());
+        assertTrue( /* check plugin has been configured as expected */ );
+    }
+```
+Within this `obsolete-configuration-as-code.yml` configuration file, use the legacy data model in use before the change you introduced, and enable JCasC support for deprecated methods:
+```yaml
+configuration-as-code:
+  deprecated: warn
+```
+This will let JCasC consider any `@Deprecated` setter in your component as a valid attribute to be set, enabling backward compatibility,
+while the canonical JCasC model evolves to match the changes you made.
+
+### Model export test
+You also can write a test case to check export from a live instance is well supported :
+
+```java 
+@Test public void export_configuration() throws Exception {
+      /** Setup jenkins to use plugin */
+      ConfigurationAsCode.get().export(System.out);
+```
+**TODO** we need to provide some yaml assertion library so that the resulting exported yam stream can be checked for expected content. 
