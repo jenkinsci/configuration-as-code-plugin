@@ -7,6 +7,8 @@ Join the community and ask questions
 
 <img src="plugin/src/main/webapp/img/logo-head.svg" width="250">
 
+Slides for Jenkins World 2018 presentation [available here](https://docs.google.com/presentation/d/1VsvDuffinmxOjg0a7irhgJSRWpCzLg_Yskf7Fw7FpBg/edit?usp=sharing).
+
 ## Release information
 
 Release notes of the latest release can be found here: https://wiki.jenkins.io/display/JENKINS/configuration+as+code+plugin
@@ -59,8 +61,6 @@ jenkins:
 
 In addition, we want such a file to have a well documented syntax, and tooling to assist in writing and testing,
 so end-users have full guidance in using this toolset and don't have to search stackoverflow for samples.
-
-Have a look at [this presentation](https://docs.google.com/presentation/d/1-irLGTAvMe8Fz1md1zkJtpIpYo9NItZKnsgTYnIqbZU/edit?usp=sharing) for more details.
 
 ## Getting started
 
