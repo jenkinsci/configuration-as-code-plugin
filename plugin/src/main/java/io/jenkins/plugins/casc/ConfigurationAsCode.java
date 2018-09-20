@@ -7,6 +7,8 @@ import hudson.init.InitMilestone;
 import hudson.init.Initializer;
 import hudson.model.ManagementLink;
 import hudson.remoting.Which;
+import hudson.security.ACL;
+import hudson.security.ACLContext;
 import hudson.util.FormValidation;
 import io.jenkins.plugins.casc.impl.DefaultConfiguratorRegistry;
 import io.jenkins.plugins.casc.model.CNode;
@@ -631,7 +633,9 @@ public class ConfigurationAsCode extends ManagementLink {
         monitor.reset();
         ConfigurationContext context = new ConfigurationContext(registry);
         context.addListener(monitor::record);
-        invokeWith(entries, (configurator, config) -> configurator.configure(config, context));
+        try (ACLContext acl = ACL.as(ACL.SYSTEM)) {
+            invokeWith(entries, (configurator, config) -> configurator.configure(config, context));
+        }
     }
 
     public Map<Source, String> checkWith(Mapping entries) throws ConfiguratorException {
