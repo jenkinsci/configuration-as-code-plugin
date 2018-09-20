@@ -1,1 +1,7 @@
-buildPlugin(jenkinsVersions: [null, "2.107.1"], timeout: 180)
+node('linux') {
+
+  infra.runMaven('clean install -DskipTests -U', 8);
+  infra.runMaven('help:effective-pom', 8);
+  infra.runMaven('help:effective-settings', 8);
+
+}
