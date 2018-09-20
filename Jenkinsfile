@@ -1,7 +1,7 @@
 node('linux') {
 
-  runMaven('clean install -DskipTests -U', 8);
-  runMaven('help:effective-pom', 8);
-  runMaven('help:effective-settings', 8);
+  infra.runMaven(['clean'], 8);
+  //infra.runMaven('help:effective-pom', 8);
 
+  //infra.runMaven('help:effective-settings', 8);
 }
