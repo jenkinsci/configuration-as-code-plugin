@@ -31,18 +31,18 @@
         }
     </style>
     <f:form method="post" action="replace" name="replace">
-        <h2>Replace configuration source with:</h2>
+        <h2>${%Replace configuration source with:}</h2>
         <f:entry title="${%Path or URL}" field="newSource" >
             <f:textbox checkUrl="'checkNewSource?newSource='+this.value" style="width:32em;" />
         </f:entry>
         <f:bottomButtonBar>
-            <f:submit name="replace" value="Apply new configuration"/>
+            <f:submit name="replace" value="${%Apply new configuration}"/>
         </f:bottomButtonBar>
     </f:form>
-    <h2>Actions</h2>
+    <h2>${%Actions}</h2>
     
     <f:form method="post" action="reload" name="reload">
-      <f:submit name="reload" value="Reload existing configuration"/>
+      <f:submit name="reload" value="${%Reload existing configuration}"/>
     </f:form>
     <br/>
     <f:form method="post" action="export" name="export">
