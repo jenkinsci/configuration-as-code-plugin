@@ -13,7 +13,27 @@ the exact same `DataBound` mechanism, which isn't a common practice (yet).
 In many plugins, `Descriptor#configure()` is implemented by lookup for attributes values from the `JSONObject`. To make your Descriptor 
 compliant with configuration-as-code, you'll need to expose your configuration attributes as `@DataBoundSetters`.
 
+Before you start, make sure the following pre-conditions are met :
+
+- the parent pom version of your plugin is aligned with the Configuration as Code [parent pom version](pom.xml).
+```xml
+<parent>
+    <groupId>org.jenkins-ci.plugins</groupId>
+    <artifactId>plugin</artifactId>
+    <version>THE_PARENT_POM_VERSION_HERE</version>
+    <relativePath />
+</parent>
+```
+- the jenkins core version and the java level of your plugin are aligned with the Configuration as Code plugin versions (also in the [pom.xml](pom.xml)).
+```xml
+<properties>
+    <jenkins.version>THE_JENKINS_CORE_VERSION_HERE</jenkins.version>
+    <java.level>THE_JAVA_VERSION_HERE</java.level>
+</properties>
+```
+
 Here's the recommended approach :
+
 
 Let's consider this Descriptor :
 
