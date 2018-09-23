@@ -3,5 +3,5 @@
   This view is used to render the installed plugins page.
 -->
 <div>
-  This plugin allows to to configure jenkins based on human-readable declarative configuration files.
+  This plugin allows configuration of Jenkins based on human-readable declarative configuration files.
 </div>
