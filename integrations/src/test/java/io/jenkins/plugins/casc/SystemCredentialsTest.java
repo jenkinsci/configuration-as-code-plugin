@@ -59,7 +59,7 @@ public class SystemCredentialsTest {
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         final ConfigurationContext context = new ConfigurationContext(registry);
         final CNode node = context.lookup(up.getClass()).describe(up, context);
-        assertEquals("1234", node.asMapping().getScalarValue("password"));
+        assertThat(node.asMapping().getScalarValue("password"), not(equals("1234")));
 
 
         List<CertificateCredentials> certs = CredentialsProvider.lookupCredentials(
