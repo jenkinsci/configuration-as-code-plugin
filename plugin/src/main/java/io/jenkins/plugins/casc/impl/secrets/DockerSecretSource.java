@@ -17,7 +17,7 @@ import java.util.Optional;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Extension
-@Restricted(Beta.class)
+
 public class DockerSecretSource extends SecretSource {
 
     public static final String DOCKER_SECRETS = "/run/secrets/";

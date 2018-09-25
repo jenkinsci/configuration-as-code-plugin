@@ -3,7 +3,6 @@ package io.jenkins.plugins.casc;
 import hudson.model.Describable;
 import hudson.model.Saveable;
 import hudson.util.PersistedList;
-import hudson.util.ReflectionUtils;
 import io.jenkins.plugins.casc.impl.attributes.DescribableAttribute;
 import io.jenkins.plugins.casc.impl.attributes.PersistedListAttribute;
 import io.jenkins.plugins.casc.model.CNode;
@@ -46,7 +45,7 @@ import static java.util.logging.Level.FINER;
  *
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-@Restricted(Beta.class)
+
 public abstract class BaseConfigurator<T> implements Configurator<T> {
 
     private static final Logger logger = Logger.getLogger(BaseConfigurator.class.getName());
@@ -379,7 +378,7 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
         return null;
     }
 
-    @Restricted(Beta.class)
+
     public static final class TypePair {
 
         final Type type;

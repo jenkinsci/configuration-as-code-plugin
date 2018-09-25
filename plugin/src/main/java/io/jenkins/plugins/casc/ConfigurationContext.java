@@ -1,8 +1,6 @@
 package io.jenkins.plugins.casc;
 
 import io.jenkins.plugins.casc.model.CNode;
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.Beta;
 import org.kohsuke.stapler.Stapler;
 
 import javax.annotation.CheckForNull;
@@ -14,8 +12,7 @@ import java.util.List;
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-@Restricted(Beta.class)
-// @Restricted(Beta.class)
+
 public class ConfigurationContext implements ConfiguratorRegistry {
 
     private Deprecation deprecation = Deprecation.reject;

@@ -1,8 +1,6 @@
 package io.jenkins.plugins.casc;
 
 import jenkins.model.Jenkins;
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.Beta;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -12,7 +10,7 @@ import java.lang.reflect.Type;
  * A Registry to allow {@link Configurator}s retrieval.
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-@Restricted(Beta.class)
+
 public interface ConfiguratorRegistry {
 
     /**
