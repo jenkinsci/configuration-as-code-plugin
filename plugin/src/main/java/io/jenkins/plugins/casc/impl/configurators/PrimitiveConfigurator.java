@@ -1,5 +1,6 @@
 package io.jenkins.plugins.casc.impl.configurators;
 
+import hudson.util.Secret;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.Configurator;
@@ -89,6 +90,9 @@ public class PrimitiveConfigurator implements Configurator {
         }
         if (instance instanceof Boolean) {
             return new Scalar((Boolean) instance);
+        }
+        if (instance instanceof Secret) {
+            return new Scalar(((Secret) instance).getEncryptedValue());
         }
         if (target.isEnum()) {
             return new Scalar((Enum) instance);
