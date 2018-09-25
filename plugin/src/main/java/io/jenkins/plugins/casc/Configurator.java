@@ -25,8 +25,6 @@ import hudson.ExtensionPoint;
 import io.jenkins.plugins.casc.model.CNode;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.Beta;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -42,7 +40,7 @@ import java.util.stream.Collectors;
  * @author Oleg Nenashev
  * @see RootElementConfigurator
  */
-@Restricted(Beta.class)
+
 public interface Configurator<T> {
 
     @Nonnull

@@ -19,7 +19,7 @@ import static io.jenkins.plugins.casc.Configurator.normalize;
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-@Restricted(Beta.class)
+
 public class DescribableAttribute<Owner, Type> extends Attribute<Owner, Type> {
 
     public DescribableAttribute(String name, Class<? extends Describable> type) {

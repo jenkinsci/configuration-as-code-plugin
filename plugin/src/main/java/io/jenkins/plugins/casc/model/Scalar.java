@@ -1,15 +1,13 @@
 package io.jenkins.plugins.casc.model;
 
 import io.jenkins.plugins.casc.SecretSource;
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.Beta;
 
 import java.util.stream.IntStream;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-@Restricted(Beta.class)
+
 public final class Scalar implements CNode, CharSequence {
 
     private String value;

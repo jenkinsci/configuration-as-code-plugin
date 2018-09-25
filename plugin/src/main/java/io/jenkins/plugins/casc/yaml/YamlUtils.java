@@ -3,8 +3,6 @@ package io.jenkins.plugins.casc.yaml;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.model.Mapping;
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.Beta;
 import io.jenkins.plugins.casc.snakeyaml.composer.Composer;
 import io.jenkins.plugins.casc.snakeyaml.nodes.MappingNode;
 import io.jenkins.plugins.casc.snakeyaml.nodes.Node;
@@ -24,7 +22,7 @@ import java.util.logging.Logger;
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-@Restricted(Beta.class)
+
 public final class YamlUtils {
 
     public static final Logger LOGGER = Logger.getLogger(ConfigurationAsCode.class.getName());

@@ -40,7 +40,7 @@ import static com.google.common.base.Defaults.defaultValue;
  *
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-@Restricted(Beta.class)
+
 public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
 
     private final static Logger logger = Logger.getLogger(DataBoundConfigurator.class.getName());

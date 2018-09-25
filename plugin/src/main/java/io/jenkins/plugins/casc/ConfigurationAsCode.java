@@ -16,6 +16,18 @@ import io.jenkins.plugins.casc.model.Mapping;
 import io.jenkins.plugins.casc.model.Scalar;
 import io.jenkins.plugins.casc.model.Sequence;
 import io.jenkins.plugins.casc.model.Source;
+import io.jenkins.plugins.casc.snakeyaml.DumperOptions;
+import io.jenkins.plugins.casc.snakeyaml.Yaml;
+import io.jenkins.plugins.casc.snakeyaml.emitter.Emitter;
+import io.jenkins.plugins.casc.snakeyaml.error.YAMLException;
+import io.jenkins.plugins.casc.snakeyaml.nodes.MappingNode;
+import io.jenkins.plugins.casc.snakeyaml.nodes.Node;
+import io.jenkins.plugins.casc.snakeyaml.nodes.NodeTuple;
+import io.jenkins.plugins.casc.snakeyaml.nodes.ScalarNode;
+import io.jenkins.plugins.casc.snakeyaml.nodes.SequenceNode;
+import io.jenkins.plugins.casc.snakeyaml.nodes.Tag;
+import io.jenkins.plugins.casc.snakeyaml.resolver.Resolver;
+import io.jenkins.plugins.casc.snakeyaml.serializer.Serializer;
 import io.jenkins.plugins.casc.yaml.YamlSource;
 import io.jenkins.plugins.casc.yaml.YamlUtils;
 import jenkins.model.GlobalConfiguration;
@@ -31,18 +43,6 @@ import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.interceptor.RequirePOST;
 import org.kohsuke.stapler.lang.Klass;
-import io.jenkins.plugins.casc.snakeyaml.DumperOptions;
-import io.jenkins.plugins.casc.snakeyaml.Yaml;
-import io.jenkins.plugins.casc.snakeyaml.emitter.Emitter;
-import io.jenkins.plugins.casc.snakeyaml.error.YAMLException;
-import io.jenkins.plugins.casc.snakeyaml.nodes.MappingNode;
-import io.jenkins.plugins.casc.snakeyaml.nodes.Node;
-import io.jenkins.plugins.casc.snakeyaml.nodes.NodeTuple;
-import io.jenkins.plugins.casc.snakeyaml.nodes.ScalarNode;
-import io.jenkins.plugins.casc.snakeyaml.nodes.SequenceNode;
-import io.jenkins.plugins.casc.snakeyaml.nodes.Tag;
-import io.jenkins.plugins.casc.snakeyaml.resolver.Resolver;
-import io.jenkins.plugins.casc.snakeyaml.serializer.Serializer;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -83,12 +83,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
-import static java.lang.String.format;
-import static java.util.logging.Level.WARNING;
-import static java.util.stream.Collectors.toList;
 import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.FlowStyle.BLOCK;
 import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.DOUBLE_QUOTED;
 import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.PLAIN;
+import static java.lang.String.format;
+import static java.util.logging.Level.WARNING;
+import static java.util.stream.Collectors.toList;
 
 /**
  * {@linkplain #configure() Main entry point of the logic}.

@@ -1,15 +1,13 @@
 package io.jenkins.plugins.casc.model;
 
 import io.jenkins.plugins.casc.ConfiguratorException;
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.Beta;
 
 import java.util.HashMap;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-@Restricted(Beta.class)
+
 public final class Mapping extends HashMap<String, CNode> implements CNode {
 
     public static final Mapping EMPTY = new Mapping();

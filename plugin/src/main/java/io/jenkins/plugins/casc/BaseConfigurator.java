@@ -45,7 +45,7 @@ import static java.util.logging.Level.FINER;
  *
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-@Restricted(Beta.class)
+
 public abstract class BaseConfigurator<T> implements Configurator<T> {
 
     private static final Logger logger = Logger.getLogger(BaseConfigurator.class.getName());
@@ -377,7 +377,7 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
         return null;
     }
 
-    @Restricted(Beta.class)
+
     public static final class TypePair {
 
         final Type type;

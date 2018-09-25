@@ -22,7 +22,7 @@ import java.util.logging.Logger;
  * alongside with CASC_VAULT_PATH and CASC_VAULT_URL
  */
 @Extension
-@Restricted(Beta.class)
+
 public class VaultSecretSource extends SecretSource {
 
     private final static Logger LOGGER = Logger.getLogger(VaultSecretSource.class.getName());
