@@ -1,5 +1,6 @@
 package io.jenkins.plugins.casc.yaml;
 
+import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.model.Mapping;
 import org.kohsuke.accmod.Restricted;
@@ -18,12 +19,15 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Restricted(Beta.class)
 public final class YamlUtils {
+
+    public static final Logger LOGGER = Logger.getLogger(ConfigurationAsCode.class.getName());
 
     public static Node merge(List<YamlSource> configs) throws ConfiguratorException {
         Node root = null;
@@ -102,6 +106,10 @@ public final class YamlUtils {
     public static Mapping loadFrom(List<YamlSource> sources) throws ConfiguratorException {
         if (sources.isEmpty()) return Mapping.EMPTY;
         final Node merged = merge(sources);
+        if (merged == null) {
+            LOGGER.warning("configuration-as-code yaml source returned an empty document.");
+            return Mapping.EMPTY;
+        }
         return loadFrom(merged);
     }
 
