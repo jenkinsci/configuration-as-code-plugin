@@ -155,58 +155,75 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
             install:
             while (!plugins.isEmpty()) {
                 PluginToInstall p = plugins.remove();
-                logger.fine("Preparing to install "+ p.shortname);
+                logger.fine("Preparing to install " + p.shortname);
                 if (installed.contains(p.shortname)) {
-                    logger.fine("Plugin "+p.shortname +" is already installed. Skipping");
+                    logger.fine("Plugin " + p.shortname + " is already installed. Skipping");
                     continue;
                 }
 
                 final Plugin plugin = jenkins.getPlugin(p.shortname);
-                if (plugin == null || !plugin.getWrapper().getVersion().equals(p.version)) { // Need to install
+                if (plugin != null) {
+                    // Plugin is allready installed, let's check we run the expected version
 
-                    // if plugin is being _upgraded_, not just installed, we NEED to restart
-                    requireRestart |= (plugin != null);
-
-                    boolean downloaded = false;
-                    final UpdateSite.Plugin installable = getPluginMetadata(updateCenter, p);
-                    try {
-                        logger.fine("Installing plugin: "+p.shortname);
-                        final UpdateCenter.UpdateCenterJob job = installable.deploy(false).get();
-                        if (job.getError() != null) {
-                            if (job.getError() instanceof UpdateCenter.DownloadJob.SuccessButRequiresRestart) {
-                                requireRestart = true;
-                            } else {
-                                throw job.getError();
-                            }
-                        }
-                        installed.add(p.shortname);
-                        final File jpi = new File(pluginManager.rootDir, p.shortname + ".jpi");
-                        try (JarFile jar = new JarFile(jpi)) {
-                            String dependencySpec = jar.getManifest().getMainAttributes().getValue("Plugin-Dependencies");
-                            if (dependencySpec != null) {
-                                List<PluginToInstall> pti = Arrays.stream(dependencySpec.split(","))
-                                        .filter(t -> !t.endsWith(";resolution:=optional"))
-                                        .map(t -> t.substring(0, t.indexOf(':')))
-                                        .map(a -> new PluginToInstall(a, "latest"))
-                                        .collect(Collectors.toList());
-                                pti.forEach( s -> logger.finest("Installing dependant plugin: "+s));
-                                logger.finest("Adding "+pti.size()+" plugin(s) to install queue.");
-                                plugins.addAll(pti);
-                            }
-                        }
-                        downloaded = true;
-                        continue install;
-                    } catch (InterruptedException | ExecutionException ex) {
-                        logger.info("Failed to download plugin " + p.shortname + ':' + p.version + " from " + p.site);
-                    } catch (Throwable ex) {
-                        throw new ConfiguratorException("Failed to download plugin " + p.shortname + ':' + p.version, ex);
+                    if (!Character.isDigit(p.version.charAt(0)) && !"latest".equals(p.version)) {
+                        // explicit download URL, we need to assume we run the expected one as we have no way
+                        // to guess where the installed version has been downloaded from
+                        continue;
                     }
-
-                    if (!downloaded) {
-                        throw new ConfiguratorException("Failed to install plugin " + p.shortname + ':' + p.version);
+                    if (plugin.getWrapper().getVersion().equals(p.version)) {
+                        // We are already running the required version
+                        continue;
                     }
-                    logger.fine("Done installing plugins");
                 }
+
+                final UpdateSite.Plugin installable = getPluginMetadata(updateCenter, p);
+                if ("latest".equals(p.version) && plugin != null && plugin.getWrapper().getVersion().equals(installable.version)) {
+                    // installed version is already latest version available in update center
+                    continue;
+                }
+
+                // if we update an installed plugin, Jenkins has to be restarted
+                requireRestart |= (plugin != null);
+
+
+                boolean downloaded = false;
+                try {
+                    logger.fine("Installing plugin: " + p.shortname);
+                    final UpdateCenter.UpdateCenterJob job = installable.deploy(false).get();
+                    if (job.getError() != null) {
+                        if (job.getError() instanceof UpdateCenter.DownloadJob.SuccessButRequiresRestart) {
+                            requireRestart = true;
+                        } else {
+                            throw job.getError();
+                        }
+                    }
+                    installed.add(p.shortname);
+                    final File jpi = new File(pluginManager.rootDir, p.shortname + ".jpi");
+                    try (JarFile jar = new JarFile(jpi)) {
+                        String dependencySpec = jar.getManifest().getMainAttributes().getValue("Plugin-Dependencies");
+                        if (dependencySpec != null) {
+                            List<PluginToInstall> pti = Arrays.stream(dependencySpec.split(","))
+                                    .filter(t -> !t.endsWith(";resolution:=optional"))
+                                    .map(t -> t.substring(0, t.indexOf(':')))
+                                    .map(a -> new PluginToInstall(a, "latest"))
+                                    .collect(Collectors.toList());
+                            pti.forEach(s -> logger.finest("Installing dependant plugin: " + s));
+                            logger.finest("Adding " + pti.size() + " plugin(s) to install queue.");
+                            plugins.addAll(pti);
+                        }
+                    }
+                    downloaded = true;
+                    continue install;
+                } catch (InterruptedException | ExecutionException ex) {
+                    logger.info("Failed to download plugin " + p.shortname + ':' + p.version + " from " + p.site);
+                } catch (Throwable ex) {
+                    throw new ConfiguratorException("Failed to download plugin " + p.shortname + ':' + p.version, ex);
+                }
+
+                if (!downloaded) {
+                    throw new ConfiguratorException("Failed to install plugin " + p.shortname + ':' + p.version);
+                }
+                logger.fine("Done installing plugins");
             }
             writeShrinkwrapFile(jenkins, shrinkwrap, pluginManager);
 
@@ -300,7 +317,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
                     try (InputStream is = ProxyConfiguration.open(metadata.toURL()).getInputStream()) {
                         FileUtils.copyInputStreamToFile(is, file);
                     } catch (IOException e) {
-                        logger.log(Level.WARNING, "Failed to download plugin-versions metadata from "+updateSite.getUrl(), e);
+                        logger.log(Level.WARNING, "Failed to download plugin-versions metadata from " + updateSite.getUrl(), e);
                     }
                 }
 
@@ -326,7 +343,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
                 for (String line : lines) {
                     int i = line.indexOf(':');
                     final String shortname = line.substring(0, i);
-                    shrinkwrapped.put(shortname, new PluginToInstall(shortname, line.substring(i+1)));
+                    shrinkwrapped.put(shortname, new PluginToInstall(shortname, line.substring(i + 1)));
                 }
             } catch (IOException e) {
                 throw new ConfiguratorException("failed to load plugins.txt shrinkwrap file", e);
@@ -348,7 +365,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
     }
 
     private void writeShrinkwrapFile(Jenkins jenkins, File shrinkwrap, PluginManager pluginManager) throws ConfiguratorException {
-        logger.fine("Writing shrinkwrap file: "+shrinkwrap);
+        logger.fine("Writing shrinkwrap file: " + shrinkwrap);
         try (PrintWriter w = new PrintWriter(shrinkwrap, UTF_8.name())) {
             for (PluginWrapper pw : pluginManager.getPlugins()) {
                 if (pw.getShortName().equals("configuration-as-code")) continue;
@@ -373,7 +390,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
 
     @Override
     public Set<Attribute<PluginManager, ?>> describe() {
-        Set<Attribute<PluginManager, ?>> attr =  new HashSet<>();
+        Set<Attribute<PluginManager, ?>> attr = new HashSet<>();
         attr.add(new Attribute<PluginManager, ProxyConfiguration>("proxy", ProxyConfiguration.class));
         attr.add(new MultivaluedAttribute<PluginManager, UpdateSite>("sites", UpdateSite.class));
         attr.add(new MultivaluedAttribute<PluginManager, Plugins>("required", Plugins.class));
