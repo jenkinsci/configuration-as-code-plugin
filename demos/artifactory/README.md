@@ -5,7 +5,7 @@ Artifactory plugin configuration belongs under `unclassified` root element
 ## sample configuration
 
 ```yaml
-jenkins: 
+jenkins:
   [...]
 unclassified:
   [...]
@@ -14,6 +14,8 @@ unclassified:
     artifactoryServers:
       - serverId: artifactory
         artifactoryUrl: http://acme.com/artifactory
+        deployerCredentialsConfig:
+          credentialsId: 'artifactory'
         resolverCredentialsConfig:
           username: artifactory_user
           password: ${ARTIFACTORY_PASSWORD}
