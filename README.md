@@ -150,7 +150,7 @@ using the `:-` operator from `bash` is also available:
 `key: ${VALUE:-defaultvalue}` will evaluate to `defaultvalue` if `$VALUE` is unset. We can provide these initial secrets in the following ways:
 
  - Using environment variables
- - Using docker-secrets, where files on path `/run/secrets/${KEY}` will be replaced by `${KEY}` in configuration
+ - Using docker-secrets, where files on path `/run/secrets/${KEY}` will be replaced by `${KEY}` in configuration. The base folder `/run/secrets` can be overriden by setting the environment variable `SECRETS`. So this can be used as a file based secret, and not just docker secrets.
  - Using kubernetes secrets, logic is the same as for docker-secrets (see example in [demos](demos) folder)
  - Using vault, see instructions in section below
 
