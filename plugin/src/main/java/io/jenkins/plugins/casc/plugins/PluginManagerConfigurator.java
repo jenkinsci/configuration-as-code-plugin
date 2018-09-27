@@ -77,12 +77,11 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
     }
 
     @Override
-    public PluginManager check(CNode c, ConfigurationContext context) throws ConfiguratorException {
-        return getTargetComponent(context);
-    }
+    protected void configure(Mapping config, PluginManager instance, boolean dryrun, ConfigurationContext context) throws ConfiguratorException {
 
-    @Override
-    public PluginManager configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
+        // PluginManager has no dry-run mode : we need to actually install plugins, or we just can't check
+        // the other elements of the configuration regarding required plugins.
+
         Mapping map = config.asMapping();
         final Jenkins jenkins = Jenkins.getInstance();
 
@@ -90,14 +89,13 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
 
         final UpdateCenter updateCenter = configureUpdateSites(map, jenkins, context);
 
-        final PluginManager pluginManager = configurePlugins(map, jenkins, updateCenter, context);
+        configurePlugins(map, jenkins, updateCenter, context);
 
         try {
             jenkins.save();
         } catch (IOException e) {
             throw new ConfiguratorException("failed to save Jenkins configuration", e);
         }
-        return pluginManager;
     }
 
     private void configureProxy(Mapping map, Jenkins jenkins, ConfigurationContext context) throws ConfiguratorException {
