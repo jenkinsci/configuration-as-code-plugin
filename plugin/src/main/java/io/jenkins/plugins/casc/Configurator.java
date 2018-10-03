@@ -21,6 +21,7 @@
 
 package io.jenkins.plugins.casc;
 
+import hudson.ExtensionList;
 import hudson.ExtensionPoint;
 import io.jenkins.plugins.casc.model.CNode;
 import org.apache.commons.lang.StringUtils;
@@ -32,7 +33,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import jenkins.model.Jenkins;
 
 /**
  * Define a {@link Configurator} which handles a configuration element, identified by name.
@@ -51,6 +56,32 @@ public interface Configurator<T> {
             name = StringUtils.uncapitalize(name);
         }
         return name;
+    }
+
+    /**
+     * Finds a Configurator for base type and a short name
+     * @param clazz Base class
+     * @param shortname Short name of the implementation
+     * @return Configurator
+     */
+    @CheckForNull
+    static Configurator<?> lookupForBaseType(Class<?> clazz, @Nonnull String shortname) {
+
+        final Logger LOGGER = Logger.getLogger(Configurator.class.getName());
+
+        final Jenkins jenkins = Jenkins.getInstance();
+        final ExtensionList<Configurator> l = jenkins.getExtensionList(Configurator.class);
+        for (Configurator c : l) {
+
+            LOGGER.log(Level.FINE, "Checking if configurator '"+c.getName()+" > "+c.getTarget().getName()+"' match with '"+shortname+" > "+clazz.getName()+"'");
+
+            if (shortname.equalsIgnoreCase(c.getName())) { // short name match, ensure that the type is compliant
+                if (clazz.isAssignableFrom(c.getTarget())) { // Implements child class
+                    return c;
+                }
+            }
+        }
+        return null;
     }
 
     /**

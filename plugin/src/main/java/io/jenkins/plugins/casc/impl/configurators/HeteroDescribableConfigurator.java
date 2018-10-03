@@ -137,6 +137,17 @@ public class HeteroDescribableConfigurator<T extends Describable> implements Con
                 }
             }
         }
+
+        // Not all Describable classes have symbols, give a chance to custom configurators in standalone plugins
+        // TODO: probably this logic should have a priority over Symbol so that extensions can override it
+        final Configurator<?> c = Configurator.lookupForBaseType(target, shortname);
+        if (c != null) {
+            Class<?> clazz = c.getTarget();
+            if (Describable.class.isAssignableFrom(clazz)) {
+                return (Class<T>) clazz;
+            }
+        }
+
         final String errSupport = !_hasSupportPluginInstalled() ? "\nPossible solution: Try to install 'configuration-as-code-support' plugin" : "";
         final String msg = "No "+target.getName()+ " implementation found for "+shortname;
         throw new IllegalArgumentException(String.format("%s%s", msg, errSupport));
