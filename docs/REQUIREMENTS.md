@@ -104,7 +104,7 @@ public boolean configure(StaplerRequest req, JSONObject json) throws FormExcepti
 }
 ```
  
-to be replaced by :`
+to be replaced by :
 
 ```xml
 <f:optionalProperty field="Authentication" title="${%Use Authentication}"/>
