@@ -30,7 +30,7 @@ The devops team would like more traceability around changes, by completely move 
 
 From that point on they all have full traceability of all the changes made, and they are able to roll it back easily by reverting commits. They can review the changes simply by looking at the git diffs on commits.
 
-**Getting there and adopting Jenkins Configuration as Code** is also quite easy for the devops team. They will need to install the plug-in, and go the the Configuration as Code menu in Manage Jenkins, and use the export function to create the initial YAML files that represent their current global configuration and plug-in's installed.
+**Getting there and adopting Jenkins Configuration as Code** is also quite easy for the devops team. They will need to install the plug-in, and go the the Configuration as Code menu in Manage Jenkins, and use the export function to create the initial YAML files that represent their current global configuration and plug-in's installed. Export is not intended to offer a directly usable jenkins.yaml configuration. It can be used for inspiration writting your own, but be aware that export can be partial, or fail for some components.
 
 When the files are in git, they can point to the file in the repository in the Configuration as Code menu, and click reload so Jenkins updates it's configuration accordingly.
 
