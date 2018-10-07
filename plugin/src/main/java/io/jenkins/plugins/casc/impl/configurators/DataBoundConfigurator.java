@@ -1,6 +1,7 @@
 package io.jenkins.plugins.casc.impl.configurators;
 
 import hudson.model.Descriptor;
+import hudson.util.Secret;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
@@ -130,7 +131,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                         final Configurator configurator = context.lookupOrFail(k);
                         args[i] = configurator.configure(value, context);
                     }
-                    logger.info("Setting " + target + "." + names[i] + " = " + (value.isSensitiveData() ? "****" : value));
+                    logger.info("Setting " + target + "." + names[i] + " = " + (t == Secret.class ? "****" : value));
                 } else if (t.isPrimitive()) {
                     args[i] = defaultValue(t);
                 }
