@@ -1,5 +1,6 @@
 package io.jenkins.plugins.casc;
 
+import hudson.BulkChange;
 import hudson.model.Describable;
 import hudson.model.Saveable;
 import hudson.util.PersistedList;
@@ -245,14 +246,18 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
     public T configure(CNode c, ConfigurationContext context) throws ConfiguratorException {
         final Mapping mapping = (c != null ? c.asMapping() : Mapping.EMPTY);
         final T instance = instance(mapping, context);
-        configure(mapping, instance, false, context);
         if (instance instanceof Saveable) {
+            BulkChange bc = new BulkChange((Saveable) instance);
+            configure(mapping, instance, false, context);
             try {
-                ((Saveable) instance).save();
+                bc.commit();
             } catch (IOException e) {
                 throw new ConfiguratorException("Failed to save "+instance, e);
             }
+        } else {
+            configure(mapping, instance, false, context);
         }
+
         return instance;
     }
 
