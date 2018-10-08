@@ -50,23 +50,31 @@ to be replaced by :
 
 ```java
 public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
-    req.bindJSON(this, json);
-    save();
+    try (BulkChange bc = new BulkChange(this)) {
+        req.bindJSON(this, json);
+        bc.commit();
+    }
     return true;
 }
 
 @DataBoundSetter
 public void setSmtpHost(String smtpHost) {
     this.smtpHost = nullify(smtpHost);
+    save();
 }
 
 @DataBoundSetter
 public void setReplyToAddress(String address) {
     this.replyToAddress = Util.fixEmpty(address);
+    save();
 }
 ```
 
-note: you might not even need to implement `configure` once [#3669](https://github.com/jenkinsci/jenkins/pull/3669) 
+notes:
+- you also need matching getters for jelly view to render current value, but you probably already have them declared. 
+- use of BulkChange allows to avoid repeated calls to `save()` to actually persist to disk only once fully 
+configured. 
+- you might not even need to implement `configure` once [#3669](https://github.com/jenkinsci/jenkins/pull/3669) 
 is merged.
 
 ### Rule 2: don't use pseudo-properties for optional
