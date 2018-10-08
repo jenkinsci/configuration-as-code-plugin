@@ -247,9 +247,8 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
         final Mapping mapping = (c != null ? c.asMapping() : Mapping.EMPTY);
         final T instance = instance(mapping, context);
         if (instance instanceof Saveable) {
-            BulkChange bc = new BulkChange((Saveable) instance);
-            configure(mapping, instance, false, context);
-            try {
+            try (BulkChange bc = new BulkChange((Saveable) instance) ){
+                configure(mapping, instance, false, context);
                 bc.commit();
             } catch (IOException e) {
                 throw new ConfiguratorException("Failed to save "+instance, e);
