@@ -46,17 +46,17 @@ data:
                 activeDeadlineSeconds: "120"
                 slaveConnectTimeout: "1000"
 
-      jobs:
-        - >
-          pipelineJob('configuration-as-code') {
-              definition {
-                  cps {
-                      sandbox()
-                      script("""
-                        node('linux-x86_64') {
-                            sh "hostname"
-                        }
-                      """.stripIndent())
-                  }
-              }
-          }
+    jobs:
+      - script: >
+        pipelineJob('configuration-as-code') {
+            definition {
+                cps {
+                    sandbox()
+                    script("""
+                      node('linux-x86_64') {
+                          sh "hostname"
+                      }
+                    """.stripIndent())
+                }
+            }
+        }
