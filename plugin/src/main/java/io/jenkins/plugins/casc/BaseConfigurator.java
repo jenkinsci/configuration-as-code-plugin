@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import static java.util.logging.Level.FINER;
 
@@ -350,7 +351,8 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
     protected final void handleUnknown(Mapping config, ConfigurationContext context) throws ConfiguratorException {
         if (!config.isEmpty()) {
             final String invalid = StringUtils.join(config.keySet(), ',');
-            final String message = "Invalid configuration elements for type " + getTarget() + " : " + invalid;
+            final String message = "Invalid configuration elements for type " + getTarget() + " : " + invalid + ".\n"
+                    + "Available attributes : " + StringUtils.join(getAttributes().stream().map(Attribute::getName).collect(Collectors.toList()), ',');
             context.warning(config, message);
             switch (context.getUnknown()) {
                 case reject:
