@@ -24,19 +24,19 @@ data:
                     command: cat
                     args: ""
 
-      jobs:
-        - >
-          pipelineJob('configuration-as-code') {
-              definition {
-                  cps {
-                      sandbox()
-                      script("""
-                        podTemplate(label: 'mypod') {
-                          node('mypod') {
-                            sh "hostname"
-                          }
+    jobs:
+      - script: >
+        pipelineJob('configuration-as-code') {
+            definition {
+                cps {
+                    sandbox()
+                    script("""
+                      podTemplate(label: 'mypod') {
+                        node('mypod') {
+                          sh "hostname"
                         }
-                      """.stripIndent())
-                  }
-              }
-          }
+                      }
+                    """.stripIndent())
+                }
+            }
+        }
