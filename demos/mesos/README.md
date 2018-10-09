@@ -7,18 +7,20 @@ jenkins:
   clouds:
     - mesos:
         checkpoint: false
+        credentialsId: "MESOS_CREDENTIALS"
         declineOfferDuration: 600
         description: "My Mesos Cloud"
         frameworkName: "Jenkins Framework"
+        # jenkinsURL is a mandatory field, jenkins fails without it. See https://github.com/jenkinsci/configuration-as-code-plugin/issues/578
         jenkinsURL: "https://jenkins.mesos.cloud"
         master: 1.2.3.4:8000
         nativeLibraryPath: "/usr/lib/libmesos.so"
         onDemandRegistration: true
+        principal: "MESOS_PRINCIPAL"
         role: "*"
         slavesUser: "jenkins"
         slaveInfos:
-          - node01:
-            labelString: 'docker'
+          - labelString: 'docker'
             slaveCpus: 0.1
             slaveMem: 512
             slaveAttributes: >
@@ -32,11 +34,12 @@ jenkins:
             jvmArgs: ''
             jnlpArgs: ''
             defaultSlave: true
-            idleTerminationMinutes: '5'
+            idleTerminationMinutes: 5
             containerInfo:
               type: "DOCKER"
               dockerImage: "cloudbees/java-with-docker-client:latest"
               networking: "BRIDGE"
+              dockerForcePullImage: false
               volumes:
                 - containerPath: "/var/run/docker.sock"
                   hostPath: "/var/run/docker.sock"
