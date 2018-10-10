@@ -5,6 +5,7 @@
 - [SECURITY-929] Don't dump sensitive data in logs when configuring value
 - use BulkChange to avoid repeated calls to save()
 - list available attributes when unknown found in yaml to help diagnose mistakes
+- log a warning when descriptor with unexpected design is detected
 
 ## 1.1
 

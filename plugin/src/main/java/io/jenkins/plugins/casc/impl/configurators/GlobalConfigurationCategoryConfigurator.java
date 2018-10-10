@@ -4,6 +4,7 @@ import hudson.model.Descriptor;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
+import io.jenkins.plugins.casc.Configurator;
 import io.jenkins.plugins.casc.RootElementConfigurator;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
@@ -19,6 +20,7 @@ import javax.annotation.CheckForNull;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -72,8 +74,17 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
                 .filter(d -> d.getCategory() == category)
                 .filter(d -> d.getGlobalConfigPage() != null)
                 .map(d -> new DescriptorConfigurator(d))
+                .filter(GlobalConfigurationCategoryConfigurator::reportDescriptorWithoutSetters)
                 .map(c -> new Attribute<GlobalConfigurationCategory, Object>(c.getName(), c.getTarget()).setter(NOP))
                 .collect(Collectors.toSet());
+    }
+
+    public static boolean reportDescriptorWithoutSetters(Configurator c) {
+        if (c.describe().isEmpty()) {
+            logger.warning(c.getTarget().getName() +
+                    " has a global view but CasC didn't detected any configurable attribute; see: https://jenkins.io/redirect/casc-requirements/");
+        }
+        return true;
     }
 
     @CheckForNull
