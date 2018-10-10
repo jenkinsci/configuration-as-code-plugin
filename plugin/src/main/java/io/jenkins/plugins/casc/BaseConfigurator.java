@@ -356,7 +356,7 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
         if (!config.isEmpty()) {
             final String invalid = StringUtils.join(config.keySet(), ',');
             final String message = "Invalid configuration elements for type " + getTarget() + " : " + invalid + ".\n"
-                    + "Available attributes : " + StringUtils.join(getAttributes().stream().map(Attribute::getName).collect(Collectors.toList()), ',');
+                    + "Available attributes : " + StringUtils.join(getAttributes().stream().map(Attribute::getName).collect(Collectors.toList()), ", ");
             context.warning(config, message);
             switch (context.getUnknown()) {
                 case reject:
