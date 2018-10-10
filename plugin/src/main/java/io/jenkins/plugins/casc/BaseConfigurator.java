@@ -3,8 +3,10 @@ package io.jenkins.plugins.casc;
 import hudson.BulkChange;
 import hudson.model.Describable;
 import hudson.model.Saveable;
+import hudson.util.DescribableList;
 import hudson.util.PersistedList;
 import io.jenkins.plugins.casc.impl.attributes.DescribableAttribute;
+import io.jenkins.plugins.casc.impl.attributes.DescribableListAttribute;
 import io.jenkins.plugins.casc.impl.attributes.PersistedListAttribute;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
@@ -143,7 +145,9 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
         }
 
         Attribute attribute;
-        if (PersistedList.class.isAssignableFrom(type.rawType)) {
+        if (DescribableList.class.isAssignableFrom(type.rawType)) {
+            return new DescribableListAttribute(name, c);
+        } else if (PersistedList.class.isAssignableFrom(type.rawType)) {
             return new PersistedListAttribute(name, c);
         } else if (!c.isPrimitive() && !c.isEnum() && Modifier.isAbstract(c.getModifiers())) {
             if (!Describable.class.isAssignableFrom(c)) {

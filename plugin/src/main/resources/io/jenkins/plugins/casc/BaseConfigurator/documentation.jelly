@@ -2,25 +2,41 @@
 <j:jelly xmlns:j="jelly:core">
 
   <div class='configurator'>
-    <div id="${it.extensionPoint.simpleName}-${it.name}" class='configurator__name'>${it.name} <sup class='configurator-pointer'>${%CONFIGURATOR}</sup></div>
+    <div id="${it.implementedAPI.simpleName}-${it.name}" class='configurator__name'>${it.name}
+      <sup class='configurator-pointer'>
+        <j:choose>
+          <j:when test="${it.rootElement}">
+            ⚙️ ️${%ROOT ELEMENT}
+          </j:when>
+          <j:otherwise>
+            ${%CONFIGURATOR}
+          </j:otherwise>
+        </j:choose>
 
-    <j:if test="${it.extensionPoint != it.target}">
+      </sup>
+    </div>
+
+    <j:if test="${it.implementedAPI != it.target}">
         <div class='configurator__implementation'>
             Implementation of
-            <a href="https://jenkins.io/doc/developer/extensions/${casc.extensionSource}/#${it.extensionPoint.simpleName.toLowerCase()}">
-                ${it.extensionPoint.simpleName}
+            <a href="https://jenkins.io/doc/developer/extensions/${casc.getExtensionSource(it)}/#${it.implementedAPI.simpleName.toLowerCase()}">
+                ${it.implementedAPI.simpleName}
             </a>
         </div>
     </j:if>
 
-    <div class='configurator__display-name'>${it.displayName}</div>
+    <j:if test="${it.name != it.displayName}">
+      <div class='configurator__display-name'>${it.displayName}</div>
+    </j:if>
+    
     <div class='configurator-attributes'>
     <j:forEach items="${it.attributes}" var="a">
         <div class='configurator-attribute'>
             <div class='configurator-attribute__name'><span class='attribute-name'>${a.name}</span></div>
             <div class='configurator-attribute__details'>
                 <div class='attribute-type'>
-                    <j:if test="${a.multiple}"><span class='attribute-type__list'>list of</span></j:if> <span class='attribute-type__class'>${a.type.simpleName}</span>
+                  <j:if test="${a.multiple}"><span class='attribute-type__list'>list of</span></j:if>
+                  <span class='attribute-type__class'>${a.type.simpleName}</span>
                 </div>
                 <div class='attribute-help'>
                     <j:out value="${casc.getHtmlHelp(it.target, a.name)}"/>
