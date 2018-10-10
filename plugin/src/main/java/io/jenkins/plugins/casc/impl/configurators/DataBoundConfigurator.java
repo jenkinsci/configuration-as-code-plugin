@@ -272,6 +272,6 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
 
     public String getDisplayName() {
         final Descriptor descriptor = getDescriptor();
-        return descriptor != null ? descriptor.getDisplayName() : "";
+        return descriptor != null ? descriptor.getDisplayName() : getName();
     }
 }
