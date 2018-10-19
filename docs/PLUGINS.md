@@ -15,7 +15,7 @@ compliant with configuration-as-code, you'll need to expose your configuration a
 
 Before you start, make sure the following pre-conditions are met :
 
-- the parent pom version of your plugin is aligned with the Configuration as Code [parent pom version](pom.xml).
+- the parent pom version of your plugin is aligned with the Configuration as Code [parent pom version](/pom.xml).
 ```xml
 <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
