@@ -563,15 +563,9 @@ public class ConfigurationAsCode extends ManagementLink {
      */
     public List<Path> configs(String path) throws ConfiguratorException {
         final PathMatcher matcher = FileSystems.getDefault().getPathMatcher(YAML_FILES_PATTERN);
-        PathMatcher myMatcher = new PathMatcher() {
-            public boolean matches(Path var1) {
-                return matcher.matches(var1) && var1.toFile().isFile();
-            }
-        };
-
 
         try (Stream<Path> stream = Files.find(Paths.get(path), Integer.MAX_VALUE,
-                (next, attrs) -> myMatcher.matches(next))) {
+                (next, attrs) -> (attrs.isRegularFile() || attrs.isSymbolicLink()) && matcher.matches(next))) {
             return stream.collect(toList());
         } catch (NoSuchFileException e) {
             throw new ConfiguratorException("File does not exist: " + path, e);
