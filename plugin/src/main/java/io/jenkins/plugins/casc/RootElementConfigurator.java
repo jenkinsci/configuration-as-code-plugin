@@ -25,7 +25,7 @@ public interface RootElementConfigurator<T> extends Configurator<T> {
 
         for (GlobalConfigurationCategory category : GlobalConfigurationCategory.all()) {
             configurators.add(new GlobalConfigurationCategoryConfigurator(category));
-        } 
+        }
 
         for (ManagementLink link : ManagementLink.all()) {
             final String name = link.getUrlName();
@@ -35,6 +35,11 @@ public interface RootElementConfigurator<T> extends Configurator<T> {
         }
 
         return configurators;
+    }
+
+    /* This function is used for configurator-pointer in the documentation.jelly file only. */
+    default boolean isRootElement() {
+        return true;
     }
 
     /**

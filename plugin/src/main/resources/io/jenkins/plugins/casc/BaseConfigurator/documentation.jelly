@@ -3,7 +3,7 @@
 
   <div class='configurator'>
     <div id="${it.implementedAPI.simpleName}-${it.name}" class='configurator__name'>${it.name}
-      <sup class='configurator-pointer'>
+      <sup class="${it.rootElement ? 'root-configurator-pointer' : 'configurator-pointer'}">
         <j:choose>
           <j:when test="${it.rootElement}">
             ⚙️ ️${%ROOT ELEMENT}
