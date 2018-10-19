@@ -39,6 +39,13 @@
 
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>ssh-credentials</artifactId>
+      <version>1.13</version>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>job-dsl</artifactId>
       <version>1.66</version>
       <optional>true</optional>
