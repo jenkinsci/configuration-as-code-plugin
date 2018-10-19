@@ -565,7 +565,7 @@ public class ConfigurationAsCode extends ManagementLink {
         PathMatcher matcher = FileSystems.getDefault().getPathMatcher(YAML_FILES_PATTERN);
 
         try (Stream<Path> stream = Files.find(Paths.get(path), Integer.MAX_VALUE,
-                (next, attrs) -> matcher.matches(next))) {
+                (next, attrs) -> (attrs.isRegularFile() || attrs.isSymbolicLink()) && matcher.matches(next))) {
             return stream.collect(toList());
         } catch (NoSuchFileException e) {
             throw new ConfiguratorException("File does not exist: " + path, e);
