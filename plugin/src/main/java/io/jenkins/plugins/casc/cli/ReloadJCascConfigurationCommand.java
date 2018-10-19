@@ -15,7 +15,7 @@ import java.io.InputStream;
  */
 @Extension
 @Restricted(NoExternalUse.class)
-public class ReloadConfigurationCommand extends CLICommand {
+public class ReloadJCascConfigurationCommand extends CLICommand {
 
     @Override
     public String getShortDescription() {
