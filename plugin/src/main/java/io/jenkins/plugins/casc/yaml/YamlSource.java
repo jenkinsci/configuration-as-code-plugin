@@ -43,7 +43,6 @@ public class YamlSource<T> {
         return source.toString();
     }
 
-
     public static final YamlReader<String> READ_FROM_URL = config -> {
         final URL url = URI.create(config).toURL();
         return new InputStreamReader(url.openStream(), UTF_8);
@@ -58,4 +57,8 @@ public class YamlSource<T> {
         return new InputStreamReader(req.getInputStream(), UTF_8);
     };
 
+    @Override
+    public String toString() {
+        return "YamlSource: " + source;
+    }
 }
