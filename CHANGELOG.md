@@ -1,6 +1,8 @@
 # ChangeLog
 
-## 1.2 (not released yet)
+## 1.3 (not released yet)
+
+## 1.2
 
 - [SECURITY-929] Don't dump sensitive data in logs when configuring value
 - [SECURITY] prevent directly entered private key to be exported in plain test
