@@ -24,6 +24,12 @@
         font-weight: 100;
     }
 
+    .root-configurator-pointer {
+        font-size: 0.5em;
+        color: #7f5200;
+        font-weight: 100;
+    }
+
     .configurator-attributes {
         display: flex;
         flex-direction: column;
