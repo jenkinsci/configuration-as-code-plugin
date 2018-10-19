@@ -19,7 +19,7 @@ public class ReloadJCascConfigurationCommand extends CLICommand {
 
     @Override
     public String getShortDescription() {
-        return "Reload YAML configuration";
+        return "Reload JCasC YAML configuration";
     }
 
     @Override
