@@ -1,0 +1,71 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>io.jenkins.configuration-as-code</groupId>
+    <artifactId>demos</artifactId>
+    <version>${revision}${changelist}</version>
+    <packaging>pom</packaging>
+    <name>Configuration as Code Test Harness</name>
+
+    <properties>
+      <revision>1.3</revision>
+      <changelist>-SNAPSHOT</changelist>
+    </properties>
+
+    <modules>
+      <module>prototype</module>
+      <module>prototype1</module>
+    </modules>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+              <plugin>
+                  <artifactId>maven-resources-plugin</artifactId>
+                  <version>3.0.2</version>
+                  <executions>
+                      <execution>
+                          <id>copy-testSources</id>
+                          <phase>pre-integration-test</phase>
+                          <goals>
+                              <goal>copy-resources</goal>
+                          </goals>
+                          <configuration>
+                              <resources>
+                                  <resource>
+                                      <directory>${project.parent.basedir}/commons</directory>
+                                      <filtering>true</filtering>
+                                      <includes>
+                                          <include>**/*</include>
+                                      </includes>
+                                  </resource>
+                              </resources>
+                              <outputDirectory>${project.basedir}</outputDirectory>
+                          </configuration>
+                      </execution>
+                  </executions>
+              </plugin>
+              <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>1.6.0</version>
+                    <executions>
+                        <execution>
+                            <id>start-test-environment</id>
+                            <phase>pre-integration-test</phase>
+                            <goals>
+                                <goal>exec</goal>
+                            </goals>
+                            <configuration>
+                                <workingDirectory>${project.basedir}</workingDirectory>
+                                <executable>docker-compose</executable>
+                                <commandlineArgs>up --build --force-recreate --abort-on-container-exit --exit-code-from bats</commandlineArgs>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+</project>

@@ -12,13 +12,6 @@
   <version>${revision}${changelist}</version>
   <packaging>pom</packaging>
 
-  <modules>
-    <module>snakeyaml</module>
-    <module>plugin</module>
-    <module>support</module>
-    <module>integrations</module>
-  </modules>
-
   <properties>
     <revision>1.4</revision>
     <changelist>-SNAPSHOT</changelist>
@@ -63,4 +56,24 @@
     </pluginRepository>
   </pluginRepositories>
 
+  <profiles>
+    <profile>
+      <id>default</id>
+       <activation>
+          <activeByDefault>true</activeByDefault>
+       </activation>
+       <modules>
+         <module>snakeyaml</module>
+         <module>plugin</module>
+         <module>support</module>
+         <module>integrations</module>
+       </modules>
+    </profile>
+    <profile>
+      <id>demos</id>
+       <modules>
+         <module>demos</module>
+       </modules>
+    </profile>
+  </profiles>
 </project>

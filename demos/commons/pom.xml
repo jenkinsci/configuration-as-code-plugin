@@ -6,7 +6,7 @@
     <version>${revision}${changelist}</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>prototype</artifactId>
+  <artifactId>${project.artifactId}</artifactId>
 
   <build>
     <plugins>
