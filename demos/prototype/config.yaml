@@ -1,0 +1,20 @@
+jenkins:
+  systemMessage: "Jenkins configured automatically by Jenkins Configuration as Code Plugin\n\n"
+  numExecutors: 5
+  scmCheckoutRetryCount: 2
+  mode: NORMAL
+
+  globalNodeProperties:
+    - envVars:
+        env:
+          - key: FOO
+            value: BAR
+security:
+    remotingCLI:
+          enabled: false
+
+unclassified:
+
+  location:
+    adminAddress: you@example.com
+    url: https://ci.example.com/
