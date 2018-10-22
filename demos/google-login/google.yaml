@@ -1,0 +1,12 @@
+jenkins:
+  systemMessage: "Example of configuring of google login plugin in Jenkins"
+
+  securityRealm:
+    googleOAuth2:
+      # The Client ID from the Google Developer Console
+      clientId: "${GOOGLE_OAUTH_CLIENT_ID}"
+      # The Client Secret from the Google Developer Console.
+      clientSecret: "${GOOGLE_OAUTH_CLIENT_SECRET}"
+      # Optional. If present, access to Jenkins will be restricted to users in the provided Google Apps Domain.
+      #           A comma separated list can be used to specify multiple domains.
+      domain: ""
