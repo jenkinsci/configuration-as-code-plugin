@@ -9,8 +9,7 @@ providing oauth authorization to Jenkins.
 ```yaml
 jenkins:
   securityRealm:
-	googleOAuth2:
+    googleOAuth2:
       clientId: "___.apps.googleusercontent.com"
       clientSecret: "${GOOGLE_OAUTH_SECRET}"
-      domain: ""
 ```
