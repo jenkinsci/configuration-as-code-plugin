@@ -325,18 +325,26 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
                 if (attribute.isMultiple()) {
                     List<Object> values = new ArrayList<>();
                     for (CNode o : sub.asSequence()) {
-                        Object value =
-                                dryrun ?
-                                        configurator.check(o, context):
-                                        configurator.configure(o, context);
-                        values.add(value);
+                        try{
+                            Object value =
+                                    dryrun ?
+                                            configurator.check(o, context):
+                                            configurator.configure(o, context);
+                            values.add(value);
+                        } catch (Exception ex) {
+                            throw new ConfiguratorException(configurator, "configuration is invalid", ex);
+                        }
                     }
                     valueToSet= values;
                 } else {
-                    valueToSet =
-                            dryrun ?
-                                    configurator.check(sub, context):
-                                    configurator.configure(sub, context);
+                    try {
+                        valueToSet =
+                                dryrun ?
+                                        configurator.check(sub, context) :
+                                        configurator.configure(sub, context);
+                    } catch (Exception ex) {
+                        throw new ConfiguratorException(configurator, "configuration is invalid", ex);
+                    }
                 }
 
                 if (!dryrun) {
