@@ -2,6 +2,8 @@
 
 ## 1.3 (not released yet)
 
+- wrap configurator checks in try/catch
+
 ## 1.2
 
 - [SECURITY-929] Don't dump sensitive data in logs when configuring value
