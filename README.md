@@ -75,6 +75,21 @@ The only other requirement is that your Jenkins instance has an environment vari
 
 If everything was setup correctly you should now be able to browse the Configuration as Code management link in `Manage Jenkins -> Configuration as Code`.
 
+## Run Locally
+
+Prerequisites: *Maven* & *IntelliJ IDEA*
+
+* Ensure maven is included in the PATH environment variable.
+
+  ```export PATH=$PATH:/path/to/apache-maven-x.y.z/bin```
+
+* Open the root directory of this project in IntelliJ IDEA.
+* If you are opening the first time, wait patiently while project dependencies are being downloaded.
+* Click `Run` in the menu. Select `Edit Configurations` in the menu item.
+* Click `Add New Configuration` (`+`) in the top left of the shown dialog. Select `Maven`.
+* Under `Parameters` tab group, `Working directory:` is `/path/to/configuration-as-code-plugin/plugin`.
+* Under `Parameters` tab group, `Command line:` is `hpi:run`.
+
 ## How to configure your first instance
 
 Generally when you are about to configure your first instance you want to first browse the examples shown in the [demos](demos)
