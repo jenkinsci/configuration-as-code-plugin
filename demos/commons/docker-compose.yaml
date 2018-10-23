@@ -23,3 +23,14 @@ services:
       sh -c "/sbin/bats --tap /my-tests > /target/output.tap"
     depends_on:
       - jenkins
+
+  debug:
+    image: 'dduportal/bats:1.0.0'
+    volumes_from:
+      - jenkins:ro
+    volumes:
+      - ./target:/target
+    entrypoint: >
+      sh -c "cp /var/jenkins_home/config.xml /target/"
+    depends_on:
+      - bats
