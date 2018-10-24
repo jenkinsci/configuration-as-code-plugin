@@ -55,7 +55,7 @@ Second, the plugin requires the `CASC_JENKINS_CONFIG` environment variable to ex
 - A full path to a single file. For example, `/var/jenkins_home/casc_configs/jenkins.yaml`.
 - A URL pointing to a file served on the web. For example, `https://acme.org/jenkins.yaml`.
 
-If everything was setup correctly, you should now be able to browse the Configuration as Code page with `Manage Jenkins -> Configuration as Code`.
+If everything was setup correctly, you should now be able to browse the Configuration as Code page with `Manage Jenkins` -> `Configuration as Code`.
 
 ## Run Locally
 
