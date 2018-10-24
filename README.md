@@ -151,19 +151,19 @@ element.
 
 ## Examples
 
-This configuration file includes root entries for various components of your primary Jenkins installation. The `jenkins`
-one is for the root Jenkins object, and other ones are for various global configuration elements.
+This configuration file includes root entries for various components of your primary Jenkins installation. The `jenkins` one is for the root Jenkins object, and other ones are for various global configuration elements.
 
 ```yaml
 jenkins:
-  securityRealm: (...)
+  securityRealm:
+    (...)
 
   nodes:
     - permanent:
         name: "static-slave"
         remoteFS: "/home/jenkins"
         launcher:
-          ? jnlp
+          jnlp:
 
   slaveAgentPort: 50000
   agentProtocols:
@@ -261,7 +261,7 @@ services:
       - jcasc_vault
 
 volumes:
-  ? jenkins-home
+  jenkins-home:
 
 secrets:
   jcasc_vault:
