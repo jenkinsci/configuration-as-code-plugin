@@ -79,7 +79,7 @@ If everything was setup correctly you should now be able to browse the Configura
 
 Prerequisites: *Java*, *Maven* & *IntelliJ IDEA*
 
-* Ensure Java 8 is available. There are problem with Java 10/11 as of October 24, 2018.
+* Ensure Java 8 is available. There are unresolved issues with Java 10/11 as of October 24, 2018.
 
   ```shell
   /usr/libexec/java_home
