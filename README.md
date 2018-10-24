@@ -77,11 +77,51 @@ If everything was setup correctly you should now be able to browse the Configura
 
 ## Run Locally
 
-Prerequisites: *Maven* & *IntelliJ IDEA*
+Prerequisites: *Java*, *Maven* & *IntelliJ IDEA*
 
-* Ensure maven is included in the PATH environment variable.
+* Ensure Java 8 is available. There are problem with Java 10/11 as of October 24, 2018.
 
-  ```export PATH=$PATH:/path/to/apache-maven-x.y.z/bin```
+  ```shell
+  /usr/libexec/java_home
+  ```
+
+  ```text
+  /Library/Java/JavaVirtualMachines/jdk-11.0.1.jdk/Contents/Home
+  ```
+
+  * If Java 11 is selected by default, check other available Java version below.
+
+  ```shell
+  /usr/libexec/java_home --verbose
+  ```
+
+  ```text
+  Matching Java Virtual Machines (3):
+      11.0.1, x86_64: "Java SE 11.0.1"  /Library/Java/JavaVirtualMachines/jdk-11.0.1.jdk/Contents/Home
+      10.0.2, x86_64: "Java SE 10.0.2"  /Library/Java/JavaVirtualMachines/jdk-10.0.2.jdk/Contents/Home
+      1.8.0_192, x86_64:  "Java SE 8"  /Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home
+
+  /Library/Java/JavaVirtualMachines/jdk-11.0.1.jdk/Contents/Home
+  ```
+
+  * Use the alternate Java 8.
+
+  ```shell
+  export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
+  echo $JAVA_HOME
+  ```
+
+  ```text
+  /Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home
+  ```
+
+* Ensure Maven is included in the PATH environment variable.
+
+  ```shell
+  export PATH=$PATH:/path/to/apache-maven-x.y.z/bin
+  ```
+
+### IntelliJ IDEA
 
 * Open the root directory of this project in IntelliJ IDEA.
 * If you are opening the first time, wait patiently while project dependencies are being downloaded.
@@ -92,6 +132,25 @@ Prerequisites: *Maven* & *IntelliJ IDEA*
 * Verify that IntelliJ IDEA is not using bundled maven.
   * Click `File` -> `Preferences...` -> `Build, Execution, Deployment` -> `Build Tools` -> `Maven`.
   * `Maven home directory:` has `/path/to/apache-maven-x.y.z` value, not `Bundled (Maven 3)`.
+* Open http://localhost:8080/jenkins/configuration-as-code/ to test the plugin locally.
+
+### CLI
+
+* Go into the `plugin` child directory under the root directory of this project.
+* Use the below commands.
+
+```shell
+export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
+export PATH=$PATH:/path/to/apache-maven-x.y.z/bin
+mvn hpi:run
+```
+
+```text
+...
+...
+INFO: Jenkins is fully up and running
+```
+
 * Open http://localhost:8080/jenkins/configuration-as-code/ to test the plugin locally.
 
 ## How to configure your first instance
