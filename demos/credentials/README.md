@@ -49,7 +49,7 @@ credentials:
       - credentials:
           - basicSSHUserPrivateKey:
               scope: SYSTEM
-              id: ssh_with_passprase_provided
+              id: ssh_with_passphrase_provided
               username: ssh_root
               passphrase: ${SSH_KEY_PASSWORD}
               description: "SSH passphrase with private key file. Private key provided"

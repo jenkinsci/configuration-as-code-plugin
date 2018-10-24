@@ -2,9 +2,8 @@ package io.jenkins.plugins.casc.support.credentials;
 
 import com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey.DirectEntryPrivateKeySource;
 import hudson.Extension;
-import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
-import io.jenkins.plugins.casc.ConfiguratorException;
+import io.jenkins.plugins.casc.impl.configurators.DataBoundConfigurator;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import io.jenkins.plugins.casc.model.Scalar;
@@ -15,11 +14,10 @@ import javax.annotation.CheckForNull;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Extension
-public class DirectEntryPrivateKeySourceConfigurator extends BaseConfigurator<DirectEntryPrivateKeySource> {
+public class DirectEntryPrivateKeySourceConfigurator extends DataBoundConfigurator<DirectEntryPrivateKeySource> {
 
-    @Override
-    protected DirectEntryPrivateKeySource instance(Mapping mapping, ConfigurationContext context) throws ConfiguratorException {
-        return new DirectEntryPrivateKeySource(mapping.getScalarValue("privateKey"));
+    public DirectEntryPrivateKeySourceConfigurator() {
+        super(DirectEntryPrivateKeySource.class);
     }
 
     @Override

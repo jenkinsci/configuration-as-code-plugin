@@ -2,6 +2,8 @@
 
 ## 1.3 (not released yet)
 
+- fix regression configuring ssh private key from a secret source
+
 ## 1.2
 
 - [SECURITY-929] Don't dump sensitive data in logs when configuring value
