@@ -297,4 +297,4 @@ Most plugins should be supported out-of-the-box, or maybe require some minimal c
 
 As Configuration-as-code is demonstrated to be a highly requested topic in Jenkins community, we have published
 [JEP 201](https://github.com/jenkinsci/jep/tree/master/jep/201) as proposal to make this a standard component
-of the Jenkins project. The proposal has been accepted. :tada:
+of the Jenkins project. The proposal was accepted. :tada:
