@@ -1,29 +1,20 @@
-[![Build Status](https://ci.jenkins.io/job/Plugins/job/configuration-as-code-plugin/job/master/badge/icon)](https://ci.jenkins.io/job/Plugins/job/configuration-as-code-plugin/job/master/)
-
-Join the community and ask questions
-[![Gitter](https://badges.gitter.im/jenkinsci/configuration-as-code-plugin.svg)](https://gitter.im/jenkinsci/configuration-as-code-plugin?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
-
 # Jenkins Configuration as Code Plugin
 
-<img src="plugin/src/main/webapp/img/logo-head.svg" width="250">
+[![Build Status](https://ci.jenkins.io/job/Plugins/job/configuration-as-code-plugin/job/master/badge/icon)](https://ci.jenkins.io/job/Plugins/job/configuration-as-code-plugin/job/master/)
+[![Jenkins Plugins](https://img.shields.io/jenkins/plugin/v/configuration-as-code.svg)](https://plugins.jenkins.io/configuration-as-code)
+[![Gitter](https://badges.gitter.im/jenkinsci/configuration-as-code-plugin.svg)](https://gitter.im/jenkinsci/configuration-as-code-plugin)
 
-Slides for Jenkins World 2018 presentation [available here](https://docs.google.com/presentation/d/1VsvDuffinmxOjg0a7irhgJSRWpCzLg_Yskf7Fw7FpBg/edit?usp=sharing).
+<img src="plugin/src/main/webapp/img/logo-head.svg" width="192">
 
-## Release information
+See our [wiki](https://wiki.jenkins.io/display/JENKINS/configuration+as+code+plugin) page. Also, see [presentation slides](https://docs.google.com/presentation/d/1VsvDuffinmxOjg0a7irhgJSRWpCzLg_Yskf7Fw7FpBg/edit?usp=sharing) from Jenkins World 2018.
 
-Release notes of the latest release can be found here: https://wiki.jenkins.io/display/JENKINS/configuration+as+code+plugin
+## Office Hours
 
-## Jenkins Configuration as Code office hours
+Configuration as Code (JCasC) office hours meeting scheduled for every second Wednesday. JCasC related topics and future plans will be discussed.
 
-Every second Wednesday we meet at JcasC office hours meeting, where we discuss:
-* current issues
-* hot topics
-* plans for the future
+Use the Hangout on Air link, which is shared few minutes before the meeting on our [Gitter](https://gitter.im/jenkinsci/configuration-as-code-plugin) chat channel. As an alternative, use the link from the [invitation](https://calendar.google.com/event?action=TEMPLATE&tmeid=MmdwdTE1cTFvaGw1NGUycGxqdWUwcXExaWFfMjAxODA3MjVUMDcwMDAwWiBld2VAcHJhcW1hLm5ldA&tmsrc=ewe%40praqma.net&scp=ALL).
 
-You can join via Hangout on Air link shared 10 minutes before the meeting on our [Gitter](https://gitter.im/jenkinsci/configuration-as-code-plugin) channel.
-If no link is shared we'll use the link from the [invitation](https://calendar.google.com/event?action=TEMPLATE&tmeid=MmdwdTE1cTFvaGw1NGUycGxqdWUwcXExaWFfMjAxODA3MjVUMDcwMDAwWiBld2VAcHJhcW1hLm5ldA&tmsrc=ewe%40praqma.net&scp=ALL).
-
-Minutes of meeting are available [here](https://docs.google.com/document/d/1Hm07Q1egWL6VVAqNgu27bcMnqNZhYJmXKRvknVw4Y84/edit?usp=sharing).
+See previous [meeting minutes](https://docs.google.com/document/d/1Hm07Q1egWL6VVAqNgu27bcMnqNZhYJmXKRvknVw4Y84/edit?usp=sharing).
 
 ## Introduction
 
@@ -62,9 +53,10 @@ jenkins:
 In addition, we want such a file to have a well documented syntax, and tooling to assist in writing and testing,
 so end-users have full guidance in using this toolset and don't have to search stackoverflow for samples.
 
-## Getting started
+## Getting Started
 
 To get started you must have a running Jenkins instance with the plugin installed.
+
 - For those running Jenkins as a [docker container](https://github.com/jenkinsci/docker) (and maybe also [pre-installing plugins](https://github.com/jenkinsci/docker#preinstalling-plugins)), the name of the plugin is `configuration-as-code`.
 
 The only other requirement is that your Jenkins instance has an environment variable set that points to the current configuration location for configuration as code. So the plugin requires the environment variable `CASC_JENKINS_CONFIG` to be set. The variable can point to the following:
