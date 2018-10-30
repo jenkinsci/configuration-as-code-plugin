@@ -27,8 +27,6 @@
   </properties>
 
   <name>Configuration as Code Parent</name>
-  <description>Manage Jenkins master configuration as code</description>
-  <url>https://wiki.jenkins-ci.org/display/JENKINS/Configuration+as+Code+Plugin</url>
 
   <licenses>
     <license>
