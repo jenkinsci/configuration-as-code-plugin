@@ -3,6 +3,7 @@
 ## 1.3 (not released yet)
 
 - fix regression configuring ssh private key from a secret source
+- CLI command renamed as "reload-jcasc-configuration" to avoid conflict with core CLI
 
 ## 1.2
 
