@@ -5,4 +5,3 @@ Please make sure to provide following information in your issue description
 - [ ] Jenkins version
 - [ ] Plugin version
 - [ ] OS
-
