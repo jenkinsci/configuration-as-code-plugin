@@ -117,7 +117,11 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
             for (CNode data : sites.asSequence()) {
                 UpdateSite in = usc.configure(data, context);
                 if (in.isDue()) {
-                    in.updateDirectly(DownloadService.signatureCheck);
+                    try {
+                        in.updateDirectlyNow(DownloadService.signatureCheck);
+                    } catch (IOException e) {
+                        throw new ConfiguratorException("failed to download metadata for update site " + in.getId(), e);
+                    }
                 }
                 updateSites.add(in);
             }
