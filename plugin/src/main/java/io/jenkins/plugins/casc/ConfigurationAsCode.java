@@ -61,6 +61,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
@@ -558,19 +559,28 @@ public class ConfigurationAsCode extends ManagementLink {
 
 
     /**
-     * Recursive search for all {@link #YAML_FILES_PATTERN} in provided base path
+     * Search for all {@link #YAML_FILES_PATTERN} in provided base path
      *
      * @param path base path to start (can be file or directory)
      * @return list of all paths matching pattern. Only base file itself if it is a file matching pattern
      */
     public List<Path> configs(String path) throws ConfiguratorException {
         final PathMatcher matcher = FileSystems.getDefault().getPathMatcher(YAML_FILES_PATTERN);
+        final Path root = Paths.get(path);
 
-        try (Stream<Path> stream = Files.find(Paths.get(path), Integer.MAX_VALUE,
-                (next, attrs) -> !attrs.isDirectory() && matcher.matches(next))) {
-            return stream.collect(toList());
-        } catch (NoSuchFileException e) {
-            throw new ConfiguratorException("File does not exist: " + path, e);
+        if (!Files.exists(root)) {
+            throw new ConfiguratorException("Invalid configuration: '"+path+"' isn't a valid path.");
+        }
+
+        if (!Files.isDirectory(root)) {
+            return matcher.matches(root) ? Collections.singletonList(root) : Collections.emptyList();
+        }
+
+        try {
+            return Files.list(root)
+                    .filter(Files::isRegularFile) // only consider regular files, following symlinks
+                    .filter(matcher::matches)     // matching pattern
+                    .collect(toList());
         } catch (IOException e) {
             throw new IllegalStateException("failed config scan for " + path, e);
         }
