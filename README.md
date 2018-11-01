@@ -210,7 +210,22 @@ We can provide these initial secrets in the following ways:
 
 - Using environment variables.
 - Using docker-secrets, where files on path `/run/secrets/${KEY}` will be replaced by `${KEY}` in configuration. The base folder `/run/secrets` can be overriden by setting the environment variable `SECRETS`. So this can be used as a file based secret, and not just docker secrets.
-- Using Kubernetes secrets, logic is the same as for docker-secrets. (See example in [demos](demos) folder.)
+- Using Kubernetes secrets, logic is the same as for docker-secrets. The secret needs to be mounted as a file to `/run/secrets/`, and then the filename can be used as the KEY. For example:
+```
+apiVersion: v1
+kind: Secret
+metadata:
+  name: secret-name
+data:
+  filename: {{ "encoded string" | b64enc }}
+```
+can be used as:
+```
+- credentials:
+  - string:
+    id: "cred-id"
+    secret: ${filename}
+```
 - Using Vault, see following section.
 
 ### Vault
