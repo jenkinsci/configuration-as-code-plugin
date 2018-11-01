@@ -4,6 +4,7 @@
 
 - fix regression configuring ssh private key from a secret source
 - CLI command renamed as "reload-jcasc-configuration" to avoid conflict with core CLI
+- restore support for k8s ConfigMaps mounts (don't recurse in CASC_JENKINS_CONFIG directory)
 
 ## 1.2
 
