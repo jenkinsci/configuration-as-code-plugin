@@ -4,6 +4,7 @@
 
 - fix regression configuring ssh private key from a secret source
 - CLI command renamed as "reload-jcasc-configuration" to avoid conflict with core CLI
+- add terraform demo
 
 ## 1.2
 
