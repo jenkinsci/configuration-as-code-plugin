@@ -1,6 +1,7 @@
 # ChangeLog
 
 ## 1.4 (not released yet)
+- Add support for Vault appRole authentication method
 
 ## 1.3
 
