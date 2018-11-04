@@ -24,7 +24,7 @@ Before you start, make sure the following pre-conditions are met :
     <relativePath />
 </parent>
 ```
-- the jenkins core version and the java level of your plugin are aligned with the Configuration as Code plugin versions (also in the [pom.xml](pom.xml)).
+- the jenkins core version and the java level of your plugin are aligned with the Configuration as Code plugin versions (also in the [pom.xml](/pom.xml)).
 ```xml
 <properties>
     <jenkins.version>THE_JENKINS_CORE_VERSION_HERE</jenkins.version>
