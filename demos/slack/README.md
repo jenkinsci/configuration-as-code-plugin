@@ -5,10 +5,19 @@ Basic configuration of the [Slack Plugin](https://wiki.jenkins.io/display/JENKIN
 ## Sample configuration
 
 ```yaml
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+          - string:
+              scope: GLOBAL
+              id: slack-token
+              secret: '${SLACK_TOKEN}'
+              description: Slack token
+
+
 unclassified:
   slackNotifier:
-    baseUrl: https://workspace.slack.com/services/hooks/jenkins-ci/
-    teamDomain: workspace
-    botUser: true
-    tokenCredentialId: "SecretTextCredentialsId
+    teamDomain: <your-domain>
+    tokenCredentialId: <secret-text-token>
 ```
