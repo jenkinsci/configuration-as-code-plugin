@@ -37,7 +37,8 @@
         "format": "uint64"
       </j:case>
       <j:default>
-        "type": "#/definitions/${it.type.name}"
+        "type":  "object",
+        "ref": "#/definitions/${it.type.name}"
       </j:default>
     </j:switch>
   </j:otherwise>
