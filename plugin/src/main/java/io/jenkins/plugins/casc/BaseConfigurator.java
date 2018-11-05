@@ -69,7 +69,7 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
                     continue;
                 }
 
-                Attribute attribute = detectActualType(name, TypePair.of(field))
+                Attribute attribute = createAttribute(name, TypePair.of(field))
                         .getter(field::get); // get value by direct access to public final field
                 attributes.put(name, attribute);
             }
@@ -103,7 +103,7 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
 
             logger.log(FINER, "Processing {0} property", name);
 
-            Attribute attribute = detectActualType(name, type);
+            Attribute attribute = createAttribute(name, type);
             if (attribute == null) continue;
 
             attribute.deprecated(method.getAnnotation(Deprecated.class) != null);
@@ -138,20 +138,30 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
         return Collections.emptySet();
     }
 
-    protected Attribute detectActualType(String name, final TypePair type) {
-        Class c = introspectActualClass(type);
+    protected Attribute createAttribute(String name, final TypePair type) {
+
+        boolean multiple =
+                type.rawType.isArray()
+            ||  Collection.class.isAssignableFrom(type.rawType);
+
+        // If attribute is a Collection|Array of T, we need to introspect further to determine T
+        Class c = multiple ? getComponentType(type) : type.rawType;
         if (c == null) {
             throw new IllegalStateException("Unable to detect type of attribute " + getTarget() + '#' + name);
         }
 
-        Attribute attribute;
+        // special collection types with dedicated handlers to manage data replacement / possible values
         if (DescribableList.class.isAssignableFrom(type.rawType)) {
             return new DescribableListAttribute(name, c);
         } else if (PersistedList.class.isAssignableFrom(type.rawType)) {
             return new PersistedListAttribute(name, c);
-        } else if (!c.isPrimitive() && !c.isEnum() && Modifier.isAbstract(c.getModifiers())) {
+        }
+
+        Attribute attribute;
+        if (!c.isPrimitive() && !c.isEnum() && Modifier.isAbstract(c.getModifiers())) {
             if (!Describable.class.isAssignableFrom(c)) {
                 // Not a Describable, so we don't know how to detect concrete implementation type
+                logger.warning("Can't handle "+getTarget()+"#"+name+": type is abstract but not Describable.");
                 return null;
             }
             attribute = new DescribableAttribute(name, c);
@@ -159,22 +169,23 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
             attribute = new Attribute(name, c);
         }
 
-        boolean multiple =
-                type.rawType.isArray()
-            ||  Collection.class.isAssignableFrom(type.rawType);
-
         attribute.multiple(multiple);
 
         return attribute;
     }
 
-    private Class introspectActualClass(TypePair type) {
+    /**
+     * Introspect the actual component type of a collection|array {@link Type}.
+     */
+    private Class getComponentType(TypePair type) {
         Class c = null;
         Type t = type.type;
         Class raw = type.rawType;
 
-        // for Hudson.CloudList extends Jenkins.CloudList extends DescribableList<Cloud,Descriptor<Cloud>>
-        // we need to check if generic superclass is owning the parameter infos
+        // First, we need to introspect class hierarchy until we found a parameterized type.
+        // for sample if type is Hudson.CloudList
+        // Hudson.CloudList extends Jenkins.CloudList extends DescribableList<Cloud,Descriptor<Cloud>>
+        // we need to get t = DescribableList<?,?> to actually retrieve component type
         while (t instanceof Class) {
             final Type superclass = ((Class) t).getGenericSuperclass();
             if (superclass == null) {

@@ -20,3 +20,5 @@ jenkins:
               attach:
                 user: "jenkins"
             instanceCapStr: "10"
+            retentionStrategy:
+              idleMinutes: 1

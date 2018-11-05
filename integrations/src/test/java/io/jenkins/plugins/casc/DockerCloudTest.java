@@ -2,6 +2,7 @@ package io.jenkins.plugins.casc;
 
 import com.nirima.jenkins.plugins.docker.DockerCloud;
 import com.nirima.jenkins.plugins.docker.DockerTemplate;
+import com.nirima.jenkins.plugins.docker.strategy.DockerOnceRetentionStrategy;
 import hudson.model.Label;
 import io.jenkins.docker.connector.DockerComputerAttachConnector;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
@@ -30,6 +31,8 @@ public class DockerCloudTest {
         final DockerTemplate template = docker.getTemplate("jenkins/slave");
         checkTemplate(template, "docker-agent", "jenkins", "/home/jenkins/agent", "10",
                 new String[] { "hello:/hello", "world:/world"}, "hello=world\nfoo=bar");
+        assertTrue(template.getRetentionStrategy() instanceof DockerOnceRetentionStrategy);
+        assertEquals(1, ((DockerOnceRetentionStrategy) template.getRetentionStrategy()).getIdleMinutes());
     }
 
     @Test
