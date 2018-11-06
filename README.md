@@ -232,8 +232,10 @@ can be used as:
 
 Prerequisites:
 
-- The environment variable `CASC_VAULT_PW` must be present, if token is not used. (Vault password.)
-- The environment variable `CASC_VAULT_USER` must be present, if token is not used. (Vault username.)
+- The environment variable `CASC_VAULT_PW` must be present, if token is not used and appRole/Secret is not used. (Vault password.)
+- The environment variable `CASC_VAULT_USER` must be present, if token is not used and appRole/Secret is not used. (Vault username.)
+- The environment variable `CASC_VAULT_APPROLE` must be present, if token is not used and U/P not used. (Vault AppRole ID.)
+- The environment variable `CASC_VAULT_APPROLE_SECRET` must be present, it token is not used and U/P not used. (Value AppRole Secret ID.)
 - The environment variable `CASC_VAULT_TOKEN` must be present, if U/P is not used. (Vault token.)
 - The environment variable `CASC_VAULT_PATH` must be present. (Vault key path. For example, `/secrets/jenkins`.)
 - The environment variable `CASC_VAULT_URL` must be present. (Vault url, including port number.)
