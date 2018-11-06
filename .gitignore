@@ -3,7 +3,7 @@ work/
 .idea/
 *.iml
 
-# ignore jenkins.yaml from root/plugin folder (used by many for testing)
+# ignore jenkins.yaml from root and plugin folder (used by many for testing)
 /jenkins.yaml
 /plugin/jenkins.yaml
 plugins.txt
