@@ -7,6 +7,7 @@
 
 - fix regression configuring ssh private key from a secret source
 - CLI command renamed as "reload-jcasc-configuration" to avoid conflict with core CLI
+- add terraform demo
 - restore support for k8s ConfigMaps mounts (don't recurse in CASC_JENKINS_CONFIG directory)
 - added support for localisation
 - added catching illegal arg exception when using ui form
