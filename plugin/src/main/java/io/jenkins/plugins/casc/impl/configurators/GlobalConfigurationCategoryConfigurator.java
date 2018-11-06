@@ -82,7 +82,7 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
     public static boolean reportDescriptorWithoutSetters(Configurator c) {
         if (c.describe().isEmpty()) {
             logger.warning(c.getTarget().getName() +
-                    " has a global view but CasC didn't detected any configurable attribute; see: https://jenkins.io/redirect/casc-requirements/");
+                    " has a global view but CasC didn't detect any configurable attribute; see: https://jenkins.io/redirect/casc-requirements/");
         }
         return true;
     }
