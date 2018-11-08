@@ -21,7 +21,7 @@ public class CheckConfigurationCommand extends CLICommand {
 
     @Override
     public String getShortDescription() {
-        return "Apply YAML configuration to instance";
+        return "Check YAML configuration to instance";
     }
 
     @Override
