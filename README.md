@@ -137,7 +137,7 @@ INFO: Jenkins is fully up and running
 
 ## Initial Configuration
 
-When configure the first Jenkins instance, browse the examples shown in the [demos](demos)
+When configuring the first Jenkins instance, browse the examples shown in the [demos](demos)
 directory of this repository. If you have a plugin that do not have an example, consult the reference
 help document. Click the `Documentation` link at the bottom of the Configuration as Code page.
 
