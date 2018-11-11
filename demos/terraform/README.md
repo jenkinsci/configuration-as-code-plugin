@@ -7,7 +7,7 @@ mvn hpi:run
 ```
 
 You need to install the following plugins to make it work (you can do it before using the export):
-- job DSL
-- job configuration-as-code support
-- SSH credentials
-- job configuration-as-code 
+- Configuration As Code
+- Configuration As Code Support
+- Job DSL
+- SSH Credentials
