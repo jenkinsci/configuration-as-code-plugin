@@ -1,0 +1,20 @@
+Manifest-Version: 1.0
+Archiver-Version: Plexus Archiver
+Created-By: Apache Maven
+Built-By: abayer
+Build-Jdk: 1.7.0_79
+Extension-Name: build-user-vars-plugin
+Specification-Title: Sets username build variables
+Implementation-Title: build-user-vars-plugin
+Implementation-Version: 1.5
+Group-Id: org.jenkins-ci.plugins
+Short-Name: build-user-vars-plugin
+Long-Name: Jenkins user build vars plugin
+Url: http://wiki.jenkins-ci.org/display/JENKINS/Build+User+Vars+Plugin
+Plugin-Version: 1.5
+Hudson-Version: 1.609.1
+Jenkins-Version: 1.609.1
+Plugin-Dependencies: mailer:1.16
+Plugin-Developers: Gavriil Konovalenko:gkonovalenko:gkonovalenko@gmail
+ .com
+
