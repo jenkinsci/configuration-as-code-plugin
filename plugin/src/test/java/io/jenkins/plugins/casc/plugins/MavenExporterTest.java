@@ -1,13 +1,28 @@
 package io.jenkins.plugins.casc.plugins;
 
 import hudson.PluginWrapper;
+import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPathExpressionException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.jar.Manifest;
 
 /**
@@ -41,5 +56,52 @@ public class MavenExporterTest {
         Assert.assertEquals("mailer:1.16", actual.getPluginDependencies());
     }
 
+    @Test public void exportPlugins_simplestPom_one()
+            throws IOException, SAXException, TransformerException, XPathExpressionException {
+        final PluginWrapper[] plugins = {
+            createPluginWrapper("display-url-api"),
+        };
+        final List<PluginWrapper> pluginList = Arrays.asList(plugins);
+        final Document actual;
+        try(
+            final InputStream is = MavenExporter.openResourceStream(this.getClass(), "simplestPom-input.xml");
+            final Reader reader = new InputStreamReader(is);
+            ) {
+
+            actual = MavenExporter.exportPlugins(pluginList, reader);
+        }
+
+        Assert.assertNotNull(actual);
+        assertXmlEquals("simplestPom-expected.xml", actual);
+    }
+
+    private static void assertXmlEquals(final String expectedFilename, final Document actualDoc)
+            throws TransformerException, IOException {
+        final String expectedXml;
+        try(
+            final InputStream is = MavenExporter.openResourceStream(MavenExporterTest.class, expectedFilename);
+            final StringWriter sw = new StringWriter();
+                ) {
+            IOUtils.copy(is, sw);
+            expectedXml = sw.toString();
+        }
+        final String actualXml = toXmlString(actualDoc);
+        Assert.assertEquals(expectedXml, actualXml);
+
+    }
+
+    private static String toXmlString(final Document document)
+            throws TransformerException {
+        final TransformerFactory tf = TransformerFactory.newInstance();
+        final Transformer transformer = tf.newTransformer();
+        final StringWriter sw = new StringWriter();
+        final DOMSource source = new DOMSource(document);
+        final StreamResult result = new StreamResult(sw);
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+        transformer.transform(source, result);
+        return sw.toString();
+    }
 
 }

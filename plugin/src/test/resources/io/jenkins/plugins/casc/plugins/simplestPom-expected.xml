@@ -1,0 +1,20 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>simplest-pom</artifactId>
+
+    <dependencies>
+    <dependency>
+            <!-- display-url-api
+Long Name: Display URL API
+Description: Provides the DisplayURLProvider extension point to provide alternate URLs for use in notifications
+Dependencies: []
+URL: https://wiki.jenkins-ci.org/display/JENKINS/Display+URL+API+Plugin
+-->
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>display-url-api</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+    </dependencies>
+
+</project>
