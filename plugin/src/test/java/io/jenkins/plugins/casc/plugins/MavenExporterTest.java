@@ -15,15 +15,18 @@ import java.util.jar.Manifest;
  */
 public class MavenExporterTest {
 
-    @Test public void exportPlugin_buildUserVarsPlugin() throws IOException {
-        final String baseName = "build-user-vars-plugin";
+    private PluginWrapper createPluginWrapper(final String baseName) throws IOException {
         final File archive = new File(baseName + ".jpi");
         final Manifest manifest = new Manifest();
         try(final InputStream is = MavenExporter.openResourceStream(this.getClass(), baseName + ".mf")) {
             manifest.read(is);
         }
         final File disableFile = new File(archive.getName() + ".disabled");
-        final PluginWrapper pw = new PluginWrapper(null, archive, manifest, null, null, disableFile, Collections.emptyList(), Collections.emptyList());
+        return new PluginWrapper(null, archive, manifest, null, null, disableFile, Collections.emptyList(), Collections.emptyList());
+    }
+
+    @Test public void exportPlugin_buildUserVarsPlugin() throws IOException {
+        final PluginWrapper pw = createPluginWrapper("build-user-vars-plugin");
 
         final ExtendedDependency actual = MavenExporter.exportPlugin(pw);
 
@@ -37,5 +40,6 @@ public class MavenExporterTest {
         Assert.assertEquals("1.609.1", actual.getJenkinsVersion());
         Assert.assertEquals("mailer:1.16", actual.getPluginDependencies());
     }
+
 
 }
