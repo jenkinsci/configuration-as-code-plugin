@@ -16,9 +16,10 @@ import java.util.jar.Manifest;
 public class MavenExporterTest {
 
     @Test public void exportPlugin_buildUserVarsPlugin() throws IOException {
-        final File archive = new File("build-user-vars-plugin.jpi");
+        final String baseName = "build-user-vars-plugin";
+        final File archive = new File(baseName + ".jpi");
         final Manifest manifest = new Manifest();
-        try(final InputStream is = MavenExporter.openResourceStream(this.getClass(), "build-user-vars-plugin.mf")) {
+        try(final InputStream is = MavenExporter.openResourceStream(this.getClass(), baseName + ".mf")) {
             manifest.read(is);
         }
         final File disableFile = new File(archive.getName() + ".disabled");
