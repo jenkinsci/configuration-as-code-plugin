@@ -23,6 +23,11 @@
       <artifactId>snakeyaml</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-model</artifactId>
+      <version>3.5.0</version>
+    </dependency>
 
     <!--TODO: This should be in a seperate plugin at some point -->
     <dependency>
