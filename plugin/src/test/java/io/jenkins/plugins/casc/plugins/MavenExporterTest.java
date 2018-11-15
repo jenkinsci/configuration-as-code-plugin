@@ -15,22 +15,10 @@ import java.util.jar.Manifest;
  */
 public class MavenExporterTest {
 
-    private InputStream openResourceStream(final String fileName) {
-        final Class clazz = this.getClass();
-        final Package aPackage = clazz.getPackage();
-        final String name = aPackage.getName();
-        final String resourceFolder = name.replace('.', '/');
-        final String resourcePath = resourceFolder + "/" + fileName;
-        final ClassLoader loader = clazz.getClassLoader();
-        //noinspection UnnecessaryLocalVariable
-        final InputStream result = loader.getResourceAsStream(resourcePath);
-        return result;
-    }
-
     @Test public void exportPlugin_buildUserVarsPlugin() throws IOException {
         final File archive = new File("build-user-vars-plugin.jpi");
         final Manifest manifest = new Manifest();
-        try(final InputStream is = openResourceStream( "build-user-vars-plugin.mf")) {
+        try(final InputStream is = MavenExporter.openResourceStream(this.getClass(), "build-user-vars-plugin.mf")) {
             manifest.read(is);
         }
         final File disableFile = new File(archive.getName() + ".disabled");
