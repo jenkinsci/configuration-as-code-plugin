@@ -123,20 +123,26 @@ public class HeteroDescribableConfigurator<T extends Describable> implements Con
 
         final Class api = getImplementedAPI();
         // Search for @Symbol annotation on Descriptor to match shortName
+
         for (Descriptor d : candidates) {
             final List<String> symbols = DescribableAttribute.getSymbols(d, api, target);
             final String preferred = symbols.get(0);
             if (preferred.equalsIgnoreCase(shortname)) {
                 return d.getKlass().toJavaClass();
-            } else {
-                for (String symbol : symbols) {
-                    if (symbol.equalsIgnoreCase(shortname)) {
-                        ObsoleteConfigurationMonitor.get().record(node, "'"+shortname+"' is obsolete, please use '" + preferred + "'");
-                        return d.getKlass().toJavaClass();
-                    }
+            }
+        }
+
+        // Not found by preferred symbol, try other ones
+        for (Descriptor d : candidates) {
+            final List<String> symbols = DescribableAttribute.getSymbols(d, api, target);
+            for (String symbol : symbols) {
+                if (symbol.equalsIgnoreCase(shortname)) {
+                    ObsoleteConfigurationMonitor.get().record(node, "'"+shortname+"' is obsolete, please use '" + symbols.get(0) + "'");
+                    return d.getKlass().toJavaClass();
                 }
             }
         }
+
         final String errSupport = !_hasSupportPluginInstalled() ? "\nPossible solution: Try to install 'configuration-as-code-support' plugin" : "";
         final String msg = "No "+target.getName()+ " implementation found for "+shortname;
         throw new IllegalArgumentException(String.format("%s%s", msg, errSupport));
