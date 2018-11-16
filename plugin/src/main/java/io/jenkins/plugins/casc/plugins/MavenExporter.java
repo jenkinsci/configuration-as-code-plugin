@@ -53,6 +53,10 @@ public class MavenExporter {
 
     static String determineArtifactVersion(final String implementationVersion, final String pluginVersion) {
         if (implementationVersion == null || implementationVersion.length() == 0) {
+            int indexOfSpace = pluginVersion.indexOf(' ');
+            if (indexOfSpace != -1) {
+                return pluginVersion.substring(0, indexOfSpace);
+            }
             return pluginVersion;
         }
         return implementationVersion;

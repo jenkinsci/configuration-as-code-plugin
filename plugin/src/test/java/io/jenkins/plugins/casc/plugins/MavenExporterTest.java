@@ -36,6 +36,15 @@ public class MavenExporterTest {
         return new PluginWrapper(null, archive, manifest, null, null, disableFile, Collections.emptyList(), Collections.emptyList());
     }
 
+    @Test public void determineArtifactVersion_pluginVersionIsPrivateBuild() {
+        final String implementationVersion = "";
+        final String pluginVersion = "1.4-SNAPSHOT (private-5b67d196-odagenais)";
+
+        final String actual = MavenExporter.determineArtifactVersion(implementationVersion, pluginVersion);
+
+        Assert.assertEquals("1.4-SNAPSHOT", actual);
+    }
+
     @Test public void exportPlugin_buildUserVarsPlugin() throws IOException {
         final PluginWrapper pw = createPluginWrapper("build-user-vars-plugin");
 
