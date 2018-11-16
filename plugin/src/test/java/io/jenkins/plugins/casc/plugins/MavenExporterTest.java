@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -112,11 +113,11 @@ public class MavenExporterTest {
         return sw.toString();
     }
 
-    private static void writeDocument(final Document document, final StringWriter sw) throws TransformerException {
+    private static void writeDocument(final Document document, final Writer writer) throws TransformerException {
         final TransformerFactory tf = TransformerFactory.newInstance();
         final Transformer transformer = tf.newTransformer();
         final DOMSource source = new DOMSource(document);
-        final StreamResult result = new StreamResult(sw);
+        final StreamResult result = new StreamResult(writer);
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
         transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
