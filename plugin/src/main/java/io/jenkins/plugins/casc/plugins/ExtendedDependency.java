@@ -7,11 +7,20 @@ import org.apache.maven.model.Dependency;
  */
 public class ExtendedDependency extends Dependency {
 
+    private String extendedVersion;
     private String longName;
     private String description;
     private String url;
     private String jenkinsVersion;
     private String pluginDependencies;
+
+    public String getExtendedVersion() {
+        return extendedVersion;
+    }
+
+    public void setExtendedVersion(final String extendedVersion) {
+        this.extendedVersion = extendedVersion;
+    }
 
     public String getLongName() {
         return longName;

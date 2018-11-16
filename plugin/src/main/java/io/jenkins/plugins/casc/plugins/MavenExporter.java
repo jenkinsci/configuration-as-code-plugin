@@ -60,6 +60,7 @@ public class MavenExporter {
         dep.setArtifactId(pluginWrapper.getShortName());
         dep.setVersion(getAttribute(attributes, "Implementation-Version"));
 
+        dep.setExtendedVersion(pluginWrapper.getVersion());
         dep.setLongName(pluginWrapper.getLongName());
         dep.setDescription(getAttribute(attributes, "Specification-Title"));
         dep.setUrl(pluginWrapper.getUrl());

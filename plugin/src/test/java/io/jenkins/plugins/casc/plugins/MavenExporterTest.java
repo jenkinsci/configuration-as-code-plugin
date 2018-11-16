@@ -45,6 +45,7 @@ public class MavenExporterTest {
         Assert.assertEquals("org.jenkins-ci.plugins", actual.getGroupId());
         Assert.assertEquals("build-user-vars-plugin", actual.getArtifactId());
         Assert.assertEquals("1.5", actual.getVersion());
+        Assert.assertEquals("1.5", actual.getExtendedVersion());
         Assert.assertEquals("Jenkins user build vars plugin", actual.getLongName());
         Assert.assertEquals("Sets username build variables", actual.getDescription());
         Assert.assertEquals("http://wiki.jenkins-ci.org/display/JENKINS/Build+User+Vars+Plugin", actual.getUrl());
@@ -61,6 +62,7 @@ public class MavenExporterTest {
         Assert.assertEquals("io.jenkins", actual.getGroupId());
         Assert.assertEquals("configuration-as-code", actual.getArtifactId());
         Assert.assertEquals("1.4-SNAPSHOT", actual.getVersion());
+        Assert.assertEquals("1.4-SNAPSHOT (private-5b67d196-odagenais)", actual.getExtendedVersion());
         Assert.assertEquals("Configuration as Code Plugin", actual.getLongName());
         Assert.assertEquals("Manage Jenkins master configuration as code", actual.getDescription());
         Assert.assertEquals("https://wiki.jenkins-ci.org/display/JENKINS/Configuration+as+Code+Plugin", actual.getUrl());
