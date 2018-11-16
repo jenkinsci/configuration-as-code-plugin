@@ -89,6 +89,25 @@ public class MavenExporterTest {
         assertXmlEquals("simplestPom_one-expected.xml", actual);
     }
 
+    @Test public void exportPlugins_simplestPom_casc()
+            throws IOException, SAXException, TransformerException, XPathExpressionException {
+        final PluginWrapper[] plugins = {
+            createPluginWrapper("configuration-as-code-plugin"),
+        };
+        final List<PluginWrapper> pluginList = Arrays.asList(plugins);
+        final Document actual;
+        try(
+            final InputStream is = MavenExporter.openResourceStream(this.getClass(), "simplestPom-input.xml");
+            final Reader reader = new InputStreamReader(is);
+            ) {
+
+            actual = MavenExporter.exportPlugins(pluginList, reader);
+        }
+
+        Assert.assertNotNull(actual);
+        assertXmlEquals("simplestPom_casc-expected.xml", actual);
+    }
+
     @Test public void exportPlugins_defaultPom_three()
             throws IOException, SAXException, TransformerException, XPathExpressionException {
         final PluginWrapper[] plugins = {
