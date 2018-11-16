@@ -7,6 +7,7 @@
     <dependency>
             <!-- configuration-as-code
 Long Name: Configuration as Code Plugin
+Long Version: 1.4-SNAPSHOT (private-5b67d196-odagenais)
 Description: Manage Jenkins master configuration as code
 Dependencies: []
 URL: https://wiki.jenkins-ci.org/display/JENKINS/Configuration+as+Code+Plugin

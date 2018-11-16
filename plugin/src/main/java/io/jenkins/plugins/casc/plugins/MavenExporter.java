@@ -98,11 +98,13 @@ public class MavenExporter {
 
             final String template = " %s%n" +
                     "Long Name: %s%n" +
+                    "Long Version: %s%n" +
                     "Description: %s%n" +
                     "Dependencies: [%s]%n" +
                     "URL: %s%n";
             final String comment = String.format(template, extendedDependency.getArtifactId(),
                     extendedDependency.getLongName(),
+                    extendedDependency.getExtendedVersion(),
                     extendedDependency.getDescription(),
                     extendedDependency.getPluginDependencies(),
                     extendedDependency.getUrl());

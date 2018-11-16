@@ -7,6 +7,7 @@
     <dependency>
             <!-- display-url-api
 Long Name: Display URL API
+Long Version: 2.2.0
 Description: Provides the DisplayURLProvider extension point to provide alternate URLs for use in notifications
 Dependencies: []
 URL: https://wiki.jenkins-ci.org/display/JENKINS/Display+URL+API+Plugin

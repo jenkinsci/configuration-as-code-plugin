@@ -110,6 +110,7 @@
     <dependency>
             <!-- build-user-vars-plugin
 Long Name: Jenkins user build vars plugin
+Long Version: 1.5
 Description: Sets username build variables
 Dependencies: [mailer:1.16]
 URL: http://wiki.jenkins-ci.org/display/JENKINS/Build+User+Vars+Plugin
@@ -121,6 +122,7 @@ URL: http://wiki.jenkins-ci.org/display/JENKINS/Build+User+Vars+Plugin
         <dependency>
             <!-- display-url-api
 Long Name: Display URL API
+Long Version: 2.2.0
 Description: Provides the DisplayURLProvider extension point to provide alternate URLs for use in notifications
 Dependencies: []
 URL: https://wiki.jenkins-ci.org/display/JENKINS/Display+URL+API+Plugin
@@ -132,6 +134,7 @@ URL: https://wiki.jenkins-ci.org/display/JENKINS/Display+URL+API+Plugin
         <dependency>
             <!-- mailer
 Long Name: Jenkins Mailer Plugin
+Long Version: 1.22
 Description: This plugin allows you to configure email notifications for build results
 Dependencies: [display-url-api:1.0]
 URL: https://wiki.jenkins-ci.org/display/JENKINS/Mailer
