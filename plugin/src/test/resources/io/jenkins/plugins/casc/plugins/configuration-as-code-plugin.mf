@@ -1,0 +1,19 @@
+Manifest-Version: 1.0
+Archiver-Version: Plexus Archiver
+Created-By: Apache Maven
+Built-By: odagenais
+Build-Jdk: 1.8.0_171
+Extension-Name: configuration-as-code
+Specification-Title: Manage Jenkins master configuration as code
+Implementation-Title: configuration-as-code
+Implementation-Version: 1.4-SNAPSHOT
+Group-Id: io.jenkins
+Short-Name: configuration-as-code
+Long-Name: Configuration as Code Plugin
+Url: https://wiki.jenkins-ci.org/display/JENKINS/Configuration+as+Code
+ +Plugin
+Plugin-Version: 1.4-SNAPSHOT (private-5b67d196-odagenais)
+Hudson-Version: 2.60.3
+Jenkins-Version: 2.60.3
+Plugin-Developers: Nicolas De Loof:ndeloof:nicolas.deloof@gmail.com
+

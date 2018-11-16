@@ -58,7 +58,7 @@ public class MavenExporter {
 
         dep.setGroupId(attributes.getValue("Group-Id"));
         dep.setArtifactId(pluginWrapper.getShortName());
-        dep.setVersion(pluginWrapper.getVersion());
+        dep.setVersion(getAttribute(attributes, "Implementation-Version"));
 
         dep.setLongName(pluginWrapper.getLongName());
         dep.setDescription(getAttribute(attributes, "Specification-Title"));

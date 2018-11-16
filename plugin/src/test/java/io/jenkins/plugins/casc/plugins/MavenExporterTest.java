@@ -52,6 +52,22 @@ public class MavenExporterTest {
         Assert.assertEquals("mailer:1.16", actual.getPluginDependencies());
     }
 
+    @Test public void exportPlugin_configurationAsCodePlugin() throws IOException {
+        final PluginWrapper pw = createPluginWrapper("configuration-as-code-plugin");
+
+        final ExtendedDependency actual = MavenExporter.exportPlugin(pw);
+
+        Assert.assertNotNull(actual);
+        Assert.assertEquals("io.jenkins", actual.getGroupId());
+        Assert.assertEquals("configuration-as-code", actual.getArtifactId());
+        Assert.assertEquals("1.4-SNAPSHOT", actual.getVersion());
+        Assert.assertEquals("Configuration as Code Plugin", actual.getLongName());
+        Assert.assertEquals("Manage Jenkins master configuration as code", actual.getDescription());
+        Assert.assertEquals("https://wiki.jenkins-ci.org/display/JENKINS/Configuration+as+Code+Plugin", actual.getUrl());
+        Assert.assertEquals("2.60.3", actual.getJenkinsVersion());
+        Assert.assertEquals("", actual.getPluginDependencies());
+    }
+
     @Test public void exportPlugins_simplestPom_one()
             throws IOException, SAXException, TransformerException, XPathExpressionException {
         final PluginWrapper[] plugins = {
