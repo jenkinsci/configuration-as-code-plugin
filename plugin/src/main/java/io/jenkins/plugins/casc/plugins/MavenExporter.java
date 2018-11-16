@@ -83,7 +83,7 @@ public class MavenExporter {
         return doc;
     }
 
-    static void createElement(final Element destination, final String name, final String text) {
+    private static void createElement(final Element destination, final String name, final String text) {
         final Document doc = destination.getOwnerDocument();
         final Element element = doc.createElement(name);
         final Text textNode = doc.createTextNode(text);
