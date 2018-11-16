@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Plugin-Dependencies: structs:1.3
+Long-Name: Gradle Plugin
+Compatible-Since-Version: 1.0
+Plugin-Developers: Stefan Wolf:wolfs:
+Group-Id: org.jenkins-ci.plugins
+Extension-Name: gradle
+Plugin-Version: 1.29
+Jenkins-Version: 1.642.1
+Url: http://wiki.jenkins-ci.org/display/JENKINS/Gradle+Plugin
+Short-Name: gradle
+

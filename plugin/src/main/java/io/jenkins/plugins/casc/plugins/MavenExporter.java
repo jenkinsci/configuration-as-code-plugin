@@ -51,16 +51,24 @@ public class MavenExporter {
         return value == null ? "" : value;
     }
 
+    static String determineArtifactVersion(final String implementationVersion, final String pluginVersion) {
+        if (implementationVersion == null || implementationVersion.length() == 0) {
+            return pluginVersion;
+        }
+        return implementationVersion;
+    }
+
     static ExtendedDependency exportPlugin(final PluginWrapper pluginWrapper) {
         final ExtendedDependency dep = new ExtendedDependency();
         final Manifest manifest = pluginWrapper.getManifest();
         final Attributes attributes = manifest.getMainAttributes();
         final String implementationVersion = getAttribute(attributes, "Implementation-Version");
         final String pluginVersion = pluginWrapper.getVersion();
+        final String artifactVersion = determineArtifactVersion(implementationVersion, pluginVersion);
 
         dep.setGroupId(attributes.getValue("Group-Id"));
         dep.setArtifactId(pluginWrapper.getShortName());
-        dep.setVersion(implementationVersion);
+        dep.setVersion(artifactVersion);
 
         dep.setExtendedVersion(pluginVersion);
         dep.setLongName(pluginWrapper.getLongName());

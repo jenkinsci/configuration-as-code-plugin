@@ -70,6 +70,23 @@ public class MavenExporterTest {
         Assert.assertEquals("", actual.getPluginDependencies());
     }
 
+    @Test public void exportPlugin_gradlePlugin() throws IOException {
+        final PluginWrapper pw = createPluginWrapper("gradle");
+
+        final ExtendedDependency actual = MavenExporter.exportPlugin(pw);
+
+        Assert.assertNotNull(actual);
+        Assert.assertEquals("org.jenkins-ci.plugins", actual.getGroupId());
+        Assert.assertEquals("gradle", actual.getArtifactId());
+        Assert.assertEquals("1.29", actual.getVersion());
+        Assert.assertEquals("1.29", actual.getExtendedVersion());
+        Assert.assertEquals("Gradle Plugin", actual.getLongName());
+        Assert.assertEquals("", actual.getDescription());
+        Assert.assertEquals("http://wiki.jenkins-ci.org/display/JENKINS/Gradle+Plugin", actual.getUrl());
+        Assert.assertEquals("1.642.1", actual.getJenkinsVersion());
+        Assert.assertEquals("structs:1.3", actual.getPluginDependencies());
+    }
+
     @Test public void exportPlugins_simplestPom_one()
             throws IOException, SAXException, TransformerException, XPathExpressionException {
         final PluginWrapper[] plugins = {
