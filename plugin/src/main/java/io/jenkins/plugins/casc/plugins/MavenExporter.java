@@ -1,7 +1,6 @@
 package io.jenkins.plugins.casc.plugins;
 
 import hudson.PluginWrapper;
-import jenkins.util.xml.RestrictiveEntityResolver;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.w3c.dom.Comment;
@@ -9,6 +8,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
+import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -122,13 +122,38 @@ public class MavenExporter {
 
         try {
             docBuilder = newDocumentBuilderFactory().newDocumentBuilder();
-            docBuilder.setEntityResolver(RestrictiveEntityResolver.INSTANCE);
+            docBuilder.setEntityResolver(RESTRICTIVE_ENTITY_RESOLVER_INSTANCE);
         } catch (ParserConfigurationException e) {
             throw new IllegalStateException("Unexpected error creating DocumentBuilder.", e);
         }
 
         return docBuilder.parse(new InputSource(reader));
     }
+
+    private final static RestrictiveEntityResolver RESTRICTIVE_ENTITY_RESOLVER_INSTANCE = new RestrictiveEntityResolver();
+
+    /**
+     * An EntityResolver that will fail to resolve any entities.
+     * Useful in preventing External XML Entity injection attacks.
+     */
+    @Restricted(NoExternalUse.class)
+    private static final class RestrictiveEntityResolver implements EntityResolver {
+
+
+        private RestrictiveEntityResolver() {
+            // prevent multiple instantiation.
+            super();
+        }
+
+        /**
+         * Throws a SAXException if this tried to resolve any entity.
+         */
+        @Override
+        public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
+            throw new SAXException("Refusing to resolve entity with publicId(" + publicId + ") and systemId (" + systemId + ")");
+        }
+    }
+
 
     private static DocumentBuilderFactory newDocumentBuilderFactory() {
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
