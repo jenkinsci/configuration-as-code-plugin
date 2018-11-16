@@ -2,6 +2,7 @@
 
 ## 1.4 (not released yet)
 - Add support for Vault appRole authentication method
+- Add `Export Plugins to POM` button
 
 ## 1.3
 
