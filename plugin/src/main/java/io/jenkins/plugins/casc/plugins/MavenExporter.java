@@ -1,7 +1,7 @@
 package io.jenkins.plugins.casc.plugins;
 
 import hudson.PluginWrapper;
-import jenkins.util.xml.XMLUtils;
+import jenkins.util.xml.RestrictiveEntityResolver;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.w3c.dom.Comment;
@@ -9,8 +9,13 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -30,9 +35,14 @@ import java.io.Writer;
 import java.util.List;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 @Restricted(NoExternalUse.class)
 public class MavenExporter {
+
+    private final static Logger LOGGER = LogManager.getLogManager().getLogger(MavenExporter.class.getName());
 
     private static final XPathFactory X_PATH_FACTORY = XPathFactory.newInstance();
 
@@ -77,7 +87,7 @@ public class MavenExporter {
 
     static Document exportPlugins(final List<PluginWrapper> plugins, final Reader reader)
             throws IOException, SAXException, XPathExpressionException {
-        final Document doc = XMLUtils.parse(reader);
+        final Document doc = parse(reader);
         final XPath xPath = X_PATH_FACTORY.newXPath();
         final XPathExpression expression = xPath.compile("/project/dependencies");
         final Node dependenciesNode = (Node) expression.evaluate(doc, XPathConstants.NODE);
@@ -105,6 +115,43 @@ public class MavenExporter {
             dependenciesNode.appendChild(dependencyNode);
         }
         return doc;
+    }
+
+    private static Document parse(final Reader reader) throws SAXException, IOException {
+        DocumentBuilder docBuilder;
+
+        try {
+            docBuilder = newDocumentBuilderFactory().newDocumentBuilder();
+            docBuilder.setEntityResolver(RestrictiveEntityResolver.INSTANCE);
+        } catch (ParserConfigurationException e) {
+            throw new IllegalStateException("Unexpected error creating DocumentBuilder.", e);
+        }
+
+        return docBuilder.parse(new InputSource(reader));
+    }
+
+    private static DocumentBuilderFactory newDocumentBuilderFactory() {
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        // Set parser features to prevent against XXE etc.
+        // Note: setting only the external entity features on DocumentBuilderFactory instance
+        // (ala how safeTransform does it for SAXTransformerFactory) does seem to work (was still
+        // processing the entities - tried Oracle JDK 7 and 8 on OSX). Setting seems a bit extreme,
+        // but looks like there's no other choice.
+        documentBuilderFactory.setXIncludeAware(false);
+        documentBuilderFactory.setExpandEntityReferences(false);
+        setDocumentBuilderFactoryFeature(documentBuilderFactory, XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        setDocumentBuilderFactoryFeature(documentBuilderFactory, "http://xml.org/sax/features/external-general-entities", false);
+        setDocumentBuilderFactoryFeature(documentBuilderFactory, "http://xml.org/sax/features/external-parameter-entities", false);
+        setDocumentBuilderFactoryFeature(documentBuilderFactory, "http://apache.org/xml/features/disallow-doctype-decl", true);
+        return documentBuilderFactory;
+    }
+
+    private static void setDocumentBuilderFactoryFeature(final DocumentBuilderFactory documentBuilderFactory, String feature, boolean state) {
+        try {
+            documentBuilderFactory.setFeature(feature, state);
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, String.format("Failed to set the XML Document Builder factory feature %s to %s", feature, state), e);
+        }
     }
 
     private static void addElementTo(final Element destination, final String name, final String text) {
