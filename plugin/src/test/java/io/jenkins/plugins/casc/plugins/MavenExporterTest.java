@@ -86,7 +86,7 @@ public class MavenExporterTest {
         }
 
         Assert.assertNotNull(actual);
-        assertXmlEquals("simplestPom-expected.xml", actual);
+        assertXmlEquals("simplestPom_one-expected.xml", actual);
     }
 
     @Test public void exportPlugins_defaultPom_three()
