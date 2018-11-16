@@ -1,0 +1,145 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- TODO: this file is meant to be used as a starting point -->
+
+    <groupId>io.jenkins.configuration-as-code</groupId>
+    <artifactId>jenkins-and-plugins</artifactId>
+    <version>2.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>Jenkins plugins</name>
+    <description>This defines the version of Jenkins and the Jenkins plugins to use when building the WAR but also against which libraries should be written.</description>
+    <url>https://jenkins.io/</url>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- TODO: automatically determine the Groovy version used by Jenkins -->
+        <groovy.version>2.4.12</groovy.version>
+        <jenkins.version>TODO</jenkins.version>
+    </properties>
+
+    <build>
+        <sourceDirectory>${project.basedir}/src</sourceDirectory>
+        <testSourceDirectory>${project.basedir}/test/groovy</testSourceDirectory>
+        <plugins>
+            <plugin>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.1</version>
+                <configuration>
+                    <goals>deploy</goals>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <additionalparam>-quiet</additionalparam>
+                </configuration>
+            </plugin>
+            <!-- https://github.com/groovy/GMavenPlus/wiki/Usage#compiling-groovy-sources -->
+            <plugin>
+                <groupId>org.codehaus.gmavenplus</groupId>
+                <artifactId>gmavenplus-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>addSources</goal>
+                            <goal>addTestSources</goal>
+                            <goal>compile</goal>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!-- https://github.com/groovy/GMavenPlus/wiki/Examples#additional-sources -->
+                    <sources>
+                        <source>
+                            <directory>${project.basedir}/src</directory>
+                        </source>
+                    </sources>
+                    <testSources>
+                        <testSource>
+                            <directory>${project.basedir}/test/groovy</directory>
+                        </testSource>
+                    </testSources>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <repositories>
+        <repository>
+            <id>repo.jenkins-ci.org</id>
+            <url>https://repo.jenkins-ci.org/public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>repo.jenkins-ci.org</id>
+            <url>https://repo.jenkins-ci.org/public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <dependencies>
+        <!-- Jenkins plugins only! -->
+    <dependency>
+            <!-- build-user-vars-plugin
+Long Name: Jenkins user build vars plugin
+Description: Sets username build variables
+Dependencies: [mailer:1.16]
+URL: http://wiki.jenkins-ci.org/display/JENKINS/Build+User+Vars+Plugin
+-->
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>build-user-vars-plugin</artifactId>
+            <version>1.5</version>
+        </dependency>
+        <dependency>
+            <!-- display-url-api
+Long Name: Display URL API
+Description: Provides the DisplayURLProvider extension point to provide alternate URLs for use in notifications
+Dependencies: []
+URL: https://wiki.jenkins-ci.org/display/JENKINS/Display+URL+API+Plugin
+-->
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>display-url-api</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+        <dependency>
+            <!-- mailer
+Long Name: Jenkins Mailer Plugin
+Description: This plugin allows you to configure email notifications for build results
+Dependencies: [display-url-api:1.0]
+URL: https://wiki.jenkins-ci.org/display/JENKINS/Mailer
+-->
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>mailer</artifactId>
+            <version>1.22</version>
+        </dependency>
+    </dependencies>
+
+</project>

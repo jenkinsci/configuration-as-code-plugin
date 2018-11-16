@@ -18,6 +18,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.List;
 import java.util.jar.Attributes;
@@ -49,6 +50,16 @@ public class MavenExporter {
         dep.setPluginDependencies(getAttribute(attributes, "Plugin-Dependencies"));
 
         return dep;
+    }
+
+    public static Document exportPlugins(final List<PluginWrapper> plugins)
+            throws IOException, XPathExpressionException, SAXException {
+        try(
+            final InputStream inputStream = openResourceStream(MavenExporter.class, "pom.xml");
+            final Reader reader = new InputStreamReader(inputStream);
+            ) {
+            return exportPlugins(plugins, reader);
+        }
     }
 
     static Document exportPlugins(final List<PluginWrapper> plugins, final Reader reader)

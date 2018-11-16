@@ -75,6 +75,21 @@ public class MavenExporterTest {
         assertXmlEquals("simplestPom-expected.xml", actual);
     }
 
+    @Test public void exportPlugins_defaultPom_three()
+            throws IOException, SAXException, TransformerException, XPathExpressionException {
+        final PluginWrapper[] plugins = {
+            createPluginWrapper("build-user-vars-plugin"),
+            createPluginWrapper("display-url-api"),
+            createPluginWrapper("mailer"),
+        };
+        final List<PluginWrapper> pluginList = Arrays.asList(plugins);
+
+        final Document actual = MavenExporter.exportPlugins(pluginList);
+
+        Assert.assertNotNull(actual);
+        assertXmlEquals("defaultPom_three-expected.xml", actual);
+    }
+
     private static void assertXmlEquals(final String expectedFilename, final Document actualDoc)
             throws TransformerException, IOException {
         final String expectedXml;
