@@ -2,6 +2,8 @@ package io.jenkins.plugins.casc;
 
 import com.google.common.annotations.VisibleForTesting;
 import hudson.Extension;
+import hudson.PluginManager;
+import hudson.PluginWrapper;
 import hudson.Util;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
@@ -16,6 +18,7 @@ import io.jenkins.plugins.casc.model.Mapping;
 import io.jenkins.plugins.casc.model.Scalar;
 import io.jenkins.plugins.casc.model.Sequence;
 import io.jenkins.plugins.casc.model.Source;
+import io.jenkins.plugins.casc.plugins.MavenExporter;
 import io.jenkins.plugins.casc.snakeyaml.DumperOptions;
 import io.jenkins.plugins.casc.snakeyaml.Yaml;
 import io.jenkins.plugins.casc.snakeyaml.emitter.Emitter;
@@ -557,6 +560,32 @@ public class ConfigurationAsCode extends ManagementLink {
         return checkWith( YamlUtils.loadFrom(sources) );
     }
 
+    /**
+     * Export list of plugins from live Jenkins instance as POM
+     * @throws Exception
+     */
+    @RequirePOST
+    public void doExportPluginsToPom(StaplerRequest req, StaplerResponse res) throws Exception {
+
+        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+            res.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+
+        res.setContentType("text/xml; charset=utf-8");
+        res.addHeader("Content-Disposition", "attachment; filename=pom.xml");
+        exportPluginsToPom(res.getOutputStream());
+    }
+
+    @org.kohsuke.accmod.Restricted(NoExternalUse.class)
+    public void exportPluginsToPom(final OutputStream out) throws Exception {
+        final Jenkins instance = Jenkins.getInstance();
+        final PluginManager manager = instance.getPluginManager();
+        final List<PluginWrapper> plugins = manager.getPlugins();
+        try (final Writer writer = new OutputStreamWriter(out, StandardCharsets.UTF_8)) {
+            MavenExporter.exportPlugins(plugins, writer);
+        }
+    }
 
     /**
      * Search for all {@link #YAML_FILES_PATTERN} in provided base path

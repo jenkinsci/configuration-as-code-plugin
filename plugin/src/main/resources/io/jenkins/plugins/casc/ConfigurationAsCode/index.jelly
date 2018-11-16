@@ -53,6 +53,10 @@
         writting your own, be aware export can be partial, or fail for some components.
       </div>
     </f:form>
+    <br/>
+    <f:form method="post" action="exportPluginsToPom" name="exportPluginsToPom">
+      <f:submit name="exportPluginsToPom" value="${%Export Plugins to POM}"/>
+    </f:form>
 
     <h2>${%Reference}</h2>
     <dt>
