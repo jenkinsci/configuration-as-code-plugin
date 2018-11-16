@@ -74,16 +74,16 @@ public class MavenExporter {
             final Comment commentNode = doc.createComment(comment);
             dependencyNode.appendChild(commentNode);
 
-            createElement(dependencyNode, "groupId", extendedDependency.getGroupId());
-            createElement(dependencyNode, "artifactId", extendedDependency.getArtifactId());
-            createElement(dependencyNode, "version", extendedDependency.getVersion());
+            addElementTo(dependencyNode, "groupId", extendedDependency.getGroupId());
+            addElementTo(dependencyNode, "artifactId", extendedDependency.getArtifactId());
+            addElementTo(dependencyNode, "version", extendedDependency.getVersion());
 
             dependenciesNode.appendChild(dependencyNode);
         }
         return doc;
     }
 
-    private static void createElement(final Element destination, final String name, final String text) {
+    private static void addElementTo(final Element destination, final String name, final String text) {
         final Document doc = destination.getOwnerDocument();
         final Element element = doc.createElement(name);
         final Text textNode = doc.createTextNode(text);
