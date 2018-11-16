@@ -59,7 +59,13 @@ public class MavenExporter {
         return dep;
     }
 
-    public static Document exportPlugins(final List<PluginWrapper> plugins)
+    public static void exportPlugins(final List<PluginWrapper> plugins, final Writer writer)
+            throws XPathExpressionException, IOException, SAXException, TransformerException {
+        final Document document = exportPlugins(plugins);
+        writeDocument(document, writer);
+    }
+
+    static Document exportPlugins(final List<PluginWrapper> plugins)
             throws IOException, XPathExpressionException, SAXException {
         try(
             final InputStream inputStream = openResourceStream(MavenExporter.class, "pom.xml");
