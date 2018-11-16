@@ -55,12 +55,14 @@ public class MavenExporter {
         final ExtendedDependency dep = new ExtendedDependency();
         final Manifest manifest = pluginWrapper.getManifest();
         final Attributes attributes = manifest.getMainAttributes();
+        final String implementationVersion = getAttribute(attributes, "Implementation-Version");
+        final String pluginVersion = pluginWrapper.getVersion();
 
         dep.setGroupId(attributes.getValue("Group-Id"));
         dep.setArtifactId(pluginWrapper.getShortName());
-        dep.setVersion(getAttribute(attributes, "Implementation-Version"));
+        dep.setVersion(implementationVersion);
 
-        dep.setExtendedVersion(pluginWrapper.getVersion());
+        dep.setExtendedVersion(pluginVersion);
         dep.setLongName(pluginWrapper.getLongName());
         dep.setDescription(getAttribute(attributes, "Specification-Title"));
         dep.setUrl(pluginWrapper.getUrl());
