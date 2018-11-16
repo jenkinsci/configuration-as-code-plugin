@@ -1,7 +1,6 @@
 package io.jenkins.plugins.casc.plugins;
 
 import hudson.PluginWrapper;
-import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -9,11 +8,13 @@ import org.xml.sax.SAXException;
 
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collections;
@@ -87,16 +88,28 @@ public class MavenExporterTest {
 
     private static void assertXmlEquals(final String expectedFilename, final Document actualDoc)
             throws TransformerException, IOException {
-        final String expectedXml;
-        try(
-            final InputStream is = MavenExporter.openResourceStream(MavenExporterTest.class, expectedFilename);
-            final StringWriter sw = new StringWriter();
-                ) {
-            IOUtils.copy(is, sw);
-            expectedXml = sw.toString();
-        }
         final String actualXml = toXmlString(actualDoc);
-        Assert.assertEquals(expectedXml, actualXml);
+        try(
+                final InputStream exIs = MavenExporter.openResourceStream(MavenExporterTest.class, expectedFilename);
+                final Reader exReader = new InputStreamReader(exIs);
+                final BufferedReader exBr = new BufferedReader(exReader);
+                final Reader acReader = new StringReader(actualXml);
+                final BufferedReader acBr = new BufferedReader(acReader);
+                ) {
+            int lineNumber = 1;
+            String expectedLine, actualLine;
+            while ((expectedLine = exBr.readLine()) != null) {
+                actualLine = acBr.readLine();
+                final String template = "Difference found at line #%d";
+                final String message = String.format(template, lineNumber);
+                Assert.assertEquals(message, expectedLine, actualLine);
+                lineNumber++;
+            }
+            actualLine = acBr.readLine();
+            final String template = "Difference found at line #%d";
+            final String message = String.format(template, lineNumber);
+            Assert.assertEquals(message, null, actualLine);
+        }
 
     }
 

@@ -95,11 +95,11 @@ public class MavenExporter {
             final ExtendedDependency extendedDependency = exportPlugin(plugin);
             final Element dependencyNode = doc.createElement("dependency");
 
-            final String template = " %s\r\n" +
-                    "Long Name: %s\r\n" +
-                    "Description: %s\r\n" +
-                    "Dependencies: [%s]\r\n" +
-                    "URL: %s\r\n";
+            final String template = " %s\n" +
+                    "Long Name: %s\n" +
+                    "Description: %s\n" +
+                    "Dependencies: [%s]\n" +
+                    "URL: %s\n";
             final String comment = String.format(template, extendedDependency.getArtifactId(),
                     extendedDependency.getLongName(),
                     extendedDependency.getDescription(),
