@@ -79,7 +79,7 @@ public class MavenExporter {
             throws IOException, XPathExpressionException, SAXException {
         try(
             final InputStream inputStream = openResourceStream(MavenExporter.class, "pom.xml");
-            final Reader reader = new InputStreamReader(inputStream);
+            final Reader reader = new InputStreamReader(inputStream, "UTF-8");
             ) {
             return exportPlugins(plugins, reader);
         }
