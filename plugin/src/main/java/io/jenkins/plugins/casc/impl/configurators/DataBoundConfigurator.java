@@ -11,8 +11,6 @@ import io.jenkins.plugins.casc.impl.attributes.DescribableAttribute;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import jenkins.model.Jenkins;
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.Beta;
 import org.kohsuke.stapler.ClassDescriptor;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.Stapler;
@@ -208,7 +206,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
             final String[] names = ClassDescriptor.loadParameterNames(constructor);
             for (int i = 0; i < parameters.length; i++) {
                 final Parameter p = parameters[i];
-                final Attribute a = detectActualType(names[i], TypePair.of(p));
+                final Attribute a = createAttribute(names[i], TypePair.of(p));
                 if (a == null) continue;
                 attributes.add(a);
             }
@@ -234,7 +232,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
         final Object[] args = new Object[parameters.length];
         for (int i = 0; i < parameters.length; i++) {
             final Parameter p = parameters[i];
-            final Attribute a = detectActualType(names[i], TypePair.of(p));
+            final Attribute a = createAttribute(names[i], TypePair.of(p));
             args[i] = Stapler.CONVERT_UTILS.convert(a.getValue(instance), a.getType());
             if (args[i] == null && p.getType().isPrimitive()) {
                 args[i] = defaultValue(p.getType());
