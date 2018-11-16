@@ -107,16 +107,20 @@ public class MavenExporterTest {
 
     private static String toXmlString(final Document document)
             throws TransformerException {
+        final StringWriter sw = new StringWriter();
+        writeDocument(document, sw);
+        return sw.toString();
+    }
+
+    private static void writeDocument(final Document document, final StringWriter sw) throws TransformerException {
         final TransformerFactory tf = TransformerFactory.newInstance();
         final Transformer transformer = tf.newTransformer();
-        final StringWriter sw = new StringWriter();
         final DOMSource source = new DOMSource(document);
         final StreamResult result = new StreamResult(sw);
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
         transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
         transformer.transform(source, result);
-        return sw.toString();
     }
 
 }
