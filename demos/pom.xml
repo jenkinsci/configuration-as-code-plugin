@@ -7,60 +7,27 @@
     <packaging>pom</packaging>
     <name>Configuration as Code Test Harness</name>
 
-    <modules>
-      <module>prototype</module>
-      <module>prototype1</module>
-    </modules>
-
     <build>
-        <pluginManagement>
-            <plugins>
-              <plugin>
-                  <artifactId>maven-resources-plugin</artifactId>
-                  <version>3.0.2</version>
-                  <executions>
-                      <execution>
-                          <id>copy-testSources</id>
-                          <phase>pre-integration-test</phase>
-                          <goals>
-                              <goal>copy-resources</goal>
-                          </goals>
-                          <configuration>
-                              <resources>
-                                  <resource>
-                                      <directory>${project.parent.basedir}/commons</directory>
-                                      <filtering>true</filtering>
-                                      <includes>
-                                          <include>**/*</include>
-                                      </includes>
-                                  </resource>
-                              </resources>
-                              <outputDirectory>${project.basedir}</outputDirectory>
-                          </configuration>
-                      </execution>
-                  </executions>
-              </plugin>
-              <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>exec-maven-plugin</artifactId>
-                    <version>1.6.0</version>
-                    <executions>
-                        <execution>
-                            <id>start-test-environment</id>
-                            <phase>pre-integration-test</phase>
-                            <goals>
-                                <goal>exec</goal>
-                            </goals>
-                            <configuration>
-                                <workingDirectory>${project.basedir}</workingDirectory>
-                                <executable>docker-compose</executable>
-                                <commandlineArgs>up --build --force-recreate --abort-on-container-exit --exit-code-from bats</commandlineArgs>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-            </plugins>
-        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <executions>
+                    <execution>
+                        <id>start-test-environment</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>bash</executable>
+                            <commandlineArgs>run.bash || echo "=== They are test failures"</commandlineArgs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
 </project>

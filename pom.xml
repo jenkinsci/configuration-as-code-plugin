@@ -67,6 +67,7 @@
          <module>plugin</module>
          <module>support</module>
          <module>integrations</module>
+         <module>demos</module>
        </modules>
     </profile>
     <profile>
