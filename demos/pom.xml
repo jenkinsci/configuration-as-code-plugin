@@ -51,8 +51,8 @@
                 </os>
             </activation>
             <properties>
-                <os.executable>cmd</os.executable>
-                <command.args>echo skipped</command.args>
+                <os.executable>cmd.exe</os.executable>
+                <command.args>/C "echo skipped"</command.args>
             </properties>
         </profile>
     </profiles>
