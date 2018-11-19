@@ -21,7 +21,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <executable>bash</executable>
+                            <executable>/bin/bash</executable>
                             <commandlineArgs>run.bash || echo "=== They are test failures"</commandlineArgs>
                         </configuration>
                     </execution>
