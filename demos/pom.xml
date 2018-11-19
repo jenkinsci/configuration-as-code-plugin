@@ -21,13 +21,40 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <executable>/bin/bash</executable>
-                            <commandlineArgs>run.bash || echo "=== They are test failures"</commandlineArgs>
+                            <executable>${os.executable}</executable>
+                            <commandlineArgs>${command.args}</commandlineArgs>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>platform-non-windows</id>
+            <activation>
+                <os>
+                    <family>!windows</family>
+                </os>
+            </activation>
+            <properties>
+                <os.executable>/bin/bash</os.executable>
+                <command.args>run.bash || echo "=== They are test failures"</command.args>
+            </properties>
+        </profile>
+        <profile>
+            <id>platform-windows</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <properties>
+                <os.executable>cmd</os.executable>
+                <command.args>echo skipped</command.args>
+            </properties>
+        </profile>
+    </profiles>
 
 </project>
