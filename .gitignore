@@ -17,5 +17,5 @@ plugins.txt
 */.settings
 
 # Ignore DS_Store (Mac)
-**/.DS_Store
+.DS_Store
 
