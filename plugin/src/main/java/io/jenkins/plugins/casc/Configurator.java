@@ -100,7 +100,7 @@ public interface Configurator<T> {
      * Typically, configurator for an abstract extension point will return Configurators for available implementations.
      */
     @NonNull
-    default List<Configurator> getConfigurators(ConfigurationContext context) {
+    default List<Configurator<T>> getConfigurators(ConfigurationContext context) {
         return Collections.singletonList(this);
     }
 
