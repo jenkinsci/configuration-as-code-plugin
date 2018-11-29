@@ -13,6 +13,7 @@ import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import java.util.Optional;
 import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 
 /**
  * Define a Configurator for a Descriptor
@@ -32,6 +33,7 @@ public class DescriptorConfigurator extends BaseConfigurator<Descriptor> impleme
         this.name = resolveName(descriptor);
     }
 
+    @Nonnull
     @Override
     public String getName() {
         return name;
