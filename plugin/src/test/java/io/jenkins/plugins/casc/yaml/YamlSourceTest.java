@@ -1,11 +1,13 @@
 package io.jenkins.plugins.casc.yaml;
 
+import org.junit.Test;
+
 import java.io.InputStream;
 import java.io.StringBufferInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import org.junit.Test;
+import java.nio.charset.Charset;
+import java.util.Base64;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -30,5 +32,23 @@ public class YamlSourceTest {
         YamlSource<InputStream> yamlSource = YamlSource.of(testInputStream);
         //expect
         assertEquals("YamlSource: " + testInputStreamToString, yamlSource.toString());
+    }
+
+    @Test
+    public void getAuthStringUsingUsernameAndPassword() {
+        //given
+        String authString = YamlSource.getAuthString("user", "password", null);
+        //expect
+        assertEquals("Basic " + Base64.getEncoder().encodeToString(("user:password").getBytes(Charset.forName("UTF-8"))),
+                authString);
+    }
+
+    @Test
+    public void getAuthStringUsingToken() {
+        //given
+        String authString = YamlSource.getAuthString(null, null, "token");
+        //expect
+        assertEquals("Bearer token",
+                authString);
     }
 }

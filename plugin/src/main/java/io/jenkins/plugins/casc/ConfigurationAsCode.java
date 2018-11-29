@@ -102,6 +102,9 @@ public class ConfigurationAsCode extends ManagementLink {
 
     public static final String CASC_JENKINS_CONFIG_PROPERTY = "casc.jenkins.config";
     public static final String CASC_JENKINS_CONFIG_ENV = "CASC_JENKINS_CONFIG";
+    public static final String CASC_JENKINS_CONFIG_USER_ENV = "CASC_JENKINS_CONFIG_USER";
+    public static final String CASC_JENKINS_CONFIG_PASSWORD_ENV = "CASC_JENKINS_CONFIG_PASSWORD";
+    public static final String CASC_JENKINS_CONFIG_TOKEN_ENV = "CASC_JENKINS_CONFIG_TOKEN";
     public static final String DEFAULT_JENKINS_YAML_PATH = "jenkins.yaml";
     public static final String YAML_FILES_PATTERN = "glob:**.{yml,yaml,YAML,YML}";
 

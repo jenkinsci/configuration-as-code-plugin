@@ -54,6 +54,12 @@ Second, the plugin looks for the `CASC_JENKINS_CONFIG` environment variable. The
 - Path to a folder containing a set of config files. For example, `/var/jenkins_home/casc_configs`.
 - A full path to a single file. For example, `/var/jenkins_home/casc_configs/jenkins.yaml`.
 - A URL pointing to a file served on the web. For example, `https://acme.org/jenkins.yaml`.
+    - If the url requires authentication, it can be passed using one of the following:
+        1. Pair of username and password:
+            - CASC_JENKINS_CONFIG_USER
+            - CASC_JENKINS_CONFIG_PASSWORD
+        2. Token 
+            - CASC_JENKINS_CONFIG_TOKEN
 
 If you do not set the `CASC_JENKINS_CONFIG` environment variable, the plugin will
 default to looking for a single config file in `$JENKINS_ROOT/jenkins.yaml`.

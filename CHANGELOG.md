@@ -2,6 +2,7 @@
 
 ## 1.4 (not released yet)
 - Add support for Vault appRole authentication method
+- Support user, password and token as env for secure download of config file from remote url
 
 ## 1.3
 
