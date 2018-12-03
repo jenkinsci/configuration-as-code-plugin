@@ -2,6 +2,7 @@
 
 ## 1.4 (not released yet)
 - Add support for Vault appRole authentication method
+- Add support for adding configurations through pipeline build steps.
 
 ## 1.3
 

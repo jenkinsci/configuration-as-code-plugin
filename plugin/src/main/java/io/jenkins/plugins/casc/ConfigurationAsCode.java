@@ -1,5 +1,12 @@
 package io.jenkins.plugins.casc;
 
+import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.FlowStyle.BLOCK;
+import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.DOUBLE_QUOTED;
+import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.PLAIN;
+import static java.lang.String.format;
+import static java.util.logging.Level.WARNING;
+import static java.util.stream.Collectors.toList;
+
 import com.google.common.annotations.VisibleForTesting;
 import hudson.Extension;
 import hudson.Util;
@@ -44,12 +51,6 @@ import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.interceptor.RequirePOST;
 import org.kohsuke.stapler.lang.Klass;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-import javax.inject.Inject;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -61,8 +62,6 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
@@ -83,13 +82,12 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
-
-import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.FlowStyle.BLOCK;
-import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.DOUBLE_QUOTED;
-import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.PLAIN;
-import static java.lang.String.format;
-import static java.util.logging.Level.WARNING;
-import static java.util.stream.Collectors.toList;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+import javax.inject.Inject;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * {@linkplain #configure() Main entry point of the logic}.
@@ -522,15 +520,19 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     public static boolean isSupportedURI(String configurationParameter) {
-        if(configurationParameter == null) {
+        if (configurationParameter == null) {
             return false;
         }
         final List<String> supportedProtocols = Arrays.asList("https","http","file");
-        URI uri = URI.create(configurationParameter);
-        if(uri == null || uri.getScheme() == null) {
+        try {
+            URI uri = URI.create(configurationParameter);
+            if (uri.getScheme() == null) {
+                return false;
+            }
+            return supportedProtocols.contains(uri.getScheme());
+        } catch (IllegalArgumentException e) {
             return false;
         }
-        return supportedProtocols.contains(uri.getScheme());
     }
 
     @org.kohsuke.accmod.Restricted(NoExternalUse.class)
