@@ -49,11 +49,14 @@ First, start a Jenkins instance with JCasC [plugin](https://plugins.jenkins.io/c
 
 - Those running Jenkins as a [Docker container](https://github.com/jenkinsci/docker) (and maybe also [pre-installing plugins](https://github.com/jenkinsci/docker#preinstalling-plugins)), do include [configuration-as-code](https://plugins.jenkins.io/configuration-as-code) plugin.
 
-Second, the plugin requires the `CASC_JENKINS_CONFIG` environment variable to exist. The variable can point to the following:
+Second, the plugin looks for the `CASC_JENKINS_CONFIG` environment variable. The variable can point to any of the following:
 
 - Path to a folder containing a set of config files. For example, `/var/jenkins_home/casc_configs`.
 - A full path to a single file. For example, `/var/jenkins_home/casc_configs/jenkins.yaml`.
 - A URL pointing to a file served on the web. For example, `https://acme.org/jenkins.yaml`.
+
+If you do not set the `CASC_JENKINS_CONFIG` environment variable, the plugin will
+default to looking for a single config file in `$JENKINS_ROOT/jenkins.yaml`.
 
 If everything was setup correctly, you should now be able to browse the Configuration as Code page with `Manage Jenkins` -> `Configuration as Code`.
 
