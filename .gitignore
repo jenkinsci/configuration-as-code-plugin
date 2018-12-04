@@ -3,8 +3,9 @@ work/
 .idea/
 *.iml
 
-# ignore jenkins.yaml from root folder (used by many for testing)
+# ignore jenkins.yaml from root and plugin folder (used by many for testing)
 /jenkins.yaml
+/plugin/jenkins.yaml
 plugins.txt
 
 # Ignore generated files.
@@ -14,4 +15,7 @@ plugins.txt
 */.factorypath
 */.project
 */.settings
+
+# Ignore DS_Store (Mac)
+.DS_Store
 
