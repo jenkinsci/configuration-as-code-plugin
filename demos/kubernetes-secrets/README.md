@@ -1,4 +1,4 @@
-# Configure Kubernetes secretes for Jenkins configuration-as-code plugin
+# Configure Kubernetes secrets for Jenkins configuration-as-code plugin
 
 ### Prerequisites
 1. `SECRETS` environment variable should provide a path to mounted secret volume.
