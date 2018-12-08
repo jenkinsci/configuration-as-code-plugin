@@ -10,10 +10,12 @@ import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.jvnet.hudson.test.Issue;
 
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -26,7 +28,7 @@ public class GitLabConfigurationTest {
 
     @Test
     @ConfiguredWithCode("GitLabTest.yml")
-    public void configure_gitlab_api_token() throws Exception {
+    public void configure_gitlab_api_token() {
         SystemCredentialsProvider systemCreds = SystemCredentialsProvider.getInstance();
         List<DomainCredentials> domainCredentials = systemCreds.getDomainCredentials();
         assertEquals(1, domainCredentials.size());
@@ -38,9 +40,10 @@ public class GitLabConfigurationTest {
         assertEquals("qwertyuiopasdfghjklzxcvbnm", apiToken.getApiToken().getPlainText());
         assertEquals("Gitlab Token", apiToken.getDescription());
     }
+
     @Test
     @ConfiguredWithCode("GitLabTest.yml")
-    public void configure_gitlab_connection() throws Exception {
+    public void configure_gitlab_connection() {
         final GitLabConnectionConfig gitLabConnections = j.jenkins.getDescriptorByType(GitLabConnectionConfig.class);
         assertEquals(1, gitLabConnections.getConnections().size());
         final GitLabConnection gitLabConnection = gitLabConnections.getConnections().get(0);
@@ -51,5 +54,13 @@ public class GitLabConfigurationTest {
         assertEquals(20, gitLabConnection.getConnectionTimeout());
         assertEquals(10, gitLabConnection.getReadTimeout());
         assertTrue(gitLabConnection.isIgnoreCertificateErrors());
+    }
+
+    @Test
+    @ConfiguredWithCode("GitLabTest.yml")
+    @Issue("https://github.com/jenkinsci/configuration-as-code-plugin/issues/676")
+    public void configure_gitlab_useAuthenticatedEndpoint() {
+        final GitLabConnectionConfig gitLabConnections = j.jenkins.getDescriptorByType(GitLabConnectionConfig.class);
+        assertFalse(gitLabConnections.isUseAuthenticatedEndpoint());
     }
 }

@@ -16,6 +16,7 @@ credentials:
               description: "Gitlab Token"
 unclassified:
   gitlabconnectionconfig:
+    useAuthenticatedEndpoint: false
     connections:
     - apiTokenId: gitlab_token
       clientBuilderId: "autodetect"

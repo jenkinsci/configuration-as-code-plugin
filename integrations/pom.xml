@@ -365,7 +365,8 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>gitlab-plugin</artifactId>
-      <version>1.5.9</version>
+      <!-- TODO: To be replaced with 1.5.12 final once available -->
+      <version>1.5.12-SNAPSHOT</version>
     </dependency>
 
     <dependency>
