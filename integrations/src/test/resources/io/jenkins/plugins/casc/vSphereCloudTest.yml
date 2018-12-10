@@ -1,0 +1,45 @@
+jenkins:
+  clouds:
+    - vSphere:
+        instanceCap: 2147483647
+        maxOnlineSlaves: 0
+        templates:
+          - cloneNamePrefix: "windows_docker"
+            cluster: "data"
+            datastore: "datastore-01"
+            folder: "someFolder"
+            forceVMLaunch: true
+            guestInfoProperties:
+              - name: "AGENT_JNLP_URL"
+                value: "${JENKINS_URL}computer/${NODE_NAME}/slave-agent.jnlp"
+              - name: "AGENT_HOME"
+                value: "${remoteFS}"
+              - name: "AGENT_PARAMETERS"
+                value: "-secret ${JNLP_SECRET}"
+            labelString: "windows docker vsphere"
+            launchDelay: 60
+            launcher:
+              jnlp:
+                workDirSettings:
+                  disabled: false
+                  failIfWorkDirIsMissing: false
+                  internalDir: "remoting"
+            limitedRunCount: 0
+            linkedClone: true
+            masterImageName: "windows-server-2019-docker"
+            mode: EXCLUSIVE
+            numberOfExecutors: 1
+            remoteFS: "C:/jenkins"
+            resourcePool: "Resources"
+            retentionStrategy:
+              vSphereCloud:
+                idleMinutes: 5
+            saveFailure: false
+            templateDescription: "Windows Jenkins agent"
+            templateInstanceCap: 5
+            useSnapshot: true
+            waitForVMTools: true
+        vsConnectionConfig:
+          credentialsId: "vsphere"
+          vsHost: "https://somevcenter.test.local"
+        vsDescription: "SomeName"
