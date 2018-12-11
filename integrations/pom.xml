@@ -233,7 +233,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>vsphere-cloud</artifactId>
-      <version>2.18</version>
+      <version>2.19-20181211.110830-1</version>
       <scope>test</scope>
     </dependency>
 
