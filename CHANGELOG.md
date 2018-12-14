@@ -2,6 +2,7 @@
 
 ## 1.4 (not released yet)
 - Add support for Vault appRole authentication method
+- Add support for separate secrets.yml file for secrets
 
 ## 1.3
 

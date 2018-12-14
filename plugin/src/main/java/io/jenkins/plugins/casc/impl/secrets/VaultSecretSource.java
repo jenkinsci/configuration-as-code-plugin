@@ -5,8 +5,6 @@ import com.bettercloud.vault.VaultConfig;
 import com.bettercloud.vault.VaultException;
 import hudson.Extension;
 import io.jenkins.plugins.casc.SecretSource;
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.Beta;
 
 import java.io.FileInputStream;
 import java.io.IOException;

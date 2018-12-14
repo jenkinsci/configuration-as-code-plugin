@@ -212,6 +212,14 @@ using the `:-` operator from `bash` is also available. For example, `key: ${VALU
 We can provide these initial secrets in the following ways:
 
 - Using environment variables.
+- Using a separate yaml file by defining the `CASC_SECRETS_CONFIG` environment variable with the path to the secrets.yml file.  If this
+variable is not defined the plugin also checks the `$JENKINS_ROOT/secrets.yml` location.  Only files are supported. The format of the secrets file is as follows:
+```yaml
+secrets:
+  secret1: secretvalue1
+  secret2: secretvalue2 
+```
+
 - Using docker-secrets, where files on path `/run/secrets/${KEY}` will be replaced by `${KEY}` in configuration. The base folder `/run/secrets` can be overriden by setting the environment variable `SECRETS`. So this can be used as a file based secret, and not just docker secrets.
 - Using Kubernetes secrets, logic is the same as for docker-secrets. The secret needs to be mounted as a file to `/run/secrets/`, and then the filename can be used as the KEY. For example:
 ```
@@ -230,6 +238,7 @@ can be used as:
     secret: ${filename}
 ```
 - Using Vault, see following section.
+
 
 ### Vault
 

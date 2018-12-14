@@ -580,6 +580,7 @@ public class ConfigurationAsCode extends ManagementLink {
             return Files.list(root)
                     .filter(Files::isRegularFile) // only consider regular files, following symlinks
                     .filter(matcher::matches)     // matching pattern
+                    .filter(a -> !a.equals("secrets.yml")) // exclude secrets.yml
                     .collect(toList());
         } catch (IOException e) {
             throw new IllegalStateException("failed config scan for " + path, e);
