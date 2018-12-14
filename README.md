@@ -239,7 +239,6 @@ can be used as:
 ```
 - Using Vault, see following section.
 
-
 ### Vault
 
 Prerequisites:

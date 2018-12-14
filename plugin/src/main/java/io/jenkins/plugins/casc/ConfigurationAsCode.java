@@ -11,6 +11,7 @@ import hudson.security.ACL;
 import hudson.security.ACLContext;
 import hudson.util.FormValidation;
 import io.jenkins.plugins.casc.impl.DefaultConfiguratorRegistry;
+import io.jenkins.plugins.casc.impl.secrets.YamlSecretSource;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import io.jenkins.plugins.casc.model.Scalar;
@@ -580,7 +581,7 @@ public class ConfigurationAsCode extends ManagementLink {
             return Files.list(root)
                     .filter(Files::isRegularFile) // only consider regular files, following symlinks
                     .filter(matcher::matches)     // matching pattern
-                    .filter(a -> !a.equals("secrets.yml")) // exclude secrets.yml
+                    .filter(f -> !f.equals(YamlSecretSource.DEFAULT_JENKINS_YAML_PATH)) // exclude secrets.yml
                     .collect(toList());
         } catch (IOException e) {
             throw new IllegalStateException("failed config scan for " + path, e);

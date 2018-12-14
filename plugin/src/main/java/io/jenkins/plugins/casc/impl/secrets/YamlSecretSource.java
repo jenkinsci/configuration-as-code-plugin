@@ -23,9 +23,25 @@ public class YamlSecretSource extends SecretSource {
     public static final String DEFAULT_JENKINS_YAML_PATH = "secrets.yml";
 
     private String secretsFile = "";
+    private Map<String, Object> secretsMap;
 
     public YamlSecretSource() {
         this.secretsFile = getStandardConfig();
+        loadYaml();
+    }
+
+    private void loadYaml() {
+        File file = new File(this.secretsFile);
+        if(file.exists()) {
+            Yaml yaml = new Yaml();
+            try(InputStream inputStream = new BufferedInputStream(new FileInputStream(this.secretsFile))) {
+                secretsMap = yaml.load(inputStream);
+            } catch (FileNotFoundException e) {
+                LOGGER.info("Secrets yaml file not found");
+            } catch (IOException e) {
+                LOGGER.log(Level.WARNING, "Error accessing secrets file");
+            }
+        }
     }
 
     private String getStandardConfig() {
@@ -54,21 +70,15 @@ public class YamlSecretSource extends SecretSource {
     }
 
     @Override
-    public Optional<String> reveal(String secret) throws IOException {
+    public Optional<String> reveal(String secret) {
 
-        File file = new File(this.secretsFile);
-        if(!file.exists()) {
-            return Optional.empty();
-        }
+        if(secretsMap!=null) {
 
-        Yaml yaml = new Yaml();
-        InputStream inputStream = new BufferedInputStream(new FileInputStream(this.secretsFile));
-        Map<String, Object> obj = yaml.load(inputStream);
-
-        if(obj.containsKey("secrets")) {
-            Map<String, Object> secrets = (Map<String, Object>)obj.get("secrets");
-            if(secrets.containsKey(secret)) {
-                return Optional.of((String)secrets.get(secret));
+            if (secretsMap.containsKey("secrets")) {
+                Map<String, Object> secrets = (Map<String, Object>) secretsMap.get("secrets");
+                if (secrets.containsKey(secret)) {
+                    return Optional.of((String) secrets.get(secret));
+                }
             }
         }
 
