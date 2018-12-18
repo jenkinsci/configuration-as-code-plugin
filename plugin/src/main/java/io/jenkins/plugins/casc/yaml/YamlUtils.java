@@ -2,6 +2,7 @@ package io.jenkins.plugins.casc.yaml;
 
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfiguratorException;
+import io.jenkins.plugins.casc.impl.secrets.YamlSecretSource;
 import io.jenkins.plugins.casc.model.Mapping;
 import io.jenkins.plugins.casc.snakeyaml.composer.Composer;
 import io.jenkins.plugins.casc.snakeyaml.nodes.MappingNode;
@@ -19,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
+
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
@@ -34,6 +36,10 @@ public final class YamlUtils {
 
                 final Node node = read(source);
 
+                if(!isSourceAllowed(node)) {
+                    continue;
+                }
+
                 if (root == null) {
                     root = node;
                 } else {
@@ -45,6 +51,23 @@ public final class YamlUtils {
         }
 
         return root;
+    }
+
+    /**
+     * Allows skipping yaml files we don't want to end up in the Jcasc config structure (e.g. secrets source in yaml file)
+     */
+    private static boolean isSourceAllowed(Node node) {
+        if(node.getNodeId() == NodeId.mapping) {
+            MappingNode mNode = (MappingNode)node;
+            NodeTuple tuple = mNode.getValue().get(0);
+            if(tuple.getKeyNode().getNodeId() == NodeId.scalar) {
+                ScalarNode keyNode = (ScalarNode)tuple.getKeyNode();
+                if(keyNode.getValue().equals(YamlSecretSource.ROOT_TAG_NAME)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     public static Node read(YamlSource source) throws IOException {

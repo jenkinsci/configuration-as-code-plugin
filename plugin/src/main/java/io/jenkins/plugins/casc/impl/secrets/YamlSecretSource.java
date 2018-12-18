@@ -21,6 +21,7 @@ public class YamlSecretSource extends SecretSource {
     public static final String CASC_SECRETS_CONFIG_PROPERTY = "casc.secrets.config";
     public static final String CASC_SECRETS_CONFIG_ENV = "CASC_SECRETS_CONFIG";
     public static final String DEFAULT_JENKINS_YAML_PATH = "secrets.yml";
+    public static final String ROOT_TAG_NAME = "secrets";
 
     private String secretsFile = "";
     private Map<String, Object> secretsMap;
@@ -40,6 +41,11 @@ public class YamlSecretSource extends SecretSource {
                 LOGGER.info("Secrets yaml file not found");
             } catch (IOException e) {
                 LOGGER.log(Level.WARNING, "Error accessing secrets file");
+            }
+        }
+        if(secretsMap!=null) {
+            if (secretsMap.containsKey(ROOT_TAG_NAME)) {
+                secretsMap = (Map<String, Object>) secretsMap.get(ROOT_TAG_NAME);
             }
         }
     }
@@ -73,12 +79,8 @@ public class YamlSecretSource extends SecretSource {
     public Optional<String> reveal(String secret) {
 
         if(secretsMap!=null) {
-
-            if (secretsMap.containsKey("secrets")) {
-                Map<String, Object> secrets = (Map<String, Object>) secretsMap.get("secrets");
-                if (secrets.containsKey(secret)) {
-                    return Optional.of((String) secrets.get(secret));
-                }
+            if (secretsMap.containsKey(secret)) {
+                return Optional.of((String) secretsMap.get(secret));
             }
         }
 
