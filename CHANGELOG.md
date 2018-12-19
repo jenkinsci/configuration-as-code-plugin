@@ -2,6 +2,7 @@
 
 ## 1.4 (not released yet)
 - Add support for Vault appRole authentication method
+- Add support for bcrypt encrypted passwords. Use with a `#jbcrypt:` prefix.
 
 ## 1.3
 
