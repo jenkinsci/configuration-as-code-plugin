@@ -1,6 +1,8 @@
 package io.jenkins.plugins.casc.core;
 
 import hudson.Extension;
+import hudson.model.User;
+import hudson.model.UserProperty;
 import hudson.security.HudsonPrivateSecurityRealm;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.impl.attributes.MultivaluedAttribute;
@@ -9,6 +11,8 @@ import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.DataBoundConstructor;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -18,6 +22,8 @@ import java.util.stream.Collectors;
 @Extension
 @Restricted(NoExternalUse.class)
 public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurator {
+    /// matches HudsonPrivateSecurityRealm.JBCRYPT_HEADER
+    private static final String HASHED_PASSWORD_PREFIX = "#jbcrypt:";
 
     public HudsonPrivateSecurityRealmConfigurator() {
         super(HudsonPrivateSecurityRealm.class);
@@ -33,11 +39,28 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
                     .collect(Collectors.toList()))
             .setter((target, value) -> {
                 for (UserWithPassword user : value) {
-                    target.createAccount(user.id, user.password);
+                    if (user.password.startsWith(HASHED_PASSWORD_PREFIX)) {
+                        User jenkinsUser = User.getById(user.id, true);
+                        jenkinsUser.addProperty(getHashedPassword(user.password));
+                    } else {
+                        target.createAccount(user.id, user.password);
+                    }
                 }
             }
         ));
         return describe;
+    }
+
+    private static UserProperty getHashedPassword(String hashedPassword) {
+        try {
+            Method fromHashedPassword = HudsonPrivateSecurityRealm.Details.class.getDeclaredMethod("fromHashedPassword", String.class);
+            fromHashedPassword.setAccessible(true);
+            return (UserProperty) fromHashedPassword.invoke(null, hashedPassword);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException("Failed to construct hashed password", e.getCause());
+        } catch (NoSuchMethodException | IllegalAccessException e) {
+            throw new RuntimeException("Failed to construct hashed password", e);
+        }
     }
 
     public static class UserWithPassword {

@@ -13,6 +13,7 @@ import io.jenkins.plugins.casc.model.Mapping;
 import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mindrot.jbcrypt.BCrypt;
 
 import static org.junit.Assert.*;
 
@@ -45,4 +46,14 @@ public class HudsonPrivateSecurityRealmConfiguratorTest {
         final Mapping user = node.asMapping().get("users").asSequence().get(0).asMapping();
         assertEquals("admin", user.getScalarValue("id"));
     }
+
+    @Test
+    @ConfiguredWithCode("HudsonPrivateSecurityRealmConfiguratorTest.yml")
+    public void config_local_security_and_hashed_admin_user() {
+        final User admin = User.getById("hashedadmin", false);
+        assertNotNull(admin);
+        final HudsonPrivateSecurityRealm.Details details = admin.getProperty(HudsonPrivateSecurityRealm.Details.class);
+        assertTrue(details.isPasswordCorrect("password"));
+    }
+
 }
