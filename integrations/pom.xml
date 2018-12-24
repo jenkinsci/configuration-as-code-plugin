@@ -3,7 +3,7 @@
   <parent>
     <artifactId>parent</artifactId>
     <groupId>io.jenkins.configuration-as-code</groupId>
-    <version>${revision}${changelist}</version>
+    <version>1.5</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 

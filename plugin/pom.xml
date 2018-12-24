@@ -5,12 +5,12 @@
   <parent>
     <groupId>io.jenkins.configuration-as-code</groupId>
     <artifactId>parent</artifactId>
-    <version>${revision}${changelist}</version>
+    <version>1.5</version>
     <relativePath>..</relativePath>
   </parent>
   <groupId>io.jenkins</groupId>
   <artifactId>configuration-as-code</artifactId>
-  <version>${revision}${changelist}</version>
+  <version>1.5</version>
   <packaging>hpi</packaging>
 
   <name>Configuration as Code Plugin</name>
@@ -90,6 +90,6 @@
     <connection>scm:git:git://github.com/jenkinsci/configuration-as-code-plugin.git</connection>
     <developerConnection>scm:git:git@github.com:jenkinsci/configuration-as-code-plugin.git</developerConnection>
     <url>https://github.com/jenkinsci/configuration-as-code-plugin</url>
-    <tag>${scmTag}</tag>
+    <tag>parent-1.5</tag>
   </scm>
 </project>
