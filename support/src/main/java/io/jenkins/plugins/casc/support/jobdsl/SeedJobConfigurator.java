@@ -64,7 +64,7 @@ public class SeedJobConfigurator implements RootElementConfigurator<GeneratedIte
             final String script;
             try {
                 script = con.configure(source, context).getScript();
-                System.out.println("your script is: " + script)
+                System.out.println("your script is: " + script);
             } catch (IOException e) {
                 throw new ConfiguratorException(this, "Failed to retrieve job-dsl script", e);
             }
