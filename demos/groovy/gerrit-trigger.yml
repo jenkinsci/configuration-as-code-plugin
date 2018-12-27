@@ -1,0 +1,38 @@
+
+groovy:
+  - script: >
+      import jenkins.model.Jenkins;
+      import net.sf.json.JSONObject;
+      import com.sonyericsson.hudson.plugins.gerrit.trigger.GerritServer;
+
+      if ( Jenkins.instance.pluginManager.activePlugins.find { it.shortName == "gerrit-trigger" } != null ) {
+          println("Setting gerrit-trigger server plugin");
+
+          def gerritPlugin = Jenkins.instance.getPlugin(com.sonyericsson.hudson.plugins.gerrit.trigger.PluginImpl.class);
+          gerritPlugin.getPluginConfig().setNumberOfReceivingWorkerThreads(3);
+          gerritPlugin.getPluginConfig().setNumberOfSendingWorkerThreads(1);
+
+          def serverName = "grenoble-gerrit";
+          GerritServer server = new GerritServer(serverName);
+          def config = server.getConfig();
+
+          def triggerConfig = [
+              'gerritHostName':"gerrit.com",
+              'gerritSshPort':29418,
+              'gerritUserName':"szandala_jenkins",
+              'gerritFrontEndUrl':"https://gerrit.com"
+          ];
+
+          config.setValues(JSONObject.fromObject(triggerConfig));
+          server.setConfig(config);
+
+          // avoid duplicate servers on the server list;
+          if ( gerritPlugin.containsServer(serverName) ) {
+              gerritPlugin.removeServer(gerritPlugin.getServer(serverName));
+          }
+
+          gerritPlugin.addServer(server);
+          server.start();
+          server.startConnection();
+          println("Setting ${serverName} completed");
+      }
