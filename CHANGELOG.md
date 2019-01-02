@@ -3,11 +3,12 @@
 ## 1.5 (not released yet)
 
 - Improve explanation of CASC_VAULT in README.md
+- Add proper string interpolation for secrets.
+- Add support for secrets while defining `jobs` declarations.
 
 ## 1.4
 
 - Add support for Vault appRole authentication method
-- Add proper string interpolation for secrets.
 
 ## 1.3
 
