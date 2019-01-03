@@ -117,7 +117,7 @@ Prerequisites: _Java_, _Maven_ & _IntelliJ IDEA_
 - Verify that IntelliJ IDEA is not using bundled maven.
   - Click `File` -> `Preferences...` -> `Build, Execution, Deployment` -> `Build Tools` -> `Maven`.
   - `Maven home directory:` has `/path/to/apache-maven-x.y.z` value, not `Bundled (Maven 3)`.
-- Open http://localhost:8080/jenkins/configuration-as-code/ to test the plugin locally.
+- Open <http://localhost:8080/jenkins/configuration-as-code/> to test the plugin locally.
 
 ### CLI
 
@@ -136,7 +136,7 @@ mvn hpi:run
 INFO: Jenkins is fully up and running
 ```
 
-- Open http://localhost:8080/jenkins/configuration-as-code/ to test the plugin locally.
+- Open <http://localhost:8080/jenkins/configuration-as-code/> to test the plugin locally.
 
 ## Initial Configuration
 
