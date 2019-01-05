@@ -134,7 +134,10 @@ public class DefaultConfiguratorRegistry implements ConfiguratorRegistry {
         }
 
         if (Descriptor.class.isAssignableFrom(clazz)) {
-            return new DescriptorConfigurator((Descriptor) jenkins.getExtensionList(clazz).get(0));
+            ExtensionList extensions = jenkins.getExtensionList(clazz);
+            if (!extensions.isEmpty()) {
+                return new DescriptorConfigurator((Descriptor) extensions.get(0));
+            }
         }
 
         if (DataBoundConfigurator.getDataBoundConstructor(clazz) != null) {
