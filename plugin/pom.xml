@@ -32,12 +32,24 @@
     </dependency>
 
     <dependency>
+      <groupId>org.bigtesting</groupId>
+      <artifactId>interpolatd</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.vavr</groupId>
+      <artifactId>vavr</artifactId>
+      <version>0.9.2</version>
+    </dependency>
+
+    <dependency>
       <groupId>com.github.stefanbirkner</groupId>
       <artifactId>system-rules</artifactId>
       <version>1.17.1</version>
       <scope>test</scope>
     </dependency>
-    
+
   </dependencies>
 
   <build>
