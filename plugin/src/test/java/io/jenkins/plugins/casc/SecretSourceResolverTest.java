@@ -83,6 +83,13 @@ public class SecretSourceResolverTest {
     }
 
     @Test
+    public void resolve_defaultValueLimit() {
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        ConfigurationContext context = new ConfigurationContext(registry);
+        assertThat(SecretSourceResolver.resolve(context, "${FOO:-default:-other}"), equalTo("default:-other"));
+    }
+
+    @Test
     public void resolve_mixedSingleEntry() {
         environment.set("FOO", "www.foo.io");
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();

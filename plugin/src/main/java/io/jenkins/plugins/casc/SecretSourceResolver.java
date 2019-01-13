@@ -39,8 +39,9 @@ public class SecretSourceResolver {
     }
 
     private static Optional<String> defaultValue(String captured) {
-        String[] split = captured.split(defaultDelimiter);
-        if (split.length == 2) {
+        int limit = 2;
+        String[] split = captured.split(defaultDelimiter, limit);
+        if (split.length == limit) {
             return Optional.ofNullable(split[1]);
         }
         return Optional.empty();
