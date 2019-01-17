@@ -5,19 +5,18 @@ import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.Configurator;
 import io.jenkins.plugins.casc.ConfiguratorException;
-import io.jenkins.plugins.casc.SecretSource;
+import io.jenkins.plugins.casc.SecretSourceResolver;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Scalar;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.Stapler;
 
-import javax.annotation.CheckForNull;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -35,43 +34,16 @@ public class PrimitiveConfigurator implements Configurator {
         return target;
     }
 
+    @Nonnull
     @Override
     public Set<Attribute> describe() {
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
 
+    @Nonnull
     @Override
     public Object configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
-
-        final String value = config.asScalar().getValue();
-        String s = value;
-        Optional<String> r = SecretSource.requiresReveal(value);
-        if (r.isPresent()) {
-            final String expr = r.get();
-            Optional<String> reveal = Optional.empty();
-            for (SecretSource secretSource : context.getSecretSources()) {
-                try {
-                    reveal = secretSource.reveal(expr);
-                } catch (IOException ex) {
-                    throw new RuntimeException("Cannot reveal secret source for variable with key: " + s, ex);
-                }
-                if (reveal.isPresent()) {
-                    s = reveal.get();
-                    break;
-                }
-            }
-
-            Optional<String> defaultValue = SecretSource.defaultValue(value);
-            if (defaultValue.isPresent() && !reveal.isPresent()) {
-                s = defaultValue.get();
-            }
-
-            if (!reveal.isPresent() && !defaultValue.isPresent()) {
-                throw new RuntimeException("Unable to reveal variable with key: " + s);
-            }
-        }
-
-        return Stapler.lookupConverter(target).convert(target, s);
+        return Stapler.lookupConverter(target).convert(target, SecretSourceResolver.resolve(context, config.asScalar().toString()));
     }
 
     @Override
@@ -101,6 +73,7 @@ public class PrimitiveConfigurator implements Configurator {
         return new Scalar(String.valueOf(instance));
     }
 
+    @Nonnull
     @Override
     public List<Configurator> getConfigurators(ConfigurationContext context) {
         return Collections.emptyList();

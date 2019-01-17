@@ -2,6 +2,7 @@
 
 ## 1.4 (not released yet)
 - Add support for Vault appRole authentication method
+- Add proper string interpolation for secrets.
 
 ## 1.3
 
