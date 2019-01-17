@@ -117,7 +117,7 @@ Prerequisites: _Java_, _Maven_ & _IntelliJ IDEA_
 - Verify that IntelliJ IDEA is not using bundled maven.
   - Click `File` -> `Preferences...` -> `Build, Execution, Deployment` -> `Build Tools` -> `Maven`.
   - `Maven home directory:` has `/path/to/apache-maven-x.y.z` value, not `Bundled (Maven 3)`.
-- Open http://localhost:8080/jenkins/configuration-as-code/ to test the plugin locally.
+- Open <http://localhost:8080/jenkins/configuration-as-code/> to test the plugin locally.
 
 ### CLI
 
@@ -136,7 +136,7 @@ mvn hpi:run
 INFO: Jenkins is fully up and running
 ```
 
-- Open http://localhost:8080/jenkins/configuration-as-code/ to test the plugin locally.
+- Open <http://localhost:8080/jenkins/configuration-as-code/> to test the plugin locally.
 
 ## Initial Configuration
 
@@ -214,7 +214,8 @@ We can provide these initial secrets in the following ways:
 - Using environment variables.
 - Using docker-secrets, where files on path `/run/secrets/${KEY}` will be replaced by `${KEY}` in configuration. The base folder `/run/secrets` can be overriden by setting the environment variable `SECRETS`. So this can be used as a file based secret, and not just docker secrets.
 - Using Kubernetes secrets, logic is the same as for docker-secrets. The secret needs to be mounted as a file to `/run/secrets/`, and then the filename can be used as the KEY. For example:
-```
+
+```yaml
 apiVersion: v1
 kind: Secret
 metadata:
@@ -222,13 +223,16 @@ metadata:
 data:
   filename: {{ "encoded string" | b64enc }}
 ```
+
 can be used as:
-```
+
+```yaml
 - credentials:
   - string:
     id: "cred-id"
     secret: ${filename}
 ```
+
 - Using Vault, see following section.
 
 ### Vault
@@ -245,7 +249,7 @@ Prerequisites:
 - The environment variable `CASC_VAULT_MOUNT` is optional. (Vault auth mount. For example, `ldap` or another username & password authentication type, defaults to `userpass`.)
 - The environment variable `CASC_VAULT_FILE` is optional, provides a way for the other variables to be read from a file instead of environment variables.
 
-If all those 4 are present, Configuration-as-Code will try to gather initial secrets from Vault. Requires read access for the configured user.
+If the environment variables `CASC_VAULT_URL` and `CASC_VAULT_PATH` are present, Configuration-as-Code will try to gather initial secrets from Vault. However for it to work properly there is a need for authentication by either the combination of `CASC_VAULT_USER` and `CASC_VAULT_PW`, a `CASC_VAULT_TOKEN`, or the combination of `CASC_VAULT_APPROLE` and `CASC_VAULT_APPROLE_SECRET`. The authenticated user must have at least read access.
 
 You can also provide a `CASC_VAULT_FILE` environment variable where you load the secrets from file.
 
