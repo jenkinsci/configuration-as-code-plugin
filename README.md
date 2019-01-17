@@ -47,7 +47,7 @@ so end-users have full guidance in using this tool-set and do not have to search
 
 First, start a Jenkins instance with JCasC [plugin](https://plugins.jenkins.io/configuration-as-code) installed.
 
-- Those running Jenkins as a [Docker container](https://github.com/jenkinsci/docker) (and maybe also [pre-installing plugins](https://github.com/jenkinsci/docker#preinstalling-plugins)), do include [configuration-as-code](https://plugins.jenkins.io/configuration-as-code) plugin.
+- Those running Jenkins as a [Docker container](https://github.com/jenkinsci/docker) (and maybe also [pre-installing plugins](https://github.com/jenkinsci/docker#preinstalling-plugins)), do include [configuration-as-code](https://plugins.jenkins.io/configuration-as-code) plugin and optionally the [configuration-as-code-support](https://plugins.jenkins.io/configuration-as-code-support) plugin if you use one of the credentials plugins or the job-dsl (see link).
 
 Second, the plugin looks for the `CASC_JENKINS_CONFIG` environment variable. The variable can point to any of the following:
 
