@@ -7,9 +7,13 @@ For now, it is using the [job-dsl-plugin](https://wiki.jenkins.io/display/JENKIN
 Job-DSL plugin uses groovy syntax for it's job configuration DSL, so a mix of yaml and groovy must be used within the
 configuration-as-code file.
 
-## sample configuration
+## sample configurations
 
 [bitbucket.yaml](bitbucket.yaml) file is an example of configuration file with Jenkins and an Organization Folder Job Type with automatic branch discovering in Bitbucket.
+
+[pipeline.yaml](pipeline.yaml) file is an example of configuring a folder and a descrative pipeline job within that folder.
+
+[multibranch-github.yaml](multibranch-github.yaml) file is an example of a multibranch pipeline job configured with GitHub as branch source, an orphaned item strategy and periodic scan triggers of 5 mins.
 
 ## implementation note
 
