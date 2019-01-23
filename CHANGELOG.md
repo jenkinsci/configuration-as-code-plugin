@@ -1,8 +1,14 @@
 # ChangeLog
 
-## 1.4 (not released yet)
-- Add support for Vault appRole authentication method
+## 1.5 (not released yet)
+
+- Improve explanation of CASC_VAULT in README.md
 - Add support for bcrypt encrypted passwords. Use with a `#jbcrypt:` prefix.
+
+## 1.4
+
+- Add support for Vault appRole authentication method
+- Add proper string interpolation for secrets.
 
 ## 1.3
 
@@ -25,7 +31,7 @@
 ## 1.1
 
 - [SECURITY-1124] Never export sensitive Secret
-- fix plugin installation 
+- fix plugin installation
 - impersonate as SYSTEM to apply configuration
 - removed Beta API annotations
 - many fixes to documentation and demos
