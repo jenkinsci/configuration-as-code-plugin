@@ -10,6 +10,8 @@ import io.jenkins.plugins.casc.impl.configurators.DataBoundConfigurator;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -22,6 +24,7 @@ import java.util.stream.Collectors;
 @Extension
 @Restricted(NoExternalUse.class)
 public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurator {
+    private static final Logger logger = LoggerFactory.getLogger(HudsonPrivateSecurityRealmConfigurator.class);
     /// matches HudsonPrivateSecurityRealm.JBCRYPT_HEADER
     private static final String HASHED_PASSWORD_PREFIX = "#jbcrypt:";
 
@@ -40,8 +43,13 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
             .setter((target, value) -> {
                 for (UserWithPassword user : value) {
                     if (user.password.startsWith(HASHED_PASSWORD_PREFIX)) {
-                        User jenkinsUser = User.getById(user.id, true);
-                        jenkinsUser.addProperty(getHashedPassword(user.password));
+                        try {
+                            target.createAccountWithHashedPassword(user.id, user.password);
+                        } catch (IllegalArgumentException e) {
+                            logger.warn("Failed to create user with presumed hashed password", e);
+                            // fallback, just create the account as is
+                            target.createAccount(user.id, user.password);
+                        }
                     } else {
                         target.createAccount(user.id, user.password);
                     }
@@ -49,18 +57,6 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
             }
         ));
         return describe;
-    }
-
-    private static UserProperty getHashedPassword(String hashedPassword) {
-        try {
-            Method fromHashedPassword = HudsonPrivateSecurityRealm.Details.class.getDeclaredMethod("fromHashedPassword", String.class);
-            fromHashedPassword.setAccessible(true);
-            return (UserProperty) fromHashedPassword.invoke(null, hashedPassword);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException("Failed to construct hashed password", e.getCause());
-        } catch (NoSuchMethodException | IllegalAccessException e) {
-            throw new RuntimeException("Failed to construct hashed password", e);
-        }
     }
 
     public static class UserWithPassword {
