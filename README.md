@@ -324,6 +324,20 @@ Kubernetes users:
 
 Most plugins should be supported out-of-the-box, or maybe require some minimal changes. See this [dashboard](https://issues.jenkins.io/secure/Dashboard.jspa?selectPageId=18341) for known compatibility issues.
 
+## Triggering Configuration Reload
+
+You have the following option to trigger a configuration reload:
+
+- via the user interface: `Manage Jenkins -> Configuration -> Reload existing configuration`
+- via http POST to `JENKINS_URL/configuration-as-code/reload`
+  Note: this needs to include a valid CRUMB and authentication information e.g. username + token of a user with admin
+  permissions
+- via Jenkins CLI
+- via htto POST to `JENKINS_URL/reload-configuration-as-code/`
+  In contrast to the above it does not need authentication and bypasses CSRF checks, but it needs to be explicitly
+  enabled by setting `CASC_ALLOW_LOCAL_RELOAD` environment variable to `true` and it only allows connections from the
+  local machine.
+
 ## Jenkins Enhancement Proposal
 
 As configuration as code is demonstrated to be a highly requested topic in Jenkins community, we have published
