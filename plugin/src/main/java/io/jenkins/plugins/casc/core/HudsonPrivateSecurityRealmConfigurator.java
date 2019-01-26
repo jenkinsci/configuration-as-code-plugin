@@ -1,20 +1,18 @@
 package io.jenkins.plugins.casc.core;
 
 import hudson.Extension;
-import hudson.model.User;
-import hudson.model.UserProperty;
 import hudson.security.HudsonPrivateSecurityRealm;
+import hudson.util.VersionNumber;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.impl.attributes.MultivaluedAttribute;
 import io.jenkins.plugins.casc.impl.configurators.DataBoundConfigurator;
+import jenkins.model.Jenkins;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -27,6 +25,7 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
     private static final Logger logger = LoggerFactory.getLogger(HudsonPrivateSecurityRealmConfigurator.class);
     /// matches HudsonPrivateSecurityRealm.JBCRYPT_HEADER
     private static final String HASHED_PASSWORD_PREFIX = "#jbcrypt:";
+    private static final VersionNumber MIN_VERSION_FOR_HASHED_PASSWORDS = new VersionNumber("2.161");
 
     public HudsonPrivateSecurityRealmConfigurator() {
         super(HudsonPrivateSecurityRealm.class);
@@ -42,7 +41,7 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
                     .collect(Collectors.toList()))
             .setter((target, value) -> {
                 for (UserWithPassword user : value) {
-                    if (user.password.startsWith(HASHED_PASSWORD_PREFIX)) {
+                    if (user.password.startsWith(HASHED_PASSWORD_PREFIX) && jenkinsSupportsHashedPasswords()) {
                         try {
                             target.createAccountWithHashedPassword(user.id, user.password);
                         } catch (IllegalArgumentException e) {
@@ -57,6 +56,15 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
             }
         ));
         return describe;
+    }
+
+    static boolean jenkinsSupportsHashedPasswords() {
+        VersionNumber currentVersion = Jenkins.getStoredVersion();
+        if (currentVersion == null) {
+            logger.warn("Could not retrieve current version for Jenkins server. Is everything configured correctly?");
+            return false;
+        }
+        return !currentVersion.isOlderThan(MIN_VERSION_FOR_HASHED_PASSWORDS);
     }
 
     public static class UserWithPassword {
