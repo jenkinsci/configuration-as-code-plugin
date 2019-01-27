@@ -10,10 +10,7 @@ jenkins:
   - amazonEC2:
       cloudName: "docker-agents"
       credentialsId: "jenkins-aws"
-      privateKey: "-----BEGIN RSA PRIVATE KEY-----\n\
-        ...
-        ...
-        -----END RSA PRIVATE KEY-----"
+      privateKey: "${EC2_PRIVATE_KEY}"
       region: "eu-central-1"
       templates:
       - ami: "ami-xyz"
