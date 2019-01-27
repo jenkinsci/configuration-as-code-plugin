@@ -12,7 +12,6 @@
   <name>Configuration as Code Integration tests</name>
 
   <properties>
-    <jenkins.version>2.161</jenkins.version> <!-- For artifact-manager-S3. Remove when parent base is updated. -->
     <maven.deploy.skip>true</maven.deploy.skip> <!-- no need to be deployed during release, this is a test-only module -->
   </properties>
 

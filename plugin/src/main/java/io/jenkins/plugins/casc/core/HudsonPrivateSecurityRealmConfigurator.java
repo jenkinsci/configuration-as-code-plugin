@@ -59,7 +59,7 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
     }
 
     static boolean jenkinsSupportsHashedPasswords() {
-        VersionNumber currentVersion = Jenkins.getStoredVersion();
+        VersionNumber currentVersion = Jenkins.getVersion();
         if (currentVersion == null) {
             logger.warn("Could not retrieve current version for Jenkins server. Is everything configured correctly?");
             return false;
