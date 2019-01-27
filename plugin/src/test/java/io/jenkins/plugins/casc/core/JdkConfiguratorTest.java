@@ -29,13 +29,5 @@ public class JdkConfiguratorTest {
 
         InstallSourceProperty installSourceProperty = jdk.getProperties().get(InstallSourceProperty.class);
         Assert.assertEquals(1, installSourceProperty.installers.size());
-
-        // https://github.com/jenkinsci/jenkins/pull/3301 moved jdk-tool
-        // to a separate plugin, with no published JAR file
-        /*
-        JDKInstaller installer = installSourceProperty.installers.get(JDKInstaller.class);
-        Assert.assertEquals("jdk-8u181-oth-JPR", installer.id);
-        Assert.assertTrue(installer.acceptLicense);
-        */
     }
 }
