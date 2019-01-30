@@ -1,7 +1,10 @@
 # ChangeLog
 
-## 1.5 (not released yet)
+## 1.6 (not released yet)
 
+## 1.5
+
+- ISSUE-697: proper string interpolation for secrets.
 - Improve explanation of CASC_VAULT in README.md
 - Add proper string interpolation for secrets.
 - Add support for secrets while defining `jobs` declarations.
