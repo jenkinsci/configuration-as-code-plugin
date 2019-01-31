@@ -22,7 +22,7 @@
   <properties>
     <revision>1.6</revision>
     <changelist>-SNAPSHOT</changelist>
-    <jenkins.version>2.60.3</jenkins.version>
+    <jenkins.version>2.161</jenkins.version>
     <java.level>8</java.level>
   </properties>
 

@@ -32,7 +32,7 @@ public class BackwardCompatibilityTest {
         // assertNotNull(j.jenkins.getNode("zot"));
 
         final List<ObsoleteConfigurationMonitor.Error> errors = ObsoleteConfigurationMonitor.get().getErrors();
-        assertEquals("'DumbSlave' is obsolete, please use 'dumb'", errors.get(0).message);
+        assertEquals("'DumbSlave' is obsolete, please use 'permanent'", errors.get(0).message);
     }
 
 }

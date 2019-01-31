@@ -58,8 +58,13 @@ public class AdminWhitelistRuleConfigurator extends BaseConfigurator<AdminWhitel
 
     @Override
     protected AdminWhitelistRule instance(Mapping mapping, ConfigurationContext context) {
-        Injector injector = Jenkins.getInstance().getInjector();
-        return injector.getInstance(AdminWhitelistRule.class);
+        Injector injector = Jenkins.get().getInjector();
+        if (injector != null) {
+            return injector.getInstance(AdminWhitelistRule.class);
+        } else {
+            throw new IllegalStateException("AdminWhitelistRule cannot be null");
+        }
+
     }
 
     @Override
