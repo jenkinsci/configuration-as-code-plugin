@@ -2,12 +2,13 @@
 
 ## 1.6 (not released yet)
 
+- Add support for secrets while defining `jobs` declarations.
+- #688: fixed an IndexOutOfBounds exception
+
 ## 1.5
 
-- ISSUE-697: proper string interpolation for secrets.
+- #697: proper string interpolation for secrets.
 - Improve explanation of CASC_VAULT in README.md
-- Add proper string interpolation for secrets.
-- Add support for secrets while defining `jobs` declarations.
 
 ## 1.4
 
