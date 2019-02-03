@@ -247,5 +247,6 @@ You also can write a test case to check export from a live instance is well supp
 @Test public void export_configuration() throws Exception {
       /** Setup jenkins to use plugin */
       ConfigurationAsCode.get().export(System.out);
+}
 ```
 **TODO** we need to provide some yaml assertion library so that the resulting exported yam stream can be checked for expected content. 
