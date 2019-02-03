@@ -196,7 +196,7 @@ Add configuration-as-code-plugin as a test dependency in your pom.xml:
 <dependency>
       <groupId>io.jenkins</groupId>
       <artifactId>configuration-as-code</artifactId>
-      <version>1.0</version>
+      <version>1.5</version>
       <scope>test</scope>
 </dependency>
 ```
