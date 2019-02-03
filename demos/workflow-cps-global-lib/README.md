@@ -1,6 +1,7 @@
 # Configure global libraries plugin
 
-Global Pipeline Libraries plugin configuration belongs under `unclassified` root element
+Global Pipeline Libraries plugin configuration belongs under the `unclassified` root element.
+The [`configuration-as-code-support`] plugin needs to be installed as well.
 
 ## Sample configuration
 
@@ -34,3 +35,5 @@ unclassified:
                 remote: 'git@github.com:furry-octo-lamp-inc/pipeline-library.git'
                 credentialsId: 'reimagined-parakeet-ssh'
 ```
+
+[`configuration-as-code-support`]: https://plugins.jenkins.io/configuration-as-code-support/

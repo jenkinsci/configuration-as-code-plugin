@@ -4,6 +4,7 @@
 
 - Add support for secrets while defining `jobs` declarations.
 - #688: fixed an IndexOutOfBounds exception
+- #725: Improved global library demo descriptions
 
 ## 1.5
 
