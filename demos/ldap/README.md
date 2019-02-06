@@ -24,3 +24,22 @@ jenkins:
 adapter code.
 It is identified as `ldap` as it implements `SecurityRealm` extension point, so we can define a "natural" Symbol name 
 for it.  
+
+## sample configuration with search filters
+
+```yaml
+jenkins:
+
+  securityRealm:
+    ldap:
+      configurations:
+        - server: "ldap.acme.com"
+          rootDN: "dc=acme,dc=fr"
+          managerDN: "manager"
+          managerPasswordSecret: ${LDAP_PASSWORD}
+          userSearch: "(&(objectCategory=User)(sAMAccountName={0}))"
+          groupSearchFilter: "(&(cn={0})(objectclass=group))"
+          groupMembershipStrategy:
+            fromGroupSearch:
+              filter: "(&(objectClass=group)(|(cn=GROUP_1)(cn=GROUP_2)))"
+```
