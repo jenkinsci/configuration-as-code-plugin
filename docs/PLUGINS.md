@@ -203,6 +203,13 @@ Add configuration-as-code-plugin as a test dependency in your pom.xml:
 
 Add a new test case to load a reference configuration yaml file designed to set configurable properties of your plugin
 ```java
+import io.jenkins.plugins.casc.ConfigurationAsCode;
+import org.junit.Rule;
+import org.junit.Test;
+import org.jvnet.hudson.test.JenkinsRule;
+
+import static org.junit.Assert.assertTrue;
+
 public class ConfigAsCodeTest {
 
     @Rule public JenkinsRule r = new JenkinsRule();
@@ -211,6 +218,7 @@ public class ConfigAsCodeTest {
         ConfigurationAsCode.get().configure(ConfigAsCodeTest.class.getResource("configuration-as-code.yml").toString());
         assertTrue( /* check plugin has been configured as expected */ );
     }
+}
 ```
 
 Doing so, you will confirm JCasC is able to introspect your plugin and build the expected configuration data model, but also detect
@@ -239,5 +247,6 @@ You also can write a test case to check export from a live instance is well supp
 @Test public void export_configuration() throws Exception {
       /** Setup jenkins to use plugin */
       ConfigurationAsCode.get().export(System.out);
+}
 ```
 **TODO** we need to provide some yaml assertion library so that the resulting exported yam stream can be checked for expected content. 
