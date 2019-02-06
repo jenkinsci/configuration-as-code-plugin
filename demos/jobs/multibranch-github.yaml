@@ -1,0 +1,19 @@
+jobs:
+  - script: >
+       multibranchPipelineJob('image-jenkins') {
+         branchSources {
+           github {
+             scanCredentialsId('github')
+             repoOwner('my-org')
+             repository('my-repository')
+           }
+         }
+         orphanedItemStrategy {
+           discardOldItems {
+             numToKeep(1)
+           }
+         }
+         triggers {
+           periodic(5)
+         }
+       } 
