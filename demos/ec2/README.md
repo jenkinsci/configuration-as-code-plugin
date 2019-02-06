@@ -37,4 +37,3 @@ jenkins:
         usePrivateDnsName: false
       useInstanceProfileForCredentials: false
 ```
-
