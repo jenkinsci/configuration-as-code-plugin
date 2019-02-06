@@ -24,6 +24,7 @@
     <changelist>-SNAPSHOT</changelist>
     <jenkins.version>2.60.3</jenkins.version>
     <java.level>8</java.level>
+    <tagNameFormat>configuration-as-code-${project.version}</tagNameFormat>
   </properties>
 
   <name>Configuration as Code Parent</name>
