@@ -9,7 +9,7 @@ configuration-as-code file.
 
 ## sample configurations
 
-[bitbucket.yaml](bitbucket.yaml) file is an example of configuration file with Jenkins and an Organization Folder Job Type with automatic branch discovering in Bitbucket.
+[bitbucket.yaml](bitbucket.yaml) file is an example of configuration file with Jenkins and an Organization Folder Job Type with automatic branch discovering in Bitbucket. It requires [Branch API plugin](https://github.com/jenkinsci/branch-api-plugin) and [Bitbucket Branch Source plugin](https://github.com/jenkinsci/bitbucket-branch-source-plugin) to be able to run this demo. `$BITBUCKET_URL` is a system environment variable that needs to be defined before Jenkins is started.
 
 [pipeline.yaml](pipeline.yaml) file is an example of configuring a folder and a descrative pipeline job within that folder.
 
