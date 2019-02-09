@@ -64,7 +64,7 @@ public class SeedJobConfigurator implements RootElementConfigurator<GeneratedIte
     @Override
     @SuppressWarnings("unchecked")
     public GeneratedItems[] configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
-        JenkinsJobManagement management = new JenkinsJobManagement(System.out, new EnvVars(), null, null, LookupStrategy.JENKINS_ROOT);
+        JenkinsJobManagement management = new JenkinsJobManagement(System.out, System.getenv(), null, null, LookupStrategy.JENKINS_ROOT);
         Configurator<ScriptSource> configurator = context.lookupOrFail(ScriptSource.class);
         return config.asSequence().stream()
                 .map(source -> getActualValue(source, context))
