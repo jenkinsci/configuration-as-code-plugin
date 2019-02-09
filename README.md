@@ -207,7 +207,7 @@ with your favourite yaml tools.
 
 Currently, you can provide initial secrets to Configuration-as-Code that all rely on <key,value>
 substitution of strings in configuration. For example, ``Jenkins: `${some_var}` ``. Default variable substitution
-using the `:-` operator from `bash` is also available. For example, `key: ${VALUE:-defaultvalue}` will evaluate to `defaultvalue` if `$VALUE` is unset.
+using the `:-` operator from `bash` is also available. For example, `key: ${VALUE:-defaultvalue}` will evaluate to `defaultvalue` if `$VALUE` is unset. To escape a string from secret interpolation, put `^` in front of the value. For example, `Jenkins: ^${some_var}` will produce the literal `Jenkins: ${some_var}`.
 
 We can provide these initial secrets in the following ways:
 
