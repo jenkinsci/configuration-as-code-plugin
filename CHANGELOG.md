@@ -2,6 +2,7 @@
 
 ## 1.6 (not released yet)
 
+- Make system environment variables available in the context used for running the jobdsl/groovy code defining the seed job.
 - Add support for secrets while defining `jobs` declarations.
 - #688: fixed an IndexOutOfBounds exception
 
