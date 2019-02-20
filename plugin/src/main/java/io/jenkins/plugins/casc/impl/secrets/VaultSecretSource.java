@@ -49,13 +49,20 @@ public class VaultSecretSource extends SecretSource {
         String vaultToken = getVariable("CASC_VAULT_TOKEN", prop);
         String vaultAppRole = getVariable("CASC_VAULT_APPROLE", prop);
         String vaultAppRoleSecret = getVariable("CASC_VAULT_APPROLE_SECRET", prop);
+        String vaultNamespace = getVariable("CASC_VAULT_NAMESPACE", prop);
 
         if(((vaultPw != null && vaultUsr != null) || 
             vaultToken != null || 
             (vaultAppRole != null && vaultAppRoleSecret != null)) && vaultPth != null && vaultUrl != null) {
             LOGGER.log(Level.FINE, "Attempting to connect to Vault: {0}", vaultUrl);
             try {
-                VaultConfig config = new VaultConfig().address(vaultUrl).build();
+                VaultConfig config = new VaultConfig().address(vaultUrl);
+                if (vaultNamespace != null) {
+                    // optionally set namespace
+                    config = config.nameSpace(vaultNamespace);
+                    LOGGER.log(Level.FINE, "Using namespace with Vault: {0}", vaultNamespace);
+                }
+                config = config.build();
                 Vault vault = new Vault(config);
                 //Obtain a login token
                 final String token;

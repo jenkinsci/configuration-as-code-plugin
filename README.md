@@ -247,6 +247,7 @@ Prerequisites:
 - The environment variable `CASC_VAULT_PATH` must be present. (Vault key path. For example, `/secrets/jenkins`.)
 - The environment variable `CASC_VAULT_URL` must be present. (Vault url, including port number.)
 - The environment variable `CASC_VAULT_MOUNT` is optional. (Vault auth mount. For example, `ldap` or another username & password authentication type, defaults to `userpass`.)
+- The environment variable `CASC_VAULT_NAMESPACE` is optional. If used, sets the Vault namespace for Enterprise Vaults.
 - The environment variable `CASC_VAULT_FILE` is optional, provides a way for the other variables to be read from a file instead of environment variables.
 
 If the environment variables `CASC_VAULT_URL` and `CASC_VAULT_PATH` are present, Configuration-as-Code will try to gather initial secrets from Vault. However for it to work properly there is a need for authentication by either the combination of `CASC_VAULT_USER` and `CASC_VAULT_PW`, a `CASC_VAULT_TOKEN`, or the combination of `CASC_VAULT_APPROLE` and `CASC_VAULT_APPROLE_SECRET`. The authenticated user must have at least read access.
