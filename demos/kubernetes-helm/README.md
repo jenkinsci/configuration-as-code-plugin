@@ -58,9 +58,9 @@ Master:
       # accessible via SSH from outside of the pod.  Note if you use non-root pod privileges (RunAsUser & FsGroup),
       # this must be > 1024:
       sshTcpPort: 1044
-      # label that the configmaps with dashboards are marked with:
+      # label that the configmaps with Configuration as Code config are marked with:
       label: jenkins_config
-      # folder in the pod that should hold the collected dashboards:
+      # folder in the pod that should hold the collected Configuration as Code config:
       folder: /var/jenkins_home/casc_configs
       # If specified, the sidecar will search for config-maps inside this namespace.
       # Otherwise the namespace in which the sidecar is running will be used.
