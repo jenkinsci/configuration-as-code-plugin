@@ -39,6 +39,14 @@ public class SecretSourceResolverTest {
     }
 
     @Test
+    public void resolve_singleEntryWithDefaultValueAndWithEnvDefined() {
+        environment.set("FOO", "hello");
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        ConfigurationContext context = new ConfigurationContext(registry);
+        assertThat(SecretSourceResolver.resolve(context, "${FOO:-default}"), equalTo("hello"));
+    }
+
+    @Test
     public void resolve_singleEntryEscaped() {
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         ConfigurationContext context = new ConfigurationContext(registry);
