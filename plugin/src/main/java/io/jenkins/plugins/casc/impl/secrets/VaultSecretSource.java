@@ -65,7 +65,7 @@ public class VaultSecretSource extends SecretSource {
                 }
                 if (vaultEngineVersion != null) {
                     // optionally set vault engine version
-                    config = config.setEngineVersion( Integer.parseInt(vaultEngineVersion) );
+                    config = config.engineVersion( Integer.parseInt(vaultEngineVersion) );
                     LOGGER.log(Level.FINE, "Using engine version: {0}", vaultEngineVersion);
                 }
                 config = config.build();
