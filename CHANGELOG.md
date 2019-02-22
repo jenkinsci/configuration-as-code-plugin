@@ -1,11 +1,14 @@
 # ChangeLog
 
-## 1.6 (not released yet)
+## 1.7 (not released yet)
+
+## 1.6 
 
 - Make system environment variables available in the context used for running the jobdsl/groovy code defining the seed job.
 - Add support for secrets while defining `jobs` declarations.
 - #688: fixed an IndexOutOfBounds exception
 - Add support for Enterprise Vault to store secrets; set CASC_VAULT_NAMESPACE to provide a namespace
+- many fixes to documentation and demos
 
 ## 1.5
 
