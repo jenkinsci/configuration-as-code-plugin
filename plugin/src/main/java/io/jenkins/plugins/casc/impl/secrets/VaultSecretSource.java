@@ -50,6 +50,7 @@ public class VaultSecretSource extends SecretSource {
         String vaultAppRole = getVariable("CASC_VAULT_APPROLE", prop);
         String vaultAppRoleSecret = getVariable("CASC_VAULT_APPROLE_SECRET", prop);
         String vaultNamespace = getVariable("CASC_VAULT_NAMESPACE", prop);
+        String vaultEngineVersion = getVariable("CASC_VAULT_ENGINE_VERSION", prop);
 
         if(((vaultPw != null && vaultUsr != null) || 
             vaultToken != null || 
@@ -61,6 +62,10 @@ public class VaultSecretSource extends SecretSource {
                     // optionally set namespace
                     config = config.nameSpace(vaultNamespace);
                     LOGGER.log(Level.FINE, "Using namespace with Vault: {0}", vaultNamespace);
+                }
+                if (vaultEngineVersion != null ) {
+                    // optionally set vault engine version
+                    config.setEngineVersion(vaultEngineVersion)
                 }
                 config = config.build();
                 Vault vault = new Vault(config);
