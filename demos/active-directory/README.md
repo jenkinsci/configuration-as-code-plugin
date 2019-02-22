@@ -4,13 +4,15 @@ Basic configuration of the [Active Directory plugin](https://wiki.jenkins.io/dis
 
 ## sample configuration
 
+For Active Directory Plugin version 2.12 and up:
 ```yaml
 jenkins:
   SecurityRealm:
     activeDirectory:
       groupLookupStrategy: AUTO
       startTls: true
-      tlsConfiguration: TRUST_ALL_CERTIFICATES
       domains:
         - name: "domain.local"
+          servers: "server.acme.com:3128"
+          tlsConfiguration: TRUST_ALL_CERTIFICATES
 ```
