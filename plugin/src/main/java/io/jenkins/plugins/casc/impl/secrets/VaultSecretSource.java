@@ -63,9 +63,9 @@ public class VaultSecretSource extends SecretSource {
                     config = config.nameSpace(vaultNamespace);
                     LOGGER.log(Level.FINE, "Using namespace with Vault: {0}", vaultNamespace);
                 }
-                if (vaultEngineVersion != null ) {
+                if (vaultEngineVersion != null) {
                     // optionally set vault engine version
-                    config = config.setEngineVersion(vaultEngineVersion)
+                    config = config.setEngineVersion(vaultEngineVersion);
                     LOGGER.log(Level.FINE, "Using engine version: {0}", vaultEngineVersion);
                 }
                 config = config.build();
