@@ -20,6 +20,53 @@ Master:
   Cpu: "200m"
   Memory: "1024Mi"
 
+  # Below is the implementation of Jenkins Configuration as Code.  Add a key under ConfigScripts for each configuration area,
+  # where each corresponds to a plugin or section of the UI.  Each key (prior to | character) is just a label, and can be any value.
+  # Keys are only used to give the section a meaningful name.  The only restriction is they may only contain RFC 1123 \ DNS label
+  # characters: lowercase letters, numbers, and hyphens.  The keys become the name of a configuration yaml file on the master in
+  # /var/jenkins_home/casc_configs (by default) and will be processed by the Configuration as Code Plugin.  The lines after each |
+  # become the content of the configuration yaml file.  The first line after this is a JCasC root element, eg jenkins, credentials,
+  # etc.  Best reference is https://<jenkins_url>/configuration-as-code/reference.  The example below creates a welcome message:
+  JCasC:
+    enabled: true
+    PluginVersion: 1.5
+    SupportPluginVersion: 1.5
+    ConfigScripts:
+      welcome-message: |
+        jenkins:
+          systemMessage: Welcome to our CI\CD server.  This Jenkins is configured and managed 'as code'.
+
+  Sidecars:
+    configAutoReload:
+      # If enabled: true, Jenkins Configuration as Code will be reloaded on-the-fly without a reboot.  If false or not-specified,
+      # jcasc changes will cause a reboot and will only be applied at the subsequent start-up.  Auto-reload uses the Jenkins CLI
+      # over SSH to reapply config when changes to the ConfigScripts are detected.  The admin user (or account you specify in
+      # Master.AdminUser) will have a random SSH private key (RSA 4096) assigned unless you specify OwnSshKey: true.  This will be saved to a k8s secret.
+      enabled: true
+      image: shadwell/k8s-sidecar:0.0.2
+      imagePullPolicy: IfNotPresent
+      resources:
+        #   limits:
+        #     cpu: 100m
+        #     memory: 100Mi
+        #   requests:
+        #     cpu: 50m
+        #     memory: 50Mi
+      # SSH port value can be set to any unused TCP port.  The default, 1044, is a non-standard SSH port that has been chosen at random.
+      # Is only used to reload jcasc config from the sidecar container running in the Jenkins master pod.
+      # This TCP port will not be open in the pod (unless you specifically configure this), so Jenkins will not be
+      # accessible via SSH from outside of the pod.  Note if you use non-root pod privileges (RunAsUser & FsGroup),
+      # this must be > 1024:
+      sshTcpPort: 1044
+      # label that the configmaps with Configuration as Code config are marked with:
+      label: jenkins_config
+      # folder in the pod that should hold the collected Configuration as Code config:
+      folder: /var/jenkins_home/casc_configs
+      # If specified, the sidecar will search for config-maps inside this namespace.
+      # Otherwise the namespace in which the sidecar is running will be used.
+      # It's also possible to specify ALL to search in all namespaces:
+      # searchNamespace:
+
   InitContainerEnv:
 
   ContainerEnv:
@@ -43,40 +90,6 @@ Master:
     - workflow-job:latest
     - credentials-binding:latest
     - git:latest
-    - configuration-as-code:1.0
-    # You might also need this for a couple of third-party plugins (e.g. for setting credentials)
-    - configuration-as-code-support:1.0
-
-Persistence:
-  volumes:
-  - name: casc-config
-    configMap:
-      name: jenkins-casc-config
-  mounts:
-  - name: casc-config
-    mountPath: /var/jenkins_home/casc_configs
-    readOnly: true
-```
-
-You will also need to create a Kubernetes ConfigMap that will contain your JCASC config file. Create a new file (below we'll assume you named it `jenkins-casc-config.yaml`) with the following contents:
-
-```yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: jenkins-casc-config
-data:
-  jenkins.yaml: |
-    jenkins:
-      systemMessage: "CASC Jenkins is cool"
-```
-
-## Installation
-
-First, upload your ConfigMap to Kubernetes:
-
-```
-kubectl create -f jenkins-casc-config.yaml
 ```
 
 Now, deploy the Helm chart with those customized values:
@@ -85,10 +98,8 @@ Now, deploy the Helm chart with those customized values:
 helm install --name jenkins stable/jenkins -f values.yaml
 ```
 
-Once Helm finishes deploying the chart, connect to your Jenkins server in your browser. You should see the `CASC Jenkins is cool` system message displayed at the top. Congratulations, you've installed the plugin and made your first Jenkins configuration change successfully! :)
+Once Helm finishes deploying the chart, connect to your Jenkins server in your browser. You should see the welcome system message displayed at the top. Congratulations, you've installed the plugin and made your first Jenkins configuration change successfully! :)
 
 ## Misc
 
-The Jenkins Helm chart can be extended to make use of a custom ConfigMap. If you are already using this facility for other reasons, you can also include your custom JCASC config in that ConfigMap (instead of creating a new ConfigMap outside of the Helm chart as the above installation guide instructs).
-
-Check the [`custom ConfigMap`](https://github.com/helm/charts/tree/master/stable/jenkins#custom-configmap) section in the Jenkins Helm chart repo for more information.
+Check the [`Configuration as Code`](https://github.com/helm/charts/tree/master/stable/jenkins#configuration-as-code) section in the Jenkins Helm chart repo for more information.
