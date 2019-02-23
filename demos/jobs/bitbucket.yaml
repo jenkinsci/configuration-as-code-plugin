@@ -37,7 +37,7 @@ jobs:
 
         // "Traits" ("Behaviours" in the GUI) that are NOT "declarative-compatible" 
         // For some 'traits, we need to configure this stuff by hand until JobDSL handles it
-        // https://issues.jenkins-ci.org/browse/JENKINS-45504
+        // https://issues.jenkins.io/browse/JENKINS-45504
         configure { node ->
             def traits = node / navigators / 'com.cloudbees.jenkins.plugins.bitbucket.BitbucketSCMNavigator' / traits
             traits << 'com.cloudbees.jenkins.plugins.bitbucket.BranchDiscoveryTrait' {

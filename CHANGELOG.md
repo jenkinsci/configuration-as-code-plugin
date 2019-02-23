@@ -41,7 +41,7 @@
 - [SECURITY] prevent directly entered private key to be exported in plain test
 - fix and improve generated documentation
 - use BulkChange to avoid repeated calls to save()
-- list available attributes when unknown found in yaml to help diagnose mistakes
+- list available attributes when unknown found in YAML to help diagnose mistakes
 - log a warning when descriptor with unexpected design is detected
 
 ## 1.1

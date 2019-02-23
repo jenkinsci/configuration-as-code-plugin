@@ -15,7 +15,7 @@
 
   <name>Configuration as Code Plugin</name>
   <description>Manage Jenkins master configuration as code</description>
-  <url>https://wiki.jenkins-ci.org/display/JENKINS/Configuration+as+Code+Plugin</url>
+  <url>https://wiki.jenkins.io/display/JENKINS/Configuration+as+Code+Plugin</url>
 
   <dependencies>
     <dependency>
@@ -24,7 +24,7 @@
       <version>${project.version}</version>
     </dependency>
 
-    <!--TODO: This should be in a seperate plugin at some point -->
+    <!--TODO: This should be in a separate plugin at some point -->
     <dependency>
       <groupId>com.bettercloud</groupId>
       <artifactId>vault-java-driver</artifactId>
@@ -94,7 +94,7 @@
                   <excludes combine.children="append">
                     <!-- Safe, https://github.com/jenkinsci/active-directory-plugin/pull/84 -->
                     <exclude>org.jvnet.com4j:com4j</exclude>
-                    <!-- Docker Java API Plugin issues, https://issues.jenkins-ci.org/browse/JENKINS-49369 -->
+                    <!-- Docker Java API Plugin issues, https://issues.jenkins.io/browse/JENKINS-49369 -->
                     <exclude>org.apache.commons:commons-compress</exclude>
                   </excludes>
                 </requireUpperBoundDeps>

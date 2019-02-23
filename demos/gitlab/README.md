@@ -25,5 +25,3 @@ unclassified:
       readTimeout: 10
       url: "https://gitlab.com/"
 ```
-
-

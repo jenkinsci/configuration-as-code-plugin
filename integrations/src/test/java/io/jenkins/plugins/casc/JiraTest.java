@@ -27,7 +27,7 @@ public class JiraTest {
         /*  JENKINS-52906
          *  assertEquals(2, descriptor.getSites().length);
          *  assertEquals("http://jira.codehaus.org/", sites[0].getUrl().toString());
-         *  assertEquals("http://issues.jenkins-ci.org/", sites[1].getUrl().toString());
+         *  assertEquals("http://issues.jenkins.io/", sites[1].getUrl().toString());
          */
 
         assertEquals(1, descriptor.getSites().length);

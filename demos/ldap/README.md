@@ -20,9 +20,9 @@ jenkins:
 
 ## implementation note
 
-`hudson.security.LDAPSecurityRealm` can be configure using it's @DataBoundConstructor parameters without any dedicated
+`hudson.security.LDAPSecurityRealm` can be configured using its `@DataBoundConstructor` parameters without any dedicated
 adapter code.
-It is identified as `ldap` as it implements `SecurityRealm` extension point, so we can define a "natural" Symbol name 
+It is identified as `ldap` as it implements the `SecurityRealm` extension point, so we can define a "natural" symbol name 
 for it.  
 
 ## sample configuration with search filters

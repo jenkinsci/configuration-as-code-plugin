@@ -1,4 +1,4 @@
-# configure Amazon EC2 Plguin
+# configure Amazon EC2 Plugin
 
 https://wiki.jenkins.io/display/JENKINS/Amazon+EC2+Plugin
 

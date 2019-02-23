@@ -241,7 +241,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
      * Update sites doesn't give us metadata about hosted plugins, but "latest" version. So here we workaround this by
      * searching update site for plugin shortname and we bake specific version's URL based on this URL, assuming this
      * will be the same but version part in the path. This is a bit fragile but we don't have a better way so far.
-     * see <a href="https://issues.jenkins-ci.org/browse/INFRA-1696">INFRA-1696</a> for status
+     * see <a href="https://issues.jenkins.io/browse/INFRA-1696">INFRA-1696</a> for status
      *
      * @param updateCenter
      * @param p
