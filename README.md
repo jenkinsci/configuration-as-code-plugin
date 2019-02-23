@@ -249,6 +249,7 @@ Prerequisites:
 - The environment variable `CASC_VAULT_MOUNT` is optional. (Vault auth mount. For example, `ldap` or another username & password authentication type, defaults to `userpass`.)
 - The environment variable `CASC_VAULT_NAMESPACE` is optional. If used, sets the Vault namespace for Enterprise Vaults.
 - The environment variable `CASC_VAULT_FILE` is optional, provides a way for the other variables to be read from a file instead of environment variables.
+- The environment variable `CASC_VAULT_ENGINE_VERSION` is optional. If unset, your vault path is assumed to be using kv version 2. If your vault path uses engine version 1, set this variable to `1`.
 
 If the environment variables `CASC_VAULT_URL` and `CASC_VAULT_PATH` are present, Configuration-as-Code will try to gather initial secrets from Vault. However for it to work properly there is a need for authentication by either the combination of `CASC_VAULT_USER` and `CASC_VAULT_PW`, a `CASC_VAULT_TOKEN`, or the combination of `CASC_VAULT_APPROLE` and `CASC_VAULT_APPROLE_SECRET`. The authenticated user must have at least read access.
 
