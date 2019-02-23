@@ -38,7 +38,7 @@ public class JenkinsConfiguredWithCodeRule extends JenkinsRule {
                         boolean match = new StringContains(configuredWithCode.message()).matches(t.getMessage());
                         if(!match) {
                             throw new AssertionError("Exception did not contain the expected string: "
-                                    +configuredWithCode.message() + "\nMesssage was:\n" + t.getMessage());
+                                    +configuredWithCode.message() + "\nMessage was:\n" + t.getMessage());
                         }
                     }
                 }

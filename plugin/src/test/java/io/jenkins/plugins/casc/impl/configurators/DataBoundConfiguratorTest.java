@@ -37,7 +37,7 @@ public class DataBoundConfiguratorTest {
         assertTrue(configured.bar);
         assertEquals(123, configured.qix);
         assertEquals("DataBoundSetter", configured.zot);
-        assertThat(configured.intialized, is(true));
+        assertThat(configured.initialized, is(true));
     }
 
 
@@ -67,7 +67,7 @@ public class DataBoundConfiguratorTest {
         final int qix;
         String zot;
         String other;
-        boolean intialized;
+        boolean initialized;
 
         @DataBoundConstructor
         public Foo(String foo, boolean bar, int qix) {
@@ -88,7 +88,7 @@ public class DataBoundConfiguratorTest {
 
         @PostConstruct
         public void init() {
-            this.intialized = true;
+            this.initialized = true;
         }
 
         public String getFoo() {

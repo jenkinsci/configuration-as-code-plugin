@@ -26,7 +26,7 @@ import java.util.Set;
  *  <p>
  *  We can't blame them for this, as the former is a {@link hudson.tasks.BuildStepDescriptor} while the later is a
  *  {@link GlobalConfiguration}, so from their point of view the symbol is unique for implemented extension point. Just
- *  we don't distinguish dreived classes from {@link Descriptor} as distinct APIs.
+ *  we don't distinguish derived classes from {@link Descriptor} as distinct APIs.
  *
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */

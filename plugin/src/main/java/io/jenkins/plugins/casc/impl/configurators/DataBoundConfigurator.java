@@ -33,8 +33,8 @@ import java.util.logging.Logger;
 import static com.google.common.base.Defaults.defaultValue;
 
 /**
- * A generic {@link Configurator} to configure components whith a {@link org.kohsuke.stapler.DataBoundConstructor}.
- * Indented to replicate Stapler's request-to-instance lifecycle, including {@link PostConstruct} init methods.
+ * A generic {@link Configurator} to configure components with a {@link org.kohsuke.stapler.DataBoundConstructor}.
+ * Intended to replicate Stapler's request-to-instance lifecycle, including {@link PostConstruct} init methods.
  * Will rely on <a href="https://github.com/jenkinsci/jep/tree/master/jep/205">JEP-205</a> once implemented
  *
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -92,7 +92,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
 
     @Override
     public T check(CNode config, ConfigurationContext context) throws ConfiguratorException {
-        // As DataBound objets are replaced in jenkins model we can build one from configuration without side-effets
+        // As DataBound objects are replaced in jenkins model we can build one from configuration without side-effects
         // BUT we don't invoke @PostConstruct methods which might un some post-build registration into jenkins APIs.
         return super.configure(config, context);
     }
