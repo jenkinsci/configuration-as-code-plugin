@@ -590,7 +590,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
 
     @FunctionalInterface
-    private interface ConfigratorOperation {
+    private interface ConfiguratorOperation {
 
         Object apply(RootElementConfigurator configurator, CNode node) throws ConfiguratorException;
     }
@@ -602,7 +602,7 @@ public class ConfigurationAsCode extends ManagementLink {
      * @param entries key-value pairs, where key should match to root configurator and value have all required properties
      * @throws ConfiguratorException configuration error
      */
-    private static void invokeWith(Mapping entries, ConfigratorOperation function) throws ConfiguratorException {
+    private static void invokeWith(Mapping entries, ConfiguratorOperation function) throws ConfiguratorException {
 
         // Run configurators by order, consuming entries until all have found a matching configurator.
         // Configurators order is important so that io.jenkins.plugins.casc.plugins.PluginManagerConfigurator run

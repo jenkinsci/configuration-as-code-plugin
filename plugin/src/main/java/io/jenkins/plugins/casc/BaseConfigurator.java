@@ -225,8 +225,8 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
                 // t is declared as parameterized t
                 // unfortunately, java reflection doesn't allow to get the actual parameter t
                 // so, if superclass it parameterized, we assume parameter t match
-                // i.e target is Foo extends AbtractFoo<Bar> with
-                // public abstract class AbtractFoo<T> { void setBar(T bar) }
+                // i.e target is Foo extends AbstractFoo<Bar> with
+                // public abstract class AbstractFoo<T> { void setBar(T bar) }
                 final Type superclass = getTarget().getGenericSuperclass();
                 if (superclass instanceof ParameterizedType) {
                     final ParameterizedType psc = (ParameterizedType) superclass;

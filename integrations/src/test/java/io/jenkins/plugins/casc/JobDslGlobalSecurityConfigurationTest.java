@@ -15,7 +15,7 @@ import static org.junit.Assert.assertThat;
 /**
  * Created by odavid on 23/12/2017.
  */
-public class JobDslGlobaSecurityConfigurationTest {
+public class JobDslGlobalSecurityConfigurationTest {
 
     @Rule
     public RestartableJenkinsRule j = new RestartableJenkinsRule();

@@ -161,7 +161,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
 
                 final Plugin plugin = jenkins.getPlugin(p.shortname);
                 if (plugin != null) {
-                    // Plugin is allready installed, let's check we run the expected version
+                    // Plugin is already installed, lets check we run the expected version
 
                     if (!Character.isDigit(p.version.charAt(0)) && !"latest".equals(p.version)) {
                         // explicit download URL, we need to assume we run the expected one as we have no way
