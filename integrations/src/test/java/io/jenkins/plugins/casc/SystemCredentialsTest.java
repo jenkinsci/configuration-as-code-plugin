@@ -49,7 +49,7 @@ public class SystemCredentialsTest {
     @Test
     @ConfiguredWithCode("SystemCredentialsTest.yml")
     public void configure_system_credentials() throws Exception {
-        Jenkins jenkins = Jenkins.getInstance();
+        Jenkins jenkins = Jenkins.get();
 
         List<UsernamePasswordCredentials> ups = CredentialsProvider.lookupCredentials(
                 UsernamePasswordCredentials.class, jenkins, ACL.SYSTEM, Collections.emptyList()

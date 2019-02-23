@@ -26,7 +26,7 @@ public class GithubOAuthTest {
     @Test
     @ConfiguredWithCode("GithubOAuth.yml")
     public void testSampleVersionForOAuth() {
-        SecurityRealm realm = Jenkins.getInstance().getSecurityRealm();
+        SecurityRealm realm = Jenkins.get().getSecurityRealm();
         assertThat(realm, instanceOf(GithubSecurityRealm.class));
         GithubSecurityRealm gsh = (GithubSecurityRealm)realm;
         assertEquals("someId", gsh.getClientID());

@@ -27,7 +27,7 @@ public class LDAPSecurityRealmTest {
     @Test
     @ConfiguredWithCode("LDAPSecurityRealmTest.yml")
     public void configure_securityRealm() {
-        final Jenkins jenkins = Jenkins.getInstance();
+        final Jenkins jenkins = Jenkins.get();
         final LDAPSecurityRealm securityRealm = (LDAPSecurityRealm) jenkins.getSecurityRealm();
         assertEquals(1, securityRealm.getConfigurations().size());
         assertTrue(securityRealm.getUserIdStrategy() instanceof IdStrategy.CaseInsensitive);
