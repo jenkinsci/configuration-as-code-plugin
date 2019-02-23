@@ -170,7 +170,7 @@ public class ConfigurationAsCode extends ManagementLink {
                 sources = candidatePaths;
                 configureWith(getConfigFromSources(getSources()));
                 CasCGlobalConfig config = GlobalConfiguration.all().get(CasCGlobalConfig.class);
-                if(config != null) {
+                if (config != null) {
                     config.setConfigurationPath(newSource);
                     config.save();
                 }
@@ -198,7 +198,7 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     // Do something with validation! Make a button instead, that function can not be RequirePost in current configuration
-    public FormValidation doCheckNewSource(@QueryParameter String newSource){
+    public FormValidation doCheckNewSource(@QueryParameter String newSource) {
         Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
         String normalized = Util.fixEmptyAndTrim(newSource);
         File f = new File(newSource);
@@ -256,7 +256,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
     /**
      * Defaults to use a file in the current working directory with the name 'jenkins.yaml'
-     *
+     * <p>
      * Add the environment variable CASC_JENKINS_CONFIG to override the default. Accepts single file or a directory.
      * If a directory is detected, we scan for all .yml and .yaml files
      *
@@ -269,6 +269,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
     /**
      * Main entry point to start configuration process.
+     *
      * @throws ConfiguratorException Configuration error
      */
     public void configure() throws ConfiguratorException {
@@ -340,7 +341,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
         PathMatcher matcher = FileSystems.getDefault().getPathMatcher(YAML_FILES_PATTERN);
         Set<String> resources = servletContext.getResourcePaths(cascDirectory);
-        if (resources!=null) {
+        if (resources != null) {
             // sort to execute them in a deterministic order
             for (String cascItem : new TreeSet<>(resources)) {
                 try {
@@ -386,6 +387,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
     /**
      * Export live jenkins instance configuration as Yaml
+     *
      * @throws Exception
      */
     @RequirePOST
@@ -499,7 +501,7 @@ public class ConfigurationAsCode extends ManagementLink {
         }
     }
 
-    public void configure(String ... configParameters) throws ConfiguratorException {
+    public void configure(String... configParameters) throws ConfiguratorException {
         configure(Arrays.asList(configParameters));
     }
 
@@ -522,12 +524,12 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     public static boolean isSupportedURI(String configurationParameter) {
-        if(configurationParameter == null) {
+        if (configurationParameter == null) {
             return false;
         }
-        final List<String> supportedProtocols = Arrays.asList("https","http","file");
+        final List<String> supportedProtocols = Arrays.asList("https", "http", "file");
         URI uri = URI.create(configurationParameter);
-        if(uri == null || uri.getScheme() == null) {
+        if (uri == null || uri.getScheme() == null) {
             return false;
         }
         return supportedProtocols.contains(uri.getScheme());
@@ -542,7 +544,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
     private void configureWith(List<YamlSource> sources) throws ConfiguratorException {
         lastTimeLoaded = System.currentTimeMillis();
-        configureWith( YamlUtils.loadFrom(sources) );
+        configureWith(YamlUtils.loadFrom(sources));
     }
 
     @org.kohsuke.accmod.Restricted(NoExternalUse.class)
@@ -554,36 +556,38 @@ public class ConfigurationAsCode extends ManagementLink {
 
     private Map<Source, String> checkWith(List<YamlSource> sources) throws ConfiguratorException {
         if (sources.isEmpty()) return null;
-        return checkWith( YamlUtils.loadFrom(sources) );
+        return checkWith(YamlUtils.loadFrom(sources));
     }
 
 
     /**
-     * Search for all {@link #YAML_FILES_PATTERN} in provided base path
+     * Recursive search for all {@link #YAML_FILES_PATTERN} in provided base path
      *
      * @param path base path to start (can be file or directory)
      * @return list of all paths matching pattern. Only base file itself if it is a file matching pattern
      */
     public List<Path> configs(String path) throws ConfiguratorException {
         final PathMatcher matcher = FileSystems.getDefault().getPathMatcher(YAML_FILES_PATTERN);
-        final Path root = Paths.get(path);
 
-        if (!Files.exists(root)) {
-            throw new ConfiguratorException("Invalid configuration: '"+path+"' isn't a valid path.");
-        }
-
-        if (!Files.isDirectory(root)) {
-            return matcher.matches(root) ? Collections.singletonList(root) : Collections.emptyList();
-        }
-
-        try {
-            return Files.list(root)
-                    .filter(Files::isRegularFile) // only consider regular files, following symlinks
-                    .filter(matcher::matches)     // matching pattern
-                    .collect(toList());
+        try (Stream<Path> stream = Files.find(Paths.get(path), Integer.MAX_VALUE,
+                (next, attrs) -> !attrs.isDirectory() && !isHidden(next) && matcher.matches(next))) {
+            return stream.collect(toList());
+        } catch (NoSuchFileException e) {
+            throw new ConfiguratorException("File does not exist: " + path, e);
         } catch (IOException e) {
             throw new IllegalStateException("failed config scan for " + path, e);
         }
+    }
+
+    private static boolean isHidden(Path path) {
+        int count = path.getNameCount();
+        for (int i = 0; i < count; i++) {
+            String name = path.getName(i).toString();
+            if (name.startsWith(".")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static Stream<? extends Map.Entry<String, Object>> entries(Reader config) {
@@ -613,7 +617,7 @@ public class ConfigurationAsCode extends ManagementLink {
             final Iterator<Map.Entry<String, CNode>> it = entries.entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry<String, CNode> entry = it.next();
-                if (! entry.getKey().equalsIgnoreCase(configurator.getName())) {
+                if (!entry.getKey().equalsIgnoreCase(configurator.getName())) {
                     continue;
                 }
                 try {
@@ -653,7 +657,7 @@ public class ConfigurationAsCode extends ManagementLink {
     public Map<Source, String> checkWith(Mapping entries) throws ConfiguratorException {
         Map<Source, String> issues = new HashMap<>();
         ConfigurationContext context = new ConfigurationContext(registry);
-        context.addListener( (node,message) -> issues.put(node.getSource(), message) );
+        context.addListener((node, message) -> issues.put(node.getSource(), message));
         invokeWith(entries, (configurator, config) -> configurator.check(config, context));
         return issues;
     }
@@ -686,11 +690,12 @@ public class ConfigurationAsCode extends ManagementLink {
     /**
      * Recursive configurators tree walk (DFS).
      * Collects all configurators starting from root ones in {@link #getConfigurators()}
-     *  @param elements   linked set (to save order) of visited elements
+     *
+     * @param elements   linked set (to save order) of visited elements
      * @param attributes siblings to find associated configurators and dive to next tree levels
      * @param context
      */
-    private void listElements(Set<Object> elements, Set<Attribute<?,?>> attributes, ConfigurationContext context) {
+    private void listElements(Set<Object> elements, Set<Attribute<?, ?>> attributes, ConfigurationContext context) {
         attributes.stream()
                 .map(Attribute::getType)
                 .map(context::lookup)
@@ -699,7 +704,7 @@ public class ConfigurationAsCode extends ManagementLink {
                 .flatMap(Collection::stream)
                 .forEach(configurator -> {
                     if (elements.add(configurator)) {
-                        listElements(elements, ((Configurator)configurator).describe(), context);   // some unexpected type erasure force to cast here
+                        listElements(elements, ((Configurator) configurator).describe(), context);   // some unexpected type erasure force to cast here
                     }
                 });
     }
@@ -709,6 +714,7 @@ public class ConfigurationAsCode extends ManagementLink {
     /**
      * Retrieve the html help tip associated to an attribute, used in documentation.jelly
      * FIXME would prefer &lt;st:include page="help-${a.name}.html" class="${c.target}" optional="true"/&gt;
+     *
      * @param attribute to get help for
      * @return String that shows help. May be empty
      * @throws IOException if the resource cannot be read
