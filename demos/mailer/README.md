@@ -20,10 +20,10 @@ unclassified:
 
 ## implementation note
 
-`hudson.task.Mailer.Descriptor` do expose global SMTP configuration parameters.
-It is identified as yaml root element `mailer` as this descriptor has a `global.jelly` UI view, so configuration-as-code
-assumes it make sense to expose it as a root element extension.
+`hudson.task.Mailer.Descriptor` exposes global SMTP configuration parameters.
+It is identified as YAML root element `mailer` as this descriptor has a `global.jelly` UI view, so configuration-as-code
+assumes it makes sense to expose it as a root element extension.
 
-Descriptor do define setters so we can inject configuration, but for SMTP authentication parameters.
+Descriptor defines setters so we can inject configuration, but for SMTP authentication parameters.
 See https://github.com/jenkinsci/configuration-as-code-plugin/issues/2.
 See https://github.com/jenkinsci/mailer-plugin/pull/39

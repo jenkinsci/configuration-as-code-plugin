@@ -16,7 +16,7 @@ Master:
   OwnSshKey: false
   # If CasC auto-reload is enabled, an SSH (RSA) keypair is needed.  Can either provide your own, or leave unconfigured\false to allow a random key to be auto-generated.
   # If you choose to use your own, you must upload your decrypted RSA private key (not the public key above) to a Kubernetes secret using the following command:
-  # kubectl -n <namespace> create secret generic <helm_release_name> --dry-run --from-file=jenkins-admin-private-key=~/.ssh/id_rsa -o yaml |kubectl -n <namespace> apply -f -
+  # kubectl -n <namespace> create secret generic <helm_release_name> --dry-run --from-file=jenkins-admin-private-key=~/.ssh/id_rsa -o YAML |kubectl -n <namespace> apply -f -
   # Replace ~/.ssh/id_rsa in the above command with the path to your private key file and the <helm_release_name> and <namespace> placeholders to suit.
   resources:
     requests:
@@ -29,9 +29,9 @@ Master:
   # Below is the implementation of Jenkins Configuration as Code.  Add a key under ConfigScripts for each configuration area,
   # where each corresponds to a plugin or section of the UI.  Each key (prior to | character) is just a label, and can be any value.
   # Keys are only used to give the section a meaningful name.  The only restriction is they may only contain RFC 1123 \ DNS label
-  # characters: lowercase letters, numbers, and hyphens.  The keys become the name of a configuration yaml file on the master in
+  # characters: lowercase letters, numbers, and hyphens.  The keys become the name of a configuration YAML file on the master in
   # /var/jenkins_home/casc_configs (by default) and will be processed by the Configuration as Code Plugin.  The lines after each |
-  # become the content of the configuration yaml file.  The first line after this is a JCasC root element, eg jenkins, credentials,
+  # become the content of the configuration YAML file.  The first line after this is a JCasC root element, eg jenkins, credentials,
   # etc.  Best reference is https://<jenkins_url>/configuration-as-code/reference.  The example below creates a welcome message:
   JCasC:
     enabled: true
@@ -82,7 +82,7 @@ Master:
 # requires additional JavaOpts, ie
 # JavaOpts: >
 #   -Dcom.sun.management.jmxremote.port=4000
-#   -Dcom.sun.management.jmxremote.authenticsate=false
+#   -Dcom.sun.management.jmxremote.authenticate=false
 #   -Dcom.sun.management.jmxremote.ssl=false
 # JMXPort: 4000
 # List of plugins to be install during Jenkins master start

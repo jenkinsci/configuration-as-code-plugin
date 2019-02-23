@@ -20,4 +20,4 @@ unclassified:
 
 ## implementation note
 
-User account name mapping strategy is not yet supported
+User account name mapping strategy is not yet supported.

@@ -10,12 +10,12 @@ jenkins:
 unclassified:
   globalLibraries:
     libraries:
-      - name: "awesome-lib"
+      - name: 'awesome-lib'
         retriever:
           modernSCM:
             scm:
               git:
-                remote: "https://github.com/jenkins-infra/pipeline-library.git"
+                remote: 'https://github.com/jenkins-infra/pipeline-library.git'
 ```
 
 ## Using credentials

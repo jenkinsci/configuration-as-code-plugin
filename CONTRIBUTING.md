@@ -19,6 +19,6 @@ Whenever you report a problem please provide information about:
 1. Create a github issue for your feature/problem you want to solve
 2. Implement solution on a branch in your fork
 3. Make sure to include issue number in commit message, and make the message speak for itself
-4. Once you're done create Pull Request and ask at least one of the maintainers for review (@ndeloof, @ewelinawilkosz)
+4. Once you're done create a pull request and ask at least one of the maintainers for review (@ndeloof, @ewelinawilkosz)
 
 !! Never push directly to this repository

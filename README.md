@@ -19,7 +19,7 @@ Experienced Jenkins users rely on groovy init scripts to customize Jenkins and e
 scripts directly invoke Jenkins API and as such can do everything (at your own risk). But they also require
 you know Jenkins internals, and are confident in writing groovy scripts on top of Jenkins API.
 
-Configuration-as-Code plugin has been designed as an _**opinionated**_ way to configure Jenkins based on
+The configuration-as-code plugin has been designed as an _**opinionated**_ way to configure Jenkins based on
 human-readable declarative configuration files. Writing such a file should be feasible without being a Jenkins
 expert, just translating into _code_ a configuration process one is used to executing in the web UI.
 
@@ -45,7 +45,7 @@ so end-users have full guidance in using this tool-set and do not have to search
 
 ## Getting Started
 
-First, start a Jenkins instance with JCasC [plugin](https://plugins.jenkins.io/configuration-as-code) installed.
+First, start a Jenkins instance with the [configuration-as-code](https://plugins.jenkins.io/configuration-as-code) plugin installed.
 
 - Those running Jenkins as a [Docker container](https://github.com/jenkinsci/docker) (and maybe also [pre-installing plugins](https://github.com/jenkinsci/docker#preinstalling-plugins)), do include [configuration-as-code](https://plugins.jenkins.io/configuration-as-code) plugin and optionally the [configuration-as-code-support](https://plugins.jenkins.io/configuration-as-code-support) plugin if you use one of the credentials plugins or the job-dsl (see link).
 
@@ -141,12 +141,12 @@ INFO: Jenkins is fully up and running
 ## Initial Configuration
 
 When configuring the first Jenkins instance, browse the examples shown in the [demos](demos)
-directory of this repository. If you have a plugin that do not have an example, consult the reference
+directory of this repository. If you have a plugin that does not have an example, consult the reference
 help document. Click the `Documentation` link at the bottom of the Configuration as Code page.
 
 ![Reference Page](images/reference.png)
 
-If you might wish to configure a specific plugin, search the page for the name of the plugin. The page will
+If you want to configure a specific plugin, search the page for the name of the plugin. The page will
 show you which root element belongs to the configuration. Most installed plugins belong under the `unclassified` root
 element.
 
@@ -163,7 +163,7 @@ jenkins:
 
   nodes:
     - permanent:
-        name: "static-slave"
+        name: "static-agent"
         remoteFS: "/home/jenkins"
         launcher:
           jnlp:
@@ -201,18 +201,18 @@ Also see [demos](demos) folder with various samples.
 
 The configuration file format depends on the version of jenkins-core and installed plugins.
 Documentation is generated from a live instance, as well as a JSON-schema you can use to validate configuration file
-with your favourite yaml tools.
+with your favourite YAML tools.
 
 ## Handling Secrets
 
 Currently, you can provide initial secrets to Configuration-as-Code that all rely on <key,value>
-substitution of strings in configuration. For example, ``Jenkins: `${some_var}` ``. Default variable substitution
+substitution of strings in the configuration. For example, ``Jenkins: `${some_var}` ``. Default variable substitution
 using the `:-` operator from `bash` is also available. For example, `key: ${VALUE:-defaultvalue}` will evaluate to `defaultvalue` if `$VALUE` is unset. To escape a string from secret interpolation, put `^` in front of the value. For example, `Jenkins: ^${some_var}` will produce the literal `Jenkins: ${some_var}`.
 
 We can provide these initial secrets in the following ways:
 
 - Using environment variables.
-- Using docker-secrets, where files on path `/run/secrets/${KEY}` will be replaced by `${KEY}` in configuration. The base folder `/run/secrets` can be overriden by setting the environment variable `SECRETS`. So this can be used as a file based secret, and not just docker secrets.
+- Using docker-secrets, where files on path `/run/secrets/${KEY}` will be replaced by `${KEY}` in the configuration. The base folder `/run/secrets` can be overridden by setting the environment variable `SECRETS`. So this can be used as a file based secret, and not just docker secrets.
 - Using Kubernetes secrets, logic is the same as for docker-secrets. The secret needs to be mounted as a file to `/run/secrets/`, and then the filename can be used as the KEY. For example:
 
 ```yaml
@@ -242,7 +242,7 @@ Prerequisites:
 - The environment variable `CASC_VAULT_PW` must be present, if token is not used and appRole/Secret is not used. (Vault password.)
 - The environment variable `CASC_VAULT_USER` must be present, if token is not used and appRole/Secret is not used. (Vault username.)
 - The environment variable `CASC_VAULT_APPROLE` must be present, if token is not used and U/P not used. (Vault AppRole ID.)
-- The environment variable `CASC_VAULT_APPROLE_SECRET` must be present, it token is not used and U/P not used. (Value AppRole Secret ID.)
+- The environment variable `CASC_VAULT_APPROLE_SECRET` must be present, it token is not used and U/P not used. (Vault AppRole Secret ID.)
 - The environment variable `CASC_VAULT_TOKEN` must be present, if U/P is not used. (Vault token.)
 - The environment variable `CASC_VAULT_PATHS` must be present. (Comma separated vault key paths. For example, `secret/jenkins,secret/admin`.)
 - The environment variable `CASC_VAULT_URL` must be present. (Vault url, including port number.)
@@ -253,7 +253,7 @@ Prerequisites:
 
 If the environment variables `CASC_VAULT_URL` and `CASC_VAULT_PATHS` are present, Configuration-as-Code will try to gather initial secrets from Vault. However for it to work properly there is a need for authentication by either the combination of `CASC_VAULT_USER` and `CASC_VAULT_PW`, a `CASC_VAULT_TOKEN`, or the combination of `CASC_VAULT_APPROLE` and `CASC_VAULT_APPROLE_SECRET`. The authenticated user must have at least read access.
 
-You can also provide a `CASC_VAULT_FILE` environment variable where you load the secrets from file.
+You can also provide a `CASC_VAULT_FILE` environment variable where you load the secrets from a file.
 
 File should be in a Java Properties format
 
@@ -304,7 +304,7 @@ We currently do support plugin installation but it will remain in `beta` for the
 we recommend that you package your plugins with your Jenkins distribution as plugin installation often requires a
 restart and can cause problems with plugin dependencies. So if you want to try it, you can.
 
-Current implementation do require a restart if you add a plugin.
+The current implementation does require a restart if you add a plugin.
 
 Example: (Requires Configuration as Code Plugin version > 0.7-alpha)
 
@@ -317,10 +317,10 @@ plugins:
 
 ## Supported Plugins
 
-Most plugins should be supported out-of-the-box, or maybe require some minimal changes. See this [dashboard](https://issues.jenkins-ci.org/secure/Dashboard.jspa?selectPageId=17346) for known compatibility issues.
+Most plugins should be supported out-of-the-box, or maybe require some minimal changes. See this [dashboard](https://issues.jenkins.io/secure/Dashboard.jspa?selectPageId=17346) for known compatibility issues.
 
 ## Jenkins Enhancement Proposal
 
-As Configuration-as-code is demonstrated to be a highly requested topic in Jenkins community, we have published
+As configuration-as-code is demonstrated to be a highly requested topic in Jenkins community, we have published
 [JEP 201](https://github.com/jenkinsci/jep/tree/master/jep/201) as proposal to make this a standard component
 of the Jenkins project. The proposal was accepted. :tada:
