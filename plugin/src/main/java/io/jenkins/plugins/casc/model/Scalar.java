@@ -1,7 +1,5 @@
 package io.jenkins.plugins.casc.model;
 
-import io.jenkins.plugins.casc.SecretSource;
-
 import java.util.stream.IntStream;
 
 /**

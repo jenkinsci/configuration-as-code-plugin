@@ -10,7 +10,6 @@ import hudson.model.User;
 import hudson.security.AuthorizationStrategy;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
-import io.jenkins.plugins.casc.support.rolestrategy.RoleBasedAuthorizationStrategyConfigurator;
 import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
