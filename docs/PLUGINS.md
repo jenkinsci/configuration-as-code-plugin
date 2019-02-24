@@ -245,7 +245,7 @@ You also can write a test case to check export from a live instance is well supp
 
 ```java 
 @Test public void export_configuration() throws Exception {
-      /** Setup jenkins to use plugin */
+      /* Setup jenkins to use plugin */
       ConfigurationAsCode.get().export(System.out);
 }
 ```

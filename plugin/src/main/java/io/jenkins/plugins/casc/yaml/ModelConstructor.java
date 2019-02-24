@@ -52,10 +52,10 @@ class ModelConstructor extends Constructor {
         return new Mapping(initSize);
     }
 
-    @Override
     /**
      * Enforce Map keys are only Scalars and can be used as {@link String} keys in {@link Mapping}
      */
+    @Override
     protected void constructMapping2ndStep(MappingNode node, final Map mapping) {
         ((Mapping) mapping).setSource(getSource(node));
         super.constructMapping2ndStep(node,
