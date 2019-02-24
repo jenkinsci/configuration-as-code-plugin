@@ -20,7 +20,6 @@ import javax.annotation.CheckForNull;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 

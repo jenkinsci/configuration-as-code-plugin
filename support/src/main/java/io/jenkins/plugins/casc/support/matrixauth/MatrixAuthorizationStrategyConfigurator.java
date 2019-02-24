@@ -1,7 +1,6 @@
 package io.jenkins.plugins.casc.support.matrixauth;
 
 import hudson.security.AuthorizationStrategy;
-import hudson.security.GlobalMatrixAuthorizationStrategy;
 import hudson.security.Permission;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.BaseConfigurator;

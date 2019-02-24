@@ -6,7 +6,6 @@ import com.michelin.cio.hudson.plugins.rolestrategy.RoleMap;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.DataBoundSetter;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
