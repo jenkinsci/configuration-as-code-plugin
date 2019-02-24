@@ -143,6 +143,13 @@ public class SecretSourceResolverTest {
     }
 
     @Test
+    public void resolve_mixedMultipleEntriesWithDefault() {
+        environment.set("FOO", "www.foo.io");
+        environment.set("protocol", "http");
+        assertThat(SecretSourceResolver.resolve(context, "${protocol:-https}://${FOO:-www.bar.io}"), equalTo("http://www.foo.io"));
+    }
+
+    @Test
     public void resolve_mixedMultipleEntriesEscaped() {
         assertThat(SecretSourceResolver.resolve(context, "http://^${FOO}:^${BAR}"), equalTo("http://${FOO}:${BAR}"));
     }
