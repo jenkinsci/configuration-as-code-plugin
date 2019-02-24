@@ -68,7 +68,7 @@ public final class Mapping extends HashMap<String, CNode> implements CNode {
     @Override
     public Mapping clone() {
         final Mapping clone = new Mapping();
-        entrySet().stream().forEach(e -> clone.put(e.getKey(), e.getValue().clone()));
+        entrySet().forEach(e -> clone.put(e.getKey(), e.getValue().clone()));
         return clone;
     }
 }
