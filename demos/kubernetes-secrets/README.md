@@ -1,4 +1,4 @@
-# Configure Kubernetes secrets for Jenkins configuration-as-code plugin
+# Configure Kubernetes secrets for Jenkins Configuration as Code plugin
 
 ### Prerequisites
 
@@ -42,7 +42,7 @@ kind: StatefulSet
               - name: CASC_JENKINS_CONFIG
                 value: /var/jenkins_config/jenkins.yaml
               # With the help of SECRETS environment variable
-              # we points Jenkins configuration-as-code plugin the location of the secrets
+              # we point Jenkins Configuration as Code plugin the location of the secrets
               - name: SECRETS
                 value: /secrets/jenkins
             ...

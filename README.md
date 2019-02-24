@@ -1,4 +1,4 @@
-# Jenkins Configuration as Code Plugin
+# Jenkins Configuration as Code (a.k.a. JCasC) Plugin
 
 [![Build Status](https://ci.jenkins.io/job/Plugins/job/configuration-as-code-plugin/job/master/badge/icon)](https://ci.jenkins.io/job/Plugins/job/configuration-as-code-plugin/job/master/)
 [![Jenkins Plugin](https://img.shields.io/jenkins/plugin/v/configuration-as-code.svg)](https://plugins.jenkins.io/configuration-as-code)
@@ -8,7 +8,7 @@
 
 View the [wiki](https://wiki.jenkins.io/display/JENKINS/configuration+as+code+plugin) page. See [presentation slides](https://docs.google.com/presentation/d/1VsvDuffinmxOjg0a7irhgJSRWpCzLg_Yskf7Fw7FpBg/edit?usp=sharing) from Jenkins World 2018.
 
-Join our Jenkins Configuration as Code (JCasC) office hours meeting scheduled for every second Wednesday. Use the Hangout on Air link from our [Gitter](https://gitter.im/jenkinsci/configuration-as-code-plugin) chat channel. As an alternative, use the link from the [invitation](https://calendar.google.com/event?action=TEMPLATE&tmeid=MmdwdTE1cTFvaGw1NGUycGxqdWUwcXExaWFfMjAxODA3MjVUMDcwMDAwWiBld2VAcHJhcW1hLm5ldA&tmsrc=ewe%40praqma.net&scp=ALL). See previous [meeting minutes](https://docs.google.com/document/d/1Hm07Q1egWL6VVAqNgu27bcMnqNZhYJmXKRvknVw4Y84/edit?usp=sharing).
+Join our Jenkins Configuration as Code office hours meeting scheduled for every second Wednesday. Use the Hangout on Air link from our [Gitter](https://gitter.im/jenkinsci/configuration-as-code-plugin) chat channel. As an alternative, use the link from the [invitation](https://calendar.google.com/event?action=TEMPLATE&tmeid=MmdwdTE1cTFvaGw1NGUycGxqdWUwcXExaWFfMjAxODA3MjVUMDcwMDAwWiBld2VAcHJhcW1hLm5ldA&tmsrc=ewe%40praqma.net&scp=ALL). See previous [meeting minutes](https://docs.google.com/document/d/1Hm07Q1egWL6VVAqNgu27bcMnqNZhYJmXKRvknVw4Y84/edit?usp=sharing).
 
 ## Introduction
 
@@ -19,13 +19,13 @@ Experienced Jenkins users rely on groovy init scripts to customize Jenkins and e
 scripts directly invoke Jenkins API and as such can do everything (at your own risk). But they also require
 you know Jenkins internals, and are confident in writing groovy scripts on top of Jenkins API.
 
-The configuration-as-code plugin has been designed as an _**opinionated**_ way to configure Jenkins based on
+The Configuration as Code plugin has been designed as an _**opinionated**_ way to configure Jenkins based on
 human-readable declarative configuration files. Writing such a file should be feasible without being a Jenkins
 expert, just translating into _code_ a configuration process one is used to executing in the web UI.
 
 ![configuration form](images/sample_form.png)
 
-This plugin aims to replace above user-interface based configuration with the below text based configuration.
+This plugin aims to replace above user interface based configuration with the below text based configuration.
 
 ```yaml
 jenkins:
@@ -41,13 +41,13 @@ jenkins:
 ```
 
 In addition, we want to have a well documented syntax file, and tooling to assist in writing and testing,
-so end-users have full guidance in using this tool-set and do not have to search for examples on the Internet.
+so end users have full guidance in using this tool set and do not have to search for examples on the Internet.
 
 ## Getting Started
 
-First, start a Jenkins instance with the [configuration-as-code](https://plugins.jenkins.io/configuration-as-code) plugin installed.
+First, start a Jenkins instance with the [Configuration as Code](https://plugins.jenkins.io/configuration-as-code) plugin installed.
 
-- Those running Jenkins as a [Docker container](https://github.com/jenkinsci/docker) (and maybe also [pre-installing plugins](https://github.com/jenkinsci/docker#preinstalling-plugins)), do include [configuration-as-code](https://plugins.jenkins.io/configuration-as-code) plugin and optionally the [configuration-as-code-support](https://plugins.jenkins.io/configuration-as-code-support) plugin if you use one of the credentials plugins or the job-dsl (see link).
+- Those running Jenkins as a [Docker](https://github.com/jenkinsci/docker) container (and maybe also [pre-installing plugins](https://github.com/jenkinsci/docker#preinstalling-plugins)), do include [Configuration as Code](https://plugins.jenkins.io/configuration-as-code) plugin and optionally the [Configuration as Code Support](https://plugins.jenkins.io/configuration-as-code-support) plugin if you use one of the credentials plugins or the job-dsl (see link).
 
 Second, the plugin looks for the `CASC_JENKINS_CONFIG` environment variable. The variable can point to any of the following:
 
@@ -200,12 +200,12 @@ Also see [demos](demos) folder with various samples.
 ## Documentation
 
 The configuration file format depends on the version of jenkins-core and installed plugins.
-Documentation is generated from a live instance, as well as a JSON-schema you can use to validate configuration file
+Documentation is generated from a live instance, as well as a JSON schema you can use to validate configuration file
 with your favourite YAML tools.
 
 ## Handling Secrets
 
-Currently, you can provide initial secrets to Configuration-as-Code that all rely on <key,value>
+Currently, you can provide initial secrets to JCasC that all rely on <key,value>
 substitution of strings in the configuration. For example, ``Jenkins: `${some_var}` ``. Default variable substitution
 using the `:-` operator from `bash` is also available. For example, `key: ${VALUE:-defaultvalue}` will evaluate to `defaultvalue` if `$VALUE` is unset. To escape a string from secret interpolation, put `^` in front of the value. For example, `Jenkins: ^${some_var}` will produce the literal `Jenkins: ${some_var}`.
 
@@ -251,7 +251,7 @@ Prerequisites:
 - The environment variable `CASC_VAULT_FILE` is optional, provides a way for the other variables to be read from a file instead of environment variables.
 - The environment variable `CASC_VAULT_ENGINE_VERSION` is optional. If unset, your vault path is assumed to be using kv version 2. If your vault path uses engine version 1, set this variable to `1`.
 
-If the environment variables `CASC_VAULT_URL` and `CASC_VAULT_PATHS` are present, Configuration-as-Code will try to gather initial secrets from Vault. However for it to work properly there is a need for authentication by either the combination of `CASC_VAULT_USER` and `CASC_VAULT_PW`, a `CASC_VAULT_TOKEN`, or the combination of `CASC_VAULT_APPROLE` and `CASC_VAULT_APPROLE_SECRET`. The authenticated user must have at least read access.
+If the environment variables `CASC_VAULT_URL` and `CASC_VAULT_PATHS` are present, JCasC will try to gather initial secrets from Vault. However for it to work properly there is a need for authentication by either the combination of `CASC_VAULT_USER` and `CASC_VAULT_PW`, a `CASC_VAULT_TOKEN`, or the combination of `CASC_VAULT_APPROLE` and `CASC_VAULT_APPROLE_SECRET`. The authenticated user must have at least read access.
 
 You can also provide a `CASC_VAULT_FILE` environment variable where you load the secrets from a file.
 
@@ -300,13 +300,13 @@ secrets:
 
 Status: `BETA`
 
-We currently do support plugin installation but it will remain in `beta` for the foreseeable future. Generally
+We currently support plugin installation but it will remain in `beta` for the foreseeable future. Generally
 we recommend that you package your plugins with your Jenkins distribution as plugin installation often requires a
 restart and can cause problems with plugin dependencies. So if you want to try it, you can.
 
 The current implementation does require a restart if you add a plugin.
 
-Example: (Requires Configuration as Code Plugin version > 0.7-alpha)
+Example: (Requires Configuration as Code plugin version > 0.7-alpha)
 
 ```yaml
 plugins:
@@ -321,6 +321,6 @@ Most plugins should be supported out-of-the-box, or maybe require some minimal c
 
 ## Jenkins Enhancement Proposal
 
-As configuration-as-code is demonstrated to be a highly requested topic in Jenkins community, we have published
+As configuration as code is demonstrated to be a highly requested topic in Jenkins community, we have published
 [JEP 201](https://github.com/jenkinsci/jep/tree/master/jep/201) as proposal to make this a standard component
 of the Jenkins project. The proposal was accepted. :tada:

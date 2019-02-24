@@ -1,11 +1,10 @@
-# Configure seed jobs 
+# Configure seed jobs
 
-As explained in [seed-jobs.md](../../docs/seed-jobs.md), `jobs` declaration is useful to create an initial set of jobs. 
+As explained in [seed-jobs.md](../../docs/seed-jobs.md), `jobs` declaration is useful to create an initial set of jobs.
 
 For now, it is using the [job-dsl-plugin](https://wiki.jenkins.io/display/JENKINS/Job+DSL+Plugin) so this plugin needs to be installed on your Jenkins instance for this sample to work.
 
-The Job DSL plugin uses groovy syntax for its job configuration DSL, so a mix of YAML and groovy must be used within the
-configuration-as-code file.
+The Job DSL plugin uses groovy syntax for its job configuration DSL, so a mix of YAML and groovy must be used within the configuration-as-code file.
 
 ## sample configurations
 
@@ -17,7 +16,6 @@ configuration-as-code file.
 
 ## implementation note
 
-- The main issue with the `jobs` declaration for now is the difference in the 'Traits' declaration due to https://issues.jenkins.io/browse/JENKINS-45504.
-When is is resolved, the workaround using the `configure` part will no longer be needed and all traits will be declared under the organizations section.
+The main issue with the `jobs` declaration for now is the difference in the `Traits` declaration due to [JENKINS-45504](https://issues.jenkins.io/browse/JENKINS-45504). When is is resolved, the workaround using the `configure` part will no longer be needed and all traits will be declared under the organizations section.
 
-- Job DSL only allows 'periodic(int min)' for configuring trigger for now. So to configure "1 day" for example, we need to use the `configure` workaround as shown in [bitbucket.yaml](bitbucket.yaml#L68) 
+Job DSL only allows `periodic(int min)` for configuring a trigger for now. So to configure "1 day" for example, we need to use the `configure` workaround as shown in [bitbucket.yaml](bitbucket.yaml#L68)

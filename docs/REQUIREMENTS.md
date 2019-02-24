@@ -5,7 +5,7 @@ API, but still require plugins to respect some contract, aka "_convention over e
 This documentation is here to explain plugin maintainers those conventions and provide guidance
 on expected design.
 
-![CasC is coming](BraceYourselves.jpg)
+![JCasC is coming](BraceYourselves.jpg)
 
 ## Overview
 
@@ -20,13 +20,13 @@ Surprisingly, this is well adopted by most plugins for `Describable` components,
 many cases the interesting components to offer configuration one want to expose to JCasC
 is attached to a Descriptors.
 
-## Check-list
+## Check List
 
 ### Rule 1: don't write code for data-binding
 
 Check implementation of `Descriptor#configure(StaplerRequest,JSONObject)` in your descriptors.
 This one should **not** use any of the `JSONObject.get*()` methods to set value for an internal
-field. Prefer exposing javabean setter methods, and use `req.bindJSON(this,JSONObject)` to rely
+field. Prefer exposing JavaBean setter methods, and use `req.bindJSON(this,JSONObject)` to rely
 on introspection-friendly data-binding.
 
 Within a Descriptor such setters don't have to be annotated as `@DataBoundSetter` but we suggest
@@ -70,7 +70,7 @@ public void setReplyToAddress(String address) {
 
 Notes:
 - You also need matching getters for jelly view to render current value, but you probably already have them declared.
-- Use of BulkChange allows to avoid repeated calls to `save()` to actually persist to disk only once fully
+- Use of `BulkChange` allows avoiding repeated calls to `save()` to actually persist to disk only once fully
 configured.
 - You might not even need to implement `configure` once [#3669](https://github.com/jenkinsci/jenkins/pull/3669)
 is merged.
@@ -130,7 +130,7 @@ by step migration guide.
 
 Checking support for JCasC is easy as long as your plugin requires Java 8 / Jenkins 2.60+.
 
-You just need CasC as a test dependency and a sample yaml file for your component
+You just need the Configuration as Code plugin as a test dependency and a sample YAML file for your component
 
 ```xml
 <dependency>

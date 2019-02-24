@@ -3,7 +3,7 @@
 ## sample configuration
 
 ```yaml
-jenkins: 
+jenkins:
   [...]
 credentials:
   system:

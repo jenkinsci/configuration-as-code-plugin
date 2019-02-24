@@ -11,7 +11,7 @@ jenkins:
         declineOfferDuration: 600
         description: "My Mesos Cloud"
         frameworkName: "Jenkins Framework"
-        # jenkinsURL is a mandatory field, jenkins fails without it. See https://github.com/jenkinsci/configuration-as-code-plugin/issues/578
+        # jenkinsURL is a mandatory field, Jenkins fails without it. See https://github.com/jenkinsci/configuration-as-code-plugin/issues/578
         jenkinsURL: "https://jenkins.mesos.cloud"
         master: 1.2.3.4:8000
         nativeLibraryPath: "/usr/lib/libmesos.so"

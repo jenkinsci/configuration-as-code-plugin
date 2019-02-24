@@ -1,4 +1,4 @@
-= Plugin Compatibility with configuration-as-code plugin
+= Plugin Compatibility with Configuration as Code plugin
 
 This document captures the ongoing status of plugins known to be compatible or incompatible.
 

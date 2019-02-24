@@ -6,16 +6,16 @@ using those annotations for data-binding, same attributes will be usable for con
 
 ## Descriptors global configuration
 
-Most of the interesting plugin's configuration you want to expose to end users with configuration-as-code is managed by your plugin's
-Descriptor(s) and exposed on web UI with a `global.jelly` view. This is fully supported by configuration-as-code as long as you rely on
+Most of the interesting plugin's configuration you want to expose to end users with JCasC is managed by your plugin's
+`Descriptor`(s) and exposed on web UI with a `global.jelly` view. This is fully supported by JCasC as long as you rely on
 the exact same `DataBound` mechanism, which isn't a common practice (yet).
 
-In many plugins, `Descriptor#configure()` is implemented by lookup for attributes values from the `JSONObject`. To make your Descriptor
-compliant with configuration-as-code, you'll need to expose your configuration attributes as `@DataBoundSetters`.
+In many plugins, `Descriptor#configure()` is implemented by lookup for attributes values from the `JSONObject`. To make your `Descriptor`
+compliant with JCasC, you'll need to expose your configuration attributes as `@DataBoundSetters`.
 
-Before you start, make sure the following pre-conditions are met :
+Before you start, make sure the following pre-conditions are met:
 
-- the parent pom version of your plugin is aligned with the Configuration as Code [parent pom version](/pom.xml).
+- The parent pom version of your plugin is aligned with the Configuration as Code [parent pom version](/pom.xml).
 ```xml
 <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
@@ -24,7 +24,7 @@ Before you start, make sure the following pre-conditions are met :
     <relativePath />
 </parent>
 ```
-- the jenkins core version and the java level of your plugin are aligned with the Configuration as Code plugin versions (also in the [pom.xml](/pom.xml)).
+- The Jenkins core version and the Java level of your plugin are aligned with the Configuration as Code plugin versions (also in the [pom.xml](/pom.xml)).
 ```xml
 <properties>
     <jenkins.version>THE_JENKINS_CORE_VERSION_HERE</jenkins.version>
@@ -32,9 +32,9 @@ Before you start, make sure the following pre-conditions are met :
 </properties>
 ```
 
-Here's the recommended approach :
+Here's the recommended approach:
 
-Let's consider this Descriptor :
+Lets consider this `Descriptor`:
 
 ```java
 public static final class DescriptorImpl extends Descriptor<Foo> {
@@ -58,7 +58,7 @@ public static final class DescriptorImpl extends Descriptor<Foo> {
 }
 ```
 
-with global.jelly view :
+with global.jelly view:
 
 ```xml
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
@@ -76,8 +76,8 @@ with global.jelly view :
 
 ### Step 1
 
-Define `@DataBoundSetters` javabean setters for your Descriptor's properties. They should match the getters you already have for
-global.jelly data-binding.
+Define `@DataBoundSetters` JavaBean setters for your `Descriptor`'s properties. They should match the getters you already have for
+`global.jelly` data-binding.
 
 ```java
    @DataBoundSetter
@@ -116,7 +116,7 @@ public class Authentication extends AbstractDescribableImpl<PAuthentication> {
 
 ### Step 3
 
-Define a new attribute in your Descriptor to own optional attributes.
+Define a new attribute in your `Descriptor` to own optional attributes.
 For binary compatibility you'll need to maintain the legacy getters as delegates to this new sub-component.
 For backward compatibility, use `readResolve` method to create the new nested component from legacy attributes.
 
@@ -145,7 +145,8 @@ public static final class DescriptorImpl extends Descriptor<FooBar> {
 
 ### Step 4
 
-Replace `optionalBlocks` in your jelly view with `optionalProperty` and add the required DataBound accessors
+Replace `optionalBlocks` in your jelly view with `optionalProperty` and add the required `DataBound` accessors
+
 ```xml
    <f:entry title="${%Charset}" field="charset">
         <f:textbox />
@@ -164,7 +165,7 @@ Replace `optionalBlocks` in your jelly view with `optionalProperty` and add the 
 ### Step 5
 
 Rewrite `Descriptor#configure()` implementation to rely on `request.bindJson(this, json)`. You will have to reset attributes to their
-default values as a Descriptor is a mutable object, i.e. data-binding won't reset values if they are not present in the JSON payload.
+default values as a `Descriptor` is a mutable object, i.e. data-binding won't reset values if they are not present in the JSON payload.
 
 ```java
         public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
@@ -179,7 +180,7 @@ default values as a Descriptor is a mutable object, i.e. data-binding won't rese
 ### Step 6
 
 If you don't have one already, define a `@Symbol` annotation on your descriptor. This is the name an end user will be able to use to access
-your Descriptor for configuration. To avoid collisions with other plugins, prefer using your plugin's artifactId as a symbolic name for your
+your `Descriptor` for configuration. To avoid collisions with other plugins, prefer using your plugin's artifactId as a symbolic name for your
 descriptor.
 
 ```java
@@ -195,7 +196,8 @@ Simplest option for you to test JCasC compatibility in your plugin is to introdu
 
 ### Configuration test
 
-Add configuration-as-code-plugin as a test dependency in your pom.xml:
+Add the Configuration as Code plugin as a test dependency in your pom.xml:
+
 ```xml
 <dependency>
     <groupId>io.jenkins</groupId>
@@ -205,7 +207,8 @@ Add configuration-as-code-plugin as a test dependency in your pom.xml:
 </dependency>
 ```
 
-Add a new test case to load a reference configuration yaml file designed to set configurable properties of your plugin
+Add a new test case to load a reference configuration YAML file designed to set configurable properties of your plugin
+
 ```java
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import org.junit.Rule;
@@ -231,6 +234,7 @@ some changes made to your plugin break this configuration model.
 ### Backward compatibility test
 
 About the later, in case you need to introduce some breaking changes, you can define a backward compatibility test case
+
 ```yaml
     @Test public void should_be_backward_compatible() throws Exception {
         ConfigurationAsCode.get().configure(ConfigAsCodeTest.class.getResource("obsolete-configuration-as-code.yml").toString());
@@ -239,6 +243,7 @@ About the later, in case you need to introduce some breaking changes, you can de
 ```
 
 Within this `obsolete-configuration-as-code.yml` configuration file, use the legacy data model in use before the change you introduced, and enable JCasC support for deprecated methods:
+
 ```yaml
 configuration-as-code:
   deprecated: warn
@@ -253,9 +258,9 @@ You also can write a test case to check export from a live instance is well supp
 
 ```java
 @Test public void export_configuration() throws Exception {
-      /* Setup jenkins to use plugin */
+      /* Setup Jenkins to use plugin */
       ConfigurationAsCode.get().export(System.out);
 }
 ```
 
-**TODO** we need to provide some yaml assertion library so that the resulting exported yam stream can be checked for expected content.
+**TODO** we need to provide some YAML assertion library so that the resulting exported yam stream can be checked for expected content.
