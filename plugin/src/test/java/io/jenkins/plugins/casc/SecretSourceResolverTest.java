@@ -88,6 +88,32 @@ public class SecretSourceResolverTest {
     }
 
     @Test
+    public void resolve_nothingSpace() {
+        assertThat(SecretSourceResolver.resolve(context, "${ }"), equalTo("${ }"));
+    }
+
+    @Test
+    public void resolve_nothingBrackets() {
+        assertThat(SecretSourceResolver.resolve(context, "${}"), equalTo("${}"));
+    }
+
+    @Test
+    public void resolve_nothingDefault() {
+        assertThat(SecretSourceResolver.resolve(context, "${:-default}"), equalTo("default"));
+    }
+
+    @Test
+    public void resolve_emptyDefault() {
+        assertThat(SecretSourceResolver.resolve(context, "${FOO:-}"), equalTo(""));
+    }
+
+    @Test
+    public void resolve_emptyDefaultEnvDefined() {
+        environment.set("FOO", "foo");
+        assertThat(SecretSourceResolver.resolve(context, "${FOO:-}"), equalTo("foo"));
+    }
+
+    @Test
     public void resolve_defaultValueLimit() {
         assertThat(SecretSourceResolver.resolve(context, "${FOO:-default:-other}"), equalTo("default:-other"));
     }

@@ -4,8 +4,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import io.jenkins.plugins.casc.SecretSource;
 import org.apache.commons.io.FileUtils;
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.Beta;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,6 +30,7 @@ public class DockerSecretSource extends SecretSource {
 
     @Override
     public Optional<String> reveal(String secret) throws IOException {
+        if (StringUtils.isBlank(secret)) return Optional.empty();
         final File file = new File(secrets, secret);
         if (file.exists()) {
             return Optional.of(FileUtils.readFileToString(file).trim());

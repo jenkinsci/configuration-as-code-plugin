@@ -5,8 +5,7 @@ import com.bettercloud.vault.VaultConfig;
 import com.bettercloud.vault.VaultException;
 import hudson.Extension;
 import io.jenkins.plugins.casc.SecretSource;
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.Beta;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -91,12 +90,9 @@ public class VaultSecretSource extends SecretSource {
     }
 
     @Override
-    public Optional<String> reveal(String vaultKey) {
-        Optional<String> returnValue = Optional.empty();
-        if(secrets.containsKey(vaultKey))  {
-            returnValue = Optional.of(secrets.get(vaultKey));
-        }
-        return returnValue;
+    public Optional<String> reveal(String secret) {
+        if (StringUtils.isBlank(secret)) return Optional.empty();
+        return Optional.ofNullable(secrets.get(secret));
     }
 
     public Map<String, String> getSecrets() {
