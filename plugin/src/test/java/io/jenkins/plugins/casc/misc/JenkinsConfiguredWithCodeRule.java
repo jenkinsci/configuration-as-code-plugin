@@ -24,7 +24,8 @@ public class JenkinsConfiguredWithCodeRule extends JenkinsRule {
             final Class<?> clazz = env.description().getTestClass();
             final String[] resource = configuredWithCode.value();
 
-            final List<String> configs = Arrays.asList(resource).stream().map(s -> clazz.getResource(s).toExternalForm())
+            final List<String> configs = Arrays.stream(resource)
+                    .map(s -> clazz.getResource(s).toExternalForm())
                     .collect(Collectors.toList());
 
             try {
