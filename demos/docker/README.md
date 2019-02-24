@@ -29,6 +29,6 @@ jenkins:
 
 ## implementation note
 
-Jenkins singleton doesn't offer any `setClouds` method. So here we rely on a pseudo-property implemented by a dedicated 
-`Attribute` to add the configured clouds to `Jenkins.clouds`. The current implementation only adds the configured cloud 
-if it doesn't exists yet. 
+Jenkins singleton doesn't offer any `setClouds` method. So here we rely on a pseudo-property implemented by a dedicated
+`Attribute` to add the configured clouds to `Jenkins.clouds`. The current implementation only adds the configured cloud
+if it doesn't exists yet.

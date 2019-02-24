@@ -10,7 +10,7 @@ Many of the plugins are actually configured in the same section, but to configur
 
 ```yaml
 jenkins:
-  systemMessage: "Jenkins configured automatically by Jenkins Configuration as Code Plugin\n\n"
+  systemMessage: "Jenkins configured automatically by Jenkins Configuration as Code plugin\n\n"
   numExecutors: 5
   scmCheckoutRetryCount: 2
   mode: NORMAL
@@ -27,7 +27,7 @@ jenkins:
     Welcome to our build server.
 
     This Jenkins is 100% configured and managed 'as code'.
-    Config is now mostly handled by 'Jenkins Configuration as Code Plugin' (JCasC).
+    Config is now mostly handled by the 'Jenkins Configuration as Code' (JCasC) plugin.
     JCasC config can be found in the jenkins.yaml file in the $JENKINS_HOME/casc/ folder.
 
     Some settings are still injected from init.groovy.d scripts,

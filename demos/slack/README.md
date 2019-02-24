@@ -1,6 +1,6 @@
 # Configure Slack
 
-Basic configuration of the [Slack Plugin](https://wiki.jenkins.io/display/JENKINS/Slack+Plugin)
+Basic configuration of the [Slack plugin](https://wiki.jenkins.io/display/JENKINS/Slack+Plugin)
 
 ## Sample configuration
 

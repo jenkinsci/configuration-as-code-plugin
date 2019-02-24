@@ -1,9 +1,9 @@
-# configure config-file-provider files 
+# configure config-file-provider files
 
 ## sample configuration
 
 ```yaml
-jenkins: 
+jenkins:
   [...]
 unclassified:
   globalConfigFiles:

@@ -68,7 +68,7 @@ public class ConfigurationAsCodeTest {
     @Test
     @ConfiguredWithCode(value = {"merge1.yml", "merge3.yml"}, expected = ConfiguratorException.class)
     public void shouldMergeYamlConfig() {
-        assertEquals("Configured by configuration-as-code-plugin", j.jenkins.getSystemMessage());
+        assertEquals("Configured by Configuration as Code plugin", j.jenkins.getSystemMessage());
         assertEquals(0, j.jenkins.getNumExecutors());
         assertNotNull(j.jenkins.getNode("agent1"));
         assertNotNull(j.jenkins.getNode("agent3"));

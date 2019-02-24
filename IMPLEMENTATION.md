@@ -17,7 +17,7 @@ It has:
 * a `describe` method to document the attributes the target component exposes to configuration
 * a `configure` method to configure the target component
 
-From a YAML node with an associated `Configurator`, configuration-as-code will handle every
+From a YAML node with an associated `Configurator`, JCasC will handle every
 child node in the YAML structure based on the current node's `Attribute`s, as described by the `Configurator`.
 
 ## Root Configurator selection
@@ -28,7 +28,7 @@ Root elements are identified by YAML entry name, and a matching
 `RootElementConfigurator` is a special interface used to identify a `Configurator` which manages a top level
 configuration element in the YAML document.
 
-configuration-as-code provides a custom `RootElementConfigurator` for the `jenkins` root entry in the YAML document,
+JCasC provides a custom `RootElementConfigurator` for the `jenkins` root entry in the YAML document,
 as well as generic `RootElementConfigurator`s to model [global configuration categories](https://github.com/jenkinsci/jenkins/blob/master/core/src/main/java/jenkins/model/GlobalConfigurationCategory.java).
 
 ### Attributes
@@ -37,8 +37,8 @@ as well as generic `RootElementConfigurator`s to model [global configuration cat
 of [`Attribute`](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/plugin/src/main/java/io/jenkins/plugins/casc/Attribute.java)s
 to document both name _AND_ type for a configurable attribute.
 
-We don't want to expose the whole Jenkins Java API to configuration-as-code. Many components define setter
-methods for technical reasons or to support backward compatibility. So configuration-as-code excludes:
+We don't want to expose the whole Jenkins Java API to JCasC. Many components define setter
+methods for technical reasons or to support backward compatibility. So JCasC excludes:
 
 * setter methods marked as `@Deprecated`
 * setter methods marked as `@Restricted`
@@ -54,18 +54,18 @@ will be detected as attribute named `foo` with target type `Foo` with multiple v
 
 ### Configuration
 
-Configurator also has to implement the `configure` method to process YAML content and instantiate or configure
-the target component. The actual mechanism depends on the target. Configuration-as-Code provides generic
+`Configurator` also has to implement the `configure` method to process YAML content and instantiate or configure
+the target component. The actual mechanism depends on the target. JCasC provides generic
 mechanisms which cover most Jenkins components.
 
-This generic mechanism assumes Jenkins core components and plugins do follow some conventions, but
+This generic mechanism assumes Jenkins core components and plugins follow some conventions, but
 custom "glue-code" can also be provided as a (temporary) workaround, or to expose a configuration model
 which doesn't reflect the internal data model, but better matches the end user experience.
 
 A typical sample for this scenario is the [credentials](https://plugins.jenkins.io/credentials) plugin.
-[CredentialsRootConfigurator](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/support/src/main/java/io/jenkins/plugins/casc/support/credentials/CredentialsRootConfigurator.java)
+[`CredentialsRootConfigurator`](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/support/src/main/java/io/jenkins/plugins/casc/support/credentials/CredentialsRootConfigurator.java)
 exposes a simplified configuration API for the `system` credentials store, which is hardly configurable
-using the other general purpose configuration-as-code component due to the internal design of this plugin.
+using the other general purpose JCasC component due to the internal design of this plugin.
 
 ## General purpose configurators
 
@@ -89,9 +89,9 @@ global configuration for Descriptors, to mimic the `global.jelly` UI exposed
 to end users on the web UI.
 
 Jenkins has hundreds of Descriptors, most of them for internal technical reasons,
-so only the ones that have a `global` view are accessible from configuration-as-code.
+so only the ones that have a `global` view are accessible from JCasC.
 
-For Descriptors to work well with configuration-as-code, they need to follow
+For Descriptors to work well with JCasC, they need to follow
 [some design best practices](docs/PLUGINS.md) in terms of data binding. This is not such a common thing,
 so we expect this will require some evangelism on plugin developers.
 
