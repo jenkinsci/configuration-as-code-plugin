@@ -2,6 +2,8 @@
 
 ## 1.7 (not released yet)
 
+- fix revealing secret with default defined, where environment variable is defined, it would always default.
+
 ## 1.6 
 
 - Make system environment variables available in the context used for running the jobdsl/groovy code defining the seed job.
