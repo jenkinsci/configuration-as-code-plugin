@@ -2,6 +2,7 @@ package io.jenkins.plugins.casc;
 
 import static io.vavr.API.unchecked;
 
+import io.vavr.Tuple;
 import io.vavr.control.Try;
 import org.bigtesting.interpolatd.Interpolator;
 
@@ -27,14 +28,11 @@ public class SecretSourceResolver {
 
     private static String handle(ConfigurationContext context, String captured) {
         String[] split = captured.split(defaultDelimiter, 2);
-        String reveal = split[0];
-        Optional<String> defaultValue = Try.of(() -> Optional.ofNullable(split[1]))
-                .getOrElse(Optional.empty());
-
-        return reveal(context, reveal)
+        return Tuple.of(split[0], Try.of(() -> split[1]).toJavaOptional()).apply(
+            (toReveal, defaultValue) -> reveal(context, toReveal)
                 .map(Optional::of)
                 .orElse(defaultValue)
-                .orElse("");
+                .orElse(""));
     }
 
     private static Optional<String> reveal(ConfigurationContext context, String captured) {
