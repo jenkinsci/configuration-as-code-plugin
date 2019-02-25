@@ -5,7 +5,7 @@ import io.jenkins.plugins.casc.Configurator;
 import io.jenkins.plugins.casc.ConfiguratorRegistry;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
-import org.junit.Rule;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -21,8 +21,8 @@ import static org.junit.Assert.*;
  */
 public class DataBoundConfiguratorTest {
 
-    @Rule
-    public JenkinsRule j = new JenkinsRule();
+    @ClassRule
+    public static JenkinsRule j = new JenkinsRule();
 
     @Test
     public void configure_databound() throws Exception {
@@ -32,9 +32,9 @@ public class DataBoundConfiguratorTest {
         config.put("qix", "123");
         config.put("zot", "DataBoundSetter");
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
-        final Foo configured = (Foo) registry.lookup(Foo.class).configure(config, new ConfigurationContext(registry));
+        final Foo configured = (Foo) registry.lookupOrFail(Foo.class).configure(config, new ConfigurationContext(registry));
         assertEquals("foo", configured.foo);
-        assertEquals(true, configured.bar);
+        assertTrue(configured.bar);
         assertEquals(123, configured.qix);
         assertEquals("DataBoundSetter", configured.zot);
         assertThat(configured.intialized, is(true));
@@ -46,7 +46,7 @@ public class DataBoundConfiguratorTest {
         Foo foo = new Foo("foo", true, 42);
         foo.setZot("zot");
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
-        final Configurator c = registry.lookup(Foo.class);
+        final Configurator c = registry.lookupOrFail(Foo.class);
         final ConfigurationContext context = new ConfigurationContext(registry);
         final CNode node = c.describe(foo, context);
         assertNotNull(node);

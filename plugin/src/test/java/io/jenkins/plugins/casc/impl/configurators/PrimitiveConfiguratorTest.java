@@ -5,6 +5,8 @@ import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.Configurator;
 import io.jenkins.plugins.casc.ConfiguratorRegistry;
 import io.jenkins.plugins.casc.model.Scalar;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
@@ -20,50 +22,54 @@ import static org.junit.Assert.assertTrue;
  */
 public class PrimitiveConfiguratorTest {
 
-    @Rule
-    public JenkinsRule j = new JenkinsRule();
+    @ClassRule
+    public static JenkinsRule j = new JenkinsRule();
 
     @Rule
     public final EnvironmentVariables environment = new EnvironmentVariables();
 
+    private static ConfiguratorRegistry registry;
+    private static ConfigurationContext context;
+
+    @BeforeClass
+    public static void setup() {
+        registry = ConfiguratorRegistry.get();
+        context = new ConfigurationContext(registry);
+    }
+
     @Test
     public void _boolean() throws Exception {
-        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
-        Configurator c =registry.lookup(boolean.class);
-        final Object value = c.configure(new Scalar("true"), new ConfigurationContext(registry));
+        Configurator c = registry.lookupOrFail(boolean.class);
+        final Object value = c.configure(new Scalar("true"), context);
         assertTrue((Boolean) value);
     }
 
     @Test
     public void _int() throws Exception {
-        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
-        Configurator c =registry.lookup(int.class);
-        final Object value = c.configure(new Scalar("123"), new ConfigurationContext(registry));
+        Configurator c = registry.lookupOrFail(int.class);
+        final Object value = c.configure(new Scalar("123"), context);
         assertEquals(123, (int) value);
     }
 
     @Test
     public void _Integer() throws Exception {
-        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
-        Configurator c =registry.lookup(Integer.class);
-        final Object value = c.configure(new Scalar("123"), new ConfigurationContext(registry));
-        assertTrue(123 == ((Integer) value).intValue());
+        Configurator c = registry.lookupOrFail(Integer.class);
+        final Object value = c.configure(new Scalar("123"), context);
+        assertTrue(123 == (Integer) value);
     }
 
     @Test
     public void _string() throws Exception {
-        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
-        Configurator c =registry.lookup(String.class);
-        final Object value = c.configure(new Scalar("abc"), new ConfigurationContext(registry));
+        Configurator c = registry.lookupOrFail(String.class);
+        final Object value = c.configure(new Scalar("abc"), context);
         assertEquals("abc", value);
     }
 
     @Test
     public void _enum() throws Exception {
         // Jenkins do register a StaplerConverter for it.
-        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         Configurator<Node.Mode> c = registry.lookupOrFail(Node.Mode.class);
-        final Node.Mode value = c.configure(new Scalar("NORMAL"), new ConfigurationContext(registry));
+        final Node.Mode value = c.configure(new Scalar("NORMAL"), context);
         assertEquals(Node.Mode.NORMAL, value);
 
     }
@@ -71,9 +77,8 @@ public class PrimitiveConfiguratorTest {
     @Test
     public void _enum2() throws Exception {
         // No explicit converter set by jenkins
-        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         Configurator<TimeUnit> c = registry.lookupOrFail(TimeUnit.class);
-        final TimeUnit value = c.configure(new Scalar("DAYS"), new ConfigurationContext(registry));
+        final TimeUnit value = c.configure(new Scalar("DAYS"), context);
         assertEquals(TimeUnit.DAYS, value);
 
     }
@@ -81,35 +86,31 @@ public class PrimitiveConfiguratorTest {
     @Test
     public void _Integer_env() throws Exception {
         environment.set("ENV_FOR_TEST", "123");
-        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
-        Configurator c =registry.lookup(Integer.class);
-        final Object value = c.configure(new Scalar("${ENV_FOR_TEST}"), new ConfigurationContext(registry));
-        assertTrue(123 == ((Integer) value).intValue());
+        Configurator c = registry.lookupOrFail(Integer.class);
+        final Object value = c.configure(new Scalar("${ENV_FOR_TEST}"), context);
+        assertTrue(123 == (Integer) value);
     }
 
     @Test
     public void _string_env() throws Exception {
         environment.set("ENV_FOR_TEST", "abc");
-        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
-        Configurator c =registry.lookup(String.class);
-        final Object value = c.configure(new Scalar("${ENV_FOR_TEST}"), new ConfigurationContext(registry));
+        Configurator c = registry.lookupOrFail(String.class);
+        final Object value = c.configure(new Scalar("${ENV_FOR_TEST}"), context);
         assertEquals("abc", value);
     }
 
     @Test
     public void _string_env_default() throws Exception {
         environment.set("NOT_THERE", "abc");
-        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
-        Configurator c =registry.lookup(String.class);
-        final Object value = c.configure(new Scalar("${ENV_FOR_TEST:-unsecured-token}"), new ConfigurationContext(registry));
+        Configurator c = registry.lookupOrFail(String.class);
+        final Object value = c.configure(new Scalar("${ENV_FOR_TEST:-unsecured-token}"), context);
         assertEquals("unsecured-token", value);
     }
 
     @Test
     public void _int_env_default() throws Exception {
-        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
-        Configurator c =registry.lookup(Integer.class);
-        final Object value = c.configure(new Scalar("${ENV_FOR_TEST:-123}"), new ConfigurationContext(registry));
+        Configurator c = registry.lookupOrFail(Integer.class);
+        final Object value = c.configure(new Scalar("${ENV_FOR_TEST:-123}"), context);
         assertEquals(123, value);
     }
 }
