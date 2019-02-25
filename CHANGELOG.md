@@ -1,20 +1,23 @@
 # ChangeLog
 
-## 1.7 (not released yet)
+## 1.8 (not released yet)
+
+## 1.7
 
 - fix revealing secret with default defined, where environment variable is defined, it would always default.
+- [#746](https://github.com/jenkinsci/configuration-as-code-plugin/issues/746): add support for specifying vault engine version via CASC_VAULT_ENGINE_VERSION
 
-## 1.6 
+## 1.6
 
 - Make system environment variables available in the context used for running the jobdsl/groovy code defining the seed job.
 - Add support for secrets while defining `jobs` declarations.
-- #688: fixed an IndexOutOfBounds exception
+- [#688](https://github.com/jenkinsci/configuration-as-code-plugin/issues/688): fixed an IndexOutOfBounds exception
 - Add support for Enterprise Vault to store secrets; set CASC_VAULT_NAMESPACE to provide a namespace
 - many fixes to documentation and demos
 
 ## 1.5
 
-- #697: proper string interpolation for secrets.
+- [#697](https://github.com/jenkinsci/configuration-as-code-plugin/issues/697): proper string interpolation for secrets.
 - Improve explanation of CASC_VAULT in README.md
 
 ## 1.4
