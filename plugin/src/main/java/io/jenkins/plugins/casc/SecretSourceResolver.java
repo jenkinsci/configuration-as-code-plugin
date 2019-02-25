@@ -2,6 +2,8 @@ package io.jenkins.plugins.casc;
 
 import static io.vavr.API.unchecked;
 
+import io.vavr.Tuple;
+import io.vavr.control.Try;
 import org.bigtesting.interpolatd.Interpolator;
 
 import java.util.Optional;
@@ -25,10 +27,12 @@ public class SecretSourceResolver {
     }
 
     private static String handle(ConfigurationContext context, String captured) {
-        return reveal(context, captured)
+        String[] split = captured.split(defaultDelimiter, 2);
+        return Tuple.of(split[0], Try.of(() -> split[1]).toJavaOptional()).apply(
+            (toReveal, defaultValue) -> reveal(context, toReveal)
                 .map(Optional::of)
-                .orElse(defaultValue(captured))
-                .orElse("");
+                .orElse(defaultValue)
+                .orElse(""));
     }
 
     private static Optional<String> reveal(ConfigurationContext context, String captured) {
@@ -36,14 +40,5 @@ public class SecretSourceResolver {
                 .map(source -> unchecked(() -> source.reveal(captured)).apply())
                 .flatMap(o -> o.map(Stream::of).orElseGet(Stream::empty))
                 .findFirst();
-    }
-
-    private static Optional<String> defaultValue(String captured) {
-        int limit = 2;
-        String[] split = captured.split(defaultDelimiter, limit);
-        if (split.length == limit) {
-            return Optional.ofNullable(split[1]);
-        }
-        return Optional.empty();
     }
 }
