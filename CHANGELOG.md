@@ -1,10 +1,13 @@
 # ChangeLog
 
-## 1.7 (not released yet)
+## 1.8 (not released yet)
+
+## 1.7
 
 - fix revealing secret with default defined, where environment variable is defined, it would always default.
+- #746: add support for specifying vault engine version via CASC_VAULT_ENGINE_VERSION
 
-## 1.6 
+## 1.6
 
 - Make system environment variables available in the context used for running the jobdsl/groovy code defining the seed job.
 - Add support for secrets while defining `jobs` declarations.
