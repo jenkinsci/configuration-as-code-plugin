@@ -61,14 +61,7 @@ public class VaultSecretSource extends SecretSource {
                 .orElse(getCommaSeparatedVariables(CASC_VAULT_PATH, prop)); // TODO: deprecate!
 
         // Check mandatory variables are set
-        if(!vaultUrl.isPresent()) {
-            LOGGER.log(Level.WARNING, "Mandatory variable {0} not set. Cannot fetch from vault.", CASC_VAULT_URL);
-            return;
-        }
-        if(!vaultPaths.isPresent()) {
-            LOGGER.log(Level.WARNING, "Mandatory variable {0} not set. Cannot fetch from vault.", CASC_VAULT_PATHS);
-            return;
-        }
+        if(!vaultUrl.isPresent() || !vaultPaths.isPresent()) return;
 
         // configure vault client
         Vault vault = null;
@@ -93,6 +86,7 @@ public class VaultSecretSource extends SecretSource {
         // attempt token login
         if (vaultToken.isPresent() && !authToken.isPresent()) {
             authToken = Optional.of(vaultToken.get());
+            LOGGER.log(Level.FINE, "Using supplied token to access Vault");
         }
 
         // attempt AppRole login
@@ -120,15 +114,10 @@ public class VaultSecretSource extends SecretSource {
         }
 
         // Use authToken to read secrets from vault
-        if (!vaultToken.isPresent() || !vaultPaths.isPresent()) {
+        if (authToken.isPresent()) {
             readSecretsFromVault(authToken.get(), vaultConfig, vault, vaultPaths.get());
         } else {
-            if (!vaultToken.isPresent()) {
-                LOGGER.log(Level.WARNING, "Vault access token missing. Cannot read from vault");
-            }
-            if (!vaultPaths.isPresent()) {
-                LOGGER.log(Level.WARNING, "Mandatory variable {0} not set. Cannot fetch from vault.", CASC_VAULT_PATHS);
-            }
+            LOGGER.log(Level.WARNING, "Vault auth token missing. Cannot read from vault");
         }
     }
 
