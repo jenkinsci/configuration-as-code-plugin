@@ -42,7 +42,6 @@ public class VaultSecretSource extends SecretSource {
         }
         String vaultPw = getVariable("CASC_VAULT_PW", prop);
         String vaultUsr = getVariable("CASC_VAULT_USER", prop);
-        String vaultPth = getVariable("CASC_VAULT_PATH", prop);
         String vaultUrl = getVariable("CASC_VAULT_URL", prop);
         String vaultMount = getVariable("CASC_VAULT_MOUNT", prop);
         String vaultToken = getVariable("CASC_VAULT_TOKEN", prop);
@@ -50,10 +49,16 @@ public class VaultSecretSource extends SecretSource {
         String vaultAppRoleSecret = getVariable("CASC_VAULT_APPROLE_SECRET", prop);
         String vaultNamespace = getVariable("CASC_VAULT_NAMESPACE", prop);
         String vaultEngineVersion = getVariable("CASC_VAULT_ENGINE_VERSION", prop);
+        String[] vaultPaths = getCommaSeparatedVariables("CASC_VAULT_PATHS", prop);
+        if(vaultPaths == null) {
+            // checking old variable for backwards compatibility
+            // TODO: deprecate!
+            vaultPaths = getCommaSeparatedVariables("CASC_VAULT_PATH", prop);
+        }
 
         if(((vaultPw != null && vaultUsr != null) || 
             vaultToken != null || 
-            (vaultAppRole != null && vaultAppRoleSecret != null)) && vaultPth != null && vaultUrl != null) {
+            (vaultAppRole != null && vaultAppRoleSecret != null)) && vaultPaths != null && vaultUrl != null) {
             LOGGER.log(Level.FINE, "Attempting to connect to Vault: {0}", vaultUrl);
             try {
                 VaultConfig config = new VaultConfig().address(vaultUrl);
@@ -82,7 +87,9 @@ public class VaultSecretSource extends SecretSource {
                     LOGGER.log(Level.FINE, "Login to Vault using U/P successful");
                 }
                 config.token(token).build();
-                secrets = vault.logical().read(vaultPth).getData();
+                for(String vaultPath : vaultPaths) {
+                    secrets.putAll(vault.logical().read(vaultPath).getData());
+                }
             } catch (VaultException ve) {
                 LOGGER.log(Level.WARNING, "Unable to connect to Vault", ve);
             }
@@ -108,6 +115,15 @@ public class VaultSecretSource extends SecretSource {
             return prop.getProperty(key, System.getenv(key));
         } else {
             return System.getenv(key);
+        }
+    }
+
+    private String[] getCommaSeparatedVariables(String key, Properties prop) {
+        if (prop != null && !prop.isEmpty()) {
+            return prop.getProperty(key, System.getenv(key)).split(",");
+        } else {
+            String envVar = System.getenv(key);
+            return (envVar == null) ? null : envVar.split(",");
         }
     }
 }

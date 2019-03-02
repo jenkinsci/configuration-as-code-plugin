@@ -244,14 +244,14 @@ Prerequisites:
 - The environment variable `CASC_VAULT_APPROLE` must be present, if token is not used and U/P not used. (Vault AppRole ID.)
 - The environment variable `CASC_VAULT_APPROLE_SECRET` must be present, it token is not used and U/P not used. (Value AppRole Secret ID.)
 - The environment variable `CASC_VAULT_TOKEN` must be present, if U/P is not used. (Vault token.)
-- The environment variable `CASC_VAULT_PATH` must be present. (Vault key path. For example, `/secrets/jenkins`.)
+- The environment variable `CASC_VAULT_PATHS` must be present. (Comma separated vault key paths. For example, `secret/jenkins,secret/admin`.)
 - The environment variable `CASC_VAULT_URL` must be present. (Vault url, including port number.)
 - The environment variable `CASC_VAULT_MOUNT` is optional. (Vault auth mount. For example, `ldap` or another username & password authentication type, defaults to `userpass`.)
 - The environment variable `CASC_VAULT_NAMESPACE` is optional. If used, sets the Vault namespace for Enterprise Vaults.
 - The environment variable `CASC_VAULT_FILE` is optional, provides a way for the other variables to be read from a file instead of environment variables.
 - The environment variable `CASC_VAULT_ENGINE_VERSION` is optional. If unset, your vault path is assumed to be using kv version 2. If your vault path uses engine version 1, set this variable to `1`.
 
-If the environment variables `CASC_VAULT_URL` and `CASC_VAULT_PATH` are present, Configuration-as-Code will try to gather initial secrets from Vault. However for it to work properly there is a need for authentication by either the combination of `CASC_VAULT_USER` and `CASC_VAULT_PW`, a `CASC_VAULT_TOKEN`, or the combination of `CASC_VAULT_APPROLE` and `CASC_VAULT_APPROLE_SECRET`. The authenticated user must have at least read access.
+If the environment variables `CASC_VAULT_URL` and `CASC_VAULT_PATHS` are present, Configuration-as-Code will try to gather initial secrets from Vault. However for it to work properly there is a need for authentication by either the combination of `CASC_VAULT_USER` and `CASC_VAULT_PW`, a `CASC_VAULT_TOKEN`, or the combination of `CASC_VAULT_APPROLE` and `CASC_VAULT_APPROLE_SECRET`. The authenticated user must have at least read access.
 
 You can also provide a `CASC_VAULT_FILE` environment variable where you load the secrets from file.
 
@@ -261,7 +261,7 @@ File should be in a Java Properties format
 CASC_VAULT_PW=PASSWORD
 CASC_VAULT_USER=USER
 CASC_VAULT_TOKEN=TOKEN
-CASC_VAULT_PATH=secret/jenkins/master
+CASC_VAULT_PATHS=secret/jenkins/master,secret/admin
 CASC_VAULT_URL=https://vault.dot.com
 CASC_VAULT_MOUNT=ldap
 ```
