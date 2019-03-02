@@ -42,7 +42,7 @@ import static com.google.common.base.Defaults.defaultValue;
 
 public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
 
-    private final static Logger logger = Logger.getLogger(DataBoundConfigurator.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(DataBoundConfigurator.class.getName());
 
     private final Class<T> target;
 
@@ -129,7 +129,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                         final Configurator configurator = context.lookupOrFail(k);
                         args[i] = configurator.configure(value, context);
                     }
-                    logger.info("Setting " + target + "." + names[i] + " = " + (t == Secret.class ? "****" : value));
+                    LOGGER.info("Setting " + target + "." + names[i] + " = " + (t == Secret.class ? "****" : value));
                 } else if (t.isPrimitive()) {
                     args[i] = defaultValue(t);
                 }
