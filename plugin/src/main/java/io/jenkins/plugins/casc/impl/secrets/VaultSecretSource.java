@@ -71,9 +71,11 @@ public class VaultSecretSource extends SecretSource {
             LOGGER.log(Level.FINE, "Attempting to connect to Vault: {0}", vaultUrl.get());
             if (vaultNamespace.isPresent()) {
                 vaultConfig.nameSpace(vaultNamespace.get());
+                LOGGER.log(Level.FINE, "Using namespace with Vault: {0}", vaultNamespace);
             }
             if (vaultEngineVersion.isPresent()) {
                 vaultConfig.engineVersion(Integer.parseInt(vaultEngineVersion.get()));
+                LOGGER.log(Level.FINE, "Using engine version: {0}", vaultEngineVersion);
             }
             vaultConfig = vaultConfig.build();
             vault = new Vault(vaultConfig);
