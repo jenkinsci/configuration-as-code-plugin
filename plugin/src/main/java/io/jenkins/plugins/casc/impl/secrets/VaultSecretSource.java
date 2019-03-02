@@ -56,11 +56,18 @@ public class VaultSecretSource extends SecretSource {
         Optional<String> vaultAppRoleSecret = getVariable(CASC_VAULT_APPROLE_SECRET, prop);
         Optional<String> vaultNamespace = getVariable(CASC_VAULT_NAMESPACE, prop);
         Optional<String> vaultEngineVersion = getVariable(CASC_VAULT_ENGINE_VERSION, prop);
-        Optional<String[]> vaultPaths = getCommaSeparatedVariables(CASC_VAULT_PATHS, prop);
-        if (!vaultPaths.isPresent()) {
-            // checking old variable for backwards compatibility
-            // TODO: deprecate!
-            vaultPaths = getCommaSeparatedVariables(CASC_VAULT_PATH, prop);
+        Optional<String[]> vaultPaths = getCommaSeparatedVariables(CASC_VAULT_PATHS, prop)
+                .map(Optional::of)
+                .orElse(getCommaSeparatedVariables(CASC_VAULT_PATH, prop)); // TODO: deprecate!
+
+        // Check mandatory variables are set
+        if(!vaultUrl.isPresent()) {
+            LOGGER.log(Level.WARNING, "Mandatory variable {0} not set. Cannot fetch from vault.", CASC_VAULT_URL);
+            return;
+        }
+        if(!vaultPaths.isPresent()) {
+            LOGGER.log(Level.WARNING, "Mandatory variable {0} not set. Cannot fetch from vault.", CASC_VAULT_PATHS);
+            return;
         }
 
         // configure vault client
@@ -91,7 +98,7 @@ public class VaultSecretSource extends SecretSource {
         // attempt AppRole login
         if (vaultAppRole.isPresent() && vaultAppRoleSecret.isPresent() && !authToken.isPresent()) {
             try {
-                authToken = Optional.of(
+                authToken = Optional.ofNullable(
                         vault.auth().loginByAppRole(vaultAppRole.get(), vaultAppRoleSecret.get()).getAuthClientToken()
                 );
                 LOGGER.log(Level.FINE, "Login to Vault using AppRole/SecretID successful");
@@ -103,7 +110,7 @@ public class VaultSecretSource extends SecretSource {
         // attempt User/Pass login
         if (vaultUser.isPresent() && vaultPw.isPresent() && !authToken.isPresent()) {
             try {
-                authToken = Optional.of(
+                authToken = Optional.ofNullable(
                         vault.auth().loginByUserPass(vaultUser.get(), vaultPw.get(), vaultMount.get()).getAuthClientToken()
                 );
                 LOGGER.log(Level.FINE, "Login to Vault using User/Pass successful");
@@ -113,7 +120,16 @@ public class VaultSecretSource extends SecretSource {
         }
 
         // Use authToken to read secrets from vault
-        readSecretsFromVault(authToken.get(), vaultConfig, vault, vaultPaths.get());
+        if (!vaultToken.isPresent() || !vaultPaths.isPresent()) {
+            readSecretsFromVault(authToken.get(), vaultConfig, vault, vaultPaths.get());
+        } else {
+            if (!vaultToken.isPresent()) {
+                LOGGER.log(Level.WARNING, "Vault access token missing. Cannot read from vault");
+            }
+            if (!vaultPaths.isPresent()) {
+                LOGGER.log(Level.WARNING, "Mandatory variable {0} not set. Cannot fetch from vault.", CASC_VAULT_PATHS);
+            }
+        }
     }
 
     private void readSecretsFromVault(String token, VaultConfig vaultConfig, Vault vault, String[] vaultPaths) {
@@ -163,13 +179,10 @@ public class VaultSecretSource extends SecretSource {
     }
 
     private Optional<String> getVariable(String key, Properties prop) {
-        return prop.containsKey(key) ?
-                Optional.ofNullable(prop.getProperty(key)) : Optional.ofNullable(System.getenv(key));
+        return Optional.ofNullable(prop.getProperty(key, System.getenv(key)));
     }
 
     private Optional<String[]> getCommaSeparatedVariables(String key, Properties prop) {
-        Optional<String> setting = getVariable(key, prop);
-        return setting.isPresent() ?
-                Optional.of(setting.get().split(",")) : Optional.empty();
+        return getVariable(key, prop).map(str -> str.split(","));
     }
 }
