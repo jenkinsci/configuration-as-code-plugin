@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 
 public class Attribute<Owner, Type> {
 
-    private final static Logger logger = Logger.getLogger(Attribute.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Attribute.class.getName());
 
     protected final String name;
     protected final Class type;
@@ -166,7 +166,7 @@ public class Attribute<Owner, Type> {
 
 
     public void setValue(Owner target, Type value) throws Exception {
-        logger.info("Setting " + target + '.' + name + " = " + (getType() == Secret.class ? "****" : value));
+        LOGGER.info("Setting " + target + '.' + name + " = " + (getType() == Secret.class ? "****" : value));
         setter.setValue(target, value);
     }
 

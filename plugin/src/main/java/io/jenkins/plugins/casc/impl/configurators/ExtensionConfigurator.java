@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 @Restricted(NoExternalUse.class)
 public class ExtensionConfigurator<T> extends BaseConfigurator<T> {
 
-    private final static Logger logger = Logger.getLogger(ExtensionConfigurator.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ExtensionConfigurator.class.getName());
 
     private final Class<T> target;
 

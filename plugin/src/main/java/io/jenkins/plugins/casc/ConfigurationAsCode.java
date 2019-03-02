@@ -86,7 +86,6 @@ import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.FlowStyle.BLOCK;
 import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.DOUBLE_QUOTED;
 import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.PLAIN;
 import static java.lang.String.format;
-import static java.util.logging.Level.WARNING;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -103,7 +102,7 @@ public class ConfigurationAsCode extends ManagementLink {
     public static final String DEFAULT_JENKINS_YAML_PATH = "jenkins.yaml";
     public static final String YAML_FILES_PATTERN = "glob:**.{yml,yaml,YAML,YML}";
 
-    public static final Logger LOGGER = Logger.getLogger(ConfigurationAsCode.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ConfigurationAsCode.class.getName());
 
     @Inject
     private DefaultConfiguratorRegistry registry;
@@ -333,7 +332,7 @@ public class ConfigurationAsCode extends ManagementLink {
                 res.add(bundled.toString());
             }
         } catch (IOException e) {
-            LOGGER.log(WARNING, "Failed to load " + cascFile, e);
+            LOGGER.log(Level.WARNING, "Failed to load " + cascFile, e);
         }
 
         PathMatcher matcher = FileSystems.getDefault().getPathMatcher(YAML_FILES_PATTERN);
@@ -347,7 +346,7 @@ public class ConfigurationAsCode extends ManagementLink {
                         res.add(bundled.toString());
                     } //TODO: else do some handling?
                 } catch (IOException e) {
-                    LOGGER.log(WARNING, "Failed to execute " + res, e);
+                    LOGGER.log(Level.WARNING, "Failed to execute " + res, e);
                 }
             }
         }

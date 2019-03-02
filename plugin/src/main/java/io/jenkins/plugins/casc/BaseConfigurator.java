@@ -36,10 +36,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
-import static java.util.logging.Level.FINER;
 
 /**
  * a General purpose abstract {@link Configurator} implementation based on introspection.
@@ -52,7 +51,7 @@ import static java.util.logging.Level.FINER;
 
 public abstract class BaseConfigurator<T> implements Configurator<T> {
 
-    private static final Logger logger = Logger.getLogger(BaseConfigurator.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(BaseConfigurator.class.getName());
 
     public Set<Attribute<T, ?>> describe() {
 
@@ -101,7 +100,7 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
                 continue;
             }
 
-            logger.log(FINER, "Processing {0} property", name);
+            LOGGER.log(Level.FINER, "Processing {0} property", name);
 
             Attribute attribute = createAttribute(name, type);
             if (attribute == null) continue;
@@ -161,7 +160,7 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
         if (!c.isPrimitive() && !c.isEnum() && Modifier.isAbstract(c.getModifiers())) {
             if (!Describable.class.isAssignableFrom(c)) {
                 // Not a Describable, so we don't know how to detect concrete implementation type
-                logger.warning("Can't handle "+getTarget()+"#"+name+": type is abstract but not Describable.");
+                LOGGER.warning("Can't handle "+getTarget()+"#"+name+": type is abstract but not Describable.");
                 return null;
             }
             attribute = new DescribableAttribute(name, c);
@@ -374,7 +373,7 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
                     throw new ConfiguratorException(message);
 
                 case warn:
-                    logger.warning(message);
+                    LOGGER.warning(message);
             }
         }
     }
