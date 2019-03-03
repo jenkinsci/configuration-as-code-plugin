@@ -3,9 +3,9 @@ package io.jenkins.plugins.casc.vault;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.Container;
 import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.utility.TestEnvironment;
 import org.testcontainers.vault.VaultContainer;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,7 +18,7 @@ public class VaultTestUtil {
     public static final String VAULT_USER = "admin";
     public static final int VAULT_PORT = 8200;
     public static final String VAULT_PW = "admin";
-    public static final String VAULT_POLCY= "io/jenkins/plugins/casc/vault/vaultTest_adminPolicy.hcl";
+    public static final String VAULT_POLICY= "io/jenkins/plugins/casc/vault/vaultTest_adminPolicy.hcl";
     public static final String VAULT_PATH_V1 = "kv-v1/admin";
     public static final String VAULT_PATH_V2 = "kv-v2/admin";
     public static String VAULT_APPROLE_ID = "";
@@ -38,19 +38,16 @@ public class VaultTestUtil {
         return result;
     }
 
-    public static boolean hasDockerDaemon() {
-        try {
-            return TestEnvironment.dockerApiAtLeast("1.10");
-        } catch (IllegalStateException e) {
-            return false;
-        }
+    public static boolean isWindowsHost() {
+        // TODO: TestContainers on Windows behave strange. Skipping for now.
+        return File.pathSeparatorChar == ';';
     }
 
     public static VaultContainer createVaultContainer() {
-        if (!hasDockerDaemon()) return null;
+        if (isWindowsHost()) return null;
         return new VaultContainer<>(VaultTestUtil.VAULT_DOCKER_IMAGE)
                 .withVaultToken(VaultTestUtil.VAULT_ROOT_TOKEN)
-                .withClasspathResourceMapping(VAULT_POLCY, "/admin.hcl", BindMode.READ_ONLY)
+                .withClasspathResourceMapping(VAULT_POLICY, "/admin.hcl", BindMode.READ_ONLY)
                 .withVaultPort(VAULT_PORT)
                 .waitingFor(Wait.forHttp("/v1/sys/seal-status").forStatusCode(200));
     }
