@@ -22,6 +22,8 @@ public class KV1WithUserTest {
 
     @BeforeClass
     public static void configureVaultContainer() {
+        // Dont run on non-docker daemon nodes
+        org.junit.Assume.assumeTrue(VaultTestUtil.hasDockerDaemon());
         VaultTestUtil.configureVaultContainer(vaultContainer);
     }
 
@@ -37,9 +39,6 @@ public class KV1WithUserTest {
     @Test
     @ConfiguredWithCode("vaultTest_jenkins.yml")
     public void kv1_with_user() {
-        // Dont run on windows
-        org.junit.Assume.assumeTrue(!VaultTestUtil.isWindowsNode());
-
         Jenkins j = Jenkins.getInstance();
         assertEquals("key1: 123", j.getSystemMessage());
     }

@@ -2,8 +2,11 @@ package io.jenkins.plugins.casc.vault;
 
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.Container;
+import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.utility.TestEnvironment;
 import org.testcontainers.vault.VaultContainer;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -15,6 +18,7 @@ public class VaultTestUtil {
     public static final String VAULT_ROOT_TOKEN = "root-token";
     public static final String VAULT_USER = "admin";
     public static final String VAULT_URL = "http://localhost:8200";
+    public static final int VAULT_PORT = 8200;
     public static final String VAULT_PW = "admin";
     public static final String VAULT_POLCY= "io/jenkins/plugins/casc/vault/vaultTest_adminPolicy.hcl";
     public static final String VAULT_PATH_V1 = "kv-v1/admin";
@@ -34,25 +38,20 @@ public class VaultTestUtil {
         return result;
     }
 
-    public static boolean isWindowsNode() {
-        return System.getProperty( "os.name" ).startsWith( "Windows" );
+    public static boolean hasDockerDaemon() {
+        return TestEnvironment.dockerApiAtLeast("1.18");
     }
 
     public static VaultContainer createVaultContainer() {
-        if (isWindowsNode()) return null;
+        if (!hasDockerDaemon()) return null;
         return new VaultContainer<>(VaultTestUtil.VAULT_DOCKER_IMAGE)
                 .withVaultToken(VaultTestUtil.VAULT_ROOT_TOKEN)
                 .withClasspathResourceMapping(VAULT_POLCY, "/admin.hcl", BindMode.READ_ONLY)
-                .withVaultPort(8200);
+                .withVaultPort(VAULT_PORT)
+                .waitingFor(Wait.forHttp("/v1/sys/seal-status").forStatusCode(200));
     }
 
     public static void configureVaultContainer(VaultContainer container) {
-        if (isWindowsNode()) return;
-        try {
-            // TODO: proper life cycle or polling
-            // Give vault 5s to start
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {}
         try {
             // Create Secret Backends
             runCommand(container, "vault", "secrets", "enable", "-path=kv-v2", "-version=2", "kv");
