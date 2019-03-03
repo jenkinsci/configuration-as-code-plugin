@@ -50,6 +50,13 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>vault</artifactId>
+      <version>1.10.6</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
