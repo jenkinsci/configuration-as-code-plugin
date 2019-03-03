@@ -6,7 +6,6 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.TestEnvironment;
 import org.testcontainers.vault.VaultContainer;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,7 +38,7 @@ public class VaultTestUtil {
     }
 
     public static boolean hasDockerDaemon() {
-        return TestEnvironment.dockerApiAtLeast("1.18");
+        return TestEnvironment.dockerApiAtLeast("1.10");
     }
 
     public static VaultContainer createVaultContainer() {
