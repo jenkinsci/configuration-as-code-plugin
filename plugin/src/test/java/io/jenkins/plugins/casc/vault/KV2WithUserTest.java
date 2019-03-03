@@ -18,6 +18,14 @@ import static org.junit.Assume.assumeTrue;
 
 // Inspired by https://github.com/BetterCloud/vault-java-driver/blob/master/src/test-integration/java/com/bettercloud/vault/util/VaultContainer.java
 public class KV2WithUserTest {
+    @Rule
+    public RuleChain chain = RuleChain.outerRule(new EnvVarsRule()
+            .env("CASC_VAULT_URL", VAULT_URL)
+            .env("CASC_VAULT_USER", VAULT_USER)
+            .env("CASC_VAULT_PW", VAULT_PW)
+            .env("CASC_VAULT_PATH", VAULT_PATH_V2)
+            .env("CASC_VAULT_ENGINE_VERSION", "2"))
+            .around(new JenkinsConfiguredWithCodeRule());
 
     @ClassRule
     public static VaultContainer vaultContainer = createVaultContainer();
@@ -29,18 +37,9 @@ public class KV2WithUserTest {
         configureVaultContainer(vaultContainer);
     }
 
-    @Rule
-    public RuleChain chain = RuleChain.outerRule(new EnvVarsRule()
-            .env("CASC_VAULT_URL", VAULT_URL)
-            .env("CASC_VAULT_USER", VAULT_USER)
-            .env("CASC_VAULT_PW", VAULT_PW)
-            .env("CASC_VAULT_PATH", VAULT_PATH_V2)
-            .env("CASC_VAULT_ENGINE_VERSION", "2"))
-            .around(new JenkinsConfiguredWithCodeRule());
-
     @Test
     @ConfiguredWithCode("vaultTest_jenkins.yml")
-    public void kv2_with_user() {
+    public void kv2WithUser() {
         Jenkins j = Jenkins.getInstance();
         assertEquals("key1: 123", j.getSystemMessage());
     }

@@ -15,16 +15,8 @@ import static org.junit.Assume.assumeTrue;
 
 // Inspired by https://github.com/BetterCloud/vault-java-driver/blob/master/src/test-integration/java/com/bettercloud/vault/util/VaultContainer.java
 public class KV1WithTokenTest {
-
     @ClassRule
     public static VaultContainer vaultContainer = createVaultContainer();
-
-    @BeforeClass
-    public static void configureContainer() {
-        // Dont run on non-docker daemon nodes
-        assumeTrue(hasDockerDaemon());
-        configureVaultContainer(vaultContainer);
-    }
 
     @Rule
     public RuleChain chain = RuleChain.outerRule(new EnvVarsRule()
@@ -34,9 +26,16 @@ public class KV1WithTokenTest {
             .env("CASC_VAULT_ENGINE_VERSION", "1"))
             .around(new JenkinsConfiguredWithCodeRule());
 
+    @BeforeClass
+    public static void configureContainer() {
+        // Dont run on non-docker daemon nodes
+        assumeTrue(hasDockerDaemon());
+        configureVaultContainer(vaultContainer);
+    }
+
     @Test
     @ConfiguredWithCode("vaultTest_jenkins.yml")
-    public void kv1_with_token() {
+    public void kv1WithToken() {
         Jenkins j = Jenkins.getInstance();
         assertEquals("key1: 123", j.getSystemMessage());
     }

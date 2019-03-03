@@ -22,13 +22,6 @@ public class KV1WithUserTest {
     @ClassRule
     public static VaultContainer vaultContainer = createVaultContainer();
 
-    @BeforeClass
-    public static void configureContainer() {
-        // Dont run on non-docker daemon nodes
-        assumeTrue(hasDockerDaemon());
-        configureVaultContainer(vaultContainer);
-    }
-
     @Rule
     public RuleChain chain = RuleChain.outerRule(new EnvVarsRule()
             .env("CASC_VAULT_URL", VAULT_URL)
@@ -38,9 +31,16 @@ public class KV1WithUserTest {
             .env("CASC_VAULT_ENGINE_VERSION", "1"))
             .around(new JenkinsConfiguredWithCodeRule());
 
+    @BeforeClass
+    public static void configureContainer() {
+        // Dont run on non-docker daemon nodes
+        assumeTrue(hasDockerDaemon());
+        configureVaultContainer(vaultContainer);
+    }
+
     @Test
     @ConfiguredWithCode("vaultTest_jenkins.yml")
-    public void kv1_with_user() {
+    public void kv1WithUser() {
         Jenkins j = Jenkins.getInstance();
         assertEquals("key1: 123", j.getSystemMessage());
     }
