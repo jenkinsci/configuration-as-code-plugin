@@ -1,2 +1,0 @@
-jenkins:
-  systemMessage: "key1: ${key1}"
