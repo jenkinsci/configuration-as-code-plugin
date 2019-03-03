@@ -73,7 +73,7 @@ public class VaultTestUtil {
             Vault vaultClient = new Vault(config);
             VAULT_APPROLE_ID = vaultClient.logical().read("auth/approle/role/admin/role-id").getData().get("role_id");
             VAULT_APPROLE_SECRET = vaultClient.logical().write("auth/approle/role/admin/secret-id",
-                    new HashMap()).getData().get("secret_id");
+                    new HashMap<>()).getData().get("secret_id");
 
             // add secrets for v1 and v2
             runCommand(container, "vault", "kv", "put", VAULT_PATH_V1, "key1=123", "key2=456");
