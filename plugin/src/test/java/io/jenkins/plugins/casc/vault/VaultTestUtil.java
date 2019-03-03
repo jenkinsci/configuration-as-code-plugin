@@ -38,7 +38,11 @@ public class VaultTestUtil {
     }
 
     public static boolean hasDockerDaemon() {
-        return TestEnvironment.dockerApiAtLeast("1.10");
+        try {
+            return TestEnvironment.dockerApiAtLeast("1.10");
+        } catch (IllegalStateException e) {
+            return false;
+        }
     }
 
     public static VaultContainer createVaultContainer() {
