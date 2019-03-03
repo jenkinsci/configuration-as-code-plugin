@@ -81,7 +81,6 @@ public class VaultSecretSourceTest {
 
     @Test
     public void kv1WithApprole() {
-        envVars.set("CASC_VAULT_URL", VAULT_URL);
         envVars.set("CASC_VAULT_APPROLE", VAULT_APPROLE_ID);
         envVars.set("CASC_VAULT_APPROLE_SECRET", VAULT_APPROLE_SECRET);
         envVars.set("CASC_VAULT_PATH", VAULT_PATH_V1);
@@ -91,7 +90,6 @@ public class VaultSecretSourceTest {
 
     @Test
     public void kv2WithApprole() {
-        envVars.set("CASC_VAULT_URL", VAULT_URL);
         envVars.set("CASC_VAULT_APPROLE", VAULT_APPROLE_ID);
         envVars.set("CASC_VAULT_APPROLE_SECRET", VAULT_APPROLE_SECRET);
         envVars.set("CASC_VAULT_PATH", VAULT_PATH_V2);

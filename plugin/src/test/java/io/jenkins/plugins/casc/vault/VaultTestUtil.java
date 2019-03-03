@@ -16,7 +16,6 @@ public class VaultTestUtil {
     public static final String VAULT_DOCKER_IMAGE = "vault:1.0.3";
     public static final String VAULT_ROOT_TOKEN = "root-token";
     public static final String VAULT_USER = "admin";
-    public static final String VAULT_URL = "http://localhost:8200";
     public static final int VAULT_PORT = 8200;
     public static final String VAULT_PW = "admin";
     public static final String VAULT_POLCY= "io/jenkins/plugins/casc/vault/vaultTest_adminPolicy.hcl";
