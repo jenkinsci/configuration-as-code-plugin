@@ -12,18 +12,19 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@SuppressWarnings("WeakerAccess")
 class VaultTestUtil {
 
     private final static Logger LOGGER = Logger.getLogger(VaultTestUtil.class.getName());
 
     private static final String VAULT_DOCKER_IMAGE = "vault:1.0.3";
-    static final String VAULT_ROOT_TOKEN = "root-token";
-    static final String VAULT_USER = "admin";
-    static final String VAULT_PW = "admin";
-    static final String VAULT_PATH_V1 = "kv-v1/admin";
-    static final String VAULT_PATH_V2 = "kv-v2/admin";
-    static String VAULT_APPROLE_ID = "";
-    static String VAULT_APPROLE_SECRET = "";
+    public static final String VAULT_ROOT_TOKEN = "root-token";
+    public static final String VAULT_USER = "admin";
+    public static final String VAULT_PW = "admin";
+    public static final String VAULT_PATH_V1 = "kv-v1/admin";
+    public static final String VAULT_PATH_V2 = "kv-v2/admin";
+    public static String VAULT_APPROLE_ID = "";
+    public static String VAULT_APPROLE_SECRET = "";
 
     private static void runCommand(VaultContainer container, final String... command)
         throws IOException, InterruptedException {
@@ -31,7 +32,7 @@ class VaultTestUtil {
         container.execInContainer(command);
     }
 
-    static boolean hasDockerDaemon() {
+    public static boolean hasDockerDaemon() {
         try {
             return TestEnvironment.dockerApiAtLeast("1.10");
         } catch (IllegalStateException e) {
@@ -39,7 +40,7 @@ class VaultTestUtil {
         }
     }
 
-    static VaultContainer createVaultContainer() {
+    public static VaultContainer createVaultContainer() {
         if (!hasDockerDaemon()) return null;
         return new VaultContainer<>(VaultTestUtil.VAULT_DOCKER_IMAGE)
                 .withVaultToken(VaultTestUtil.VAULT_ROOT_TOKEN)
@@ -50,7 +51,7 @@ class VaultTestUtil {
                 .waitingFor(Wait.forHttp("/v1/sys/seal-status").forStatusCode(200));
     }
 
-    static void configureVaultContainer(VaultContainer container) {
+    public static void configureVaultContainer(VaultContainer container) {
         try {
             // Create Secret Backends
             runCommand(container, "vault", "secrets", "enable", "-path=kv-v2",
