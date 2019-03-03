@@ -8,13 +8,12 @@ import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
 import hudson.security.ACL;
 import io.jenkins.plugins.casc.impl.configurators.DataBoundConfigurator;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
-import io.jenkins.plugins.casc.misc.EnvVarsRule;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.model.CNode;
 import jenkins.model.Jenkins;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.rules.RuleChain;
 import org.jvnet.hudson.test.LoggerRule;
 
@@ -39,10 +38,10 @@ public class SystemCredentialsTest {
         .capture(100);
 
     @Rule
-    public RuleChain chain = RuleChain.outerRule(new EnvVarsRule()
-            .env("SUDO_PASSWORD", "1234")
-            .env("SSH_PRIVATE_KEY", "s3cr3t")
-            .env("SSH_KEY_PASSWORD", "ABCD"))
+    public RuleChain chain = RuleChain.outerRule(new EnvironmentVariables()
+            .set("SUDO_PASSWORD", "1234")
+            .set("SSH_PRIVATE_KEY", "s3cr3t")
+            .set("SSH_KEY_PASSWORD", "ABCD"))
             .around(log)
             .around(new JenkinsConfiguredWithCodeRule());
 

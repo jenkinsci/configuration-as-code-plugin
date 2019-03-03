@@ -2,12 +2,12 @@ package io.jenkins.plugins.casc;
 
 import hudson.security.csrf.CrumbIssuer;
 import hudson.security.csrf.CrumbIssuerDescriptor;
-import io.jenkins.plugins.casc.misc.EnvVarsRule;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import jenkins.model.Jenkins;
 import org.jenkinsci.Symbol;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.rules.RuleChain;
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -23,8 +23,8 @@ public class JenkinsConfigTest {
 
 
     @Rule
-    public RuleChain chain = RuleChain.outerRule( new EnvVarsRule()
-            .env("CASC_JENKINS_CONFIG", getClass().getResource("JenkinsConfigTest.yml").toExternalForm()))
+    public RuleChain chain = RuleChain.outerRule( new EnvironmentVariables()
+            .set("CASC_JENKINS_CONFIG", getClass().getResource("JenkinsConfigTest.yml").toExternalForm()))
             .around(new JenkinsConfiguredWithCodeRule());
 
 
