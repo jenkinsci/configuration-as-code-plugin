@@ -24,7 +24,8 @@ public class VaultSecretSourceTest {
     public JenkinsRule j = new JenkinsRule();
 
     @Rule
-    public EnvironmentVariables envVars = new EnvironmentVariables();
+    public EnvironmentVariables envVars = new EnvironmentVariables()
+        .set("CASC_VAULT_FILE", getClass().getResource("vaultTest_cascFile").getPath());
 
     private ConfigurationContext context;
 
@@ -46,7 +47,6 @@ public class VaultSecretSourceTest {
 
     @Test
     public void kv1WithUser() {
-        envVars.set("CASC_VAULT_URL", VAULT_URL);
         envVars.set("CASC_VAULT_USER", VAULT_USER);
         envVars.set("CASC_VAULT_PW", VAULT_PW);
         envVars.set("CASC_VAULT_PATH", VAULT_PATH_V1);
@@ -56,7 +56,6 @@ public class VaultSecretSourceTest {
 
     @Test
     public void kv2WithUser() {
-        envVars.set("CASC_VAULT_URL", VAULT_URL);
         envVars.set("CASC_VAULT_USER", VAULT_USER);
         envVars.set("CASC_VAULT_PW", VAULT_PW);
         envVars.set("CASC_VAULT_PATH", VAULT_PATH_V2);
@@ -66,7 +65,6 @@ public class VaultSecretSourceTest {
 
     @Test
     public void kv1WithToken() {
-        envVars.set("CASC_VAULT_URL", VAULT_URL);
         envVars.set("CASC_VAULT_TOKEN", VAULT_ROOT_TOKEN);
         envVars.set("CASC_VAULT_PATH", VAULT_PATH_V1);
         envVars.set("CASC_VAULT_ENGINE_VERSION", "1");
@@ -75,7 +73,6 @@ public class VaultSecretSourceTest {
 
     @Test
     public void kv2WithToken() {
-        envVars.set("CASC_VAULT_URL", VAULT_URL);
         envVars.set("CASC_VAULT_TOKEN", VAULT_ROOT_TOKEN);
         envVars.set("CASC_VAULT_PATH", VAULT_PATH_V2);
         envVars.set("CASC_VAULT_ENGINE_VERSION", "2");
