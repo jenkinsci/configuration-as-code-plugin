@@ -34,7 +34,12 @@ public class VaultTestUtil {
         return result;
     }
 
+    public static boolean isWindowsNode() {
+        return System.getProperty( "os.name" ).startsWith( "Windows" );
+    }
+
     public static VaultContainer createVaultContainer() {
+        if (isWindowsNode()) return null;
         return new VaultContainer<>(VaultTestUtil.VAULT_DOCKER_IMAGE)
                 .withVaultToken(VaultTestUtil.VAULT_ROOT_TOKEN)
                 .withClasspathResourceMapping(VAULT_POLCY, "/admin.hcl", BindMode.READ_ONLY)
@@ -42,10 +47,11 @@ public class VaultTestUtil {
     }
 
     public static void configureVaultContainer(VaultContainer container) {
+        if (isWindowsNode()) return;
         try {
             // TODO: proper life cycle or polling
-            // Give vault 15s to start
-            Thread.sleep(15000);
+            // Give vault 5s to start
+            Thread.sleep(5000);
         } catch (InterruptedException e) {}
         try {
             // Create Secret Backends

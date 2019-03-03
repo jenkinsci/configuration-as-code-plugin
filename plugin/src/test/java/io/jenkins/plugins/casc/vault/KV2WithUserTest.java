@@ -15,7 +15,7 @@ import org.testcontainers.vault.VaultContainer;
 import static org.junit.Assert.assertEquals;
 
 // Inspired by https://github.com/BetterCloud/vault-java-driver/blob/master/src/test-integration/java/com/bettercloud/vault/util/VaultContainer.java
-public class KV1WithUser {
+public class KV2WithUserTest {
 
     @ClassRule
     public static VaultContainer vaultContainer = VaultTestUtil.createVaultContainer();
@@ -30,13 +30,16 @@ public class KV1WithUser {
             .env("CASC_VAULT_URL", VaultTestUtil.VAULT_URL)
             .env("CASC_VAULT_USER", VaultTestUtil.VAULT_USER)
             .env("CASC_VAULT_PW", VaultTestUtil.VAULT_PW)
-            .env("CASC_VAULT_PATH", VaultTestUtil.VAULT_PATH_V1)
-            .env("CASC_VAULT_ENGINE_VERSION", "1"))
+            .env("CASC_VAULT_PATH", VaultTestUtil.VAULT_PATH_V2)
+            .env("CASC_VAULT_ENGINE_VERSION", "2"))
             .around(new JenkinsConfiguredWithCodeRule());
 
     @Test
     @ConfiguredWithCode("vaultTest_jenkins.yml")
-    public void kv1_with_user() {
+    public void kv2_with_user() {
+        // Dont run on windows
+        org.junit.Assume.assumeTrue(!VaultTestUtil.isWindowsNode());
+
         Jenkins j = Jenkins.getInstance();
         assertEquals("key1: 123", j.getSystemMessage());
     }

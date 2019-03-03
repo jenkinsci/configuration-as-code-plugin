@@ -33,6 +33,9 @@ public class KV1WithTokenTest {
     @Test
     @ConfiguredWithCode("vaultTest_jenkins.yml")
     public void kv1_with_token() {
+        // Dont run on windows
+        org.junit.Assume.assumeTrue(!VaultTestUtil.isWindowsNode());
+
         Jenkins j = Jenkins.getInstance();
         assertEquals("key1: 123", j.getSystemMessage());
     }
