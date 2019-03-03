@@ -64,6 +64,15 @@ public class VaultSecretSourceTest {
     }
 
     @Test
+    public void kv2WithWrongUser() {
+        envVars.set("CASC_VAULT_USER", "1234");
+        envVars.set("CASC_VAULT_PW", VAULT_PW);
+        envVars.set("CASC_VAULT_PATH", VAULT_PATH_V2);
+        envVars.set("CASC_VAULT_ENGINE_VERSION", "2");
+        assertThat(SecretSourceResolver.resolve(context, "${key1}"), equalTo(""));
+    }
+
+    @Test
     public void kv1WithToken() {
         envVars.set("CASC_VAULT_TOKEN", VAULT_ROOT_TOKEN);
         envVars.set("CASC_VAULT_PATH", VAULT_PATH_V1);
@@ -77,6 +86,14 @@ public class VaultSecretSourceTest {
         envVars.set("CASC_VAULT_PATH", VAULT_PATH_V2);
         envVars.set("CASC_VAULT_ENGINE_VERSION", "2");
         assertThat(SecretSourceResolver.resolve(context, "${key1}"), equalTo("123"));
+    }
+
+    @Test
+    public void kv1WithWrongToken() {
+        envVars.set("CASC_VAULT_TOKEN", "1234");
+        envVars.set("CASC_VAULT_PATH", VAULT_PATH_V1);
+        envVars.set("CASC_VAULT_ENGINE_VERSION", "1");
+        assertThat(SecretSourceResolver.resolve(context, "${key1}"), equalTo(""));
     }
 
     @Test
@@ -95,5 +112,14 @@ public class VaultSecretSourceTest {
         envVars.set("CASC_VAULT_PATH", VAULT_PATH_V2);
         envVars.set("CASC_VAULT_ENGINE_VERSION", "2");
         assertThat(SecretSourceResolver.resolve(context, "${key1}"), equalTo("123"));
+    }
+
+    @Test
+    public void kv2WithWrongApprole() {
+        envVars.set("CASC_VAULT_APPROLE", "1234");
+        envVars.set("CASC_VAULT_APPROLE_SECRET", VAULT_APPROLE_SECRET);
+        envVars.set("CASC_VAULT_PATH", VAULT_PATH_V2);
+        envVars.set("CASC_VAULT_ENGINE_VERSION", "2");
+        assertThat(SecretSourceResolver.resolve(context, "${key1}"), equalTo(""));
     }
 }
