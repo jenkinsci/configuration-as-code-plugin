@@ -22,6 +22,8 @@ public class VaultTestUtil {
     public static final String VAULT_POLCY= "io/jenkins/plugins/casc/vault/vaultTest_adminPolicy.hcl";
     public static final String VAULT_PATH_V1 = "kv-v1/admin";
     public static final String VAULT_PATH_V2 = "kv-v2/admin";
+    public static String VAULT_APPROLE_ID = "";
+    public static String VAULT_APPROLE_SECRET = "";
 
     private static Container.ExecResult runCommand(VaultContainer container, final String... command) throws IOException, InterruptedException {
         LOGGER.log(Level.FINE, String.join(" ", command));
@@ -66,6 +68,15 @@ public class VaultTestUtil {
 
             // Create policies
             runCommand(container, "vault", "policy", "write", "admin", "/admin.hcl");
+
+            // Create AppRole
+            runCommand(container, "vault", "auth", "enable", "approle");
+            runCommand(container, "vault", "write", "auth/approle/role/admin", "secret_id_ttl=10m",
+                    "token_num_uses=0", "token_ttl=20m", "token_max_ttl=20m", "secret_id_num_uses=1000", "policies=admin");
+            VAULT_APPROLE_ID = runCommand(container, "vault", "read", "-field=role_id", "auth/approle/role/admin/role-id")
+                    .getStdout();
+            VAULT_APPROLE_SECRET = runCommand(container, "vault", "write", "-force", "-field=secret_id", "auth/approle/role/admin/secret-id")
+                    .getStdout();
 
             // add secrets for v1 and v2
             runCommand(container, "vault", "kv", "put", VAULT_PATH_V1, "key1=123", "key2=456");

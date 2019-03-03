@@ -81,4 +81,24 @@ public class VaultSecretSourceTest {
         envVars.set("CASC_VAULT_ENGINE_VERSION", "2");
         assertThat(SecretSourceResolver.resolve(context, "${key1}"), equalTo("123"));
     }
+
+    @Test
+    public void kv1WithApprole() {
+        envVars.set("CASC_VAULT_URL", VAULT_URL);
+        envVars.set("CASC_VAULT_APPROLE", VAULT_APPROLE_ID);
+        envVars.set("CASC_VAULT_APPROLE_SECRET", VAULT_APPROLE_SECRET);
+        envVars.set("CASC_VAULT_PATH", VAULT_PATH_V1);
+        envVars.set("CASC_VAULT_ENGINE_VERSION", "1");
+        assertThat(SecretSourceResolver.resolve(context, "${key1}"), equalTo("123"));
+    }
+
+    @Test
+    public void kv2WithApprole() {
+        envVars.set("CASC_VAULT_URL", VAULT_URL);
+        envVars.set("CASC_VAULT_APPROLE", VAULT_APPROLE_ID);
+        envVars.set("CASC_VAULT_APPROLE_SECRET", VAULT_APPROLE_SECRET);
+        envVars.set("CASC_VAULT_PATH", VAULT_PATH_V2);
+        envVars.set("CASC_VAULT_ENGINE_VERSION", "2");
+        assertThat(SecretSourceResolver.resolve(context, "${key1}"), equalTo("123"));
+    }
 }
