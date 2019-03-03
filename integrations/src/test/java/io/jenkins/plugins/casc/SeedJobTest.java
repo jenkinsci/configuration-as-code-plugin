@@ -3,11 +3,11 @@ package io.jenkins.plugins.casc;
 import static org.junit.Assert.assertNotNull;
 
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
-import io.jenkins.plugins.casc.misc.EnvVarsRule;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.rules.RuleChain;
 
 /**
@@ -16,9 +16,9 @@ import org.junit.rules.RuleChain;
 public class SeedJobTest {
 
     @Rule
-    public RuleChain rc = RuleChain.outerRule(new EnvVarsRule()
-            .env("SEED_JOB_PATH", "./src/test/resources/io/jenkins/plugins/casc/testJob2.groovy")
-            .env("REPO_URL", "git://github.com/jenkinsci/configuration-as-code-plugin.git"))
+    public RuleChain rc = RuleChain.outerRule(new EnvironmentVariables()
+            .set("SEED_JOB_PATH", "./src/test/resources/io/jenkins/plugins/casc/testJob2.groovy")
+            .set("REPO_URL", "git://github.com/jenkinsci/configuration-as-code-plugin.git"))
             .around(new JenkinsConfiguredWithCodeRule());
 
     @Test
