@@ -21,8 +21,11 @@ class VaultTestUtil {
     public static final String VAULT_ROOT_TOKEN = "root-token";
     public static final String VAULT_USER = "admin";
     public static final String VAULT_PW = "admin";
-    public static final String VAULT_PATH_V1 = "kv-v1/admin";
-    public static final String VAULT_PATH_V2 = "kv-v2/admin";
+    public static final String VAULT_PATH_KV1_1 = "kv-v1/admin";
+    public static final String VAULT_PATH_KV1_2 = "kv-v1/dev";
+    public static final String VAULT_PATH_KV2_1 = "kv-v2/admin";
+    public static final String VAULT_PATH_KV2_2 = "kv-v2/dev";
+    public static final String VAULT_PATH_KV2_3 = "kv-v2/qa";
     public static String VAULT_APPROLE_ID = "";
     public static String VAULT_APPROLE_SECRET = "";
 
@@ -83,8 +86,11 @@ class VaultTestUtil {
                     new HashMap<>()).getData().get("secret_id");
 
             // add secrets for v1 and v2
-            runCommand(container, "vault", "kv", "put", VAULT_PATH_V1, "key1=123", "key2=456");
-            runCommand(container, "vault", "kv", "put", VAULT_PATH_V2, "key1=123", "key2=456");
+            runCommand(container, "vault", "kv", "put", VAULT_PATH_KV1_1, "key1=123", "key2=456");
+            runCommand(container, "vault", "kv", "put", VAULT_PATH_KV1_2, "key3=789");
+            runCommand(container, "vault", "kv", "put", VAULT_PATH_KV2_1, "key1=123", "key2=456");
+            runCommand(container, "vault", "kv", "put", VAULT_PATH_KV2_2, "key3=789");
+            runCommand(container, "vault", "kv", "put", VAULT_PATH_KV2_3, "key2=321");
 
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, e.getMessage());

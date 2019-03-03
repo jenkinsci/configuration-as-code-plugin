@@ -40,6 +40,9 @@ public class VaultSecretSource extends SecretSource {
     private static final String CASC_VAULT_PATHS = "CASC_VAULT_PATHS";
     private static final String CASC_VAULT_PATH = "CASC_VAULT_PATH"; // TODO: deprecate!
 
+    private static final String DEFAULT_ENGINE_VERSION = "2";
+    private static final String DEFAULT_USER_BACKEND = "userpass";
+
 
     public VaultSecretSource() {
         Optional<String> vaultFile = Optional.ofNullable(System.getenv(CASC_VAULT_FILE));
@@ -62,6 +65,10 @@ public class VaultSecretSource extends SecretSource {
 
         // Check mandatory variables are set
         if(!vaultUrl.isPresent() || !vaultPaths.isPresent()) return;
+
+        // Check defaults
+        if(!vaultMount.isPresent()) vaultMount = Optional.of(DEFAULT_USER_BACKEND);
+        if(!vaultEngineVersion.isPresent()) vaultEngineVersion = Optional.of(DEFAULT_ENGINE_VERSION);
 
         // configure vault client
         Vault vault = null;
@@ -104,7 +111,7 @@ public class VaultSecretSource extends SecretSource {
         }
 
         // attempt User/Pass login
-        if (vaultUser.isPresent() && vaultPw.isPresent() && !authToken.isPresent()) {
+        if (vaultUser.isPresent() && vaultPw.isPresent() && vaultMount.isPresent() && !authToken.isPresent()) {
             try {
                 authToken = Optional.ofNullable(
                         vault.auth().loginByUserPass(vaultUser.get(), vaultPw.get(), vaultMount.get()).getAuthClientToken()
