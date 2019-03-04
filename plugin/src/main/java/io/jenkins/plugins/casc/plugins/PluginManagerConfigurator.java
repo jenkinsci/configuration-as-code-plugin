@@ -225,7 +225,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
             }
             writeShrinkwrapFile(jenkins, shrinkwrap, pluginManager);
 
-            if (requireRestart) {
+            if (requireRestart && context.getAllowRestart() != ConfigurationContext.AllowRestart.noRestart) {
                 try {
                     jenkins.restart();
                 } catch (RestartNotSupportedException e) {

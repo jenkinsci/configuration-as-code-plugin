@@ -18,6 +18,7 @@ public class ConfigurationContext implements ConfiguratorRegistry {
     private Deprecation deprecation = Deprecation.reject;
     private Restriction restriction = Restriction.reject;
     private Unknown unknown = Unknown.reject;
+    private AllowRestart allowRestart = AllowRestart.restart;
 
     private transient List<Listener> listeners = new ArrayList<>();
 
@@ -43,6 +44,8 @@ public class ConfigurationContext implements ConfiguratorRegistry {
 
     public Unknown getUnknown() { return unknown; }
 
+    public AllowRestart getAllowRestart() { return allowRestart; }
+
     public void setDeprecated(Deprecation deprecation) {
         this.deprecation = deprecation;
     }
@@ -53,6 +56,10 @@ public class ConfigurationContext implements ConfiguratorRegistry {
 
     public void setUnknown(Unknown unknown) {
         this.unknown = unknown;
+    }
+
+    public void setAllowRestart(AllowRestart allowRestart) {
+        this.allowRestart = allowRestart;
     }
 
 
@@ -144,6 +151,11 @@ public class ConfigurationContext implements ConfiguratorRegistry {
      * Policy regarding {@link Deprecated} attributes.
      */
     enum Deprecation { reject, warn }
+
+    /**
+     * Policy regarding automatic restarts .
+     */
+    public enum AllowRestart { restart, safeRestart, noRestart }
 
     @FunctionalInterface
     public interface Listener {
