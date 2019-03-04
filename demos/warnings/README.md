@@ -1,28 +1,30 @@
 # warnings-plugin
 
-Supported in plugin **version >= 4.66**
+Supported in plugin **version >= 5.00**
+
+Now present in the new `Groovy Based Warnings Parsers` section.
 
 ## sample-configuration (Example parser from help)
 
 ```yaml
-jenkins: 
-  [...]
 unclassified:
-  warnings:
+  warningsParsers:
     parsers:
       - name: "Example parser"
-        linkName: "Example parser link"
-        trendName: "Example parser trend name"
+        id: example-id
         regexp: "^\\s*(.*):(\\d+):(.*):\\s*(.*)$"
         script: |
-          import hudson.plugins.warnings.parser.Warning
-          String fileName = matcher.group(1)
-          String lineNumber = matcher.group(2)
-          String category = matcher.group(3)
-          String message = matcher.group(4)
-          return new Warning(fileName, Integer.parseInt(lineNumber), "Dynamic Parser", category, message);
+          import edu.hm.hafner.analysis.Severity
+          builder.setFileName(matcher.group(1))
+                  .setLineStart(Integer.parseInt(matcher.group(2)))
+                  .setSeverity(Severity.WARNING_NORMAL)
+                  .setCategory(matcher.group(3))
+                  .setMessage(matcher.group(4))
+          return builder.buildOptional();
         example: "somefile.txt:2:SeriousWarnings:SomethingWentWrong"
 ```
+
+
 
 
 
