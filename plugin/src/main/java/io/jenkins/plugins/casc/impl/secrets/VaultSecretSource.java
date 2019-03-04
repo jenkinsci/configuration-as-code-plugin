@@ -71,30 +71,28 @@ public class VaultSecretSource extends SecretSource {
         if(!vaultEngineVersion.isPresent()) vaultEngineVersion = Optional.of(DEFAULT_ENGINE_VERSION);
 
         // configure vault client
-        Vault vault = null;
-        VaultConfig vaultConfig = null;
+        VaultConfig vaultConfig = new VaultConfig().address(vaultUrl.get());
         try {
-            vaultConfig = new VaultConfig().address(vaultUrl.get());
             LOGGER.log(Level.FINE, "Attempting to connect to Vault: {0}", vaultUrl.get());
             if (vaultNamespace.isPresent()) {
                 vaultConfig.nameSpace(vaultNamespace.get());
                 LOGGER.log(Level.FINE, "Using namespace with Vault: {0}", vaultNamespace);
             }
-            if (vaultEngineVersion.isPresent()) {
-                vaultConfig.engineVersion(Integer.parseInt(vaultEngineVersion.get()));
-                LOGGER.log(Level.FINE, "Using engine version: {0}", vaultEngineVersion);
-            }
+
+            vaultConfig.engineVersion(Integer.parseInt(vaultEngineVersion.get()));
+            LOGGER.log(Level.FINE, "Using engine version: {0}", vaultEngineVersion);
+
             vaultConfig = vaultConfig.build();
-            vault = new Vault(vaultConfig);
         } catch (VaultException e) {
             LOGGER.log(Level.WARNING, "Could not configure vault connection", e);
         }
 
+        Vault vault = new Vault(vaultConfig);
         Optional<String> authToken = Optional.empty();
 
         // attempt token login
-        if (vaultToken.isPresent() && !authToken.isPresent()) {
-            authToken = Optional.of(vaultToken.get());
+        if (vaultToken.isPresent()) {
+            authToken = vaultToken;
             LOGGER.log(Level.FINE, "Using supplied token to access Vault");
         }
 
@@ -111,7 +109,7 @@ public class VaultSecretSource extends SecretSource {
         }
 
         // attempt User/Pass login
-        if (vaultUser.isPresent() && vaultPw.isPresent() && vaultMount.isPresent() && !authToken.isPresent()) {
+        if (vaultUser.isPresent() && vaultPw.isPresent() && !authToken.isPresent()) {
             try {
                 authToken = Optional.ofNullable(
                         vault.auth().loginByUserPass(vaultUser.get(), vaultPw.get(), vaultMount.get()).getAuthClientToken()
