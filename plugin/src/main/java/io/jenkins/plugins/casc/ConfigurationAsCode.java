@@ -159,25 +159,26 @@ public class ConfigurationAsCode extends ManagementLink {
             return;
         }
         String newSource = request.getParameter("_.newSource");
-        File file = new File(newSource);
-        if (file.exists() || ConfigurationAsCode.isSupportedURI(newSource)) {
-            List<String> candidatePaths = Collections.singletonList(newSource);
+        String normalizedSource = Util.fixEmptyAndTrim(newSource);
+        File file = new File(Util.fixNull(normalizedSource));
+        if (file.exists() || ConfigurationAsCode.isSupportedURI(normalizedSource)) {
+            List<String> candidatePaths = Collections.singletonList(normalizedSource);
             List<YamlSource> candidates = getConfigFromSources(candidatePaths);
             if (canApplyFrom(candidates)) {
                 sources = candidatePaths;
                 configureWith(getConfigFromSources(getSources()));
                 CasCGlobalConfig config = GlobalConfiguration.all().get(CasCGlobalConfig.class);
-                if(config != null) {
-                    config.setConfigurationPath(newSource);
+                if (config != null) {
+                    config.setConfigurationPath(normalizedSource);
                     config.save();
                 }
-                LOGGER.log(Level.FINE, "Replace configuration with: " + newSource);
+                LOGGER.log(Level.FINE, "Replace configuration with: " + normalizedSource);
             } else {
                 LOGGER.log(Level.INFO, "Provided sources could not be applied");
                 // todo: show message in UI
             }
         } else {
-            LOGGER.log(Level.FINE, "There is no such source exist, applying default");
+            LOGGER.log(Level.FINE, "No such source exists, applying default");
             // May be do nothing instead?
             configure();
         }
@@ -195,17 +196,18 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     // Do something with validation! Make a button instead, that function can not be RequirePost in current configuration
-    public FormValidation doCheckNewSource(@QueryParameter String newSource){
+    public FormValidation doCheckNewSource(@QueryParameter String newSource) {
         Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
-        String normalized = Util.fixEmptyAndTrim(newSource);
-        File f = new File(newSource);
-        if (normalized == null) {
+        String normalizedSource = Util.fixEmptyAndTrim(newSource);
+        File file = new File(Util.fixNull(normalizedSource));
+        if (normalizedSource == null) {
             return FormValidation.ok(); // empty, do nothing
-        } else if (!f.exists() && !ConfigurationAsCode.isSupportedURI(normalized)) {
+        }
+        if (!file.exists() && !ConfigurationAsCode.isSupportedURI(normalizedSource)) {
             return FormValidation.error("Configuration cannot be applied. File or URL cannot be parsed or do not exist.");
         }
         try {
-            final Map<Source, String> issues = collectIssues(newSource);
+            final Map<Source, String> issues = collectIssues(normalizedSource);
             final JSONArray errors = collectProblems(issues, "error");
             if (!errors.isEmpty()) {
                 return FormValidation.error(errors.toString());
