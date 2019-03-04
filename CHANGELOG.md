@@ -2,6 +2,8 @@
 
 ## 1.8 (not released yet)
 
+- [#763](https://github.com/jenkinsci/configuration-as-code-plugin/issues/763) Introduce CASC_VAULT_PATHS to allow multiple vault paths to read from. CASC_VAULT_PATH kept for backwards compatibility and offering multi path too now.
+
 ## 1.7
 
 - fix revealing secret with default defined, where environment variable is defined, it would always default.
