@@ -59,16 +59,17 @@ public class VaultSecretSource extends SecretSource {
         Optional<String> vaultAppRoleSecret = getVariable(CASC_VAULT_APPROLE_SECRET, prop);
         Optional<String> vaultNamespace = getVariable(CASC_VAULT_NAMESPACE, prop);
         Optional<String> vaultEngineVersion = getVariable(CASC_VAULT_ENGINE_VERSION, prop);
+
         Optional<String[]> vaultPaths = getCommaSeparatedVariables(CASC_VAULT_PATHS, prop)
                 .map(Optional::of)
                 .orElse(getCommaSeparatedVariables(CASC_VAULT_PATH, prop)); // TODO: deprecate!
 
         // Check mandatory variables are set
-        if(!vaultUrl.isPresent() || !vaultPaths.isPresent()) return;
+        if (!vaultUrl.isPresent() || !vaultPaths.isPresent()) return;
 
         // Check defaults
-        if(!vaultMount.isPresent()) vaultMount = Optional.of(DEFAULT_USER_BACKEND);
-        if(!vaultEngineVersion.isPresent()) vaultEngineVersion = Optional.of(DEFAULT_ENGINE_VERSION);
+        if (!vaultMount.isPresent()) vaultMount = Optional.of(DEFAULT_USER_BACKEND);
+        if (!vaultEngineVersion.isPresent()) vaultEngineVersion = Optional.of(DEFAULT_ENGINE_VERSION);
 
         // configure vault client
         VaultConfig vaultConfig = new VaultConfig().address(vaultUrl.get());
@@ -134,7 +135,7 @@ public class VaultSecretSource extends SecretSource {
             for (String vaultPath : vaultPaths) {
 
                 // check if we overwrite an existing key from another path
-                Map<String,String> nextSecrets = vault.logical().read(vaultPath).getData();
+                Map<String, String> nextSecrets = vault.logical().read(vaultPath).getData();
                 for (String key : nextSecrets.keySet()) {
                     if (secrets.containsKey(key)) {
                         LOGGER.log(Level.WARNING, "Key {0} exists in multiple vault paths.", key);
@@ -179,6 +180,8 @@ public class VaultSecretSource extends SecretSource {
     }
 
     private Optional<String[]> getCommaSeparatedVariables(String key, Properties prop) {
+        if (key.equals(CASC_VAULT_PATH)) LOGGER.log(Level.WARNING, "[Deprecation Warning] CASC_VAULT_PATH will be deprecated. " +
+                "Please use CASC_VAULT_PATHS instead."); // TODO: deprecate!
         return getVariable(key, prop).map(str -> str.split(","));
     }
 }
