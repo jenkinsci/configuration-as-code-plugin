@@ -157,48 +157,51 @@ public class VaultSecretSource extends SecretSource {
         Optional<String> vaultUserOpt = Optional.ofNullable(vaultUser);
         Optional<String> vaultPwOpt = Optional.ofNullable(vaultPw);
 
-        if (vaultTokenOpt.isPresent() ||
+        if (!(vaultTokenOpt.isPresent() ||
                 (vaultAppRoleOpt.isPresent() && vaultAppRoleSecretOpt.isPresent()) ||
-                (vaultUserOpt.isPresent() && vaultPwOpt.isPresent())
+                (vaultUserOpt.isPresent() && vaultPwOpt.isPresent()))
         ) {
-            if (needNewToken()) {
-                Optional<String> authTokenOpt = Optional.empty();
+            // Options are not configured for vault access
+            return;
+        }
 
-                // attempt token login
-                if (vaultTokenOpt.isPresent()) {
-                    authTokenOpt = vaultTokenOpt;
-                    LOGGER.log(Level.FINE, "Using supplied token to access Vault");
-                }
+        if (needNewToken()) {
+            Optional<String> authTokenOpt = Optional.empty();
 
-                // attempt AppRole login
-                if (vaultAppRoleOpt.isPresent() && vaultAppRoleSecretOpt.isPresent() && !authTokenOpt.isPresent()) {
-                    try {
-                        authTokenOpt = Optional.ofNullable(
-                                vault.auth().loginByAppRole(vaultAppRoleOpt.get(), vaultAppRoleSecretOpt.get()).getAuthClientToken()
-                        );
-                        LOGGER.log(Level.FINE, "Login to Vault using AppRole/SecretID successful");
-                    } catch (VaultException e) {
-                        LOGGER.log(Level.WARNING, "Could not login with AppRole", e);
-                    }
-                }
+            // attempt token login
+            if (vaultTokenOpt.isPresent()) {
+                authTokenOpt = vaultTokenOpt;
+                LOGGER.log(Level.FINE, "Using supplied token to access Vault");
+            }
 
-                // attempt User/Pass login
-                if (vaultUserOpt.isPresent() && vaultPwOpt.isPresent() && !authTokenOpt.isPresent()) {
-                    try {
-                        authTokenOpt = Optional.ofNullable(
-                                vault.auth().loginByUserPass(vaultUserOpt.get(), vaultPwOpt.get(), vaultMount).getAuthClientToken()
-                        );
-                        LOGGER.log(Level.FINE, "Login to Vault using User/Pass successful");
-                    } catch (VaultException e) {
-                        LOGGER.log(Level.WARNING, "Could not login with User/Pass", e);
-                    }
+            // attempt AppRole login
+            if (vaultAppRoleOpt.isPresent() && vaultAppRoleSecretOpt.isPresent() && !authTokenOpt.isPresent()) {
+                try {
+                    authTokenOpt = Optional.ofNullable(
+                            vault.auth().loginByAppRole(vaultAppRoleOpt.get(), vaultAppRoleSecretOpt.get()).getAuthClientToken()
+                    );
+                    LOGGER.log(Level.FINE, "Login to Vault using AppRole/SecretID successful");
+                } catch (VaultException e) {
+                    LOGGER.log(Level.WARNING, "Could not login with AppRole", e);
                 }
+            }
 
-                if (authTokenOpt.isPresent()) {
-                    setAuthTokenInVaultClient(authTokenOpt.get());
-                } else {
-                    LOGGER.log(Level.WARNING, "Vault auth token is null.");
+            // attempt User/Pass login
+            if (vaultUserOpt.isPresent() && vaultPwOpt.isPresent() && !authTokenOpt.isPresent()) {
+                try {
+                    authTokenOpt = Optional.ofNullable(
+                            vault.auth().loginByUserPass(vaultUserOpt.get(), vaultPwOpt.get(), vaultMount).getAuthClientToken()
+                    );
+                    LOGGER.log(Level.FINE, "Login to Vault using User/Pass successful");
+                } catch (VaultException e) {
+                    LOGGER.log(Level.WARNING, "Could not login with User/Pass", e);
                 }
+            }
+
+            if (authTokenOpt.isPresent()) {
+                setAuthTokenInVaultClient(authTokenOpt.get());
+            } else {
+                LOGGER.log(Level.WARNING, "Vault auth token is null.");
             }
         }
     }
