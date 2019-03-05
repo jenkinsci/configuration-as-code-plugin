@@ -159,7 +159,7 @@ public class VaultSecretSourceTest {
 
         try {
             // Wait for auth token to become stale
-            Thread.sleep(5000);
+            Thread.sleep(2000);
 
             // Update secret
             runCommand(vaultContainer, "vault", "kv", "put", VAULT_PATH_KV2_AUTH_TEST, "key1=re-auth-test");
