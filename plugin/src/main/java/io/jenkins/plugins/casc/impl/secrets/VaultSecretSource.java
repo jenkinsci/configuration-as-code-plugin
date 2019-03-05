@@ -132,6 +132,24 @@ public class VaultSecretSource extends SecretSource {
         return result;
     }
 
+    private void setAuthTokenInVaultClient(String authToken) {
+        // Set auth token
+        try {
+            vaultConfig.token(authToken).build();
+        } catch (VaultException e) {
+            LOGGER.log(Level.WARNING, "Could not set auth token in vault client", e);
+        }
+
+        // Set token expiration date
+        try {
+            authTokenExpiration = Calendar.getInstance();
+            authTokenExpiration.add(Calendar.SECOND, (int) vault.auth().lookupSelf().getTTL());
+        } catch (VaultException e) {
+            LOGGER.log(Level.WARNING, "Could not determine token expiration. Assuming expired soon.", e);
+            authTokenExpiration = Calendar.getInstance();
+        }
+    }
+
     private void authenticate() {
         Optional<String> vaultTokenOpt = Optional.ofNullable(vaultToken);
         Optional<String> vaultAppRoleOpt = Optional.ofNullable(vaultAppRole);
@@ -172,24 +190,10 @@ public class VaultSecretSource extends SecretSource {
                 }
             }
 
-            // Set auth token
-            try {
-                if (authTokenOpt.isPresent()) {
-                    vaultConfig.token(authTokenOpt.get()).build();
-                } else {
-                    LOGGER.log(Level.WARNING, "authToken not present");
-                }
-            } catch (VaultException e) {
-                LOGGER.log(Level.WARNING, "Could not set auth token in vault client", e);
-            }
-
-            // Set token expiration
-            try {
-                authTokenExpiration = Calendar.getInstance();
-                authTokenExpiration.add(Calendar.SECOND, (int) vault.auth().lookupSelf().getTTL());
-            } catch (VaultException e) {
-                LOGGER.log(Level.WARNING, "Could not determine token expiration. Assuming expired soon.", e);
-                authTokenExpiration = Calendar.getInstance();
+            if (authTokenOpt.isPresent()) {
+                setAuthTokenInVaultClient(authTokenOpt.get());
+            } else {
+                LOGGER.log(Level.WARNING, "Vault auth token is null.");
             }
         }
     }
