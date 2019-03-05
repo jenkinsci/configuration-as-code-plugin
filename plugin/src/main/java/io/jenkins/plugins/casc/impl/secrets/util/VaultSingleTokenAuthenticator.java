@@ -4,11 +4,7 @@ import com.bettercloud.vault.Vault;
 import com.bettercloud.vault.VaultConfig;
 import com.bettercloud.vault.VaultException;
 
-import java.util.logging.Logger;
-
 public class VaultSingleTokenAuthenticator implements VaultAuthenticator {
-    private final static Logger LOGGER = Logger.getLogger(VaultSingleTokenAuthenticator.class.getName());
-
     private String token;
 
     public VaultSingleTokenAuthenticator(String token) {
@@ -19,6 +15,5 @@ public class VaultSingleTokenAuthenticator implements VaultAuthenticator {
         // No special mechanism - token already exists
         config.token(token);
         config.build();
-        return;
     }
 }
