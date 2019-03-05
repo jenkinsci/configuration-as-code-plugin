@@ -162,12 +162,12 @@ public class VaultSecretSourceTest {
             Thread.sleep(5000);
 
             // Update secret
-            VaultTestUtil.runCommand(vaultContainer, "vault", "kv", "put", VAULT_PATH_KV2_AUTH_TEST, "key1=re-auth-test");
+            runCommand(vaultContainer, "vault", "kv", "put", VAULT_PATH_KV2_AUTH_TEST, "key1=re-auth-test");
         } catch (InterruptedException e) {
-            LOGGER.log(Level.WARNING, "Test got interrupted");
+            LOGGER.log(Level.WARNING, "Test got interrupted", e);
             assert false;
         } catch (IOException eio) {
-            LOGGER.log(Level.WARNING, "Could not update vault secret for test");
+            LOGGER.log(Level.WARNING, "Could not update vault secret for test", eio);
             assert false;
         }
 
