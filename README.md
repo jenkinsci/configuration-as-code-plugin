@@ -300,11 +300,11 @@ secrets:
 
 We don't support installing plugins with JCasC you need to use something else for this,
 
-Dockers users can use:
-https://github.com/jenkinsci/docker/#preinstalling-plugins
+Dockers users can use:  
+[https://github.com/jenkinsci/docker/#preinstalling-plugins](https://github.com/jenkinsci/docker/#preinstalling-plugins)
 
-Kubernetes users:
-https://github.com/helm/charts/tree/master/stable/jenkins
+Kubernetes users:  
+[https://github.com/helm/charts/tree/master/stable/jenkins](https://github.com/helm/charts/tree/master/stable/jenkins)
 
 ## Supported Plugins
 
