@@ -1,4 +1,4 @@
-package io.jenkins.plugins.casc.impl.secrets.util;
+package io.jenkins.plugins.casc.impl.secrets.vault;
 
 import com.bettercloud.vault.Vault;
 import com.bettercloud.vault.VaultException;

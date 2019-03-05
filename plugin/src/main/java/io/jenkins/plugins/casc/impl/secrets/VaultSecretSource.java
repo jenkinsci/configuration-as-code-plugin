@@ -5,10 +5,10 @@ import com.bettercloud.vault.VaultConfig;
 import com.bettercloud.vault.VaultException;
 import hudson.Extension;
 import io.jenkins.plugins.casc.SecretSource;
-import io.jenkins.plugins.casc.impl.secrets.util.VaultAppRoleAuthenticator;
-import io.jenkins.plugins.casc.impl.secrets.util.VaultAuthenticator;
-import io.jenkins.plugins.casc.impl.secrets.util.VaultSingleTokenAuthenticator;
-import io.jenkins.plugins.casc.impl.secrets.util.VaultUserPassAuthenticator;
+import io.jenkins.plugins.casc.impl.secrets.vault.VaultAppRoleAuthenticator;
+import io.jenkins.plugins.casc.impl.secrets.vault.VaultAuthenticator;
+import io.jenkins.plugins.casc.impl.secrets.vault.VaultSingleTokenAuthenticator;
+import io.jenkins.plugins.casc.impl.secrets.vault.VaultUserPassAuthenticator;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.FileInputStream;
