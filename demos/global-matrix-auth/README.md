@@ -42,4 +42,3 @@ jenkins:
 
 Some permissions depends on actual plugin-usage. 
 For Example: "Release/*:authenticated" is only available if you _use_ the Release plugin in one of your jobs. 
-
