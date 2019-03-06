@@ -31,15 +31,18 @@ abstract class VaultAuthenticatorWithExpiration implements VaultAuthenticator {
     }
 
     public void getTTLExpiryOfCurrentToken(Vault vault) {
+        int tokenTTL = 0;
+
         try {
             // save token TTL
-            tokenExpiration = Calendar.getInstance();
-            tokenExpiration.add(Calendar.SECOND, (int) vault.auth().lookupSelf().getTTL());
+            tokenTTL = (int)vault.auth().lookupSelf().getTTL();
         } catch (VaultException e) {
             LOGGER.log(Level.WARNING, "Could not determine token expiration. " +
                     "Check if token is allowed to access auth/token/lookup-self. " +
                     "Assuming token TTL expired.", e);
-            tokenExpiration = Calendar.getInstance();
         }
+
+        tokenExpiration = Calendar.getInstance();
+        tokenExpiration.add(Calendar.SECOND, tokenTTL);
     }
 }

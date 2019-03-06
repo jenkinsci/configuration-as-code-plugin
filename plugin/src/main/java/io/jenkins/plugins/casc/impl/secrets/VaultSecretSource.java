@@ -84,8 +84,6 @@ public class VaultSecretSource extends SecretSource {
 
             vaultConfig.engineVersion(Integer.parseInt(vaultEngineVersion));
             LOGGER.log(Level.FINE, "Using engine version: {0}", vaultEngineVersion);
-
-            vaultConfig = vaultConfig.build();
         } catch (VaultException e) {
             LOGGER.log(Level.WARNING, "Could not configure vault connection", e);
         }

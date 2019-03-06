@@ -22,8 +22,7 @@ public class VaultAppRoleAuthenticator extends VaultAuthenticatorWithExpiration 
         if (isTokenTTLExpired()) {
             // authenticate
             String authToken = vault.auth().loginByAppRole(approle, approleSecret).getAuthClientToken();
-            config.token(authToken);
-            config.build();
+            config.token(authToken).build();
             LOGGER.log(Level.FINE, "Login to Vault using AppRole/SecretID successful");
             getTTLExpiryOfCurrentToken(vault);
         }

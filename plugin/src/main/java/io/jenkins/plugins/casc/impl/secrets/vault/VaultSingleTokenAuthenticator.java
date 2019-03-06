@@ -13,7 +13,6 @@ public class VaultSingleTokenAuthenticator implements VaultAuthenticator {
 
     public void authenticate(Vault vault, VaultConfig config) throws VaultException {
         // No special mechanism - token already exists
-        config.token(token);
-        config.build();
+        config.token(token).build();
     }
 }
