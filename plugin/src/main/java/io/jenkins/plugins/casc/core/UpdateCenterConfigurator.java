@@ -65,7 +65,9 @@ public class UpdateCenterConfigurator extends BaseConfigurator<UpdateCenter> {
         Sequence sequence = new Sequence();
         for (UpdateSite site : sites) {
             final CNode describe = c.describe(site, context);
-            sequence.add(describe.asMapping());
+            if (describe != null) {
+                sequence.add(describe.asMapping());
+            }
         }
 
         if (sequence.isEmpty()) {
