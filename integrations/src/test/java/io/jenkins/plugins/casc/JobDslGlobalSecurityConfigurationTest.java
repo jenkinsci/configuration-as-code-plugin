@@ -7,7 +7,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.model.Statement;
 import org.jvnet.hudson.test.Issue;
-import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.RestartableJenkinsRule;
 
 import static org.hamcrest.Matchers.is;
@@ -16,7 +15,7 @@ import static org.junit.Assert.assertThat;
 /**
  * Created by odavid on 23/12/2017.
  */
-public class JobDslGlobaSecurityConfigurationTest {
+public class JobDslGlobalSecurityConfigurationTest {
 
     @Rule
     public RestartableJenkinsRule j = new RestartableJenkinsRule();

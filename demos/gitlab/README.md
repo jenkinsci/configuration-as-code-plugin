@@ -3,7 +3,7 @@
 ## sample configuration
 
 ```yaml
-jenkins: 
+jenkins:
   [...]
 credentials:
   system:
@@ -25,5 +25,3 @@ unclassified:
       readTimeout: 10
       url: "https://gitlab.com/"
 ```
-
-

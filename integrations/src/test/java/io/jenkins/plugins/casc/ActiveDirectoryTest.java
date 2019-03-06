@@ -26,7 +26,7 @@ public class ActiveDirectoryTest {
     @Test
     @ConfiguredWithCode(value = "ActiveDirectoryTest.yml")
     public void configure_active_directory() throws Exception {
-        final Jenkins jenkins = Jenkins.getInstance();
+        final Jenkins jenkins = Jenkins.get();
         final ActiveDirectorySecurityRealm realm = (ActiveDirectorySecurityRealm) jenkins.getSecurityRealm();
         assertEquals(1, realm.domains.size());
         final ActiveDirectoryDomain domain = realm.domains.get(0);

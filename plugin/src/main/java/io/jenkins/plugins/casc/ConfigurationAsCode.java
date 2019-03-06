@@ -61,8 +61,6 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
@@ -88,7 +86,6 @@ import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.FlowStyle.BLOCK;
 import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.DOUBLE_QUOTED;
 import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.PLAIN;
 import static java.lang.String.format;
-import static java.util.logging.Level.WARNING;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -105,7 +102,7 @@ public class ConfigurationAsCode extends ManagementLink {
     public static final String DEFAULT_JENKINS_YAML_PATH = "jenkins.yaml";
     public static final String YAML_FILES_PATTERN = "glob:**.{yml,yaml,YAML,YML}";
 
-    public static final Logger LOGGER = Logger.getLogger(ConfigurationAsCode.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ConfigurationAsCode.class.getName());
 
     @Inject
     private DefaultConfiguratorRegistry registry;
@@ -335,7 +332,7 @@ public class ConfigurationAsCode extends ManagementLink {
                 res.add(bundled.toString());
             }
         } catch (IOException e) {
-            LOGGER.log(WARNING, "Failed to load " + cascFile, e);
+            LOGGER.log(Level.WARNING, "Failed to load " + cascFile, e);
         }
 
         PathMatcher matcher = FileSystems.getDefault().getPathMatcher(YAML_FILES_PATTERN);
@@ -349,7 +346,7 @@ public class ConfigurationAsCode extends ManagementLink {
                         res.add(bundled.toString());
                     } //TODO: else do some handling?
                 } catch (IOException e) {
-                    LOGGER.log(WARNING, "Failed to execute " + res, e);
+                    LOGGER.log(Level.WARNING, "Failed to execute " + res, e);
                 }
             }
         }
@@ -592,7 +589,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
 
     @FunctionalInterface
-    private interface ConfigratorOperation {
+    private interface ConfiguratorOperation {
 
         Object apply(RootElementConfigurator configurator, CNode node) throws ConfiguratorException;
     }
@@ -604,7 +601,7 @@ public class ConfigurationAsCode extends ManagementLink {
      * @param entries key-value pairs, where key should match to root configurator and value have all required properties
      * @throws ConfiguratorException configuration error
      */
-    private static void invokeWith(Mapping entries, ConfigratorOperation function) throws ConfiguratorException {
+    private static void invokeWith(Mapping entries, ConfiguratorOperation function) throws ConfiguratorException {
 
         // Run configurators by order, consuming entries until all have found a matching configurator.
         // Configurators order is important so that io.jenkins.plugins.casc.plugins.PluginManagerConfigurator run

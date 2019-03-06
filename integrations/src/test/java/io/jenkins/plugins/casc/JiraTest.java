@@ -24,10 +24,10 @@ public class JiraTest {
 
         final DescriptorImpl descriptor = (DescriptorImpl) j.jenkins.getDescriptor(JiraProjectProperty.class);
 
-        /** JENKINS-52906
+        /*  JENKINS-52906
          *  assertEquals(2, descriptor.getSites().length);
          *  assertEquals("http://jira.codehaus.org/", sites[0].getUrl().toString());
-         *  assertEquals("http://issues.jenkins-ci.org/", sites[1].getUrl().toString());
+         *  assertEquals("http://issues.jenkins.io/", sites[1].getUrl().toString());
          */
 
         assertEquals(1, descriptor.getSites().length);

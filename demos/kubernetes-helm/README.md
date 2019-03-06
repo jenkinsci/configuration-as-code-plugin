@@ -1,11 +1,11 @@
-# Install the Plugin using the Official Jenkins helm chart
+# Install the plugin using the official Jenkins helm chart
 
 ## Preparation
 
-Jenkins can be installed in Kubernetes using [`helm`](https://github.com/helm/helm).
-The latest stable helm chart can be found [`here`](https://github.com/helm/charts/tree/master/stable/jenkins).
+Jenkins can be installed in Kubernetes using [helm](https://github.com/helm/helm).
+The latest stable helm chart can be found [here](https://github.com/helm/charts/tree/master/stable/jenkins).
 
-Now grab a copy of the helm chart [`values file`](https://github.com/helm/charts/blob/master/stable/jenkins/values.yaml) and adjust the Master part a little bit:
+Now grab a copy of the helm chart [values file](https://github.com/helm/charts/blob/master/stable/jenkins/values.yaml) and adjust the Master part a little bit:
 
 ```yaml
 Master:
@@ -23,9 +23,9 @@ Master:
   # Below is the implementation of Jenkins Configuration as Code.  Add a key under ConfigScripts for each configuration area,
   # where each corresponds to a plugin or section of the UI.  Each key (prior to | character) is just a label, and can be any value.
   # Keys are only used to give the section a meaningful name.  The only restriction is they may only contain RFC 1123 \ DNS label
-  # characters: lowercase letters, numbers, and hyphens.  The keys become the name of a configuration yaml file on the master in
-  # /var/jenkins_home/casc_configs (by default) and will be processed by the Configuration as Code Plugin.  The lines after each |
-  # become the content of the configuration yaml file.  The first line after this is a JCasC root element, eg jenkins, credentials,
+  # characters: lowercase letters, numbers, and hyphens.  The keys become the name of a configuration YAML file on the master in
+  # /var/jenkins_home/casc_configs (by default) and will be processed by the Configuration as Code plugin.  The lines after each |
+  # become the content of the configuration YAML file.  The first line after this is a JCasC root element, eg jenkins, credentials,
   # etc.  Best reference is https://<jenkins_url>/configuration-as-code/reference.  The example below creates a welcome message:
   JCasC:
     enabled: true
@@ -39,7 +39,7 @@ Master:
   Sidecars:
     configAutoReload:
       # If enabled: true, Jenkins Configuration as Code will be reloaded on-the-fly without a reboot.  If false or not-specified,
-      # jcasc changes will cause a reboot and will only be applied at the subsequent start-up.  Auto-reload uses the Jenkins CLI
+      # JCasC changes will cause a reboot and will only be applied at the subsequent start-up.  Auto-reload uses the Jenkins CLI
       # over SSH to reapply config when changes to the ConfigScripts are detected.  The admin user (or account you specify in
       # Master.AdminUser) will have a random SSH private key (RSA 4096) assigned unless you specify OwnSshKey: true.  This will be saved to a k8s secret.
       enabled: true
@@ -53,7 +53,7 @@ Master:
         #     cpu: 50m
         #     memory: 50Mi
       # SSH port value can be set to any unused TCP port.  The default, 1044, is a non-standard SSH port that has been chosen at random.
-      # Is only used to reload jcasc config from the sidecar container running in the Jenkins master pod.
+      # Is only used to reload JCasC config from the sidecar container running in the Jenkins master pod.
       # This TCP port will not be open in the pod (unless you specifically configure this), so Jenkins will not be
       # accessible via SSH from outside of the pod.  Note if you use non-root pod privileges (RunAsUser & FsGroup),
       # this must be > 1024:
@@ -77,7 +77,7 @@ Master:
       value: /var/jenkins_home/casc_configs/..data/jenkins.yaml
     # `SECRETS` is used to override the `/run/secrets` path,
     # which is useful for setting credentials.
-    # But it needs to be used in conjuction with Master.SecretsFilesSecret
+    # But it needs to be used in conjunction with Master.SecretsFilesSecret
     # - name: SECRETS
     #   value: /usr/share/jenkins/ref/secrets
 
@@ -102,4 +102,4 @@ Once Helm finishes deploying the chart, connect to your Jenkins server in your b
 
 ## Misc
 
-Check the [`Configuration as Code`](https://github.com/helm/charts/tree/master/stable/jenkins#configuration-as-code) section in the Jenkins Helm chart repo for more information.
+Check the [Configuration as Code](https://github.com/helm/charts/tree/master/stable/jenkins#configuration-as-code) section in the Jenkins Helm chart repo for more information.

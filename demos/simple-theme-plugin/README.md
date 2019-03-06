@@ -1,4 +1,4 @@
-# configure simple-theme-plugin Plugin
+# configure simple-theme-plugin plugin
 
 ## sample configuration
 

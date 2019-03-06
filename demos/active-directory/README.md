@@ -4,7 +4,8 @@ Basic configuration of the [Active Directory plugin](https://wiki.jenkins.io/dis
 
 ## sample configuration
 
-For Active Directory Plugin version 2.12 and up:
+For plugin version 2.12 and up:
+
 ```yaml
 jenkins:
   SecurityRealm:

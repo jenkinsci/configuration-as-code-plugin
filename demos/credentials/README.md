@@ -6,7 +6,7 @@
 credentials:
   system:
     domainCredentials:
-      - domain :
+      - domain:
           name: "test.com"
           description: "test.com domain"
           specifications:

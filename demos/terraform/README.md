@@ -1,4 +1,4 @@
-# example of how to configure terraform plugin 
+# example of how to configure terraform plugin
 
 to test it from root of the current repository:
 ```

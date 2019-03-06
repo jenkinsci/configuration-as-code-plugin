@@ -5,7 +5,7 @@ TFS plugin configuration belongs under `unclassified` root element
 ## sample configuration
 
 ```yaml
-jenkins: 
+jenkins:
   [...]
 unclassified:
   teampluginglobalconfig:
@@ -20,4 +20,4 @@ unclassified:
 
 ## implementation note
 
-User account name mapping strategy is not yet supported
+User account name mapping strategy is not yet supported.

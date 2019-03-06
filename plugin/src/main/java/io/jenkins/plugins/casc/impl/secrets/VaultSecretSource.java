@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 
 public class VaultSecretSource extends SecretSource {
 
-    private final static Logger LOGGER = Logger.getLogger(VaultSecretSource.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(VaultSecretSource.class.getName());
     private Map<String, String> secrets = new HashMap<>();
 
     private static final String CASC_VAULT_FILE = "CASC_VAULT_FILE";

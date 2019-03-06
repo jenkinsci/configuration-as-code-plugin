@@ -2,6 +2,7 @@ package io.jenkins.plugins.casc.core;
 
 import hudson.Extension;
 import hudson.model.Node;
+import hudson.model.UpdateCenter;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
@@ -16,10 +17,8 @@ import org.kohsuke.accmod.restrictions.NoExternalUse;
 import javax.annotation.CheckForNull;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import static io.jenkins.plugins.casc.Attribute.noop;
@@ -64,6 +63,11 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
                     .collect(Collectors.toList())
             )
         );
+
+        // Add updateCenter, all legwork will be done by a configurator
+        attributes.add(new Attribute<Jenkins, UpdateCenter>("updateCenter", UpdateCenter.class)
+                .getter( j -> j.getInjector().getInstance(UpdateCenter.class))
+                .setter( noop() ));
 
         return attributes;
     }

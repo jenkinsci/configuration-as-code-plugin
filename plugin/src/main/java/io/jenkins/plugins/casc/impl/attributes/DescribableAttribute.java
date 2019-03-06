@@ -5,8 +5,6 @@ import hudson.model.Descriptor;
 import io.jenkins.plugins.casc.Attribute;
 import jenkins.model.Jenkins;
 import org.jenkinsci.Symbol;
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.Beta;
 
 import java.util.ArrayList;
 import java.util.Arrays;

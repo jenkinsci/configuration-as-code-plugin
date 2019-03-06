@@ -21,7 +21,7 @@ public class BackwardCompatibilityTest {
 
     @Test
     @ConfiguredWithCode("BackwardCompatibilityTest.yml")
-    public void shloud_accept_legacy_symbols_on_descriptors() throws Exception {
+    public void should_accept_legacy_symbols_on_descriptors() throws Exception {
 
         final List<Node> nodes = j.jenkins.getNodes();
         System.out.println(nodes);

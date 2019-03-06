@@ -50,7 +50,7 @@
       <div class="alert alert-warning">
         <img src="${rootURL}/images/16x16/warning.png"/>
         Export is not intended to offer a directly usable jenkins.yaml configuration. It can be used for inspiration
-        writting your own, be aware export can be partial, or fail for some components.
+        writing your own, be aware export can be partial, or fail for some components.
       </div>
     </f:form>
 

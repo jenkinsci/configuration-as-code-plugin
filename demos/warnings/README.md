@@ -23,8 +23,3 @@ unclassified:
           return builder.buildOptional();
         example: "somefile.txt:2:SeriousWarnings:SomethingWentWrong"
 ```
-
-
-
-
-
