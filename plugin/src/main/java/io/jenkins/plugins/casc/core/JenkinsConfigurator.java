@@ -1,6 +1,7 @@
 package io.jenkins.plugins.casc.core;
 
 import hudson.Extension;
+import hudson.ProxyConfiguration;
 import hudson.model.Node;
 import hudson.model.UpdateCenter;
 import io.jenkins.plugins.casc.Attribute;
@@ -14,12 +15,12 @@ import jenkins.security.s2m.AdminWhitelistRule;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
-import javax.annotation.CheckForNull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import javax.annotation.CheckForNull;
 
 import static io.jenkins.plugins.casc.Attribute.noop;
 
@@ -67,6 +68,10 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
         // Add updateCenter, all legwork will be done by a configurator
         attributes.add(new Attribute<Jenkins, UpdateCenter>("updateCenter", UpdateCenter.class)
                 .getter( j -> j.getInjector().getInstance(UpdateCenter.class))
+                .setter( noop() ));
+
+        attributes.add(new Attribute<Jenkins, ProxyConfiguration>("proxy", ProxyConfiguration.class)
+                .getter( j -> j.getInjector().getInstance(ProxyConfiguration.class))
                 .setter( noop() ));
 
         return attributes;
