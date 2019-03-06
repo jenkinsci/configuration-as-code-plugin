@@ -1,4 +1,4 @@
-# configure Metrics Graphite Plugin
+# configure Metrics Graphite plugin
 
 ## sample configuration
 

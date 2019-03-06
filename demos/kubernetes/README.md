@@ -1,8 +1,8 @@
 # Configure Kubernetes plugin
 
 Jenkins can be installed in Kubernetes and preconfigured to run jobs (and other
-options) in the Kubernetes cluster, using yaml stored in a `ConfigMap`.
-See [`config.yml`](config.yml) for the `ConfigMap` definition.
+options) in the Kubernetes cluster, using YAML stored in a `ConfigMap`.
+See [config.yml](config.yml) for the `ConfigMap` definition.
 
 Example installation on Kubernetes:
 

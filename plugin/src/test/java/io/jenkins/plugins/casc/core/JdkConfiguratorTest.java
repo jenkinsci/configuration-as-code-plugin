@@ -1,14 +1,10 @@
 package io.jenkins.plugins.casc.core;
 
 import hudson.model.JDK;
-import hudson.tasks.Maven;
 import hudson.tools.InstallSourceProperty;
 import hudson.tools.JDKInstaller;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
-import jenkins.mvn.FilePathSettingsProvider;
-import jenkins.mvn.GlobalMavenConfig;
-import jenkins.mvn.SettingsProvider;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;

@@ -1,5 +1,5 @@
 jenkins:
-  systemMessage: "Jenkins configured automatically by Jenkins Configuration as Code Plugin\n\n"
+  systemMessage: "Jenkins configured automatically by Jenkins Configuration as Code plugin\n\n"
 
 tool:
   terraforminstallation:

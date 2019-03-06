@@ -24,7 +24,8 @@ public class JenkinsConfiguredWithCodeRule extends JenkinsRule {
             final Class<?> clazz = env.description().getTestClass();
             final String[] resource = configuredWithCode.value();
 
-            final List<String> configs = Arrays.asList(resource).stream().map(s -> clazz.getResource(s).toExternalForm())
+            final List<String> configs = Arrays.stream(resource)
+                    .map(s -> clazz.getResource(s).toExternalForm())
                     .collect(Collectors.toList());
 
             try {
@@ -37,7 +38,7 @@ public class JenkinsConfiguredWithCodeRule extends JenkinsRule {
                         boolean match = new StringContains(configuredWithCode.message()).matches(t.getMessage());
                         if(!match) {
                             throw new AssertionError("Exception did not contain the expected string: "
-                                    +configuredWithCode.message() + "\nMesssage was:\n" + t.getMessage());
+                                    +configuredWithCode.message() + "\nMessage was:\n" + t.getMessage());
                         }
                     }
                 }

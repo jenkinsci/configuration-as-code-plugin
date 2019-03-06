@@ -24,8 +24,8 @@ public class GlobalMatrixAuthorizationTest {
     @Test
     @ConfiguredWithCode("GlobalMatrixStrategy.yml")
     public void checkCorrectlyConfiguredPermissions() throws Exception {
-        assertEquals("The configured instance must use the Global Matrix Authentication Strategy", GlobalMatrixAuthorizationStrategy.class, Jenkins.getInstance().getAuthorizationStrategy().getClass());
-        GlobalMatrixAuthorizationStrategy gms = (GlobalMatrixAuthorizationStrategy) Jenkins.getInstance().getAuthorizationStrategy();
+        assertEquals("The configured instance must use the Global Matrix Authentication Strategy", GlobalMatrixAuthorizationStrategy.class, Jenkins.get().getAuthorizationStrategy().getClass());
+        GlobalMatrixAuthorizationStrategy gms = (GlobalMatrixAuthorizationStrategy) Jenkins.get().getAuthorizationStrategy();
 
         List<String> adminPermission = new ArrayList<>(gms.getGrantedPermissions().get(Jenkins.ADMINISTER));
         assertEquals("authenticated", adminPermission.get(0));

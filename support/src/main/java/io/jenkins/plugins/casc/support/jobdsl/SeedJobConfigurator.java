@@ -3,7 +3,6 @@ package io.jenkins.plugins.casc.support.jobdsl;
 import static io.vavr.API.Try;
 import static io.vavr.API.unchecked;
 
-import hudson.EnvVars;
 import hudson.Extension;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.ConfigurationContext;
