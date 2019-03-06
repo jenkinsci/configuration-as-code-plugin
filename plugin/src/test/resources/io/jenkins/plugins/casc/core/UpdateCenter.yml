@@ -1,0 +1,7 @@
+jenkins:
+  updateCenter:
+    sites:
+      - id: "default"
+        url: "https://updates.jenkins.io/update-center.json"
+      - id: "experimental"
+        url: "https://updates.jenkins.io/experimental/update-center.json"
