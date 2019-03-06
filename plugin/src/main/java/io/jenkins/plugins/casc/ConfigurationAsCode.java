@@ -62,7 +62,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
@@ -566,12 +565,15 @@ public class ConfigurationAsCode extends ManagementLink {
      */
     public List<Path> configs(String path) throws ConfiguratorException {
         final PathMatcher matcher = FileSystems.getDefault().getPathMatcher(YAML_FILES_PATTERN);
+        final Path root = Paths.get(path);
+
+        if (!Files.exists(root)) {
+            throw new ConfiguratorException("Invalid configuration: '"+path+"' isn't a valid path.");
+        }
 
         try (Stream<Path> stream = Files.find(Paths.get(path), Integer.MAX_VALUE,
                 (next, attrs) -> !attrs.isDirectory() && !isHidden(next) && matcher.matches(next))) {
             return stream.collect(toList());
-        } catch (NoSuchFileException e) {
-            throw new ConfiguratorException("File does not exist: " + path, e);
         } catch (IOException e) {
             throw new IllegalStateException("failed config scan for " + path, e);
         }
