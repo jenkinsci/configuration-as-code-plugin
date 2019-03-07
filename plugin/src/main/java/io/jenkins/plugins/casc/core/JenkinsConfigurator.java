@@ -71,7 +71,7 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
                 .setter( noop() ));
 
         attributes.add(new Attribute<Jenkins, ProxyConfiguration>("proxy", ProxyConfiguration.class)
-                .getter( j -> j.getInjector().getInstance(ProxyConfiguration.class))
+                .getter( j -> j.proxy)
                 .setter( noop() ));
 
         return attributes;
