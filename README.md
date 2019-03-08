@@ -55,6 +55,8 @@ Second, the plugin looks for the `CASC_JENKINS_CONFIG` environment variable. The
 - A full path to a single file. For example, `/var/jenkins_home/casc_configs/jenkins.yaml`.
 - A URL pointing to a file served on the web. For example, `https://acme.org/jenkins.yaml`.
 
+If `CASC_JENKINS_CONFIG` points to a folder, the plugin will recursively traverse the folder to find file (suffix with .yml,.yaml,.YAML,.YML), but doesn't contain hidden files or hidden subdirectories. It doesn't follow symbolic links.
+
 If you do not set the `CASC_JENKINS_CONFIG` environment variable, the plugin will
 default to looking for a single config file in `$JENKINS_ROOT/jenkins.yaml`.
 

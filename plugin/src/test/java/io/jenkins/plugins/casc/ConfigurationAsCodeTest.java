@@ -59,7 +59,7 @@ public class ConfigurationAsCodeTest {
 
         assertThat(casc.configs(exactFile.getAbsolutePath()), hasSize(1));
         final List<Path> foo = casc.configs(tempFolder.getRoot().getAbsolutePath());
-        assertThat(foo, hasSize(5));
+        assertThat(foo, hasSize(6));
     }
 
     @Test(expected = ConfiguratorException.class)

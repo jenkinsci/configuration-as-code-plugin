@@ -558,7 +558,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
 
     /**
-     * Search for all {@link #YAML_FILES_PATTERN} in provided base path
+     * Recursive search for all {@link #YAML_FILES_PATTERN} in provided base path
      *
      * @param path base path to start (can be file or directory)
      * @return list of all paths matching pattern. Only base file itself if it is a file matching pattern
@@ -571,18 +571,23 @@ public class ConfigurationAsCode extends ManagementLink {
             throw new ConfiguratorException("Invalid configuration: '"+path+"' isn't a valid path.");
         }
 
-        if (!Files.isDirectory(root)) {
-            return matcher.matches(root) ? Collections.singletonList(root) : Collections.emptyList();
-        }
-
-        try {
-            return Files.list(root)
-                    .filter(Files::isRegularFile) // only consider regular files, following symlinks
-                    .filter(matcher::matches)     // matching pattern
-                    .collect(toList());
+        try (Stream<Path> stream = Files.find(Paths.get(path), Integer.MAX_VALUE,
+                (next, attrs) -> !attrs.isDirectory() && !isHidden(next) && matcher.matches(next))) {
+            return stream.collect(toList());
         } catch (IOException e) {
             throw new IllegalStateException("failed config scan for " + path, e);
         }
+    }
+
+    private static boolean isHidden(Path path) {
+        int count = path.getNameCount();
+        for (int i = 0; i < count; i++) {
+            String name = path.getName(i).toString();
+            if (name.startsWith(".")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static Stream<? extends Map.Entry<String, Object>> entries(Reader config) {
