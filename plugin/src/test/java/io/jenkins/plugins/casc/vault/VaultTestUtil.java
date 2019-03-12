@@ -2,6 +2,11 @@ package io.jenkins.plugins.casc.vault;
 
 import com.bettercloud.vault.Vault;
 import com.bettercloud.vault.VaultConfig;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Properties;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.MountableFile;
 import org.testcontainers.utility.TestEnvironment;
@@ -27,8 +32,8 @@ class VaultTestUtil {
     public static final String VAULT_PATH_KV2_2 = "kv-v2/dev";
     public static final String VAULT_PATH_KV2_3 = "kv-v2/qa";
     public static final String VAULT_PATH_KV2_AUTH_TEST = "kv-v2/auth-test";
-    public static String VAULT_APPROLE_ID = "";
-    public static String VAULT_APPROLE_SECRET = "";
+    public static final String VAULT_APPROLE_FILE = "JCasC_temp_approle_secret.prop";
+    private static boolean configured = false;
 
     public static void runCommand(VaultContainer container, final String... command)
         throws IOException, InterruptedException {
@@ -56,17 +61,18 @@ class VaultTestUtil {
     }
 
     public static void configureVaultContainer(VaultContainer container) {
+        if (configured) return;
         try {
             // Create Secret Backends
             runCommand(container, "vault", "secrets", "enable", "-path=kv-v2",
-                    "-version=2", "kv");
+                "-version=2", "kv");
             runCommand(container, "vault", "secrets", "enable", "-path=kv-v1",
-                    "-version=1", "kv");
+                "-version=1", "kv");
 
             // Create user/password credential
             runCommand(container, "vault", "auth", "enable", "userpass");
             runCommand(container, "vault", "write", "auth/userpass/users/" + VAULT_USER,
-                    "password=" + VAULT_PW, "policies=admin");
+                "password=" + VAULT_PW, "policies=admin");
 
             // Create policies
             runCommand(container, "vault", "policy", "write", "admin", "/admin.hcl");
@@ -74,26 +80,39 @@ class VaultTestUtil {
             // Create AppRole
             runCommand(container, "vault", "auth", "enable", "approle");
             runCommand(container, "vault", "write", "auth/approle/role/admin",
-                    "secret_id_ttl=10m", "token_num_uses=0", "token_ttl=4s", "token_max_ttl=4s",
-                    "secret_id_num_uses=1000", "policies=admin");
+                "secret_id_ttl=10m", "token_num_uses=0", "token_ttl=4s", "token_max_ttl=4s",
+                "secret_id_num_uses=1000", "policies=admin");
 
             // Retrieve AppRole credentials
             VaultConfig config = new VaultConfig().address("http://localhost:8200")
-                    .token(VAULT_ROOT_TOKEN).engineVersion(1).build();
+                .token(VAULT_ROOT_TOKEN).engineVersion(1).build();
             Vault vaultClient = new Vault(config);
-            VAULT_APPROLE_ID = vaultClient.logical().read("auth/approle/role/admin/role-id")
-                    .getData().get("role_id");
-            VAULT_APPROLE_SECRET = vaultClient.logical().write("auth/approle/role/admin/secret-id",
-                    new HashMap<>()).getData().get("secret_id");
+            final String roleID = vaultClient.logical().read("auth/approle/role/admin/role-id")
+                .getData().get("role_id");
+            final String secretID = vaultClient.logical().write("auth/approle/role/admin/secret-id",
+                new HashMap<>()).getData().get("secret_id");
+
+            Properties properties = new Properties();
+            properties.put("CASC_VAULT_APPROLE", roleID);
+            properties.put("CASC_VAULT_APPROLE_SECRET", secretID);
+
+            Path filePath = Paths.get(System.getProperty("java.io.tmpdir"), VAULT_APPROLE_FILE);
+            File file = filePath.toFile();
+            FileOutputStream fos = new FileOutputStream(file);
+            properties.store(fos, null);
 
             // add secrets for v1 and v2
-            runCommand(container, "vault", "kv", "put", VAULT_PATH_KV1_1, "key1=123", "key2=456");
+            runCommand(container, "vault", "kv", "put", VAULT_PATH_KV1_1, "key1=123",
+                "key2=456");
             runCommand(container, "vault", "kv", "put", VAULT_PATH_KV1_2, "key3=789");
-            runCommand(container, "vault", "kv", "put", VAULT_PATH_KV2_1, "key1=123", "key2=456");
+            runCommand(container, "vault", "kv", "put", VAULT_PATH_KV2_1, "key1=123",
+                "key2=456");
             runCommand(container, "vault", "kv", "put", VAULT_PATH_KV2_2, "key3=789");
             runCommand(container, "vault", "kv", "put", VAULT_PATH_KV2_3, "key2=321");
-            runCommand(container, "vault", "kv", "put", VAULT_PATH_KV2_AUTH_TEST, "key1=auth-test");
-
+            runCommand(container, "vault", "kv", "put", VAULT_PATH_KV2_AUTH_TEST,
+                "key1=auth-test");
+            LOGGER.log(Level.INFO, "Vault is configured");
+            configured = true;
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, e.getMessage());
         }
