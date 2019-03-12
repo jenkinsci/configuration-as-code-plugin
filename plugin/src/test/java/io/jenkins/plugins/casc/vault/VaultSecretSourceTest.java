@@ -7,9 +7,12 @@ import io.jenkins.plugins.casc.ConfiguratorRegistry;
 import io.jenkins.plugins.casc.SecretSource;
 import io.jenkins.plugins.casc.SecretSourceResolver;
 import io.jenkins.plugins.casc.misc.*;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -46,6 +49,12 @@ public class VaultSecretSourceTest {
 
         // Create vault policies/users/roles ..
         configureVaultContainer(vaultContainer);
+    }
+
+    @AfterClass
+    public static void removeAppRoleFile() {
+        File file = Paths.get(System.getProperty("java.io.tmpdir"), VAULT_APPROLE_FILE).toFile();
+        assert file.delete() || !file.exists();
     }
 
     @Before
