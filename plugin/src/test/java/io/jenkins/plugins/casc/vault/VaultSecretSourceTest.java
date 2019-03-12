@@ -16,7 +16,6 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
-import org.junit.runners.model.Statement;
 import org.testcontainers.vault.VaultContainer;
 
 import static io.jenkins.plugins.casc.vault.VaultTestUtil.*;
@@ -33,17 +32,8 @@ public class VaultSecretSourceTest {
     public static VaultContainer vaultContainer = createVaultContainer();
 
     @Rule
-    public RuleChain chain = RuleChain.outerRule(
-        (base, description) -> new Statement() {
-            @Override
-            public void evaluate() throws Throwable {
-                // Ensure vault is configured before trying to use EnvVarRules
-                // Needed to for AppRole secrets, NOOP if already configured
-                configureVaultContainer(vaultContainer);
-                base.evaluate();
-            }
-        })
-        .around(new EnvVarsRule()
+    public RuleChain chain = RuleChain
+        .outerRule(new EnvVarsRule()
             .set("CASC_VAULT_FILE", getClass().getResource("vaultTest_cascFile").getPath()))
         .around(new JenkinsConfiguredWithCodeRule());
 
