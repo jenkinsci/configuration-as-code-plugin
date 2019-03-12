@@ -63,7 +63,7 @@ public class VaultSecretSource extends SecretSource {
         Optional<String> vaultNamespace = getVariable(CASC_VAULT_NAMESPACE, prop);
         Optional<String[]> vaultPaths = getCommaSeparatedVariables(CASC_VAULT_PATHS, prop)
                 .map(Optional::of)
-                .orElse(getCommaSeparatedVariables(CASC_VAULT_PATH, prop)); // TODO: deprecate!
+                .orElseGet(() -> getCommaSeparatedVariables(CASC_VAULT_PATH, prop)); // TODO: deprecate!
 
         // Check mandatory variables are set
         if (!vaultUrl.isPresent() || !vaultPaths.isPresent()) return;
