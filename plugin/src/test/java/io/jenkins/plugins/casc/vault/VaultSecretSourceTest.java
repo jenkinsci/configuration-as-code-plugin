@@ -9,6 +9,10 @@ import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.testcontainers.vault.VaultContainer;
 
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static io.jenkins.plugins.casc.vault.VaultTestUtil.*;
 import static org.junit.Assert.assertThat;
@@ -16,6 +20,8 @@ import static org.junit.Assume.assumeTrue;
 
 // Inspired by https://github.com/BetterCloud/vault-java-driver/blob/master/src/test-integration/java/com/bettercloud/vault/util/VaultContainer.java
 public class VaultSecretSourceTest {
+
+    private final static Logger LOGGER = Logger.getLogger(VaultSecretSourceTest.class.getName());
 
     @ClassRule
     public static VaultContainer vaultContainer = createVaultContainer();
@@ -141,6 +147,31 @@ public class VaultSecretSourceTest {
         envVars.set("CASC_VAULT_ENGINE_VERSION", "2");
         assertThat(SecretSourceResolver.resolve(context, "${key2}"), equalTo("321"));
         assertThat(SecretSourceResolver.resolve(context, "${key1}"), equalTo("123"));
+    }
+
+    @Test
+    public void kv2WithApproleWithReauth() {
+        envVars.set("CASC_VAULT_APPROLE", VAULT_APPROLE_ID);
+        envVars.set("CASC_VAULT_APPROLE_SECRET", VAULT_APPROLE_SECRET);
+        envVars.set("CASC_VAULT_PATHS", VAULT_PATH_KV2_AUTH_TEST);
+        envVars.set("CASC_VAULT_ENGINE_VERSION", "2");
+        assertThat(SecretSourceResolver.resolve(context, "${key1}"), equalTo("auth-test"));
+
+        try {
+            // Wait for auth token to become stale
+            Thread.sleep(2000);
+
+            // Update secret
+            runCommand(vaultContainer, "vault", "kv", "put", VAULT_PATH_KV2_AUTH_TEST, "key1=re-auth-test");
+        } catch (InterruptedException e) {
+            LOGGER.log(Level.WARNING, "Test got interrupted", e);
+            assert false;
+        } catch (IOException eio) {
+            LOGGER.log(Level.WARNING, "Could not update vault secret for test", eio);
+            assert false;
+        }
+
+        assertThat(SecretSourceResolver.resolve(context, "${key1}"), equalTo("re-auth-test"));
     }
 
     // TODO: used to check for backwards compatibility. Deprecate!
