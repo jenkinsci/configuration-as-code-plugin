@@ -6,11 +6,9 @@ import hudson.ProxyConfiguration;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
-import io.jenkins.plugins.casc.Configurator;
 import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
-import jenkins.model.Jenkins;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
@@ -39,7 +37,19 @@ public class ProxyConfigurator extends BaseConfigurator<ProxyConfiguration> {
 
     @Override
     protected ProxyConfiguration instance(Mapping mapping, ConfigurationContext context) throws ConfiguratorException {
-        return Jenkins.getInstance().proxy;
+        Set<String> keys = mapping.keySet();
+        return new ProxyConfiguration(
+                mapping.getScalarValue("name"),
+                Integer.parseInt(mapping.getScalarValue("port")),
+                getOptionalParam(mapping, keys, "userName"),
+                getOptionalParam(mapping, keys, "password"),
+                getOptionalParam(mapping, keys, "noProxyHost"),
+                getOptionalParam(mapping, keys, "testUrl")
+        );
+    }
+
+    private String getOptionalParam(Mapping mapping, Set<String> keys, String key) throws ConfiguratorException {
+        return keys.contains(key) ? mapping.getScalarValue(key) : null;
     }
 
     @NonNull
@@ -70,12 +80,6 @@ public class ProxyConfigurator extends BaseConfigurator<ProxyConfiguration> {
     @Override
     @CheckForNull
     public CNode describe(ProxyConfiguration instance, ConfigurationContext context) throws Exception {
-        final Mapping mapping = new Mapping();
-        final Configurator cp = context.lookupOrFail(ProxyConfiguration.class);
-        final ProxyConfiguration proxy = Jenkins.getInstance().proxy;
-        if (proxy != null) {
-            mapping.putIfNotNull("proxy", cp.describe(proxy, context));
-        }
-        return mapping;
+        return null;
     }
 }
