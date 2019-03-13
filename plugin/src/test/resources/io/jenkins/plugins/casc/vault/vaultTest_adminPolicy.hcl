@@ -9,3 +9,7 @@ path "kv-v1/*" {
 path "kv-v2/*" {
     capabilities = ["create", "read", "list"]
 }
+
+path "auth/token/lookup-self" {
+    capabilities = ["read"]
+}
