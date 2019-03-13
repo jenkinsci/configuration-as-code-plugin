@@ -52,7 +52,6 @@ public class VaultSecretSource extends SecretSource {
     private VaultAuthenticator vaultAuthenticator;
     private String[] vaultPaths;
 
-
     public VaultSecretSource() {
         Optional<String> vaultFile = Optional.ofNullable(System.getenv(CASC_VAULT_FILE));
         Properties prop = new Properties();
@@ -64,7 +63,7 @@ public class VaultSecretSource extends SecretSource {
         Optional<String> vaultNamespace = getVariable(CASC_VAULT_NAMESPACE, prop);
         Optional<String[]> vaultPaths = getCommaSeparatedVariables(CASC_VAULT_PATHS, prop)
                 .map(Optional::of)
-                .orElse(getCommaSeparatedVariables(CASC_VAULT_PATH, prop)); // TODO: deprecate!
+                .orElseGet(() -> getCommaSeparatedVariables(CASC_VAULT_PATH, prop)); // TODO: deprecate!
 
         // Check mandatory variables are set
         if (!vaultUrl.isPresent() || !vaultPaths.isPresent()) return;
@@ -168,19 +167,6 @@ public class VaultSecretSource extends SecretSource {
     @Override
     public Optional<String> reveal(String secret) {
         if (StringUtils.isBlank(secret)) return Optional.empty();
-
-        // TODO: move this to SecretSource.init() function which gets called only once when CasC.configure() is run
-        // Ensure secrets are up-to-date
-        if (vaultAuthenticator != null) {
-            try {
-                vaultAuthenticator.authenticate(vault, vaultConfig);
-            } catch (VaultException e) {
-                LOGGER.log(Level.WARNING, "Could not authenticate with vault client", e);
-            }
-
-            readSecretsFromVault();
-        }
-
         return Optional.ofNullable(secrets.get(secret));
     }
 
@@ -201,5 +187,18 @@ public class VaultSecretSource extends SecretSource {
             LOGGER.log(Level.WARNING, "[Deprecation Warning] CASC_VAULT_PATH will be deprecated. " +
                     "Please use CASC_VAULT_PATHS instead."); // TODO: deprecate!
         return getVariable(key, prop).map(str -> str.split(","));
+    }
+
+    @Override
+    public void init() {
+        // Ensure secrets are up-to-date and Check vault authentication
+        if (vaultAuthenticator != null) {
+            try {
+                vaultAuthenticator.authenticate(vault, vaultConfig);
+            } catch (VaultException e) {
+                LOGGER.log(Level.WARNING, "Could not authenticate with vault client", e);
+            }
+            readSecretsFromVault();
+        }
     }
 }

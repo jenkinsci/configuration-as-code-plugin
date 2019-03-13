@@ -2,19 +2,27 @@ package io.jenkins.plugins.casc.vault;
 
 
 import io.jenkins.plugins.casc.ConfigurationContext;
+import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.ConfiguratorRegistry;
+import io.jenkins.plugins.casc.SecretSource;
 import io.jenkins.plugins.casc.SecretSourceResolver;
-import org.junit.*;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
-import org.jvnet.hudson.test.JenkinsRule;
-import org.testcontainers.vault.VaultContainer;
-
+import io.jenkins.plugins.casc.misc.*;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.RuleChain;
+import org.testcontainers.vault.VaultContainer;
 
-import static org.hamcrest.CoreMatchers.equalTo;
 import static io.jenkins.plugins.casc.vault.VaultTestUtil.*;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeTrue;
 
@@ -27,11 +35,10 @@ public class VaultSecretSourceTest {
     public static VaultContainer vaultContainer = createVaultContainer();
 
     @Rule
-    public JenkinsRule j = new JenkinsRule();
-
-    @Rule
-    public EnvironmentVariables envVars = new EnvironmentVariables()
-        .set("CASC_VAULT_FILE", getClass().getResource("vaultTest_cascFile").getPath());
+    public RuleChain chain = RuleChain
+        .outerRule(new EnvVarsRule()
+            .set("CASC_VAULT_FILE", getClass().getResource("vaultTest_cascFile").getPath()))
+        .around(new JenkinsConfiguredWithCodeRule());
 
     private ConfigurationContext context;
 
@@ -44,6 +51,12 @@ public class VaultSecretSourceTest {
         configureVaultContainer(vaultContainer);
     }
 
+    @AfterClass
+    public static void removeAppRoleFile() {
+        File file = Paths.get(System.getProperty("java.io.tmpdir"), VAULT_APPROLE_FILE).toFile();
+        assert file.delete() || !file.exists();
+    }
+
     @Before
     public void refreshConfigurationContext() {
         // Setup Jenkins
@@ -52,109 +65,140 @@ public class VaultSecretSourceTest {
     }
 
     @Test
+    @ConfiguredWithCode("vault.yml")
+    @Envs({
+        @Env(name = "CASC_VAULT_USER", value = VAULT_USER),
+        @Env(name = "CASC_VAULT_PW", value = VAULT_PW),
+        @Env(name = "CASC_VAULT_PATHS", value = VAULT_PATH_KV1_1 + "," + VAULT_PATH_KV1_2),
+        @Env(name = "CASC_VAULT_ENGINE_VERSION", value = "1")
+    })
     public void kv1WithUser() {
-        envVars.set("CASC_VAULT_USER", VAULT_USER);
-        envVars.set("CASC_VAULT_PW", VAULT_PW);
-        envVars.set("CASC_VAULT_PATHS", VAULT_PATH_KV1_1 + "," + VAULT_PATH_KV1_2);
-        envVars.set("CASC_VAULT_ENGINE_VERSION", "1");
         assertThat(SecretSourceResolver.resolve(context, "${key1}"), equalTo("123"));
     }
 
     @Test
+    @ConfiguredWithCode("vault.yml")
+    @Envs({
+        @Env(name = "CASC_VAULT_USER", value = VAULT_USER),
+        @Env(name = "CASC_VAULT_PW", value = VAULT_PW),
+        @Env(name = "CASC_VAULT_PATHS", value = VAULT_PATH_KV2_1 + "," + VAULT_PATH_KV2_2),
+        @Env(name = "CASC_VAULT_ENGINE_VERSION", value = "2")
+    })
     public void kv2WithUser() {
-        envVars.set("CASC_VAULT_USER", VAULT_USER);
-        envVars.set("CASC_VAULT_PW", VAULT_PW);
-        envVars.set("CASC_VAULT_PATHS", VAULT_PATH_KV2_1 + "," + VAULT_PATH_KV2_2);
-        envVars.set("CASC_VAULT_ENGINE_VERSION", "2");
         assertThat(SecretSourceResolver.resolve(context, "${key1}"), equalTo("123"));
     }
 
     @Test
+    @ConfiguredWithCode("vault.yml")
+    @Envs({
+        @Env(name = "CASC_VAULT_USER", value = "1234"),
+        @Env(name = "CASC_VAULT_PW", value = VAULT_PW),
+        @Env(name = "CASC_VAULT_PATHS", value = VAULT_PATH_KV2_1),
+        @Env(name = "CASC_VAULT_ENGINE_VERSION", value = "2")
+    })
     public void kv2WithWrongUser() {
-        envVars.set("CASC_VAULT_USER", "1234");
-        envVars.set("CASC_VAULT_PW", VAULT_PW);
-        envVars.set("CASC_VAULT_PATHS", VAULT_PATH_KV2_1);
-        envVars.set("CASC_VAULT_ENGINE_VERSION", "2");
         assertThat(SecretSourceResolver.resolve(context, "${key1}"), equalTo(""));
     }
 
     @Test
+    @ConfiguredWithCode("vault.yml")
+    @Envs({
+        @Env(name = "CASC_VAULT_TOKEN", value = VAULT_ROOT_TOKEN),
+        @Env(name = "CASC_VAULT_PATHS", value = VAULT_PATH_KV1_1 + "," + VAULT_PATH_KV1_2),
+        @Env(name = "CASC_VAULT_ENGINE_VERSION", value = "1")
+    })
     public void kv1WithToken() {
-        envVars.set("CASC_VAULT_TOKEN", VAULT_ROOT_TOKEN);
-        envVars.set("CASC_VAULT_PATHS", VAULT_PATH_KV1_1 + "," + VAULT_PATH_KV1_2);
-        envVars.set("CASC_VAULT_ENGINE_VERSION", "1");
         assertThat(SecretSourceResolver.resolve(context, "${key1}"), equalTo("123"));
     }
 
     @Test
+    @ConfiguredWithCode("vault.yml")
+    @Envs({
+        @Env(name = "CASC_VAULT_TOKEN", value = VAULT_ROOT_TOKEN),
+        @Env(name = "CASC_VAULT_PATHS", value = VAULT_PATH_KV2_1 + "," + VAULT_PATH_KV2_2),
+        @Env(name = "CASC_VAULT_ENGINE_VERSION", value = "2")
+    })
     public void kv2WithToken() {
-        envVars.set("CASC_VAULT_TOKEN", VAULT_ROOT_TOKEN);
-        envVars.set("CASC_VAULT_PATHS", VAULT_PATH_KV2_1 + "," + VAULT_PATH_KV2_2);
-        envVars.set("CASC_VAULT_ENGINE_VERSION", "2");
         assertThat(SecretSourceResolver.resolve(context, "${key1}"), equalTo("123"));
     }
 
     @Test
+    @ConfiguredWithCode("vault.yml")
+    @Envs({
+        @Env(name = "CASC_VAULT_TOKEN", value = "1234"),
+        @Env(name = "CASC_VAULT_PATHS", value = VAULT_PATH_KV1_1),
+        @Env(name = "CASC_VAULT_ENGINE_VERSION", value = "1")
+    })
     public void kv1WithWrongToken() {
-        envVars.set("CASC_VAULT_TOKEN", "1234");
-        envVars.set("CASC_VAULT_PATHS", VAULT_PATH_KV1_1);
-        envVars.set("CASC_VAULT_ENGINE_VERSION", "1");
         assertThat(SecretSourceResolver.resolve(context, "${key1}"), equalTo(""));
     }
 
     @Test
+    @ConfiguredWithCode("vault.yml")
+    @EnvsFromFile(VAULT_APPROLE_FILE)
+    @Envs({
+        @Env(name = "CASC_VAULT_PATHS", value = VAULT_PATH_KV1_1 + "," + VAULT_PATH_KV1_2),
+        @Env(name = "CASC_VAULT_ENGINE_VERSION", value = "1")
+    })
     public void kv1WithApprole() {
-        envVars.set("CASC_VAULT_APPROLE", VAULT_APPROLE_ID);
-        envVars.set("CASC_VAULT_APPROLE_SECRET", VAULT_APPROLE_SECRET);
-        envVars.set("CASC_VAULT_PATHS", VAULT_PATH_KV1_1 + "," + VAULT_PATH_KV1_2);
-        envVars.set("CASC_VAULT_ENGINE_VERSION", "1");
         assertThat(SecretSourceResolver.resolve(context, "${key1}"), equalTo("123"));
     }
 
     @Test
-    public void kv2WithApprole() {
-        envVars.set("CASC_VAULT_APPROLE", VAULT_APPROLE_ID);
-        envVars.set("CASC_VAULT_APPROLE_SECRET", VAULT_APPROLE_SECRET);
-        envVars.set("CASC_VAULT_PATHS", VAULT_PATH_KV2_1 + "," + VAULT_PATH_KV2_2);
-        envVars.set("CASC_VAULT_ENGINE_VERSION", "2");
+    @ConfiguredWithCode("vault.yml")
+    @EnvsFromFile(VAULT_APPROLE_FILE)
+    @Envs({
+        @Env(name = "CASC_VAULT_PATHS", value = VAULT_PATH_KV2_1 + "," + VAULT_PATH_KV2_2),
+        @Env(name = "CASC_VAULT_ENGINE_VERSION", value = "2")
+    })
+    public void kv2WithApprole() throws ConfiguratorException {
         assertThat(SecretSourceResolver.resolve(context, "${key1}"), equalTo("123"));
     }
 
     @Test
+    @ConfiguredWithCode("vault.yml")
+    @EnvsFromFile(VAULT_APPROLE_FILE)
+    @Envs({
+        @Env(name = "CASC_VAULT_APPROLE", value = "1234"),
+        @Env(name = "CASC_VAULT_PATHS", value = VAULT_PATH_KV2_1),
+        @Env(name = "CASC_VAULT_ENGINE_VERSION", value = "2")
+    })
     public void kv2WithWrongApprole() {
-        envVars.set("CASC_VAULT_APPROLE", "1234");
-        envVars.set("CASC_VAULT_APPROLE_SECRET", VAULT_APPROLE_SECRET);
-        envVars.set("CASC_VAULT_PATHS", VAULT_PATH_KV2_1);
-        envVars.set("CASC_VAULT_ENGINE_VERSION", "2");
         assertThat(SecretSourceResolver.resolve(context, "${key1}"), equalTo(""));
     }
 
     @Test
+    @ConfiguredWithCode("vault.yml")
+    @EnvsFromFile(VAULT_APPROLE_FILE)
+    @Envs({
+        @Env(name = "CASC_VAULT_PATHS", value = VAULT_PATH_KV2_1 + "," + VAULT_PATH_KV2_2),
+        @Env(name = "CASC_VAULT_ENGINE_VERSION", value = "2")
+    })
     public void kv2WithApproleMultipleKeys() {
-        envVars.set("CASC_VAULT_APPROLE", VAULT_APPROLE_ID);
-        envVars.set("CASC_VAULT_APPROLE_SECRET", VAULT_APPROLE_SECRET);
-        envVars.set("CASC_VAULT_PATHS", VAULT_PATH_KV2_1 + "," + VAULT_PATH_KV2_2);
-        envVars.set("CASC_VAULT_ENGINE_VERSION", "2");
         assertThat(SecretSourceResolver.resolve(context, "${key2}"), equalTo("456"));
         assertThat(SecretSourceResolver.resolve(context, "${key3}"), equalTo("789"));
     }
 
     @Test
+    @ConfiguredWithCode("vault.yml")
+    @EnvsFromFile(VAULT_APPROLE_FILE)
+    @Envs({
+        @Env(name = "CASC_VAULT_PATHS", value = VAULT_PATH_KV2_1 + "," + VAULT_PATH_KV2_2 + "," + VAULT_PATH_KV2_3),
+        @Env(name = "CASC_VAULT_ENGINE_VERSION", value = "2")
+    })
     public void kv2WithApproleMultipleKeysOverriden() {
-        envVars.set("CASC_VAULT_APPROLE", VAULT_APPROLE_ID);
-        envVars.set("CASC_VAULT_APPROLE_SECRET", VAULT_APPROLE_SECRET);
-        envVars.set("CASC_VAULT_PATHS", VAULT_PATH_KV2_1 + "," + VAULT_PATH_KV2_2 + "," + VAULT_PATH_KV2_3);
-        envVars.set("CASC_VAULT_ENGINE_VERSION", "2");
         assertThat(SecretSourceResolver.resolve(context, "${key2}"), equalTo("321"));
         assertThat(SecretSourceResolver.resolve(context, "${key1}"), equalTo("123"));
     }
 
     @Test
-    public void kv2WithApproleWithReauth() {
-        envVars.set("CASC_VAULT_APPROLE", VAULT_APPROLE_ID);
-        envVars.set("CASC_VAULT_APPROLE_SECRET", VAULT_APPROLE_SECRET);
-        envVars.set("CASC_VAULT_PATHS", VAULT_PATH_KV2_AUTH_TEST);
-        envVars.set("CASC_VAULT_ENGINE_VERSION", "2");
+    @ConfiguredWithCode("vault.yml")
+    @EnvsFromFile(VAULT_APPROLE_FILE)
+    @Envs({
+        @Env(name = "CASC_VAULT_PATHS", value = VAULT_PATH_KV2_AUTH_TEST),
+        @Env(name = "CASC_VAULT_ENGINE_VERSION", value = "2")
+    })
+    public void kv2WithApproleWithReauth() throws Exception {
         assertThat(SecretSourceResolver.resolve(context, "${key1}"), equalTo("auth-test"));
 
         try {
@@ -162,7 +206,8 @@ public class VaultSecretSourceTest {
             Thread.sleep(2000);
 
             // Update secret
-            runCommand(vaultContainer, "vault", "kv", "put", VAULT_PATH_KV2_AUTH_TEST, "key1=re-auth-test");
+            runCommand(vaultContainer, "vault", "kv", "put", VAULT_PATH_KV2_AUTH_TEST,
+                "key1=re-auth-test");
         } catch (InterruptedException e) {
             LOGGER.log(Level.WARNING, "Test got interrupted", e);
             assert false;
@@ -171,16 +216,20 @@ public class VaultSecretSourceTest {
             assert false;
         }
 
+        // SecretSource.init is normally called on configure
+        context.getSecretSources().forEach(SecretSource::init);
         assertThat(SecretSourceResolver.resolve(context, "${key1}"), equalTo("re-auth-test"));
     }
 
     // TODO: used to check for backwards compatibility. Deprecate!
     @Test
+    @ConfiguredWithCode("vault.yml")
+    @EnvsFromFile(VAULT_APPROLE_FILE)
+    @Envs({
+        @Env(name = "CASC_VAULT_PATH", value = VAULT_PATH_KV1_1 + "," + VAULT_PATH_KV1_2),
+        @Env(name = "CASC_VAULT_ENGINE_VERSION", value = "1")
+    })
     public void kv2WithUserDeprecatedPath() {
-        envVars.set("CASC_VAULT_APPROLE", VAULT_APPROLE_ID);
-        envVars.set("CASC_VAULT_APPROLE_SECRET", VAULT_APPROLE_SECRET);
-        envVars.set("CASC_VAULT_PATH", VAULT_PATH_KV1_1 + "," + VAULT_PATH_KV1_2);
-        envVars.set("CASC_VAULT_ENGINE_VERSION", "1");
         assertThat(SecretSourceResolver.resolve(context, "${key3}"), equalTo("789"));
     }
 }

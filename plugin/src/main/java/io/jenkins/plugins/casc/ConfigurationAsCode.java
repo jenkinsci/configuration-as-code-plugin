@@ -649,6 +649,7 @@ public class ConfigurationAsCode extends ManagementLink {
         monitor.reset();
         ConfigurationContext context = new ConfigurationContext(registry);
         context.addListener(monitor::record);
+        context.getSecretSources().forEach(SecretSource::init);
         try (ACLContext acl = ACL.as(ACL.SYSTEM)) {
             invokeWith(entries, (configurator, config) -> configurator.configure(config, context));
         }
