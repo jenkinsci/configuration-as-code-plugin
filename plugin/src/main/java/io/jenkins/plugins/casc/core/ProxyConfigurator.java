@@ -66,7 +66,7 @@ public class ProxyConfigurator extends BaseConfigurator<ProxyConfiguration> {
                         .getter(ProxyConfiguration::getUserName)
                         .setter(noop()),
                 new Attribute<ProxyConfiguration, String>("password", String.class)
-                        .getter(ProxyConfiguration::getPassword)
+                        .getter(ProxyConfiguration::getEncryptedPassword)
                         .setter(noop()),
                 new Attribute<ProxyConfiguration, String>("noProxyHost", String.class)
                         .getter(config -> config.noProxyHost)
