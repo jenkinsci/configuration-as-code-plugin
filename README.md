@@ -55,6 +55,8 @@ Second, the plugin looks for the `CASC_JENKINS_CONFIG` environment variable. The
 - A full path to a single file. For example, `/var/jenkins_home/casc_configs/jenkins.yaml`.
 - A URL pointing to a file served on the web. For example, `https://acme.org/jenkins.yaml`.
 
+If `CASC_JENKINS_CONFIG` points to a folder, the plugin will recursively traverse the folder to find file (suffix with .yml,.yaml,.YAML,.YML), but doesn't contain hidden files or hidden subdirectories. It doesn't follow symbolic links.
+
 If you do not set the `CASC_JENKINS_CONFIG` environment variable, the plugin will
 default to looking for a single config file in `$JENKINS_ROOT/jenkins.yaml`.
 
@@ -250,6 +252,7 @@ Prerequisites:
 - The environment variable `CASC_VAULT_NAMESPACE` is optional. If used, sets the Vault namespace for Enterprise Vaults.
 - The environment variable `CASC_VAULT_FILE` is optional, provides a way for the other variables to be read from a file instead of environment variables.
 - The environment variable `CASC_VAULT_ENGINE_VERSION` is optional. If unset, your vault path is assumed to be using kv version 2. If your vault path uses engine version 1, set this variable to `1`.
+- The issued token should have read access to vault path `auth/token/lookup-self` in order to determine its expiration time. JCasC will re-issue a token if its expiration is reached (except for `CASC_VAULT_TOKEN`).
 
 If the environment variables `CASC_VAULT_URL` and `CASC_VAULT_PATHS` are present, JCasC will try to gather initial secrets from Vault. However for it to work properly there is a need for authentication by either the combination of `CASC_VAULT_USER` and `CASC_VAULT_PW`, a `CASC_VAULT_TOKEN`, or the combination of `CASC_VAULT_APPROLE` and `CASC_VAULT_APPROLE_SECRET`. The authenticated user must have at least read access.
 

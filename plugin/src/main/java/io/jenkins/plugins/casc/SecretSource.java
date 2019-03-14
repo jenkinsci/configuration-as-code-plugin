@@ -17,6 +17,10 @@ import java.util.Optional;
 
 public abstract class SecretSource implements ExtensionPoint {
 
+    public void init() {
+        // NOOP
+    }
+
     public abstract Optional<String> reveal(String secret) throws IOException;
 
     public static List<SecretSource> all() {
