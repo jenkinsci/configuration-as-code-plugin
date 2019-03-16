@@ -8,7 +8,6 @@ import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.RootElementConfigurator;
-import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import jenkins.model.Jenkins;
 import jenkins.security.s2m.AdminWhitelistRule;
@@ -20,7 +19,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import javax.annotation.CheckForNull;
 
 import static io.jenkins.plugins.casc.Attribute.noop;
 
@@ -67,7 +65,7 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
 
         // Add updateCenter, all legwork will be done by a configurator
         attributes.add(new Attribute<Jenkins, UpdateCenter>("updateCenter", UpdateCenter.class)
-                .getter( j -> j.getInjector().getInstance(UpdateCenter.class))
+                .getter(Jenkins::getUpdateCenter)
                 .setter( noop() ));
 
         attributes.add(new Attribute<Jenkins, ProxyConfiguration>("proxy", ProxyConfiguration.class)
@@ -80,18 +78,6 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
     @Override
     protected Set<String> exclusions() {
         return Collections.singleton("installState");
-    }
-
-    @CheckForNull
-    @Override
-    public CNode describe(Jenkins instance, ConfigurationContext context) throws Exception {
-
-        // we can't generate a fresh new Jenkins object as constructor is mixed with init and check for `theInstance` singleton 
-        Mapping mapping = new Mapping();
-        for (Attribute attribute : getAttributes()) {
-            mapping.put(attribute.getName(), attribute.describe(instance, context));
-        }
-        return mapping;
     }
 
     @Override

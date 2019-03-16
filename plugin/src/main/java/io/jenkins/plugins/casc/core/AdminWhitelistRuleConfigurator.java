@@ -25,7 +25,6 @@ import hudson.Extension;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
-import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import java.util.Collections;
 import jenkins.model.Jenkins;
@@ -33,8 +32,6 @@ import jenkins.security.s2m.AdminWhitelistRule;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
-import javax.annotation.CheckForNull;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -70,13 +67,5 @@ public class AdminWhitelistRuleConfigurator extends BaseConfigurator<AdminWhitel
                 .getter(target -> !target.getMasterKillSwitch())
                 .setter((target, value) -> target.setMasterKillSwitch(!value))
         ));
-    }
-
-    @CheckForNull
-    @Override
-    public CNode describe(AdminWhitelistRule instance, ConfigurationContext context) {
-        final Mapping mapping = new Mapping();
-        mapping.put("enabled", !instance.getMasterKillSwitch());
-        return mapping;
     }
 }

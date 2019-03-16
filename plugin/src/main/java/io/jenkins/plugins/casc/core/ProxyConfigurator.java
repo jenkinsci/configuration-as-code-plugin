@@ -7,7 +7,6 @@ import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.ConfiguratorException;
-import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
@@ -15,7 +14,6 @@ import org.kohsuke.accmod.restrictions.NoExternalUse;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import javax.annotation.CheckForNull;
 
 import static io.jenkins.plugins.casc.Attribute.noop;
 
@@ -75,11 +73,5 @@ public class ProxyConfigurator extends BaseConfigurator<ProxyConfiguration> {
                         .getter(ProxyConfiguration::getTestUrl)
                         .setter(noop())
         ));
-    }
-
-    @Override
-    @CheckForNull
-    public CNode describe(ProxyConfiguration instance, ConfigurationContext context) throws Exception {
-        return null;
     }
 }

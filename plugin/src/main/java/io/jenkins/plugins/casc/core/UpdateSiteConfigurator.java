@@ -6,15 +6,12 @@ import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.ConfiguratorException;
-import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
-
-import javax.annotation.CheckForNull;
 
 import static io.jenkins.plugins.casc.Attribute.noop;
 
@@ -48,16 +45,5 @@ public class UpdateSiteConfigurator extends BaseConfigurator<UpdateSite> {
                 .getter(UpdateSite::getUrl)
                 .setter( noop() )
         ));
-    }
-
-    @CheckForNull
-    @Override
-    public CNode describe(UpdateSite instance, ConfigurationContext context) throws Exception {
-        final Mapping mapping = new Mapping();
-        // TODO would need to compare with hudson.model.UpdateCenter.createDefaultUpdateSite
-        // so we return null if default update site is in use.
-        mapping.put("id", instance.getId());
-        mapping.put("url", instance.getUrl());
-        return mapping;
     }
 }

@@ -23,6 +23,7 @@ package io.jenkins.plugins.casc;
 
 import hudson.ExtensionPoint;
 import io.jenkins.plugins.casc.model.CNode;
+import io.jenkins.plugins.casc.model.Mapping;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 
@@ -156,6 +157,15 @@ public interface Configurator<T> {
      * Only export attributes which are <b>not</b> set to default value.
      */
     @CheckForNull
-    CNode describe(T instance, ConfigurationContext context) throws Exception;
+    default CNode describe(T instance, ConfigurationContext context) throws Exception {
+        Mapping mapping = new Mapping();
+        for (Attribute attribute : getAttributes()) {
+            CNode value = attribute.describe(instance, context);
+            if (value != null) {
+                mapping.put(attribute.getName(), value);
+            }
+        }
+        return mapping;
+    }
 
 }
