@@ -2,10 +2,8 @@ package io.jenkins.plugins.casc.core;
 
 import hudson.model.UpdateCenter;
 import hudson.model.UpdateSite;
-import hudson.security.HudsonPrivateSecurityRealm;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.Configurator;
-import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.ConfiguratorRegistry;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
