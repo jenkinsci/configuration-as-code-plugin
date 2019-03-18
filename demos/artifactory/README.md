@@ -22,6 +22,7 @@ unclassified:
 ```
 
 ## implementation note
+
 Currently setting credentials causes ERROR & `Enable Push to Bintray` is not supported (always enabled).
 
 see [https://www.jfrog.com/jira/browse/HAP-1018]

@@ -43,7 +43,7 @@ import java.util.logging.Logger;
 @Restricted(NoExternalUse.class)
 public class DefaultConfiguratorRegistry implements ConfiguratorRegistry {
 
-    private final static Logger logger = Logger.getLogger(DefaultConfiguratorRegistry.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(DefaultConfiguratorRegistry.class.getName());
 
 
     @Override
@@ -134,7 +134,10 @@ public class DefaultConfiguratorRegistry implements ConfiguratorRegistry {
         }
 
         if (Descriptor.class.isAssignableFrom(clazz)) {
-            return new DescriptorConfigurator((Descriptor) jenkins.getExtensionList(clazz).get(0));
+            ExtensionList extensions = jenkins.getExtensionList(clazz);
+            if (!extensions.isEmpty()) {
+                return new DescriptorConfigurator((Descriptor) extensions.get(0));
+            }
         }
 
         if (DataBoundConfigurator.getDataBoundConstructor(clazz) != null) {
@@ -158,7 +161,7 @@ public class DefaultConfiguratorRegistry implements ConfiguratorRegistry {
             return new EnumConfigurator(clazz);
         }
 
-        logger.warning("Configuration-as-Code can't handle type "+ type);
+        LOGGER.warning("Configuration-as-Code can't handle type "+ type);
         return null;
     }
 

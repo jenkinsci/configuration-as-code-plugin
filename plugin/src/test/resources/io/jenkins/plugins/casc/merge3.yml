@@ -1,5 +1,5 @@
 jenkins:
-  systemMessage: "Configured by configuration-as-code-plugin"
+  systemMessage: "Configured by Configuration as Code plugin"
 
   nodes:
     - dumb:

@@ -27,7 +27,7 @@ public class EC2CloudTest {
     @Test
     @ConfiguredWithCode("EC2Cloud.yml")
     public void configure_ec2_cloud() throws Exception {
-        final AmazonEC2Cloud ec2Cloud = (AmazonEC2Cloud) Jenkins.getInstance().getCloud("ec2-ec2");
+        final AmazonEC2Cloud ec2Cloud = (AmazonEC2Cloud) Jenkins.get().getCloud("ec2-ec2");
         assertNotNull(ec2Cloud);
 
         assertTrue(ec2Cloud.isUseInstanceProfileForCredentials());
@@ -48,7 +48,7 @@ public class EC2CloudTest {
     @Test
     @ConfiguredWithCode("EC2CloudAMIType.yml")
     public void configure_ec2_cloud_with_custom_ami_type() throws Exception {
-        final AmazonEC2Cloud ec2Cloud = (AmazonEC2Cloud) Jenkins.getInstance().getCloud("ec2-ec2");
+        final AmazonEC2Cloud ec2Cloud = (AmazonEC2Cloud) Jenkins.get().getCloud("ec2-ec2");
         assertNotNull(ec2Cloud);
 
         assertTrue(ec2Cloud.isUseInstanceProfileForCredentials());

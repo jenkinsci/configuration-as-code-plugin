@@ -1,8 +1,11 @@
 package io.jenkins.plugins.casc;
 
+import com.gargoylesoftware.htmlunit.html.HtmlForm;
+import com.gargoylesoftware.htmlunit.html.HtmlInput;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import hudson.util.FormValidation;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
-import org.apache.commons.io.FileUtils;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -53,11 +56,10 @@ public class ConfigurationAsCodeTest {
         Files.createSymbolicLink(data, timestamp.toPath());
         Files.createSymbolicLink(Paths.get(tempFolder.getRoot().getAbsolutePath(), "jenkins_6.yaml"),
                                  data.resolve("jenkins_6.yaml"));
-        
 
         assertThat(casc.configs(exactFile.getAbsolutePath()), hasSize(1));
         final List<Path> foo = casc.configs(tempFolder.getRoot().getAbsolutePath());
-        assertThat(foo, hasSize(5));
+        assertThat(foo, hasSize(6));
     }
 
     @Test(expected = ConfiguratorException.class)
@@ -69,7 +71,7 @@ public class ConfigurationAsCodeTest {
     @Test
     @ConfiguredWithCode(value = {"merge1.yml", "merge3.yml"}, expected = ConfiguratorException.class)
     public void shouldMergeYamlConfig() {
-        assertEquals("Configured by configuration-as-code-plugin", j.jenkins.getSystemMessage());
+        assertEquals("Configured by Configuration as Code plugin", j.jenkins.getSystemMessage());
         assertEquals(0, j.jenkins.getNumExecutors());
         assertNotNull(j.jenkins.getNode("agent1"));
         assertNotNull(j.jenkins.getNode("agent3"));
@@ -78,5 +80,29 @@ public class ConfigurationAsCodeTest {
     @Test
     @ConfiguredWithCode(value = {"merge1.yml", "merge2.yml"}, expected = ConfiguratorException.class)
     public void shouldReportConfigurationConflict() {
+    }
+
+    @Test
+    public void doCheckNewSource_should_trim_input() throws Exception {
+        ConfigurationAsCode casc = ConfigurationAsCode.get();
+
+        String configUri = getClass().getResource("merge3.yml").toExternalForm();
+
+        assertEquals(casc.doCheckNewSource("  " + configUri + "  ").kind, FormValidation.Kind.OK);
+    }
+
+    @Test
+    public void doReplace_should_trim_input() throws Exception {
+        HtmlPage page = j.createWebClient().goTo("configuration-as-code");
+        j.assertGoodStatus(page);
+
+        HtmlForm form = page.getFormByName("replace");
+        HtmlInput input = form.getInputByName("_.newSource");
+        String configUri = getClass().getResource("merge3.yml").toExternalForm();
+        input.setValueAttribute("  " + configUri + "  ");
+        HtmlPage resultPage = j.submit(form);
+        j.assertGoodStatus(resultPage);
+
+        assertEquals("Configured by Configuration as Code plugin", j.jenkins.getSystemMessage());
     }
 }

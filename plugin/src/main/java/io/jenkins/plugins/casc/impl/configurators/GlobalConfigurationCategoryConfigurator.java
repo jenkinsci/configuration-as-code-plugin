@@ -20,7 +20,6 @@ import javax.annotation.CheckForNull;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -32,7 +31,7 @@ import static io.jenkins.plugins.casc.Attribute.Setter.NOP;
 @Restricted(NoExternalUse.class)
 public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<GlobalConfigurationCategory> implements RootElementConfigurator<GlobalConfigurationCategory> {
 
-    private final static Logger logger = Logger.getLogger(GlobalConfigurationCategoryConfigurator.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(GlobalConfigurationCategoryConfigurator.class.getName());
 
     private final GlobalConfigurationCategory category;
 
@@ -81,7 +80,7 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
 
     public static boolean reportDescriptorWithoutSetters(Configurator c) {
         if (c.describe().isEmpty()) {
-            logger.fine(c.getTarget().getName() +
+            LOGGER.fine(c.getTarget().getName() +
                     " has a global view but CasC didn't detect any configurable attribute; see: https://jenkins.io/redirect/casc-requirements/");
         }
         return true;

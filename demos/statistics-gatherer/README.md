@@ -1,6 +1,7 @@
 # configure statistics-gatherer plugin
 
 ## sample configuration
+
 Sample configuration for the Statistics Gatherer plugin.
 
 ```yaml

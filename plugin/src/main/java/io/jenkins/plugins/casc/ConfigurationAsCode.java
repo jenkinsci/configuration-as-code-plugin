@@ -61,8 +61,6 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
@@ -88,7 +86,6 @@ import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.FlowStyle.BLOCK;
 import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.DOUBLE_QUOTED;
 import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.PLAIN;
 import static java.lang.String.format;
-import static java.util.logging.Level.WARNING;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -105,7 +102,7 @@ public class ConfigurationAsCode extends ManagementLink {
     public static final String DEFAULT_JENKINS_YAML_PATH = "jenkins.yaml";
     public static final String YAML_FILES_PATTERN = "glob:**.{yml,yaml,YAML,YML}";
 
-    public static final Logger LOGGER = Logger.getLogger(ConfigurationAsCode.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ConfigurationAsCode.class.getName());
 
     @Inject
     private DefaultConfiguratorRegistry registry;
@@ -162,25 +159,26 @@ public class ConfigurationAsCode extends ManagementLink {
             return;
         }
         String newSource = request.getParameter("_.newSource");
-        File file = new File(newSource);
-        if (file.exists() || ConfigurationAsCode.isSupportedURI(newSource)) {
-            List<String> candidatePaths = Collections.singletonList(newSource);
+        String normalizedSource = Util.fixEmptyAndTrim(newSource);
+        File file = new File(Util.fixNull(normalizedSource));
+        if (file.exists() || ConfigurationAsCode.isSupportedURI(normalizedSource)) {
+            List<String> candidatePaths = Collections.singletonList(normalizedSource);
             List<YamlSource> candidates = getConfigFromSources(candidatePaths);
             if (canApplyFrom(candidates)) {
                 sources = candidatePaths;
                 configureWith(getConfigFromSources(getSources()));
                 CasCGlobalConfig config = GlobalConfiguration.all().get(CasCGlobalConfig.class);
-                if(config != null) {
-                    config.setConfigurationPath(newSource);
+                if (config != null) {
+                    config.setConfigurationPath(normalizedSource);
                     config.save();
                 }
-                LOGGER.log(Level.FINE, "Replace configuration with: " + newSource);
+                LOGGER.log(Level.FINE, "Replace configuration with: " + normalizedSource);
             } else {
                 LOGGER.log(Level.INFO, "Provided sources could not be applied");
                 // todo: show message in UI
             }
         } else {
-            LOGGER.log(Level.FINE, "There is no such source exist, applying default");
+            LOGGER.log(Level.FINE, "No such source exists, applying default");
             // May be do nothing instead?
             configure();
         }
@@ -198,17 +196,18 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     // Do something with validation! Make a button instead, that function can not be RequirePost in current configuration
-    public FormValidation doCheckNewSource(@QueryParameter String newSource){
+    public FormValidation doCheckNewSource(@QueryParameter String newSource) {
         Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
-        String normalized = Util.fixEmptyAndTrim(newSource);
-        File f = new File(newSource);
-        if (normalized == null) {
+        String normalizedSource = Util.fixEmptyAndTrim(newSource);
+        File file = new File(Util.fixNull(normalizedSource));
+        if (normalizedSource == null) {
             return FormValidation.ok(); // empty, do nothing
-        } else if (!f.exists() && !ConfigurationAsCode.isSupportedURI(normalized)) {
+        }
+        if (!file.exists() && !ConfigurationAsCode.isSupportedURI(normalizedSource)) {
             return FormValidation.error("Configuration cannot be applied. File or URL cannot be parsed or do not exist.");
         }
         try {
-            final Map<Source, String> issues = collectIssues(newSource);
+            final Map<Source, String> issues = collectIssues(normalizedSource);
             final JSONArray errors = collectProblems(issues, "error");
             if (!errors.isEmpty()) {
                 return FormValidation.error(errors.toString());
@@ -335,7 +334,7 @@ public class ConfigurationAsCode extends ManagementLink {
                 res.add(bundled.toString());
             }
         } catch (IOException e) {
-            LOGGER.log(WARNING, "Failed to load " + cascFile, e);
+            LOGGER.log(Level.WARNING, "Failed to load " + cascFile, e);
         }
 
         PathMatcher matcher = FileSystems.getDefault().getPathMatcher(YAML_FILES_PATTERN);
@@ -349,7 +348,7 @@ public class ConfigurationAsCode extends ManagementLink {
                         res.add(bundled.toString());
                     } //TODO: else do some handling?
                 } catch (IOException e) {
-                    LOGGER.log(WARNING, "Failed to execute " + res, e);
+                    LOGGER.log(Level.WARNING, "Failed to execute " + res, e);
                 }
             }
         }
@@ -559,7 +558,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
 
     /**
-     * Search for all {@link #YAML_FILES_PATTERN} in provided base path
+     * Recursive search for all {@link #YAML_FILES_PATTERN} in provided base path
      *
      * @param path base path to start (can be file or directory)
      * @return list of all paths matching pattern. Only base file itself if it is a file matching pattern
@@ -572,18 +571,23 @@ public class ConfigurationAsCode extends ManagementLink {
             throw new ConfiguratorException("Invalid configuration: '"+path+"' isn't a valid path.");
         }
 
-        if (!Files.isDirectory(root)) {
-            return matcher.matches(root) ? Collections.singletonList(root) : Collections.emptyList();
-        }
-
-        try {
-            return Files.list(root)
-                    .filter(Files::isRegularFile) // only consider regular files, following symlinks
-                    .filter(matcher::matches)     // matching pattern
-                    .collect(toList());
+        try (Stream<Path> stream = Files.find(Paths.get(path), Integer.MAX_VALUE,
+                (next, attrs) -> !attrs.isDirectory() && !isHidden(next) && matcher.matches(next))) {
+            return stream.collect(toList());
         } catch (IOException e) {
             throw new IllegalStateException("failed config scan for " + path, e);
         }
+    }
+
+    private static boolean isHidden(Path path) {
+        int count = path.getNameCount();
+        for (int i = 0; i < count; i++) {
+            String name = path.getName(i).toString();
+            if (name.startsWith(".")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static Stream<? extends Map.Entry<String, Object>> entries(Reader config) {
@@ -592,7 +596,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
 
     @FunctionalInterface
-    private interface ConfigratorOperation {
+    private interface ConfiguratorOperation {
 
         Object apply(RootElementConfigurator configurator, CNode node) throws ConfiguratorException;
     }
@@ -604,7 +608,7 @@ public class ConfigurationAsCode extends ManagementLink {
      * @param entries key-value pairs, where key should match to root configurator and value have all required properties
      * @throws ConfiguratorException configuration error
      */
-    private static void invokeWith(Mapping entries, ConfigratorOperation function) throws ConfiguratorException {
+    private static void invokeWith(Mapping entries, ConfiguratorOperation function) throws ConfiguratorException {
 
         // Run configurators by order, consuming entries until all have found a matching configurator.
         // Configurators order is important so that io.jenkins.plugins.casc.plugins.PluginManagerConfigurator run
@@ -645,6 +649,7 @@ public class ConfigurationAsCode extends ManagementLink {
         monitor.reset();
         ConfigurationContext context = new ConfigurationContext(registry);
         context.addListener(monitor::record);
+        context.getSecretSources().forEach(SecretSource::init);
         try (ACLContext acl = ACL.as(ACL.SYSTEM)) {
             invokeWith(entries, (configurator, config) -> configurator.configure(config, context));
         }

@@ -23,7 +23,7 @@ public class EssentialsTest {
     @Test
     @ConfiguredWithCode("EssentialsTest.yml")
     public void essentialsTest() throws Exception {
-        final Jenkins jenkins = Jenkins.getInstance();
+        final Jenkins jenkins = Jenkins.get();
         assertEquals("Welcome to Jenkins Essentials!", jenkins.getSystemMessage());
 
         final ExtensionList<MetricsAccessKey.DescriptorImpl> metricsDescriptors = ExtensionList.lookup(MetricsAccessKey.DescriptorImpl.class);

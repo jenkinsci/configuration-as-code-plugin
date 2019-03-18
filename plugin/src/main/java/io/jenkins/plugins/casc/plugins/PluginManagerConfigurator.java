@@ -59,7 +59,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @Restricted(NoExternalUse.class)
 public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> implements RootElementConfigurator<PluginManager> {
 
-    private final static Logger logger = Logger.getLogger(PluginManagerConfigurator.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(PluginManagerConfigurator.class.getName());
 
     @Override
     public Class<PluginManager> getTarget() {
@@ -144,7 +144,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
 
         final PluginManager pluginManager = getTargetComponent(context);
         if (!plugins.isEmpty()) {
-            logger.log(java.util.logging.Level.CONFIG, String.format("Using plugin root dir: '%s'", pluginManager.rootDir));
+            LOGGER.log(Level.CONFIG, String.format("Using plugin root dir: '%s'", pluginManager.rootDir));
             boolean requireRestart = false;
             Set<String> installed = new HashSet<>();
 
@@ -153,15 +153,15 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
             install:
             while (!plugins.isEmpty()) {
                 PluginToInstall p = plugins.remove();
-                logger.fine("Preparing to install " + p.shortname);
+                LOGGER.fine("Preparing to install " + p.shortname);
                 if (installed.contains(p.shortname)) {
-                    logger.fine("Plugin " + p.shortname + " is already installed. Skipping");
+                    LOGGER.fine("Plugin " + p.shortname + " is already installed. Skipping");
                     continue;
                 }
 
                 final Plugin plugin = jenkins.getPlugin(p.shortname);
                 if (plugin != null) {
-                    // Plugin is allready installed, let's check we run the expected version
+                    // Plugin is already installed, lets check we run the expected version
 
                     if (!Character.isDigit(p.version.charAt(0)) && !"latest".equals(p.version)) {
                         // explicit download URL, we need to assume we run the expected one as we have no way
@@ -186,7 +186,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
 
                 boolean downloaded = false;
                 try {
-                    logger.fine("Installing plugin: " + p.shortname);
+                    LOGGER.fine("Installing plugin: " + p.shortname);
                     final UpdateCenter.UpdateCenterJob job = installable.deploy(false).get();
                     if (job.getError() != null) {
                         if (job.getError() instanceof UpdateCenter.DownloadJob.SuccessButRequiresRestart) {
@@ -205,15 +205,15 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
                                     .map(t -> t.substring(0, t.indexOf(':')))
                                     .map(a -> new PluginToInstall(a, "latest"))
                                     .collect(Collectors.toList());
-                            pti.forEach(s -> logger.finest("Installing dependant plugin: " + s));
-                            logger.finest("Adding " + pti.size() + " plugin(s) to install queue.");
+                            pti.forEach(s -> LOGGER.finest("Installing dependant plugin: " + s));
+                            LOGGER.finest("Adding " + pti.size() + " plugin(s) to install queue.");
                             plugins.addAll(pti);
                         }
                     }
                     downloaded = true;
                     continue install;
                 } catch (InterruptedException | ExecutionException ex) {
-                    logger.info("Failed to download plugin " + p.shortname + ':' + p.version + " from " + p.site);
+                    LOGGER.info("Failed to download plugin " + p.shortname + ':' + p.version + " from " + p.site);
                 } catch (Throwable ex) {
                     throw new ConfiguratorException("Failed to download plugin " + p.shortname + ':' + p.version, ex);
                 }
@@ -221,7 +221,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
                 if (!downloaded) {
                     throw new ConfiguratorException("Failed to install plugin " + p.shortname + ':' + p.version);
                 }
-                logger.fine("Done installing plugins");
+                LOGGER.fine("Done installing plugins");
             }
             writeShrinkwrapFile(jenkins, shrinkwrap, pluginManager);
 
@@ -241,7 +241,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
      * Update sites doesn't give us metadata about hosted plugins, but "latest" version. So here we workaround this by
      * searching update site for plugin shortname and we bake specific version's URL based on this URL, assuming this
      * will be the same but version part in the path. This is a bit fragile but we don't have a better way so far.
-     * see <a href="https://issues.jenkins-ci.org/browse/INFRA-1696">INFRA-1696</a> for status
+     * see <a href="https://issues.jenkins.io/browse/INFRA-1696">INFRA-1696</a> for status
      *
      * @param updateCenter
      * @param p
@@ -315,7 +315,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
                     try (InputStream is = ProxyConfiguration.open(metadata.toURL()).getInputStream()) {
                         FileUtils.copyInputStreamToFile(is, file);
                     } catch (IOException e) {
-                        logger.log(Level.WARNING, "Failed to download plugin-versions metadata from " + updateSite.getUrl(), e);
+                        LOGGER.log(Level.WARNING, "Failed to download plugin-versions metadata from " + updateSite.getUrl(), e);
                     }
                 }
 
@@ -332,7 +332,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
 
     private File readShrinkwrapFile(Jenkins jenkins, Queue<PluginToInstall> plugins) throws ConfiguratorException {
         File shrinkwrap = new File(jenkins.getRootDir(), "plugins.txt");
-        logger.log(java.util.logging.Level.CONFIG, String.format("Using shrinkwrap file: '%s'", shrinkwrap.getAbsoluteFile()));
+        LOGGER.log(Level.CONFIG, String.format("Using shrinkwrap file: '%s'", shrinkwrap.getAbsoluteFile()));
 
         Map<String, PluginToInstall> shrinkwrapped = new HashMap<>();
         if (shrinkwrap.exists()) {
@@ -363,7 +363,7 @@ public class PluginManagerConfigurator extends BaseConfigurator<PluginManager> i
     }
 
     private void writeShrinkwrapFile(Jenkins jenkins, File shrinkwrap, PluginManager pluginManager) throws ConfiguratorException {
-        logger.fine("Writing shrinkwrap file: " + shrinkwrap);
+        LOGGER.fine("Writing shrinkwrap file: " + shrinkwrap);
         try (PrintWriter w = new PrintWriter(shrinkwrap, UTF_8.name())) {
             for (PluginWrapper pw : pluginManager.getPlugins()) {
                 if (pw.getShortName().equals("configuration-as-code")) continue;

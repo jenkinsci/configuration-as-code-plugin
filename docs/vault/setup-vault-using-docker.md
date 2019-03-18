@@ -82,7 +82,7 @@
 
 1. Execute: `export VAULT_TOKEN="[VAULT_TOKEN]"` where  _Vault Token_ is used
 1. Execute: `curl --header "X-Vault-Token: $VAULT_TOKEN" --request POST --data '{"bar": "Baz"}' http://vault.domain.local:8200/v1/secret/foo` to put test data into the vault. No output is returned if it works
-1. Execute: `curl --header "X-Vault-Token: $VAULT_TOKEN" http://vault.domain.local:8200/v1/secret/foo` to get test data from the vault. Expected output is json formatted:
+1. Execute: `curl --header "X-Vault-Token: $VAULT_TOKEN" http://vault.domain.local:8200/v1/secret/foo` to get test data from the vault. Expected output is JSON formatted:
 
    ```json
    {

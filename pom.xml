@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>3.18</version>
+    <version>3.36</version>
     <relativePath />
   </parent>
   <groupId>io.jenkins.configuration-as-code</groupId>
@@ -20,10 +20,11 @@
   </modules>
 
   <properties>
-    <revision>1.5</revision>
+    <revision>1.8</revision>
     <changelist>-SNAPSHOT</changelist>
     <jenkins.version>2.161</jenkins.version>
     <java.level>8</java.level>
+    <tagNameFormat>configuration-as-code-@{project.version}</tagNameFormat>
   </properties>
 
   <name>Configuration as Code Parent</name>

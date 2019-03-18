@@ -1,14 +1,32 @@
 # ChangeLog
 
-## 1.5 (not released yet)
+## 1.8 (not released yet)
 
+- [#763](https://github.com/jenkinsci/configuration-as-code-plugin/issues/763) Introduce CASC_VAULT_PATHS to allow multiple vault paths to read from. CASC_VAULT_PATH kept for backwards compatibility and offering multi path too now.
+- [#770](https://github.com/jenkinsci/configuration-as-code-plugin/issues/770) Re-issue TTL expired vault tokens for user/pass and appRole/secret authentication. Refresh secrets from vault on each `configure()` call.
+
+## 1.7
+
+- fix revealing secret with default defined, where environment variable is defined, it would always default.
+- [#746](https://github.com/jenkinsci/configuration-as-code-plugin/issues/746): add support for specifying vault engine version via CASC_VAULT_ENGINE_VERSION
+
+## 1.6
+
+- Make system environment variables available in the context used for running the jobdsl/groovy code defining the seed job.
+- Add support for secrets while defining `jobs` declarations.
+- [#688](https://github.com/jenkinsci/configuration-as-code-plugin/issues/688): fixed an IndexOutOfBounds exception
+- Add support for Enterprise Vault to store secrets; set CASC_VAULT_NAMESPACE to provide a namespace
+- many fixes to documentation and demos
+
+## 1.5
+
+- [#697](https://github.com/jenkinsci/configuration-as-code-plugin/issues/697): proper string interpolation for secrets.
 - Improve explanation of CASC_VAULT in README.md
 - Add support for bcrypt encrypted passwords. Use with a `#jbcrypt:` prefix.
 
 ## 1.4
 
 - Add support for Vault appRole authentication method
-- Add proper string interpolation for secrets.
 
 ## 1.3
 
@@ -25,7 +43,7 @@
 - [SECURITY] prevent directly entered private key to be exported in plain test
 - fix and improve generated documentation
 - use BulkChange to avoid repeated calls to save()
-- list available attributes when unknown found in yaml to help diagnose mistakes
+- list available attributes when unknown found in YAML to help diagnose mistakes
 - log a warning when descriptor with unexpected design is detected
 
 ## 1.1
