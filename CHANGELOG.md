@@ -3,6 +3,7 @@
 ## 1.8 (not released yet)
 
 - [#763](https://github.com/jenkinsci/configuration-as-code-plugin/issues/763) Introduce CASC_VAULT_PATHS to allow multiple vault paths to read from. CASC_VAULT_PATH kept for backwards compatibility and offering multi path too now.
+- Remove plugin management beta feature - this feature was not widely used as it required restarts to be performed for plugins to be usable in a JCasC config file, moved proxy config and documented it
 - [#770](https://github.com/jenkinsci/configuration-as-code-plugin/issues/770) Re-issue TTL expired vault tokens for user/pass and appRole/secret authentication. Refresh secrets from vault on each `configure()` call.
 
 ## 1.7

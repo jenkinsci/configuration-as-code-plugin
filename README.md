@@ -299,24 +299,15 @@ secrets:
 
 **TODO**: Provide a Dockerfile to generate documentation from specified jenkins-core release and plugins.
 
-## Plugin Management
+## Installing plugins
 
-Status: `BETA`
+We don't support installing plugins with JCasC you need to use something else for this,
 
-We currently support plugin installation but it will remain in `beta` for the foreseeable future. Generally
-we recommend that you package your plugins with your Jenkins distribution as plugin installation often requires a
-restart and can cause problems with plugin dependencies. So if you want to try it, you can.
+Dockers users can use:  
+[https://github.com/jenkinsci/docker/#preinstalling-plugins](https://github.com/jenkinsci/docker/#preinstalling-plugins)
 
-The current implementation does require a restart if you add a plugin.
-
-Example: (Requires Configuration as Code plugin version > 0.7-alpha)
-
-```yaml
-plugins:
-  required:
-    git: 3.9.0
-    warnings: 4.67
-```
+Kubernetes users:  
+[https://github.com/helm/charts/tree/master/stable/jenkins](https://github.com/helm/charts/tree/master/stable/jenkins)
 
 ## Supported Plugins
 

@@ -1,19 +1,19 @@
 package io.jenkins.plugins.casc.core;
 
 import hudson.Extension;
+import hudson.ProxyConfiguration;
 import hudson.model.Node;
+import hudson.model.UpdateCenter;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.RootElementConfigurator;
-import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import jenkins.model.Jenkins;
 import jenkins.security.s2m.AdminWhitelistRule;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
-import javax.annotation.CheckForNull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -63,24 +63,21 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
             )
         );
 
+        // Add updateCenter, all legwork will be done by a configurator
+        attributes.add(new Attribute<Jenkins, UpdateCenter>("updateCenter", UpdateCenter.class)
+                .getter(Jenkins::getUpdateCenter)
+                .setter( noop() ));
+
+        attributes.add(new Attribute<Jenkins, ProxyConfiguration>("proxy", ProxyConfiguration.class)
+                .getter( j -> j.proxy)
+                .setter((o, v) -> o.proxy = v));
+
         return attributes;
     }
 
     @Override
     protected Set<String> exclusions() {
         return Collections.singleton("installState");
-    }
-
-    @CheckForNull
-    @Override
-    public CNode describe(Jenkins instance, ConfigurationContext context) throws Exception {
-
-        // we can't generate a fresh new Jenkins object as constructor is mixed with init and check for `theInstance` singleton 
-        Mapping mapping = new Mapping();
-        for (Attribute attribute : getAttributes()) {
-            mapping.put(attribute.getName(), attribute.describe(instance, context));
-        }
-        return mapping;
     }
 
     @Override
