@@ -1,6 +1,8 @@
 # ChangeLog
 
-## 1.8 (not released yet)
+## 1.9 (not released yet)
+
+## 1.8
 
 - [#753](https://github.com/jenkinsci/configuration-as-code-plugin/issues/753) Add support for recursive file search for CASC_JENKINS_CONFIG
 - [#763](https://github.com/jenkinsci/configuration-as-code-plugin/issues/763) Introduce CASC_VAULT_PATHS to allow multiple vault paths to read from. CASC_VAULT_PATH kept for backwards compatibility and offering multi path too now.
