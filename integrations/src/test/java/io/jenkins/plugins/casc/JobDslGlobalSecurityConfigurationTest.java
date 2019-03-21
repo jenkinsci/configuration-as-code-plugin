@@ -10,6 +10,7 @@ import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.RestartableJenkinsRule;
 
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -27,6 +28,7 @@ public class JobDslGlobalSecurityConfigurationTest {
             public void evaluate() throws Throwable {
                 final GlobalJobDslSecurityConfiguration dslSecurity = GlobalConfiguration.all()
                         .get(GlobalJobDslSecurityConfiguration.class);
+                assertNotNull(dslSecurity);
 
                 dslSecurity.setUseScriptSecurity(true);
                 assertThat("ScriptSecurity", dslSecurity.isUseScriptSecurity(), is(true));
@@ -38,13 +40,14 @@ public class JobDslGlobalSecurityConfigurationTest {
         });
     }
 
-    @Test @Issue("#253") @Ignore
+    @Test @Issue("#253")
     public void global_dsl_security_can_be_reapplied_after_restart() {
         j.addStep(new Statement() {
             @Override
             public void evaluate() throws Throwable {
                 final GlobalJobDslSecurityConfiguration dslSecurity = GlobalConfiguration.all()
                         .get(GlobalJobDslSecurityConfiguration.class);
+                assertNotNull(dslSecurity);
 
                 dslSecurity.setUseScriptSecurity(true);
                 assertThat("ScriptSecurity", dslSecurity.isUseScriptSecurity(), is(true));
@@ -60,6 +63,7 @@ public class JobDslGlobalSecurityConfigurationTest {
             public void evaluate() throws Throwable {
                 final GlobalJobDslSecurityConfiguration dslSecurity = GlobalConfiguration.all()
                         .get(GlobalJobDslSecurityConfiguration.class);
+                assertNotNull(dslSecurity);
 
                 // step 1 configuration still applies
                 assertThat("ScriptSecurity", dslSecurity.isUseScriptSecurity(), is(false));
