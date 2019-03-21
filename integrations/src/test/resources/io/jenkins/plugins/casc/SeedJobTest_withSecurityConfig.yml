@@ -7,7 +7,8 @@ jobs:
   - script: >
       freeStyleJob('seedJobWithSecurityConfig') {
         steps {
-            customWorkspace('$JOBS_DSL_JENKINS_CONFIG_DIR')
+            customWorkspace("$SEED_JOB_FOLDER_FILE_PATH")
             dsl(['testJob2.groovy'], 'DISABLE')
         }
       }
+  - script: queue("seedJobWithSecurityConfig")

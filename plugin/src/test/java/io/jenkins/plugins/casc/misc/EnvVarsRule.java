@@ -1,5 +1,6 @@
 package io.jenkins.plugins.casc.misc;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -14,9 +15,20 @@ import org.junit.runners.model.Statement;
 
 public class EnvVarsRule extends EnvironmentVariables {
 
+    private Class<?> clazz;
+
+    private void setValue(Env env) {
+        String value = env.value();
+        if (env.name().endsWith("FILE_PATH")) {
+            value = new File(clazz.getResource(value).getPath()).getAbsolutePath();
+        }
+        set(env.name(), value);
+    }
+
     @Override
     public Statement apply(Statement base, Description description) {
         EnvsFromFile configuredWithEnvsFromFile = description.getAnnotation(EnvsFromFile.class);
+        clazz = description.getTestClass();
         if (Objects.nonNull(configuredWithEnvsFromFile)) {
 
             final String[] resource = configuredWithEnvsFromFile.value();
@@ -38,7 +50,7 @@ public class EnvVarsRule extends EnvironmentVariables {
         Envs configuredWithEnvs = description.getAnnotation(Envs.class);
         if (Objects.nonNull(configuredWithEnvs)) {
             List<Env> envs = Arrays.asList(configuredWithEnvs.value());
-            envs.forEach(env -> set(env.name(), env.value()));
+            envs.forEach(this::setValue);
         }
         return super.apply(base, description);
     }
