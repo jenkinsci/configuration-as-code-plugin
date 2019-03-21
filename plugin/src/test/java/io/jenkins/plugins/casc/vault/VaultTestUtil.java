@@ -80,7 +80,7 @@ class VaultTestUtil {
             // Create AppRole
             runCommand(container, "vault", "auth", "enable", "approle");
             runCommand(container, "vault", "write", "auth/approle/role/admin",
-                "secret_id_ttl=10m", "token_num_uses=0", "token_ttl=4s", "token_max_ttl=4s",
+                "secret_id_ttl=10m", "token_num_uses=0", "token_ttl=50ms", "token_max_ttl=50ms",
                 "secret_id_num_uses=1000", "policies=admin");
 
             // Retrieve AppRole credentials
