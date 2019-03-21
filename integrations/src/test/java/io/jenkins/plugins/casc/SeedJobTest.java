@@ -3,6 +3,8 @@ package io.jenkins.plugins.casc;
 import static org.junit.Assert.assertNotNull;
 
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
+import io.jenkins.plugins.casc.misc.Env;
+import io.jenkins.plugins.casc.misc.Envs;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import jenkins.model.Jenkins;
 import org.junit.Rule;
@@ -41,5 +43,15 @@ public class SeedJobTest {
     public void configure_seed_job_with_env_vars() throws Exception {
         final Jenkins jenkins = Jenkins.get();
         assertNotNull(jenkins.getItem("seedJobWithEnvVars"));
+    }
+
+    @Test
+    @ConfiguredWithCode("SeedJobTest_withSecurityConfig.yml")
+    @Envs(
+        @Env(name = "JOBS_DSL_JENKINS_CONFIG_DIR", value = "./src/test/resources/io/jenkins/plugins/casc")
+    )
+    public void configure_seed_job_with_security_config() throws Exception {
+        final Jenkins jenkins = Jenkins.get();
+        assertNotNull(jenkins.getItem("seedJobWithSecurityConfig"));
     }
 }
