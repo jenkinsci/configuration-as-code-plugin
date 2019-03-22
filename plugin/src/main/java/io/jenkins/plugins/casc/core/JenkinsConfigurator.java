@@ -1,7 +1,6 @@
 package io.jenkins.plugins.casc.core;
 
 import hudson.Extension;
-import hudson.ProxyConfiguration;
 import hudson.model.Node;
 import hudson.model.UpdateCenter;
 import io.jenkins.plugins.casc.Attribute;
@@ -67,10 +66,6 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
         attributes.add(new Attribute<Jenkins, UpdateCenter>("updateCenter", UpdateCenter.class)
                 .getter(Jenkins::getUpdateCenter)
                 .setter( noop() ));
-
-        attributes.add(new Attribute<Jenkins, ProxyConfiguration>("proxy", ProxyConfiguration.class)
-                .getter( j -> j.proxy)
-                .setter((o, v) -> o.proxy = v));
 
         return attributes;
     }
