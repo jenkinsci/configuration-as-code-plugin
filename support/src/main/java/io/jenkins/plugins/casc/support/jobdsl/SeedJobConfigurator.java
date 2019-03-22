@@ -31,7 +31,7 @@ import javax.annotation.Nonnull;
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-@Extension(optional = true)
+@Extension(optional = true, ordinal = -100) // Ordinal -100 Ensure it is loaded after GlobalJobDslSecurityConfiguration
 @Restricted(NoExternalUse.class)
 public class SeedJobConfigurator implements RootElementConfigurator<GeneratedItems[]> {
 

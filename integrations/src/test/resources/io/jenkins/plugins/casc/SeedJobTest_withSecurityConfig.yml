@@ -1,0 +1,14 @@
+security:
+  GlobalJobDslSecurityConfiguration:
+    useScriptSecurity: false
+
+jobs:
+  - file: ./src/test/resources/io/jenkins/plugins/casc/testJob2.groovy
+  - script: >
+      freeStyleJob('seedJobWithSecurityConfig') {
+        steps {
+            customWorkspace("$SEED_JOB_FOLDER_FILE_PATH")
+            dsl(['testJob2.groovy'], 'DISABLE')
+        }
+      }
+  - script: queue("seedJobWithSecurityConfig")
