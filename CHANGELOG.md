@@ -2,6 +2,8 @@
 
 ## 1.9 (not released yet)
 
+- Update proxy configuration - rename password to secretPassword to match upstream change
+
 ## 1.8
 
 - [#753](https://github.com/jenkinsci/configuration-as-code-plugin/issues/753) Add support for recursive file search for CASC_JENKINS_CONFIG
