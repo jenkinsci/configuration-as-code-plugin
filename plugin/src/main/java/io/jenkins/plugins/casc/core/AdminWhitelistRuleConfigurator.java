@@ -26,12 +26,12 @@ import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.model.Mapping;
-import java.util.Collections;
 import jenkins.model.Jenkins;
 import jenkins.security.s2m.AdminWhitelistRule;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -57,6 +57,9 @@ public class AdminWhitelistRuleConfigurator extends BaseConfigurator<AdminWhitel
     @Override
     protected AdminWhitelistRule instance(Mapping mapping, ConfigurationContext context) {
         Injector injector = Jenkins.getInstance().getInjector();
+        if (injector == null) {
+            throw new IllegalStateException("Required dependency injection container is no present");
+        }
         return injector.getInstance(AdminWhitelistRule.class);
     }
 
