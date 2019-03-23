@@ -1,13 +1,16 @@
 package io.jenkins.plugins.casc;
 
 import hudson.model.Node;
+import hudson.util.VersionNumber;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.List;
 
+import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -18,6 +21,9 @@ public class BackwardCompatibilityTest {
 
     @Rule
     public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+
+    // see https://github.com/jenkinsci/jenkins/pull/3475
+    private static final VersionNumber MIN_VERSION_FOR_PERMANENT_SYMBOL = new VersionNumber("2.127");
 
     @Test
     @ConfiguredWithCode("BackwardCompatibilityTest.yml")
@@ -32,7 +38,15 @@ public class BackwardCompatibilityTest {
         // assertNotNull(j.jenkins.getNode("zot"));
 
         final List<ObsoleteConfigurationMonitor.Error> errors = ObsoleteConfigurationMonitor.get().getErrors();
-        assertEquals("'DumbSlave' is obsolete, please use 'dumb'", errors.get(0).message);
+        assertEquals(format("'DumbSlave' is obsolete, please use '%s'", agentNameToCompareAgainst()), errors.get(0).message);
+    }
+
+    private static String agentNameToCompareAgainst() {
+        VersionNumber currentVersion = Jenkins.getStoredVersion();
+        if (currentVersion == null) {
+            throw new IllegalArgumentException("Couldn't get jenkins version");
+        }
+        return currentVersion.isOlderThan(MIN_VERSION_FOR_PERMANENT_SYMBOL) ? "dumb" : "permanent";
     }
 
 }
