@@ -32,6 +32,7 @@ import io.jenkins.plugins.casc.snakeyaml.resolver.Resolver;
 import io.jenkins.plugins.casc.snakeyaml.serializer.Serializer;
 import io.jenkins.plugins.casc.yaml.YamlSource;
 import io.jenkins.plugins.casc.yaml.YamlUtils;
+import java.util.stream.IntStream;
 import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONArray;
@@ -569,14 +570,9 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     private static boolean isHidden(Path path) {
-        int count = path.getNameCount();
-        for (int i = 0; i < count; i++) {
-            String name = path.getName(i).toString();
-            if (name.startsWith(".")) {
-                return true;
-            }
-        }
-        return false;
+        return IntStream.range(0, path.getNameCount())
+            .mapToObj(path::getName)
+            .anyMatch(subPath -> subPath.toString().startsWith("."));
     }
 
     private static Stream<? extends Map.Entry<String, Object>> entries(Reader config) {
