@@ -20,7 +20,7 @@ public interface RootElementConfigurator<T> extends Configurator<T> {
 
     static List<RootElementConfigurator> all() {
         List<RootElementConfigurator> configurators = new ArrayList<>();
-        final Jenkins jenkins = Jenkins.getInstance();
+        final Jenkins jenkins = Jenkins.get();
         configurators.addAll(jenkins.getExtensionList(RootElementConfigurator.class));
 
         for (GlobalConfigurationCategory category : GlobalConfigurationCategory.all()) {
@@ -29,7 +29,7 @@ public interface RootElementConfigurator<T> extends Configurator<T> {
 
         for (ManagementLink link : ManagementLink.all()) {
             final String name = link.getUrlName();
-            final Descriptor descriptor = Jenkins.getInstance().getDescriptor(name);
+            final Descriptor descriptor = Jenkins.get().getDescriptor(name);
             if (descriptor != null)
                 configurators.add(new DescriptorConfigurator(descriptor));
         }

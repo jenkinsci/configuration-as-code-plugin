@@ -25,7 +25,7 @@ public abstract class SecretSource implements ExtensionPoint {
 
     public static List<SecretSource> all() {
         List<SecretSource> all = new ArrayList<>();
-        all.addAll(Jenkins.getInstance().getExtensionList(SecretSource.class));
+        all.addAll(Jenkins.get().getExtensionList(SecretSource.class));
         return all;
     }
 }

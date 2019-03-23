@@ -144,7 +144,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
     @RequirePOST
     public void doReload(StaplerRequest request, StaplerResponse response) throws Exception {
-        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+        if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -154,7 +154,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
     @RequirePOST
     public void doReplace(StaplerRequest request, StaplerResponse response) throws Exception {
-        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+        if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -197,7 +197,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
     // Do something with validation! Make a button instead, that function can not be RequirePost in current configuration
     public FormValidation doCheckNewSource(@QueryParameter String newSource) {
-        Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
+        Jenkins.get().checkPermission(Jenkins.ADMINISTER);
         String normalizedSource = Util.fixEmptyAndTrim(newSource);
         File file = new File(Util.fixNull(normalizedSource));
         if (normalizedSource == null) {
@@ -302,7 +302,7 @@ public class ConfigurationAsCode extends ManagementLink {
         }
 
         if (configParameter == null) {
-            String fullPath = Jenkins.getInstance().getRootDir() + File.separator + DEFAULT_JENKINS_YAML_PATH;
+            String fullPath = Jenkins.get().getRootDir() + File.separator + DEFAULT_JENKINS_YAML_PATH;
             if (Files.exists(Paths.get(fullPath))) {
                 configParameter = fullPath;
             }
@@ -324,7 +324,7 @@ public class ConfigurationAsCode extends ManagementLink {
         final String cascDirectory = "/WEB-INF/" + DEFAULT_JENKINS_YAML_PATH + ".d/";
         List<String> res = new ArrayList<>();
 
-        final ServletContext servletContext = Jenkins.getInstance().servletContext;
+        final ServletContext servletContext = Jenkins.get().servletContext;
         try {
             URL bundled = servletContext.getResource(cascFile);
             if (bundled != null) {
@@ -356,7 +356,7 @@ public class ConfigurationAsCode extends ManagementLink {
     @RequirePOST
     public void doCheck(StaplerRequest req, StaplerResponse res) throws Exception {
 
-        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+        if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -372,7 +372,7 @@ public class ConfigurationAsCode extends ManagementLink {
     @RequirePOST
     public void doApply(StaplerRequest req, StaplerResponse res) throws Exception {
 
-        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+        if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -386,7 +386,7 @@ public class ConfigurationAsCode extends ManagementLink {
     @RequirePOST
     public void doExport(StaplerRequest req, StaplerResponse res) throws Exception {
 
-        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+        if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -650,7 +650,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
 
     public static ConfigurationAsCode get() {
-        return Jenkins.getInstance().getExtensionList(ConfigurationAsCode.class).get(0);
+        return Jenkins.get().getExtensionList(ConfigurationAsCode.class).get(0);
     }
 
     /**

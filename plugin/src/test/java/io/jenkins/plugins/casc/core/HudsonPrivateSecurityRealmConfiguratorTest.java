@@ -27,7 +27,7 @@ public class HudsonPrivateSecurityRealmConfiguratorTest {
     @Test
     @ConfiguredWithCode("HudsonPrivateSecurityRealmConfiguratorTest.yml")
     public void configure_local_security_and_admin_user() throws Exception {
-        final Jenkins jenkins = Jenkins.getInstance();
+        final Jenkins jenkins = Jenkins.get();
         final HudsonPrivateSecurityRealm securityRealm = (HudsonPrivateSecurityRealm) jenkins.getSecurityRealm();
         assertFalse(securityRealm.allowsSignup());
         final User admin = User.getById("admin", false);

@@ -130,7 +130,7 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
     }
 
     private Stream<Descriptor<T>> getDescriptors() {
-        return Stream.ofAll(Jenkins.getInstance().getDescriptorList(target));
+        return Stream.ofAll(Jenkins.get().getDescriptorList(target));
     }
 
     @SuppressWarnings("unchecked")
@@ -177,7 +177,7 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
     }
 
     private Boolean lookupPlugin(String name) {
-        return Option.of(Jenkins.getInstance().getPlugin(name)).isDefined();
+        return Option.of(Jenkins.get().getPlugin(name)).isDefined();
     }
 
     private HashMap<String, Descriptor<T>> handleDuplicateSymbols(HashMap<String, Descriptor<T>> r, Tuple2<String, Descriptor<T>> t) {
