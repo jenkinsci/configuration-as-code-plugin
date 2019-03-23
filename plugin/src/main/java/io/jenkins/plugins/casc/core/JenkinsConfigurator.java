@@ -38,7 +38,7 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
 
     @Override
     public Jenkins getTargetComponent(ConfigurationContext context) {
-        return Jenkins.getInstance();
+        return Jenkins.get();
     }
 
     @Override

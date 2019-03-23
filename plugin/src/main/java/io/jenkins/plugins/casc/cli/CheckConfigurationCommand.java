@@ -27,7 +27,7 @@ public class CheckConfigurationCommand extends CLICommand {
     @Override
     protected int run() throws Exception {
 
-        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+        if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
             return -1;
         }
 

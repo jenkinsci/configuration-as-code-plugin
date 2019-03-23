@@ -35,7 +35,7 @@ public class UnsecuredAuthorizationStrategyConfigurator extends BaseConfigurator
 
     @Override
     public String getDisplayName() {
-        return Jenkins.getInstance().getDescriptorOrDie(Unsecured.class).getDisplayName();
+        return Jenkins.get().getDescriptorOrDie(Unsecured.class).getDisplayName();
     }
 
     @Override

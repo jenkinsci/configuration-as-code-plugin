@@ -48,7 +48,7 @@ public class AdminWhitelistRuleConfiguratorTest {
     @Issue("Issue #28")
     @ConfiguredWithCode("AdminWhitelistRuleConfigurator/Agent2MasterSecurityKillSwitch_enabled.yml")
     public void checkM2ASecurityKillSwitch_disabled() {
-        final Jenkins jenkins = Jenkins.getInstance();
+        final Jenkins jenkins = Jenkins.get();
         AdminWhitelistRule rule = jenkins.getInjector().getInstance(AdminWhitelistRule.class);
         Assert.assertFalse("MasterToAgent Security should be disabled", rule.getMasterKillSwitch());
     }
@@ -57,7 +57,7 @@ public class AdminWhitelistRuleConfiguratorTest {
     @Issue("Issue #28")
     @ConfiguredWithCode("AdminWhitelistRuleConfigurator/Agent2MasterSecurityKillSwitch_disabled.yml")
     public void checkM2ASecurityKillSwitch_enabled() {
-        final Jenkins jenkins = Jenkins.getInstance();
+        final Jenkins jenkins = Jenkins.get();
         AdminWhitelistRule rule = jenkins.getInjector().getInstance(AdminWhitelistRule.class);
         Assert.assertTrue("MasterToAgent Security should be enabled", rule.getMasterKillSwitch());
     }
@@ -66,7 +66,7 @@ public class AdminWhitelistRuleConfiguratorTest {
     @Issue("Issue #172")
     @ConfiguredWithCode("AdminWhitelistRuleConfigurator/Agent2MasterSecurityKillSwitch_enabled.yml")
     public void checkA2MAccessControl_enabled() throws Exception {
-        final Jenkins jenkins = Jenkins.getInstance();
+        final Jenkins jenkins = Jenkins.get();
         MasterKillSwitchConfiguration config = jenkins.getDescriptorByType(MasterKillSwitchConfiguration.class);
         Assert.assertTrue("Agent → Master Access Control should be enabled", config.getMasterToSlaveAccessControl());
         AdminWhitelistRule rule = jenkins.getInjector().getInstance(AdminWhitelistRule.class);
@@ -82,7 +82,7 @@ public class AdminWhitelistRuleConfiguratorTest {
     @Issue("Issue #172")
     @ConfiguredWithCode("AdminWhitelistRuleConfigurator/Agent2MasterSecurityKillSwitch_disabled.yml")
     public void checkA2MAccessControl_disable() throws Exception {
-        final Jenkins jenkins = Jenkins.getInstance();
+        final Jenkins jenkins = Jenkins.get();
         MasterKillSwitchConfiguration config = jenkins.getDescriptorByType(MasterKillSwitchConfiguration.class);
         Assert.assertFalse("Agent → Master Access Control should be disabled", config.getMasterToSlaveAccessControl());
         AdminWhitelistRule rule = jenkins.getInjector().getInstance(AdminWhitelistRule.class);

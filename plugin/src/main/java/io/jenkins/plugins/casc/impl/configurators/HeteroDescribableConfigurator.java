@@ -58,7 +58,7 @@ public class HeteroDescribableConfigurator<T extends Describable> implements Con
     }
 
     public List<Configurator> getConfigurators(ConfigurationContext context) {
-        final List<Descriptor> candidates = Jenkins.getInstance().getDescriptorList(target);
+        final List<Descriptor> candidates = Jenkins.get().getDescriptorList(target);
         final List<Configurator> configurators = candidates.stream()
                 .map(d -> context.lookup(d.getKlass().toJavaClass()))
                 .filter(c -> c != null)
@@ -88,7 +88,7 @@ public class HeteroDescribableConfigurator<T extends Describable> implements Con
                 throw new IllegalArgumentException("Unexpected configuration type "+config);
         }
 
-        final List<Descriptor> candidates = Jenkins.getInstance().getDescriptorList(target);
+        final List<Descriptor> candidates = Jenkins.get().getDescriptorList(target);
 
         Class<? extends T> k = findDescribableBySymbol(config, shortname, candidates);
         final Configurator<T> configurator = context.lookup(k);
@@ -103,7 +103,7 @@ public class HeteroDescribableConfigurator<T extends Describable> implements Con
 
     public Map<String, Class> getImplementors() {
         final Class api = getImplementedAPI();
-        final List<Descriptor> descriptors = Jenkins.getInstance().getDescriptorList(target);
+        final List<Descriptor> descriptors = Jenkins.get().getDescriptorList(target);
         return descriptors.stream()
             .collect(Collectors.toMap(
                     d -> DescribableAttribute.getSymbols(d, api, target).get(0),
@@ -116,7 +116,7 @@ public class HeteroDescribableConfigurator<T extends Describable> implements Con
      * @return true if the support plugin is installed, false otherwise.
      */
     private boolean _hasSupportPluginInstalled() {
-        return Jenkins.getInstance().getPlugin("configuration-as-code-support") != null;
+        return Jenkins.get().getPlugin("configuration-as-code-support") != null;
     }
 
     private Class<T> findDescribableBySymbol(CNode node, String shortname, List<Descriptor> candidates) {

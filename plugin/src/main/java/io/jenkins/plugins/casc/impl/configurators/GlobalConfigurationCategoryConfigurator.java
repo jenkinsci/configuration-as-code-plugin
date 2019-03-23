@@ -69,7 +69,7 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
 
     @Override
     public Set describe() {
-        return (Set) Jenkins.getInstance().getExtensionList(Descriptor.class).stream()
+        return (Set) Jenkins.get().getExtensionList(Descriptor.class).stream()
                 .filter(d -> d.getCategory() == category)
                 .filter(d -> d.getGlobalConfigPage() != null)
                 .map(d -> new DescriptorConfigurator(d))
@@ -91,7 +91,7 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
     public CNode describe(GlobalConfigurationCategory instance, ConfigurationContext context) {
 
         final Mapping mapping = new Mapping();
-        Jenkins.getInstance().getExtensionList(Descriptor.class).stream()
+        Jenkins.get().getExtensionList(Descriptor.class).stream()
             .filter(d -> d.getCategory() == category)
             .filter(d -> d.getGlobalConfigPage() != null)
             .forEach(d -> describe(d, mapping, context));

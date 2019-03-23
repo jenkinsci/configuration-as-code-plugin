@@ -20,7 +20,7 @@ public class SelfConfiguratorTest {
     @Test
     @ConfiguredWithCode(value = "SelfConfiguratorTest.yml")
     public void self_configure() {
-        assertEquals("/tmp", Jenkins.getInstance().getRawBuildsDir());
+        assertEquals("/tmp", Jenkins.get().getRawBuildsDir());
     }
 
     @Test
