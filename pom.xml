@@ -22,7 +22,7 @@
   <properties>
     <revision>1.9</revision>
     <changelist>-SNAPSHOT</changelist>
-    <jenkins.version>2.60.3</jenkins.version>
+    <jenkins.version>2.169-rc28059.2f6b64a98bd3</jenkins.version>
     <java.level>8</java.level>
     <tagNameFormat>configuration-as-code-@{project.version}</tagNameFormat>
   </properties>

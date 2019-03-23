@@ -35,7 +35,7 @@ public class ProxyConfiguratorTest {
         assertEquals(proxy.port, 80);
 
         assertEquals(proxy.getUserName(), "login");
-        assertEquals(proxy.getPassword(), "password");
+        assertEquals(proxy.getSecretPassword().getPlainText(), "password");
         assertEquals(proxy.noProxyHost, "externalhost");
         assertEquals(proxy.getTestUrl(), "http://google.com");
 
@@ -65,7 +65,7 @@ public class ProxyConfiguratorTest {
         final CNode node = c.describe(proxy, context);
         assertNotNull(node);
         Mapping mapping = node.asMapping();
-        assertEquals(3, node.asMapping().size());
+        assertEquals(2, node.asMapping().size());
         assertEquals("proxyhost", mapping.getScalarValue("name"));
     }
 
@@ -77,7 +77,7 @@ public class ProxyConfiguratorTest {
         ConfigurationContext context = new ConfigurationContext(registry);
         final CNode configNode = getProxyNode(root, context);
 
-        Secret password = Secret.decrypt(getProxyNode(root, context).asMapping().getScalarValue("password"));
+        Secret password = Secret.decrypt(getProxyNode(root, context).asMapping().getScalarValue("secretPassword"));
 
         final String yamlConfig = toYamlString(configNode);
         assertEquals(String.join("\n",
