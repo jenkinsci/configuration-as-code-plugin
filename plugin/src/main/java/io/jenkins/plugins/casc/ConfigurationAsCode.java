@@ -237,20 +237,23 @@ public class ConfigurationAsCode extends ManagementLink {
         return problems;
     }
 
+    private void appendSources(List<YamlSource> sources, String source) throws ConfiguratorException {
+        if (isSupportedURI(source)) {
+            sources.add(new YamlSource<>(source, YamlSource.READ_FROM_URL));
+        } else {
+            sources.addAll(configs(source).stream()
+                .map(s -> new YamlSource<>(s, YamlSource.READ_FROM_PATH))
+                .collect(toList()));
+        }
+    }
 
     private List<YamlSource> getConfigFromSources(List<String> newSources) throws ConfiguratorException {
-        List<YamlSource> ret = new ArrayList<>();
+        List<YamlSource> sources = new ArrayList<>();
 
         for (String p : newSources) {
-            if (isSupportedURI(p)) {
-                ret.add(new YamlSource<>(p, YamlSource.READ_FROM_URL));
-            } else {
-                ret.addAll(configs(p).stream()
-                        .map(s -> new YamlSource<>(s, YamlSource.READ_FROM_PATH))
-                        .collect(toList()));
-            }
+            appendSources(sources, p);
         }
-        return ret;
+        return sources;
     }
 
     /**
@@ -278,13 +281,7 @@ public class ConfigurationAsCode extends ManagementLink {
         List<YamlSource> configs = new ArrayList<>();
 
         for (String p : getStandardConfig()) {
-            if (isSupportedURI(p)) {
-                configs.add(new YamlSource<>(p, YamlSource.READ_FROM_URL));
-            } else {
-                configs.addAll(configs(p).stream()
-                        .map(s -> new YamlSource<>(s, YamlSource.READ_FROM_PATH))
-                        .collect(toList()));
-            }
+            appendSources(configs, p);
             sources = Collections.singletonList(p);
         }
         return configs;
@@ -507,13 +504,7 @@ public class ConfigurationAsCode extends ManagementLink {
         List<YamlSource> configs = new ArrayList<>();
 
         for (String p : configParameters) {
-            if (isSupportedURI(p)) {
-                configs.add(new YamlSource<>(p, YamlSource.READ_FROM_URL));
-            } else {
-                configs.addAll(configs(p).stream()
-                        .map(s -> new YamlSource<>(s, YamlSource.READ_FROM_PATH))
-                        .collect(toList()));
-            }
+            appendSources(configs, p);
             sources = Collections.singletonList(p);
         }
         configureWith(configs);
