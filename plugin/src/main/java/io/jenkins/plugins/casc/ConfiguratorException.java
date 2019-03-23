@@ -21,9 +21,9 @@
 
 package io.jenkins.plugins.casc;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import io.jenkins.plugins.casc.model.CNode;
 
-import javax.annotation.CheckForNull;
 import java.io.IOException;
 
 /**

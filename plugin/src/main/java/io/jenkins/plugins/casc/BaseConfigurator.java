@@ -1,5 +1,6 @@
 package io.jenkins.plugins.casc;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.BulkChange;
 import hudson.model.Describable;
 import hudson.model.Saveable;
@@ -16,7 +17,6 @@ import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.Beta;
 import org.kohsuke.accmod.restrictions.None;
 
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
@@ -256,7 +256,7 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
      */
     protected abstract T instance(Mapping mapping, ConfigurationContext context) throws ConfiguratorException;
 
-    @Nonnull
+    @NonNull
     @Override
     public T configure(CNode c, ConfigurationContext context) throws ConfiguratorException {
         final Mapping mapping = (c != null ? c.asMapping() : Mapping.EMPTY);
@@ -378,7 +378,7 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
         }
     }
 
-    protected @Nonnull Mapping compare(T instance, T reference, ConfigurationContext context) throws Exception {
+    protected @NonNull Mapping compare(T instance, T reference, ConfigurationContext context) throws Exception {
 
         Mapping mapping = new Mapping();
         for (Attribute attribute : getAttributes()) {

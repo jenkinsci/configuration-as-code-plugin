@@ -1,6 +1,8 @@
 package io.jenkins.plugins.casc;
 
 import com.google.common.annotations.VisibleForTesting;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.Util;
 import hudson.init.InitMilestone;
@@ -44,8 +46,6 @@ import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.interceptor.RequirePOST;
 import org.kohsuke.stapler.lang.Klass;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
@@ -707,7 +707,7 @@ public class ConfigurationAsCode extends ManagementLink {
      * @return String that shows help. May be empty
      * @throws IOException if the resource cannot be read
      */
-    @Nonnull
+    @NonNull
     public String getHtmlHelp(Class type, String attribute) throws IOException {
         final URL resource = Klass.java(type).getResource("help-" + attribute + ".html");
         if (resource != null) {

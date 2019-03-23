@@ -3,6 +3,8 @@ package io.jenkins.plugins.casc.impl;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.model.Describable;
@@ -25,8 +27,6 @@ import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.Stapler;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -64,7 +64,7 @@ public class DefaultConfiguratorRegistry implements ConfiguratorRegistry {
      * @throws ConfiguratorException Configurator is not found
      */
     @Override
-    @Nonnull
+    @NonNull
     public Configurator lookupOrFail(Type type) throws ConfiguratorException {
         try {
             return cache.get(type);

@@ -1,10 +1,10 @@
 package io.jenkins.plugins.casc;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import io.jenkins.plugins.casc.model.CNode;
 import org.kohsuke.stapler.Stapler;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +31,7 @@ public class ConfigurationContext implements ConfiguratorRegistry {
         listeners.add(listener);
     }
 
-    public void warning(@Nonnull CNode node, @Nonnull String message) {
+    public void warning(@NonNull CNode node, @NonNull String message) {
         for (Listener listener : listeners) {
             listener.warning(node, message);
         }
@@ -66,7 +66,7 @@ public class ConfigurationContext implements ConfiguratorRegistry {
     }
 
     @Override
-    @Nonnull
+    @NonNull
     public Configurator lookupOrFail(Type type) throws ConfiguratorException {
         return registry.lookupOrFail(type);
     }
@@ -147,7 +147,7 @@ public class ConfigurationContext implements ConfiguratorRegistry {
 
     @FunctionalInterface
     public interface Listener {
-        void warning(@Nonnull CNode node, @Nonnull String error);
+        void warning(@NonNull CNode node, @NonNull String error);
     }
     
 }

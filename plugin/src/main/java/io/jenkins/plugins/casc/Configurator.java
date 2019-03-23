@@ -21,14 +21,14 @@
 
 package io.jenkins.plugins.casc;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.ExtensionPoint;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -44,8 +44,8 @@ import java.util.stream.Collectors;
 
 public interface Configurator<T> {
 
-    @Nonnull
-    static String normalize(@Nonnull String name) {
+    @NonNull
+    static String normalize(@NonNull String name) {
         if (name.toUpperCase().equals(name)) {
             name = name.toLowerCase();
         } else {
@@ -58,7 +58,7 @@ public interface Configurator<T> {
      * Get a configurator name.
      * @return short name for this component when used in a configuration.yaml file
      */
-    @Nonnull
+    @NonNull
     default String getName() {
         final Symbol annotation = getTarget().getAnnotation(Symbol.class);
         if (annotation != null) return annotation.value()[0];
@@ -89,7 +89,7 @@ public interface Configurator<T> {
      * @return The API implemented by target type, i.e. implemented {@link ExtensionPoint} for components to implement
      * some jenkins APIs, or raw type for others.
      */
-    @Nonnull
+    @NonNull
     default Class getImplementedAPI() {
         return getTarget();
     }
@@ -99,7 +99,7 @@ public interface Configurator<T> {
      * @return list of {@link }Configurator}s to be considered so one can fully configure this component.
      * Typically, configurator for an abstract extension point will return Configurators for available implementations.
      */
-    @Nonnull
+    @NonNull
     default List<Configurator> getConfigurators(ConfigurationContext context) {
         return Collections.singletonList(this);
     }
@@ -110,7 +110,7 @@ public interface Configurator<T> {
      *
      * @return A set of {@link Attribute}s that describes this object
      */
-    @Nonnull
+    @NonNull
     Set<Attribute<T,?>> describe();
 
 
@@ -118,7 +118,7 @@ public interface Configurator<T> {
      * @return Ordered version of {@link #describe()} for documentation generation.
      * Only include non-deprecated, non-restricted attribute
      */
-    @Nonnull
+    @NonNull
     default List<Attribute<T,?>> getAttributes() {
         return describe().stream()
                 .filter(a -> !a.isRestricted())
@@ -139,7 +139,7 @@ public interface Configurator<T> {
      *      if no new objects got created, but some existing objects may have been modified, return updated target object.
      * @throws ConfiguratorException if something went wrong, depends on the concrete implementation
      */
-    @Nonnull
+    @NonNull
     T configure(CNode config, ConfigurationContext context) throws ConfiguratorException;
 
     /**

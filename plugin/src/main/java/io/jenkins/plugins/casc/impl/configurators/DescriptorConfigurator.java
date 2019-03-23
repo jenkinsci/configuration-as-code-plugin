@@ -1,6 +1,8 @@
 package io.jenkins.plugins.casc.impl.configurators;
 
 import com.google.common.base.CaseFormat;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Descriptor;
 import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
@@ -12,8 +14,6 @@ import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import java.util.Optional;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 
 /**
  * Define a Configurator for a Descriptor
@@ -33,7 +33,7 @@ public class DescriptorConfigurator extends BaseConfigurator<Descriptor> impleme
         this.name = resolveName(descriptor);
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public String getName() {
         return name;
