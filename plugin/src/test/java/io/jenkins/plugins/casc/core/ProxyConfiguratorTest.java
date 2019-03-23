@@ -83,8 +83,8 @@ public class ProxyConfiguratorTest {
         assertEquals(String.join("\n",
                 "name: \"proxyhost\"",
                 "noProxyHost: \"externalhost\"",
-                "secretPassword: \"" + password.getEncryptedValue() + "\"",
                 "port: 80",
+                "secretPassword: \"" + password.getEncryptedValue() + "\"",
                 "testUrl: \"http://google.com\"",
                 "userName: \"login\"",
                 ""
