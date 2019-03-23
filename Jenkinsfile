@@ -1,1 +1,1 @@
-buildPlugin(jenkinsVersions: null, timeout: 180)
+buildPlugin(jenkinsVersions: null, jdkVersions: [8, 11], timeout: 180)
