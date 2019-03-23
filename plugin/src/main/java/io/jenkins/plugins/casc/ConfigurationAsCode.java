@@ -48,7 +48,6 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
@@ -239,10 +238,10 @@ public class ConfigurationAsCode extends ManagementLink {
 
     private void appendSources(List<YamlSource> sources, String source) throws ConfiguratorException {
         if (isSupportedURI(source)) {
-            sources.add(new YamlSource<>(source, YamlSource.READ_FROM_URL));
+            sources.add(YamlSource.of(source));
         } else {
             sources.addAll(configs(source).stream()
-                .map(s -> new YamlSource<>(s, YamlSource.READ_FROM_PATH))
+                .map(YamlSource::of)
                 .collect(toList()));
         }
     }
@@ -361,7 +360,7 @@ public class ConfigurationAsCode extends ManagementLink {
             return;
         }
 
-        final Map<Source, String> issues = checkWith(new YamlSource<HttpServletRequest>(req, YamlSource.READ_FROM_REQUEST));
+        final Map<Source, String> issues = checkWith(YamlSource.of(req));
         res.setContentType("application/json");
         final JSONArray warnings = new JSONArray();
         issues.entrySet().stream().map(e -> new JSONObject().accumulate("line", e.getKey().line).accumulate("warning", e.getValue()))
@@ -376,8 +375,7 @@ public class ConfigurationAsCode extends ManagementLink {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
-
-        configureWith(new YamlSource<HttpServletRequest>(req, YamlSource.READ_FROM_REQUEST));
+        configureWith(YamlSource.of(req));
     }
 
     /**
