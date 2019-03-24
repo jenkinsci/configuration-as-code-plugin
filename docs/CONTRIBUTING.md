@@ -1,5 +1,9 @@
 # Contribution guide
 
+## Reporting plugin compatibility issues
+
+See [COMPATIBILITY](./COMPATIBILITY.md)
+
 ## Why should you contribute?
 
 You can contribute in many ways, and whatever you choose we're grateful!
@@ -16,9 +20,10 @@ Whenever you report a problem please provide information about:
 
 ### Regarding source code contribution WoW:
 
-1. Create a GitHub issue for your feature/problem you want to solve
-2. Implement solution on a branch in your fork
-3. Make sure to include issue number in commit message, and make the message speak for itself
-4. Once you're done create a pull request and ask at least one of the maintainers for review
+- Create a GitHub issue for your feature/problem you want to solve
+- Implement solution on a branch in your fork
+- Make sure to include issue number in commit message, and make the message speak for itself
+- Once you're done create a pull request and ask at least one of the maintainers for review
+    - Remember to title your pull request properly as it is used for release notes
 
 Never push directly to this repository!

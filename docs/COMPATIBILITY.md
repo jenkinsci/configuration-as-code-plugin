@@ -1,0 +1,15 @@
+# Plugin Compatibility issues with Configuration as Code plugin
+
+Often JCasC is not the one having issues with configuring a plugin.
+Because of how the JCasC was designed, plugins _should_ be expected to work out of the box if they followed the main patterns in place.
+We rely heavely on data bindings so if a plugin is not setup according to expected design pattern for data binding.
+
+JCasC cannot communicate properly with the plugin without fixing their data binding issues or writing a special configurator.
+The path of least resistence is fixing the data binding, since other plugins in the Jenkins eco-system relies heavely on data binding.
+
+The list of already known issues in the Jenkins issue tracker, are tracked through using the label `jcasc-compatibility` [see dashboard](https://issues.jenkins.io/secure/Dashboard.jspa?selectPageId=17346).
+
+## Reporting Plugin Compatiblity issue
+
+Create an issue at [issues.jenkins-ci.org](https://issues.jenkins-ci.org) with the label `jcasc-compatibility` and fill out the details.
+[Link to create issue](https://issues.jenkins-ci.org/secure/CreateIssueDetails!init.jspa?pid=10172&issuetype=1&summary=Cannot+configure+X+plugin+with+JCasC&labels=jcasc-compatibility)
