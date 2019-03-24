@@ -199,10 +199,20 @@ Simplest option for you to test JCasC compatibility in your plugin is to introdu
 Add the Configuration as Code plugin as a test dependency in your pom.xml:
 
 ```xml
+<properties>
+    <configuration-as-code.version>1.8</configuration-as-code.version>
+</properties>
 <dependency>
     <groupId>io.jenkins</groupId>
     <artifactId>configuration-as-code</artifactId>
-    <version>1.5</version>
+    <version>${configuration-as-code.version}</version>
+    <scope>test</scope>
+</dependency>
+<dependency>
+    <groupId>io.jenkins</groupId>
+    <artifactId>configuration-as-code</artifactId>
+    <version>${configuration-as-code.version}</version>
+    <classifier>tests</classifier>
     <scope>test</scope>
 </dependency>
 ```
@@ -210,19 +220,20 @@ Add the Configuration as Code plugin as a test dependency in your pom.xml:
 Add a new test case to load a reference configuration YAML file designed to set configurable properties of your plugin
 
 ```java
-import io.jenkins.plugins.casc.ConfigurationAsCode;
+import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
+import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.jvnet.hudson.test.JenkinsRule;
 
 import static org.junit.Assert.assertTrue;
 
 public class ConfigAsCodeTest {
 
-    @Rule public JenkinsRule r = new JenkinsRule();
+    @Rule public JenkinsConfiguredWithCodeRule r = new JenkinsConfiguredWithCodeRule();
 
-    @Test public void should_support_configuration_as_code() throws Exception {
-        ConfigurationAsCode.get().configure(ConfigAsCodeTest.class.getResource("configuration-as-code.yml").toString());
+    @Test
+    @ConfiguredWithCode("configuration-as-code.yml")
+    public void should_support_configuration_as_code() throws Exception {
         assertTrue( /* check plugin has been configured as expected */ );
     }
 }
@@ -233,11 +244,12 @@ some changes made to your plugin break this configuration model.
 
 ### Backward compatibility test
 
-About the later, in case you need to introduce some breaking changes, you can define a backward compatibility test case
+About the latter, in case you need to introduce some breaking changes, you can define a backward compatibility test case
 
-```yaml
-    @Test public void should_be_backward_compatible() throws Exception {
-        ConfigurationAsCode.get().configure(ConfigAsCodeTest.class.getResource("obsolete-configuration-as-code.yml").toString());
+```java
+    @Test 
+    @ConfiguredWithCode("obsolete-configuration-as-code.yml")
+    public void should_be_backward_compatible() throws Exception {  
         assertTrue( /* check plugin has been configured as expected */ );
     }
 ```
@@ -257,10 +269,12 @@ while the canonical JCasC model evolves to match the changes you made.
 You also can write a test case to check export from a live instance is well supported:
 
 ```java
-@Test public void export_configuration() throws Exception {
+    @Test
+    @ConfiguredWithCode("configuration-as-code.yml")
+    public void export_configuration() throws Exception {
       /* Setup Jenkins to use plugin */
       ConfigurationAsCode.get().export(System.out);
-}
+    }
 ```
 
 **TODO** we need to provide some YAML assertion library so that the resulting exported yam stream can be checked for expected content.
