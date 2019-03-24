@@ -7,7 +7,7 @@ about: Create a plugin compatibility issue report
 
 🚨 Please review the [guidelines for contributing](../blob/master/docs/CONTRIBUTING.md) to this repository.
 
-- [ ] Create an issue on [issues.jenkins-ci.org](https://issues.jenkins-ci.org), that is commonplace to report plugin issues
+- [ ] Create an issue on [issues.jenkins-ci.org](https://issues.jenkins-ci.org), set the component to the plugin you are reporting it against
 
 - [ ] Before creating an issue on Jenkins JIRA, check that an existing one does not already exist [see dashboard](https://issues.jenkins.io/secure/Dashboard.jspa?selectPageId=17346)
 
