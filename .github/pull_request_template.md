@@ -2,10 +2,13 @@
 
 🚨 Please review the [guidelines for contributing](../blob/master/docs/CONTRIBUTING.md) to this repository.
 
--   [ ] Make sure you are requesting to **pull a topic/feature/bugfix branch** (right side). Don't request your master!
--   [ ] Please describe what you did
--   [ ] Link to issue you're working on if there's a relevant one
--   [ ] Did you provide a test-case? That demonstrates feature works or fixes the issue.
+- [ ] Make sure you are requesting to **pull a topic/feature/bugfix branch** (right side). Don't request your master!
+
+- [ ] Please describe what you did
+
+- [ ] Link to issue you're working on if there's a relevant one
+
+- [ ] Did you provide a test-case? That demonstrates feature works or fixes the issue.
 
 <!--
 Put a `x` into the [ ] to show you have filled the information below

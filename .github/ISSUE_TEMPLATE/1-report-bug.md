@@ -11,9 +11,11 @@ Never report security issues on GitHub or other public channels (Gitter/Twitter/
 
 🚨 Please review the [guidelines for contributing](../blob/master/docs/CONTRIBUTING.md) to this repository.
 
--   [ ] Jenkins version
--   [ ] Plugin version
--   [ ] OS
+- [ ] Jenkins version
+
+- [ ] Plugin version
+
+- [ ] OS
 
 <!--
 Put an `x` into the [ ] to show you have filled the information below
