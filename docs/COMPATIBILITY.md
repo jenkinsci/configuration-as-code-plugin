@@ -7,7 +7,7 @@ We rely heavely on data bindings so if a plugin is not setup according to expect
 JCasC cannot communicate properly with the plugin without fixing their data binding issues or writing a special configurator.
 The path of least resistence is fixing the data binding, since other plugins in the Jenkins eco-system relies heavely on data binding.
 
-The list of already known issues in the Jenkins issue tracker, are tracked through using the label `jcasc-compatibility` [see dashboard](https://issues.jenkins.io/secure/Dashboard.jspa?selectPageId=17346).
+The list of already known issues in the Jenkins issue tracker, are tracked through using the label `jcasc-compatibility` [see dashboard](https://issues.jenkins.io/secure/Dashboard.jspa?selectPageId=18341).
 
 ## Reporting Plugin Compatiblity issue
 
