@@ -9,7 +9,7 @@ about: Create a plugin compatibility issue report
 
 - [ ] Create an issue on [issues.jenkins-ci.org](https://issues.jenkins-ci.org), set the component to the plugin you are reporting it against
 
-- [ ] Before creating an issue on Jenkins JIRA, check that an existing one does not already exist [see dashboard](https://issues.jenkins.io/secure/Dashboard.jspa?selectPageId=17346)
+- [ ] Before creating an issue on Jenkins JIRA, check that an existing one does not already exist [see dashboard](https://issues.jenkins.io/secure/Dashboard.jspa?selectPageId=18341)
 
 - [ ] Link to Jenkins JIRA issue
 
