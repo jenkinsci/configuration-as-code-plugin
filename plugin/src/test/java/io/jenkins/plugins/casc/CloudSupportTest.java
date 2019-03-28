@@ -1,4 +1,4 @@
-package io.jenkins.plugins.casc.core;
+package io.jenkins.plugins.casc;
 
 import hudson.Extension;
 import hudson.model.Descriptor;
@@ -7,7 +7,6 @@ import hudson.model.TaskListener;
 import hudson.slaves.AbstractCloudComputer;
 import hudson.slaves.AbstractCloudSlave;
 import hudson.slaves.EphemeralNode;
-import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import org.junit.Rule;
