@@ -4,6 +4,8 @@ import hudson.Extension;
 import hudson.ProxyConfiguration;
 import hudson.model.Node;
 import hudson.model.UpdateCenter;
+import hudson.slaves.AbstractCloudSlave;
+import hudson.slaves.EphemeralNode;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
@@ -56,11 +58,24 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
                 .setter( noop() ));
 
         // Override "nodes" getter so we don't export Nodes registered by Cloud plugins
-        Attribute.<Jenkins,List<Node>>get(attributes, "nodes").ifPresent(a ->
-            a.getter(j -> j.getNodes().stream()
-                    .filter(node -> node.getDescriptor().isInstantiable())
-                    .collect(Collectors.toList())
-            )
+        Attribute.<Jenkins, List<Node>>get(attributes, "nodes").ifPresent(attribute ->
+                attribute
+                        .setter((jenkins, configuredNodes) -> {
+                            List<String> configuredNodesNames = configuredNodes.stream()
+                                    .map(Node::getNodeName)
+                                    .collect(Collectors.toList());
+                            List<Node> nodesToKeep = jenkins.getNodes().stream()
+                                    .filter(node -> !configuredNodesNames.contains(node.getNodeName()))
+                                    .filter(node -> {
+                                        final boolean instantiable = node.getDescriptor().isInstantiable();
+                                        final boolean cloudSlave = node instanceof AbstractCloudSlave;
+                                        final boolean ephemeral = node instanceof EphemeralNode;
+                                        return !instantiable || cloudSlave || ephemeral;
+                                    })
+                                    .collect(Collectors.toList());
+                            nodesToKeep.addAll(configuredNodes);
+                            jenkins.setNodes(nodesToKeep);
+                        })
         );
 
         // Add updateCenter, all legwork will be done by a configurator
