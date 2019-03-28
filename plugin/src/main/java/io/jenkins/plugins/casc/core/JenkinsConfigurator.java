@@ -19,7 +19,6 @@ import org.kohsuke.accmod.restrictions.NoExternalUse;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static io.jenkins.plugins.casc.Attribute.noop;
@@ -30,8 +29,6 @@ import static io.jenkins.plugins.casc.Attribute.noop;
 @Extension
 @Restricted(NoExternalUse.class)
 public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements RootElementConfigurator<Jenkins> {
-
-    private static final Logger LOGGER = Logger.getLogger(JenkinsConfigurator.class.getName());
 
     @Override
     public Class<Jenkins> getTarget() {
