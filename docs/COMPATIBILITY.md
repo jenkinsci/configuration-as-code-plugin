@@ -2,7 +2,7 @@
 
 Often JCasC is not the one having issues with configuring a plugin.
 Because of how the JCasC was designed, plugins _should_ be expected to work out of the box if they followed the main patterns in place.
-We rely heavely on data bindings so if a plugin is not setup according to expected design pattern for data binding.
+We rely heavily on data bindings so if a plugin is not setup according to expected design pattern for data binding.
 
 JCasC cannot communicate properly with the plugin without fixing their data binding issues or writing a special configurator.
 The path of least resistence is fixing the data binding, since other plugins in the Jenkins eco-system relies heavely on data binding.
