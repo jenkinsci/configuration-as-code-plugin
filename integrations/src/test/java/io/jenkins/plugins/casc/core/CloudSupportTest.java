@@ -89,8 +89,6 @@ public class CloudSupportTest {
 
         @Extension
         public static class DescriptorImpl extends SlaveDescriptor {
-            public DescriptorImpl() {
-            }
         }
     }
 
@@ -102,9 +100,6 @@ public class CloudSupportTest {
 
         @Extension
         public static class DescriptorImpl extends SlaveDescriptor {
-            public DescriptorImpl() {
-            }
-
             public boolean isInstantiable() {
                 return false;
             }
@@ -124,8 +119,6 @@ public class CloudSupportTest {
 
         @Extension
         public static class DescriptorImpl extends SlaveDescriptor {
-            public DescriptorImpl() {
-            }
         }
     }
 
@@ -142,13 +135,11 @@ public class CloudSupportTest {
 
         @Override
         protected void _terminate(TaskListener taskListener) throws IOException, InterruptedException {
-
+            // empty
         }
 
         @Extension
         public static class DescriptorImpl extends SlaveDescriptor {
-            public DescriptorImpl() {
-            }
         }
     }
 }
