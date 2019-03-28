@@ -60,18 +60,16 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
         // Override "nodes" getter so we don't export Nodes registered by Cloud plugins
         Attribute.<Jenkins, List<Node>>get(attributes, "nodes").ifPresent(attribute ->
                 attribute
+                        .getter(jenkins -> jenkins.getNodes().stream()
+                                .filter(node -> !isCloudNode(node))
+                                .collect(Collectors.toList()))
                         .setter((jenkins, configuredNodes) -> {
                             List<String> configuredNodesNames = configuredNodes.stream()
                                     .map(Node::getNodeName)
                                     .collect(Collectors.toList());
                             List<Node> nodesToKeep = jenkins.getNodes().stream()
                                     .filter(node -> !configuredNodesNames.contains(node.getNodeName()))
-                                    .filter(node -> {
-                                        final boolean instantiable = node.getDescriptor().isInstantiable();
-                                        final boolean cloudSlave = node instanceof AbstractCloudSlave;
-                                        final boolean ephemeral = node instanceof EphemeralNode;
-                                        return !instantiable || cloudSlave || ephemeral;
-                                    })
+                                    .filter(this::isCloudNode)
                                     .collect(Collectors.toList());
                             nodesToKeep.addAll(configuredNodes);
                             jenkins.setNodes(nodesToKeep);
@@ -90,6 +88,14 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
         return attributes;
     }
 
+
+    private boolean isCloudNode(Node node) {
+        final boolean instantiable = node.getDescriptor().isInstantiable();
+        final boolean cloudSlave = node instanceof AbstractCloudSlave;
+        final boolean ephemeral = node instanceof EphemeralNode;
+        return !instantiable || cloudSlave || ephemeral;
+    }
+    
     @Override
     protected Set<String> exclusions() {
         return Collections.singleton("installState");
