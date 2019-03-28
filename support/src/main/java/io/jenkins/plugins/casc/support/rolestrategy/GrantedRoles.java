@@ -3,11 +3,11 @@ package io.jenkins.plugins.casc.support.rolestrategy;
 import com.michelin.cio.hudson.plugins.rolestrategy.Role;
 import com.michelin.cio.hudson.plugins.rolestrategy.RoleBasedAuthorizationStrategy;
 import com.michelin.cio.hudson.plugins.rolestrategy.RoleMap;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +44,7 @@ public class GrantedRoles {
         return grantedRoles;
     }
 
-    @Nonnull
+    @NonNull
     private RoleMap retrieveRoleMap(List<RoleDefinition> definitions) {
         TreeMap<Role, Set<String>> resMap = new TreeMap<>();
         for (RoleDefinition definition : definitions) {

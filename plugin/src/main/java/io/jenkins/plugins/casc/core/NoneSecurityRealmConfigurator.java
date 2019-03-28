@@ -1,5 +1,7 @@
 package io.jenkins.plugins.casc.core;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.security.SecurityRealm;
 import io.jenkins.plugins.casc.Attribute;
@@ -10,8 +12,6 @@ import io.jenkins.plugins.casc.model.CNode;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.Set;
 
@@ -33,7 +33,7 @@ public class NoneSecurityRealmConfigurator implements Configurator<SecurityRealm
         return clazz.getName().equals("hudson.security.SecurityRealm$None");
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public SecurityRealm configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
         return SecurityRealm.NO_AUTHENTICATION;
@@ -50,7 +50,7 @@ public class NoneSecurityRealmConfigurator implements Configurator<SecurityRealm
         return null;
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public Set<Attribute<SecurityRealm,?>> describe() {
         return Collections.emptySet();

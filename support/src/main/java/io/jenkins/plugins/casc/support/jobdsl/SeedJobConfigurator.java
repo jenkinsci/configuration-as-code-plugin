@@ -3,6 +3,8 @@ package io.jenkins.plugins.casc.support.jobdsl;
 import static io.vavr.API.Try;
 import static io.vavr.API.unchecked;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.ConfigurationContext;
@@ -24,8 +26,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 
 // TODO: Move outside the plugin?
 /**
@@ -35,7 +35,7 @@ import javax.annotation.Nonnull;
 @Restricted(NoExternalUse.class)
 public class SeedJobConfigurator implements RootElementConfigurator<GeneratedItems[]> {
 
-    @Nonnull
+    @NonNull
     @Override
     public String getName() {
         return "jobs";
@@ -47,7 +47,7 @@ public class SeedJobConfigurator implements RootElementConfigurator<GeneratedIte
         return GeneratedItems[].class;
     }
 
-    @Nonnull
+    @NonNull
     @Override
     @SuppressWarnings("unchecked")
     public Set<Attribute<GeneratedItems[], ?>> describe() {
@@ -59,7 +59,7 @@ public class SeedJobConfigurator implements RootElementConfigurator<GeneratedIte
         return new GeneratedItems[0]; // Doesn't really make sense
     }
 
-    @Nonnull
+    @NonNull
     @Override
     @SuppressWarnings("unchecked")
     public GeneratedItems[] configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
@@ -78,7 +78,7 @@ public class SeedJobConfigurator implements RootElementConfigurator<GeneratedIte
         return new GeneratedItems[0];
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public List<Configurator> getConfigurators(ConfigurationContext context) {
         return Collections.singletonList(context.lookup(ScriptSource.class));

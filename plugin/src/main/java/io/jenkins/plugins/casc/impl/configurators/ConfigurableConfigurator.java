@@ -1,5 +1,7 @@
 package io.jenkins.plugins.casc.impl.configurators;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.Configurable;
 import io.jenkins.plugins.casc.ConfigurationContext;
@@ -7,8 +9,6 @@ import io.jenkins.plugins.casc.Configurator;
 import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.model.CNode;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.Set;
 
@@ -28,13 +28,13 @@ public class ConfigurableConfigurator<T extends Configurable> implements Configu
         return target;
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public Set<Attribute<T,?>> describe() {
         return Collections.emptySet();
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public T configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
         try {

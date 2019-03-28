@@ -3,6 +3,7 @@ package io.jenkins.plugins.casc.impl.configurators;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
@@ -11,8 +12,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
-
-import javax.annotation.Nonnull;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -52,7 +51,7 @@ public class DescriptorConfiguratorTest {
             this.bar = bar;
         }
 
-        @Nonnull
+        @NonNull
         public String getFoo() {
             return foo;
         }
@@ -62,7 +61,7 @@ public class DescriptorConfiguratorTest {
             this.foo = foo;
         }
 
-        @Nonnull
+        @NonNull
         public String getBar() {
             return bar;
         }

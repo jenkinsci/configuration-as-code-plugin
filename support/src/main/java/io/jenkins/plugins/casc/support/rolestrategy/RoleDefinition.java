@@ -1,13 +1,13 @@
 package io.jenkins.plugins.casc.support.rolestrategy;
 
 import com.michelin.cio.hudson.plugins.rolestrategy.Role;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import io.jenkins.plugins.casc.util.PermissionFinder;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -24,7 +24,7 @@ public class RoleDefinition {
 
     private transient Role role;
 
-    @Nonnull
+    @NonNull
     private final String name;
     @CheckForNull
     private final String description;
@@ -34,7 +34,7 @@ public class RoleDefinition {
     private final Set<String> assignments;
 
     @DataBoundConstructor
-    public RoleDefinition(String name, String description, String pattern, Collection<String> permissions, Collection<String> assignments) {
+    public RoleDefinition(@NonNull String name, String description, String pattern, Collection<String> permissions, Collection<String> assignments) {
         this.name = name;
         this.description = description;
         this.pattern = pattern;
@@ -59,6 +59,7 @@ public class RoleDefinition {
         return role;
     }
 
+    @NonNull
     public String getName() {
         return name;
     }

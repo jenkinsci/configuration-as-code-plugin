@@ -1,5 +1,6 @@
 package io.jenkins.plugins.casc.impl.configurators;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
 import hudson.security.HudsonPrivateSecurityRealm;
@@ -18,7 +19,6 @@ import org.jenkinsci.Symbol;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
-import javax.annotation.CheckForNull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
