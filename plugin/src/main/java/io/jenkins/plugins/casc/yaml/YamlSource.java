@@ -35,6 +35,18 @@ public class YamlSource<T> {
         return new YamlSource<>(url.toExternalForm(), READ_FROM_URL);
     }
 
+    public static YamlSource<String> of(String url) {
+        return new YamlSource<>(url, READ_FROM_URL);
+    }
+
+    public static YamlSource<HttpServletRequest> of(HttpServletRequest req) {
+        return new YamlSource<>(req, YamlSource.READ_FROM_REQUEST);
+    }
+
+    public static YamlSource<Path> of(Path path) {
+        return new YamlSource<>(path, YamlSource.READ_FROM_PATH);
+    }
+
     public Reader read() throws IOException {
         return reader.open(source);
     }
