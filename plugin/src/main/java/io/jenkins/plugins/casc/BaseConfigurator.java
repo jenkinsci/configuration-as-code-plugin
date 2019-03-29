@@ -383,7 +383,10 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
 
         Mapping mapping = new Mapping();
         for (Attribute attribute : getAttributes()) {
-            mapping.put(attribute.getName(), attribute.describe(instance, context));
+            CNode value = attribute.describe(instance, context);
+            if (value != null) {
+                mapping.put(attribute.getName(), value);
+            }
         }
         return mapping;
     }
