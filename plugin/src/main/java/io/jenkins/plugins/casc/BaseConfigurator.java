@@ -383,7 +383,6 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
 
         Mapping mapping = new Mapping();
         for (Attribute attribute : getAttributes()) {
-            if (attribute.equals(instance, reference)) continue;
             mapping.put(attribute.getName(), attribute.describe(instance, context));
         }
         return mapping;
