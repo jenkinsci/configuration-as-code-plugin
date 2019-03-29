@@ -11,6 +11,7 @@ import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.RootElementConfigurator;
 import io.jenkins.plugins.casc.model.Mapping;
+import io.vavr.control.Try;
 import jenkins.model.Jenkins;
 import jenkins.security.s2m.AdminWhitelistRule;
 import org.kohsuke.accmod.Restricted;
@@ -87,7 +88,7 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
 
 
     private boolean isCloudNode(Node node) {
-        final boolean instantiable = node.getDescriptor().isInstantiable();
+        boolean instantiable = Try.of(() -> node.getDescriptor().isInstantiable()).getOrElse(true);
         final boolean cloudSlave = node instanceof AbstractCloudSlave;
         final boolean ephemeral = node instanceof EphemeralNode;
         return !instantiable || cloudSlave || ephemeral;

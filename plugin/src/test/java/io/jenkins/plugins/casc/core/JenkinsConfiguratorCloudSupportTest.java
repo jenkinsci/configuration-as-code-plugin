@@ -131,10 +131,6 @@ public class JenkinsConfiguratorCloudSupportTest {
         public StaticPretendSlave() throws IOException, Descriptor.FormException {
             super();
         }
-
-        @Extension
-        public static class DescriptorImpl extends SlaveDescriptor {
-        }
     }
 
     private static class Cloud1PretendSlave extends StaticPretendSlave {
@@ -161,10 +157,6 @@ public class JenkinsConfiguratorCloudSupportTest {
         public Node asNode() {
             return null;
         }
-
-        @Extension
-        public static class DescriptorImpl extends SlaveDescriptor {
-        }
     }
 
     private static class Cloud3PretendSlave extends AbstractCloudSlave {
@@ -181,10 +173,6 @@ public class JenkinsConfiguratorCloudSupportTest {
         @Override
         protected void _terminate(TaskListener taskListener) throws IOException, InterruptedException {
             // empty
-        }
-
-        @Extension
-        public static class DescriptorImpl extends SlaveDescriptor {
         }
     }
 }
