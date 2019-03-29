@@ -159,6 +159,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
         return object;
     }
 
+    @NonNull
     public String getName() {
         final Descriptor d = getDescriptor();
         return DescribableAttribute.getPreferredSymbol(d, getImplementedAPI(), getTarget());
@@ -168,6 +169,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
         return Jenkins.getInstance().getDescriptor(getTarget());
     }
 
+    @NonNull
     public Class getImplementedAPI() {
 
         final Descriptor descriptor = getDescriptor();
@@ -196,6 +198,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
     }
 
 
+    @NonNull
     @Override
     public Set<Attribute<T,?>> describe() {
         final Set<Attribute<T,?>> attributes = super.describe();

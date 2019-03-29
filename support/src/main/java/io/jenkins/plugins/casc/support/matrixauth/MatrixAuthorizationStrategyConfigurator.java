@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
  */
 public abstract class MatrixAuthorizationStrategyConfigurator<T extends AuthorizationContainer> extends BaseConfigurator<T> {
 
+    @NonNull
     @CheckForNull
     @Override
     public Class getImplementedAPI() {

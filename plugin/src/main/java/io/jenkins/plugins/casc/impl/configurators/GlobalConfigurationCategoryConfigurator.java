@@ -1,6 +1,7 @@
 package io.jenkins.plugins.casc.impl.configurators;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Descriptor;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.BaseConfigurator;
@@ -39,6 +40,7 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
         this.category = category;
     }
 
+    @NonNull
     @Override
     public String getName() {
         final Class c = category.getClass();
@@ -67,6 +69,7 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
         return category;
     }
 
+    @NonNull
     @Override
     public Set describe() {
         return (Set) Jenkins.getInstance().getExtensionList(Descriptor.class).stream()

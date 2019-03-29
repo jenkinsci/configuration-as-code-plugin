@@ -1,6 +1,7 @@
 package io.jenkins.plugins.casc.impl.configurators;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
 import hudson.security.HudsonPrivateSecurityRealm;
@@ -57,6 +58,7 @@ public class HeteroDescribableConfigurator<T extends Describable> implements Con
         return target;
     }
 
+    @NonNull
     public List<Configurator> getConfigurators(ConfigurationContext context) {
         final List<Descriptor> candidates = Jenkins.getInstance().getDescriptorList(target);
         final List<Configurator> configurators = candidates.stream()
@@ -67,6 +69,7 @@ public class HeteroDescribableConfigurator<T extends Describable> implements Con
         return configurators;
     }
 
+    @NonNull
     @Override
     public T configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
         String shortname;
@@ -148,6 +151,7 @@ public class HeteroDescribableConfigurator<T extends Describable> implements Con
         throw new IllegalArgumentException(String.format("%s%s", msg, errSupport));
     }
 
+    @NonNull
     @Override
     public Set<Attribute<T,?>> describe() {
         return Collections.emptySet();

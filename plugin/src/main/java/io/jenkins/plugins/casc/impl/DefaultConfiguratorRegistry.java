@@ -92,7 +92,7 @@ public class DefaultConfiguratorRegistry implements ConfiguratorRegistry {
             .expireAfterAccess(10, TimeUnit.SECONDS)
             .build(new CacheLoader<Type, Configurator>() {
                 @Override
-                public Configurator load(Type type) throws Exception {
+                public Configurator load(@NonNull Type type) throws Exception {
                     final Configurator configurator = internalLookup(type);
                     if (configurator == null) throw new ConfiguratorException("Cannot find configurator for type " + type);
                     return configurator;
