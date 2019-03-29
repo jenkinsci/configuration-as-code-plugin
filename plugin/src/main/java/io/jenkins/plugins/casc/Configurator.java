@@ -127,6 +127,18 @@ public interface Configurator<T> {
                 .collect(Collectors.toList());
     }
 
+    default Mapping attributesToMapping(T instance, ConfigurationContext context)
+        throws ConfiguratorException {
+        Mapping mapping = new Mapping();
+        for (Attribute attribute : getAttributes()) {
+            CNode value = attribute.describe(instance, context);
+            if (value != null) {
+                mapping.put(attribute.getName(), value);
+            }
+        }
+        return mapping;
+    }
+
     /**
      * Configures/creates a Jenkins object based on a tree.
      *
@@ -158,14 +170,7 @@ public interface Configurator<T> {
      */
     @CheckForNull
     default CNode describe(T instance, ConfigurationContext context) throws Exception {
-        Mapping mapping = new Mapping();
-        for (Attribute attribute : getAttributes()) {
-            CNode value = attribute.describe(instance, context);
-            if (value != null) {
-                mapping.put(attribute.getName(), value);
-            }
-        }
-        return mapping;
+        return attributesToMapping(instance, context);
     }
 
 }

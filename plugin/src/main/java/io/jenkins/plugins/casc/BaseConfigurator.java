@@ -380,15 +380,7 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
     }
 
     protected @NonNull Mapping compare(T instance, T reference, ConfigurationContext context) throws Exception {
-
-        Mapping mapping = new Mapping();
-        for (Attribute attribute : getAttributes()) {
-            CNode value = attribute.describe(instance, context);
-            if (value != null) {
-                mapping.put(attribute.getName(), value);
-            }
-        }
-        return mapping;
+        return attributesToMapping(instance, context);
     }
 
     private CNode removeIgnoreCase(Mapping config, String name) {
