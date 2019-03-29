@@ -67,13 +67,13 @@ public class ConfigurationContext implements ConfiguratorRegistry {
 
     @Override
     @NonNull
-    public Configurator lookupOrFail(Type type) throws ConfiguratorException {
+    public <T> Configurator<T> lookupOrFail(Type type) throws ConfiguratorException {
         return registry.lookupOrFail(type);
     }
 
     @Override
     @CheckForNull
-    public Configurator lookup(Type type) {
+    public <T> Configurator<T> lookup(Type type) {
         return registry.lookup(type);
     }
 

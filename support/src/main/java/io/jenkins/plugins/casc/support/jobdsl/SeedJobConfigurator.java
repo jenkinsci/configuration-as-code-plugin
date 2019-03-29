@@ -80,7 +80,7 @@ public class SeedJobConfigurator implements RootElementConfigurator<GeneratedIte
 
     @NonNull
     @Override
-    public List<Configurator> getConfigurators(ConfigurationContext context) {
+    public List<Configurator<GeneratedItems[]>> getConfigurators(ConfigurationContext context) {
         return Collections.singletonList(context.lookup(ScriptSource.class));
     }
 

@@ -1,5 +1,8 @@
 package io.jenkins.plugins.casc.impl.configurators;
 
+import static io.jenkins.plugins.casc.model.CNode.Type.MAPPING;
+import static io.vavr.API.unchecked;
+
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Describable;
@@ -9,12 +12,16 @@ import hudson.security.SecurityRealm;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.Configurator;
-import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.ObsoleteConfigurationMonitor;
 import io.jenkins.plugins.casc.impl.attributes.DescribableAttribute;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import io.jenkins.plugins.casc.model.Scalar;
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
+import io.vavr.collection.HashMap;
+import io.vavr.collection.Stream;
+import io.vavr.control.Option;
 import jenkins.model.Jenkins;
 import org.jenkinsci.Symbol;
 import org.kohsuke.accmod.Restricted;
@@ -24,8 +31,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 /**
  * {@link Configurator} that works with {@link Describable} subtype as a {@link #target}.
@@ -42,10 +49,9 @@ import java.util.stream.Collectors;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Restricted(NoExternalUse.class)
-public class HeteroDescribableConfigurator<T extends Describable> implements Configurator<T> {
+public class HeteroDescribableConfigurator<T extends Describable<T>> implements Configurator<T> {
 
     private static final Logger LOGGER = Logger.getLogger(HeteroDescribableConfigurator.class.getName());
-
 
     private final Class<T> target;
 
@@ -59,119 +65,167 @@ public class HeteroDescribableConfigurator<T extends Describable> implements Con
     }
 
     @NonNull
-    public List<Configurator> getConfigurators(ConfigurationContext context) {
-        final List<Descriptor> candidates = Jenkins.getInstance().getDescriptorList(target);
-        final List<Configurator> configurators = candidates.stream()
-                .map(d -> context.lookup(d.getKlass().toJavaClass()))
-                .filter(c -> c != null)
-                .collect(Collectors.toList());
-        configurators.add(this);
-        return configurators;
+    @Override
+    public List<Configurator<T>> getConfigurators(ConfigurationContext context) {
+        return getDescriptors()
+            .flatMap(d -> lookupConfigurator(context, descriptorClass(d)))
+            .append(this)
+            .toJavaList();
     }
 
     @NonNull
     @Override
-    public T configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
-        String shortname;
-        CNode subconfig = null;
-        switch (config.getType()) {
-            case SCALAR:
-                shortname = config.asScalar().getValue();
-                break;
-            case MAPPING:
-                Mapping map = config.asMapping();
-                if (map.size() != 1) {
-                    throw new IllegalArgumentException("single entry map expected to configure a "+target.getName());
-                }
-                final Map.Entry<String, CNode> next = map.entrySet().iterator().next();
-                shortname = next.getKey();
-                subconfig = next.getValue();
-                break;
-            default:
-                throw new IllegalArgumentException("Unexpected configuration type "+config);
-        }
-
-        final List<Descriptor> candidates = Jenkins.getInstance().getDescriptorList(target);
-
-        Class<? extends T> k = findDescribableBySymbol(config, shortname, candidates);
-        final Configurator<T> configurator = context.lookup(k);
-        if (configurator == null) throw new IllegalStateException("No configurator implementation to manage "+k);
-        return configurator.configure(subconfig, context);
+    public T configure(CNode config, ConfigurationContext context) {
+        return preConfigure(config).apply((shortName, subConfig) ->
+            lookupDescriptor(shortName, config)
+                .map(descriptor -> forceLookupConfigurator(context, descriptor))
+                .map(configurator -> doConfigure(context, configurator, subConfig.getOrNull())))
+            .getOrNull();
     }
 
     @Override
-    public T check(CNode config, ConfigurationContext context) throws ConfiguratorException {
+    public T check(CNode config, ConfigurationContext context) {
         return configure(config, context);
     }
 
-    public Map<String, Class> getImplementors() {
-        final Class api = getImplementedAPI();
-        final List<Descriptor> descriptors = Jenkins.getInstance().getDescriptorList(target);
-        return descriptors.stream()
-            .collect(Collectors.toMap(
-                    d -> DescribableAttribute.getSymbols(d, api, target).get(0),
-                    d -> d.getKlass().toJavaClass()));
-    }
-
-
-    /**
-     *
-     * @return true if the support plugin is installed, false otherwise.
-     */
-    private boolean _hasSupportPluginInstalled() {
-        return Jenkins.getInstance().getPlugin("configuration-as-code-support") != null;
-    }
-
-    private Class<T> findDescribableBySymbol(CNode node, String shortname, List<Descriptor> candidates) {
-
-        final Class api = getImplementedAPI();
-        // Search for @Symbol annotation on Descriptor to match shortName
-
-        for (Descriptor d : candidates) {
-            final List<String> symbols = DescribableAttribute.getSymbols(d, api, target);
-            final String preferred = symbols.get(0);
-            if (preferred.equalsIgnoreCase(shortname)) {
-                return d.getKlass().toJavaClass();
-            }
-        }
-
-        // Not found by preferred symbol, try other ones
-        for (Descriptor d : candidates) {
-            final List<String> symbols = DescribableAttribute.getSymbols(d, api, target);
-            for (String symbol : symbols) {
-                if (symbol.equalsIgnoreCase(shortname)) {
-                    ObsoleteConfigurationMonitor.get().record(node, "'"+shortname+"' is obsolete, please use '" + symbols.get(0) + "'");
-                    return d.getKlass().toJavaClass();
-                }
-            }
-        }
-
-        final String errSupport = !_hasSupportPluginInstalled() ? "\nPossible solution: Try to install 'configuration-as-code-support' plugin" : "";
-        final String msg = "No "+target.getName()+ " implementation found for "+shortname;
-        throw new IllegalArgumentException(String.format("%s%s", msg, errSupport));
-    }
-
     @NonNull
     @Override
-    public Set<Attribute<T,?>> describe() {
+    public Set<Attribute<T, ?>> describe() {
         return Collections.emptySet();
     }
 
     @CheckForNull
     @Override
-    public CNode describe(Describable instance, ConfigurationContext context) throws Exception {
-        final String symbol = DescribableAttribute.getPreferredSymbol(instance.getDescriptor(), getTarget(), instance.getClass());
-        final Configurator c = context.lookupOrFail(instance.getClass());
-        final CNode describe = c.describe(instance, context);
-        if (describe == null) {
-            return null;
-        }
-        if (describe.getType() == CNode.Type.MAPPING && describe.asMapping().size() == 0) {
-            return new Scalar(symbol);
-        }
+    public CNode describe(T instance, ConfigurationContext context) {
+        Predicate<CNode> isScalar = node -> node.getType().equals(MAPPING) && unchecked(node::asMapping).apply().size() == 0;
+        return lookupConfigurator(context, instance.getClass())
+                .map(configurator -> convertToNode(context, configurator, instance))
+                .map(node -> {
+                    if (isScalar.test(node)) {
+                        return new Scalar(preferredSymbol(instance.getDescriptor()));
+                    } else {
+                        return new Mapping().put(preferredSymbol(instance.getDescriptor()), node);
+                    }
+                }).getOrNull();
+    }
 
-        Mapping mapping = new Mapping();
-        mapping.put(symbol, describe);
-        return mapping;
+    @SuppressWarnings("unused")
+    public Map<String, Class<T>> getImplementors() {
+        return getDescriptors()
+                .map(descriptor -> Tuple.of(preferredSymbol(descriptor), descriptor))
+                .foldLeft(HashMap.empty(), this::handleDuplicateSymbols)
+                .mapValues(this::descriptorClass)
+                .toJavaMap();
+    }
+
+    @SuppressWarnings("unchecked")
+    private Option<Configurator<T>> lookupConfigurator(ConfigurationContext context, Class<?> descriptor) {
+        return Option.of(context.lookup(descriptor));
+    }
+
+    private Configurator<T> forceLookupConfigurator(ConfigurationContext context, Descriptor<T> descriptor) {
+        Class<T> klazz = descriptorClass(descriptor);
+        return lookupConfigurator(context, klazz)
+                .getOrElseThrow(() -> new IllegalStateException("No configurator implementation to manage " + klazz));
+    }
+
+    private Stream<Descriptor<T>> getDescriptors() {
+        return Stream.ofAll(Jenkins.getInstance().getDescriptorList(target));
+    }
+
+    @SuppressWarnings("unchecked")
+    private Class<T> descriptorClass(Descriptor<T> descriptor) {
+        return descriptor.getKlass().toJavaClass();
+    }
+
+    private Option<Descriptor<T>> lookupDescriptor(String symbol, CNode config) {
+        return getDescriptors()
+                .filter(descriptor -> findByPreferredSymbol(descriptor, symbol) || findBySymbols(descriptor, symbol, config))
+                .map(descriptor -> Tuple.of(preferredSymbol(descriptor), descriptor))
+                .foldLeft(HashMap.empty(), this::handleDuplicateSymbols)
+                .values()
+                .headOption()
+                .orElse(() -> {
+                    String message = "No " + target.getName() + " implementation found for " + symbol;
+                    String possible = lookupPlugin("configuration-as-code-support") ? "" : System.lineSeparator() + "Possible solution: Try to install 'configuration-as-code-support' plugin";
+                    throw new IllegalArgumentException(Stream.of(message, possible)
+                            .intersperse("")
+                            .foldLeft(new StringBuilder(), StringBuilder::append)
+                            .toString());
+                });
+    }
+
+    private Boolean findByPreferredSymbol(Descriptor<T> descriptor, String symbol) {
+        return preferredSymbol(descriptor).equalsIgnoreCase(symbol);
+    }
+
+    private Boolean findBySymbols(Descriptor<T> descriptor, String symbol, CNode node) {
+        return getSymbols(descriptor)
+                .find(actual -> actual.equalsIgnoreCase(symbol))
+                .map(actual -> {
+                    ObsoleteConfigurationMonitor.get().record(node, "'" + symbol + "' is obsolete, please use '" + preferredSymbol(descriptor) + "'");
+                    return descriptorClass(descriptor);
+                }).isDefined();
+    }
+
+    private Stream<String> getSymbols(Descriptor<T> descriptor) {
+        return Stream.ofAll(DescribableAttribute.getSymbols(descriptor, target, target));
+    }
+
+    private String preferredSymbol(Descriptor<?> descriptor) {
+        return DescribableAttribute.getPreferredSymbol(descriptor, target, target);
+    }
+
+    private Boolean lookupPlugin(String name) {
+        return Option.of(Jenkins.getInstance().getPlugin(name)).isDefined();
+    }
+
+    private HashMap<String, Descriptor<T>> handleDuplicateSymbols(HashMap<String, Descriptor<T>> r, Tuple2<String, Descriptor<T>> t) {
+        if (r.containsKey(t._1)) {
+            String message = String.format("Found multiple implementations for symbol = %s: [%s, %s]. Please report to plugin maintainer.", t._1, r.get(t._1).get(), t._2);
+            LOGGER.warning(message);
+            return r;
+        } else {
+            return r.put(t);
+        }
+    }
+
+    private Tuple2<String, Option<CNode>> preConfigure(CNode config) {
+        switch (config.getType()) {
+            case SCALAR:
+                return configureScalar(config);
+            case MAPPING:
+                return configureMapping(config);
+            default:
+                return configureUnexpected(config);
+        }
+    }
+
+    private Tuple2<String, Option<CNode>> configureUnexpected(CNode config) {
+        throw new IllegalArgumentException("Unexpected configuration type " + config);
+    }
+
+    private Tuple2<String, Option<CNode>> configureScalar(CNode config) {
+        Scalar scalar = unchecked(config::asScalar).apply();
+        return Tuple.of(scalar.getValue(), Option.none());
+    }
+
+    private Tuple2<String, Option<CNode>> configureMapping(CNode config) {
+        Mapping mapping = unchecked(config::asMapping).apply();
+        if (mapping.size() != 1) {
+            throw new IllegalArgumentException("Single entry map expected to configure a " + target.getName());
+        } else {
+            Map.Entry<String, CNode> next = mapping.entrySet().iterator().next();
+            return Tuple.of(next.getKey(), Option.some(next.getValue()));
+        }
+    }
+
+    private T doConfigure(ConfigurationContext context, Configurator<T> configurator, CNode subConfig) {
+        return unchecked(() -> configurator.configure(subConfig, context)).apply();
+    }
+
+    @SuppressWarnings("unchecked")
+    private CNode convertToNode(ConfigurationContext context, Configurator configurator, Describable instance) {
+        return unchecked(() -> configurator.describe(instance, context)).apply();
     }
 }
