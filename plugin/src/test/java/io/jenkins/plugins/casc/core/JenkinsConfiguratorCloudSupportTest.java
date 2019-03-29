@@ -8,15 +8,20 @@ import hudson.slaves.AbstractCloudComputer;
 import hudson.slaves.AbstractCloudSlave;
 import hudson.slaves.EphemeralNode;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
+import io.jenkins.plugins.casc.ConfigurationContext;
+import io.jenkins.plugins.casc.ConfiguratorRegistry;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.model.CNode;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.PretendSlave;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 
+import static io.jenkins.plugins.casc.ConfigurationAsCode.serializeYamlNode;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -76,6 +81,46 @@ public class JenkinsConfiguratorCloudSupportTest {
         assertNotNull("Slave cloud", j.jenkins.getNode("testCloud"));
     }
 
+    @Test
+    @ConfiguredWithCode("JenkinsConfiguratorCloudSupportTest.yml")
+    public void should_export_only_static_nodes() throws Exception {
+        j.jenkins.addNode(new Cloud1PretendSlave());
+        j.jenkins.addNode(new Cloud2PretendSlave());
+        j.jenkins.addNode(new Cloud3PretendSlave());
+        
+        final JenkinsConfigurator root = getJenkinsConfigurator();
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        ConfigurationContext context = new ConfigurationContext(registry);
+        final CNode configNode = getNodesNode(root, context);
+
+        final String yamlConfig = toYamlString(configNode);
+        assertEquals(String.join("\n",
+                "- dumb:",
+                "    name: \"agent1\"",
+                "    remoteFS: \"/home/user1\"",
+                "- dumb:",
+                "    name: \"agent2\"",
+                "    remoteFS: \"/home/user1\"",
+                ""
+        ), yamlConfig);
+    }
+
+
+    private CNode getNodesNode(JenkinsConfigurator root, ConfigurationContext context) throws Exception {
+        return root.describe(root.getTargetComponent(context), context).asMapping().get("nodes");
+    }
+
+    private JenkinsConfigurator getJenkinsConfigurator() {
+        return j.jenkins.getExtensionList(JenkinsConfigurator.class).get(0);
+    }
+
+    private static String toYamlString(CNode rootNode) throws IOException {
+        io.jenkins.plugins.casc.snakeyaml.nodes.Node yamlRoot = ConfigurationAsCode.get().toYaml(rootNode);
+        StringWriter buffer = new StringWriter();
+        serializeYamlNode(yamlRoot, buffer);
+        return buffer.toString();
+    }
+    
     private static class BasePretendSlave extends PretendSlave {
         public BasePretendSlave() throws IOException, Descriptor.FormException {
             super("testCloud", "remoteFS", 3, Mode.NORMAL, "labelString", null, null);
