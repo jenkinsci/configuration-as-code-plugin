@@ -21,6 +21,7 @@
 package io.jenkins.plugins.casc.core;
 
 import com.google.inject.Injector;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.BaseConfigurator;
@@ -44,6 +45,7 @@ import java.util.Set;
 @Restricted(NoExternalUse.class)
 public class AdminWhitelistRuleConfigurator extends BaseConfigurator<AdminWhitelistRule> {
 
+    @NonNull
     @Override
     public String getName() {
         return "remotingSecurity";
@@ -60,6 +62,7 @@ public class AdminWhitelistRuleConfigurator extends BaseConfigurator<AdminWhitel
         return injector.getInstance(AdminWhitelistRule.class);
     }
 
+    @NonNull
     @Override
     public Set<Attribute<AdminWhitelistRule,?>> describe() {
         return new HashSet<>(Collections.singletonList(

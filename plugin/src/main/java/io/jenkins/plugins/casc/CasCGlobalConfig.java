@@ -1,5 +1,6 @@
 package io.jenkins.plugins.casc;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import jenkins.model.GlobalConfiguration;
 import net.sf.json.JSONObject;
@@ -24,6 +25,7 @@ public class CasCGlobalConfig extends GlobalConfiguration {
         load();
     }
 
+    @NonNull
     @Override
     public String getDisplayName() {
         return "CasC configuration";

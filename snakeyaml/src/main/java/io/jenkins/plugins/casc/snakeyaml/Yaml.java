@@ -15,6 +15,7 @@
  */
 package io.jenkins.plugins.casc.snakeyaml;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -562,6 +563,7 @@ public class Yaml {
             this.iterator = iterator;
         }
 
+        @NonNull
         @Override
         public Iterator<Object> iterator() {
             return iterator;
@@ -647,6 +649,7 @@ public class Yaml {
             this.iterator = iterator;
         }
 
+        @NonNull
         @Override
         public Iterator<Node> iterator() {
             return iterator;
@@ -731,6 +734,7 @@ public class Yaml {
             this.iterator = iterator;
         }
 
+        @NonNull
         @Override
         public Iterator<Event> iterator() {
             return iterator;

@@ -1,5 +1,6 @@
 package io.jenkins.plugins.casc.core;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.ProxyConfiguration;
 import hudson.model.Node;
@@ -46,6 +47,7 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
         return getTargetComponent(context);
     }
 
+    @NonNull
     @Override
     public Set<Attribute<Jenkins,?>> describe() {
         final Set<Attribute<Jenkins,?>> attributes = super.describe();
@@ -80,6 +82,7 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
         return Collections.singleton("installState");
     }
 
+    @NonNull
     @Override
     public String getName() {
         return "jenkins";

@@ -53,6 +53,7 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
 
     private static final Logger LOGGER = Logger.getLogger(BaseConfigurator.class.getName());
 
+    @NonNull
     public Set<Attribute<T, ?>> describe() {
 
         Map<String, Attribute<T,?>> attributes = new HashMap<>();

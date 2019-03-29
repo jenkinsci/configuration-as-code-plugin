@@ -1,5 +1,6 @@
 package io.jenkins.plugins.casc.core;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.model.UpdateSite;
 import io.jenkins.plugins.casc.Attribute;
@@ -34,6 +35,7 @@ public class UpdateSiteConfigurator extends BaseConfigurator<UpdateSite> {
         return new UpdateSite(mapping.getScalarValue("id"), mapping.getScalarValue("url"));
     }
 
+    @NonNull
     @Override
     public Set<Attribute<UpdateSite, ?>> describe() {
         // setters are marked as noop, a new instance needs to be created.
