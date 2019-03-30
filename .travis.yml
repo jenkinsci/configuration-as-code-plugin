@@ -4,9 +4,6 @@ cache:
   directories:
     - $HOME/.m2
 
-jdk:
-  - openjdk8
-
 env:
   global:
     - JAVA_LEVEL=8
@@ -15,22 +12,23 @@ matrix:
   include:
     - jdk: openjdk11
       env:
-        - MAVEN_OPTS="-Djenkins.version=2.164.1 -Daccess-modifier-checker.failOnError=true"
+        - MVN_FLAG='-Djenkins.version=2.164.1 -Daccess-modifier-checker.failOnError=true'
     - jdk: openjdk8
       env:
-        - MAVEN_OPTS="-Djenkins.version=2.164.1 -Daccess-modifier-checker.failOnError=true"
+        - MVN_FLAG='-Djenkins.version=2.164.1 -Daccess-modifier-checker.failOnError=true'
+    - jdk: openjdk8
 
 services:
   - docker
 
 install:
-  - mvn clean install -DskipTests=true -Dmaven.javadoc.skip=true -B -V $MAVEN_OPTS
+  - mvn clean install -DskipTests=true -Dmaven.javadoc.skip=true -B -V $MVN_FLAG
 
 script:
   - |
     mvn clean install -B \
       -Djava.level=$JAVA_LEVEL \
-      $MAVEN_OPTS
+      $MVN_FLAG
 
 notifications:
   email: false
