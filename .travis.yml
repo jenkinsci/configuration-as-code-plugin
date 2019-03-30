@@ -1,17 +1,34 @@
 language: java
 
+services:
+  - docker
+
 cache:
   directories:
     - $HOME/.m2
 
-jdk:
-  - openjdk8
+env:
+  global:
+    - JAVA_LEVEL=8
 
-services:
-  - docker
+matrix:
+  include:
+    - jdk: openjdk11
+      env:
+        - MVN_FLAG='-Djenkins.version=2.164.1 -Daccess-modifier-checker.failOnError=true'
+    - jdk: openjdk8
+      env:
+        - MVN_FLAG='-Djenkins.version=2.164.1 -Daccess-modifier-checker.failOnError=true'
+    - jdk: openjdk8
+
+install:
+  - mvn clean install -DskipTests=true -Dmaven.javadoc.skip=true -B -V $MVN_FLAG
 
 script:
-  - mvn clean package -B
+  - |
+    mvn clean install -B \
+      -Djava.level=$JAVA_LEVEL \
+      $MVN_FLAG
 
 notifications:
   email: false

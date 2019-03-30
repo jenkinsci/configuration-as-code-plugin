@@ -1,0 +1,10 @@
+<FindBugsFilter>
+  <Match>
+    <Or>
+      <!-- TODO: Remove once SpotBugs fully supports Java 11 (JENKINS-53720) -->
+      <!-- JDK 11 generates a different binary code than expected by SpotBugs -->
+      <!-- https://github.com/spotbugs/spotbugs/issues/756 -->
+      <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE"/>
+    </Or>
+  </Match>
+</FindBugsFilter>
