@@ -25,9 +25,9 @@ services:
 
 script:
   - |
-    mvn clean package -B `
-      -Djava.level=${JAVA_LEVEL} `
-      -Djenkins.version=${JENKINS_VERSION} `
+    mvn clean package -B \
+      -Djava.level=${JAVA_LEVEL} \
+      -Djenkins.version=${JENKINS_VERSION} \
       -Daccess-modifier-checker.failOnError=${AMC_FAIL_ON_ERROR}
 
 notifications:
