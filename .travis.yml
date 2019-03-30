@@ -1,5 +1,8 @@
 language: java
 
+services:
+  - docker
+
 cache:
   directories:
     - $HOME/.m2
@@ -17,9 +20,6 @@ matrix:
       env:
         - MVN_FLAG='-Djenkins.version=2.164.1 -Daccess-modifier-checker.failOnError=true'
     - jdk: openjdk8
-
-services:
-  - docker
 
 install:
   - mvn clean install -DskipTests=true -Dmaven.javadoc.skip=true -B -V $MVN_FLAG
