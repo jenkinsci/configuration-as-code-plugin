@@ -11,6 +11,7 @@ import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import jenkins.model.Jenkins;
+import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 
