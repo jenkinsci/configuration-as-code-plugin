@@ -6,19 +6,19 @@ cache:
 
 jdk:
   - openjdk8
-  - openjdk11
 
 env:
   global:
     - JAVA_LEVEL=8
-  matrix:
-    - JENKINS_VERSION=2.60.3 AMC_FAIL_ON_ERROR=true
-    - JENKINS_VERSION=2.164.1 AMC_FAIL_ON_ERROR=false
 
 matrix:
-  exclude:
+  include:
     - jdk: openjdk11
-      env: JENKINS_VERSION=2.60.3 AMC_FAIL_ON_ERROR=true
+      env:
+        - MAVEN_OPTS="-Djenkins.version=2.164.1 -Daccess-modifier-checker.failOnError=true"
+    - jdk: openjdk8
+      env:
+        - MAVEN_OPTS="-Djenkins.version=2.164.1 -Daccess-modifier-checker.failOnError=true"
 
 services:
   - docker
@@ -30,8 +30,7 @@ script:
   - |
     mvn clean install -B \
       -Djava.level=$JAVA_LEVEL \
-      -Djenkins.version=$JENKINS_VERSION \
-      -Daccess-modifier-checker.failOnError=$AMC_FAIL_ON_ERROR
+      $MAVEN_OPTS
 
 notifications:
   email: false
