@@ -59,6 +59,9 @@ public class AdminWhitelistRuleConfigurator extends BaseConfigurator<AdminWhitel
     @Override
     protected AdminWhitelistRule instance(Mapping mapping, ConfigurationContext context) {
         Injector injector = Jenkins.getInstance().getInjector();
+        if (injector == null) {
+            throw new IllegalStateException("Required dependency injection container is not present");
+        }
         return injector.getInstance(AdminWhitelistRule.class);
     }
 
