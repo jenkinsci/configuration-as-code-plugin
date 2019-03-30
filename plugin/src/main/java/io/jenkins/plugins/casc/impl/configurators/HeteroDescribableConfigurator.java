@@ -104,7 +104,9 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
                     if (isScalar.test(node)) {
                         return new Scalar(preferredSymbol(instance.getDescriptor()));
                     } else {
-                        return new Mapping().put(preferredSymbol(instance.getDescriptor()), node);
+                        final Mapping mapping = new Mapping();
+                        mapping.put(preferredSymbol(instance.getDescriptor()), node);
+                        return mapping;
                     }
                 }).getOrNull();
     }

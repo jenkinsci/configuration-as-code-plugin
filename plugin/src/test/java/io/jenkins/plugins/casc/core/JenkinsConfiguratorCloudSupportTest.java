@@ -22,8 +22,11 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 
 import static io.jenkins.plugins.casc.ConfigurationAsCode.serializeYamlNode;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 public class JenkinsConfiguratorCloudSupportTest {
 
@@ -85,8 +88,6 @@ public class JenkinsConfiguratorCloudSupportTest {
     @ConfiguredWithCode("JenkinsConfiguratorCloudSupportTest.yml")
     public void should_export_only_static_nodes() throws Exception {
         j.jenkins.addNode(new Cloud1PretendSlave());
-        j.jenkins.addNode(new Cloud2PretendSlave());
-        j.jenkins.addNode(new Cloud3PretendSlave());
         
         final JenkinsConfigurator root = getJenkinsConfigurator();
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
@@ -94,15 +95,9 @@ public class JenkinsConfiguratorCloudSupportTest {
         final CNode configNode = getNodesNode(root, context);
 
         final String yamlConfig = toYamlString(configNode);
-        assertEquals(String.join("\n",
-                "- dumb:",
-                "    name: \"agent1\"",
-                "    remoteFS: \"/home/user1\"",
-                "- dumb:",
-                "    name: \"agent2\"",
-                "    remoteFS: \"/home/user1\"",
-                ""
-        ), yamlConfig);
+        assertThat(yamlConfig, containsString("name: \"agent1\""));
+        assertThat(yamlConfig, containsString("name: \"agent2\""));
+        assertThat(yamlConfig, not(containsString("name: \"testCloud\"")));
     }
 
 
