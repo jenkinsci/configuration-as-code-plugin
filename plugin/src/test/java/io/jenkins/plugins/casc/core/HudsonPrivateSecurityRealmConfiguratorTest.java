@@ -45,4 +45,16 @@ public class HudsonPrivateSecurityRealmConfiguratorTest {
         final Mapping user = node.asMapping().get("users").asSequence().get(0).asMapping();
         assertEquals("admin", user.getScalarValue("id"));
     }
+
+    @Test
+    @ConfiguredWithCode("HudsonPrivateSecurityRealmConfiguratorTest.yml")
+    public void config_local_security_and_hashed_admin_user() {
+        Assume.assumeTrue(HudsonPrivateSecurityRealmConfigurator.jenkinsSupportsHashedPasswords());
+
+        final User admin = User.getById("hashedadmin", false);
+        assertNotNull(admin);
+        final HudsonPrivateSecurityRealm.Details details = admin.getProperty(HudsonPrivateSecurityRealm.Details.class);
+        assertTrue(details.isPasswordCorrect("password"));
+    }
+
 }
