@@ -13,6 +13,8 @@ import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Set;
 import java.util.logging.Level;
@@ -55,6 +57,7 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
         for (UserWithPassword user : value) {
             if (user.password.startsWith(HASHED_PASSWORD_PREFIX) && jenkinsSupportsHashedPasswords()) {
                 try {
+                    createAccount(target, user);
                     target.createAccountWithHashedPassword(user.id, user.password);
                 } catch (IllegalArgumentException e) {
                     logger.log(Level.WARNING, "Failed to create user with presumed hashed password", e);
@@ -64,6 +67,25 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
             } else {
                 target.createAccount(user.id, user.password);
             }
+        }
+    }
+
+    /**
+     * Call createAccountWithHashedPassword reflectively, as it only exists in Jenkins 2.161+, and we
+     * cannot depend on that newer Jenkins version in this plugin yet.
+     * @param target
+     *        The target to invoke
+     * @param user
+     *        The user to construct
+     */
+    private static void createAccount(HudsonPrivateSecurityRealm target, UserWithPassword user) {
+        try {
+            Method createAccountWithHashedPassword = HudsonPrivateSecurityRealm.class.getDeclaredMethod(
+                    "createAccountWithHashedPassword", String.class, String.class);
+            createAccountWithHashedPassword.invoke(target, user.id, user.password);
+        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+            logger.log(Level.WARNING, "Failed to invoke createAccountWithHashedPassword method", e);
+            throw new IllegalArgumentException(e);
         }
     }
 
