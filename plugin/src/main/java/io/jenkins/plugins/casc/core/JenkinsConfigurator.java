@@ -5,11 +5,14 @@ import hudson.Extension;
 import hudson.ProxyConfiguration;
 import hudson.model.Node;
 import hudson.model.UpdateCenter;
+import hudson.slaves.AbstractCloudSlave;
+import hudson.slaves.EphemeralNode;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.RootElementConfigurator;
 import io.jenkins.plugins.casc.model.Mapping;
+import io.vavr.control.Try;
 import jenkins.model.Jenkins;
 import jenkins.security.s2m.AdminWhitelistRule;
 import org.kohsuke.accmod.Restricted;
@@ -18,7 +21,6 @@ import org.kohsuke.accmod.restrictions.NoExternalUse;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static io.jenkins.plugins.casc.Attribute.noop;
@@ -29,8 +31,6 @@ import static io.jenkins.plugins.casc.Attribute.noop;
 @Extension
 @Restricted(NoExternalUse.class)
 public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements RootElementConfigurator<Jenkins> {
-
-    private static final Logger LOGGER = Logger.getLogger(JenkinsConfigurator.class.getName());
 
     @Override
     public Class<Jenkins> getTarget() {
@@ -58,11 +58,22 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
                 .setter( noop() ));
 
         // Override "nodes" getter so we don't export Nodes registered by Cloud plugins
-        Attribute.<Jenkins,List<Node>>get(attributes, "nodes").ifPresent(a ->
-            a.getter(j -> j.getNodes().stream()
-                    .filter(node -> node.getDescriptor().isInstantiable())
-                    .collect(Collectors.toList())
-            )
+        Attribute.<Jenkins, List<Node>>get(attributes, "nodes").ifPresent(attribute ->
+                attribute
+                        .getter(jenkins -> jenkins.getNodes().stream()
+                                .filter(node -> !isCloudNode(node))
+                                .collect(Collectors.toList()))
+                        .setter((jenkins, configuredNodes) -> {
+                            List<String> configuredNodesNames = configuredNodes.stream()
+                                    .map(Node::getNodeName)
+                                    .collect(Collectors.toList());
+                            List<Node> nodesToKeep = jenkins.getNodes().stream()
+                                    .filter(node -> !configuredNodesNames.contains(node.getNodeName()))
+                                    .filter(this::isCloudNode)
+                                    .collect(Collectors.toList());
+                            nodesToKeep.addAll(configuredNodes);
+                            jenkins.setNodes(nodesToKeep);
+                        })
         );
 
         // Add updateCenter, all legwork will be done by a configurator
@@ -77,6 +88,14 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
         return attributes;
     }
 
+
+    private boolean isCloudNode(Node node) {
+        boolean instantiable = Try.of(() -> node.getDescriptor().isInstantiable()).getOrElse(true);
+        final boolean cloudSlave = node instanceof AbstractCloudSlave;
+        final boolean ephemeral = node instanceof EphemeralNode;
+        return !instantiable || cloudSlave || ephemeral;
+    }
+    
     @Override
     protected Set<String> exclusions() {
         return Collections.singleton("installState");
