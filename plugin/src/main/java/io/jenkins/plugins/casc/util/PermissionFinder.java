@@ -1,11 +1,11 @@
 package io.jenkins.plugins.casc.util;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import hudson.security.Permission;
 import hudson.security.PermissionGroup;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
-import javax.annotation.CheckForNull;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;

@@ -70,11 +70,9 @@ Master:
   InitContainerEnv:
 
   ContainerEnv:
-    # Tell the plugin where to find its config. The '..data'
-    # part is needed for now due to this bug:
-    # https://github.com/jenkinsci/configuration-as-code-plugin/issues/425
+    # Tell the plugin where to find its config.
     - name: CASC_JENKINS_CONFIG
-      value: /var/jenkins_home/casc_configs/..data/jenkins.yaml
+      value: /var/jenkins_home/casc_configs/jenkins.yaml
     # `SECRETS` is used to override the `/run/secrets` path,
     # which is useful for setting credentials.
     # But it needs to be used in conjunction with Master.SecretsFilesSecret

@@ -29,7 +29,7 @@ public class ApplyConfigurationCommand extends CLICommand {
             return -1;
         }
 
-        ConfigurationAsCode.get().configureWith(new YamlSource<InputStream>(stdin, YamlSource.READ_FROM_INPUTSTREAM));
+        ConfigurationAsCode.get().configureWith(YamlSource.of(stdin));
         return 0;
     }
 }

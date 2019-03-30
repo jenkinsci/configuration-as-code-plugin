@@ -1,5 +1,7 @@
 package io.jenkins.plugins.casc.impl.configurators;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Descriptor;
 import hudson.util.Secret;
 import io.jenkins.plugins.casc.Attribute;
@@ -15,7 +17,6 @@ import org.kohsuke.stapler.ClassDescriptor;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.Stapler;
 
-import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.PostConstruct;
 import java.lang.reflect.Constructor;
@@ -51,7 +52,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
     }
 
     @CheckForNull
-    public static Constructor getDataBoundConstructor(@Nonnull Class type) {
+    public static Constructor getDataBoundConstructor(@NonNull Class type) {
         for (Constructor c : type.getConstructors()) {
             if (c.getAnnotation(DataBoundConstructor.class) != null) return c;
         }
@@ -73,7 +74,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
         return tryConstructor((Constructor<T>) dataBoundConstructor, config, context);
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public T configure(CNode c, ConfigurationContext context) throws ConfiguratorException {
         T object = super.configure(c, context);
@@ -158,6 +159,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
         return object;
     }
 
+    @NonNull
     public String getName() {
         final Descriptor d = getDescriptor();
         return DescribableAttribute.getPreferredSymbol(d, getImplementedAPI(), getTarget());
@@ -167,6 +169,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
         return Jenkins.getInstance().getDescriptor(getTarget());
     }
 
+    @NonNull
     public Class getImplementedAPI() {
 
         final Descriptor descriptor = getDescriptor();
@@ -195,6 +198,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
     }
 
 
+    @NonNull
     @Override
     public Set<Attribute<T,?>> describe() {
         final Set<Attribute<T,?>> attributes = super.describe();

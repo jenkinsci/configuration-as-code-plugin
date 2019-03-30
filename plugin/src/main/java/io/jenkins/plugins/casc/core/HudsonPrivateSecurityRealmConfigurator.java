@@ -1,5 +1,6 @@
 package io.jenkins.plugins.casc.core;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.security.HudsonPrivateSecurityRealm;
 import io.jenkins.plugins.casc.Attribute;
@@ -23,6 +24,7 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
         super(HudsonPrivateSecurityRealm.class);
     }
 
+    @NonNull
     @Override
     public Set<Attribute> describe() {
         final Set<Attribute> describe = super.describe();

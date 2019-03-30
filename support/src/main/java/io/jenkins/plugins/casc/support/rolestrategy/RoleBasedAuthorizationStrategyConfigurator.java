@@ -2,6 +2,8 @@ package io.jenkins.plugins.casc.support.rolestrategy;
 
 
 import com.michelin.cio.hudson.plugins.rolestrategy.RoleBasedAuthorizationStrategy;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.BaseConfigurator;
@@ -13,7 +15,6 @@ import io.jenkins.plugins.casc.model.Mapping;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
-import javax.annotation.CheckForNull;
 import java.util.Collections;
 import java.util.Set;
 
@@ -27,6 +28,7 @@ import java.util.Set;
 public class RoleBasedAuthorizationStrategyConfigurator extends BaseConfigurator<RoleBasedAuthorizationStrategy> {
 
     @Override
+    @NonNull
     public String getName() {
         return "roleStrategy";
     }
@@ -44,6 +46,7 @@ public class RoleBasedAuthorizationStrategyConfigurator extends BaseConfigurator
     }
 
     @Override
+    @NonNull
     public Set<Attribute<RoleBasedAuthorizationStrategy,?>> describe() {
         return Collections.singleton(
                 new Attribute<RoleBasedAuthorizationStrategy, GrantedRoles>("roles", GrantedRoles.class));

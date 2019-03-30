@@ -1,6 +1,8 @@
 package io.jenkins.plugins.casc;
 
 import com.google.common.annotations.VisibleForTesting;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.Util;
 import hudson.init.InitMilestone;
@@ -44,11 +46,8 @@ import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.interceptor.RequirePOST;
 import org.kohsuke.stapler.lang.Klass;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
@@ -237,20 +236,23 @@ public class ConfigurationAsCode extends ManagementLink {
         return problems;
     }
 
+    private void appendSources(List<YamlSource> sources, String source) throws ConfiguratorException {
+        if (isSupportedURI(source)) {
+            sources.add(YamlSource.of(source));
+        } else {
+            sources.addAll(configs(source).stream()
+                .map(YamlSource::of)
+                .collect(toList()));
+        }
+    }
 
     private List<YamlSource> getConfigFromSources(List<String> newSources) throws ConfiguratorException {
-        List<YamlSource> ret = new ArrayList<>();
+        List<YamlSource> sources = new ArrayList<>();
 
         for (String p : newSources) {
-            if (isSupportedURI(p)) {
-                ret.add(new YamlSource<>(p, YamlSource.READ_FROM_URL));
-            } else {
-                ret.addAll(configs(p).stream()
-                        .map(s -> new YamlSource<>(s, YamlSource.READ_FROM_PATH))
-                        .collect(toList()));
-            }
+            appendSources(sources, p);
         }
-        return ret;
+        return sources;
     }
 
     /**
@@ -278,13 +280,7 @@ public class ConfigurationAsCode extends ManagementLink {
         List<YamlSource> configs = new ArrayList<>();
 
         for (String p : getStandardConfig()) {
-            if (isSupportedURI(p)) {
-                configs.add(new YamlSource<>(p, YamlSource.READ_FROM_URL));
-            } else {
-                configs.addAll(configs(p).stream()
-                        .map(s -> new YamlSource<>(s, YamlSource.READ_FROM_PATH))
-                        .collect(toList()));
-            }
+            appendSources(configs, p);
             sources = Collections.singletonList(p);
         }
         return configs;
@@ -364,7 +360,7 @@ public class ConfigurationAsCode extends ManagementLink {
             return;
         }
 
-        final Map<Source, String> issues = checkWith(new YamlSource<HttpServletRequest>(req, YamlSource.READ_FROM_REQUEST));
+        final Map<Source, String> issues = checkWith(YamlSource.of(req));
         res.setContentType("application/json");
         final JSONArray warnings = new JSONArray();
         issues.entrySet().stream().map(e -> new JSONObject().accumulate("line", e.getKey().line).accumulate("warning", e.getValue()))
@@ -379,8 +375,7 @@ public class ConfigurationAsCode extends ManagementLink {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
-
-        configureWith(new YamlSource<HttpServletRequest>(req, YamlSource.READ_FROM_REQUEST));
+        configureWith(YamlSource.of(req));
     }
 
     /**
@@ -507,13 +502,7 @@ public class ConfigurationAsCode extends ManagementLink {
         List<YamlSource> configs = new ArrayList<>();
 
         for (String p : configParameters) {
-            if (isSupportedURI(p)) {
-                configs.add(new YamlSource<>(p, YamlSource.READ_FROM_URL));
-            } else {
-                configs.addAll(configs(p).stream()
-                        .map(s -> new YamlSource<>(s, YamlSource.READ_FROM_PATH))
-                        .collect(toList()));
-            }
+            appendSources(configs, p);
             sources = Collections.singletonList(p);
         }
         configureWith(configs);
@@ -718,7 +707,7 @@ public class ConfigurationAsCode extends ManagementLink {
      * @return String that shows help. May be empty
      * @throws IOException if the resource cannot be read
      */
-    @Nonnull
+    @NonNull
     public String getHtmlHelp(Class type, String attribute) throws IOException {
         final URL resource = Klass.java(type).getResource("help-" + attribute + ".html");
         if (resource != null) {

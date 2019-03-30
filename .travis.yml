@@ -1,0 +1,17 @@
+language: java
+
+cache:
+  directories:
+    - $HOME/.m2
+
+jdk:
+  - openjdk8
+
+services:
+  - docker
+
+script:
+  - mvn clean package -B
+
+notifications:
+  email: false

@@ -1,5 +1,7 @@
 package io.jenkins.plugins.casc.core;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.model.Descriptor;
 import hudson.tasks.Maven;
@@ -16,8 +18,6 @@ import jenkins.mvn.GlobalMavenConfig;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 import java.util.Set;
 
 /**
@@ -45,7 +45,7 @@ public class MavenConfigurator extends BaseConfigurator<GlobalMavenConfig> {
         return GlobalMavenConfig.get();
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public Set<Attribute<GlobalMavenConfig,?>> describe() {
         final Set<Attribute<GlobalMavenConfig,?>> attributes = super.describe();

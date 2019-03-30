@@ -37,6 +37,7 @@ package io.jenkins.plugins.casc.snakeyaml.reader;
  Unicode format = UTF-16LE
  ***/
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -120,7 +121,7 @@ public class UnicodeReader extends Reader {
         internalIn2.close();
     }
 
-    public int read(char[] cbuf, int off, int len) throws IOException {
+    public int read(@NonNull char[] cbuf, int off, int len) throws IOException {
         init();
         return internalIn2.read(cbuf, off, len);
     }

@@ -15,6 +15,7 @@
  */
 package io.jenkins.plugins.casc.snakeyaml.representer;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -201,6 +202,7 @@ class SafeRepresenter extends BaseRepresenter {
             this.iter = iter;
         }
 
+        @NonNull
         public Iterator<Object> iterator() {
             return iter;
         }

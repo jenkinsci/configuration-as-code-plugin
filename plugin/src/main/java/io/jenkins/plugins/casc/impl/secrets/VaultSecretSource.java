@@ -183,10 +183,11 @@ public class VaultSecretSource extends SecretSource {
     }
 
     private Optional<String[]> getCommaSeparatedVariables(String key, Properties prop) {
-        if (key.equals(CASC_VAULT_PATH))
-            LOGGER.log(Level.WARNING, "[Deprecation Warning] CASC_VAULT_PATH will be deprecated. " +
+        Optional<String[]> strings = getVariable(key, prop).map(str -> str.split(","));
+        if (key.equals(CASC_VAULT_PATH) && strings.isPresent())
+             LOGGER.log(Level.WARNING, "[Deprecation Warning] CASC_VAULT_PATH is deprecated. " +
                     "Please use CASC_VAULT_PATHS instead."); // TODO: deprecate!
-        return getVariable(key, prop).map(str -> str.split(","));
+        return strings;
     }
 
     @Override

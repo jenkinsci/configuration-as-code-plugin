@@ -70,9 +70,9 @@
               <goal>test-jar</goal>
             </goals>
             <configuration>
-              <excludes>
-                <exclude>test-dependencies/index</exclude>
-              </excludes>
+              <includes>
+                <include>io/jenkins/plugins/casc/misc/**</include>
+              </includes>
             </configuration>
           </execution>
         </executions>
