@@ -6,12 +6,24 @@ cache:
 
 jdk:
   - openjdk8
+  - openjdk11
+
+env:
+  global:
+    - JAVA_LEVEL=8
+  matrix:
+    - JENKINS_VERSION=2.60.3 AMC_FAIL_ON_ERROR=true
+    - JENKINS_VERSION=2.164.1 AMC_FAIL_ON_ERROR=false
 
 services:
   - docker
 
 script:
-  - mvn clean package -B
+  - |
+    mvn clean package -B `
+      -Djava.level=${JAVA_LEVEL} `
+      -Djenkins.version=${JENKINS_VERSION} `
+      -Daccess-modifier-checker.failOnError=${AMC_FAIL_ON_ERROR}
 
 notifications:
   email: false
