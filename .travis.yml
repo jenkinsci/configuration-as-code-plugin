@@ -25,10 +25,10 @@ services:
 
 script:
   - |
-    mvn clean package -B \
-      -Djava.level=${JAVA_LEVEL} \
-      -Djenkins.version=${JENKINS_VERSION} \
-      -Daccess-modifier-checker.failOnError=${AMC_FAIL_ON_ERROR}
+    mvn clean install -B \
+      -Djava.level=$JAVA_LEVEL \
+      -Djenkins.version=$JENKINS_VERSION \
+      -Daccess-modifier-checker.failOnError=$AMC_FAIL_ON_ERROR
 
 notifications:
   email: false
