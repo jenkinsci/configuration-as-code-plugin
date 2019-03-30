@@ -23,6 +23,9 @@ matrix:
 services:
   - docker
 
+install:
+  - mvn clean install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+
 script:
   - |
     mvn clean install -B \
