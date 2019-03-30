@@ -15,6 +15,11 @@ env:
     - JENKINS_VERSION=2.60.3 AMC_FAIL_ON_ERROR=true
     - JENKINS_VERSION=2.164.1 AMC_FAIL_ON_ERROR=false
 
+matrix:
+  exclude:
+    - jdk: openjdk11
+      env: JENKINS_VERSION=2.60.3
+
 services:
   - docker
 
