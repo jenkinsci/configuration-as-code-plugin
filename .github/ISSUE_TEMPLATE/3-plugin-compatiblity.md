@@ -1,5 +1,6 @@
 ---
 name: "💥 Plugin compatibility"
+labels: plugin-compatibility
 about: Create a plugin compatibility issue report
 ---
 
