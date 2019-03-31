@@ -12,7 +12,6 @@ public class VaultAppRoleAuthenticator extends VaultAuthenticatorWithExpiration 
 
     private String approle;
     private String approleSecret;
-    private String currentAuthToken;
 
     public VaultAppRoleAuthenticator(String approle, String approleSecret) {
         this.approle = approle;

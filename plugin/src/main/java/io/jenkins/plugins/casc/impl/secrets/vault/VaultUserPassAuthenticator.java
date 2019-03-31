@@ -13,7 +13,6 @@ public class VaultUserPassAuthenticator extends VaultAuthenticatorWithExpiration
     private String user;
     private String pass;
     private String mountPath;
-    private String currentAuthToken;
 
     public VaultUserPassAuthenticator(String user, String pass, String mountPath) {
         this.user = user;

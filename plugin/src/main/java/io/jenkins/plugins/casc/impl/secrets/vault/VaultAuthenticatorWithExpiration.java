@@ -1,6 +1,7 @@
 package io.jenkins.plugins.casc.impl.secrets.vault;
 
 import com.bettercloud.vault.Vault;
+import com.bettercloud.vault.VaultConfig;
 import com.bettercloud.vault.VaultException;
 import java.util.Calendar;
 import java.util.logging.Level;
@@ -11,6 +12,7 @@ abstract class VaultAuthenticatorWithExpiration implements VaultAuthenticator {
     private final static Logger LOGGER = Logger.getLogger(VaultAuthenticatorWithExpiration.class.getName());
 
     private Calendar tokenExpiration;
+    protected String currentAuthToken;
 
     public boolean isTokenTTLExpired() {
         if (tokenExpiration == null) return true;
