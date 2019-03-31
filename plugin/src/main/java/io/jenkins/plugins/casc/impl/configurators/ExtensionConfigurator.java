@@ -40,7 +40,7 @@ public class ExtensionConfigurator<T> extends BaseConfigurator<T> {
         if (list.size() != 1) {
             throw new ConfiguratorException("Expected a unique instance of extension "+target);
         }
-        return (T) list.get(0);
+        return list.get(0);
     }
 
     @CheckForNull

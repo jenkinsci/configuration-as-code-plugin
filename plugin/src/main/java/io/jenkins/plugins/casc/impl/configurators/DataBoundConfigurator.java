@@ -152,8 +152,8 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
         }
 
         // constructor was successful, so let's removed configuration elements we have consumed doing so.
-        for (int i = 0; i < names.length; i++) {
-            config.remove(names[i]);
+        for (String name : names) {
+            config.remove(name);
         }
 
         return object;

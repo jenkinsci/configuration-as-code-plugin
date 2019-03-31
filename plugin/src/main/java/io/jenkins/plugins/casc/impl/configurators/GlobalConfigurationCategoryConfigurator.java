@@ -72,10 +72,10 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
     @NonNull
     @Override
     public Set describe() {
-        return (Set) Jenkins.getInstance().getExtensionList(Descriptor.class).stream()
+        return Jenkins.getInstance().getExtensionList(Descriptor.class).stream()
                 .filter(d -> d.getCategory() == category)
                 .filter(d -> d.getGlobalConfigPage() != null)
-                .map(d -> new DescriptorConfigurator(d))
+                .map(DescriptorConfigurator::new)
                 .filter(GlobalConfigurationCategoryConfigurator::reportDescriptorWithoutSetters)
                 .map(c -> new Attribute<GlobalConfigurationCategory, Object>(c.getName(), c.getTarget()).setter(NOP))
                 .collect(Collectors.toSet());
