@@ -6,7 +6,9 @@
 
 - [ ] Please describe what you did
 
-- [ ] Link to issue you're working on if there's a relevant one
+- [ ] Link to relevant GitHub issues or pull requests
+
+- [ ] Link to relevant [Jenkins JIRA issues](https://issues.jenkins-ci.org)
 
 - [ ] Did you provide a test-case? That demonstrates feature works or fixes the issue.
 
