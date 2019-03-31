@@ -5,10 +5,8 @@ import com.bettercloud.vault.VaultConfig;
 import com.bettercloud.vault.VaultException;
 import hudson.Extension;
 import io.jenkins.plugins.casc.SecretSource;
-import io.jenkins.plugins.casc.impl.secrets.vault.VaultAppRoleAuthenticator;
 import io.jenkins.plugins.casc.impl.secrets.vault.VaultAuthenticator;
-import io.jenkins.plugins.casc.impl.secrets.vault.VaultSingleTokenAuthenticator;
-import io.jenkins.plugins.casc.impl.secrets.vault.VaultUserPassAuthenticator;
+import java.util.function.BiConsumer;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
@@ -48,31 +46,30 @@ public class VaultSecretSource extends SecretSource {
     private Map<String, String> secrets = new HashMap<>();
     private Vault vault;
     private VaultConfig vaultConfig;
-    private VaultAuthenticator currentlyUsedAuthenticator;
-    private VaultAuthenticator configuredAuthenticator;
+    private VaultAuthenticator vaultAuthenticator;
     private String[] vaultPaths;
-
+    private Properties prop;
 
     private void configureVault() {
         // Read config file/env
+        prop = new Properties();
         Optional<String> vaultFile = Optional.ofNullable(System.getenv(CASC_VAULT_FILE));
-        Properties prop = new Properties();
-        vaultFile.ifPresent(file -> readPropertiesFromVaultFile(file, prop));
+        vaultFile.ifPresent(this::readPropertiesFromVaultFile);
 
         // Parse variables
-        Optional<String> vaultEngineVersionOpt = getVariable(CASC_VAULT_ENGINE_VERSION, prop);
-        Optional<String> vaultUrl = getVariable(CASC_VAULT_URL, prop);
-        Optional<String> vaultNamespace = getVariable(CASC_VAULT_NAMESPACE, prop);
-        Optional<String[]> vaultPaths = getCommaSeparatedVariables(CASC_VAULT_PATHS, prop)
+        Optional<String> vaultEngineVersionOpt = getVariable(CASC_VAULT_ENGINE_VERSION);
+        Optional<String> vaultUrl = getVariable(CASC_VAULT_URL);
+        Optional<String> vaultNamespace = getVariable(CASC_VAULT_NAMESPACE);
+        Optional<String[]> vaultPaths = getCommaSeparatedVariables(CASC_VAULT_PATHS)
                 .map(Optional::of)
-                .orElseGet(() -> getCommaSeparatedVariables(CASC_VAULT_PATH, prop)); // TODO: deprecate!
+                .orElseGet(() -> getCommaSeparatedVariables(CASC_VAULT_PATH)); // TODO: deprecate!
 
         // Check mandatory variables are set
         if (!vaultUrl.isPresent() || !vaultPaths.isPresent()) return;
 
         String vaultEngineVersion = vaultEngineVersionOpt.orElse(DEFAULT_ENGINE_VERSION);
         this.vaultPaths = vaultPaths.get();
-        determineAuthenticator(prop);
+        determineAuthenticator();
 
         // configure vault client
         vaultConfig = new VaultConfig().address(vaultUrl.get());
@@ -98,39 +95,46 @@ public class VaultSecretSource extends SecretSource {
         vault = new Vault(vaultConfig);
     }
 
-    private void determineAuthenticator(Properties prop) {
-        Optional<String> vaultPw = getVariable(CASC_VAULT_PW, prop);
-        Optional<String> vaultUser = getVariable(CASC_VAULT_USER, prop);
-        Optional<String> vaultMount = getVariable(CASC_VAULT_MOUNT, prop);
-        Optional<String> vaultToken = getVariable(CASC_VAULT_TOKEN, prop);
-        Optional<String> vaultAppRole = getVariable(CASC_VAULT_APPROLE, prop);
-        Optional<String> vaultAppRoleSecret = getVariable(CASC_VAULT_APPROLE_SECRET, prop);
+    private void determineAuthenticator() {
+        Optional<String> vaultPw = getVariable(CASC_VAULT_PW);
+        Optional<String> vaultUser = getVariable(CASC_VAULT_USER);
+        Optional<String> vaultToken = getVariable(CASC_VAULT_TOKEN);
+        Optional<String> vaultAppRole = getVariable(CASC_VAULT_APPROLE);
+        Optional<String> vaultAppRoleSecret = getVariable(CASC_VAULT_APPROLE_SECRET);
 
-        vaultToken.ifPresent(
-                token -> configuredAuthenticator = new VaultSingleTokenAuthenticator(token)
-        );
+        vaultToken.ifPresent(this::token);
+        allPresent(vaultUser, vaultPw, this::userPass);
+        allPresent(vaultAppRole, vaultAppRoleSecret, this::approle);
 
-        vaultUser.ifPresent(
-                user -> vaultPw.ifPresent(
-                        pw -> configuredAuthenticator = new VaultUserPassAuthenticator(user, pw, vaultMount.orElse(DEFAULT_USER_BACKEND))
-                )
-        );
-
-        vaultAppRole.ifPresent(
-                approle -> vaultAppRoleSecret.ifPresent(
-                        approleSecret -> configuredAuthenticator = new VaultAppRoleAuthenticator(approle, approleSecret)
-                )
-        );
-
-        // Overwrite current authenticator only if there was a change, because we do not want to loose current auth token
-        if (configuredAuthenticator != null
-                && !configuredAuthenticator.equals(currentlyUsedAuthenticator)) {
-            currentlyUsedAuthenticator = configuredAuthenticator;
-        }
-
-        if (currentlyUsedAuthenticator == null) {
+        if (vaultAuthenticator == null) {
             LOGGER.log(Level.WARNING, "Could not determine vault authentication method. Not able to read secrets from vault.");
         }
+    }
+
+    private void setAuthenticator(VaultAuthenticator vaultAuthenticator) {
+        // Overwrite current authenticator only if there was a change, because we do not want to loose current auth token
+        if (vaultAuthenticator != null
+            && !vaultAuthenticator.equals(this.vaultAuthenticator)) {
+            this.vaultAuthenticator = vaultAuthenticator;
+        }
+    }
+
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    public static <T, U> void allPresent(Optional<T> o1, Optional<U> o2, BiConsumer<T, U> consumer) {
+        o1.ifPresent(t -> o2.ifPresent(u -> consumer.accept(t, u)));
+    }
+
+    private void token(String token) {
+        setAuthenticator(VaultAuthenticator.of(token));
+    }
+
+    private void userPass(String user, String pass) {
+        Optional<String> mount = getVariable(CASC_VAULT_MOUNT);
+        setAuthenticator(VaultAuthenticator.of(user, pass, mount.orElse(DEFAULT_USER_BACKEND)));
+    }
+
+    private void approle(String approle, String approleSecret) {
+        setAuthenticator(VaultAuthenticator.of(approle, approleSecret));
     }
 
     private void readSecretsFromVault() {
@@ -161,7 +165,7 @@ public class VaultSecretSource extends SecretSource {
         }
     }
 
-    private void readPropertiesFromVaultFile(String vaultFile, Properties prop) {
+    private void readPropertiesFromVaultFile(String vaultFile) {
         try (FileInputStream input = new FileInputStream(vaultFile)) {
             prop.load(input);
             if (prop.isEmpty()) {
@@ -186,12 +190,12 @@ public class VaultSecretSource extends SecretSource {
         this.secrets = secrets;
     }
 
-    private Optional<String> getVariable(String key, Properties prop) {
+    private Optional<String> getVariable(String key) {
         return Optional.ofNullable(prop.getProperty(key, System.getenv(key)));
     }
 
-    private Optional<String[]> getCommaSeparatedVariables(String key, Properties prop) {
-        Optional<String[]> strings = getVariable(key, prop).map(str -> str.split(","));
+    private Optional<String[]> getCommaSeparatedVariables(String key) {
+        Optional<String[]> strings = getVariable(key).map(str -> str.split(","));
         if (key.equals(CASC_VAULT_PATH) && strings.isPresent())
              LOGGER.log(Level.WARNING, "[Deprecation Warning] CASC_VAULT_PATH is deprecated. " +
                     "Please use CASC_VAULT_PATHS instead."); // TODO: deprecate!
@@ -203,9 +207,9 @@ public class VaultSecretSource extends SecretSource {
         configureVault();
 
         // Ensure secrets are up-to-date and Check vault authentication
-        if (currentlyUsedAuthenticator != null) {
+        if (vaultAuthenticator != null) {
             try {
-                currentlyUsedAuthenticator.authenticate(vault, vaultConfig);
+                vaultAuthenticator.authenticate(vault, vaultConfig);
             } catch (VaultException e) {
                 LOGGER.log(Level.WARNING, "Could not authenticate with vault client", e);
             }
