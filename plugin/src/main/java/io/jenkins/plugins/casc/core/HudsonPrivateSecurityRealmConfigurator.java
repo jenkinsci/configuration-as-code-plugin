@@ -3,14 +3,22 @@ package io.jenkins.plugins.casc.core;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.security.HudsonPrivateSecurityRealm;
+import hudson.util.VersionNumber;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.impl.attributes.MultivaluedAttribute;
 import io.jenkins.plugins.casc.impl.configurators.DataBoundConfigurator;
+import jenkins.model.Jenkins;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.DataBoundConstructor;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -18,7 +26,11 @@ import java.util.stream.Collectors;
  */
 @Extension
 @Restricted(NoExternalUse.class)
-public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurator {
+public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurator<HudsonPrivateSecurityRealm> {
+    private static final Logger logger = Logger.getLogger(HudsonPrivateSecurityRealmConfigurator.class.getName());
+    private static final VersionNumber MIN_VERSION_FOR_HASHED_PASSWORDS = new VersionNumber("2.161");
+    /// matches HudsonPrivateSecurityRealm.JBCRYPT_HEADER
+    private static final String HASHED_PASSWORD_PREFIX = "#jbcrypt:";
 
     public HudsonPrivateSecurityRealmConfigurator() {
         super(HudsonPrivateSecurityRealm.class);
@@ -26,20 +38,66 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
 
     @NonNull
     @Override
-    public Set<Attribute> describe() {
-        final Set<Attribute> describe = super.describe();
+    public Set<Attribute<HudsonPrivateSecurityRealm, ?>> describe() {
+        final Set<Attribute<HudsonPrivateSecurityRealm, ?>> describe = super.describe();
         describe.add(new MultivaluedAttribute<HudsonPrivateSecurityRealm, UserWithPassword>("users", UserWithPassword.class)
-            .getter(target ->
-                target.getAllUsers().stream()
-                    .map(u -> new UserWithPassword(u.getId(), null))    // password isn't actually stored, only hashed
-                    .collect(Collectors.toList()))
-            .setter((target, value) -> {
-                for (UserWithPassword user : value) {
+            .getter(HudsonPrivateSecurityRealmConfigurator::getter)
+            .setter(HudsonPrivateSecurityRealmConfigurator::setter)
+        );
+        return describe;
+    }
+
+    private static Collection<UserWithPassword> getter(HudsonPrivateSecurityRealm target) {
+        return target.getAllUsers().stream()
+                .map(u -> new UserWithPassword(u.getId(), null)) // password isn't actually stored, only hashed
+                .collect(Collectors.toList());
+    }
+
+    private static void setter(HudsonPrivateSecurityRealm target, Collection<UserWithPassword> value) throws IOException {
+        for (UserWithPassword user : value) {
+            if (user.password.startsWith(HASHED_PASSWORD_PREFIX) && jenkinsSupportsHashedPasswords()) {
+                try {
+                    createAccount(target, user);
+                } catch (IllegalArgumentException e) {
+                    logger.log(Level.WARNING, "Failed to create user with presumed hashed password", e);
+                    // fallback, just create the account as is
                     target.createAccount(user.id, user.password);
                 }
+            } else {
+                target.createAccount(user.id, user.password);
             }
-        ));
-        return describe;
+        }
+    }
+
+    /**
+     * Call createAccountWithHashedPassword reflectively, as it only exists in Jenkins 2.161+, and we
+     * cannot depend on that newer Jenkins version in this plugin yet.
+     * @param target
+     *        The target to invoke
+     * @param user
+     *        The user to construct
+     */
+    private static void createAccount(HudsonPrivateSecurityRealm target, UserWithPassword user) {
+        // TODO remove reflection once we target 2.161+
+        try {
+            @SuppressWarnings("JavaReflectionMemberAccess") // available from 2.161+
+            Method createAccountWithHashedPassword = HudsonPrivateSecurityRealm.class.getDeclaredMethod(
+                    "createAccountWithHashedPassword", String.class, String.class);
+            createAccountWithHashedPassword.invoke(target, user.id, user.password);
+        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+            logger.log(Level.WARNING, "Failed to invoke createAccountWithHashedPassword method", e);
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    static boolean jenkinsSupportsHashedPasswords() {
+        VersionNumber currentVersion = Jenkins.getVersion();
+        if (currentVersion == null) {
+            logger.log(Level.WARNING,
+                    "Could not retrieve current version for Jenkins server. Is everything configured correctly?");
+            return false;
+        }
+        return !currentVersion.isOlderThan(MIN_VERSION_FOR_HASHED_PASSWORDS);
     }
 
     public static class UserWithPassword {

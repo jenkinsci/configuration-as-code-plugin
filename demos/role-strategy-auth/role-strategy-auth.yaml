@@ -53,6 +53,9 @@ jenkins:
           password: "1234"
         - id: "user1"
           password: ""
+        - id: "user_hashed"
+          # password is password
+          password: "#jbcrypt:$2a$10$3bnAsorIxhl9kTYvNHa2hOJQwPzwT4bv9Vs.9KdXkh9ySANjJKm5u"
 
   nodes:
     - dumb:
