@@ -93,7 +93,7 @@ public final class YamlUtils {
                 return;
             default:
                 throw new ConfiguratorException(
-                        String.format("Found conflicting configuration at %s %s", source.toString(), node.getStartMark()));
+                        String.format("Found conflicting configuration at %s %s", source, node.getStartMark()));
         }
 
     }

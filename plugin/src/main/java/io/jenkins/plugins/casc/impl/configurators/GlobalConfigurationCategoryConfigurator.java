@@ -69,13 +69,14 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
         return category;
     }
 
+    @SuppressWarnings("RedundantCast") // TODO remove once we are on JDK 11
     @NonNull
     @Override
     public Set describe() {
         return (Set) Jenkins.getInstance().getExtensionList(Descriptor.class).stream()
                 .filter(d -> d.getCategory() == category)
                 .filter(d -> d.getGlobalConfigPage() != null)
-                .map(d -> new DescriptorConfigurator(d))
+                .map(DescriptorConfigurator::new)
                 .filter(GlobalConfigurationCategoryConfigurator::reportDescriptorWithoutSetters)
                 .map(c -> new Attribute<GlobalConfigurationCategory, Object>(c.getName(), c.getTarget()).setter(NOP))
                 .collect(Collectors.toSet());
