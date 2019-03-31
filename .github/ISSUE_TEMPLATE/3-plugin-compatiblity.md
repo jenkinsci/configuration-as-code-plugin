@@ -3,7 +3,7 @@ name: "💥 Plugin compatibility"
 labels: plugin-compatibility
 about: Create a plugin compatibility issue report
 ---
-[Jenkins-JIRA]: https://issues.jenkins-ci.org
+[jenkins-jira]: https://issues.jenkins-ci.org
 [dashboard]: https://issues.jenkins.io/secure/Dashboard.jspa?selectPageId=18341
 [contributing]: ../blob/master/docs/CONTRIBUTING.md
 [compatibility]: ../blob/master/docs/COMPATIBILITY.md
@@ -17,13 +17,13 @@ Here is a link to get you started with creating the issue over at Jenkins JIRA
 https://issues.jenkins-ci.org/secure/CreateIssueDetails!init.jspa?pid=10172&issuetype=1&summary=Cannot+configure+X+plugin+with+JCasC&labels=jcasc-compatibility
 -->
 
-- [ ] Create an issue on [issues.jenkins-ci.org][Jenkins-JIRA], set the component to the plugin you are reporting it against
+- [ ] Create an issue on [issues.jenkins-ci.org][jenkins-jira], set the component to the plugin you are reporting it against
 
-- [ ] Before creating an issue on [Jenkins JIRA][Jenkins-JIRA], check that an existing one does not already exist [see dashboard][dashboard]
+- [ ] Before creating an issue on [Jenkins JIRA][jenkins-jira], check that an existing one does not already exist [see dashboard][dashboard]
 
-- [ ] Link to [Jenkins JIRA issue][Jenkins-JIRA]
+- [ ] Link to [Jenkins JIRA issue][jenkins-jira]
 
-- [ ] Ensure [Jenkins JIRA issue][Jenkins-JIRA] has the label `jcasc-compatibility`
+- [ ] Ensure [Jenkins JIRA issue][jenkins-jira] has the label `jcasc-compatibility`
 
 - [ ] Link to plugin's GitHub repository
 
