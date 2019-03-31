@@ -19,7 +19,7 @@ https://issues.jenkins-ci.org/secure/CreateIssueDetails!init.jspa?pid=10172&issu
 
 - [ ] Create an issue on [issues.jenkins-ci.org][jenkins-jira], set the component to the plugin you are reporting it against
 
-- [ ] Before creating an issue on [Jenkins JIRA][jenkins-jira], check that an existing one does not already exist [see dashboard][dashboard]
+- [ ] Before creating an issue on [Jenkins JIRA][jenkins-jira], check for [an existing one via dashboard][dashboard]
 
 - [ ] Link to [Jenkins JIRA issue][jenkins-jira]
 
