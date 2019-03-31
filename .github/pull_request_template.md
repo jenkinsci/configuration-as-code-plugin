@@ -2,7 +2,7 @@
 
 🚨 Please review the [guidelines for contributing](../blob/master/docs/CONTRIBUTING.md) to this repository.
 
-- [ ] Make sure you are requesting to **pull a topic/feature/bugfix branch** (right side). Don't request your master!
+- [ ] Make sure you are requesting to **pull a topic/feature/bugfix branch** (right side) and not your master branch!
 
 - [ ] Please describe what you did
 
@@ -13,7 +13,7 @@
 - [ ] Did you provide a test-case? That demonstrates feature works or fixes the issue.
 
 <!--
-Put a `x` into the [ ] to show you have filled the information below
+Put an `x` into the [ ] to show you have filled the information below
 Describe your pull request below
 -->
 
