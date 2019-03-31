@@ -35,7 +35,7 @@ public class VaultAppRoleAuthenticator extends VaultAuthenticatorWithExpiration 
     public String getAttributeHash() {
         return DigestUtils.sha256Hex(
                 DigestUtils.sha256Hex(approle)
-                        + DigestUtils.sha256Hex(approleSecret)
+                        + approleSecret
         );
     }
 }

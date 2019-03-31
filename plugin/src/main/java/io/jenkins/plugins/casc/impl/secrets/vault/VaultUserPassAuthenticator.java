@@ -37,8 +37,8 @@ public class VaultUserPassAuthenticator extends VaultAuthenticatorWithExpiration
     public String getAttributeHash() {
         return DigestUtils.sha256Hex(
                 DigestUtils.sha256Hex(user)
-                        + DigestUtils.sha256Hex(pass)
-                        + DigestUtils.sha256Hex(mountPath)
+                        + pass
+                        + mountPath
         );
     }
 }
