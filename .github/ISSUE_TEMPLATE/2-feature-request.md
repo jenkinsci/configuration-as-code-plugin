@@ -17,4 +17,4 @@ Describe your issue below
 
 ### Feature Request
 
-Describe your feature request here
+Describe your feature request here.

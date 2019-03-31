@@ -36,4 +36,4 @@ Describe your issue below
 
 ### Description
 
-Please describe your issue here
+Please describe your issue here.
