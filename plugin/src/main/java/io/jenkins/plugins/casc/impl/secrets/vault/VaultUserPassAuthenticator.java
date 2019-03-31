@@ -5,6 +5,7 @@ import com.bettercloud.vault.VaultConfig;
 import com.bettercloud.vault.VaultException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.codec.digest.DigestUtils;
 
 public class VaultUserPassAuthenticator extends VaultAuthenticatorWithExpiration {
     private final static Logger LOGGER = Logger.getLogger(VaultUserPassAuthenticator.class.getName());
@@ -12,6 +13,7 @@ public class VaultUserPassAuthenticator extends VaultAuthenticatorWithExpiration
     private String user;
     private String pass;
     private String mountPath;
+    private String currentAuthToken;
 
     public VaultUserPassAuthenticator(String user, String pass, String mountPath) {
         this.user = user;
@@ -22,10 +24,21 @@ public class VaultUserPassAuthenticator extends VaultAuthenticatorWithExpiration
     public void authenticate(Vault vault, VaultConfig config) throws VaultException {
         if (isTokenTTLExpired()) {
             // authenticate
-            String authToken = vault.auth().loginByUserPass(user, pass, mountPath).getAuthClientToken();
-            config.token(authToken).build();
+            currentAuthToken = vault.auth().loginByUserPass(user, pass, mountPath).getAuthClientToken();
+            config.token(currentAuthToken).build();
             LOGGER.log(Level.FINE, "Login to Vault using AppRole/SecretID successful");
             getTTLExpiryOfCurrentToken(vault);
+        } else {
+            // make sure current auth token is set in config
+            config.token(currentAuthToken).build();
         }
+    }
+
+    public String getAttributeHash() {
+        return DigestUtils.sha256Hex(
+                DigestUtils.sha256Hex(user)
+                        + DigestUtils.sha256Hex(pass)
+                        + DigestUtils.sha256Hex(mountPath)
+        );
     }
 }

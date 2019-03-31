@@ -15,4 +15,8 @@ public class VaultSingleTokenAuthenticator implements VaultAuthenticator {
         // No special mechanism - token already exists
         config.token(token).build();
     }
+
+    public boolean equalsAuthenticator(VaultAuthenticator authenticator) {
+        return this == authenticator;
+    }
 }

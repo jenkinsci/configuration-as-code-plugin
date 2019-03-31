@@ -48,10 +48,13 @@ public class VaultSecretSource extends SecretSource {
     private Map<String, String> secrets = new HashMap<>();
     private Vault vault;
     private VaultConfig vaultConfig;
-    private VaultAuthenticator vaultAuthenticator;
+    private VaultAuthenticator currentlyUsedAuthenticator;
+    private VaultAuthenticator configuredAuthenticator;
     private String[] vaultPaths;
 
-    public VaultSecretSource() {
+
+    private void configureVault() {
+        // Read config file/env
         Optional<String> vaultFile = Optional.ofNullable(System.getenv(CASC_VAULT_FILE));
         Properties prop = new Properties();
         vaultFile.ifPresent(file -> readPropertiesFromVaultFile(file, prop));
@@ -104,22 +107,28 @@ public class VaultSecretSource extends SecretSource {
         Optional<String> vaultAppRoleSecret = getVariable(CASC_VAULT_APPROLE_SECRET, prop);
 
         vaultToken.ifPresent(
-                token -> vaultAuthenticator = new VaultSingleTokenAuthenticator(token)
+                token -> configuredAuthenticator = new VaultSingleTokenAuthenticator(token)
         );
 
         vaultUser.ifPresent(
                 user -> vaultPw.ifPresent(
-                        pw -> vaultAuthenticator = new VaultUserPassAuthenticator(user, pw, vaultMount.orElse(DEFAULT_USER_BACKEND))
+                        pw -> configuredAuthenticator = new VaultUserPassAuthenticator(user, pw, vaultMount.orElse(DEFAULT_USER_BACKEND))
                 )
         );
 
         vaultAppRole.ifPresent(
                 approle -> vaultAppRoleSecret.ifPresent(
-                        approleSecret -> vaultAuthenticator = new VaultAppRoleAuthenticator(approle, approleSecret)
+                        approleSecret -> configuredAuthenticator = new VaultAppRoleAuthenticator(approle, approleSecret)
                 )
         );
 
-        if (vaultAuthenticator == null) {
+        // Overwrite current authenticator only if there was a change, because we do not want to loose current auth token
+        if (configuredAuthenticator != null
+                && !configuredAuthenticator.equalsAuthenticator(currentlyUsedAuthenticator)) {
+            currentlyUsedAuthenticator = configuredAuthenticator;
+        }
+
+        if (currentlyUsedAuthenticator == null) {
             LOGGER.log(Level.WARNING, "Could not determine vault authentication method. Not able to read secrets from vault.");
         }
     }
@@ -191,10 +200,12 @@ public class VaultSecretSource extends SecretSource {
 
     @Override
     public void init() {
+        configureVault();
+
         // Ensure secrets are up-to-date and Check vault authentication
-        if (vaultAuthenticator != null) {
+        if (currentlyUsedAuthenticator != null) {
             try {
-                vaultAuthenticator.authenticate(vault, vaultConfig);
+                currentlyUsedAuthenticator.authenticate(vault, vaultConfig);
             } catch (VaultException e) {
                 LOGGER.log(Level.WARNING, "Could not authenticate with vault client", e);
             }

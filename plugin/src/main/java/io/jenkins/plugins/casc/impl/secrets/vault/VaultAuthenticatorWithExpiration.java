@@ -44,4 +44,13 @@ abstract class VaultAuthenticatorWithExpiration implements VaultAuthenticator {
         tokenExpiration = Calendar.getInstance();
         tokenExpiration.add(Calendar.SECOND, tokenTTL);
     }
+
+    public boolean equalsAuthenticator(VaultAuthenticator o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        VaultAuthenticatorWithExpiration authenticator = (VaultAuthenticatorWithExpiration) o;
+        return getAttributeHash().equals(authenticator.getAttributeHash());
+    }
+
+    abstract String getAttributeHash();
 }

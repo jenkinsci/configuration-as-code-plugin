@@ -6,4 +6,5 @@ import com.bettercloud.vault.VaultException;
 
 public interface VaultAuthenticator {
     void authenticate(Vault vault, VaultConfig config) throws VaultException;
+    boolean equalsAuthenticator(VaultAuthenticator authenticator);
 }
