@@ -1,5 +1,5 @@
 ---
-name: "💥 Plugin compatibility"
+name: "💥 Plugin Compatibility"
 labels: plugin-compatibility
 about: Create a plugin compatibility issue report
 ---
@@ -11,7 +11,7 @@ about: Create a plugin compatibility issue report
 ### Your checklist for this issue
 
 🚨 Please review the [guidelines for contributing][contributing] to this repository.
-💡 To better understand plugin compatiblity issues, you can [read more here][compatibility]
+💡 To better understand plugin compatibility issues, you can [read more here][compatibility]
 <!--
 Here is a link to get you started with creating the issue over at Jenkins JIRA
 https://issues.jenkins-ci.org/secure/CreateIssueDetails!init.jspa?pid=10172&issuetype=1&summary=Cannot+configure+X+plugin+with+JCasC&labels=jcasc-compatibility
