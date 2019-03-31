@@ -124,7 +124,7 @@ public class VaultSecretSource extends SecretSource {
 
         // Overwrite current authenticator only if there was a change, because we do not want to loose current auth token
         if (configuredAuthenticator != null
-                && !configuredAuthenticator.equalsAuthenticator(currentlyUsedAuthenticator)) {
+                && !configuredAuthenticator.equals(currentlyUsedAuthenticator)) {
             currentlyUsedAuthenticator = configuredAuthenticator;
         }
 

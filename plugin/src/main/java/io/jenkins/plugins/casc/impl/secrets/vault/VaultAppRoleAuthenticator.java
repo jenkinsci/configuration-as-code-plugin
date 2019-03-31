@@ -3,9 +3,9 @@ package io.jenkins.plugins.casc.impl.secrets.vault;
 import com.bettercloud.vault.Vault;
 import com.bettercloud.vault.VaultConfig;
 import com.bettercloud.vault.VaultException;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.codec.digest.DigestUtils;
 
 public class VaultAppRoleAuthenticator extends VaultAuthenticatorWithExpiration {
     private final static Logger LOGGER = Logger.getLogger(VaultAppRoleAuthenticator.class.getName());
@@ -32,10 +32,8 @@ public class VaultAppRoleAuthenticator extends VaultAuthenticatorWithExpiration 
         }
     }
 
-    public String getAttributeHash() {
-        return DigestUtils.sha256Hex(
-                DigestUtils.sha256Hex(approle)
-                        + approleSecret
-        );
+    @Override
+    public int hashCode() {
+        return Objects.hash(approle, approleSecret);
     }
 }
