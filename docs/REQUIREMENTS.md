@@ -5,7 +5,7 @@ API, but still require plugins to respect some contract, aka "_convention over e
 This documentation is here to explain plugin maintainers those conventions and provide guidance
 on expected design.
 
-![JCasC is coming](BraceYourselves.jpg)
+![JCasC is coming](../images/BraceYourselves.jpg)
 
 ## Overview
 
@@ -91,8 +91,8 @@ sample:
 ```xml
 <f:optionalBlock name="useAuth" title="${%Use Authentication}"
                  checked="${descriptor.username!=null}">
-    <f:entry title="${%User Name}" field="username">	
-          <f:textbox />	
+    <f:entry title="${%User Name}" field="username">
+          <f:textbox />
     </f:entry>
     ...
 ```
@@ -105,7 +105,7 @@ public boolean configure(StaplerRequest req, JSONObject json) throws FormExcepti
     if(json.has("useAuth")) {
         JSONObject auth = json.getJSONObject("useAuth");
         username = nullify(auth.getString("username"));
-        password = Secret.fromString(nullify(auth.getString("password")));	
+        password = Secret.fromString(nullify(auth.getString("password")));
     }
 }
 ```

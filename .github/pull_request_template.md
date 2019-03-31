@@ -1,9 +1,22 @@
-Here is our checklist for contributors. No hard requirement here, just a reminder
+### Your checklist for this pull request
+
+🚨 Please review the [guidelines for contributing](../blob/master/docs/CONTRIBUTING.md) to this repository.
+
+- [ ] Make sure you are requesting to **pull a topic/feature/bugfix branch** (right side). Don't request your master!
 
 - [ ] Please describe what you did
 
-- [ ] Link to issue you're working on if there's a relevant one
+- [ ] Link to relevant GitHub issues or pull requests
 
-- [ ] Did you provide a test-case to demonstrate feature actually works / issue is fixed ?
+- [ ] Link to relevant [Jenkins JIRA issues](https://issues.jenkins-ci.org)
 
-- [ ] Please also consider adding a line to [CHANGELOG.md](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/CHANGELOG.md)
+- [ ] Did you provide a test-case? That demonstrates feature works or fixes the issue.
+
+<!--
+Put a `x` into the [ ] to show you have filled the information below
+Describe your pull request below
+-->
+
+### Description
+
+Please describe your pull request here.
