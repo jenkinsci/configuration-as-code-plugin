@@ -58,7 +58,6 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
             if (user.password.startsWith(HASHED_PASSWORD_PREFIX) && jenkinsSupportsHashedPasswords()) {
                 try {
                     createAccount(target, user);
-                    target.createAccountWithHashedPassword(user.id, user.password);
                 } catch (IllegalArgumentException e) {
                     logger.log(Level.WARNING, "Failed to create user with presumed hashed password", e);
                     // fallback, just create the account as is
@@ -79,7 +78,9 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
      *        The user to construct
      */
     private static void createAccount(HudsonPrivateSecurityRealm target, UserWithPassword user) {
+        // TODO remove reflection once we target 2.161+
         try {
+            @SuppressWarnings("JavaReflectionMemberAccess") // available from 2.161+
             Method createAccountWithHashedPassword = HudsonPrivateSecurityRealm.class.getDeclaredMethod(
                     "createAccountWithHashedPassword", String.class, String.class);
             createAccountWithHashedPassword.invoke(target, user.id, user.password);
