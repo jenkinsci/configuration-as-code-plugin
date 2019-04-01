@@ -4,18 +4,17 @@ import com.bettercloud.vault.Vault;
 import com.bettercloud.vault.VaultConfig;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.MountableFile;
 import org.testcontainers.utility.TestEnvironment;
 import org.testcontainers.vault.VaultContainer;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @SuppressWarnings("WeakerAccess")
 class VaultTestUtil {

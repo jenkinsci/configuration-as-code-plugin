@@ -4,7 +4,6 @@ import io.jenkins.plugins.casc.model.Mapping;
 import io.jenkins.plugins.casc.model.Scalar;
 import io.jenkins.plugins.casc.model.Sequence;
 import io.jenkins.plugins.casc.model.Source;
-import org.apache.commons.collections.map.AbstractMapDecorator;
 import io.jenkins.plugins.casc.snakeyaml.constructor.AbstractConstruct;
 import io.jenkins.plugins.casc.snakeyaml.constructor.Construct;
 import io.jenkins.plugins.casc.snakeyaml.constructor.Constructor;
@@ -14,10 +13,10 @@ import io.jenkins.plugins.casc.snakeyaml.nodes.Node;
 import io.jenkins.plugins.casc.snakeyaml.nodes.ScalarNode;
 import io.jenkins.plugins.casc.snakeyaml.nodes.SequenceNode;
 import io.jenkins.plugins.casc.snakeyaml.nodes.Tag;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.collections.map.AbstractMapDecorator;
 
 
 /**

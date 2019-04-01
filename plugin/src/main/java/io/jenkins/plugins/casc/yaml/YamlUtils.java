@@ -12,7 +12,6 @@ import io.jenkins.plugins.casc.snakeyaml.nodes.ScalarNode;
 import io.jenkins.plugins.casc.snakeyaml.nodes.SequenceNode;
 import io.jenkins.plugins.casc.snakeyaml.parser.ParserImpl;
 import io.jenkins.plugins.casc.snakeyaml.resolver.Resolver;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Iterator;

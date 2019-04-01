@@ -1,14 +1,12 @@
 package io.jenkins.plugins.casc.impl.configurators;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-
 import hudson.Extension;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
 import io.jenkins.plugins.casc.ConfiguratorRegistry;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import java.util.Objects;
 import jenkins.model.GlobalConfiguration;
 import org.jenkinsci.Symbol;
 import org.junit.Rule;
@@ -16,7 +14,8 @@ import org.junit.Test;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
-import java.util.Objects;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class DuplicateKeyDescribableConfiguratorTest {
     @Rule

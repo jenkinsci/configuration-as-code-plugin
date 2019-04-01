@@ -94,5 +94,4 @@ public class AdminWhitelistRuleConfiguratorTest {
         assertEquals("false", agent.get("enabled").toString());
     }
 
-    
 }

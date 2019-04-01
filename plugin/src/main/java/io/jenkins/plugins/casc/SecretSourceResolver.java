@@ -1,13 +1,12 @@
 package io.jenkins.plugins.casc;
 
-import static io.vavr.API.unchecked;
-
 import io.vavr.Tuple;
 import io.vavr.control.Try;
-import org.bigtesting.interpolatd.Interpolator;
-
 import java.util.Optional;
 import java.util.stream.Stream;
+import org.bigtesting.interpolatd.Interpolator;
+
+import static io.vavr.API.unchecked;
 
 public class SecretSourceResolver {
     private static final String enclosedBy = "${";

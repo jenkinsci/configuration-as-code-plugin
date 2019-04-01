@@ -11,9 +11,11 @@
   <description>Snakeyaml shaded for configuration-as-code plugin</description>
 
   <properties>
+    <checkstyle.skip>true</checkstyle.skip>
     <spotbugs.skip>true</spotbugs.skip>
     <maven.javadoc.skip>true</maven.javadoc.skip>
     <snakeyaml.version>1.23</snakeyaml.version>
+    <rootdir>${basedir}/..</rootdir>
   </properties>
 
   <dependencies>

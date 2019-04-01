@@ -7,11 +7,10 @@ import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.RootElementConfigurator;
 import io.jenkins.plugins.casc.model.Mapping;
+import java.util.Optional;
 import org.jenkinsci.Symbol;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
-
-import java.util.Optional;
 
 /**
  * Define a Configurator for a Descriptor

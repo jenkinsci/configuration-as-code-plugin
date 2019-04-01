@@ -3,7 +3,6 @@ package io.jenkins.plugins.casc.impl.secrets.vault;
 import com.bettercloud.vault.Vault;
 import com.bettercloud.vault.VaultConfig;
 import com.bettercloud.vault.VaultException;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

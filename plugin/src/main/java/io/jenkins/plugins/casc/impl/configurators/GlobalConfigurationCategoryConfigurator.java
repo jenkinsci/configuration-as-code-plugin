@@ -11,18 +11,17 @@ import io.jenkins.plugins.casc.RootElementConfigurator;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import io.jenkins.plugins.casc.model.Scalar;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Set;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import jenkins.model.GlobalConfigurationCategory;
 import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Set;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import static io.jenkins.plugins.casc.Attribute.Setter.NOP;
 

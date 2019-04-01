@@ -1,8 +1,5 @@
 package io.jenkins.plugins.casc.support.jobdsl;
 
-import static io.vavr.API.Try;
-import static io.vavr.API.unchecked;
-
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
@@ -15,6 +12,10 @@ import io.jenkins.plugins.casc.SecretSourceResolver;
 import io.jenkins.plugins.casc.impl.attributes.MultivaluedAttribute;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import javaposse.jobdsl.dsl.GeneratedItems;
 import javaposse.jobdsl.plugin.JenkinsDslScriptLoader;
 import javaposse.jobdsl.plugin.JenkinsJobManagement;
@@ -22,10 +23,8 @@ import javaposse.jobdsl.plugin.LookupStrategy;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import static io.vavr.API.Try;
+import static io.vavr.API.unchecked;
 
 // TODO: Move outside the plugin?
 /**
