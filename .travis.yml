@@ -3,6 +3,9 @@ language: java
 services:
   - docker
 
+before_cache:
+  - rm -rf $HOME/.m2/repository/io/jenkins/configuration-as-code*
+
 cache:
   directories:
     - $HOME/.m2
