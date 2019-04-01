@@ -12,7 +12,6 @@ categories:
   - title: 🚦 Tests
     label: test
 
-change-template: '- $TITLE (#$NUMBER)'
 template: |
   ## Changes
 
