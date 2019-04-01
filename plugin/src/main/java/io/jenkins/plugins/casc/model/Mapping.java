@@ -1,7 +1,6 @@
 package io.jenkins.plugins.casc.model;
 
 import io.jenkins.plugins.casc.ConfiguratorException;
-
 import java.util.HashMap;
 
 /**

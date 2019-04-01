@@ -9,8 +9,6 @@ import io.jenkins.plugins.casc.impl.secrets.vault.VaultAppRoleAuthenticator;
 import io.jenkins.plugins.casc.impl.secrets.vault.VaultAuthenticator;
 import io.jenkins.plugins.casc.impl.secrets.vault.VaultSingleTokenAuthenticator;
 import io.jenkins.plugins.casc.impl.secrets.vault.VaultUserPassAuthenticator;
-import org.apache.commons.lang.StringUtils;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
@@ -19,6 +17,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Requires either CASC_VAULT_USER and CASC_VAULT_PW, or CASC_VAULT_TOKEN,

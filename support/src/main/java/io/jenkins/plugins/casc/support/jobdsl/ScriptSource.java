@@ -2,7 +2,6 @@ package io.jenkins.plugins.casc.support.jobdsl;
 
 import hudson.ExtensionPoint;
 import hudson.model.AbstractDescribableImpl;
-
 import java.io.IOException;
 
 /**

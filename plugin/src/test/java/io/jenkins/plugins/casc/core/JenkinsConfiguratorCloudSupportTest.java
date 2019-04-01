@@ -13,13 +13,12 @@ import io.jenkins.plugins.casc.ConfiguratorRegistry;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.model.CNode;
-import org.junit.Rule;
-import org.junit.Test;
-import org.jvnet.hudson.test.PretendSlave;
-
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import org.junit.Rule;
+import org.junit.Test;
+import org.jvnet.hudson.test.PretendSlave;
 
 import static io.jenkins.plugins.casc.ConfigurationAsCode.serializeYamlNode;
 import static org.hamcrest.Matchers.containsString;
@@ -88,7 +87,7 @@ public class JenkinsConfiguratorCloudSupportTest {
     @ConfiguredWithCode("JenkinsConfiguratorCloudSupportTest.yml")
     public void should_export_only_static_nodes() throws Exception {
         j.jenkins.addNode(new Cloud1PretendSlave());
-        
+
         final JenkinsConfigurator root = getJenkinsConfigurator();
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         ConfigurationContext context = new ConfigurationContext(registry);
@@ -115,7 +114,7 @@ public class JenkinsConfiguratorCloudSupportTest {
         serializeYamlNode(yamlRoot, buffer);
         return buffer.toString();
     }
-    
+
     private static class BasePretendSlave extends PretendSlave {
         public BasePretendSlave() throws IOException, Descriptor.FormException {
             super("testCloud", "remoteFS", 3, Mode.NORMAL, "labelString", null, null);

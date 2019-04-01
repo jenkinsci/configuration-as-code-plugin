@@ -2,12 +2,11 @@ package io.jenkins.plugins.casc.support.jobdsl;
 
 import hudson.Extension;
 import hudson.model.Descriptor;
-import org.apache.commons.io.FileUtils;
-import org.jenkinsci.Symbol;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import org.apache.commons.io.FileUtils;
+import org.jenkinsci.Symbol;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>

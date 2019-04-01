@@ -5,12 +5,11 @@ import hudson.model.AdministrativeMonitor;
 import hudson.util.VersionNumber;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Source;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import jenkins.model.Jenkins;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
-
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>

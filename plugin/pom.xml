@@ -17,6 +17,10 @@
   <description>Manage Jenkins master configuration as code</description>
   <url>https://wiki.jenkins.io/display/JENKINS/Configuration+as+Code+Plugin</url>
 
+  <properties>
+    <rootdir>${basedir}/..</rootdir>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>io.jenkins.configuration-as-code</groupId>

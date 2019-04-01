@@ -2,9 +2,8 @@ package io.jenkins.plugins.casc;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import jenkins.model.Jenkins;
-
 import java.lang.reflect.Type;
+import jenkins.model.Jenkins;
 
 /**
  * A Registry to allow {@link Configurator}s retrieval.

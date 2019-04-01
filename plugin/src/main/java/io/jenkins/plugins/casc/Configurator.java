@@ -26,14 +26,13 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.ExtensionPoint;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
-import org.apache.commons.lang.StringUtils;
-import org.jenkinsci.Symbol;
-
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.Symbol;
 
 /**
  * Define a {@link Configurator} which handles a configuration element, identified by name.
