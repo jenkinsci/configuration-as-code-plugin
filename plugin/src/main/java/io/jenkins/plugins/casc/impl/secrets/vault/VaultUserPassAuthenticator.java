@@ -3,6 +3,7 @@ package io.jenkins.plugins.casc.impl.secrets.vault;
 import com.bettercloud.vault.Vault;
 import com.bettercloud.vault.VaultConfig;
 import com.bettercloud.vault.VaultException;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,10 +23,18 @@ public class VaultUserPassAuthenticator extends VaultAuthenticatorWithExpiration
     public void authenticate(Vault vault, VaultConfig config) throws VaultException {
         if (isTokenTTLExpired()) {
             // authenticate
-            String authToken = vault.auth().loginByUserPass(user, pass, mountPath).getAuthClientToken();
-            config.token(authToken).build();
+            currentAuthToken = vault.auth().loginByUserPass(user, pass, mountPath).getAuthClientToken();
+            config.token(currentAuthToken).build();
             LOGGER.log(Level.FINE, "Login to Vault using AppRole/SecretID successful");
             getTTLExpiryOfCurrentToken(vault);
+        } else {
+            // make sure current auth token is set in config
+            config.token(currentAuthToken).build();
         }
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(user, pass, mountPath);
     }
 }
