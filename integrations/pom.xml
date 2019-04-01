@@ -15,7 +15,6 @@
     <jenkins.version>2.164.1</jenkins.version> <!-- Remove when parent base is updated. -->
     <maven.deploy.skip>true</maven.deploy.skip> <!-- no need to be deployed during release, this is a test-only module -->
     <enforcer.skip>true</enforcer.skip> <!-- no need to be enforced, this is a test-only module -->
-      <rootdir>${basedir}/..</rootdir>
   </properties>
 
   <dependencies>
