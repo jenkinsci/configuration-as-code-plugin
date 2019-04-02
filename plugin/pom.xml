@@ -22,6 +22,12 @@
       <groupId>io.jenkins.configuration-as-code</groupId>
       <artifactId>snakeyaml</artifactId>
       <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.yaml</groupId>
+          <artifactId>snakeyaml</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!--TODO: This should be in a separate plugin at some point -->
