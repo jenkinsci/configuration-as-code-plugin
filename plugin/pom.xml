@@ -17,6 +17,13 @@
   <description>Manage Jenkins master configuration as code</description>
   <url>https://wiki.jenkins.io/display/JENKINS/Configuration+as+Code+Plugin</url>
 
+  <developers>
+    <developer>
+      <id>casz</id>
+      <name>Joseph Petersen</name>
+    </developer>
+  </developers>
+
   <dependencies>
     <dependency>
       <groupId>io.jenkins.configuration-as-code</groupId>
