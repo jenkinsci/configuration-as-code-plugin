@@ -45,7 +45,7 @@
       </j:case>
       <j:default>
         "type":  "object",
-        "$ref": "#/definitions/${it.type.name}"
+        "$$ref": "#/definitions/${it.type.name}"
       </j:default>
     </j:switch>
   </j:otherwise>
