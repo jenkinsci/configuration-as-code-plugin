@@ -1,7 +1,9 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler">
   "${it.target.name}": {
-    "type": "object",
+    "type": "object"
+    <j:if test="${it.implementors.size() > 0}">
+    ,
     "oneOf" : [
   <j:forEach items="${it.implementors.entrySet()}" var="impl" varStatus="st">
     {
@@ -12,5 +14,6 @@
     <j:if test="${!st.last}">,</j:if>
   </j:forEach>
     ]
+  </j:if>
   }
 </j:jelly>
