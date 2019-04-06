@@ -10,7 +10,7 @@
 <j:forEach items="${it.rootConfigurators}" var="r" varStatus="rst">
     "${r.name}": {
       "type": "object",
-      "$ref": "#/definitions/${r.target.name}"
+      "$$ref": "#/definitions/${r.target.name}"
     }<j:if test="${!rst.last}">,</j:if>
 </j:forEach>
   },
