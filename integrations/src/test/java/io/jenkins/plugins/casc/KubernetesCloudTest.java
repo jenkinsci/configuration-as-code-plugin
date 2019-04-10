@@ -2,6 +2,7 @@ package io.jenkins.plugins.casc;
 
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import java.util.List;
 import org.csanchez.jenkins.plugins.kubernetes.KubernetesCloud;
 import org.csanchez.jenkins.plugins.kubernetes.PodTemplate;
 import org.csanchez.jenkins.plugins.kubernetes.model.KeyValueEnvVar;
@@ -11,9 +12,9 @@ import org.csanchez.jenkins.plugins.kubernetes.volumes.PodVolume;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.util.List;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>

@@ -9,7 +9,7 @@
       <j:arg value="${it.type}"/>
     </j:invokeStatic>
       {
-        "${symbol}": { "type": "#/definitions/${d.klass.toJavaClass().name}" }
+        "${symbol}": { "$$ref": "#/definitions/${d.klass.toJavaClass().name}" }
       }<j:if test="${!st.last}">,</j:if>
   </j:forEach>
     ]

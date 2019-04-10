@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>3.36</version>
+    <version>3.40</version>
     <relativePath />
   </parent>
   <groupId>io.jenkins.configuration-as-code</groupId>
@@ -20,7 +20,7 @@
   </modules>
 
   <properties>
-    <revision>1.9</revision>
+    <revision>1.11</revision>
     <changelist>-SNAPSHOT</changelist>
     <jenkins.version>2.169-rc28059.2f6b64a98bd3</jenkins.version>
     <java.level>8</java.level>
@@ -55,5 +55,46 @@
       <url>https://repo.jenkins-ci.org/public/</url>
     </pluginRepository>
   </pluginRepositories>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>3.0.0</version>
+          <dependencies>
+            <dependency>
+              <groupId>com.puppycrawl.tools</groupId>
+              <artifactId>checkstyle</artifactId>
+              <version>8.17</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      <plugin>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <configLocation>${maven.multiModuleProjectDirectory}/.mvn/checkstyle.xml</configLocation>
+          <includeTestSourceDirectory>true</includeTestSourceDirectory>
+          <sourceDirectories>
+            <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
+          </sourceDirectories>
+          <testSourceDirectories>
+            <sourceDirectory>${project.build.testSourceDirectory}</sourceDirectory>
+          </testSourceDirectories>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>

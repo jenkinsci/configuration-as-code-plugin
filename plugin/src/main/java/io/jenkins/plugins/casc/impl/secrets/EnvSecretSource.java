@@ -2,11 +2,10 @@ package io.jenkins.plugins.casc.impl.secrets;
 
 import hudson.Extension;
 import io.jenkins.plugins.casc.SecretSource;
+import java.util.Optional;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
-
-import java.util.Optional;
 
 @Extension
 @Restricted(NoExternalUse.class)

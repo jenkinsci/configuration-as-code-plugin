@@ -17,6 +17,7 @@
   <properties>
     <useBeta>true</useBeta>
     <access-modifier-checker.skip>true</access-modifier-checker.skip>
+    <rootdir>${basedir}/..</rootdir>
   </properties>
 
 

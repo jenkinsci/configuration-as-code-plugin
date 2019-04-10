@@ -1,5 +1,6 @@
 package io.jenkins.plugins.casc.model;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.stream.IntStream;
 
 /**
@@ -66,6 +67,7 @@ public final class Scalar implements CNode, CharSequence {
         return value;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return value;

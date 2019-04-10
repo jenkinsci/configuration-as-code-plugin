@@ -3,6 +3,8 @@ package io.jenkins.plugins.casc.impl;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.model.Describable;
@@ -19,14 +21,6 @@ import io.jenkins.plugins.casc.impl.configurators.EnumConfigurator;
 import io.jenkins.plugins.casc.impl.configurators.ExtensionConfigurator;
 import io.jenkins.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
 import io.jenkins.plugins.casc.impl.configurators.PrimitiveConfigurator;
-import jenkins.model.Jenkins;
-import org.jvnet.tiger_types.Types;
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.NoExternalUse;
-import org.kohsuke.stapler.Stapler;
-
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -35,6 +29,11 @@ import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+import jenkins.model.Jenkins;
+import org.jvnet.tiger_types.Types;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
+import org.kohsuke.stapler.Stapler;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -64,7 +63,7 @@ public class DefaultConfiguratorRegistry implements ConfiguratorRegistry {
      * @throws ConfiguratorException Configurator is not found
      */
     @Override
-    @Nonnull
+    @NonNull
     public Configurator lookupOrFail(Type type) throws ConfiguratorException {
         try {
             return cache.get(type);
@@ -92,7 +91,7 @@ public class DefaultConfiguratorRegistry implements ConfiguratorRegistry {
             .expireAfterAccess(10, TimeUnit.SECONDS)
             .build(new CacheLoader<Type, Configurator>() {
                 @Override
-                public Configurator load(Type type) throws Exception {
+                public Configurator load(@NonNull Type type) throws Exception {
                     final Configurator configurator = internalLookup(type);
                     if (configurator == null) throw new ConfiguratorException("Cannot find configurator for type " + type);
                     return configurator;

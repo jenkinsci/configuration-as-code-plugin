@@ -1,10 +1,9 @@
 package io.jenkins.plugins.casc;
 
-import jenkins.model.Jenkins;
-
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.lang.reflect.Type;
+import jenkins.model.Jenkins;
 
 /**
  * A Registry to allow {@link Configurator}s retrieval.
@@ -34,7 +33,7 @@ public interface ConfiguratorRegistry {
      * @param type
      * @throws ConfiguratorException if we don't know any {@link RootElementConfigurator} for requested type
      */
-    @Nonnull
+    @NonNull
     <T> Configurator<T> lookupOrFail(Type type) throws ConfiguratorException;
 
     /**

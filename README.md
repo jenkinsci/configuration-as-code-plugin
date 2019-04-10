@@ -311,7 +311,7 @@ Kubernetes users:
 
 ## Supported Plugins
 
-Most plugins should be supported out-of-the-box, or maybe require some minimal changes. See this [dashboard](https://issues.jenkins.io/secure/Dashboard.jspa?selectPageId=17346) for known compatibility issues.
+Most plugins should be supported out-of-the-box, or maybe require some minimal changes. See this [dashboard](https://issues.jenkins.io/secure/Dashboard.jspa?selectPageId=18341) for known compatibility issues.
 
 ## Jenkins Enhancement Proposal
 

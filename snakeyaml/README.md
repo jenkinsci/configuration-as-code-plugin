@@ -1,3 +1,3 @@
-This is a vendored version of snakeyaml library.
+This is a shaded version of snakeyaml library.
 
-To upgrade, change `snakeyaml.version` and run `mvn -Pvendor package`
+To upgrade, change `snakeyaml.version` and run `mvn package`

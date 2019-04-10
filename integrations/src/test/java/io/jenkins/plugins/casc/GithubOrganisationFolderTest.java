@@ -8,7 +8,9 @@ import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.github_branch_source.GitHubSCMNavigator;
 import org.junit.Rule;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>

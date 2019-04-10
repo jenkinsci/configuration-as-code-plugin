@@ -5,11 +5,6 @@ import hudson.util.Secret;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Scalar;
 import io.jenkins.plugins.casc.model.Sequence;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.reflect.FieldUtils;
-import org.kohsuke.accmod.AccessRestriction;
-import org.kohsuke.stapler.export.Exported;
-
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -25,6 +20,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.reflect.FieldUtils;
+import org.kohsuke.accmod.AccessRestriction;
+import org.kohsuke.stapler.export.Exported;
 
 /**
  * One attribute of {@link Configurator}.

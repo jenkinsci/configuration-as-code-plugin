@@ -1,7 +1,6 @@
 package io.jenkins.plugins.casc.yaml;
 
 import io.jenkins.plugins.casc.snakeyaml.reader.StreamReader;
-
 import java.io.IOException;
 import java.lang.reflect.Field;
 

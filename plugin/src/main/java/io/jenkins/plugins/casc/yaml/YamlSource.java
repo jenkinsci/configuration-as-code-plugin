@@ -1,6 +1,5 @@
 package io.jenkins.plugins.casc.yaml;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -9,6 +8,7 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import javax.servlet.http.HttpServletRequest;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -33,6 +33,18 @@ public class YamlSource<T> {
 
     public static YamlSource<String> of(URL url) {
         return new YamlSource<>(url.toExternalForm(), READ_FROM_URL);
+    }
+
+    public static YamlSource<String> of(String url) {
+        return new YamlSource<>(url, READ_FROM_URL);
+    }
+
+    public static YamlSource<HttpServletRequest> of(HttpServletRequest req) {
+        return new YamlSource<>(req, YamlSource.READ_FROM_REQUEST);
+    }
+
+    public static YamlSource<Path> of(Path path) {
+        return new YamlSource<>(path, YamlSource.READ_FROM_PATH);
     }
 
     public Reader read() throws IOException {

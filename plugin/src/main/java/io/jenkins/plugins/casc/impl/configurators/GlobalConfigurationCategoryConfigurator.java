@@ -1,5 +1,7 @@
 package io.jenkins.plugins.casc.impl.configurators;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Descriptor;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.BaseConfigurator;
@@ -9,19 +11,17 @@ import io.jenkins.plugins.casc.RootElementConfigurator;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import io.jenkins.plugins.casc.model.Scalar;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Set;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import jenkins.model.GlobalConfigurationCategory;
 import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
-
-import javax.annotation.CheckForNull;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Set;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import static io.jenkins.plugins.casc.Attribute.Setter.NOP;
 
@@ -39,6 +39,7 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
         this.category = category;
     }
 
+    @NonNull
     @Override
     public String getName() {
         final Class c = category.getClass();
@@ -67,12 +68,14 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
         return category;
     }
 
+    @SuppressWarnings("RedundantCast") // TODO remove once we are on JDK 11
+    @NonNull
     @Override
     public Set describe() {
         return (Set) Jenkins.getInstance().getExtensionList(Descriptor.class).stream()
                 .filter(d -> d.getCategory() == category)
                 .filter(d -> d.getGlobalConfigPage() != null)
-                .map(d -> new DescriptorConfigurator(d))
+                .map(DescriptorConfigurator::new)
                 .filter(GlobalConfigurationCategoryConfigurator::reportDescriptorWithoutSetters)
                 .map(c -> new Attribute<GlobalConfigurationCategory, Object>(c.getName(), c.getTarget()).setter(NOP))
                 .collect(Collectors.toSet());

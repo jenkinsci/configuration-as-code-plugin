@@ -1,5 +1,7 @@
 package io.jenkins.plugins.casc.impl.configurators;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Descriptor;
 import hudson.util.Secret;
 import io.jenkins.plugins.casc.Attribute;
@@ -10,14 +12,6 @@ import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.impl.attributes.DescribableAttribute;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
-import jenkins.model.Jenkins;
-import org.kohsuke.stapler.ClassDescriptor;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.Stapler;
-
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-import javax.annotation.PostConstruct;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -29,6 +23,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
+import javax.annotation.Nonnull;
+import javax.annotation.PostConstruct;
+import jenkins.model.Jenkins;
+import org.kohsuke.stapler.ClassDescriptor;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.Stapler;
 
 import static com.google.common.base.Defaults.defaultValue;
 
@@ -51,7 +51,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
     }
 
     @CheckForNull
-    public static Constructor getDataBoundConstructor(@Nonnull Class type) {
+    public static Constructor getDataBoundConstructor(@NonNull Class type) {
         for (Constructor c : type.getConstructors()) {
             if (c.getAnnotation(DataBoundConstructor.class) != null) return c;
         }
@@ -73,7 +73,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
         return tryConstructor((Constructor<T>) dataBoundConstructor, config, context);
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public T configure(CNode c, ConfigurationContext context) throws ConfiguratorException {
         T object = super.configure(c, context);
@@ -151,13 +151,14 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
         }
 
         // constructor was successful, so let's removed configuration elements we have consumed doing so.
-        for (int i = 0; i < names.length; i++) {
-            config.remove(names[i]);
+        for (String name : names) {
+            config.remove(name);
         }
 
         return object;
     }
 
+    @NonNull
     public String getName() {
         final Descriptor d = getDescriptor();
         return DescribableAttribute.getPreferredSymbol(d, getImplementedAPI(), getTarget());
@@ -167,6 +168,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
         return Jenkins.getInstance().getDescriptor(getTarget());
     }
 
+    @NonNull
     public Class getImplementedAPI() {
 
         final Descriptor descriptor = getDescriptor();
@@ -195,6 +197,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
     }
 
 
+    @NonNull
     @Override
     public Set<Attribute<T,?>> describe() {
         final Set<Attribute<T,?>> attributes = super.describe();

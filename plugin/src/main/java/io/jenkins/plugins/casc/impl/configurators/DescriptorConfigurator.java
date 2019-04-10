@@ -1,19 +1,16 @@
 package io.jenkins.plugins.casc.impl.configurators;
 
 import com.google.common.base.CaseFormat;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Descriptor;
 import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.RootElementConfigurator;
-import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
+import java.util.Optional;
 import org.jenkinsci.Symbol;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
-
-import java.util.Optional;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 
 /**
  * Define a Configurator for a Descriptor
@@ -33,7 +30,7 @@ public class DescriptorConfigurator extends BaseConfigurator<Descriptor> impleme
         this.name = resolveName(descriptor);
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public String getName() {
         return name;
@@ -52,13 +49,6 @@ public class DescriptorConfigurator extends BaseConfigurator<Descriptor> impleme
     @Override
     protected Descriptor instance(Mapping mapping, ConfigurationContext context) {
         return descriptor;
-    }
-
-    @CheckForNull
-    @Override
-    public CNode describe(Descriptor instance, ConfigurationContext context) throws Exception {
-        final Descriptor ref = (Descriptor) target.newInstance();
-        return compare(instance, ref, context);
     }
 
     private String resolveName(Descriptor descriptor) {

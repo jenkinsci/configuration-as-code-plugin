@@ -1,5 +1,6 @@
 package io.jenkins.plugins.casc;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.BulkChange;
 import hudson.model.Describable;
 import hudson.model.Saveable;
@@ -10,13 +11,6 @@ import io.jenkins.plugins.casc.impl.attributes.DescribableListAttribute;
 import io.jenkins.plugins.casc.impl.attributes.PersistedListAttribute;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
-import org.apache.commons.lang.StringUtils;
-import org.kohsuke.accmod.AccessRestriction;
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.Beta;
-import org.kohsuke.accmod.restrictions.None;
-
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
@@ -39,6 +33,11 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.apache.commons.lang.StringUtils;
+import org.kohsuke.accmod.AccessRestriction;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.Beta;
+import org.kohsuke.accmod.restrictions.None;
 
 /**
  * a General purpose abstract {@link Configurator} implementation based on introspection.
@@ -53,6 +52,7 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
 
     private static final Logger LOGGER = Logger.getLogger(BaseConfigurator.class.getName());
 
+    @NonNull
     public Set<Attribute<T, ?>> describe() {
 
         Map<String, Attribute<T,?>> attributes = new HashMap<>();
@@ -214,7 +214,6 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
                 }
             }
         }
-        
 
         while (c == null) {
             if (t instanceof Class) {
@@ -256,7 +255,7 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
      */
     protected abstract T instance(Mapping mapping, ConfigurationContext context) throws ConfiguratorException;
 
-    @Nonnull
+    @NonNull
     @Override
     public T configure(CNode c, ConfigurationContext context) throws ConfiguratorException {
         final Mapping mapping = (c != null ? c.asMapping() : Mapping.EMPTY);
@@ -378,7 +377,7 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
         }
     }
 
-    protected @Nonnull Mapping compare(T instance, T reference, ConfigurationContext context) throws Exception {
+    protected @NonNull Mapping compare(T instance, T reference, ConfigurationContext context) throws Exception {
 
         Mapping mapping = new Mapping();
         for (Attribute attribute : getAttributes()) {

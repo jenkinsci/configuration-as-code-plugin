@@ -1,5 +1,7 @@
 package io.jenkins.plugins.casc.impl.configurators;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.util.Secret;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.ConfigurationContext;
@@ -8,15 +10,12 @@ import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.SecretSourceResolver;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Scalar;
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.NoExternalUse;
-import org.kohsuke.stapler.Stapler;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
+import org.kohsuke.stapler.Stapler;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -34,13 +33,13 @@ public class PrimitiveConfigurator implements Configurator {
         return target;
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public Set<Attribute> describe() {
         return Collections.emptySet();
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public Object configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
         return Stapler.lookupConverter(target).convert(target, SecretSourceResolver.resolve(context, config.asScalar().toString()));
@@ -73,7 +72,7 @@ public class PrimitiveConfigurator implements Configurator {
         return new Scalar(String.valueOf(instance));
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public List<Configurator> getConfigurators(ConfigurationContext context) {
         return Collections.emptyList();

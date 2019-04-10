@@ -11,10 +11,14 @@ import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import jenkins.model.Jenkins;
+import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -45,4 +49,16 @@ public class HudsonPrivateSecurityRealmConfiguratorTest {
         final Mapping user = node.asMapping().get("users").asSequence().get(0).asMapping();
         assertEquals("admin", user.getScalarValue("id"));
     }
+
+    @Test
+    @ConfiguredWithCode("HudsonPrivateSecurityRealmConfiguratorTest.yml")
+    public void config_local_security_and_hashed_admin_user() {
+        Assume.assumeTrue(HudsonPrivateSecurityRealmConfigurator.jenkinsSupportsHashedPasswords());
+
+        final User admin = User.getById("hashedadmin", false);
+        assertNotNull(admin);
+        final HudsonPrivateSecurityRealm.Details details = admin.getProperty(HudsonPrivateSecurityRealm.Details.class);
+        assertTrue(details.isPasswordCorrect("password"));
+    }
+
 }
