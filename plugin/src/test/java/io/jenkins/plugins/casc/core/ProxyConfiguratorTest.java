@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 import static io.jenkins.plugins.casc.ConfigurationAsCode.serializeYamlNode;
+import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -35,7 +36,7 @@ public class ProxyConfiguratorTest {
         assertEquals(proxy.port, 80);
 
         assertEquals(proxy.getUserName(), "login");
-        assertEquals(proxy.getSecretPassword().getPlainText(), "password");
+        assertEquals(proxy.getPassword().getPlainText(), "password");
         assertEquals(proxy.noProxyHost, "externalhost");
         assertEquals(proxy.getTestUrl(), "http://google.com");
 
@@ -77,14 +78,14 @@ public class ProxyConfiguratorTest {
         ConfigurationContext context = new ConfigurationContext(registry);
         final CNode configNode = getProxyNode(root, context);
 
-        Secret password = Secret.decrypt(getProxyNode(root, context).asMapping().getScalarValue("secretPassword"));
+        Secret password = requireNonNull(Secret.decrypt(getProxyNode(root, context).asMapping().getScalarValue("password")));
 
         final String yamlConfig = toYamlString(configNode);
         assertEquals(String.join("\n",
                 "name: \"proxyhost\"",
                 "noProxyHost: \"externalhost\"",
+                "password: \"" + password.getEncryptedValue() + "\"",
                 "port: 80",
-                "secretPassword: \"" + password.getEncryptedValue() + "\"",
                 "testUrl: \"http://google.com\"",
                 "userName: \"login\"",
                 ""
@@ -92,7 +93,7 @@ public class ProxyConfiguratorTest {
     }
 
     private CNode getProxyNode(JenkinsConfigurator root, ConfigurationContext context) throws Exception {
-        return root.describe(root.getTargetComponent(context), context).asMapping().get("proxy");
+        return requireNonNull(root.describe(root.getTargetComponent(context), context)).asMapping().get("proxy");
     }
 
     private JenkinsConfigurator getJenkinsConfigurator() {
