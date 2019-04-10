@@ -11,11 +11,10 @@ import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import io.jenkins.plugins.casc.snakeyaml.nodes.Node;
-import org.junit.Rule;
-import org.junit.Test;
-
 import java.io.IOException;
 import java.io.StringWriter;
+import org.junit.Rule;
+import org.junit.Test;
 
 import static io.jenkins.plugins.casc.ConfigurationAsCode.serializeYamlNode;
 import static java.util.Objects.requireNonNull;
