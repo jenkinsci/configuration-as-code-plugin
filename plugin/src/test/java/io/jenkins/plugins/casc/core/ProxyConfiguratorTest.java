@@ -91,6 +91,22 @@ public class ProxyConfiguratorTest {
         ), yamlConfig);
     }
 
+    @Test
+    @ConfiguredWithCode("ProxyMinimal.yml")
+    public void describeMinimalProxyConfig() throws Exception {
+        final JenkinsConfigurator root = getJenkinsConfigurator();
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        ConfigurationContext context = new ConfigurationContext(registry);
+        final CNode configNode = getProxyNode(root, context);
+
+        final String yamlConfig = toYamlString(configNode);
+        assertEquals(String.join("\n",
+                "name: \"proxyhost\"",
+                "port: 80",
+                ""
+        ), yamlConfig);
+    }
+
     private CNode getProxyNode(JenkinsConfigurator root, ConfigurationContext context) throws Exception {
         return requireNonNull(root.describe(root.getTargetComponent(context), context)).asMapping().get("proxy");
     }
