@@ -8,7 +8,7 @@ jenkins:
     name: "proxyhost"
     port: 80
     userName: "login"
-    secretPassword: "password"
+    password: "password"
     noProxyHost: "externalhost"
     testUrl: "http://google.com"
 ```
