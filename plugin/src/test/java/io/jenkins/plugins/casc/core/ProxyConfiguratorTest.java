@@ -67,7 +67,6 @@ public class ProxyConfiguratorTest {
         Mapping mapping = node.asMapping();
         assertEquals(2, node.asMapping().size());
         assertEquals("proxyhost", mapping.getScalarValue("name"));
-        assertEquals("", Secret.decrypt(mapping.getScalarValue("password")).getPlainText());
     }
 
     @Test
