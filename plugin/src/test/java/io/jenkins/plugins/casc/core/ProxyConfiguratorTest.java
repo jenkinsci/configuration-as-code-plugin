@@ -35,7 +35,7 @@ public class ProxyConfiguratorTest {
         assertEquals(proxy.port, 80);
 
         assertEquals(proxy.getUserName(), "login");
-        assertEquals(proxy.getPassword().getPlainText(), "password");
+        assertEquals(Secret.decrypt(proxy.getEncryptedPassword()).getPlainText(), "password");
         assertEquals(proxy.noProxyHost, "externalhost");
         assertEquals(proxy.getTestUrl(), "http://google.com");
 
@@ -67,6 +67,7 @@ public class ProxyConfiguratorTest {
         Mapping mapping = node.asMapping();
         assertEquals(2, node.asMapping().size());
         assertEquals("proxyhost", mapping.getScalarValue("name"));
+        assertEquals("", Secret.decrypt(mapping.getScalarValue("password")).getPlainText());
     }
 
     @Test
