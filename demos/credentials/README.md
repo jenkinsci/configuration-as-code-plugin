@@ -14,11 +14,10 @@ credentials:
                 includes: "*.test.com"
         credentials:
           - usernamePassword:
-              scope:    SYSTEM
-              id:       sudo_password
+              scope: SYSTEM
+              id: sudo_password
               username: root
               password: ${SUDO_PASSWORD}
-
 ```
 
 ## implementation note

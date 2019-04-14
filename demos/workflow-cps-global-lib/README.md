@@ -5,32 +5,28 @@ Global Pipeline Libraries plugin configuration belongs under `unclassified` root
 ## Sample configuration
 
 ```yaml
-jenkins:
-  [...]
 unclassified:
   globalLibraries:
     libraries:
-      - name: 'awesome-lib'
+      - name: "awesome-lib"
         retriever:
           modernSCM:
             scm:
               git:
-                remote: 'https://github.com/jenkins-infra/pipeline-library.git'
+                remote: "https://github.com/jenkins-infra/pipeline-library.git"
 ```
 
 ## Using credentials
 
 ```yaml
-jenkins:
-  [...]
 unclassified:
   globalLibraries:
     libraries:
-      - name: 'internal-pipeline-library'
+      - name: "internal-pipeline-library"
         retriever:
           modernSCM:
             scm:
               git:
-                remote: 'git@github.com:furry-octo-lamp-inc/pipeline-library.git'
-                credentialsId: 'reimagined-parakeet-ssh'
+                remote: "git@github.com:furry-octo-lamp-inc/pipeline-library.git"
+                credentialsId: "reimagined-parakeet-ssh"
 ```

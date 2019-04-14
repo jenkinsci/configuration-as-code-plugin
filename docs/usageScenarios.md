@@ -34,11 +34,11 @@ When the files are in git, they can point to the file in the repository in the C
 
 _Migration step-by-step guide:_ For the exact steps, see this part of the migration guide - TBD when all relevant issues fixed:
 
-* [#6 about reloading configuration when changed](https://github.com/jenkinsci/configuration-as-code-plugin/issues/6)
-* [#7 about plug-in installation support](https://github.com/jenkinsci/configuration-as-code-plugin/issues/7)
-* [#10 related to hierarchy and re-use of configuration](https://github.com/jenkinsci/configuration-as-code-plugin/issues/10)
-* [#32 where to draft a migration to Jenkins Configuration as Code guide](https://github.com/jenkinsci/configuration-as-code-plugin/issues/32)
-* [#65 helping users migrate by export existing configuration](https://github.com/jenkinsci/configuration-as-code-plugin/issues/65)
+- [#6 about reloading configuration when changed](https://github.com/jenkinsci/configuration-as-code-plugin/issues/6)
+- [#7 about plug-in installation support](https://github.com/jenkinsci/configuration-as-code-plugin/issues/7)
+- [#10 related to hierarchy and re-use of configuration](https://github.com/jenkinsci/configuration-as-code-plugin/issues/10)
+- [#32 where to draft a migration to Jenkins Configuration as Code guide](https://github.com/jenkinsci/configuration-as-code-plugin/issues/32)
+- [#65 helping users migrate by export existing configuration](https://github.com/jenkinsci/configuration-as-code-plugin/issues/65)
 
 ## Jenkins master already in docker
 
@@ -58,8 +58,8 @@ This means the team above will only have to maintain the `plugins.yml` entries f
 
 _Migration step-by-step guide:_ For the exact steps, see this part of the migration guide - TBD when all relevant issues fixed:
 
-* [#6 about reloading configuration when changed](https://github.com/jenkinsci/configuration-as-code-plugin/issues/6)
-* [#7 about plug-in installation support](https://github.com/jenkinsci/configuration-as-code-plugin/issues/7)
-* [#32 where to draft a migration to Jenkins Configuration as Code guide](https://github.com/jenkinsci/configuration-as-code-plugin/issues/32)
-* [#65 helping users migrate by export existing configuration](https://github.com/jenkinsci/configuration-as-code-plugin/issues/65)
-* [#70 explaining we need the Docker image the team above need to use](https://github.com/jenkinsci/configuration-as-code-plugin/issues/70)
+- [#6 about reloading configuration when changed](https://github.com/jenkinsci/configuration-as-code-plugin/issues/6)
+- [#7 about plug-in installation support](https://github.com/jenkinsci/configuration-as-code-plugin/issues/7)
+- [#32 where to draft a migration to Jenkins Configuration as Code guide](https://github.com/jenkinsci/configuration-as-code-plugin/issues/32)
+- [#65 helping users migrate by export existing configuration](https://github.com/jenkinsci/configuration-as-code-plugin/issues/65)
+- [#70 explaining we need the Docker image the team above need to use](https://github.com/jenkinsci/configuration-as-code-plugin/issues/70)

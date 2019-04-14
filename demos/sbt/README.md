@@ -14,5 +14,5 @@ tool:
           - installSource:
               installers:
                 - sbtInstaller:
-                    id: '1.2.8'
+                    id: "1.2.8"
 ```
