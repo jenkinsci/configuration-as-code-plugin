@@ -6,11 +6,8 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/1c872818b46f4fdd890e4a22af0bee8c)](https://www.codacy.com/app/casz/configuration-as-code-plugin)
 [![Jenkins Plugin](https://img.shields.io/jenkins/plugin/v/configuration-as-code.svg)](https://plugins.jenkins.io/configuration-as-code)
 [![GitHub release](https://img.shields.io/github/release/jenkinsci/configuration-as-code-plugin.svg?label=release)](https://github.com/jenkinsci/configuration-as-code-plugin/releases/latest)
-[![Jenkins Plugin](https://img.shields.io/jenkins/plugin/i/configuration-as-code.svg?color=blue)](https://plugins.jenkins.io/configuration-as-code)
+[![Jenkins Plugin Installs](https://img.shields.io/jenkins/plugin/i/configuration-as-code.svg?color=blue)](https://plugins.jenkins.io/configuration-as-code)
 [![Gitter](https://badges.gitter.im/jenkinsci/configuration-as-code-plugin.svg)](https://gitter.im/jenkinsci/configuration-as-code-plugin)
-[![Jenkins Version](https://img.shields.io/badge/Jenkins-2.60.3-yellow.svg)](https://jenkins.io/download/)
-![JDK8](https://img.shields.io/badge/jdk-8-yellow.svg)
-[![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
 
 <img src="plugin/src/main/webapp/img/logo-head.svg" width="192">
 
