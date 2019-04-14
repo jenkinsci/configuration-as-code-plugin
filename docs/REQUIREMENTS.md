@@ -132,11 +132,13 @@ Checking support for JCasC is easy as long as your plugin requires Java 8 / Jenk
 
 You just need the Configuration as Code plugin as a test dependency and a sample YAML file for your component
 
+[![GitHub release](https://img.shields.io/github/release/jenkinsci/configuration-as-code-plugin.svg?label=release)](https://github.com/jenkinsci/configuration-as-code-plugin/releases/latest)
+
 ```xml
 <dependency>
     <groupId>io.jenkins</groupId>
     <artifactId>configuration-as-code</artifactId>
-    <version>1.5</version>
+    <version>LATEST_RELEASE</version>
     <scope>test</scope>
 </dependency>
 ```

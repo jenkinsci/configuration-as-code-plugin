@@ -198,9 +198,11 @@ Simplest option for you to test JCasC compatibility in your plugin is to introdu
 
 Add the Configuration as Code plugin as a test dependency in your pom.xml:
 
+[![GitHub release](https://img.shields.io/github/release/jenkinsci/configuration-as-code-plugin.svg?label=release)](https://github.com/jenkinsci/configuration-as-code-plugin/releases/latest)
+
 ```xml
 <properties>
-    <configuration-as-code.version>1.8</configuration-as-code.version>
+    <configuration-as-code.version>LATEST_RELEASE</configuration-as-code.version>
 </properties>
 <dependency>
     <groupId>io.jenkins</groupId>
