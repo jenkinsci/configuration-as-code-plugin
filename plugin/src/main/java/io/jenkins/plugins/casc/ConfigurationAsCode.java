@@ -557,7 +557,7 @@ public class ConfigurationAsCode extends ManagementLink {
             throw new ConfiguratorException("Invalid configuration: '"+path+"' isn't a valid path.");
         }
 
-        if (Files.isRegularFile(root)) {
+        if (Files.isRegularFile(root) && Files.isReadable(root)) {
             return Collections.singletonList(root);
         }
 
