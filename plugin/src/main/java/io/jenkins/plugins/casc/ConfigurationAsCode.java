@@ -558,6 +558,10 @@ public class ConfigurationAsCode extends ManagementLink {
             throw new ConfiguratorException("Invalid configuration: '"+path+"' isn't a valid path.");
         }
 
+        if (Files.isRegularFile(root)) {
+            return Collections.singletonList(root);
+        }
+
         try (Stream<Path> stream = Files.find(Paths.get(path), Integer.MAX_VALUE,
                 (next, attrs) -> !attrs.isDirectory() && !isHidden(next) && matcher.matches(next))) {
             return stream.collect(toList());

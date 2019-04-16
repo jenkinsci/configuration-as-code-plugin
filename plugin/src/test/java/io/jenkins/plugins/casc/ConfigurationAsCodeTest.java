@@ -3,19 +3,22 @@ package io.jenkins.plugins.casc;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.google.common.io.Resources;
 import hudson.util.FormValidation;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import java.io.File;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -61,6 +64,21 @@ public class ConfigurationAsCodeTest {
         assertThat(casc.configs(exactFile.getAbsolutePath()), hasSize(1));
         final List<Path> foo = casc.configs(tempFolder.getRoot().getAbsolutePath());
         assertThat(foo, hasSize(6));
+    }
+
+    @Test
+    public void test_loads_single_file_from_hidden_folder() throws Exception {
+        ConfigurationAsCode casc = ConfigurationAsCode.get();
+
+        File hiddenFolder = tempFolder.newFolder(".nested");
+        File singleFile = new File(hiddenFolder, "jenkins.yml");
+        try (InputStream configStream = getClass().getResourceAsStream("JenkinsConfigTest.yml")) {
+            Files.copy(configStream, singleFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        casc.configure(singleFile.getAbsolutePath());
+        assertThat(casc.getSources(), contains(singleFile.getAbsolutePath()));
+        assertThat(j.jenkins.getSystemMessage(), equalTo("configuration as code - JenkinsConfigTest"));
     }
 
     @Test(expected = ConfiguratorException.class)
