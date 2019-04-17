@@ -16,6 +16,7 @@ compliant with JCasC, you'll need to expose your configuration attributes as `@D
 Before you start, make sure the following pre-conditions are met:
 
 - The parent pom version of your plugin is aligned with the Configuration as Code [parent pom version](/pom.xml).
+
 ```xml
 <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
@@ -24,7 +25,9 @@ Before you start, make sure the following pre-conditions are met:
     <relativePath />
 </parent>
 ```
+
 - The Jenkins core version and the Java level of your plugin are aligned with the Configuration as Code plugin versions (also in the [pom.xml](/pom.xml)).
+
 ```xml
 <properties>
     <jenkins.version>THE_JENKINS_CORE_VERSION_HERE</jenkins.version>
@@ -249,9 +252,9 @@ some changes made to your plugin break this configuration model.
 About the latter, in case you need to introduce some breaking changes, you can define a backward compatibility test case
 
 ```java
-    @Test 
+    @Test
     @ConfiguredWithCode("obsolete-configuration-as-code.yml")
-    public void should_be_backward_compatible() throws Exception {  
+    public void should_be_backward_compatible() throws Exception {
         assertTrue( /* check plugin has been configured as expected */ );
     }
 ```

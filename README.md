@@ -166,7 +166,14 @@ This configuration file includes root entries for various components of your pri
 ```yaml
 jenkins:
   securityRealm:
-    (...)
+    ldap:
+      configurations:
+        - groupMembershipStrategy:
+            fromUserRecord:
+              attributeName: "memberOf"
+          inhibitInferRootDN: false
+          rootDN: "dc=acme,dc=org"
+          server: "ldaps://ldap.acme.org:1636"
 
   nodes:
     - permanent:
@@ -213,8 +220,8 @@ with your favourite YAML tools.
 ## Handling Secrets
 
 Currently, you can provide initial secrets to JCasC that all rely on <key,value>
-substitution of strings in the configuration. For example, ``Jenkins: `${some_var}` ``. Default variable substitution
-using the `:-` operator from `bash` is also available. For example, `key: ${VALUE:-defaultvalue}` will evaluate to `defaultvalue` if `$VALUE` is unset. To escape a string from secret interpolation, put `^` in front of the value. For example, `Jenkins: ^${some_var}` will produce the literal `Jenkins: ${some_var}`.
+substitution of strings in the configuration. For example, `Jenkins: "${some_var}"`. Default variable substitution
+using the `:-` operator from `bash` is also available. For example, `key: "${VALUE:-defaultvalue}"` will evaluate to `defaultvalue` if `$VALUE` is unset. To escape a string from secret interpolation, put `^` in front of the value. For example, `Jenkins: "^${some_var}"` will produce the literal `Jenkins: "${some_var}"`.
 
 We can provide these initial secrets in the following ways:
 
@@ -235,9 +242,9 @@ can be used as:
 
 ```yaml
 - credentials:
-  - string:
-    id: "cred-id"
-    secret: ${filename}
+    - string:
+      id: "cred-id"
+      secret: ${filename}
 ```
 
 - Using Vault, see following section.
