@@ -1,0 +1,16 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler">
+    <st:contentType value="text/html;charset=UTF-8"/>
+    <head>
+        <link href="${request.contextPath+'/'+app.getAdjuncts(null).rootURL+'/io/jenkins/plugins/casc/assets/prism.css'}"
+              rel="stylesheet" type="text/css"/>
+
+    </head>
+    <script src="${request.contextPath+'/'+app.getAdjuncts(null).rootURL+'/io/jenkins/plugins/casc/assets/prism.js'}"/>
+    <html>
+        <body>
+            <pre>
+                <code class="language-yaml">${it.export()}</code>
+            </pre>
+        </body>
+    </html>
+</j:jelly>

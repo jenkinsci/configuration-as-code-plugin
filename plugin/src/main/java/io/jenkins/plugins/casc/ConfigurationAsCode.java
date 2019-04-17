@@ -32,6 +32,7 @@ import io.jenkins.plugins.casc.snakeyaml.resolver.Resolver;
 import io.jenkins.plugins.casc.snakeyaml.serializer.Serializer;
 import io.jenkins.plugins.casc.yaml.YamlSource;
 import io.jenkins.plugins.casc.yaml.YamlUtils;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -391,6 +392,14 @@ public class ConfigurationAsCode extends ManagementLink {
         res.setContentType("application/x-yaml; charset=utf-8");
         res.addHeader("Content-Disposition", "attachment; filename=jenkins.yaml");
         export(res.getOutputStream());
+    }
+
+    @org.kohsuke.accmod.Restricted(NoExternalUse.class)
+    public String export() throws Exception {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        export(out);
+
+        return out.toString(StandardCharsets.UTF_8.name());
     }
 
     @org.kohsuke.accmod.Restricted(NoExternalUse.class)
