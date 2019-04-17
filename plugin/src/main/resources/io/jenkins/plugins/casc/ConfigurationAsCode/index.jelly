@@ -47,7 +47,7 @@
     <br/>
     <f:form method="post" action="export" name="export">
       <span>
-        <p><a href="view">${%View Configuration}</a></p>
+        <p><a href="view"><button type="button">View</button></a></p>
       </span>
       <f:submit name="export" value="${%Download Configuration}"/>
       <div class="alert alert-warning">
