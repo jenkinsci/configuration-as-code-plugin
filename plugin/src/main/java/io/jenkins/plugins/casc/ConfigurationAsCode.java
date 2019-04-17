@@ -394,7 +394,7 @@ public class ConfigurationAsCode extends ManagementLink {
         export(res.getOutputStream());
     }
 
-    @org.kohsuke.accmod.Restricted(NoExternalUse.class)
+    @Restricted(NoExternalUse.class)
     public String export() throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         export(out);
@@ -402,7 +402,7 @@ public class ConfigurationAsCode extends ManagementLink {
         return out.toString(StandardCharsets.UTF_8.name());
     }
 
-    @org.kohsuke.accmod.Restricted(NoExternalUse.class)
+    @Restricted(NoExternalUse.class)
     public void export(OutputStream out) throws Exception {
 
         final List<NodeTuple> tuples = new ArrayList<>();
@@ -426,7 +426,7 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     @VisibleForTesting
-    @org.kohsuke.accmod.Restricted(NoExternalUse.class)
+    @Restricted(NoExternalUse.class)
     public static void serializeYamlNode(Node root, Writer writer) throws IOException {
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(BLOCK);
@@ -442,7 +442,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
     @CheckForNull
     @VisibleForTesting
-    @org.kohsuke.accmod.Restricted(NoExternalUse.class)
+    @Restricted(NoExternalUse.class)
     public Node toYaml(CNode config) throws ConfiguratorException {
 
         if (config == null) return null;
@@ -528,7 +528,7 @@ public class ConfigurationAsCode extends ManagementLink {
         return supportedProtocols.contains(uri.getScheme());
     }
 
-    @org.kohsuke.accmod.Restricted(NoExternalUse.class)
+    @Restricted(NoExternalUse.class)
     public void configureWith(YamlSource source) throws ConfiguratorException {
         final List<YamlSource> sources = getStandardConfigSources();
         sources.add(source);
@@ -540,7 +540,7 @@ public class ConfigurationAsCode extends ManagementLink {
         configureWith( YamlUtils.loadFrom(sources) );
     }
 
-    @org.kohsuke.accmod.Restricted(NoExternalUse.class)
+    @Restricted(NoExternalUse.class)
     public Map<Source, String> checkWith(YamlSource source) throws ConfiguratorException {
         final List<YamlSource> sources = getStandardConfigSources();
         sources.add(source);
