@@ -4,6 +4,7 @@ import com.google.common.annotations.VisibleForTesting;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
+import hudson.Functions;
 import hudson.Util;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
@@ -736,6 +737,14 @@ public class ConfigurationAsCode extends ManagementLink {
             return "jenkins-core";
         }
         return jar.substring(0, jar.lastIndexOf('.'));
+    }
+
+    @Restricted(NoExternalUse.class)
+    public static String printThrowable(@NonNull Throwable t) {
+        String s = Functions.printThrowable(t)
+            .split("at io.jenkins.plugins.casc.ConfigurationAsCode.export")[0]
+            .replaceAll("\n\t", "  ");
+        return s.substring(0, s.lastIndexOf(")") + 1);
     }
 
 }

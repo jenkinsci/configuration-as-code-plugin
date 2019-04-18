@@ -1,6 +1,5 @@
 package io.jenkins.plugins.casc;
 
-import hudson.Functions;
 import hudson.util.Secret;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Scalar;
@@ -24,6 +23,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.reflect.FieldUtils;
 import org.kohsuke.accmod.AccessRestriction;
 import org.kohsuke.stapler.export.Exported;
+
+import static io.jenkins.plugins.casc.ConfigurationAsCode.printThrowable;
 
 /**
  * One attribute of {@link Configurator}.
@@ -195,7 +196,8 @@ public class Attribute<Owner, Type> {
             return c.describe(o, context);
         } catch (Exception | /* Jenkins.getDescriptorOrDie */AssertionError e) {
             // Don't fail the whole export, prefer logging this error
-            return new Scalar("FAILED TO EXPORT " + instance.getClass().getName() + "#" + name + ": \n" + Functions.printThrowable(e));
+            return new Scalar("FAILED TO EXPORT " + instance.getClass().getName() + "#" + name + ": "
+                + printThrowable(e));
         }
     }
 
