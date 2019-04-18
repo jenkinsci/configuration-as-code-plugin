@@ -15,7 +15,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -106,11 +105,5 @@ public class ConfigurationAsCodeTest {
         j.assertGoodStatus(resultPage);
 
         assertEquals("Configured by Configuration as Code plugin", j.jenkins.getSystemMessage());
-    }
-
-    @Test
-    @ConfiguredWithCode("merge3.yml")
-    public void export_returns_expected_output() throws Exception {
-        assertThat(ConfigurationAsCode.get().export(), containsString("Configured by Configuration as Code plugin"));
     }
 }

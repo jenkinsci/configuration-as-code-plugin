@@ -394,16 +394,17 @@ public class ConfigurationAsCode extends ManagementLink {
         export(res.getOutputStream());
     }
 
-    @Restricted(NoExternalUse.class)
-    public String export() throws Exception {
+    public void doViewExport(StaplerRequest req, StaplerResponse res) throws Exception {
         if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
-            return "You do not have permission to view this page";
+            res.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
         }
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         export(out);
 
-        return out.toString(StandardCharsets.UTF_8.name());
+        req.setAttribute("export", out.toString(StandardCharsets.UTF_8.name()));
+        req.getView(this, "viewExport.jelly").forward(req, res);
     }
 
     @Restricted(NoExternalUse.class)
