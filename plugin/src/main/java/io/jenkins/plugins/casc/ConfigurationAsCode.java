@@ -397,7 +397,7 @@ public class ConfigurationAsCode extends ManagementLink {
     @Restricted(NoExternalUse.class)
     public String export() throws Exception {
         if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
-            throw new RuntimeException("Only admins can access this view");
+            return "You do not have permission to view this page";
         }
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
