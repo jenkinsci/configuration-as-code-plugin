@@ -96,7 +96,8 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
     @CheckForNull
     @Override
     public CNode describe(T instance, ConfigurationContext context) {
-        Predicate<CNode> isScalar = node -> node.getType().equals(MAPPING) && unchecked(node::asMapping).apply().size() == 0;
+        Predicate<CNode> isScalar = node -> node.getType().equals(MAPPING)
+            && unchecked(node::asMapping).apply().size() == 0;
         return lookupConfigurator(context, instance.getClass())
                 .map(configurator -> convertToNode(context, configurator, instance))
                 .map(node -> {
