@@ -217,7 +217,7 @@ public class ConfigurationAsCode extends ManagementLink {
             }
             return FormValidation.okWithMarkup("The configuration can be applied");
         } catch (ConfiguratorException | IllegalArgumentException e) {
-            return FormValidation.error(e, e.getCause().getMessage());
+            return FormValidation.error(e, e.getCause() == null ? e.getMessage() : e.getCause().getMessage());
         }
     }
 
