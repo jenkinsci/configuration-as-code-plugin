@@ -22,7 +22,6 @@ import io.vavr.control.Option;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
@@ -97,11 +96,9 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
     @CheckForNull
     @Override
     public CNode describe(T instance, ConfigurationContext context) {
-        Predicate<CNode> isScalar = node -> node.getType().equals(MAPPING)
-            && unchecked(node::asMapping).apply().size() == 0;
+        Predicate<CNode> isScalar = node -> node.getType().equals(MAPPING) && unchecked(node::asMapping).apply().size() == 0;
         return lookupConfigurator(context, instance.getClass())
                 .map(configurator -> convertToNode(context, configurator, instance))
-                .filter(Objects::nonNull)
                 .map(node -> {
                     if (isScalar.test(node)) {
                         return new Scalar(preferredSymbol(instance.getDescriptor()));
