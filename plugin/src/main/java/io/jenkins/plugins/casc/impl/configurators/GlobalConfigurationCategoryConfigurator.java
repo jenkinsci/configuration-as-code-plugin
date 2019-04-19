@@ -31,6 +31,7 @@ import static io.jenkins.plugins.casc.ConfigurationAsCode.printThrowable;
 public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<GlobalConfigurationCategory> implements RootElementConfigurator<GlobalConfigurationCategory> {
 
     private static final Logger LOGGER = Logger.getLogger(GlobalConfigurationCategoryConfigurator.class.getName());
+    private static final String CREDENTIALS_PROVIDER_MANAGER_CONFIGURATION = "com.cloudbees.plugins.credentials.CredentialsProviderManager$Configuration";
 
     private final GlobalConfigurationCategory category;
 
@@ -94,8 +95,7 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
 
         final Mapping mapping = new Mapping();
         Jenkins.getInstance().getExtensionList(Descriptor.class).stream()
-            .filter(d -> d.getCategory() == category)
-            .filter(d -> d.getGlobalConfigPage() != null)
+            .filter(this::filterDescriptors)
             .forEach(d -> describe(d, mapping, context));
         return mapping;
     }
@@ -109,6 +109,17 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
             final Scalar scalar = new Scalar(
                 "FAILED TO EXPORT " + d.getClass().getName() + " : " + printThrowable(e));
             mapping.put(c.getName(), scalar);
+        }
+    }
+
+    private boolean filterDescriptors(Descriptor d) {
+        if (d.clazz.getName().equals(CREDENTIALS_PROVIDER_MANAGER_CONFIGURATION)) {
+            // CREDENTIALS_PROVIDER_MANAGER_CONFIGURATION is located in the wrong category.
+            // JCasC will also turn the simple name into empty string
+            // It should be a part of the credentials root configurator node.
+            return false;
+        } else {
+            return d.getCategory() == category && d.getGlobalConfigPage() != null;
         }
     }
 
