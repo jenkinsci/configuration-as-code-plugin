@@ -395,6 +395,7 @@ public class ConfigurationAsCode extends ManagementLink {
         export(res.getOutputStream());
     }
 
+    @RequirePOST
     public void doViewExport(StaplerRequest req, StaplerResponse res) throws Exception {
         if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
