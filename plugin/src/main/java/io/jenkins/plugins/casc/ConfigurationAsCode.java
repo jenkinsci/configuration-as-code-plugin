@@ -551,13 +551,17 @@ public class ConfigurationAsCode extends ManagementLink {
      * @return list of all paths matching pattern. Only base file itself if it is a file matching pattern
      */
     public List<Path> configs(String path) throws ConfiguratorException {
-        final PathMatcher matcher = FileSystems.getDefault().getPathMatcher(YAML_FILES_PATTERN);
         final Path root = Paths.get(path);
 
         if (!Files.exists(root)) {
             throw new ConfiguratorException("Invalid configuration: '"+path+"' isn't a valid path.");
         }
 
+        if (Files.isRegularFile(root) && Files.isReadable(root)) {
+            return Collections.singletonList(root);
+        }
+
+        final PathMatcher matcher = FileSystems.getDefault().getPathMatcher(YAML_FILES_PATTERN);
         try (Stream<Path> stream = Files.find(Paths.get(path), Integer.MAX_VALUE,
                 (next, attrs) -> !attrs.isDirectory() && !isHidden(next) && matcher.matches(next))) {
             return stream.collect(toList());
