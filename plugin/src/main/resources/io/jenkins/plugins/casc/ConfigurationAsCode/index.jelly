@@ -33,7 +33,7 @@
     <f:form method="post" action="replace" name="replace">
         <h2>${%Replace configuration source with:}</h2>
         <f:entry title="${%Path or URL}" field="newSource" >
-            <f:textbox checkUrl="'checkNewSource?newSource='+this.value" style="width:32em;" />
+            <f:textbox checkUrl="'checkNewSource?newSource='+this.value" checkMethod="post" style="width:32em;" />
         </f:entry>
         <f:bottomButtonBar>
             <f:submit name="replace" value="${%Apply new configuration}"/>
