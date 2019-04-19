@@ -11,8 +11,6 @@ import io.jenkins.plugins.casc.RootElementConfigurator;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import io.jenkins.plugins.casc.model.Scalar;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -24,6 +22,7 @@ import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import static io.jenkins.plugins.casc.Attribute.Setter.NOP;
+import static io.jenkins.plugins.casc.ConfigurationAsCode.printThrowable;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -107,9 +106,8 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
             final CNode node = c.describe(d, context);
             if (node != null) mapping.put(c.getName(), node);
         } catch (Exception e) {
-            final StringWriter w = new StringWriter();
-            e.printStackTrace(new PrintWriter(w));
-            final Scalar scalar = new Scalar("FAILED TO EXPORT " + d.getClass().getName() + " : \n" + w.toString());
+            final Scalar scalar = new Scalar(
+                "FAILED TO EXPORT " + d.getClass().getName() + " : " + printThrowable(e));
             mapping.put(c.getName(), scalar);
         }
     }

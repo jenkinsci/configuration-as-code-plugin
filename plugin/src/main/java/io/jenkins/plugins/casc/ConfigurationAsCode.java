@@ -4,6 +4,7 @@ import com.google.common.annotations.VisibleForTesting;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
+import hudson.Functions;
 import hudson.Util;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
@@ -32,6 +33,7 @@ import io.jenkins.plugins.casc.snakeyaml.resolver.Resolver;
 import io.jenkins.plugins.casc.snakeyaml.serializer.Serializer;
 import io.jenkins.plugins.casc.yaml.YamlSource;
 import io.jenkins.plugins.casc.yaml.YamlUtils;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -80,6 +82,7 @@ import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.interceptor.RequirePOST;
 import org.kohsuke.stapler.lang.Klass;
+import org.kohsuke.stapler.verb.POST;
 
 import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.FlowStyle.BLOCK;
 import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.DOUBLE_QUOTED;
@@ -194,7 +197,7 @@ public class ConfigurationAsCode extends ManagementLink {
         return false;
     }
 
-    // Do something with validation! Make a button instead, that function can not be RequirePost in current configuration
+    @POST
     public FormValidation doCheckNewSource(@QueryParameter String newSource) {
         Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
         String normalizedSource = Util.fixEmptyAndTrim(newSource);
@@ -217,7 +220,7 @@ public class ConfigurationAsCode extends ManagementLink {
             }
             return FormValidation.okWithMarkup("The configuration can be applied");
         } catch (ConfiguratorException | IllegalArgumentException e) {
-            return FormValidation.error(e, e.getCause().getMessage());
+            return FormValidation.error(e, e.getCause() == null ? e.getMessage() : e.getCause().getMessage());
         }
     }
 
@@ -393,7 +396,21 @@ public class ConfigurationAsCode extends ManagementLink {
         export(res.getOutputStream());
     }
 
-    @org.kohsuke.accmod.Restricted(NoExternalUse.class)
+    @RequirePOST
+    public void doViewExport(StaplerRequest req, StaplerResponse res) throws Exception {
+        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+            res.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        export(out);
+
+        req.setAttribute("export", out.toString(StandardCharsets.UTF_8.name()));
+        req.getView(this, "viewExport.jelly").forward(req, res);
+    }
+
+    @Restricted(NoExternalUse.class)
     public void export(OutputStream out) throws Exception {
 
         final List<NodeTuple> tuples = new ArrayList<>();
@@ -417,7 +434,7 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     @VisibleForTesting
-    @org.kohsuke.accmod.Restricted(NoExternalUse.class)
+    @Restricted(NoExternalUse.class)
     public static void serializeYamlNode(Node root, Writer writer) throws IOException {
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(BLOCK);
@@ -433,7 +450,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
     @CheckForNull
     @VisibleForTesting
-    @org.kohsuke.accmod.Restricted(NoExternalUse.class)
+    @Restricted(NoExternalUse.class)
     public Node toYaml(CNode config) throws ConfiguratorException {
 
         if (config == null) return null;
@@ -519,7 +536,7 @@ public class ConfigurationAsCode extends ManagementLink {
         return supportedProtocols.contains(uri.getScheme());
     }
 
-    @org.kohsuke.accmod.Restricted(NoExternalUse.class)
+    @Restricted(NoExternalUse.class)
     public void configureWith(YamlSource source) throws ConfiguratorException {
         final List<YamlSource> sources = getStandardConfigSources();
         sources.add(source);
@@ -531,7 +548,7 @@ public class ConfigurationAsCode extends ManagementLink {
         configureWith( YamlUtils.loadFrom(sources) );
     }
 
-    @org.kohsuke.accmod.Restricted(NoExternalUse.class)
+    @Restricted(NoExternalUse.class)
     public Map<Source, String> checkWith(YamlSource source) throws ConfiguratorException {
         final List<YamlSource> sources = getStandardConfigSources();
         sources.add(source);
@@ -551,13 +568,17 @@ public class ConfigurationAsCode extends ManagementLink {
      * @return list of all paths matching pattern. Only base file itself if it is a file matching pattern
      */
     public List<Path> configs(String path) throws ConfiguratorException {
-        final PathMatcher matcher = FileSystems.getDefault().getPathMatcher(YAML_FILES_PATTERN);
         final Path root = Paths.get(path);
 
         if (!Files.exists(root)) {
             throw new ConfiguratorException("Invalid configuration: '"+path+"' isn't a valid path.");
         }
 
+        if (Files.isRegularFile(root) && Files.isReadable(root)) {
+            return Collections.singletonList(root);
+        }
+
+        final PathMatcher matcher = FileSystems.getDefault().getPathMatcher(YAML_FILES_PATTERN);
         try (Stream<Path> stream = Files.find(Paths.get(path), Integer.MAX_VALUE,
                 (next, attrs) -> !attrs.isDirectory() && !isHidden(next) && matcher.matches(next))) {
             return stream.collect(toList());
@@ -722,6 +743,14 @@ public class ConfigurationAsCode extends ManagementLink {
             return "jenkins-core";
         }
         return jar.substring(0, jar.lastIndexOf('.'));
+    }
+
+    @Restricted(NoExternalUse.class)
+    public static String printThrowable(@NonNull Throwable t) {
+        String s = Functions.printThrowable(t)
+            .split("at io.jenkins.plugins.casc.ConfigurationAsCode.export")[0]
+            .replaceAll("\n\t", "  ");
+        return s.substring(0, s.lastIndexOf(")") + 1);
     }
 
 }
