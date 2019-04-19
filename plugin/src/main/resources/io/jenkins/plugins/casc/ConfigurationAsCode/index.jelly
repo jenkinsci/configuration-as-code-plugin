@@ -46,13 +46,16 @@
     </f:form>
     <br/>
     <f:form method="post" action="export" name="export">
-      <f:submit name="export" value="${%Export Configuration}"/>
-      <div class="alert alert-warning">
-        <img src="${rootURL}/images/16x16/warning.png"/>
-        Export is not intended to offer a directly usable jenkins.yaml configuration. It can be used for inspiration
-        writing your own, be aware export can be partial, or fail for some components.
-      </div>
+      <f:submit name="export" value="${%Download Configuration}"/>
+      <span class="yui-button yui-submit-button submit-button primary">
+        <a href="viewExport"><button type="button">${%View Configuration}</button></a>
+      </span>
     </f:form>
+    <div class="alert alert-warning" style="margin-top: 10px;">
+      <img src="${rootURL}/images/16x16/warning.png"/>
+      Export is not intended to offer a directly usable jenkins.yaml configuration. It can be used for inspiration
+      writing your own, be aware export can be partial, or fail for some components.
+    </div>
 
     <h2>${%Reference}</h2>
     <dt>
