@@ -35,6 +35,6 @@ jenkins:
   numExecutors: 1 # This is just a random example entry to show that there is no "end token" for the multiline string apart from un-indent to the next YAML property.
 ```
 
-# implementation note
+## implementation note
 
 The example above is only a subset of commonly used settings. The full list is available in the generated documentation.

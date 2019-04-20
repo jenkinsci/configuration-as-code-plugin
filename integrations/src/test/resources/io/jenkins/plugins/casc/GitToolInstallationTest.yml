@@ -5,4 +5,3 @@ tool:
         home: /bin/git
       - name: another_git
         home: /usr/local/bin/git
-

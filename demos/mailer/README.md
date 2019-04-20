@@ -23,5 +23,4 @@ It is identified as YAML root element `mailer` as this descriptor has a `global.
 assumes it makes sense to expose it as a root element extension.
 
 Descriptor defines setters so we can inject configuration, but for SMTP authentication parameters.
-See https://github.com/jenkinsci/configuration-as-code-plugin/issues/2.
-See https://github.com/jenkinsci/mailer-plugin/pull/39
+See [jenknisci/mailer-plugin#39](https://github.com/jenkinsci/mailer-plugin/pull/39)

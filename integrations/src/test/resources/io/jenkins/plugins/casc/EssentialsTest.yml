@@ -9,10 +9,10 @@ jenkins:
 unclassified:
   metricsaccesskey:
     accessKeys:
-      - key:            "evergreen"
-        description:    "Key for evergreen health-check"
+      - key: "evergreen"
+        description: "Key for evergreen health-check"
         canHealthCheck: true
-        canPing:        false
-        canThreadDump:  false
-        canMetrics:     false
-        origins:        "*"
+        canPing: false
+        canThreadDump: false
+        canMetrics: false
+        origins: "*"

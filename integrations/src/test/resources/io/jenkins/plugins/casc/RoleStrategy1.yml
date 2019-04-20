@@ -1,5 +1,4 @@
 jenkins:
-
   authorizationStrategy:
     roleBased:
       roles:

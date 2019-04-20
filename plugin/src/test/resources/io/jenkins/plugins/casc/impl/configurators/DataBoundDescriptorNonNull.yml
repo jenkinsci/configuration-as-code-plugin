@@ -28,9 +28,9 @@ jenkins:
           - "lastDuration"
           - "buildButton"
         name: "other list view"
-#        Currently not possible due to missing getter/setter in Jenkins Core
-#        jobNames:
-#          - "testJob1"
+  #        Currently not possible due to missing getter/setter in Jenkins Core
+  #        jobNames:
+  #          - "testJob1"
   viewsTabBar: "standard"
   authorizationStrategy: "loggedInUsersCanDoAnything"
   securityRealm:

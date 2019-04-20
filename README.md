@@ -139,7 +139,6 @@ mvn hpi:run
 
 ```text
 ...
-...
 INFO: Jenkins is fully up and running
 ```
 

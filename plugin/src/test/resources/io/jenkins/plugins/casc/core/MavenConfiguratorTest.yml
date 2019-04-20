@@ -9,5 +9,5 @@ tool:
         properties:
           - installSourceProperty:
               installers:
-              - mavenInstaller:
-                  id: '3.5.0'
+                - mavenInstaller:
+                    id: "3.5.0"

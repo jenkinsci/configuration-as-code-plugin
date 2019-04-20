@@ -6,7 +6,6 @@ Build agents configuration belongs (currently) under `jenkins` root element
 
 ```yaml
 jenkins:
-  (...)
   nodes:
     - permanent:
         labelString: "linux docker test"

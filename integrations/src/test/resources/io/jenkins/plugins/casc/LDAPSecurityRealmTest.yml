@@ -1,5 +1,4 @@
 jenkins:
-
   securityRealm:
     ldap:
       configurations:

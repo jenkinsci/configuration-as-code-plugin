@@ -92,7 +92,7 @@ Master:
 
 Now, deploy the Helm chart with those customized values:
 
-```
+```bash
 helm install --name jenkins stable/jenkins -f values.yaml
 ```
 
