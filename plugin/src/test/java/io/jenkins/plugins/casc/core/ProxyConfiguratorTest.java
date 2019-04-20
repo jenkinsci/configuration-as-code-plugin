@@ -2,7 +2,6 @@ package io.jenkins.plugins.casc.core;
 
 import hudson.ProxyConfiguration;
 import hudson.util.Secret;
-import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.Configurator;
 import io.jenkins.plugins.casc.ConfiguratorRegistry;
@@ -10,14 +9,9 @@ import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
-import io.jenkins.plugins.casc.snakeyaml.nodes.Node;
-import java.io.IOException;
-import java.io.StringWriter;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static io.jenkins.plugins.casc.ConfigurationAsCode.serializeYamlNode;
-import static io.jenkins.plugins.casc.misc.Util.getJenkinsConfigurator;
 import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
 import static io.jenkins.plugins.casc.misc.Util.toYamlString;
 import static java.util.Objects.requireNonNull;

@@ -14,14 +14,11 @@ import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.model.CNode;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.PretendSlave;
 
-import static io.jenkins.plugins.casc.ConfigurationAsCode.serializeYamlNode;
-import static io.jenkins.plugins.casc.misc.Util.getJenkinsConfigurator;
 import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
 import static io.jenkins.plugins.casc.misc.Util.toYamlString;
 import static org.hamcrest.Matchers.containsString;
