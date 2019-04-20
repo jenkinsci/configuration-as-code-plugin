@@ -17,6 +17,9 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import static io.jenkins.plugins.casc.ConfigurationAsCode.serializeYamlNode;
+import static io.jenkins.plugins.casc.misc.Util.getJenkinsConfigurator;
+import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
+import static io.jenkins.plugins.casc.misc.Util.toYamlString;
 import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -73,12 +76,11 @@ public class ProxyConfiguratorTest {
     @Test
     @ConfiguredWithCode("Proxy.yml")
     public void describeProxyConfig() throws Exception {
-        final JenkinsConfigurator root = getJenkinsConfigurator();
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         ConfigurationContext context = new ConfigurationContext(registry);
-        final CNode configNode = getProxyNode(root, context);
+        final CNode configNode = getProxyNode(context);
 
-        Secret password = requireNonNull(Secret.decrypt(getProxyNode(root, context).asMapping().getScalarValue("password")));
+        Secret password = requireNonNull(Secret.decrypt(getProxyNode(context).getScalarValue("password")));
 
         final String yamlConfig = toYamlString(configNode);
         assertEquals(String.join("\n",
@@ -95,12 +97,11 @@ public class ProxyConfiguratorTest {
     @Test
     @ConfiguredWithCode("ProxyMinimal.yml")
     public void describeMinimalProxyConfig() throws Exception {
-        final JenkinsConfigurator root = getJenkinsConfigurator();
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         ConfigurationContext context = new ConfigurationContext(registry);
-        final CNode configNode = getProxyNode(root, context);
+        final CNode configNode = getProxyNode(context);
 
-        Secret password = requireNonNull(Secret.decrypt(getProxyNode(root, context).asMapping().getScalarValue("password")));
+        Secret password = requireNonNull(Secret.decrypt(getProxyNode(context).getScalarValue("password")));
 
         final String yamlConfig = toYamlString(configNode);
         assertEquals(String.join("\n",
@@ -111,18 +112,7 @@ public class ProxyConfiguratorTest {
         ), yamlConfig);
     }
 
-    private CNode getProxyNode(JenkinsConfigurator root, ConfigurationContext context) throws Exception {
-        return requireNonNull(root.describe(root.getTargetComponent(context), context)).asMapping().get("proxy");
-    }
-
-    private JenkinsConfigurator getJenkinsConfigurator() {
-        return j.jenkins.getExtensionList(JenkinsConfigurator.class).get(0);
-    }
-
-    private static String toYamlString(CNode rootNode) throws IOException {
-        Node yamlRoot = ConfigurationAsCode.get().toYaml(rootNode);
-        StringWriter buffer = new StringWriter();
-        serializeYamlNode(yamlRoot, buffer);
-        return buffer.toString();
+    private Mapping getProxyNode(ConfigurationContext context) throws Exception {
+        return getJenkinsRoot(context).get("proxy").asMapping();
     }
 }
