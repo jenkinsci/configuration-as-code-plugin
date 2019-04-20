@@ -1,6 +1,8 @@
 package io.jenkins.plugins.casc.misc;
 
 import io.jenkins.plugins.casc.ConfigurationAsCode;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -16,8 +18,7 @@ public class JenkinsConfiguredWithCodeRule extends JenkinsRule {
     @Override
     public void before() throws Throwable {
         super.before();
-        ConfiguredWithCode configuredWithCode = env.description().getAnnotation(ConfiguredWithCode.class);
-
+        ConfiguredWithCode configuredWithCode = getConfiguredWithCode();
         if (Objects.nonNull(configuredWithCode)) {
 
             final Class<?> clazz = env.description().getTestClass();
@@ -43,5 +44,25 @@ public class JenkinsConfiguredWithCodeRule extends JenkinsRule {
                 }
             }
         }
+    }
+
+    private ConfiguredWithCode getConfiguredWithCode() {
+        ConfiguredWithCode configuredWithCode = env.description().getAnnotation(ConfiguredWithCode.class);
+        if (Objects.nonNull(configuredWithCode)) return configuredWithCode;
+        for (Field field : env.description().getTestClass().getFields()) {
+            if (field.isAnnotationPresent(ConfiguredWithCode.class)) {
+                int m = field.getModifiers();
+                Class<?> clazz = field.getType();
+                if (Modifier.isStatic(m) && Modifier.isPublic(m) && clazz.isAssignableFrom(JenkinsConfiguredWithCodeRule.class)) {
+                    configuredWithCode = field.getAnnotation(ConfiguredWithCode.class);
+                    if (Objects.nonNull(configuredWithCode)) {
+                        return configuredWithCode;
+                    }
+                } else {
+                    throw new IllegalStateException("Field must be public static JenkinsConfiguredWithCodeRule");
+                }
+            }
+        }
+        return null;
     }
 }

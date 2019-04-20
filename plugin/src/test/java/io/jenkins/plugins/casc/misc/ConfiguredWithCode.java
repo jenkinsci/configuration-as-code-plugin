@@ -4,13 +4,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import org.junit.Test;
 
+import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * To load specified config with plugin
  */
-@Target(METHOD)
+@Target({METHOD,FIELD})
 @Retention(RUNTIME)
 public @interface ConfiguredWithCode {
 
