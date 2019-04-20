@@ -111,7 +111,7 @@ public class Authentication extends AbstractDescribableImpl<PAuthentication> {
 
 ```xml
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
-      <f:entry title="${%Password}" field="smtpAuthPassword">
+      <f:entry title="${%Password}" field="password">
         <f:password />
       </f:entry>
 </j:jelly>
