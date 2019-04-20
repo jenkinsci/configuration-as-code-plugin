@@ -53,4 +53,9 @@ abstract class VaultAuthenticatorWithExpiration implements VaultAuthenticator {
         VaultAuthenticatorWithExpiration authenticator = (VaultAuthenticatorWithExpiration) o;
         return hashCode() == authenticator.hashCode();
     }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }
