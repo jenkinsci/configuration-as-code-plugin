@@ -193,7 +193,7 @@ public static final class DescriptorImpl extends Descriptor<Foo> {
 
 See [mailer plugin#39](https://github.com/jenkinsci/mailer-plugin/pull/39) for a sample on required changes.
 
-## How to test?
+## How to test
 
 Simplest option for you to test JCasC compatibility in your plugin is to introduce a simple test case.
 
