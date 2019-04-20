@@ -1,6 +1,6 @@
 # configure Amazon EC2 plugin
 
-https://wiki.jenkins.io/display/JENKINS/Amazon+EC2+Plugin
+[Amazon EC2 Plugin](https://wiki.jenkins.io/display/JENKINS/Amazon+EC2+Plugin)
 
 ## sample configuration
 

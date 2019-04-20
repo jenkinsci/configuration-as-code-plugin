@@ -6,7 +6,7 @@ See [config.yml](config.yml) for the `ConfigMap` definition.
 
 Example installation on Kubernetes:
 
-```
+```bash
 kubectl apply -f service-account.yml
 kubectl apply -f config.yml
 kubectl apply -f jenkins.yml

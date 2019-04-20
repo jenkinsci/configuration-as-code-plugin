@@ -68,22 +68,22 @@
 
 ## Run it
 
-1. Set execute permissions on the newly created scripts: `chmod u+x run-consul-agent.sh`
-1. Set execute permissions on the newly created scripts: `chmod u+x run-vault-server.sh`
-1. Execute: `./run-consul-agent.sh` to start the consul agent locally
-   - Verify that the consul agent is up and running, connected to the cluster.
-1. Execute: `./run-vault-server.sh` to start the vault server
-1. Configure the vault server
-   - Execute: `docker exec -it vault /bin/sh` to access the vault docker container
-   - Execute: `vault operator init` to initialize the vault server. Take note of the _Unseal Keys_ and the _Initial Root Token_. Without these, the vault is lost when sealed/locked
-   - Execute: `vault operator unseal` to unseal/open the vault. Follow the onscreen instructions and use 3 of the five _Unseal Keys_
-   - Execute: `exit` to log out of the vault docker container
+- Set execute permissions on the newly created scripts: `chmod u+x run-consul-agent.sh`
+- Set execute permissions on the newly created scripts: `chmod u+x run-vault-server.sh`
+- Execute: `./run-consul-agent.sh` to start the consul agent locally
+  - Verify that the consul agent is up and running, connected to the cluster.
+- Execute: `./run-vault-server.sh` to start the vault server
+- Configure the vault server
+  - Execute: `docker exec -it vault /bin/sh` to access the vault docker container
+  - Execute: `vault operator init` to initialize the vault server. Take note of the _Unseal Keys_ and the _Initial Root Token_. Without these, the vault is lost when sealed/locked
+  - Execute: `vault operator unseal` to unseal/open the vault. Follow the onscreen instructions and use 3 of the five _Unseal Keys_
+  - Execute: `exit` to log out of the vault docker container
 
 ## Test it
 
-1. Execute: `export VAULT_TOKEN="[VAULT_TOKEN]"` where _Vault Token_ is used
-1. Execute: `curl --header "X-Vault-Token: $VAULT_TOKEN" --request POST --data '{"bar": "Baz"}' http://vault.domain.local:8200/v1/secret/foo` to put test data into the vault. No output is returned if it works
-1. Execute: `curl --header "X-Vault-Token: $VAULT_TOKEN" http://vault.domain.local:8200/v1/secret/foo` to get test data from the vault. Expected output is JSON formatted:
+- Execute: `export VAULT_TOKEN="[VAULT_TOKEN]"` where _Vault Token_ is used
+- Execute: `curl --header "X-Vault-Token: $VAULT_TOKEN" --request POST --data '{"bar": "Baz"}' http://vault.domain.local:8200/v1/secret/foo` to put test data into the vault. No output is returned if it works
+- Execute: `curl --header "X-Vault-Token: $VAULT_TOKEN" http://vault.domain.local:8200/v1/secret/foo` to get test data from the vault. Expected output is JSON formatted:
 
 ```json
 {
