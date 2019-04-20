@@ -14,13 +14,13 @@ import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.model.CNode;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.PretendSlave;
 
-import static io.jenkins.plugins.casc.ConfigurationAsCode.serializeYamlNode;
+import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
+import static io.jenkins.plugins.casc.misc.Util.toYamlString;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
@@ -88,31 +88,14 @@ public class JenkinsConfiguratorCloudSupportTest {
     public void should_export_only_static_nodes() throws Exception {
         j.jenkins.addNode(new Cloud1PretendSlave());
 
-        final JenkinsConfigurator root = getJenkinsConfigurator();
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         ConfigurationContext context = new ConfigurationContext(registry);
-        final CNode configNode = getNodesNode(root, context);
+        final CNode configNode = getJenkinsRoot(context).get("nodes");
 
         final String yamlConfig = toYamlString(configNode);
         assertThat(yamlConfig, containsString("name: \"agent1\""));
         assertThat(yamlConfig, containsString("name: \"agent2\""));
         assertThat(yamlConfig, not(containsString("name: \"testCloud\"")));
-    }
-
-
-    private CNode getNodesNode(JenkinsConfigurator root, ConfigurationContext context) throws Exception {
-        return root.describe(root.getTargetComponent(context), context).asMapping().get("nodes");
-    }
-
-    private JenkinsConfigurator getJenkinsConfigurator() {
-        return j.jenkins.getExtensionList(JenkinsConfigurator.class).get(0);
-    }
-
-    private static String toYamlString(CNode rootNode) throws IOException {
-        io.jenkins.plugins.casc.snakeyaml.nodes.Node yamlRoot = ConfigurationAsCode.get().toYaml(rootNode);
-        StringWriter buffer = new StringWriter();
-        serializeYamlNode(yamlRoot, buffer);
-        return buffer.toString();
     }
 
     private static class BasePretendSlave extends PretendSlave {
