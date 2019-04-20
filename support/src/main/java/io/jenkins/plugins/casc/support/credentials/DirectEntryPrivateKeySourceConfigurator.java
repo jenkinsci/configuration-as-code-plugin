@@ -12,7 +12,7 @@ import io.jenkins.plugins.casc.model.Scalar;
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-@Extension
+@Extension(optional = true)
 public class DirectEntryPrivateKeySourceConfigurator extends DataBoundConfigurator<DirectEntryPrivateKeySource> {
 
     public DirectEntryPrivateKeySourceConfigurator() {
