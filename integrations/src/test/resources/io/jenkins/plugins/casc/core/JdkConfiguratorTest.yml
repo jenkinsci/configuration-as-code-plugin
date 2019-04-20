@@ -7,5 +7,5 @@ tool:
           - installSource:
               installers:
                 - jdkInstaller:
-                    id: 'jdk-8u181-oth-JPR'
+                    id: "jdk-8u181-oth-JPR"
                     acceptLicense: true
