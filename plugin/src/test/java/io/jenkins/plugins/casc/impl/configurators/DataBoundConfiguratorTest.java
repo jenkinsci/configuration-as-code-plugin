@@ -1,17 +1,21 @@
 package io.jenkins.plugins.casc.impl.configurators;
 
+import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.Configurator;
 import io.jenkins.plugins.casc.ConfiguratorRegistry;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
+import io.jenkins.plugins.casc.model.Sequence;
 import javax.annotation.PostConstruct;
-import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
+import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
+import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -24,8 +28,8 @@ import static org.junit.Assert.assertTrue;
  */
 public class DataBoundConfiguratorTest {
 
-    @ClassRule
-    public static JenkinsRule j = new JenkinsRule();
+    @Rule
+    public JenkinsRule j = new JenkinsRule();
 
     @Test
     public void configure_databound() throws Exception {
@@ -42,7 +46,6 @@ public class DataBoundConfiguratorTest {
         assertEquals("DataBoundSetter", configured.zot);
         assertThat(configured.initialized, is(true));
     }
-
 
     @Test
     public void exportYaml() throws Exception {
@@ -62,6 +65,30 @@ public class DataBoundConfiguratorTest {
         assertFalse(map.containsKey("other"));
     }
 
+    @SuppressWarnings("unchecked")
+    @Test
+    @Issue("PR #838, Issue #222")
+    public void export_mapping_should_not_be_null() throws Exception {
+        j.createFreeStyleProject("testJob1");
+        ConfigurationAsCode casc = ConfigurationAsCode.get();
+        casc.configure(this.getClass().getResource("DataBoundDescriptorNonNull.yml")
+                .toString());
+
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        ConfigurationContext context = new ConfigurationContext(registry);
+        final Mapping configNode = getJenkinsRoot(context);
+        final CNode viewsNode = configNode.get("views");
+        Mapping listView = viewsNode.asSequence().get(1).asMapping().get("list").asMapping();
+        Mapping otherListView = viewsNode.asSequence().get(2).asMapping().get("list").asMapping();
+        Sequence listViewColumns = listView.get("columns").asSequence();
+        Sequence otherListViewColumns = otherListView.get("columns").asSequence();
+        assertNotNull(listViewColumns);
+        assertEquals(6, listViewColumns.size());
+        assertNotNull(otherListViewColumns);
+        assertEquals(7, otherListViewColumns.size());
+        assertEquals("loggedInUsersCanDoAnything", configNode.getScalarValue("authorizationStrategy"));
+        assertEquals("plainText", configNode.getScalarValue("markupFormatter"));
+    }
 
     public static class Foo {
 

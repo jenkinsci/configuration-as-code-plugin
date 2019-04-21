@@ -12,10 +12,10 @@ about data this component exposes to end users for configuration.
 
 It has:
 
-* a `name` to match a YAML entry
-* a `target` component type
-* a `describe` method to document the attributes the target component exposes to configuration
-* a `configure` method to configure the target component
+- a `name` to match a YAML entry
+- a `target` component type
+- a `describe` method to document the attributes the target component exposes to configuration
+- a `configure` method to configure the target component
 
 From a YAML node with an associated `Configurator`, JCasC will handle every
 child node in the YAML structure based on the current node's `Attribute`s, as described by the `Configurator`.
@@ -40,16 +40,18 @@ to document both name _AND_ type for a configurable attribute.
 We don't want to expose the whole Jenkins Java API to JCasC. Many components define setter
 methods for technical reasons or to support backward compatibility. So JCasC excludes:
 
-* setter methods marked as `@Deprecated`
-* setter methods marked as `@Restricted`
+- setter methods marked as `@Deprecated`
+- setter methods marked as `@Restricted`
 
 `Attribute` also is responsible to document the target component type. We use Java reflection to extract this
 information from the Java API, including parameterized types.
 
 As a resume, a component which exposes a method like:
+
 ```java
 public void setFoo(List<Foo> foos) { ... }
 ```
+
 will be detected as attribute named `foo` with target type `Foo` with multiple values expected.
 
 ### Configuration

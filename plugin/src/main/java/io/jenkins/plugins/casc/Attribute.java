@@ -1,6 +1,5 @@
 package io.jenkins.plugins.casc;
 
-import hudson.Functions;
 import hudson.util.Secret;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Scalar;
@@ -20,10 +19,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.reflect.FieldUtils;
 import org.kohsuke.accmod.AccessRestriction;
 import org.kohsuke.stapler.export.Exported;
+
+import static io.jenkins.plugins.casc.ConfigurationAsCode.printThrowable;
 
 /**
  * One attribute of {@link Configurator}.
@@ -195,7 +197,8 @@ public class Attribute<Owner, Type> {
             return c.describe(o, context);
         } catch (Exception | /* Jenkins.getDescriptorOrDie */AssertionError e) {
             // Don't fail the whole export, prefer logging this error
-            return new Scalar("FAILED TO EXPORT " + instance.getClass().getName() + "#" + name + ": \n" + Functions.printThrowable(e));
+            return new Scalar("FAILED TO EXPORT " + instance.getClass().getName() + "#" + name + ": "
+                + printThrowable(e));
         }
     }
 
@@ -203,10 +206,12 @@ public class Attribute<Owner, Type> {
         final Object v1 = getValue(o1);
         final Object v2 = getValue(o2);
         if (v1 == null && v2 == null) return true;
-        if (multiple) {
-            // FIXME need to compare collection1  and collection2 contain same elements...
+        if (multiple && v1 instanceof Collection && v2 instanceof Collection) {
+            Collection c1 = (Collection) v1;
+            Collection c2 = (Collection) v2;
+            return CollectionUtils.isEqualCollection(c1, c2);
         }
-        return (v1 != null && v1.equals(v2));
+        return v1 != null && v1.equals(v2);
     }
 
     /**

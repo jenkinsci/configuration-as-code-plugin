@@ -5,10 +5,7 @@ Alauda DevOps Sync plugin configuration belongs under `unclassified` root elemen
 ## sample configuration
 
 ```yaml
-jenkins:
-  [...]
 unclassified:
-  [...]
   alaudaSync:
     enabled: true
     jenkinsService: jenkins

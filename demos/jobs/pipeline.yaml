@@ -1,21 +1,21 @@
 jobs:
   - script: >
-       folder('testjobs')
+      folder('testjobs')
   - script: >
-       pipelineJob('testjobs/default-agent') {
-         definition {
-           cps {
-             script("""\
-               pipeline {
-                 agent any
-                 stages {
-                   stage ('test') {
-                     steps {
-                       echo "hello"
-                     }
-                   }
-                 }
-               }""".stripIndent())
-           }
-         }
-       }
+      pipelineJob('testjobs/default-agent') {
+        definition {
+          cps {
+            script("""\
+              pipeline {
+                agent any
+                stages {
+                  stage ('test') {
+                    steps {
+                      echo "hello"
+                    }
+                  }
+                }
+              }""".stripIndent())
+          }
+        }
+      }
