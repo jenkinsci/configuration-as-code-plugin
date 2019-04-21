@@ -4,11 +4,10 @@ import hudson.model.Descriptor;
 import hudson.model.ManagementLink;
 import io.jenkins.plugins.casc.impl.configurators.DescriptorConfigurator;
 import io.jenkins.plugins.casc.impl.configurators.GlobalConfigurationCategoryConfigurator;
-import jenkins.model.GlobalConfigurationCategory;
-import jenkins.model.Jenkins;
-
 import java.util.ArrayList;
 import java.util.List;
+import jenkins.model.GlobalConfigurationCategory;
+import jenkins.model.Jenkins;
 
 /**
  * Define a {@link Configurator} which handles a root configuration element, identified by name.

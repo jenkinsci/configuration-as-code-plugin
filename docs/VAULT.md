@@ -39,7 +39,9 @@ Key                        Value
 operator_pass        doggo
 operator_userid      catto
 ```
+
 and use them in configuration:
+
 ```yaml
 # config truncated
 credentials:

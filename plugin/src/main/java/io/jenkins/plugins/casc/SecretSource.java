@@ -1,12 +1,11 @@
 package io.jenkins.plugins.casc;
 
 import hudson.ExtensionPoint;
-import jenkins.model.Jenkins;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import jenkins.model.Jenkins;
 
 /**
  * Resolves variable references in configuration file of the form "${abc}"

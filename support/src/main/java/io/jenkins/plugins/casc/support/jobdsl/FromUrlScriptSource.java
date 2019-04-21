@@ -3,11 +3,10 @@ package io.jenkins.plugins.casc.support.jobdsl;
 import hudson.Extension;
 import hudson.model.Descriptor;
 import io.jenkins.plugins.casc.Configurable;
-import org.apache.commons.io.IOUtils;
-import org.jenkinsci.Symbol;
-
 import java.io.IOException;
 import java.net.URI;
+import org.apache.commons.io.IOUtils;
+import org.jenkinsci.Symbol;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>

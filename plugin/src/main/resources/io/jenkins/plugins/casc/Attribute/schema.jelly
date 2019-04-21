@@ -2,12 +2,19 @@
 <j:jelly xmlns:j="jelly:core">
 <j:choose>
   <j:when test="${it.type.enum}">
-    "type": "string",
-    "enum": [ 
-<j:forEach items="${it.type.getEnumConstants()}" var="v" varStatus="st">
-    "${v}"<j:if test="${!st.last}">,</j:if>
-</j:forEach>
-    ]
+    <j:choose>
+      <j:when test="${it.type.values().length == 0}">
+        "type": "string"
+      </j:when>
+      <j:otherwise>
+        "type": "string",
+        "enum": [ 
+        <j:forEach items="${it.type.getEnumConstants()}" var="v" varStatus="st">
+          "${v}"<j:if test="${!st.last}">,</j:if>
+        </j:forEach>
+        ]
+      </j:otherwise>
+    </j:choose>
   </j:when>
   <j:otherwise>
     <j:switch on="${it.type.name}">
@@ -38,7 +45,7 @@
       </j:case>
       <j:default>
         "type":  "object",
-        "$ref": "#/definitions/${it.type.name}"
+        "$$ref": "#/definitions/${it.type.name}"
       </j:default>
     </j:switch>
   </j:otherwise>

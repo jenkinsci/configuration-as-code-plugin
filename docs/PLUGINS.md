@@ -16,6 +16,7 @@ compliant with JCasC, you'll need to expose your configuration attributes as `@D
 Before you start, make sure the following pre-conditions are met:
 
 - The parent pom version of your plugin is aligned with the Configuration as Code [parent pom version](/pom.xml).
+
 ```xml
 <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
@@ -24,7 +25,9 @@ Before you start, make sure the following pre-conditions are met:
     <relativePath />
 </parent>
 ```
+
 - The Jenkins core version and the Java level of your plugin are aligned with the Configuration as Code plugin versions (also in the [pom.xml](/pom.xml)).
+
 ```xml
 <properties>
     <jenkins.version>THE_JENKINS_CORE_VERSION_HERE</jenkins.version>
@@ -108,7 +111,7 @@ public class Authentication extends AbstractDescribableImpl<PAuthentication> {
 
 ```xml
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
-      <f:entry title="${%Password}" field="smtpAuthPassword">
+      <f:entry title="${%Password}" field="password">
         <f:password />
       </f:entry>
 </j:jelly>
@@ -190,7 +193,7 @@ public static final class DescriptorImpl extends Descriptor<Foo> {
 
 See [mailer plugin#39](https://github.com/jenkinsci/mailer-plugin/pull/39) for a sample on required changes.
 
-## How to test?
+## How to test
 
 Simplest option for you to test JCasC compatibility in your plugin is to introduce a simple test case.
 
@@ -198,9 +201,11 @@ Simplest option for you to test JCasC compatibility in your plugin is to introdu
 
 Add the Configuration as Code plugin as a test dependency in your pom.xml:
 
+[![GitHub release](https://img.shields.io/github/release/jenkinsci/configuration-as-code-plugin.svg?label=release)](https://github.com/jenkinsci/configuration-as-code-plugin/releases/latest)
+
 ```xml
 <properties>
-    <configuration-as-code.version>1.8</configuration-as-code.version>
+    <configuration-as-code.version>LATEST_RELEASE</configuration-as-code.version>
 </properties>
 <dependency>
     <groupId>io.jenkins</groupId>
@@ -247,9 +252,9 @@ some changes made to your plugin break this configuration model.
 About the latter, in case you need to introduce some breaking changes, you can define a backward compatibility test case
 
 ```java
-    @Test 
+    @Test
     @ConfiguredWithCode("obsolete-configuration-as-code.yml")
-    public void should_be_backward_compatible() throws Exception {  
+    public void should_be_backward_compatible() throws Exception {
         assertTrue( /* check plugin has been configured as expected */ );
     }
 ```

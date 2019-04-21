@@ -47,7 +47,7 @@ public class UpdateCenterConfigurator extends BaseConfigurator<UpdateCenter> {
         return new HashSet<>(Collections.singletonList(
             new MultivaluedAttribute<UpdateCenter, UpdateSite>("sites", UpdateSite.class)
                 .getter(UpdateCenter::getSiteList)
-                .setter((target, value) -> { target.getSites().replaceBy(value); })
+                .setter((target, value) -> target.getSites().replaceBy(value))
         ));
     }
 }

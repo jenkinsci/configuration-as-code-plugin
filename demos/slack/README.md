@@ -12,9 +12,8 @@ credentials:
           - string:
               scope: GLOBAL
               id: slack-token
-              secret: '${SLACK_TOKEN}'
+              secret: "${SLACK_TOKEN}"
               description: Slack token
-
 
 unclassified:
   slackNotifier:

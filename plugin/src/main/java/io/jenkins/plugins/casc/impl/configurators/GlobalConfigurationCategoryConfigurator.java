@@ -11,6 +11,9 @@ import io.jenkins.plugins.casc.RootElementConfigurator;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import io.jenkins.plugins.casc.model.Scalar;
+import java.util.Set;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import jenkins.model.GlobalConfigurationCategory;
 import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
@@ -18,13 +21,8 @@ import org.jenkinsci.Symbol;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Set;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
 import static io.jenkins.plugins.casc.Attribute.Setter.NOP;
+import static io.jenkins.plugins.casc.ConfigurationAsCode.printThrowable;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -33,6 +31,7 @@ import static io.jenkins.plugins.casc.Attribute.Setter.NOP;
 public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<GlobalConfigurationCategory> implements RootElementConfigurator<GlobalConfigurationCategory> {
 
     private static final Logger LOGGER = Logger.getLogger(GlobalConfigurationCategoryConfigurator.class.getName());
+    private static final String CREDENTIALS_PROVIDER_MANAGER_CONFIGURATION = "com.cloudbees.plugins.credentials.CredentialsProviderManager$Configuration";
 
     private final GlobalConfigurationCategory category;
 
@@ -69,13 +68,14 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
         return category;
     }
 
+    @SuppressWarnings("RedundantCast") // TODO remove once we are on JDK 11
     @NonNull
     @Override
     public Set describe() {
         return (Set) Jenkins.get().getExtensionList(Descriptor.class).stream()
                 .filter(d -> d.getCategory() == category)
                 .filter(d -> d.getGlobalConfigPage() != null)
-                .map(d -> new DescriptorConfigurator(d))
+                .map(DescriptorConfigurator::new)
                 .filter(GlobalConfigurationCategoryConfigurator::reportDescriptorWithoutSetters)
                 .map(c -> new Attribute<GlobalConfigurationCategory, Object>(c.getName(), c.getTarget()).setter(NOP))
                 .collect(Collectors.toSet());
@@ -95,8 +95,7 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
 
         final Mapping mapping = new Mapping();
         Jenkins.get().getExtensionList(Descriptor.class).stream()
-            .filter(d -> d.getCategory() == category)
-            .filter(d -> d.getGlobalConfigPage() != null)
+            .filter(this::filterDescriptors)
             .forEach(d -> describe(d, mapping, context));
         return mapping;
     }
@@ -107,10 +106,20 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
             final CNode node = c.describe(d, context);
             if (node != null) mapping.put(c.getName(), node);
         } catch (Exception e) {
-            final StringWriter w = new StringWriter();
-            e.printStackTrace(new PrintWriter(w));
-            final Scalar scalar = new Scalar("FAILED TO EXPORT " + d.getClass().getName() + " : \n" + w.toString());
+            final Scalar scalar = new Scalar(
+                "FAILED TO EXPORT " + d.getClass().getName() + " : " + printThrowable(e));
             mapping.put(c.getName(), scalar);
+        }
+    }
+
+    private boolean filterDescriptors(Descriptor d) {
+        if (d.clazz.getName().equals(CREDENTIALS_PROVIDER_MANAGER_CONFIGURATION)) {
+            // CREDENTIALS_PROVIDER_MANAGER_CONFIGURATION is located in the wrong category.
+            // JCasC will also turn the simple name into empty string
+            // It should be a part of the credentials root configurator node.
+            return false;
+        } else {
+            return d.getCategory() == category && d.getGlobalConfigPage() != null;
         }
     }
 

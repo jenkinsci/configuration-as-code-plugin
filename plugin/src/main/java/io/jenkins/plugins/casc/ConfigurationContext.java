@@ -3,11 +3,10 @@ package io.jenkins.plugins.casc;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import io.jenkins.plugins.casc.model.CNode;
-import org.kohsuke.stapler.Stapler;
-
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import org.kohsuke.stapler.Stapler;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -149,5 +148,5 @@ public class ConfigurationContext implements ConfiguratorRegistry {
     public interface Listener {
         void warning(@NonNull CNode node, @NonNull String error);
     }
-    
+
 }

@@ -4,7 +4,6 @@ import java.io.InputStream;
 import java.io.StringBufferInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

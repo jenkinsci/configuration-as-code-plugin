@@ -21,12 +21,6 @@ import io.jenkins.plugins.casc.impl.configurators.EnumConfigurator;
 import io.jenkins.plugins.casc.impl.configurators.ExtensionConfigurator;
 import io.jenkins.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
 import io.jenkins.plugins.casc.impl.configurators.PrimitiveConfigurator;
-import jenkins.model.Jenkins;
-import org.jvnet.tiger_types.Types;
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.NoExternalUse;
-import org.kohsuke.stapler.Stapler;
-
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -35,6 +29,11 @@ import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+import jenkins.model.Jenkins;
+import org.jvnet.tiger_types.Types;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
+import org.kohsuke.stapler.Stapler;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>

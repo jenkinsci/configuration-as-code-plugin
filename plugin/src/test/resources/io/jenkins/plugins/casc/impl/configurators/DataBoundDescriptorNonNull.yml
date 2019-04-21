@@ -1,0 +1,41 @@
+jenkins:
+  disableRememberMe: false
+  markupFormatter: "plainText"
+  myViewsTabBar: "standard"
+  primaryView:
+    all:
+      name: "all"
+  views:
+    - all:
+        name: "all"
+    - list:
+        columns:
+          - "status"
+          - "jobName"
+          - "lastSuccess"
+          - "lastFailure"
+          - "lastDuration"
+          - "buildButton"
+        includeRegex: ".+"
+        name: "listView"
+    - list:
+        columns:
+          - "status"
+          - "weather"
+          - "jobName"
+          - "lastSuccess"
+          - "lastFailure"
+          - "lastDuration"
+          - "buildButton"
+        name: "other list view"
+  #        Currently not possible due to missing getter/setter in Jenkins Core
+  #        jobNames:
+  #          - "testJob1"
+  viewsTabBar: "standard"
+  authorizationStrategy: "loggedInUsersCanDoAnything"
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "admin"
+          password: "admin"

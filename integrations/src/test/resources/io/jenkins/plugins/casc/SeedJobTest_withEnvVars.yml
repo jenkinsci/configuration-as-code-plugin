@@ -1,13 +1,13 @@
 jobs:
-    - script: >
-          job('seedJobWithEnvVars') {
-              scm {
-                  git("$REPO_URL")
-              }
-              triggers {
-                  scm('H/15 * * * *')
-              }
-              steps {
-                  maven('-e clean test')
-              }
+  - script: >
+      job('seedJobWithEnvVars') {
+          scm {
+              git("$REPO_URL")
           }
+          triggers {
+              scm('H/15 * * * *')
+          }
+          steps {
+              maven('-e clean test')
+          }
+      }

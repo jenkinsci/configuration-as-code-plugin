@@ -1,6 +1,5 @@
 package io.jenkins.plugins.casc.support.matrixauth;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.security.AuthorizationStrategy;
 import hudson.security.Permission;
@@ -8,12 +7,11 @@ import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.impl.attributes.MultivaluedAttribute;
 import io.jenkins.plugins.casc.util.PermissionFinder;
-import org.jenkinsci.plugins.matrixauth.AuthorizationContainer;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.jenkinsci.plugins.matrixauth.AuthorizationContainer;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>

@@ -3,6 +3,8 @@ package io.jenkins.plugins.casc;
 import hudson.security.csrf.CrumbIssuer;
 import hudson.security.csrf.CrumbIssuerDescriptor;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import java.io.ByteArrayOutputStream;
+import javax.servlet.ServletRequest;
 import jenkins.model.Jenkins;
 import org.jenkinsci.Symbol;
 import org.junit.Rule;
@@ -10,9 +12,6 @@ import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.rules.RuleChain;
 import org.kohsuke.stapler.DataBoundConstructor;
-
-import javax.servlet.ServletRequest;
-import java.io.ByteArrayOutputStream;
 
 import static org.junit.Assert.assertEquals;
 

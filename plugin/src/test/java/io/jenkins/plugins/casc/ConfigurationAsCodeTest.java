@@ -1,23 +1,33 @@
 package io.jenkins.plugins.casc;
 
+import com.gargoylesoftware.htmlunit.WebRequest;
+import com.gargoylesoftware.htmlunit.WebResponse;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import hudson.util.FormValidation;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-
 import java.io.File;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.jvnet.hudson.test.JenkinsRule.WebClient;
 
+import static com.gargoylesoftware.htmlunit.HttpMethod.POST;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 public class ConfigurationAsCodeTest {
 
@@ -62,6 +72,21 @@ public class ConfigurationAsCodeTest {
         assertThat(foo, hasSize(6));
     }
 
+    @Test
+    public void test_loads_single_file_from_hidden_folder() throws Exception {
+        ConfigurationAsCode casc = ConfigurationAsCode.get();
+
+        File hiddenFolder = tempFolder.newFolder(".nested");
+        File singleFile = new File(hiddenFolder, "jenkins.yml");
+        try (InputStream configStream = getClass().getResourceAsStream("JenkinsConfigTest.yml")) {
+            Files.copy(configStream, singleFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        casc.configure(singleFile.getAbsolutePath());
+        assertThat(casc.getSources(), contains(singleFile.getAbsolutePath()));
+        assertThat(j.jenkins.getSystemMessage(), equalTo("configuration as code - JenkinsConfigTest"));
+    }
+
     @Test(expected = ConfiguratorException.class)
     public void shouldReportMissingFileOnNotFoundConfig() throws ConfiguratorException {
         ConfigurationAsCode casc = new ConfigurationAsCode();
@@ -104,5 +129,19 @@ public class ConfigurationAsCodeTest {
         j.assertGoodStatus(resultPage);
 
         assertEquals("Configured by Configuration as Code plugin", j.jenkins.getSystemMessage());
+    }
+
+    @Test
+    @ConfiguredWithCode("admin.yml")
+    public void doViewExport_should_require_authentication() throws Exception {
+        WebClient client = j.createWebClient();
+        WebRequest request =
+            new WebRequest(client.createCrumbedUrl("configuration-as-code/viewExport"), POST);
+        WebResponse response = client.loadWebResponse(request);
+        assertThat(response.getStatusCode(), is(403));
+        String user = "admin";
+        WebClient loggedInClient = client.login(user, user);
+        response = loggedInClient.loadWebResponse(request);
+        assertThat(response.getStatusCode(), is(200));
     }
 }

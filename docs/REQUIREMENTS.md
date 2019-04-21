@@ -5,7 +5,7 @@ API, but still require plugins to respect some contract, aka "_convention over e
 This documentation is here to explain plugin maintainers those conventions and provide guidance
 on expected design.
 
-![JCasC is coming](BraceYourselves.jpg)
+![JCasC is coming](../images/BraceYourselves.jpg)
 
 ## Overview
 
@@ -69,11 +69,12 @@ public void setReplyToAddress(String address) {
 ```
 
 Notes:
+
 - You also need matching getters for jelly view to render current value, but you probably already have them declared.
 - Use of `BulkChange` allows avoiding repeated calls to `save()` to actually persist to disk only once fully
-configured.
+  configured.
 - You might not even need to implement `configure` once [#3669](https://github.com/jenkinsci/jenkins/pull/3669)
-is merged.
+  is merged.
 
 ### Rule 2: don't use pseudo-properties for optional
 
@@ -91,8 +92,8 @@ sample:
 ```xml
 <f:optionalBlock name="useAuth" title="${%Use Authentication}"
                  checked="${descriptor.username!=null}">
-    <f:entry title="${%User Name}" field="username">	
-          <f:textbox />	
+    <f:entry title="${%User Name}" field="username">
+          <f:textbox />
     </f:entry>
     ...
 ```
@@ -105,7 +106,7 @@ public boolean configure(StaplerRequest req, JSONObject json) throws FormExcepti
     if(json.has("useAuth")) {
         JSONObject auth = json.getJSONObject("useAuth");
         username = nullify(auth.getString("username"));
-        password = Secret.fromString(nullify(auth.getString("password")));	
+        password = Secret.fromString(nullify(auth.getString("password")));
     }
 }
 ```
@@ -132,11 +133,13 @@ Checking support for JCasC is easy as long as your plugin requires Java 8 / Jenk
 
 You just need the Configuration as Code plugin as a test dependency and a sample YAML file for your component
 
+[![GitHub release](https://img.shields.io/github/release/jenkinsci/configuration-as-code-plugin.svg?label=release)](https://github.com/jenkinsci/configuration-as-code-plugin/releases/latest)
+
 ```xml
 <dependency>
     <groupId>io.jenkins</groupId>
     <artifactId>configuration-as-code</artifactId>
-    <version>1.5</version>
+    <version>LATEST_RELEASE</version>
     <scope>test</scope>
 </dependency>
 ```

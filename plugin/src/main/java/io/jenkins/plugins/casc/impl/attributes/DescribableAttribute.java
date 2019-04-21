@@ -3,14 +3,13 @@ package io.jenkins.plugins.casc.impl.attributes;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
 import io.jenkins.plugins.casc.Attribute;
-import jenkins.model.Jenkins;
-import org.jenkinsci.Symbol;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import jenkins.model.Jenkins;
+import org.jenkinsci.Symbol;
 
 import static io.jenkins.plugins.casc.Configurator.normalize;
 

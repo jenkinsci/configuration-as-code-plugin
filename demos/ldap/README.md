@@ -4,7 +4,6 @@
 
 ```yaml
 jenkins:
-
   securityRealm:
     ldap:
       configurations:
@@ -29,7 +28,6 @@ for it.
 
 ```yaml
 jenkins:
-
   securityRealm:
     ldap:
       configurations:

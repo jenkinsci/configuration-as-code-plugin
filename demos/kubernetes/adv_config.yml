@@ -45,7 +45,12 @@ data:
                 idleMinutes: "1"
                 activeDeadlineSeconds: "120"
                 slaveConnectTimeout: "1000"
-
+    credentials:
+      system:
+        domainCredentials:
+          - credentials:
+              - fileSystemServiceAccountCredential:
+                  id: "advanced-k8s-credentials"
     jobs:
       - script: >
         pipelineJob('configuration-as-code') {

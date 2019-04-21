@@ -12,13 +12,6 @@ import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.impl.attributes.DescribableAttribute;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
-import jenkins.model.Jenkins;
-import org.kohsuke.stapler.ClassDescriptor;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.Stapler;
-
-import javax.annotation.Nonnull;
-import javax.annotation.PostConstruct;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -30,6 +23,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
+import javax.annotation.Nonnull;
+import javax.annotation.PostConstruct;
+import jenkins.model.Jenkins;
+import org.kohsuke.stapler.ClassDescriptor;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.Stapler;
 
 import static com.google.common.base.Defaults.defaultValue;
 
@@ -152,8 +151,8 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
         }
 
         // constructor was successful, so let's removed configuration elements we have consumed doing so.
-        for (int i = 0; i < names.length; i++) {
-            config.remove(names[i]);
+        for (String name : names) {
+            config.remove(name);
         }
 
         return object;
@@ -256,7 +255,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
             mapping.put(names[i], attributes[i].describe(instance, context));
         }
 
-        return mapping.isEmpty() ? null : mapping;
+        return mapping;
     }
 
     /**

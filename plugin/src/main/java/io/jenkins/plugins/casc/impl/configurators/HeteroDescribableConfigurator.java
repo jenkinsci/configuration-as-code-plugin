@@ -1,8 +1,5 @@
 package io.jenkins.plugins.casc.impl.configurators;
 
-import static io.jenkins.plugins.casc.model.CNode.Type.MAPPING;
-import static io.vavr.API.unchecked;
-
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Describable;
@@ -22,17 +19,20 @@ import io.vavr.Tuple2;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.Stream;
 import io.vavr.control.Option;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.logging.Logger;
 import jenkins.model.Jenkins;
 import org.jenkinsci.Symbol;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.logging.Logger;
+import static io.jenkins.plugins.casc.model.CNode.Type.MAPPING;
+import static io.vavr.API.unchecked;
 
 /**
  * {@link Configurator} that works with {@link Describable} subtype as a {@link #target}.
@@ -97,14 +97,18 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
     @CheckForNull
     @Override
     public CNode describe(T instance, ConfigurationContext context) {
-        Predicate<CNode> isScalar = node -> node.getType().equals(MAPPING) && unchecked(node::asMapping).apply().size() == 0;
+        Predicate<CNode> isScalar = node -> node.getType().equals(MAPPING)
+            && unchecked(node::asMapping).apply().size() == 0;
         return lookupConfigurator(context, instance.getClass())
                 .map(configurator -> convertToNode(context, configurator, instance))
+                .filter(Objects::nonNull)
                 .map(node -> {
                     if (isScalar.test(node)) {
                         return new Scalar(preferredSymbol(instance.getDescriptor()));
                     } else {
-                        return new Mapping().put(preferredSymbol(instance.getDescriptor()), node);
+                        final Mapping mapping = new Mapping();
+                        mapping.put(preferredSymbol(instance.getDescriptor()), node);
+                        return mapping;
                     }
                 }).getOrNull();
     }
