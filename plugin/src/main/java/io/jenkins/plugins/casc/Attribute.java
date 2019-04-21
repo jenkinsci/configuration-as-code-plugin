@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.reflect.FieldUtils;
 import org.kohsuke.accmod.AccessRestriction;
@@ -205,10 +206,12 @@ public class Attribute<Owner, Type> {
         final Object v1 = getValue(o1);
         final Object v2 = getValue(o2);
         if (v1 == null && v2 == null) return true;
-        if (multiple) {
-            // FIXME need to compare collection1  and collection2 contain same elements...
+        if (multiple && v1 instanceof Collection && v2 instanceof Collection) {
+            Collection c1 = (Collection) v1;
+            Collection c2 = (Collection) v2;
+            return CollectionUtils.isEqualCollection(c1, c2);
         }
-        return (v1 != null && v1.equals(v2));
+        return v1 != null && v1.equals(v2);
     }
 
     /**
