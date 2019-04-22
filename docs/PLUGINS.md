@@ -297,3 +297,30 @@ You also can write a test case to check export from a live instance is well supp
         assertEquals(yourList.get(0).asMapping().getScalarValue("key"), "expected-key")
 
 ```
+
+_Hint:  use a class rule if you just want to test a single import and export_
+
+```java
+import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
+import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import org.junit.ClassRule;
+import org.junit.Test;
+
+public class ConfigAsCodeTest {
+
+    @ClassRule
+    @ConfiguredWithCode("configuration-as-code.yml")
+    public static JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+    
+    @Test
+    public void should_import() {
+     ...
+    }
+    
+    @Test
+    public void should_export() {
+     ...
+    }
+}
+
+```
