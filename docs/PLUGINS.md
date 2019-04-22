@@ -277,9 +277,18 @@ You also can write a test case to check export from a live instance is well supp
     @Test
     @ConfiguredWithCode("configuration-as-code.yml")
     public void export_configuration() throws Exception {
-      /* Setup Jenkins to use plugin */
-      ConfigurationAsCode.get().export(System.out);
-    }
-```
+        YourGlobalConfiguration globalConfiguration = YourGlobalConfiguration.get();
 
-**TODO** we need to provide some YAML assertion library so that the resulting exported yam stream can be checked for expected content.
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        ConfigurationContext context = new ConfigurationContext(registry);
+        final Configurator c = context.lookupOrFail(YourGlobalConfiguration.class);
+
+        @SuppressWarnings("unchecked")
+        CNode node = c.describe(globalConfiguration, context);
+        assertNotNull(node);
+        final Mapping mapping = node.asMapping();
+
+        assertEquals(mapping.getScalarValue("expected-property"), "expected-value");
+        assertEquals(mapping.getScalarValue("another-property"), "another-value");
+
+```
