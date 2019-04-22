@@ -1,0 +1,21 @@
+jenkins:
+  views:
+    - all:
+        name: "all"
+    - list:
+        columns:
+          - "status"
+          - "jobName"
+          - "lastSuccess"
+          - "lastFailure"
+          - "lastDuration"
+          - "buildButton"
+        includeRegex: "a.+"
+        jobFilters:
+          - "gitHubBranchFilter"
+          - "gitHubPullRequestFilter"
+        jobNames:
+          - "test"
+          - "otherTest"
+        name: "test-list-view"
+        statusFilter: true

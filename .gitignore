@@ -6,6 +6,7 @@ work/
 # ignore jenkins.yaml from root and plugin folder (used by many for testing)
 /jenkins.yaml
 /plugin/jenkins.yaml
+/integrations/jenkins.yaml
 plugins.txt
 
 # Ignore generated files.
