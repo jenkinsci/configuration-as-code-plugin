@@ -1,21 +1,3 @@
-/* Custom Jenkins bits to provide a good user experience
- */
-
-iframe,
-.yui-overlay,
-#page-head,
-#menuSelector,
-footer
- {
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-}
-
-/* Paste PrismJS below
- */
-
 /* PrismJS 1.16.0
 https://prismjs.com/download.html#themes=prism-okaidia&languages=yaml */
 /**
