@@ -19,3 +19,4 @@ jenkins:
           - "otherTest"
         name: "test-list-view"
         statusFilter: true
+        recurse: true

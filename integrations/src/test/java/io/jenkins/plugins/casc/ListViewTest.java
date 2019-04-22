@@ -40,6 +40,7 @@ public class ListViewTest {
         WeatherColumn weatherColumn = view.getColumns().get(WeatherColumn.class);
         assertNull(weatherColumn);
         assertThat(view.getStatusFilter(), is(true));
+        assertThat(view.isRecurse(), is(true));
     }
 
     @Test
@@ -52,6 +53,7 @@ public class ListViewTest {
         assertThat(listView.getScalarValue("name"), is("test-list-view"));
         assertThat(listView.getScalarValue("includeRegex"), is("a.+"));
         assertThat(listView.getScalarValue("statusFilter"), is("true"));
+        assertThat(listView.getScalarValue("recurse"), is("true"));
         Sequence listViewColumns = listView.get("columns").asSequence();
         assertNotNull(listViewColumns);
         assertEquals(6, listViewColumns.size());
