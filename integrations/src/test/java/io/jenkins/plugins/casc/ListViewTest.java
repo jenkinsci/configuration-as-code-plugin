@@ -64,5 +64,8 @@ public class ListViewTest {
         Sequence jobFilters = listView.get("jobFilters").asSequence();
         assertThat(jobFilters.get(0).asScalar().getValue(), is("gitHubBranchFilter"));
         assertThat(jobFilters.get(1).asScalar().getValue(), is("gitHubPullRequestFilter"));
+        Sequence jobNames = listView.get("jobNames").asSequence();
+        assertThat(jobNames.get(0).asScalar().getValue(), is("otherTest"));
+        assertThat(jobNames.get(1).asScalar().getValue(), is("test"));
     }
 }

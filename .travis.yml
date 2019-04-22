@@ -20,10 +20,10 @@ matrix:
   include:
     - jdk: openjdk11
       env:
-        - MVN_FLAG='-Djenkins.version=2.164.1 -Daccess-modifier-checker.failOnError=true'
+        - MVN_FLAG='-Djenkins.version=2.174-rc28244.3d5a5a7c3c04 -Daccess-modifier-checker.failOnError=true'
     - jdk: openjdk8
       env:
-        - MVN_FLAG='-Djenkins.version=2.164.1 -Daccess-modifier-checker.failOnError=true'
+        - MVN_FLAG='-Djenkins.version=2.174-rc28244.3d5a5a7c3c04 -Daccess-modifier-checker.failOnError=true'
     - jdk: openjdk8
 
 install:
