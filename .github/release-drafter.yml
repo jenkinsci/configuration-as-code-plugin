@@ -12,6 +12,8 @@ categories:
     label: documentation
   - title: 🚦 Tests
     label: test
+exclude-labels:
+  - reverted
 
 template: |
   ## Changes
