@@ -290,5 +290,8 @@ You also can write a test case to check export from a live instance is well supp
 
         assertEquals(mapping.getScalarValue("expected-property"), "expected-value");
         assertEquals(mapping.getScalarValue("another-property"), "another-value");
+        
+        List<CNode> yourList = mapping.get("a-list-property").asSequence();
+        assertEquals("list size", 5, yourList.size());
 
 ```
