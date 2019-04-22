@@ -295,6 +295,7 @@ You also can write a test case to check export from a live instance is well supp
         assertEquals("list size", 5, yourList.size());
         assertEquals(yourList.get(0).getScalar().getValue(), "expected-value");
         assertEquals(yourList.get(0).asMapping().getScalarValue("key"), "expected-key");
+    }
 ```
 
 _Hint:  use a class rule if you just want to test a single import and export_
