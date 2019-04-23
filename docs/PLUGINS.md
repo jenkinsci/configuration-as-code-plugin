@@ -277,9 +277,45 @@ You also can write a test case to check export from a live instance is well supp
     @Test
     @ConfiguredWithCode("configuration-as-code.yml")
     public void export_configuration() throws Exception {
-      /* Setup Jenkins to use plugin */
-      ConfigurationAsCode.get().export(System.out);
+        YourGlobalConfiguration globalConfiguration = YourGlobalConfiguration.get();
+
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        ConfigurationContext context = new ConfigurationContext(registry);
+        final Configurator c = context.lookupOrFail(YourGlobalConfiguration.class);
+
+        @SuppressWarnings("unchecked")
+        CNode node = c.describe(globalConfiguration, context);
+        assertNotNull(node);
+        final Mapping mapping = node.asMapping();
+
+        assertEquals(mapping.getScalarValue("expected-property"), "expected-value");
+        assertEquals(mapping.getScalarValue("another-property"), "another-value");
+        
+        List<CNode> yourList = mapping.get("a-list-property").asSequence();
+        assertEquals("list size", 5, yourList.size());
+        assertEquals(yourList.get(0).getScalar().getValue(), "expected-value");
+        assertEquals(yourList.get(0).asMapping().getScalarValue("key"), "expected-key");
     }
 ```
 
-**TODO** we need to provide some YAML assertion library so that the resulting exported yam stream can be checked for expected content.
+_Hint:  use a class rule if you just want to test a single import and export_
+
+```java
+public class ConfigAsCodeTest {
+
+    @ClassRule
+    @ConfiguredWithCode("configuration-as-code.yml")
+    public static JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+    
+    @Test
+    public void should_import() {
+     ...
+    }
+    
+    @Test
+    public void should_export() {
+     ...
+    }
+}
+
+```
