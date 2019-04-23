@@ -1,0 +1,101 @@
+repository:
+  name: configuration-as-code-plugin
+  description: Jenkins Configuration as Code Plugin
+  topics: 'configuration-as-code, jenkins, hacktoberfest, jenkins-configuration, jcasc'
+  private: false
+  default_branch: master
+  has_issues: true
+  has_wiki: false
+  allow_merge_commit: false
+  allow_squash_merge: true
+  allow_rebase_merge: false
+
+labels:
+  - name: good first issue
+    color: 7057ff
+  - name: Status - in progress
+    color: ededed
+  - name: Action - awaiting feed-back
+    color: 6eb82c
+  - name: Action - needs grooming
+    color: 009800
+  - name: Prio 1 - must have
+    color: e83d0f
+  - name: Prio 2 - should have
+    color: eb6420
+  - name: Prio 3 - could have
+    color: e8850f
+  - name: Prio 4 - won’t have
+    color: e8a80f
+  - name: Size 0 - Briefing
+    color: c7def8
+  - name: Size 1 - small
+    color: 20b4e5
+  - name: Size 2 - medium
+    color: 208fe5
+  - name: Size 3 - large
+    color: 0052cc
+  - name: Size 4 - too big
+    color: 100b6b
+  - name: Status - duplicate
+    color: '111111'
+  - name: Status - workable
+    color: ededed
+  - name: Status - up Next
+    color: eeeeee
+  - name: hackathon
+    color: 85f920
+  - name: beta-release
+    color: 002282
+  - name: help wanted
+    color: 008672
+  - name: question
+    color: D876E3
+  - name: wontfix
+    color: FFFFFF
+  - name: invalid
+    color: E4E669
+  - name: duplicate
+    color: CFD3D7
+  - name: enhancement
+    color: A2EEEF
+  - name: bug
+    color: D73A4A
+  - name: Work in progress
+    color: d93f0b
+  - name: documentation
+    color: 0e8a16
+    description: A PR that adds to documentation - used by Release Drafter
+  - name: do not merge
+    color: c64221
+  - name: pending PR
+    color: 46c957
+    description: a fix is available but require third party plugin to approve our PR
+  - name: hacktoberfest
+    color: bdff3a
+    description: 'Hacktoberfest. https://jenkins.io/blog/2018/10/01/hacktoberfest/'
+  - name: needs-plugin-issue
+    color: f9ce61
+  - name: feature
+    color: 1d00ff
+    description: A PR that adds a feature - used by Release Drafter
+  - name: fix
+    color: c9e85c
+    description: A PR that fixes a bug - used by Release Drafter
+  - name: chore
+    color: c9abea
+    description: a PR that adds to maintenance - used by Release Drafter
+  - name: test
+    color: d6e819
+    description: A PR that adds to testing - used by Release Drafter
+  - name: pinned
+    color: 5ed5e5
+    description: 'Used to avoid stale[bot] marking a issue/PR stale'
+  - name: plugin-compatibility
+    color: 8425c4
+  - name: stale
+    color: ffffff
+    description: 'Used by stale[bot] to mark a issue/PR stale'
+  - name: reverted
+    color: f44271
+    description: A PR that is excluded from Release draft - used by Release Drafter
