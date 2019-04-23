@@ -48,6 +48,10 @@ class VaultTestUtil {
         }
     }
 
+    public static boolean isAppveyor() {
+        return "True".equalsIgnoreCase(System.getenv("APPVEYOR"));
+    }
+
     public static VaultContainer createVaultContainer() {
         if (!hasDockerDaemon()) return null;
         return new VaultContainer<>(VaultTestUtil.VAULT_DOCKER_IMAGE)

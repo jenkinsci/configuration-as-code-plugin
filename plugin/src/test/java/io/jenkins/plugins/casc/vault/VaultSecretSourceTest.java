@@ -39,9 +39,11 @@ import static io.jenkins.plugins.casc.vault.VaultTestUtil.VAULT_USER;
 import static io.jenkins.plugins.casc.vault.VaultTestUtil.configureVaultContainer;
 import static io.jenkins.plugins.casc.vault.VaultTestUtil.createVaultContainer;
 import static io.jenkins.plugins.casc.vault.VaultTestUtil.hasDockerDaemon;
+import static io.jenkins.plugins.casc.vault.VaultTestUtil.isAppveyor;
 import static io.jenkins.plugins.casc.vault.VaultTestUtil.runCommand;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
 // Inspired by https://github.com/BetterCloud/vault-java-driver/blob/master/src/test-integration/java/com/bettercloud/vault/util/VaultContainer.java
@@ -64,6 +66,7 @@ public class VaultSecretSourceTest {
     public static void configureContainer() {
         // Check if docker daemon is available
         assumeTrue(hasDockerDaemon());
+        assumeFalse(isAppveyor());
 
         // Create vault policies/users/roles ..
         configureVaultContainer(vaultContainer);
