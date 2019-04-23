@@ -17,7 +17,7 @@ install:
   - cmd: mvn clean install -DskipTests=true -Dmaven.javadoc.skip=true -B -V %MVN_FLAG
 
 build_script:
-  - cmd: %APPVEYOR%
+  - cmd: echo "APPVEYOR %APPVEYOR%"
   - cmd: mvn clean install -B -Djava.level=%JAVA_LEVEL% %MVN_FLAG%
 
 notifications:
