@@ -1,0 +1,17 @@
+/*
+Support easy copy with select all keyboard shortcut
+ */
+
+* {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+code.language-yaml, code.language-yaml > .token {
+  -webkit-user-select: auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
+  user-select: auto;
+}
