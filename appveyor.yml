@@ -14,7 +14,7 @@ environment:
 test: off
 
 install:
-  - cmd: mvn clean install -DskipTests=true -Dmaven.javadoc.skip=true -B -V %MVN_FLAG
+  - cmd: mvn clean install -DskipTests=true -Dmaven.javadoc.skip=true -B -V %MVN_FLAG%
 
 build_script:
   - cmd: echo "APPVEYOR %APPVEYOR%"
