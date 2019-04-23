@@ -18,3 +18,10 @@ install:
 
 build_script:
   - ps: mvn clean install "-B -Djava.level=$env:JAVA_LEVEL $env:MVN_FLAG"
+
+notifications:
+  - provider: Email
+    on_build_success: false
+    on_build_failure: false
+    on_build_status_changed: false
+
