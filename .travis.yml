@@ -25,13 +25,13 @@ matrix:
     - jdk: openjdk8
 
 install:
-  - mvn clean install -DskipTests=true -Dmaven.javadoc.skip=true -B -V $MVN_FLAG
+  - mvn clean install -DskipTests=true -Dmaven.javadoc.skip=true -B -V $MVN_FLAG -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
 
 script:
   - |
     mvn clean install -B \
       -Djava.level=$JAVA_LEVEL \
-      $MVN_FLAG
+      $MVN_FLAG -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
 
 notifications:
   email: false
