@@ -14,7 +14,7 @@ environment:
 test: off
 
 install:
-  - ps: mvn clean install -DskipTests=true -Dmaven.javadoc.skip=true -B -V $env:MVN_FLAG
+  - ps: mvn clean install "-DskipTests=true -Dmaven.javadoc.skip=true -B -V $env:MVN_FLAG"
 
 build_script:
-  - ps: mvn clean install -B -Djava.level=$env:JAVA_LEVEL $env:MVN_FLAG
+  - ps: mvn clean install "-B -Djava.level=$env:JAVA_LEVEL $env:MVN_FLAG"
