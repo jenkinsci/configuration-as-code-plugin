@@ -18,7 +18,6 @@ install:
 
 build_script:
   - ps: >-
-  - ps: >-
     mvn clean install -B `
       -Djava.level=$env:JAVA_LEVEL `
       $env:MVN_FLAG
