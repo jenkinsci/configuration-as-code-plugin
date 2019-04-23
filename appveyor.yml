@@ -4,13 +4,12 @@ image:
 environment:
   global:
     JAVA_LEVEL: 8
-    MVN_FLAG: -Dcheckstyle.skip
   matrix:
     - JAVA_HOME: C:\Program Files\Java\jdk1.8.0
     - JAVA_HOME: C:\Program Files\Java\jdk1.8.0
-      MVN_FLAG: %MVN_FLAG% -Djenkins.version=2.164.1 -Daccess-modifier-checker.failOnError=true
+      MVN_FLAG: -Djenkins.version=2.164.1 -Daccess-modifier-checker.failOnError=true
     - JAVA_HOME: C:\Program Files\Java\jdk11
-      MVN_FLAG: %MVN_FLAG% -Djenkins.version=2.164.1 -Daccess-modifier-checker.failOnError=true
+      MVN_FLAG: -Djenkins.version=2.164.1 -Daccess-modifier-checker.failOnError=true
 
 test: off
 
