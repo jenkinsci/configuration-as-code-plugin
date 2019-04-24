@@ -1,17 +1,10 @@
 package io.jenkins.plugins.casc;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.eclipse.jetty.server.Request;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-
-import java.io.IOException;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

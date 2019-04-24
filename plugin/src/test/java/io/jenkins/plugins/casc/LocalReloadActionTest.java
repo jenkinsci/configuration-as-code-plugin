@@ -1,6 +1,12 @@
 package io.jenkins.plugins.casc;
 
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import org.apache.commons.httpclient.HttpStatus;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Response;
@@ -12,14 +18,9 @@ import org.jvnet.hudson.test.LoggerRule;
 import org.kohsuke.stapler.RequestImpl;
 import org.kohsuke.stapler.ResponseImpl;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class LocalReloadActionTest {
 

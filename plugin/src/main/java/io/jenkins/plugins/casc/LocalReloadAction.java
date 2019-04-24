@@ -2,23 +2,17 @@ package io.jenkins.plugins.casc;
 
 import hudson.Extension;
 import hudson.model.UnprotectedRootAction;
-import hudson.security.csrf.CrumbExclusion;
+import java.io.IOException;
+import java.util.logging.Logger;
+import javax.annotation.CheckForNull;
 import org.apache.commons.httpclient.HttpStatus;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.interceptor.RequirePOST;
 
-import javax.annotation.CheckForNull;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.logging.Logger;
-
 /**
  * If enabled by setting environment variable "CASC_ALLOW_LOCAL_RELOAD" to "true" it allows reloading
- * configuration by issuing a POST request to "http://localhost:8080/reload-configuration-as-code/"
+ * configuration by issuing a POST request to "http://localhost:8080/reload-configuration-as-code/".
  */
 @Extension
 public class LocalReloadAction implements UnprotectedRootAction {
