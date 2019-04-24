@@ -82,9 +82,9 @@ public class ConfigurationAsCodeTest {
             Files.copy(configStream, singleFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         }
 
-        String s = singleFile.toURI().toString();
-        casc.configure(s);
-        assertThat(casc.getSources(), contains(s));
+        String source = singleFile.toURI().toString();
+        casc.configure(source);
+        assertThat(casc.getSources(), contains(source));
         assertThat(j.jenkins.getSystemMessage(), equalTo("configuration as code - JenkinsConfigTest"));
     }
 
