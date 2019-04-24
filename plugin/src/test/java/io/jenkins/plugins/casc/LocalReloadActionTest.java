@@ -26,6 +26,19 @@ public class LocalReloadActionTest {
 
     private Date lastTimeLoaded;
 
+    private LocalReloadAction localReloadAction;
+
+    @Rule
+    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
+
+    @Rule
+    public final LoggerRule loggerRule = new LoggerRule();
+
+    @Rule
+    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+
+    private ServletResponseSpy response;
+
     private class ServletResponseSpy extends Response {
 
         private int error = HttpStatus.SC_OK;
@@ -66,20 +79,6 @@ public class LocalReloadActionTest {
             return remoteAddr;
         }
     }
-
-    private LocalReloadAction localReloadAction;
-
-    @Rule
-    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
-
-    @Rule
-    public final LoggerRule loggerRule = new LoggerRule();
-
-    @Rule
-    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
-
-    private ServletResponseSpy response;
-
 
     private ResponseImpl newResponse() {
         return new ResponseImpl(null, response);

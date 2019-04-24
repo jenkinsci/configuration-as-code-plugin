@@ -11,6 +11,9 @@ import static org.junit.Assert.assertTrue;
 
 public class LocalReloadCrumbExclusionTest {
 
+    @Rule
+    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
+
     private Request newRequestWithPath(String hello) {
         return new Request(null, null) {
             @Override
@@ -19,10 +22,6 @@ public class LocalReloadCrumbExclusionTest {
             }
         };
     }
-
-    @Rule
-    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
-
 
     @Test
     public void crumbExclusionIsDisabledByDefault() throws Exception {
