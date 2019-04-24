@@ -42,8 +42,7 @@ class VaultTestUtil {
 
     public static boolean hasDockerDaemon() {
         try {
-            return TestEnvironment.dockerApiAtLeast("1.10") && !"True"
-                .equalsIgnoreCase(System.getenv("APPVEYOR"));
+            return TestEnvironment.dockerApiAtLeast("1.10");
         } catch (IllegalStateException e) {
             return false;
         }
