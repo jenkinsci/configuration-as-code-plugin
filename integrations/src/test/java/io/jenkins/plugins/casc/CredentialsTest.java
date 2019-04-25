@@ -31,9 +31,14 @@ public class CredentialsTest {
 
         List<BasicSSHUserPrivateKey> creds2 = CredentialsProvider.lookupCredentials(BasicSSHUserPrivateKey.class,Jenkins.getInstanceOrNull(), null, Collections.emptyList());
         assertThat(creds2.size(), is(1));
-        assertEquals("agentuser", creds2.get(0).getUsername());
-        assertEquals("password", creds2.get(0).getPassphrase().getPlainText());
-        assertEquals("ssh private key used to connect ssh slaves", creds2.get(0).getDescription());
+        BasicSSHUserPrivateKey basicSSHUserPrivateKey = creds2.get(0);
+        assertEquals("agentuser", basicSSHUserPrivateKey.getUsername());
+        assertEquals("password", basicSSHUserPrivateKey.getPassphrase().getPlainText());
+        assertEquals("ssh private key used to connect ssh slaves", basicSSHUserPrivateKey.getDescription());
+        assertThat(basicSSHUserPrivateKey.getPrivateKeySource().getPrivateKeys().size(), is(1));
+        String directKey = basicSSHUserPrivateKey.getPrivateKeySource().getPrivateKeys().get(0);
+        assertThat(directKey, is("sp0ds9d+skkfjf"));
+
     }
 
 
