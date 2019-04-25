@@ -2,6 +2,7 @@ package io.jenkins.plugins.casc;
 
 import com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
+import com.cloudbees.plugins.credentials.casc.CredentialsRootConfigurator;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import hudson.ExtensionList;
 import hudson.util.Secret;
@@ -9,7 +10,6 @@ import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
-import io.jenkins.plugins.casc.support.credentials.CredentialsRootConfigurator;
 import java.util.Collections;
 import java.util.List;
 import jenkins.model.Jenkins;
