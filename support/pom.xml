@@ -65,14 +65,6 @@
       <optional>true</optional>
     </dependency>
 
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>matrix-auth</artifactId>
-      <version>2.3</version>
-      <optional>true</optional>
-    </dependency>
-
-    
   </dependencies>
   <scm>
     <connection>scm:git:git://github.com/jenkinsci/configuration-as-code-plugin.git</connection>
