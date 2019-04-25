@@ -54,3 +54,9 @@ labels:
   - name: reverted
     color: f44271
     description: A PR that is excluded from Release draft - used by Release Drafter
+  - name: removed
+    color: aa0f1c
+    description: A PR that removes code - used by Release Drafter
+  - name: deprecated
+    color: e2b626
+    description: A PR that deprecates code - used by Release Drafter
