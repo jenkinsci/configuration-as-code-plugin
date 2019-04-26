@@ -1,3 +1,8 @@
+<!--
+To mark your pull request as work in progress put the construction emoji 🚧 in your title. (hint: copy it)
+Helps us to block accidental merges of unfinished work.
+-->
+
 ### Your checklist for this pull request
 
 🚨 Please review the [guidelines for contributing](../blob/master/docs/CONTRIBUTING.md) to this repository.
