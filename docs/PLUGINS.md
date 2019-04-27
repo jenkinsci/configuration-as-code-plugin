@@ -283,8 +283,7 @@ You also can write a test case to check export from a live instance is well supp
 
          String exported = toYamlString(yourAttribute);
 
-         String expected = new String(Files.readAllBytes(Paths.get(getClass()
-                .getResource("expected_output.yaml").toURI())));
+         String expected = toStringFromYamlFile(this, "expected_output.yaml");
 
          assertThat(exported, is(expected));
     }

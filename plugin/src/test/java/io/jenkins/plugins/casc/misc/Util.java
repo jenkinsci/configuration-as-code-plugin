@@ -8,8 +8,13 @@ import io.jenkins.plugins.casc.impl.configurators.GlobalConfigurationCategoryCon
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import io.jenkins.plugins.casc.snakeyaml.nodes.Node;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Objects;
 import jenkins.model.GlobalConfigurationCategory;
 import jenkins.model.Jenkins;
@@ -54,5 +59,15 @@ public class Util {
         StringWriter buffer = new StringWriter();
         serializeYamlNode(yamlRoot, buffer);
         return buffer.toString();
+    }
+
+    public static String toStringFromYamlFile(Object clazz, String resourcePath) throws URISyntaxException, IOException {
+        URL resource = clazz.getClass()
+                .getResource(resourcePath);
+        if (resource == null) {
+            throw new FileNotFoundException("Couldn't find file: " + resourcePath);
+        }
+
+        return new String(Files.readAllBytes(Paths.get(resource.toURI())));
     }
 }
