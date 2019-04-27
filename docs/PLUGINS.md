@@ -281,11 +281,11 @@ You also can write a test case to check export from a live instance is well supp
         ConfigurationContext context = new ConfigurationContext(registry);
         final CNode yourAttribute = getUnclassifiedRoot(context).get("<your-attribute>");
 
-         String exported = toYamlString(yourAttribute);
+        String exported = toYamlString(yourAttribute);
 
-         String expected = toStringFromYamlFile(this, "expected_output.yaml");
+        String expected = toStringFromYamlFile(this, "expected_output.yaml");
 
-         assertThat(exported, is(expected));
+        assertThat(exported, is(expected));
     }
 ```
 
