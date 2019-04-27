@@ -1,5 +1,7 @@
 language: java
 
+dist: xenial
+
 services:
   - docker
 
