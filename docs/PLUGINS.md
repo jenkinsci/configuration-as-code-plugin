@@ -277,24 +277,15 @@ You also can write a test case to check export from a live instance is well supp
     @Test
     @ConfiguredWithCode("configuration-as-code.yml")
     public void export_configuration() throws Exception {
-        YourGlobalConfiguration globalConfiguration = YourGlobalConfiguration.get();
-
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         ConfigurationContext context = new ConfigurationContext(registry);
-        final Configurator c = context.lookupOrFail(YourGlobalConfiguration.class);
+        final CNode yourAttribute = getUnclassifiedRoot(context).get("<your-attribute>");
 
-        @SuppressWarnings("unchecked")
-        CNode node = c.describe(globalConfiguration, context);
-        assertNotNull(node);
-        final Mapping mapping = node.asMapping();
+        String exported = toYamlString(yourAttribute);
 
-        assertEquals(mapping.getScalarValue("expected-property"), "expected-value");
-        assertEquals(mapping.getScalarValue("another-property"), "another-value");
-        
-        List<CNode> yourList = mapping.get("a-list-property").asSequence();
-        assertEquals("list size", 5, yourList.size());
-        assertEquals(yourList.get(0).getScalar().getValue(), "expected-value");
-        assertEquals(yourList.get(0).asMapping().getScalarValue("key"), "expected-key");
+        String expected = toStringFromYamlFile(this, "expected_output.yaml");
+
+        assertThat(exported, is(expected));
     }
 ```
 
