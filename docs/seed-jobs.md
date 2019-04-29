@@ -1,5 +1,7 @@
 # How to create initial "seed" job
 
+Requires `job-dsl` >= 1.73
+
 Configuration is not just about setting up Jenkins master, it's also about creating an initial set of jobs.
 For this purpose, we delegate to the popular [job-dsl-plugin](https://wiki.jenkins.io/display/JENKINS/Job+DSL+Plugin)
 and run a job-dsl script to create an initial set of jobs.
