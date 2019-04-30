@@ -1,9 +1,0 @@
-<?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler">
-    "[javaposse.jobdsl.dsl.GeneratedItems;": {
-      "type": "array",
-      "items": {
-        "type": "#/definitions/io.jenkins.plugins.casc.support.jobdsl.ScriptSource"
-      }
-    }
-</j:jelly>
