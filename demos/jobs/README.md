@@ -1,5 +1,7 @@
 # Configure seed jobs
 
+Requires `job-dsl` >= 1.73
+
 As explained in [seed-jobs.md](../../docs/seed-jobs.md), `jobs` declaration is useful to create an initial set of jobs.
 
 For now, it is using the [job-dsl-plugin](https://wiki.jenkins.io/display/JENKINS/Job+DSL+Plugin) so this plugin needs to be installed on your Jenkins instance for this sample to work.
