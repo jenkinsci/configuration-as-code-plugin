@@ -1,4 +1,4 @@
-package io.jenkins.plugins.casc.core;
+package io.jenkins.plugins.casc;
 
 import hudson.model.JDK;
 import hudson.tools.InstallSourceProperty;
