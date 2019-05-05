@@ -1,6 +1,6 @@
 # Configure seed jobs
 
-Requires `job-dsl` >= 1.73
+Requires `job-dsl` >= 1.74
 
 As explained in [seed-jobs.md](../../docs/seed-jobs.md), `jobs` declaration is useful to create an initial set of jobs.
 
