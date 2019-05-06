@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Objects;
@@ -137,6 +138,7 @@ public class Util {
             throw new FileNotFoundException("Couldn't find file: " + resourcePath);
         }
 
-        return new String(Files.readAllBytes(Paths.get(resource.toURI())));
+        byte[] bytes = Files.readAllBytes(Paths.get(resource.toURI()));
+        return new String(bytes, StandardCharsets.UTF_8).replaceAll("\r\n?", "\n");
     }
 }
