@@ -276,7 +276,7 @@ You also can write a test case to check export from a live instance is well supp
 ```java
     @Test
     @ConfiguredWithCode("configuration-as-code.yml")
-    public void export_configuration() throws Exception {
+    public void should_support_configuration_export() throws Exception {
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         ConfigurationContext context = new ConfigurationContext(registry);
         final CNode yourAttribute = getUnclassifiedRoot(context).get("<your-attribute>");
@@ -299,12 +299,12 @@ public class ConfigurationAsCodeTest {
     public static JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
     
     @Test
-    public void should_import() {
+    public void should_support_configuration_as_code() throws Exception {
      ...
     }
     
     @Test
-    public void should_export() {
+    public void should_support_configuration_export() throws Exception {
      ...
     }
 }
