@@ -18,7 +18,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Objects;
 import jenkins.model.GlobalConfigurationCategory;
-import jenkins.model.Jenkins;
 
 import static io.jenkins.plugins.casc.ConfigurationAsCode.serializeYamlNode;
 
@@ -30,7 +29,7 @@ public class Util {
      * @return the Jenkins configurator
      */
     public static JenkinsConfigurator getJenkinsConfigurator() {
-        return Jenkins.getInstance().getExtensionList(JenkinsConfigurator.class).get(0);
+        return ExtensionList.lookup(JenkinsConfigurator.class).get(0);
     }
 
     /**
