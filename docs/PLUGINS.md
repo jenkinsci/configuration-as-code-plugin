@@ -232,7 +232,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 
-public class ConfigAsCodeTest {
+public class ConfigurationAsCodeTest {
 
     @Rule public JenkinsConfiguredWithCodeRule r = new JenkinsConfiguredWithCodeRule();
 
@@ -292,7 +292,7 @@ You also can write a test case to check export from a live instance is well supp
 _Hint:  use a class rule if you just want to test a single import and export_
 
 ```java
-public class ConfigAsCodeTest {
+public class ConfigurationAsCodeTest {
 
     @ClassRule
     @ConfiguredWithCode("configuration-as-code.yml")
