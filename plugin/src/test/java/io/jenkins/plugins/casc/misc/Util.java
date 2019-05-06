@@ -45,9 +45,9 @@ public class Util {
      * @return the "jenkins" root mapping
      * @throws Exception something's not right...
      */
-    public static Mapping getJenkinsRoot(ConfigurationContext context)
-        throws Exception {
+    public static Mapping getJenkinsRoot(ConfigurationContext context) throws Exception {
         JenkinsConfigurator root = getJenkinsConfigurator();
+
         return Objects.requireNonNull(root.describe(root.getTargetComponent(context), context)).asMapping();
     }
 
@@ -64,8 +64,7 @@ public class Util {
      * @return the "unclassified" root mapping
      * @throws Exception something's not right...
      */
-    public static Mapping getUnclassifiedRoot(ConfigurationContext context)
-            throws Exception {
+    public static Mapping getUnclassifiedRoot(ConfigurationContext context) throws Exception {
         GlobalConfigurationCategory.Unclassified unclassified = ExtensionList.lookup(GlobalConfigurationCategory.Unclassified.class).get(0);
 
         GlobalConfigurationCategoryConfigurator unclassifiedConfigurator = new GlobalConfigurationCategoryConfigurator(unclassified);
@@ -85,8 +84,7 @@ public class Util {
      * @return the "security" root mapping
      * @throws Exception something's not right...
      */
-    public static Mapping getSecurityRoot(ConfigurationContext context)
-            throws Exception {
+    public static Mapping getSecurityRoot(ConfigurationContext context) throws Exception {
         GlobalConfigurationCategory.Security security = ExtensionList.lookup(GlobalConfigurationCategory.Security.class).get(0);
 
         GlobalConfigurationCategoryConfigurator securityConfigurator = new GlobalConfigurationCategoryConfigurator(security);
@@ -131,8 +129,7 @@ public class Util {
      * @throws IOException invalid path or file not found in general
      */
     public static String toStringFromYamlFile(Object clazz, String resourcePath) throws URISyntaxException, IOException {
-        URL resource = clazz.getClass()
-                .getResource(resourcePath);
+        URL resource = clazz.getClass().getResource(resourcePath);
         if (resource == null) {
             throw new FileNotFoundException("Couldn't find file: " + resourcePath);
         }
