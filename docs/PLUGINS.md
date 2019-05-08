@@ -197,11 +197,9 @@ See [mailer plugin#39](https://github.com/jenkinsci/mailer-plugin/pull/39) for a
 
 Simplest option for you to test JCasC compatibility in your plugin is to introduce a simple test case.
 
-### Configuration test
+[![GitHub release](https://img.shields.io/github/release/jenkinsci/configuration-as-code-plugin.svg?label=release)](https://github.com/jenkinsci/configuration-as-code-plugin/releases/latest)
 
 Add the Configuration as Code plugin as a test dependency in your pom.xml:
-
-[![GitHub release](https://img.shields.io/github/release/jenkinsci/configuration-as-code-plugin.svg?label=release)](https://github.com/jenkinsci/configuration-as-code-plugin/releases/latest)
 
 ```xml
 <properties>
@@ -222,7 +220,9 @@ Add the Configuration as Code plugin as a test dependency in your pom.xml:
 </dependency>
 ```
 
-Add a new test case to load a reference configuration YAML file designed to set configurable properties of your plugin
+### Configuration test
+
+Add a new test case to load a reference configuration YAML file designed to set configurable properties of your plugin:
 
 ```java
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
@@ -232,7 +232,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 
-public class ConfigAsCodeTest {
+public class ConfigurationAsCodeTest {
 
     @Rule public JenkinsConfiguredWithCodeRule r = new JenkinsConfiguredWithCodeRule();
 
@@ -249,7 +249,7 @@ some changes made to your plugin break this configuration model.
 
 ### Backward compatibility test
 
-About the latter, in case you need to introduce some breaking changes, you can define a backward compatibility test case
+About the latter, in case you need to introduce some breaking changes, you can define a backward compatibility test case:
 
 ```java
     @Test
@@ -276,10 +276,10 @@ You also can write a test case to check export from a live instance is well supp
 ```java
     @Test
     @ConfiguredWithCode("configuration-as-code.yml")
-    public void export_configuration() throws Exception {
+    public void should_support_configuration_export() throws Exception {
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         ConfigurationContext context = new ConfigurationContext(registry);
-        final CNode yourAttribute = getUnclassifiedRoot(context).get("<your-attribute>");
+        CNode yourAttribute = getUnclassifiedRoot(context).get("<your-attribute>");
 
         String exported = toYamlString(yourAttribute);
 
@@ -289,24 +289,25 @@ You also can write a test case to check export from a live instance is well supp
     }
 ```
 
-_Hint:  use a class rule if you just want to test a single import and export_
+The helper methods shown are provided by the `io.jenkins.plugins.casc.misc.Util` class.
+
+_Hint:  Use a class rule if you just want to test a single import and export._
 
 ```java
-public class ConfigAsCodeTest {
+public class ConfigurationAsCodeTest {
 
     @ClassRule
     @ConfiguredWithCode("configuration-as-code.yml")
     public static JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
     
     @Test
-    public void should_import() {
+    public void should_support_configuration_as_code() throws Exception {
      ...
     }
     
     @Test
-    public void should_export() {
+    public void should_support_configuration_export() throws Exception {
      ...
     }
 }
-
 ```
