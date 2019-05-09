@@ -28,6 +28,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class ConfigurationAsCodeTest {
 
@@ -70,6 +71,23 @@ public class ConfigurationAsCodeTest {
         assertThat(casc.configs(exactFile.getAbsolutePath()), hasSize(1));
         final List<Path> foo = casc.configs(tempFolder.getRoot().getAbsolutePath());
         assertThat(foo, hasSize(6));
+    }
+
+    @Test
+    public void test_ordered_config_loading() throws Exception {
+        ConfigurationAsCode casc = new ConfigurationAsCode();
+
+        tempFolder.newFile("0.yaml");
+        tempFolder.newFile("1.yaml");
+        tempFolder.newFile("a.yaml");
+        tempFolder.newFile("z.yaml");
+
+        final List<Path> foo = casc.configs(tempFolder.getRoot().getAbsolutePath());
+        assertThat(foo, hasSize(4));
+        assertTrue(foo.get(0).endsWith("0.yaml"));
+        assertTrue(foo.get(1).endsWith("1.yaml"));
+        assertTrue(foo.get(2).endsWith("a.yaml"));
+        assertTrue(foo.get(3).endsWith("z.yaml"));
     }
 
     @Test
