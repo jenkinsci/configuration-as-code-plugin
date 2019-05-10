@@ -334,9 +334,10 @@ You have the following option to trigger a configuration reload:
   permissions. Since Jenkins 2.96 CRUMB is not needed for API tokens.
 - via Jenkins CLI
 - via http POST to `JENKINS_URL/reload-configuration-as-code/`
-  In contrast to the above it does not need authentication and bypasses CSRF checks, but it needs to be explicitly
-  enabled by setting `CASC_ALLOW_LOCAL_RELOAD` environment variable to `true` and it only allows connections from the
-  local machine.
+  It's disabled by default and secured via a token configured as system property `jcasc.reloadToken`.
+  Setting the system property enables this functionality and the requests need to include the token as
+  basic auth password.
+
 
 ## Jenkins Enhancement Proposal
 

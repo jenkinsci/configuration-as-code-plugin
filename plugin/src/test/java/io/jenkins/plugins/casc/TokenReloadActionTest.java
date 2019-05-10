@@ -2,6 +2,7 @@ package io.jenkins.plugins.casc;
 
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import java.io.IOException;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -13,7 +14,7 @@ import org.eclipse.jetty.server.Response;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
+import org.junit.contrib.java.lang.system.RestoreSystemProperties;
 import org.jvnet.hudson.test.LoggerRule;
 import org.kohsuke.stapler.RequestImpl;
 import org.kohsuke.stapler.ResponseImpl;
@@ -22,14 +23,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class LocalReloadActionTest {
+public class TokenReloadActionTest {
 
     private Date lastTimeLoaded;
 
-    private LocalReloadAction localReloadAction;
+    private TokenReloadAction tokenReloadAction;
 
     @Rule
-    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
+    public final RestoreSystemProperties restoreSystemProperties = new RestoreSystemProperties();
 
     @Rule
     public final LoggerRule loggerRule = new LoggerRule();
@@ -60,32 +61,24 @@ public class LocalReloadActionTest {
     }
 
     private class RequestStub extends Request {
-        private final String localAddr;
-        private final String remoteAddr;
+        private final String authorization;
 
-        public RequestStub(String localAddr, String remoteAddr) {
+        public RequestStub(String authorization) {
             super(null, null);
-            this.localAddr = localAddr;
-            this.remoteAddr = remoteAddr;
+            this.authorization = authorization;
         }
 
         @Override
-        public String getLocalAddr() {
-            return localAddr;
-        }
-
-        @Override
-        public String getRemoteAddr() {
-            return remoteAddr;
+        public String getHeader(String name) {
+            if ("Authorization".equals(name)) {
+                return authorization;
+            }
+            return super.getHeader(name);
         }
     }
 
-    private ResponseImpl newResponse() {
-        return new ResponseImpl(null, response);
-    }
-
-    private RequestImpl newRequest(String localAddr, String remoteAddr) {
-        return new RequestImpl(null, new RequestStub(localAddr, remoteAddr), Collections.emptyList(), null);
+    private RequestImpl newRequest(String authorization) {
+        return new RequestImpl(null, new RequestStub(authorization), Collections.emptyList(), null);
     }
 
     private boolean configWasReloaded() {
@@ -93,64 +86,65 @@ public class LocalReloadActionTest {
     }
 
     @Before
-    public void setUp() throws Exception {
-        localReloadAction = new LocalReloadAction();
+    public void setUp() {
+        tokenReloadAction = new TokenReloadAction();
         response = new ServletResponseSpy();
-        loggerRule.record(LocalReloadAction.class, Level.ALL);
+        loggerRule.record(TokenReloadAction.class, Level.ALL);
         loggerRule.capture(3);
         lastTimeLoaded = ConfigurationAsCode.get().getLastTimeLoaded();
     }
 
     @Test
     public void getUrlName() {
-        localReloadAction.getUrlName();
-        assertEquals("/reload-configuration-as-code", localReloadAction.getUrlName());
+        tokenReloadAction.getUrlName();
+        assertEquals("/reload-configuration-as-code", tokenReloadAction.getUrlName());
     }
 
     @Test
     public void reloadIsDisabledByDefault() throws IOException {
-        environmentVariables.clear("CASC_ALLOW_LOCAL_RELOAD");
+        System.clearProperty("jcasc.reloadToken");
 
-        localReloadAction.doIndex(null, null);
+        tokenReloadAction.doIndex(null, null);
 
         List<LogRecord> messages = loggerRule.getRecords();
         assertEquals(1, messages.size());
-        assertEquals("local reload is not enabled", messages.get(0).getMessage());
+        assertEquals("reload via token is not enabled", messages.get(0).getMessage());
         assertEquals(Level.FINE, messages.get(0).getLevel());
         assertFalse(configWasReloaded());
     }
 
-
     @Test
-    public void reloadReturnsUnauthorizedIfLocalAndRemoteAddressDoNotMatch() throws IOException {
-        environmentVariables.set("CASC_ALLOW_LOCAL_RELOAD", "true");
+    public void reloadReturnsUnauthorizedIfTokenDoesNotMatch() throws IOException {
+        System.setProperty("jcasc.reloadToken", "someSecretValue");
 
-        localReloadAction.doIndex(newRequest("local", "remote"), new ResponseImpl(null, response));
+        RequestImpl request = newRequest(null);
+        tokenReloadAction.doIndex(request, new ResponseImpl(null, response));
 
         assertEquals(HttpStatus.SC_UNAUTHORIZED, response.getStatus());
 
+        assertFalse(configWasReloaded());
+
         List<LogRecord> messages = loggerRule.getRecords();
         assertEquals(1, messages.size());
-        assertEquals("unauthorized access from 'remote'", messages.get(0).getMessage());
+        assertEquals("unauthorized to reload configuration", messages.get(0).getMessage());
         assertEquals(Level.WARNING, messages.get(0).getLevel());
-        assertFalse(configWasReloaded());
     }
 
     @Test
-    public void reloadReturnsOkIfLocalAndRemoteAddressAreIdentical() throws IOException {
-        environmentVariables.set("CASC_ALLOW_LOCAL_RELOAD", "true");
-        assertFalse(configWasReloaded());
+    public void reloadReturnsOkWhenCalledWithValidToken() throws IOException {
+        System.setProperty("jcasc.reloadToken", "someSecretValue");
 
-        localReloadAction.doIndex(newRequest("remote", "remote"), newResponse());
+        String authorization = "Basic " + Base64.getEncoder().encodeToString(":someSecretValue".getBytes());
+
+        tokenReloadAction.doIndex(newRequest(authorization), new ResponseImpl(null, response));
 
         assertEquals(HttpStatus.SC_OK, response.getStatus());
 
+        assertTrue(configWasReloaded());
+
         List<LogRecord> messages = loggerRule.getRecords();
         assertEquals(1, messages.size());
-        assertEquals("local reload triggered from 'remote'", messages.get(0).getMessage());
+        assertEquals("configuration reload triggered via token", messages.get(0).getMessage());
         assertEquals(Level.INFO, messages.get(0).getLevel());
-
-        assertTrue(configWasReloaded());
     }
-
 }

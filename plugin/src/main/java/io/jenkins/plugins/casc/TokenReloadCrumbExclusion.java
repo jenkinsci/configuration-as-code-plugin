@@ -9,14 +9,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Extension
-public class LocalReloadCrumbExclusion extends CrumbExclusion {
+public class TokenReloadCrumbExclusion extends CrumbExclusion {
 
     @Override
     public boolean process(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
 
-        if (LocalReloadAction.localReloadEnabled()) {
+        if (TokenReloadAction.tokenReloadEnabled()) {
             String pathInfo = request.getPathInfo();
-            if (pathInfo != null && pathInfo.equals(LocalReloadAction.URL_NAME + "/")) {
+            if (pathInfo != null && pathInfo.equals(TokenReloadAction.URL_NAME + "/")) {
                 chain.doFilter(request, response);
                 return true;
             }

@@ -4,15 +4,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.eclipse.jetty.server.Request;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
+import org.junit.contrib.java.lang.system.RestoreSystemProperties;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class LocalReloadCrumbExclusionTest {
+public class TokenReloadCrumbExclusionTest {
 
     @Rule
-    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
+    public final RestoreSystemProperties restoreSystemProperties = new RestoreSystemProperties();
 
     private Request newRequestWithPath(String hello) {
         return new Request(null, null) {
@@ -25,27 +25,27 @@ public class LocalReloadCrumbExclusionTest {
 
     @Test
     public void crumbExclusionIsDisabledByDefault() throws Exception {
-        environmentVariables.clear("CASC_ALLOW_LOCAL_RELOAD");
+        System.clearProperty("jcasc.reloadToken");
 
-        LocalReloadCrumbExclusion crumbExclusion = new LocalReloadCrumbExclusion();
+        TokenReloadCrumbExclusion crumbExclusion = new TokenReloadCrumbExclusion();
 
         assertFalse(crumbExclusion.process(newRequestWithPath("/reload-configuration-as-code/"), null, null));
     }
 
     @Test
     public void crumbExclusionChecksRequestPath() throws Exception {
-        environmentVariables.set("CASC_ALLOW_LOCAL_RELOAD", "true");
+        System.setProperty("jcasc.reloadToken", "someSecretValue");
 
-        LocalReloadCrumbExclusion crumbExclusion = new LocalReloadCrumbExclusion();
+        TokenReloadCrumbExclusion crumbExclusion = new TokenReloadCrumbExclusion();
 
         assertFalse(crumbExclusion.process(newRequestWithPath("/reload-configuration-as-code/2"), null, null));
     }
 
     @Test
     public void crumbExclustionAllowsReloadIfEnabledAndRequestPathMatch() throws Exception {
-        environmentVariables.set("CASC_ALLOW_LOCAL_RELOAD", "true");
+        System.setProperty("jcasc.reloadToken", "someSecretValue");
 
-        LocalReloadCrumbExclusion crumbExclusion = new LocalReloadCrumbExclusion();
+        TokenReloadCrumbExclusion crumbExclusion = new TokenReloadCrumbExclusion();
 
         AtomicBoolean callProcessed = new AtomicBoolean(false);
         assertTrue(crumbExclusion.process(newRequestWithPath("/reload-configuration-as-code/"), null, (request, response) -> callProcessed.set(true)));
