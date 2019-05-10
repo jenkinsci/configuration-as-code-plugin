@@ -3,8 +3,8 @@
 <module name="Checker">
   <module name="FileTabCharacter" />
   <module name="NewlineAtEndOfFile">
-        <property name="lineSeparator" value="lf" />
-    </module>
+    <property name="lineSeparator" value="lf" />
+  </module>
   <module name="RegexpSingleline">
     <property name="format" value="\s+$"/>
     <property name="message" value="Trailing spaces are not allowed."/>
