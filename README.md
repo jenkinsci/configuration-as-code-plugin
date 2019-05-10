@@ -333,10 +333,10 @@ You have the following option to trigger a configuration reload:
   Note: this needs to include a valid CRUMB and authentication information e.g. username + token of a user with admin
   permissions. Since Jenkins 2.96 CRUMB is not needed for API tokens.
 - via Jenkins CLI
-- via http POST to `JENKINS_URL/configuration-as-code/reload-webhook`
+- via http POST to `JENKINS_URL/reload-configuration-as-code`
   It's disabled by default and secured via a token configured as system property `casc.reload.token`.
   Setting the system property enables this functionality and the requests need to include the token as
-  query parameter named `jcasc-reload-token`.
+  query parameter named `casc-reload-token`.
 
 
 ## Jenkins Enhancement Proposal

@@ -18,7 +18,7 @@ public class TokenReloadAction implements UnprotectedRootAction {
 
     public static final String URL_NAME = "/reload-configuration-as-code";
     public static final String RELOAD_TOKEN_PROPERTY = "casc.reload.token";
-    public static final String RELOAD_TOKEN_QUERY_PARAMETER = "jcasc-reload-token";
+    public static final String RELOAD_TOKEN_QUERY_PARAMETER = "casc-reload-token";
 
 
     @CheckForNull
