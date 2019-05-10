@@ -25,7 +25,7 @@ public class TokenReloadCrumbExclusionTest {
 
     @Test
     public void crumbExclusionIsDisabledByDefault() throws Exception {
-        System.clearProperty("jcasc.reloadToken");
+        System.clearProperty("casc.reload.token");
 
         TokenReloadCrumbExclusion crumbExclusion = new TokenReloadCrumbExclusion();
 
@@ -34,7 +34,7 @@ public class TokenReloadCrumbExclusionTest {
 
     @Test
     public void crumbExclusionChecksRequestPath() throws Exception {
-        System.setProperty("jcasc.reloadToken", "someSecretValue");
+        System.setProperty("casc.reload.token", "someSecretValue");
 
         TokenReloadCrumbExclusion crumbExclusion = new TokenReloadCrumbExclusion();
 
@@ -43,7 +43,7 @@ public class TokenReloadCrumbExclusionTest {
 
     @Test
     public void crumbExclustionAllowsReloadIfEnabledAndRequestPathMatch() throws Exception {
-        System.setProperty("jcasc.reloadToken", "someSecretValue");
+        System.setProperty("casc.reload.token", "someSecretValue");
 
         TokenReloadCrumbExclusion crumbExclusion = new TokenReloadCrumbExclusion();
 

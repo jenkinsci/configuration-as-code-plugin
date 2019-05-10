@@ -2,7 +2,6 @@ package io.jenkins.plugins.casc;
 
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import java.io.IOException;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -69,12 +68,11 @@ public class TokenReloadActionTest {
         }
 
         @Override
-        public String getHeader(String name) {
-            if ("Authorization".equals(name)) {
+        public String getParameter(String name) {
+            if (TokenReloadAction.RELOAD_TOKEN_QUERY_PARAMETER.equals(name)) {
                 return authorization;
             }
-            return super.getHeader(name);
-        }
+            return super.getHeader(name);        }
     }
 
     private RequestImpl newRequest(String authorization) {
@@ -95,27 +93,21 @@ public class TokenReloadActionTest {
     }
 
     @Test
-    public void getUrlName() {
-        tokenReloadAction.getUrlName();
-        assertEquals("/reload-configuration-as-code", tokenReloadAction.getUrlName());
-    }
-
-    @Test
     public void reloadIsDisabledByDefault() throws IOException {
-        System.clearProperty("jcasc.reloadToken");
+        System.clearProperty("casc.reload.token");
 
         tokenReloadAction.doIndex(null, null);
 
         List<LogRecord> messages = loggerRule.getRecords();
         assertEquals(1, messages.size());
-        assertEquals("reload via token is not enabled", messages.get(0).getMessage());
-        assertEquals(Level.FINE, messages.get(0).getLevel());
+        assertEquals("Configuration reload via token is not enabled", messages.get(0).getMessage());
+        assertEquals(Level.WARNING, messages.get(0).getLevel());
         assertFalse(configWasReloaded());
     }
 
     @Test
     public void reloadReturnsUnauthorizedIfTokenDoesNotMatch() throws IOException {
-        System.setProperty("jcasc.reloadToken", "someSecretValue");
+        System.setProperty("casc.reload.token", "someSecretValue");
 
         RequestImpl request = newRequest(null);
         tokenReloadAction.doIndex(request, new ResponseImpl(null, response));
@@ -126,17 +118,15 @@ public class TokenReloadActionTest {
 
         List<LogRecord> messages = loggerRule.getRecords();
         assertEquals(1, messages.size());
-        assertEquals("unauthorized to reload configuration", messages.get(0).getMessage());
+        assertEquals("Invalid token received, not reloading configuration", messages.get(0).getMessage());
         assertEquals(Level.WARNING, messages.get(0).getLevel());
     }
 
     @Test
     public void reloadReturnsOkWhenCalledWithValidToken() throws IOException {
-        System.setProperty("jcasc.reloadToken", "someSecretValue");
+        System.setProperty("casc.reload.token", "someSecretValue");
 
-        String authorization = "Basic " + Base64.getEncoder().encodeToString(":someSecretValue".getBytes());
-
-        tokenReloadAction.doIndex(newRequest(authorization), new ResponseImpl(null, response));
+        tokenReloadAction.doIndex(newRequest("someSecretValue"), new ResponseImpl(null, response));
 
         assertEquals(HttpStatus.SC_OK, response.getStatus());
 
@@ -144,7 +134,7 @@ public class TokenReloadActionTest {
 
         List<LogRecord> messages = loggerRule.getRecords();
         assertEquals(1, messages.size());
-        assertEquals("configuration reload triggered via token", messages.get(0).getMessage());
+        assertEquals("Configuration reload triggered via token", messages.get(0).getMessage());
         assertEquals(Level.INFO, messages.get(0).getLevel());
     }
 }
