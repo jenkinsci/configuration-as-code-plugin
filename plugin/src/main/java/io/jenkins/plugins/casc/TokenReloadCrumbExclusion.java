@@ -14,9 +14,9 @@ public class TokenReloadCrumbExclusion extends CrumbExclusion {
     @Override
     public boolean process(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
 
-        if (TokenReloadAction.tokenReloadEnabled()) {
+        if (ConfigurationAsCode.tokenReloadEnabled()) {
             String pathInfo = request.getPathInfo();
-            if (pathInfo != null && pathInfo.equals(TokenReloadAction.URL_NAME + "/")) {
+            if (pathInfo != null && pathInfo.equals("/configuration-as-code/reloadWebhook/")) {
                 chain.doFilter(request, response);
                 return true;
             }

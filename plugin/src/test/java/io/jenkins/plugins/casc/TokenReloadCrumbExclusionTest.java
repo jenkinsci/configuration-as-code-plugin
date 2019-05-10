@@ -29,7 +29,7 @@ public class TokenReloadCrumbExclusionTest {
 
         TokenReloadCrumbExclusion crumbExclusion = new TokenReloadCrumbExclusion();
 
-        assertFalse(crumbExclusion.process(newRequestWithPath("/reload-configuration-as-code/"), null, null));
+        assertFalse(crumbExclusion.process(newRequestWithPath("/configuration-as-code/reloadWebhook/"), null, null));
     }
 
     @Test
@@ -38,7 +38,7 @@ public class TokenReloadCrumbExclusionTest {
 
         TokenReloadCrumbExclusion crumbExclusion = new TokenReloadCrumbExclusion();
 
-        assertFalse(crumbExclusion.process(newRequestWithPath("/reload-configuration-as-code/2"), null, null));
+        assertFalse(crumbExclusion.process(newRequestWithPath("/configuration-as-code/reloadWebhook/2"), null, null));
     }
 
     @Test
@@ -48,7 +48,7 @@ public class TokenReloadCrumbExclusionTest {
         TokenReloadCrumbExclusion crumbExclusion = new TokenReloadCrumbExclusion();
 
         AtomicBoolean callProcessed = new AtomicBoolean(false);
-        assertTrue(crumbExclusion.process(newRequestWithPath("/reload-configuration-as-code/"), null, (request, response) -> callProcessed.set(true)));
+        assertTrue(crumbExclusion.process(newRequestWithPath("/configuration-as-code/reloadWebhook/"), null, (request, response) -> callProcessed.set(true)));
 
         assertTrue(callProcessed.get());
     }
