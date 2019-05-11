@@ -1,7 +1,6 @@
 package io.jenkins.plugins.casc;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Strings;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
@@ -69,13 +68,11 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.accmod.Restricted;
@@ -106,8 +103,6 @@ public class ConfigurationAsCode extends ManagementLink {
     public static final String CASC_JENKINS_CONFIG_ENV = "CASC_JENKINS_CONFIG";
     public static final String DEFAULT_JENKINS_YAML_PATH = "jenkins.yaml";
     public static final String YAML_FILES_PATTERN = "glob:**.{yml,yaml,YAML,YML}";
-    public static final String RELOAD_TOKEN_PROPERTY = "casc.reload.token";
-    public static final String RELOAD_TOKEN_QUERY_PARAMETER = "casc-reload-token";
 
     private static final Logger LOGGER = Logger.getLogger(ConfigurationAsCode.class.getName());
 
@@ -413,37 +408,6 @@ public class ConfigurationAsCode extends ManagementLink {
 
         req.setAttribute("export", out.toString(StandardCharsets.UTF_8.name()));
         req.getView(this, "viewExport.jelly").forward(req, res);
-    }
-
-    @RequirePOST
-    public void doReloadWebhook(StaplerRequest req, StaplerResponse res) throws IOException {
-        String token = getReloadTokenProperty();
-
-        if (Strings.isNullOrEmpty(token)) {
-            LOGGER.warning("Configuration reload via token is not enabled");
-        } else {
-            String requestToken = getRequestToken(req);
-
-            if (token.equals(requestToken)) {
-                LOGGER.info("Configuration reload triggered via token");
-                ConfigurationAsCode.get().configure();
-            } else {
-                res.sendError(HttpStatus.SC_UNAUTHORIZED);
-                LOGGER.warning("Invalid token received, not reloading configuration");
-            }
-        }
-    }
-
-    private static String getReloadTokenProperty() {
-        return System.getProperty(ConfigurationAsCode.RELOAD_TOKEN_PROPERTY);
-    }
-
-    public static boolean tokenReloadEnabled() {
-        return !Strings.isNullOrEmpty(getReloadTokenProperty());
-    }
-
-    private String getRequestToken(HttpServletRequest request) {
-        return request.getParameter(ConfigurationAsCode.RELOAD_TOKEN_QUERY_PARAMETER);
     }
 
     @Restricted(NoExternalUse.class)

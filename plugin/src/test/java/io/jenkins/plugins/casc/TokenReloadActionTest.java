@@ -22,11 +22,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class ConfigurationAsCodeWebhookTest {
+public class TokenReloadActionTest {
 
     private Date lastTimeLoaded;
 
-    private ConfigurationAsCode configurationAsCode;
+    private TokenReloadAction tokenReloadAction;
 
     @Rule
     public final RestoreSystemProperties restoreSystemProperties = new RestoreSystemProperties();
@@ -69,7 +69,7 @@ public class ConfigurationAsCodeWebhookTest {
 
         @Override
         public String getParameter(String name) {
-            if (ConfigurationAsCode.RELOAD_TOKEN_QUERY_PARAMETER.equals(name)) {
+            if (TokenReloadAction.RELOAD_TOKEN_QUERY_PARAMETER.equals(name)) {
                 return authorization;
             }
             return super.getHeader(name);        }
@@ -85,9 +85,9 @@ public class ConfigurationAsCodeWebhookTest {
 
     @Before
     public void setUp() {
-        configurationAsCode = new ConfigurationAsCode();
+        tokenReloadAction = new TokenReloadAction();
         response = new ServletResponseSpy();
-        loggerRule.record(ConfigurationAsCode.class, Level.ALL);
+        loggerRule.record(TokenReloadAction.class, Level.ALL);
         loggerRule.capture(3);
         lastTimeLoaded = ConfigurationAsCode.get().getLastTimeLoaded();
     }
@@ -96,7 +96,7 @@ public class ConfigurationAsCodeWebhookTest {
     public void reloadIsDisabledByDefault() throws IOException {
         System.clearProperty("casc.reload.token");
 
-        configurationAsCode.doReloadWebhook(null, null);
+        tokenReloadAction.doIndex(null, null);
 
         List<LogRecord> messages = loggerRule.getRecords();
         assertEquals(1, messages.size());
@@ -110,7 +110,7 @@ public class ConfigurationAsCodeWebhookTest {
         System.setProperty("casc.reload.token", "someSecretValue");
 
         RequestImpl request = newRequest(null);
-        configurationAsCode.doReloadWebhook(request, new ResponseImpl(null, response));
+        tokenReloadAction.doIndex(request, new ResponseImpl(null, response));
 
         assertEquals(HttpStatus.SC_UNAUTHORIZED, response.getStatus());
 
@@ -126,15 +126,15 @@ public class ConfigurationAsCodeWebhookTest {
     public void reloadReturnsOkWhenCalledWithValidToken() throws IOException {
         System.setProperty("casc.reload.token", "someSecretValue");
 
-        configurationAsCode.doReloadWebhook(newRequest("someSecretValue"), new ResponseImpl(null, response));
+        tokenReloadAction.doIndex(newRequest("someSecretValue"), new ResponseImpl(null, response));
 
         assertEquals(HttpStatus.SC_OK, response.getStatus());
 
         assertTrue(configWasReloaded());
 
         List<LogRecord> messages = loggerRule.getRecords();
-        assertEquals(2, messages.size());
-        assertEquals("Configuration reload triggered via token", messages.get(1).getMessage());
-        assertEquals(Level.INFO, messages.get(1).getLevel());
+        assertEquals(1, messages.size());
+        assertEquals("Configuration reload triggered via token", messages.get(0).getMessage());
+        assertEquals(Level.INFO, messages.get(0).getLevel());
     }
 }
