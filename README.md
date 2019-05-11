@@ -336,7 +336,7 @@ You have the following option to trigger a configuration reload:
 - via http POST to `JENKINS_URL/reload-configuration-as-code`
   It's disabled by default and secured via a token configured as system property `casc.reload.token`.
   Setting the system property enables this functionality and the requests need to include the token as
-  query parameter named `casc-reload-token`.
+  query parameter named `casc-reload-token`, i.e. `JENKINS_URL/reload-configuration-as-code/?casc-reload-token=32424324rdsadsa`.
 
 
 ## Jenkins Enhancement Proposal
