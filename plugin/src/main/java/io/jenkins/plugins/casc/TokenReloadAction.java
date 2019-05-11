@@ -20,7 +20,6 @@ public class TokenReloadAction implements UnprotectedRootAction {
     public static final String RELOAD_TOKEN_PROPERTY = "casc.reload.token";
     public static final String RELOAD_TOKEN_QUERY_PARAMETER = "casc-reload-token";
 
-
     @CheckForNull
     @Override
     public String getIconFileName() {
@@ -70,5 +69,4 @@ public class TokenReloadAction implements UnprotectedRootAction {
     public static boolean tokenReloadEnabled() {
         return !Strings.isNullOrEmpty(getReloadTokenProperty());
     }
-
 }

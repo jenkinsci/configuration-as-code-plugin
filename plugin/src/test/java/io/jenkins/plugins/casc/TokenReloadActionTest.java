@@ -40,7 +40,6 @@ public class TokenReloadActionTest {
     private ServletResponseSpy response;
 
     private class ServletResponseSpy extends Response {
-
         private int error = HttpStatus.SC_OK;
 
         public ServletResponseSpy() {
