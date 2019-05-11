@@ -236,7 +236,10 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
         for (int i = 0; i < parameters.length; i++) {
             final Parameter p = parameters[i];
             final Attribute a = createAttribute(names[i], TypePair.of(p));
-            args[i] = Stapler.CONVERT_UTILS.convert(a.getValue(instance), a.getType());
+            Object value = a.getValue(instance);
+            if (value != null) {
+                args[i] = Stapler.CONVERT_UTILS.convert(value, a.getType());
+            }
             if (args[i] == null && p.getType().isPrimitive()) {
                 args[i] = defaultValue(p.getType());
             }
