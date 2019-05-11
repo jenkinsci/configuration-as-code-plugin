@@ -95,7 +95,10 @@ public class TokenReloadActionTest {
     public void reloadIsDisabledByDefault() throws IOException {
         System.clearProperty("casc.reload.token");
 
-        tokenReloadAction.doIndex(null, null);
+        RequestImpl request = newRequest(null);
+        tokenReloadAction.doIndex(request, new ResponseImpl(null, response));
+
+        assertEquals(HttpStatus.SC_NOT_FOUND, response.getStatus());
 
         List<LogRecord> messages = loggerRule.getRecords();
         assertEquals(1, messages.size());
