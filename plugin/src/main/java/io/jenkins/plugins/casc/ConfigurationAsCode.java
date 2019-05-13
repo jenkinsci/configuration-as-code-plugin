@@ -581,7 +581,7 @@ public class ConfigurationAsCode extends ManagementLink {
         final PathMatcher matcher = FileSystems.getDefault().getPathMatcher(YAML_FILES_PATTERN);
         try (Stream<Path> stream = Files.find(Paths.get(path), Integer.MAX_VALUE,
                 (next, attrs) -> !attrs.isDirectory() && !isHidden(next) && matcher.matches(next))) {
-            return stream.collect(toList());
+            return stream.sorted().collect(toList());
         } catch (IOException e) {
             throw new IllegalStateException("failed config scan for " + path, e);
         }

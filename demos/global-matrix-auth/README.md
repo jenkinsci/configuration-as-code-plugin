@@ -1,5 +1,7 @@
 # matrix-auth-plugin
 
+Requires `matrix-auth` >= 2.4
+
 ## sample-configuration (global matrix)
 
 ```yaml

@@ -28,20 +28,16 @@
         "type": "boolean"
       </j:case>
       <j:case value="int">
-        "type": "integer",
-        "format": "uint32"
+        "type": "integer"
       </j:case>
       <j:case value="java.lang.Integer">
-        "type": "integer",
-        "format": "uint32"
+        "type": "integer"
       </j:case>
       <j:case value="long">
-        "type": "integer",
-        "format": "uint64"
+        "type": "integer"
       </j:case>
       <j:case value="java.lang.Long">
-        "type": "integer",
-        "format": "uint64"
+        "type": "integer"
       </j:case>
       <j:default>
         "type":  "object",

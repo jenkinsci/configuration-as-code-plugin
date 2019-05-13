@@ -8,7 +8,7 @@
   <j:forEach items="${it.implementors.entrySet()}" var="impl" varStatus="st">
     {
       "properties" : {
-        "${impl.key}" : { "$$ref" : "#/definitions/${impl.value}" }
+        "${impl.key}" : { "$$ref" : "#/definitions/${impl.value.name }" }
       }
     }
     <j:if test="${!st.last}">,</j:if>

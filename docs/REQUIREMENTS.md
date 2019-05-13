@@ -145,12 +145,12 @@ You just need the Configuration as Code plugin as a test dependency and a sample
 ```
 
 ```java
-public class ConfigAsCodeTest {
+public class ConfigurationAsCodeTest {
 
     @Rule public JenkinsRule r = new JenkinsRule();
 
     @Test public void should_support_configuration_as_code() throws Exception {
-        ConfigurationAsCode.get().configure(ConfigAsCodeTest.class.getResource("configuration-as-code.yml").toString());
+        ConfigurationAsCode.get().configure(ConfigurationAsCodeTest.class.getResource("configuration-as-code.yml").toString());
         assertTrue( /* check plugin has been configured as expected */ );
     }
 ```
