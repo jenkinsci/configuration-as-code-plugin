@@ -16,7 +16,7 @@ public class TokenReloadCrumbExclusion extends CrumbExclusion {
 
         if (TokenReloadAction.tokenReloadEnabled()) {
             String pathInfo = request.getPathInfo();
-            if (pathInfo != null && pathInfo.equals(TokenReloadAction.URL_NAME + "/")) {
+            if (pathInfo != null && pathInfo.equals("/" + TokenReloadAction.URL_NAME + "/")) {
                 chain.doFilter(request, response);
                 return true;
             }
