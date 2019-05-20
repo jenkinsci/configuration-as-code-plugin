@@ -16,16 +16,6 @@ env:
   global:
     - JAVA_LEVEL=8
 
-matrix:
-  include:
-    - jdk: openjdk11
-      env:
-        - MVN_FLAG='-Djenkins.version=2.174-rc28244.3d5a5a7c3c04 -Daccess-modifier-checker.failOnError=true'
-    - jdk: openjdk8
-      env:
-        - MVN_FLAG='-Djenkins.version=2.174-rc28244.3d5a5a7c3c04 -Daccess-modifier-checker.failOnError=true'
-    - jdk: openjdk8
-
 install:
   - mvn clean install -DskipTests=true -Dmaven.javadoc.skip=true -B -V $MVN_FLAG -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
 
