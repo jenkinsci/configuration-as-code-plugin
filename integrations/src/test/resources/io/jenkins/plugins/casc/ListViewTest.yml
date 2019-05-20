@@ -3,6 +3,7 @@ jenkins:
     - all:
         name: "all"
     - list:
+        description: "so descriptive!"
         columns:
           - "status"
           - "jobName"

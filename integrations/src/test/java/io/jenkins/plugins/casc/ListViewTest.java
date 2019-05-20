@@ -30,6 +30,7 @@ public class ListViewTest {
     public void should_import() {
         ListView view = (ListView) j.jenkins.getView("test-list-view");
         assertNotNull(view);
+        assertThat(view.getDescription(), is("so descriptive!"));
         assertThat(view.getIncludeRegex(), is("a.+"));
         assertThat(view.getJobNames(), hasItems("otherTest", "test"));
         GitHubBranchFilter gitHubBranchFilter = view.getJobFilters().get(GitHubBranchFilter.class);
@@ -51,6 +52,7 @@ public class ListViewTest {
         final CNode viewsNode = configNode.get("views");
         Mapping listView = viewsNode.asSequence().get(1).asMapping().get("list").asMapping();
         assertThat(listView.getScalarValue("name"), is("test-list-view"));
+        assertThat(listView.getScalarValue("description"), is("so descriptive!"));
         assertThat(listView.getScalarValue("includeRegex"), is("a.+"));
         assertThat(listView.getScalarValue("statusFilter"), is("true"));
         assertThat(listView.getScalarValue("recurse"), is("true"));
