@@ -2,6 +2,7 @@ package io.jenkins.plugins.casc;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import hudson.util.EnumConverter;
 import io.jenkins.plugins.casc.model.CNode;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -126,7 +127,7 @@ public class ConfigurationContext implements ConfiguratorRegistry {
     }
 
     static {
-        Stapler.CONVERT_UTILS.register((type, value) -> Version.of(value.toString()), Version.class);
+        Stapler.CONVERT_UTILS.register(new EnumConverter(), Version.class);
     }
 
     /**
