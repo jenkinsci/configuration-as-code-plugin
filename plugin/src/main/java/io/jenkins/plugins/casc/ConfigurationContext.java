@@ -2,7 +2,6 @@ package io.jenkins.plugins.casc;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import hudson.util.EnumConverter;
 import io.jenkins.plugins.casc.model.CNode;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
