@@ -6,6 +6,7 @@ import io.jenkins.plugins.casc.model.CNode;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.beanutils.Converter;
 import org.kohsuke.stapler.Stapler;
 
 /**
@@ -126,7 +127,7 @@ public class ConfigurationContext implements ConfiguratorRegistry {
     }
 
     static {
-        Stapler.CONVERT_UTILS.register((type, value) -> Version.of(value.toString()), Version.class);
+        Stapler.CONVERT_UTILS.register(new VersionConverter(), Version.class);
     }
 
     /**
