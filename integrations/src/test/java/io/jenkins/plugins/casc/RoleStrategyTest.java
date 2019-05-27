@@ -10,10 +10,9 @@ import hudson.model.User;
 import hudson.security.AuthorizationStrategy;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.model.CNode;
 import java.util.Map;
 import java.util.Set;
-
-import io.jenkins.plugins.casc.model.CNode;
 import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
