@@ -126,7 +126,7 @@ public class ConfigurationContext implements ConfiguratorRegistry {
     }
 
     static {
-        Stapler.CONVERT_UTILS.register((type, value) -> Version.of(value.toString()), Version.class);
+        Stapler.CONVERT_UTILS.register(new VersionConverter(), Version.class);
     }
 
     /**
