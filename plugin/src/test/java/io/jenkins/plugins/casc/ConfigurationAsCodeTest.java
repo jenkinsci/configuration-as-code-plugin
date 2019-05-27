@@ -15,7 +15,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
-import org.hamcrest.core.Is;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -177,10 +176,10 @@ public class ConfigurationAsCodeTest {
         assertNotNull(descriptor);
         descriptor.setConfigurationPath(firstConfig);
         ConfigurationAsCode.get().configure();
-        Assert.assertThat(j.jenkins.getDescription(), Is.is("configuration as code - JenkinsConfigTest"));
+        Assert.assertThat(j.jenkins.getDescription(), is("configuration as code - JenkinsConfigTest"));
         System.setProperty(CASC_JENKINS_CONFIG_PROPERTY, secondConfig);
         ConfigurationAsCode.get().configure();
-        Assert.assertThat(j.jenkins.getDescription(), Is.is("Configured by Configuration as Code plugin"));
+        Assert.assertThat(j.jenkins.getDescription(), is("Configured by Configuration as Code plugin"));
         System.clearProperty(CASC_JENKINS_CONFIG_PROPERTY);
     }
 }
