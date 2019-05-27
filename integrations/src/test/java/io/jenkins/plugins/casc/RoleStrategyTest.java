@@ -10,6 +10,7 @@ import hudson.model.User;
 import hudson.security.AuthorizationStrategy;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.model.CNode;
 import java.util.Map;
 import java.util.Set;
 import jenkins.model.Jenkins;
@@ -19,8 +20,12 @@ import org.jvnet.hudson.test.Issue;
 
 import static io.jenkins.plugins.casc.PermissionAssert.assertHasNoPermission;
 import static io.jenkins.plugins.casc.PermissionAssert.assertHasPermission;
+import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
+import static io.jenkins.plugins.casc.misc.Util.toStringFromYamlFile;
+import static io.jenkins.plugins.casc.misc.Util.toYamlString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -84,6 +89,20 @@ public class RoleStrategyTest {
         // Same user still cannot build on agent2
         assertHasNoPermission(user1, agent2, Computer.BUILD);
     }
+
+    @Test
+    @ConfiguredWithCode("RoleStrategy1.yml")
+    public void shouldExportRolesCorrect() throws Exception {
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        ConfigurationContext context = new ConfigurationContext(registry);
+        CNode yourAttribute = getJenkinsRoot(context).get("authorizationStrategy");
+
+        String exported = toYamlString(yourAttribute);
+        String expected = toStringFromYamlFile(this, "RoleStrategy1Expected.yml");
+
+        assertThat(exported, is(expected));
+    }
+
 
     @Test
     @Issue("Issue #214")
