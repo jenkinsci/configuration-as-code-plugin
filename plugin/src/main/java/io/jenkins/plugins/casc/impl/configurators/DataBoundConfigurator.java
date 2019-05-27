@@ -19,6 +19,7 @@ import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -238,7 +239,13 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
             final Attribute a = createAttribute(names[i], TypePair.of(p));
             Object value = a.getValue(instance);
             if (value != null) {
-                args[i] = Stapler.CONVERT_UTILS.convert(value, a.getType());
+                Object converted = Stapler.CONVERT_UTILS.convert(value, a.getType());
+                if (a.isMultiple()) {
+                    args[i] = Arrays.asList(converted);
+                } else {
+                    args[i] = converted;
+
+                }
             }
             if (args[i] == null && p.getType().isPrimitive()) {
                 args[i] = defaultValue(p.getType());

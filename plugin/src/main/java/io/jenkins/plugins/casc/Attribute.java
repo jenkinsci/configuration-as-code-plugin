@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.apache.commons.collections.CollectionUtils;
@@ -197,6 +198,7 @@ public class Attribute<Owner, Type> {
             return c.describe(o, context);
         } catch (Exception | /* Jenkins.getDescriptorOrDie */AssertionError e) {
             // Don't fail the whole export, prefer logging this error
+            LOGGER.log(Level.WARNING, "Failed to export", e);
             return new Scalar("FAILED TO EXPORT " + instance.getClass().getName() + "#" + name + ": "
                 + printThrowable(e));
         }
