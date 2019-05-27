@@ -297,7 +297,8 @@ public class ConfigurationAsCode extends ManagementLink {
                 System.getenv(CASC_JENKINS_CONFIG_ENV)
         );
 
-        if (!StringUtils.isBlank(cascPath)) {
+        // We prefer to rely on environment variable over global config
+        if (StringUtils.isNotBlank(cascPath) && StringUtils.isBlank(configParameter)) {
             configParameter = cascPath;
         }
 

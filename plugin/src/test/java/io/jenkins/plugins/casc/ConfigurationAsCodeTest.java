@@ -15,12 +15,15 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule.WebClient;
 
 import static com.gargoylesoftware.htmlunit.HttpMethod.POST;
+import static io.jenkins.plugins.casc.ConfigurationAsCode.CASC_JENKINS_CONFIG_PROPERTY;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -162,5 +165,21 @@ public class ConfigurationAsCodeTest {
         WebClient loggedInClient = client.login(user, user);
         response = loggedInClient.loadWebResponse(request);
         assertThat(response.getStatusCode(), is(200));
+    }
+
+    @Test
+    @Issue("Issue #739")
+    public void preferEnvOverGlobalConfigForConfigPath() throws Exception {
+        String firstConfig = getClass().getResource("JenkinsConfigTest.yml").toExternalForm();
+        String secondConfig = getClass().getResource("merge3.yml").toExternalForm();
+        CasCGlobalConfig descriptor = (CasCGlobalConfig) j.jenkins.getDescriptor(CasCGlobalConfig.class);
+        assertNotNull(descriptor);
+        descriptor.setConfigurationPath(firstConfig);
+        ConfigurationAsCode.get().configure();
+        Assert.assertThat(j.jenkins.getDescription(), is("configuration as code - JenkinsConfigTest"));
+        System.setProperty(CASC_JENKINS_CONFIG_PROPERTY, secondConfig);
+        ConfigurationAsCode.get().configure();
+        Assert.assertThat(j.jenkins.getDescription(), is("Configured by Configuration as Code plugin"));
+        System.clearProperty(CASC_JENKINS_CONFIG_PROPERTY);
     }
 }
