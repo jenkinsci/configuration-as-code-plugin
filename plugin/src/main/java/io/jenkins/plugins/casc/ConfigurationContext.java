@@ -6,8 +6,7 @@ import io.jenkins.plugins.casc.model.CNode;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.beanutils.Converter;
-import org.kohsuke.stapler.Stapler;
+    import org.kohsuke.stapler.Stapler;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
