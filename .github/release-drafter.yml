@@ -1,25 +1,3 @@
+_extends: .github
 name-template: v$NEXT_MINOR_VERSION 🌈
 tag-template: configuration-as-code-$NEXT_MINOR_VERSION
-version-template: $MAJOR.$MINOR
-categories:
-  - title: 🚨 Removed
-    label: removed
-  - title: ⚠️ Deprecated
-    label: deprecated
-  - title: 🚀 Features
-    label: feature
-  - title: 🐛 Bug Fixes
-    label: fix
-  - title: 👻 Maintenance
-    label: chore
-  - title: 📝 Documentation updates
-    label: documentation
-  - title: 🚦 Tests
-    label: test
-exclude-labels:
-  - reverted
-
-template: |
-  ## Changes
-
-  $CHANGES
