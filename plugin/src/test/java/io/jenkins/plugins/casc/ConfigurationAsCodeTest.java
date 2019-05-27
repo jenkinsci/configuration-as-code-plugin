@@ -181,5 +181,6 @@ public class ConfigurationAsCodeTest {
         System.setProperty(CASC_JENKINS_CONFIG_PROPERTY, secondConfig);
         ConfigurationAsCode.get().configure();
         Assert.assertThat(j.jenkins.getDescription(), Is.is("Configured by Configuration as Code plugin"));
+        System.clearProperty(CASC_JENKINS_CONFIG_PROPERTY);
     }
 }
