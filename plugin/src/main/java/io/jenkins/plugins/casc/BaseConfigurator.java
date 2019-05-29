@@ -102,6 +102,12 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
 
             LOGGER.log(Level.FINER, "Processing {0} property", name);
 
+            if (Map.class.isAssignableFrom(type.rawType)) {
+                // yaml has support for Maps, but as nobody seem to like them we agreed not to support them
+                LOGGER.log(Level.FINER, "{0} is a Map<?,?>. We decided not to support Maps.", name);
+                continue;
+            }
+
             Attribute attribute = createAttribute(name, type);
             if (attribute == null) continue;
 
