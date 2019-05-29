@@ -3,6 +3,7 @@ package io.jenkins.plugins.casc.impl.configurators;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Descriptor;
+import hudson.util.DescribableList;
 import hudson.util.Secret;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.BaseConfigurator;
@@ -19,8 +20,8 @@ import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -240,11 +241,10 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
             Object value = a.getValue(instance);
             if (value != null) {
                 Object converted = Stapler.CONVERT_UTILS.convert(value, a.getType());
-                if (a.isMultiple()) {
-                    args[i] = Arrays.asList(converted);
-                } else {
+                if (converted instanceof DescribableList || !a.isMultiple()) {
                     args[i] = converted;
-
+                } else {
+                    args[i] = Collections.singletonList(converted);
                 }
             }
             if (args[i] == null && p.getType().isPrimitive()) {

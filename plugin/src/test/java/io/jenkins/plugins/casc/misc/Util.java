@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Objects;
 import jenkins.model.GlobalConfigurationCategory;
+import jenkins.tools.ToolConfigurationCategory;
 
 import static io.jenkins.plugins.casc.ConfigurationAsCode.serializeYamlNode;
 
@@ -89,6 +90,26 @@ public class Util {
 
         GlobalConfigurationCategoryConfigurator securityConfigurator = new GlobalConfigurationCategoryConfigurator(security);
         return Objects.requireNonNull(securityConfigurator.describe(securityConfigurator.getTargetComponent(context), context)).asMapping();
+    }
+
+    /**
+     * Gets the "tool" root mapping.
+     * <p>
+     * Example usage:
+     * <pre>{@code
+     * ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+     * ConfigurationContext context = new ConfigurationContext(registry);
+     * CNode configNode = getToolRoot(context).get("git");}</pre>
+     *
+     * @param context the configuration context
+     * @return the "tool" root mapping
+     * @throws Exception something's not right...
+     */
+    public static Mapping getToolRoot(ConfigurationContext context) throws Exception {
+        ToolConfigurationCategory category = ExtensionList.lookup(ToolConfigurationCategory.class).get(0);
+
+        GlobalConfigurationCategoryConfigurator configurator = new GlobalConfigurationCategoryConfigurator(category);
+        return Objects.requireNonNull(configurator.describe(configurator.getTargetComponent(context), context)).asMapping();
     }
 
     /**
