@@ -1,4 +1,0 @@
-<?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler">
-    "io.jenkins.plugins.casc.support.jobdsl.InlineGroovyScriptSource": { "type": "string" }
-</j:jelly>
