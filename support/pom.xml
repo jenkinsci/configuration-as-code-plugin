@@ -14,6 +14,10 @@
   <name>Configuration as Code Support Plugin</name>
   <!-- This is an incubator for code we expect to get hosted by target plugins -->
 
+  <properties>
+    <hpi.compatibleSinceVersion>1.18</hpi.compatibleSinceVersion>
+  </properties>
+
   <scm>
     <connection>scm:git:git://github.com/jenkinsci/configuration-as-code-plugin.git</connection>
     <developerConnection>scm:git:git@github.com:jenkinsci/configuration-as-code-plugin.git</developerConnection>
