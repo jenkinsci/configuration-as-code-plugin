@@ -51,7 +51,7 @@ labels:
   - name: stale
     color: ffffff
     description: 'Used by stale[bot] to mark a issue/PR stale'
-  - name: reverted
+  - name: skip-changelog
     color: f44271
     description: A PR that is excluded from Release draft - used by Release Drafter
   - name: removed
