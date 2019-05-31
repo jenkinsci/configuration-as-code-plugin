@@ -67,8 +67,9 @@ public class SystemCredentialsTest {
         List<CertificateCredentials> certs = CredentialsProvider.lookupCredentials(
                 CertificateCredentials.class, jenkins, ACL.SYSTEM, Collections.emptyList()
         );
-        assertThat(certs, hasSize(1));
-        assertThat(certs.get(0).getPassword().getPlainText(), equalTo("ABCD"));
+        assertThat(certs, hasSize(0));
+//       TODO: add test for uploaded certificate
+//        assertThat(certs.get(0).getPassword().getPlainText(), equalTo("ABCD"));
 
         List<BasicSSHUserPrivateKey> sshPrivateKeys = CredentialsProvider.lookupCredentials(
                 BasicSSHUserPrivateKey.class, jenkins, ACL.SYSTEM, Collections.emptyList()
