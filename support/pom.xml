@@ -14,22 +14,6 @@
   <name>Configuration as Code Support Plugin</name>
   <!-- This is an incubator for code we expect to get hosted by target plugins -->
 
-  <properties>
-    <useBeta>true</useBeta>
-    <access-modifier-checker.skip>true</access-modifier-checker.skip>
-    <rootdir>${basedir}/..</rootdir>
-  </properties>
-
-
-  <dependencies>
-
-    <dependency>
-      <groupId>io.jenkins</groupId>
-      <artifactId>configuration-as-code</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-  </dependencies>
   <scm>
     <connection>scm:git:git://github.com/jenkinsci/configuration-as-code-plugin.git</connection>
     <developerConnection>scm:git:git@github.com:jenkinsci/configuration-as-code-plugin.git</developerConnection>
