@@ -11,7 +11,7 @@ public class MissingConfiguratorTest {
     public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 
     @ConfiguredWithCode(value = "MissingConfiguratorTest.yml", expected = IllegalArgumentException.class,
-            message = "Possible solution: Try to install 'configuration-as-code-support' plugin")
+            message = "No hudson.security.AuthorizationStrategy implementation found for globalMatrix")
     @Test
     public void testThrowsSuggestion() throws Exception {
         //No config check needed, should fail with IllegalArgumentException

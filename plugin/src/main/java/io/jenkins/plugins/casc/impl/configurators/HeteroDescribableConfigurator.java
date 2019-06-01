@@ -150,12 +150,7 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
                 .values()
                 .headOption()
                 .orElse(() -> {
-                    String message = "No " + target.getName() + " implementation found for " + symbol;
-                    String possible = lookupPlugin("configuration-as-code-support") ? "" : System.lineSeparator() + "Possible solution: Try to install 'configuration-as-code-support' plugin";
-                    throw new IllegalArgumentException(Stream.of(message, possible)
-                            .intersperse("")
-                            .foldLeft(new StringBuilder(), StringBuilder::append)
-                            .toString());
+                    throw new IllegalArgumentException("No " + target.getName() + " implementation found for " + symbol);
                 });
     }
 
@@ -178,10 +173,6 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
 
     private String preferredSymbol(Descriptor<?> descriptor) {
         return DescribableAttribute.getPreferredSymbol(descriptor, target, target);
-    }
-
-    private Boolean lookupPlugin(String name) {
-        return Option.of(Jenkins.getInstance().getPlugin(name)).isDefined();
     }
 
     private HashMap<String, Descriptor<T>> handleDuplicateSymbols(HashMap<String, Descriptor<T>> r, Tuple2<String, Descriptor<T>> t) {
