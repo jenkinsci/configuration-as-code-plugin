@@ -52,7 +52,7 @@ so end users have full guidance in using this tool set and do not have to search
 
 First, start a Jenkins instance with the [Configuration as Code](https://plugins.jenkins.io/configuration-as-code) plugin installed.
 
-- Those running Jenkins as a [Docker](https://github.com/jenkinsci/docker) container (and maybe also [pre-installing plugins](https://github.com/jenkinsci/docker#preinstalling-plugins)), do include [Configuration as Code](https://plugins.jenkins.io/configuration-as-code) plugin and optionally the [Configuration as Code Support](https://plugins.jenkins.io/configuration-as-code-support) plugin if you use one of the credentials plugins or the job-dsl (see link).
+- Those running Jenkins as a [Docker](https://github.com/jenkinsci/docker) container (and maybe also [pre-installing plugins](https://github.com/jenkinsci/docker#preinstalling-plugins)), do include [Configuration as Code](https://plugins.jenkins.io/configuration-as-code) plugin.
 
 Second, the plugin looks for the `CASC_JENKINS_CONFIG` environment variable. The variable can point to any of the following:
 

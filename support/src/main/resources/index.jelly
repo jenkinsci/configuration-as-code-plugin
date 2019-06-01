@@ -1,8 +1,0 @@
-<?jelly escape-by-default='true'?>
-<!--
-  This view is used to render the installed plugins page.
--->
-<div>
-  This plugin no longer provides any function, feel free to uninstall it.<br />
-  The custom configurators have been moved to the third-party plugins.
-</div>

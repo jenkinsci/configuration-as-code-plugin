@@ -1,6 +1,6 @@
 # configure config-file-provider files
 
-Configuration as Code support is available from config-file-provider 3.4.1.
+support for Configuration as Code is available from config-file-provider 3.4.1.
 
 ## sample configuration
 

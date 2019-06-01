@@ -15,7 +15,6 @@
   <modules>
     <module>snakeyaml</module>
     <module>plugin</module>
-    <module>support</module>
     <module>integrations</module>
   </modules>
 
