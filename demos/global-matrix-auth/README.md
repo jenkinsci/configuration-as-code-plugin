@@ -8,7 +8,7 @@ Requires `matrix-auth` >= 2.4
 jenkins:
   authorizationStrategy:
     globalMatrix:
-      grantedPermissions:
+      permissions:
         - "Overall/Read:anonymous"
         - "Overall/Administer:authenticated"
 ```
@@ -19,7 +19,7 @@ jenkins:
 jenkins:
   authorizationStrategy:
     projectMatrix:
-      grantedPermissions:
+      permissions:
         - "View/Delete:authenticated"
         - "View/Read:authenticated"
         - "View/Configure:authenticated"

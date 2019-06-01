@@ -25,12 +25,6 @@
     </dependency>
 
     <dependency>
-      <groupId>io.jenkins.configuration-as-code</groupId>
-      <artifactId>configuration-as-code-support</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
       <groupId>io.jenkins</groupId>
       <artifactId>configuration-as-code</artifactId>
       <version>${project.version}</version>
