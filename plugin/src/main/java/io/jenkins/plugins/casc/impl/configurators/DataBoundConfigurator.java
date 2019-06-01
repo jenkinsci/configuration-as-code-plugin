@@ -3,7 +3,6 @@ package io.jenkins.plugins.casc.impl.configurators;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Descriptor;
-import hudson.util.DescribableList;
 import hudson.util.Secret;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.BaseConfigurator;
@@ -241,7 +240,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
             Object value = a.getValue(instance);
             if (value != null) {
                 Object converted = Stapler.CONVERT_UTILS.convert(value, a.getType());
-                if (converted instanceof DescribableList || !a.isMultiple()) {
+                if (converted instanceof List || !a.isMultiple()) {
                     args[i] = converted;
                 } else {
                     args[i] = Collections.singletonList(converted);
