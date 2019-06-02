@@ -1,5 +1,7 @@
 # credentials plugin
 
+Requires `credentials` >= 2.2.0
+
 ## sample configuration
 
 ```yaml

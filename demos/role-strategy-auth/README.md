@@ -2,6 +2,8 @@
 
 Basic configuration of the [Role-based Authorization Strategy plugin](https://plugins.jenkins.io/role-strategy)
 
+Requires `role-strategy` >= 2.11
+
 ## sample
 
 ```yml
