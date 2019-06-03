@@ -48,12 +48,6 @@ public abstract class ExportImportRoundTripAbstractTest {
     @Rule
     public LoggerRule logging = new LoggerRule();
 
-    static {
-        // The restartable rule add spaces to Jenkins home and it makes the second and next steps to fail loading the
-        // jenkins.yml. This property avoid that.
-        //System.setProperty("jenkins.test.noSpaceInTmpDirs", "true");
-    }
-
     /**
      * A method to assert if the configuration was correctly loaded. The Jenkins rule and the content of the config
      * supposedly loaded are passed.
@@ -81,7 +75,7 @@ public abstract class ExportImportRoundTripAbstractTest {
             jenkinsConfigContentOld = FileUtils.readFileToString(jenkinsConfig);
         }
 
-        cascJenkinsConfigPropOld = System.getProperty("casc.jenkins.config", null);
+        cascJenkinsConfigPropOld = System.getProperty(ConfigurationAsCode.CASC_JENKINS_CONFIG_PROPERTY, null);
     }
 
     /*
@@ -104,9 +98,9 @@ public abstract class ExportImportRoundTripAbstractTest {
         }
 
         if (cascJenkinsConfigPropOld != null) {
-            System.setProperty("casc.jenkins.config", cascJenkinsConfigPropOld);
+            System.setProperty(ConfigurationAsCode.CASC_JENKINS_CONFIG_PROPERTY, cascJenkinsConfigPropOld);
         } else {
-            System.clearProperty("casc.jenkins.config");
+            System.clearProperty(ConfigurationAsCode.CASC_JENKINS_CONFIG_PROPERTY);
         }
     }
 
@@ -140,7 +134,8 @@ public abstract class ExportImportRoundTripAbstractTest {
             // Get the full configuration
             //String jenkinsConf = getJenkinsConfViaWebUI();
             //hack: the full Jenkins config fails due to defaultProperties of maven, we use the config of the plugin
-            //TODO: remove when full Jenkins config works
+            //TODO: remove when https://issues.jenkins-ci.org/browse/JENKINS-57122 is solved
+            //@Issue("JENKINS-57122")
             String jenkinsConf = getResourceContent(resourcePath);
 
             // Get the schema
@@ -151,7 +146,6 @@ public abstract class ExportImportRoundTripAbstractTest {
             //verifyJsonAgainstSchema(jenkinsConf, schema);
 
             // Check if the exported configuration is valid
-            //TODO: we use the plugin conf so far. The Jenkins conf fails because maven defaultProperties tag is not valid
             assertConfigViaWebUI(jenkinsConf);
 
             // Apply full configuration. Maybe not needed, we already have it configured and checked it is valid.
@@ -163,7 +157,7 @@ public abstract class ExportImportRoundTripAbstractTest {
             putConfigInHome(jenkinsConf);
 
             // Before restarting we need to establish this property, it's not managed properly so far
-            System.setProperty("casc.jenkins.config", new File(r.home, ConfigurationAsCode.DEFAULT_JENKINS_YAML_PATH).toURI().toURL().toExternalForm());
+            System.setProperty(ConfigurationAsCode.CASC_JENKINS_CONFIG_PROPERTY, new File(r.home, ConfigurationAsCode.DEFAULT_JENKINS_YAML_PATH).toURI().toURL().toExternalForm());
 
             // Start recording the logs just before restarting, to avoid capture the previous startup. We're look there
             // if the "magic token" is there
@@ -203,10 +197,11 @@ public abstract class ExportImportRoundTripAbstractTest {
         File configFile = new File(r.home, ConfigurationAsCode.DEFAULT_JENKINS_YAML_PATH);
 
         writeToFile(config, configFile.getAbsolutePath());
-        assertTrue("jenkins.yml should be created", configFile.exists());
+        assertTrue(ConfigurationAsCode.DEFAULT_JENKINS_YAML_PATH + " should be created", configFile.exists());
     }
 
-    //TODO: use when the Jenkins Config can be loaded (maven failure)
+    //TODO: to be used when https://issues.jenkins-ci.org/browse/JENKINS-57122 is solved
+    //@Issue("JENKINS-57122")
 //    private String getJenkinsConfViaWebUI() throws Exception {
 //        return download("configuration-as-code/export");
 //    }
