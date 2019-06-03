@@ -221,7 +221,7 @@ public abstract class ExportImportRoundTripAbstractTest {
         // Call the check url
         JenkinsRule.WebClient client = r.j.createWebClient();
         WebRequest request = new WebRequest(client.createCrumbedUrl("configuration-as-code/checkNewSource"), POST);
-        NameValuePair param = new NameValuePair("newSource", f.getAbsolutePath());
+        NameValuePair param = new NameValuePair("newSource", f.toURI().toURL().toExternalForm());
         request.setRequestParameters(Collections.singletonList(param));
         WebResponse response = client.loadWebResponse(request);
         assertEquals(200, response.getStatusCode());
@@ -237,7 +237,7 @@ public abstract class ExportImportRoundTripAbstractTest {
         // Call the replace url
         JenkinsRule.WebClient client = r.j.createWebClient();
         WebRequest request = new WebRequest(client.createCrumbedUrl("configuration-as-code/replace"), POST);
-        NameValuePair param = new NameValuePair("_.newSource", f.getAbsolutePath());
+        NameValuePair param = new NameValuePair("_.newSource", f.toURI().toURL().toExternalForm());
         request.setRequestParameters(Collections.singletonList(param));
         WebResponse response = client.loadWebResponse(request);
         assertEquals(200, response.getStatusCode());
