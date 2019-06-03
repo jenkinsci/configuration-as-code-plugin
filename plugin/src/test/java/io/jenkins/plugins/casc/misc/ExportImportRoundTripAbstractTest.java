@@ -1,8 +1,8 @@
 package io.jenkins.plugins.casc.misc;
 
-import com.gargoylesoftware.htmlunit.util.NameValuePair;
 import com.gargoylesoftware.htmlunit.WebRequest;
 import com.gargoylesoftware.htmlunit.WebResponse;
+import com.gargoylesoftware.htmlunit.util.NameValuePair;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.impl.configurators.DataBoundConfigurator;
