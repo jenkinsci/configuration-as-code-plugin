@@ -55,7 +55,7 @@ public abstract class ExportImportRoundTripAbstractTest {
      * A method to assert if the configuration was correctly loaded. The Jenkins rule and the content of the config
      * supposedly loaded are passed.
      */
-    public abstract void configuredAsExpected(RestartableJenkinsRule j, String configContent);
+    public abstract void assertConfiguredAsExpected(RestartableJenkinsRule j, String configContent);
 
     /**
      * Return the resource path (yaml file) to be loaded. i.e: If the resource is in the same package of the implementor
@@ -124,7 +124,7 @@ public abstract class ExportImportRoundTripAbstractTest {
         r.then(step -> {
             // Configure and validate
             configureWithResource(resourcePath);
-            configuredAsExpected(r, resourceContent);
+            assertConfiguredAsExpected(r, resourceContent);
 
             // Get the full configuration
             //String jenkinsConf = getJenkinsConfViaWebUI();
@@ -141,11 +141,11 @@ public abstract class ExportImportRoundTripAbstractTest {
 
             // Check if the exported configuration is valid
             //TODO: we use the plugin conf so far. The Jenkins conf fails because maven defaultProperties tag is not valid
-            checkConfigViaWebUI(jenkinsConf);
+            assertConfigViaWebUI(jenkinsConf);
 
             // Apply full configuration. Maybe not needed, we already have it configured and checked it is valid.
             applyConfigViaWebUI(jenkinsConf);
-            configuredAsExpected(r, resourceContent);
+            assertConfiguredAsExpected(r, resourceContent);
 
             // Configure Jenkins default JCasC file with the config file. It's already established, we check if applied
             // looking at the logs.
@@ -162,10 +162,10 @@ public abstract class ExportImportRoundTripAbstractTest {
         r.then(step -> {
             try {
                 // Verify the log shows it's configured
-                verifyLogAsExpected(stringInLogExpected());
+                assertLogAsExpected(stringInLogExpected());
 
                 // Verify the configuration set at home/jenkins.yaml is loaded
-                configuredAsExpected(r, resourceContent);
+                assertConfiguredAsExpected(r, resourceContent);
             } finally {
                 restoreJenkinsConfig();
             }
@@ -195,9 +195,10 @@ public abstract class ExportImportRoundTripAbstractTest {
         assertTrue("jenkins.yml should be created", configFile.exists());
     }
 
-    private String getJenkinsConfViaWebUI() throws Exception {
-        return download("configuration-as-code/export");
-    }
+    //TODO: use when the Jenkins Config can be loaded (maven failure)
+//    private String getJenkinsConfViaWebUI() throws Exception {
+//        return download("configuration-as-code/export");
+//    }
 
     private String download(String url) throws IOException {
         JenkinsRule.WebClient client = r.j.createWebClient();
@@ -208,7 +209,7 @@ public abstract class ExportImportRoundTripAbstractTest {
         return response.getContentAsString();
     }
 
-    private void checkConfigViaWebUI(String jenkinsConfig) throws Exception {
+    private void assertConfigViaWebUI(String jenkinsConfig) throws Exception {
         // The UI requires the path to the config file
         File f = tempFolder.newFile();
         writeToFile(jenkinsConfig, f.getAbsolutePath());
@@ -247,7 +248,7 @@ public abstract class ExportImportRoundTripAbstractTest {
         assertThat(res, containsString(f.getAbsolutePath()));
     }
 
-    private void verifyLogAsExpected(String uniqueText) {
+    private void assertLogAsExpected(String uniqueText) {
         assertTrue(logging.getMessages().stream().anyMatch(m -> m.contains(uniqueText)));
     }
 }
