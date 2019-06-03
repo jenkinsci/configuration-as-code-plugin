@@ -156,7 +156,7 @@ public abstract class ExportImportRoundTripAbstractTest {
             putConfigInHome(jenkinsConf);
 
             // Before restarting we need to establish this property, it's not managed properly so far
-            System.setProperty("casc.jenkins.config", new File(r.home, ConfigurationAsCode.DEFAULT_JENKINS_YAML_PATH).getAbsolutePath());
+            System.setProperty("casc.jenkins.config", new File(r.home, ConfigurationAsCode.DEFAULT_JENKINS_YAML_PATH).toURI().toURL().toExternalForm());
 
             // Start recording the logs just before restarting, to avoid capture the previous startup. We're look there
             // if the "magic token" is there
@@ -249,7 +249,7 @@ public abstract class ExportImportRoundTripAbstractTest {
                         </ul>
         path is the file used to store the configuration.
          */
-        assertThat(res, containsString(f.getAbsolutePath()));
+        assertThat(res, containsString(f.toURI().toURL().toExternalForm()));
     }
 
     private void assertLogAsExpected(String uniqueText) {
