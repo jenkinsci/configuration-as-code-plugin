@@ -10,7 +10,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.FileSystemException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.logging.Level;
 import org.apache.commons.io.FileUtils;
@@ -49,7 +51,7 @@ public abstract class ExportImportRoundTripAbstractTest {
     static {
         // The restartable rule add spaces to Jenkins home and it makes the second and next steps to fail loading the
         // jenkins.yml. This property avoid that.
-        System.setProperty("jenkins.test.noSpaceInTmpDirs", "true");
+        //System.setProperty("jenkins.test.noSpaceInTmpDirs", "true");
     }
 
     /**
@@ -93,7 +95,12 @@ public abstract class ExportImportRoundTripAbstractTest {
         } else {
             //We remove the file created during the test, it may affect other tests, for example, if the jenkins.yaml
             //is invalid
-            Files.deleteIfExists(new File(r.home, ConfigurationAsCode.DEFAULT_JENKINS_YAML_PATH).toPath());
+            try {
+                Files.deleteIfExists(Paths.get(new File(r.home, ConfigurationAsCode.DEFAULT_JENKINS_YAML_PATH).toURI()));
+            } catch (FileSystemException e) {
+                //On windows: The process cannot access the file because it is being used by another process. Don't
+                //know where, so far.
+            }
         }
 
         if (cascJenkinsConfigPropOld != null) {
