@@ -27,6 +27,7 @@ import static com.gargoylesoftware.htmlunit.HttpMethod.POST;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -121,6 +122,9 @@ public abstract class ExportImportRoundTripAbstractTest {
         String resourcePath = configResource();
         String resourceContent = getResourceContent(resourcePath);
 
+        assertNotNull(resourcePath);
+        assertNotNull(resourceContent);
+
         r.then(step -> {
             // Configure and validate
             configureWithResource(resourcePath);
@@ -199,15 +203,15 @@ public abstract class ExportImportRoundTripAbstractTest {
 //    private String getJenkinsConfViaWebUI() throws Exception {
 //        return download("configuration-as-code/export");
 //    }
-
-    private String download(String url) throws IOException {
-        JenkinsRule.WebClient client = r.j.createWebClient();
-        WebRequest request = new WebRequest(client.createCrumbedUrl(url), POST);
-        WebResponse response = client.loadWebResponse(request);
-
-        assertEquals(200, response.getStatusCode());
-        return response.getContentAsString();
-    }
+//
+//    private String download(String url) throws IOException {
+//        JenkinsRule.WebClient client = r.j.createWebClient();
+//        WebRequest request = new WebRequest(client.createCrumbedUrl(url), POST);
+//        WebResponse response = client.loadWebResponse(request);
+//
+//        assertEquals(200, response.getStatusCode());
+//        return response.getContentAsString();
+//    }
 
     private void assertConfigViaWebUI(String jenkinsConfig) throws Exception {
         // The UI requires the path to the config file
