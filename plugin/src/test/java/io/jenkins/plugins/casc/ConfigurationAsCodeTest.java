@@ -182,4 +182,9 @@ public class ConfigurationAsCodeTest {
         Assert.assertThat(j.jenkins.getDescription(), is("Configured by Configuration as Code plugin"));
         System.clearProperty(CASC_JENKINS_CONFIG_PROPERTY);
     }
+
+    @Test
+    @ConfiguredWithCode(value = {"aNonEmpty.yml", "empty.yml"}) //file names matter for order!
+    public void test_non_first_yaml_file_empty() {
+    }
 }
