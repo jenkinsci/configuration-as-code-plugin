@@ -10,14 +10,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.file.FileSystemException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.logging.Level;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -33,12 +28,24 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
+ * Base test to check a complete test of each plugin configuration. What it makes:
+ * 1.  Configure the instance with the {@link #configResource()} implemented.
+ * 2.  Check it was configured correctly.
+ * 3.  Export the full Jenkins configuration via Web UI (hacked as it fails so far).
+ * 4.  Export the schema via Web UI (commented out as there is no good validator so far).
+ * 5.  Verify the Jenkins configuration against the schema (commented out as there is no good validator so far).
+ * 6.  Check the Jenkins configuration is valid via Web UI (used the plugin config so far).
+ * 7.  Apply the Jenkins configuration via Web UI (maybe not needed, but we test it as well).
+ * 8.  Write the Jenkins configuration to $JENKINS_ROOT/jenkins.yaml.
+ * 9.  Restart Jenkins.
+ * 10. Check the {@link #stringInLogExpected()} is set during the restart.
  *
+ * All the plugin author needs to do is override the methods providing:
+ * 1. The resource with the yaml configuration of the plugin
+ * 2. A way to validate the configuration is established
+ * 3. A string that should be present in the logs that guarantees the config is loaded. Usually a weird text configured.
  */
 public abstract class ExportImportRoundTripAbstractTest {
-    private String jenkinsConfigContentOld;
-    private String cascJenkinsConfigPropOld;
-
     @Rule
     public RestartableJenkinsRule r = new RestartableJenkinsRule();
 
@@ -52,57 +59,21 @@ public abstract class ExportImportRoundTripAbstractTest {
      * A method to assert if the configuration was correctly loaded. The Jenkins rule and the content of the config
      * supposedly loaded are passed.
      */
-    public abstract void assertConfiguredAsExpected(RestartableJenkinsRule j, String configContent);
+    protected abstract void assertConfiguredAsExpected(RestartableJenkinsRule j, String configContent);
 
     /**
      * Return the resource path (yaml file) to be loaded. i.e: If the resource is in the same package of the implementor
      * class, then: my-config.yaml
      * @return the resource name and path.
      */
-    public abstract String configResource();
+    protected abstract String configResource();
 
     /**
      * Return the string that should be in the logs of the JCasC logger to verify it's configured after a restart. This
      * string should be unique to avoid interpreting that it was configured successfully, but it wasn't.
      * @return the unique string to be in the logs to certify the configuration was done successfully.
      */
-    public abstract String stringInLogExpected();
-
-    @Before
-    public void saveJenkinsConfig() throws IOException {
-        File jenkinsConfig = new File(r.home, ConfigurationAsCode.DEFAULT_JENKINS_YAML_PATH);
-        if (jenkinsConfig.exists()) {
-            jenkinsConfigContentOld = FileUtils.readFileToString(jenkinsConfig);
-        }
-
-        cascJenkinsConfigPropOld = System.getProperty(ConfigurationAsCode.CASC_JENKINS_CONFIG_PROPERTY, null);
-    }
-
-    /*
-    Annotated with @After is executed before the second step is ended.
-    We need to call it at the end of the second step.
-     */
-    //@After
-    public void restoreJenkinsConfig() throws IOException {
-        if (jenkinsConfigContentOld != null) {
-            writeToFile(jenkinsConfigContentOld, new File(r.home, ConfigurationAsCode.DEFAULT_JENKINS_YAML_PATH).getAbsolutePath());
-        } else {
-            //We remove the file created during the test, it may affect other tests, for example, if the jenkins.yaml
-            //is invalid
-            try {
-                Files.deleteIfExists(Paths.get(new File(r.home, ConfigurationAsCode.DEFAULT_JENKINS_YAML_PATH).toURI()));
-            } catch (FileSystemException e) {
-                //On windows: The process cannot access the file because it is being used by another process. Don't
-                //know where, so far.
-            }
-        }
-
-        if (cascJenkinsConfigPropOld != null) {
-            System.setProperty(ConfigurationAsCode.CASC_JENKINS_CONFIG_PROPERTY, cascJenkinsConfigPropOld);
-        } else {
-            System.clearProperty(ConfigurationAsCode.CASC_JENKINS_CONFIG_PROPERTY);
-        }
-    }
+    protected abstract String stringInLogExpected();
 
     /**
      * 1.  Configure the instance with the {@link #configResource()} implemented.
@@ -156,24 +127,17 @@ public abstract class ExportImportRoundTripAbstractTest {
             // looking at the logs.
             putConfigInHome(jenkinsConf);
 
-            // Before restarting we need to establish this property, it's not managed properly so far
-            System.setProperty(ConfigurationAsCode.CASC_JENKINS_CONFIG_PROPERTY, new File(r.home, ConfigurationAsCode.DEFAULT_JENKINS_YAML_PATH).toURI().toURL().toExternalForm());
-
             // Start recording the logs just before restarting, to avoid capture the previous startup. We're look there
             // if the "magic token" is there
             logging.record(DataBoundConfigurator.class.getName(), Level.INFO).capture(5);
         });
 
         r.then(step -> {
-            try {
-                // Verify the log shows it's configured
-                assertLogAsExpected(stringInLogExpected());
+            // Verify the log shows it's configured
+            assertLogAsExpected(stringInLogExpected());
 
-                // Verify the configuration set at home/jenkins.yaml is loaded
-                assertConfiguredAsExpected(r, resourceContent);
-            } finally {
-                restoreJenkinsConfig();
-            }
+            // Verify the configuration set at home/jenkins.yaml is loaded
+            assertConfiguredAsExpected(r, resourceContent);
         });
     }
 
