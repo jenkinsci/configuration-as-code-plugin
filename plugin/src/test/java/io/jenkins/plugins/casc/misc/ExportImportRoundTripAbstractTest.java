@@ -66,7 +66,9 @@ public abstract class ExportImportRoundTripAbstractTest {
      * class, then: my-config.yaml
      * @return the resource name and path.
      */
-    protected abstract String configResource();
+    protected String configResource() {
+        return "configuration-as-code.yaml";
+    }
 
     /**
      * Return the string that should be in the logs of the JCasC logger to verify it's configured after a restart. This
