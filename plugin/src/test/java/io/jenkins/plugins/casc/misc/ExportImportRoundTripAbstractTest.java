@@ -41,7 +41,7 @@ import static org.junit.Assert.assertTrue;
  * 10. Check the {@link #stringInLogExpected()} is set during the restart.
  *
  * All the plugin author needs to do is override the methods providing:
- * 1. The resource with the yaml configuration of the plugin
+ * 1. The resource with the yaml configuration of the plugin in case they use their own name for the file
  * 2. A way to validate the configuration is established
  * 3. A string that should be present in the logs that guarantees the config is loaded. Usually a weird text configured.
  */
