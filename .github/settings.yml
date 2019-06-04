@@ -10,6 +10,7 @@ repository:
   allow_squash_merge: true
   allow_rebase_merge: false
 
+#TODO(oleg-nenashev): Consider moving to https://github.com/jenkinsci/.github once https://github.com/probot/settings/issues/107 is fixed
 labels:
   - name: good first issue
     color: 7057ff
