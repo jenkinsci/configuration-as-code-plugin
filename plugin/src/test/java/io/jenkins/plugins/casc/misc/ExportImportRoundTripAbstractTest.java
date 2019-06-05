@@ -125,7 +125,7 @@ public abstract class ExportImportRoundTripAbstractTest {
             // bug filed is solved we can uncomment that check. In other way, all the plugins with plain secrets in
             // their YAMLs will fail in this test. Example: Credentials.
             //TODO: uncomment when https://issues.jenkins-ci.org/browse/JENKINS-57863 is solved
-            //assertJenkinsHasConfiguredPath(jenkinsConf, resourcePath);
+            assertJenkinsHasConfiguredPath(jenkinsConf, resourcePath);
 
             //hack: the full Jenkins config fails due to defaultProperties of maven, we use the config of the plugin,
             //but first, we guarantee that the exported configuration is the same as the configured.
