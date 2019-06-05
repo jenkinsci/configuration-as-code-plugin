@@ -174,8 +174,6 @@ public abstract class ExportImportRoundTripAbstractTest {
         YamlSource<Path> yamlConfigSource = YamlSource.of(Paths.get(getClass().getResource(resourcePath).toURI()));
         Mapping configMapping = YamlUtils.loadFrom(Collections.singletonList(yamlConfigSource));
 
-        Mapping result = new Mapping();
-
         // We use a recursive method to compare all nodes of configMapping
         sameInfoAs(jenkinsMapping, configMapping);
     }
@@ -216,7 +214,7 @@ public abstract class ExportImportRoundTripAbstractTest {
                 }
                 break;
 
-            case SCALAR:
+            default: //SCALAR
                 // If both are scalar, just compared then
                 Scalar value = (Scalar) values;
                 Scalar oneCompared = (Scalar) compared;
@@ -225,6 +223,7 @@ public abstract class ExportImportRoundTripAbstractTest {
                             oneCompared.getSource().file, oneCompared.getSource().line, oneCompared.getValue(),
                             value.getSource().file, value.getSource().line, value.getValue()));
                 }
+                break;
         }
     }
 
