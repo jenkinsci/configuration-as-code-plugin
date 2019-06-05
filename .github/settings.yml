@@ -35,7 +35,8 @@ labels:
   - name: feature
     color: 1d00ff
     description: A PR that adds a feature - used by Release Drafter
-  - name: fix
+  - name: bugfix
+    oldname: fix
     color: c9e85c
     description: A PR that fixes a bug - used by Release Drafter
   - name: chore
