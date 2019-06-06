@@ -7,6 +7,7 @@ import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.ConfiguratorException;
+import io.jenkins.plugins.casc.SecretSourceResolver;
 import io.jenkins.plugins.casc.model.Mapping;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -36,17 +37,18 @@ public class ProxyConfigurator extends BaseConfigurator<ProxyConfiguration> {
     protected ProxyConfiguration instance(Mapping mapping, ConfigurationContext context) throws ConfiguratorException {
         Set<String> keys = mapping.keySet();
         return new ProxyConfiguration(
-                mapping.getScalarValue("name"),
-                Integer.parseInt(mapping.getScalarValue("port")),
-                getOptionalParam(mapping, keys, "userName"),
-                getOptionalParam(mapping, keys, "password"),
-                getOptionalParam(mapping, keys, "noProxyHost"),
-                getOptionalParam(mapping, keys, "testUrl")
+                SecretSourceResolver.resolve(context, mapping.getScalarValue("name")),
+                Integer.parseInt(SecretSourceResolver.resolve(context, mapping.getScalarValue("port"))),
+                getOptionalParam(mapping, context, keys, "userName"),
+                getOptionalParam(mapping, context, keys, "password"),
+                getOptionalParam(mapping, context, keys, "noProxyHost"),
+                getOptionalParam(mapping, context, keys, "testUrl")
         );
     }
 
-    private String getOptionalParam(Mapping mapping, Set<String> keys, String key) throws ConfiguratorException {
-        return keys.contains(key) ? mapping.getScalarValue(key) : null;
+    private String getOptionalParam(Mapping mapping, ConfigurationContext context,
+                                    Set<String> keys, String key) throws ConfiguratorException {
+        return keys.contains(key) ? SecretSourceResolver.resolve(context, mapping.getScalarValue(key)) : null;
     }
 
     @NonNull
