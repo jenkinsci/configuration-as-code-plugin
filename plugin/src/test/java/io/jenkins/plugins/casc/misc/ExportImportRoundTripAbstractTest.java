@@ -143,6 +143,7 @@ public abstract class ExportImportRoundTripAbstractTest {
         });
     }
 
+//TODO: uncomment when https://issues.jenkins-ci.org/browse/JENKINS-57863 is solved
 //    private void assertJenkinsHasConfiguredPath(String jenkinsConfig, String resourcePath) throws IOException, URISyntaxException {
 //        // Get mapping from full Jenkins configuration
 //        InputStream configStream = IOUtils.toInputStream(jenkinsConfig, Charset.forName("UTF-8"));
