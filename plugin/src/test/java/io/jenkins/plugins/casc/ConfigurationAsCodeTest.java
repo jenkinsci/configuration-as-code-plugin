@@ -187,4 +187,11 @@ public class ConfigurationAsCodeTest {
     @ConfiguredWithCode(value = {"aNonEmpty.yml", "empty.yml"}) //file names matter for order!
     public void test_non_first_yaml_file_empty() {
     }
+
+    @Test
+    @Issue("Issue #914")
+    public void isSupportedURI_should_not_throw_on_invalid_uri() {
+        //for example, a Windows path is not a valid URI
+        assertThat(ConfigurationAsCode.isSupportedURI("C:\\jenkins\\casc"), is(false));
+    }
 }
