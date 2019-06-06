@@ -43,18 +43,17 @@ import static org.junit.Assert.fail;
  * Base test to check a complete test of each plugin configuration. What it makes:
  * 1.  Configure the instance with the {@link #configResource()} implemented.
  * 2.  Check it was configured correctly.
- * 3.  Export the full Jenkins configuration via Web UI (hacked as it fails so far).
- * 4.  Export the schema via Web UI (commented out as there is no good validator so far).
- * 5.  Verify the Jenkins configuration against the schema (commented out as there is no good validator so far).
- * 6.  Check the Jenkins configuration is valid via Web UI (used the plugin config so far).
+ * 3.  Export the full Jenkins configuration via Web UI.
+ * 4.  Compare the content exported against the YAML used (commented out because of the bug JENKINS-57863).
+ * 6.  Check the Jenkins configuration is valid via Web UI (used the YAML config because of the bug JENKINS-57122).
  * 7.  Apply the Jenkins configuration via Web UI (maybe not needed, but we test it as well).
  * 8.  Write the Jenkins configuration to $JENKINS_ROOT/jenkins.yaml.
  * 9.  Restart Jenkins.
  * 10. Check the {@link #stringInLogExpected()} is set during the restart.
  *
  * All the plugin author needs to do is override the methods providing:
- * 1. The resource with the yaml configuration of the plugin in case they use their own name for the file
- * 2. A way to validate the configuration is established
+ * 1. The resource with the yaml configuration of the plugin in case they use their own name for the file.
+ * 2. A way to validate the configuration is established.
  * 3. A string that should be present in the logs that guarantees the config is loaded. Usually a weird text configured.
  */
 public abstract class ExportImportRoundTripAbstractTest {
@@ -92,10 +91,9 @@ public abstract class ExportImportRoundTripAbstractTest {
     /**
      * 1.  Configure the instance with the {@link #configResource()} implemented.
      * 2.  Check it was configured correctly.
-     * 3.  Export the full Jenkins configuration via Web UI (commented as it fails with maven defaultProperties).
-     * 4.  Export the schema via Web UI (commented out as there is no good validator so far).
-     * 5.  Verify the Jenkins configuration against the schema (commented out as there is no good validator so far).
-     * 6.  Check the Jenkins configuration is valid via Web UI (used the plugin config so far).
+     * 3.  Export the full Jenkins configuration via Web UI.
+     * 4.  Compare the content exported against the YAML used (commented out because of the bug JENKINS-57863).
+     * 6.  Check the Jenkins configuration is valid via Web UI (used the YAML config because of the bug JENKINS-57122).
      * 7.  Apply the Jenkins configuration via Web UI (maybe not needed, but we test it as well).
      * 8.  Write the Jenkins configuration to $JENKINS_ROOT/jenkins.yaml.
      * 9.  Restart Jenkins.
@@ -132,13 +130,6 @@ public abstract class ExportImportRoundTripAbstractTest {
             //TODO: remove when https://issues.jenkins-ci.org/browse/JENKINS-57122 is solved
             //@Issue("JENKINS-57122")
             jenkinsConf = getResourceContent(resourcePath);
-
-            // Get the schema
-            //String schema = getSchemaViaWebUI();
-
-            // Verify it's compliant to the schema
-            // TODO: when YAML schema validation is mature enough we can do that.
-            //verifyJsonAgainstSchema(jenkinsConf, schema);
 
             // Check if the exported configuration is valid
             assertConfigViaWebUI(jenkinsConf);
@@ -250,8 +241,6 @@ public abstract class ExportImportRoundTripAbstractTest {
         assertTrue(ConfigurationAsCode.DEFAULT_JENKINS_YAML_PATH + " should be created", configFile.exists());
     }
 
-    //TODO: to be used when https://issues.jenkins-ci.org/browse/JENKINS-57122 is solved
-    //@Issue("JENKINS-57122")
     private String getJenkinsConfViaWebUI() throws Exception {
         return download("configuration-as-code/export");
     }
