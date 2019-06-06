@@ -182,4 +182,11 @@ public class ConfigurationAsCodeTest {
         Assert.assertThat(j.jenkins.getDescription(), is("Configured by Configuration as Code plugin"));
         System.clearProperty(CASC_JENKINS_CONFIG_PROPERTY);
     }
+
+    @Test
+    @Issue("Issue #914")
+    public void isSupportedURI_should_not_throw_on_invalid_uri() {
+        //for example, a Windows path is not a valid URI
+        assertThat(ConfigurationAsCode.isSupportedURI("C:\\jenkins\\casc"), is(false));
+    }
 }

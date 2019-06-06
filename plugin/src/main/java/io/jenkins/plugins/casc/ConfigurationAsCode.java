@@ -41,6 +41,7 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
@@ -530,8 +531,13 @@ public class ConfigurationAsCode extends ManagementLink {
             return false;
         }
         final List<String> supportedProtocols = Arrays.asList("https","http","file");
-        URI uri = URI.create(configurationParameter);
-        if(uri == null || uri.getScheme() == null) {
+        URI uri;
+        try {
+            uri = new URI(configurationParameter);
+        } catch (URISyntaxException ex) {
+            return false;
+        }
+        if(uri.getScheme() == null) {
             return false;
         }
         return supportedProtocols.contains(uri.getScheme());
