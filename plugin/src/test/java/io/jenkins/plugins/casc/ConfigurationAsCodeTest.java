@@ -187,6 +187,6 @@ public class ConfigurationAsCodeTest {
     @Issue("Issue #914")
     public void isSupportedURI_should_not_throw_on_invalid_uri() {
         //for example, a Windows path is not a valid URI
-        ConfigurationAsCode.isSupportedURI("C:\\jenkins\\casc");
+        assertThat(ConfigurationAsCode.isSupportedURI("C:\\jenkins\\casc"), is(false));
     }
 }
