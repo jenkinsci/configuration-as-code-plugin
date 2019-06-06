@@ -42,6 +42,8 @@ import static org.junit.Assert.assertTrue;
  * 1. The resource with the yaml configuration of the plugin in case they use their own name for the file.
  * 2. A way to validate the configuration is established.
  * 3. A string that should be present in the logs that guarantees the config is loaded. Usually a weird text configured.
+ *
+ * @since TODO
  */
 public abstract class ExportImportRoundTripAbstractTest {
     @Rule
