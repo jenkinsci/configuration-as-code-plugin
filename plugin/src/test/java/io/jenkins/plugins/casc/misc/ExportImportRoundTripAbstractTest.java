@@ -28,20 +28,19 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Base test to check a complete test of each plugin configuration. What it makes:
- * 1.  Configure the instance with the {@link #configResource()} implemented.
- * 2.  Check it was configured correctly.
- * 3.  Export the full Jenkins configuration via Web UI.
- * 4.  Compare the content exported against the YAML used (commented out because of the bug JENKINS-57863).
- * 6.  Check the Jenkins configuration is valid via Web UI (used the YAML config because of the bug JENKINS-57122).
- * 7.  Apply the Jenkins configuration via Web UI (maybe not needed, but we test it as well).
- * 8.  Write the Jenkins configuration to $JENKINS_ROOT/jenkins.yaml.
- * 9.  Restart Jenkins.
- * 10. Check the {@link #stringInLogExpected()} is set during the restart.
+ * 1. Configure the instance with the {@link #configResource()} implemented.
+ * 2. Check it was configured correctly.
+ * 3. Check the configuration is valid via Web UI.
+ * 4. Apply the configuration via Web UI.
+ * 5. Write the configuration to $JENKINS_ROOT/jenkins.yaml.
+ * 6. Restart Jenkins.
+ * 7. Check the {@link #stringInLogExpected()} is set during the restart.
  *
  * All the plugin author needs to do is override the methods providing:
  * 1. The resource with the yaml configuration of the plugin in case they use their own name for the file.
  * 2. A way to validate the configuration is established.
- * 3. A string that should be present in the logs that guarantees the config is loaded. Usually a weird text configured.
+ * 3. A string that should be present in the logs (casc logger) that guarantees the config is loaded. Usually a weird
+ *    text configured.
  *
  * @since TODO
  */
@@ -78,15 +77,13 @@ public abstract class ExportImportRoundTripAbstractTest {
     protected abstract String stringInLogExpected();
 
     /**
-     * 1.  Configure the instance with the {@link #configResource()} implemented.
-     * 2.  Check it was configured correctly.
-     * 3.  Export the full Jenkins configuration via Web UI.
-     * 4.  Compare the content exported against the YAML used (commented out because of the bug JENKINS-57863).
-     * 6.  Check the Jenkins configuration is valid via Web UI (used the YAML config because of the bug JENKINS-57122).
-     * 7.  Apply the Jenkins configuration via Web UI (maybe not needed, but we test it as well).
-     * 8.  Write the Jenkins configuration to $JENKINS_ROOT/jenkins.yaml.
-     * 9.  Restart Jenkins.
-     * 10. Check the {@link #stringInLogExpected()} is set during the restart.
+     * 1. Configure the instance with the {@link #configResource()} implemented.
+     * 2. Check it was configured correctly.
+     * 3. Check the configuration is valid via Web UI.
+     * 4. Apply the configuration via Web UI.
+     * 5. Write the configuration to $JENKINS_ROOT/jenkins.yaml.
+     * 6. Restart Jenkins.
+     * 7. Check the {@link #stringInLogExpected()} is set during the restart.
      *
      * @throws IOException If an exception is thrown managing resources or files.
      */
@@ -103,27 +100,11 @@ public abstract class ExportImportRoundTripAbstractTest {
             configureWithResource(resourcePath);
             assertConfiguredAsExpected(r, resourceContent);
 
-            // Get the full configuration
-//            String jenkinsConf = getJenkinsConfViaWebUI();
-
-            // Here we check that the exported configuration has the same information as the YAML used.
-            // hack: But when JCasC is running under test (not normally) the ciphered secrets in the YAML are ciphered
-            // again, so the exported configuration won't be the same never. When running normally it works. When the
-            // bug filed is solved we can uncomment that check. In other way, all the plugins with plain secrets in
-            // their YAMLs will fail in this test. Example: Credentials.
-            //TODO: uncomment when https://issues.jenkins-ci.org/browse/JENKINS-57863 is solved
-            //assertJenkinsHasConfiguredPath(jenkinsConf, resourcePath);
-
-            //hack: the full Jenkins config fails due to defaultProperties of maven, we use the config of the plugin,
-            //but first, we guarantee that the exported configuration is the same as the configured.
-            //TODO: remove when https://issues.jenkins-ci.org/browse/JENKINS-57122 is solved
-            //@Issue("JENKINS-57122")
+            // Check config is valid via Web UI
             String jenkinsConf = getResourceContent(resourcePath);
-
-            // Check if the exported configuration is valid
             assertConfigViaWebUI(jenkinsConf);
 
-            // Apply full configuration. Maybe not needed, we already have it configured and checked it is valid.
+            // Apply configuration via Web UI
             applyConfigViaWebUI(jenkinsConf);
             assertConfiguredAsExpected(r, resourceContent);
 
@@ -144,69 +125,6 @@ public abstract class ExportImportRoundTripAbstractTest {
             assertConfiguredAsExpected(r, resourceContent);
         });
     }
-
-//TODO: uncomment when https://issues.jenkins-ci.org/browse/JENKINS-57863 is solved
-//    private void assertJenkinsHasConfiguredPath(String jenkinsConfig, String resourcePath) throws IOException, URISyntaxException {
-//        // Get mapping from full Jenkins configuration
-//        InputStream configStream = IOUtils.toInputStream(jenkinsConfig, Charset.forName("UTF-8"));
-//        Mapping jenkinsMapping = YamlUtils.loadFrom(Collections.singletonList(YamlSource.of(configStream)));
-//
-//        // Get mapping from resourcePath
-//        YamlSource<Path> yamlConfigSource = YamlSource.of(Paths.get(getClass().getResource(resourcePath).toURI()));
-//        Mapping configMapping = YamlUtils.loadFrom(Collections.singletonList(yamlConfigSource));
-//
-//        // We use a recursive method to compare all nodes of configMapping
-//        sameInfoAs(jenkinsMapping, configMapping);
-//    }
-//
-//    /**
-//     * Look if the compared node has AT LEAST the same information as values. <code>compared</code> could have more
-//     * information, but the matching entries must be equals.
-//     * @param compared a configuration with a lot of information
-//     * @param values a configuration with less information to compare to
-//     */
-//    private void sameInfoAs(CNode compared, CNode values) {
-//        if (compared.getType() != values.getType()) {
-//            fail(String.format("The Jenkins configuration exported has an entry of different type of the config entry used.\nJenkins: '%s:%s (%s)'\nConfig file: '%s:%s (%s)'",
-//                    compared.getSource().file, compared.getSource().line, compared.getType(),
-//                    values.getSource().file, values.getSource().line, values.getType()));
-//        }
-//
-//        switch (values.getType()) {
-//            case MAPPING:
-//                // Each entry of values MUST have the same entry on compared
-//                for (Map.Entry<String, CNode> node : ((Mapping) values).entrySet()) {
-//                    // We look for the entry of values inside compared and look if they both have the same info
-//                    for (Map.Entry<String, CNode> node2 : ((Mapping) compared).entrySet()) {
-//                        if (node2.getKey().equals(node.getKey())) {
-//                            sameInfoAs(node2.getValue(), node.getValue());
-//                        }
-//                    }
-//                }
-//                break;
-//
-//            case SEQUENCE:
-//                // Each entry of values MUST have an equal entry on compared
-//                for (CNode node : ((Sequence) values)) {
-//                    // We look for the entry of values inside compared and look if they both have the same info
-//                    for (CNode node2 : ((Sequence) compared)) {
-//                        sameInfoAs(node2, node);
-//                    }
-//                }
-//                break;
-//
-//            default: //SCALAR
-//                // If both are scalar, just compared then
-//                Scalar value = (Scalar) values;
-//                Scalar oneCompared = (Scalar) compared;
-//                if (!value.getValue().equals(oneCompared.getValue())) {
-//                    fail(String.format("The Jenkins configuration exported has a value different from the config used. \nJenkins: %s:%s.\nValue: '%s'\nConfig file: %s:%s.\nValue: '%s'",
-//                            oneCompared.getSource().file, oneCompared.getSource().line, oneCompared.getValue(),
-//                            value.getSource().file, value.getSource().line, value.getValue()));
-//                }
-//                break;
-//        }
-//    }
 
     private void configureWithResource(String config) throws ConfiguratorException {
         ConfigurationAsCode.get().configure(this.getClass().getResource(config).toExternalForm());
@@ -230,19 +148,6 @@ public abstract class ExportImportRoundTripAbstractTest {
         writeToFile(config, configFile.getAbsolutePath());
         assertTrue(ConfigurationAsCode.DEFAULT_JENKINS_YAML_PATH + " should be created", configFile.exists());
     }
-
-//    private String getJenkinsConfViaWebUI() throws Exception {
-//        return download("configuration-as-code/export");
-//    }
-
-//    private String download(String url) throws IOException {
-//        JenkinsRule.WebClient client = r.j.createWebClient();
-//        WebRequest request = new WebRequest(client.createCrumbedUrl(url), POST);
-//        WebResponse response = client.loadWebResponse(request);
-//
-//        assertEquals(200, response.getStatusCode());
-//        return response.getContentAsString();
-//    }
 
     private void assertConfigViaWebUI(String jenkinsConfig) throws Exception {
         // The UI requires the path to the config file
