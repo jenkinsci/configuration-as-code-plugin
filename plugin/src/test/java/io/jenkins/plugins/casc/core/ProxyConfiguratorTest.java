@@ -6,11 +6,14 @@ import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.Configurator;
 import io.jenkins.plugins.casc.ConfiguratorRegistry;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
+import io.jenkins.plugins.casc.misc.Env;
+import io.jenkins.plugins.casc.misc.EnvVarsRule;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
 
 import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
 import static io.jenkins.plugins.casc.misc.Util.toYamlString;
@@ -21,8 +24,12 @@ import static org.junit.Assert.assertNull;
 
 public class ProxyConfiguratorTest {
 
+    final JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+
     @Rule
-    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+    public RuleChain chain = RuleChain
+            .outerRule(new EnvVarsRule())
+            .around(j);
 
     @Test
     @ConfiguredWithCode("Proxy.yml")
@@ -65,6 +72,25 @@ public class ProxyConfiguratorTest {
         assertEquals(3, node.asMapping().size());
         assertEquals("proxyhost", mapping.getScalarValue("name"));
         assertEquals("", Secret.decrypt(mapping.getScalarValue("password")).getPlainText());
+    }
+
+    @Test
+    @Env(name = "PROXY_HOST", value = "proxyhost")
+    @Env(name = "PROXY_PORT", value = "80")
+    @Env(name = "PROXY_USER", value = "proxy_user")
+    @Env(name = "PROXY_PASSWORD", value = "proxy_password")
+    @Env(name = "PROXY_NOPROXY", value = "external.host")
+    @Env(name = "PROXY_TEST_URL", value = "http://google.com")
+    @ConfiguredWithCode("ProxyWithSecrets.yml")
+    public void shouldSetProxyWithSecretInFields() {
+        ProxyConfiguration proxy = j.jenkins.proxy;
+        assertEquals(proxy.name, "proxyhost");
+        assertEquals(proxy.port, 80);
+
+        assertEquals(proxy.getUserName(), "proxy_user");
+        assertEquals(Secret.decrypt(proxy.getEncryptedPassword()).getPlainText(), "proxy_password");
+        assertEquals(proxy.noProxyHost, "external.host");
+        assertEquals(proxy.getTestUrl(), "http://google.com");
     }
 
     @Test
