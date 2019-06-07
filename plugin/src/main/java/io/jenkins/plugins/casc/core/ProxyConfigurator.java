@@ -6,14 +6,16 @@ import hudson.ProxyConfiguration;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
+import io.jenkins.plugins.casc.Configurator;
 import io.jenkins.plugins.casc.ConfiguratorException;
-import io.jenkins.plugins.casc.SecretSourceResolver;
 import io.jenkins.plugins.casc.model.Mapping;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 
 import static io.jenkins.plugins.casc.Attribute.noop;
 
@@ -27,28 +29,17 @@ public class ProxyConfigurator extends BaseConfigurator<ProxyConfiguration> {
         return ProxyConfiguration.class;
     }
 
+    @NonNull
     @Override
-    protected void configure(Mapping config, ProxyConfiguration instance, boolean dryrun,
-                             ConfigurationContext context) throws ConfiguratorException {
-        super.configure(config, instance, dryrun, context);
+    public Class getImplementedAPI() {
+        return ProxyConfigurationDataBounded.class;
     }
 
     @Override
     protected ProxyConfiguration instance(Mapping mapping, ConfigurationContext context) throws ConfiguratorException {
-        Set<String> keys = mapping.keySet();
-        return new ProxyConfiguration(
-                SecretSourceResolver.resolve(context, mapping.getScalarValue("name")),
-                Integer.parseInt(SecretSourceResolver.resolve(context, mapping.getScalarValue("port"))),
-                getOptionalParam(mapping, context, keys, "userName"),
-                getOptionalParam(mapping, context, keys, "password"),
-                getOptionalParam(mapping, context, keys, "noProxyHost"),
-                getOptionalParam(mapping, context, keys, "testUrl")
-        );
-    }
-
-    private String getOptionalParam(Mapping mapping, ConfigurationContext context,
-                                    Set<String> keys, String key) throws ConfiguratorException {
-        return keys.contains(key) ? SecretSourceResolver.resolve(context, mapping.getScalarValue(key)) : null;
+        final Configurator<ProxyConfigurationDataBounded> c = context.lookupOrFail(ProxyConfigurationDataBounded.class);
+        final ProxyConfigurationDataBounded proxy = c.configure(mapping, context);
+        return new ProxyConfiguration(proxy.name, proxy.port, proxy.userName, proxy.password, proxy.noProxyHost, proxy.testUrl);
     }
 
     @NonNull
@@ -74,5 +65,65 @@ public class ProxyConfigurator extends BaseConfigurator<ProxyConfiguration> {
                         .getter(ProxyConfiguration::getTestUrl)
                         .setter(noop())
         ));
+    }
+
+    @Restricted(NoExternalUse.class)
+    public static class ProxyConfigurationDataBounded {
+        private final String name;
+        private final int port;
+        private String userName;
+        private String noProxyHost;
+        private String password;
+        private String testUrl;
+
+        @DataBoundConstructor
+        public ProxyConfigurationDataBounded(String name, int port) {
+            this.name = name;
+            this.port = port;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public int getPort() {
+            return port;
+        }
+
+        public String getUserName() {
+            return userName;
+        }
+
+        @DataBoundSetter
+        public void setUserName(String userName) {
+            this.userName = userName;
+        }
+
+        public String getNoProxyHost() {
+            return noProxyHost;
+        }
+
+        @DataBoundSetter
+        public void setNoProxyHost(String noProxyHost) {
+            this.noProxyHost = noProxyHost;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        @DataBoundSetter
+        public void setPassword(String password) {
+            this.password = password;
+        }
+
+        public String getTestUrl() {
+            return testUrl;
+        }
+
+        @DataBoundSetter
+        public void setTestUrl(String testUrl) {
+            this.testUrl = testUrl;
+        }
     }
 }
