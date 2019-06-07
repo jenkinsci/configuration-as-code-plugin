@@ -44,7 +44,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @since TODO
  */
-public abstract class ExportImportRoundTripAbstractTest {
+public abstract class RoundTripAbstractTest {
     @Rule
     public RestartableJenkinsRule r = new RestartableJenkinsRule();
 
@@ -88,7 +88,7 @@ public abstract class ExportImportRoundTripAbstractTest {
      * @throws IOException If an exception is thrown managing resources or files.
      */
     @Test
-    public void exportImportRoundTrip() throws IOException {
+    public void roundTripTest() throws IOException {
         String resourcePath = configResource();
         String resourceContent = getResourceContent(resourcePath);
 
@@ -174,6 +174,7 @@ public abstract class ExportImportRoundTripAbstractTest {
         JenkinsRule.WebClient client = r.j.createWebClient();
         WebRequest request = new WebRequest(client.createCrumbedUrl("configuration-as-code/replace"), POST);
         NameValuePair param = new NameValuePair("_.newSource", f.toURI().toURL().toExternalForm());
+        request.setRequestParameters(Collections.singletonList(param));
         request.setRequestParameters(Collections.singletonList(param));
         WebResponse response = client.loadWebResponse(request);
         assertEquals(200, response.getStatusCode());
