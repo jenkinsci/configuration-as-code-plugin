@@ -3,6 +3,7 @@ package io.jenkins.plugins.casc.core;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.ProxyConfiguration;
+import hudson.util.Secret;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
@@ -39,7 +40,8 @@ public class ProxyConfigurator extends BaseConfigurator<ProxyConfiguration> {
     protected ProxyConfiguration instance(Mapping mapping, ConfigurationContext context) throws ConfiguratorException {
         final Configurator<ProxyConfigurationDataBounded> c = context.lookupOrFail(ProxyConfigurationDataBounded.class);
         final ProxyConfigurationDataBounded proxy = c.configure(mapping, context);
-        return new ProxyConfiguration(proxy.name, proxy.port, proxy.userName, proxy.password, proxy.noProxyHost, proxy.testUrl);
+        return new ProxyConfiguration(proxy.name, proxy.port, proxy.userName,
+            Secret.toString(proxy.password), proxy.noProxyHost, proxy.testUrl);
     }
 
     @NonNull
@@ -73,7 +75,7 @@ public class ProxyConfigurator extends BaseConfigurator<ProxyConfiguration> {
         private final int port;
         private String userName;
         private String noProxyHost;
-        private String password;
+        private Secret password;
         private String testUrl;
 
         @DataBoundConstructor
@@ -108,12 +110,12 @@ public class ProxyConfigurator extends BaseConfigurator<ProxyConfiguration> {
             this.noProxyHost = noProxyHost;
         }
 
-        public String getPassword() {
+        public Secret getPassword() {
             return password;
         }
 
         @DataBoundSetter
-        public void setPassword(String password) {
+        public void setPassword(Secret password) {
             this.password = password;
         }
 
