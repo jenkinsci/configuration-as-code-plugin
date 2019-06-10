@@ -216,11 +216,15 @@ The configuration file format depends on the version of jenkins-core and install
 Documentation is generated from a live instance, as well as a JSON schema you can use to validate configuration file
 with your favourite YAML tools.
 
+## Escape character
+If your need to put in an YAML definition a character which has a dedicated meaning (like character "$" or "'"), you need to escape it by character "^".
+For example, if you want to have an output content like literal "${foo}"", you need to put "^${foo}"" to YAML definition, otherwise content of environment variable "foo" is put instead of the "${foo}".
+
 ## Handling Secrets
 
 Currently, you can provide initial secrets to JCasC that all rely on <key,value>
 substitution of strings in the configuration. For example, `Jenkins: "${some_var}"`. Default variable substitution
-using the `:-` operator from `bash` is also available. For example, `key: "${VALUE:-defaultvalue}"` will evaluate to `defaultvalue` if `$VALUE` is unset. To escape a string from secret interpolation, put `^` in front of the value. For example, `Jenkins: "^${some_var}"` will produce the literal `Jenkins: "${some_var}"`.
+using the `:-` operator from `bash` is also available. For example, `key: "${VALUE:-defaultvalue}"` will evaluate to `defaultvalue` if `$VALUE` is unset. To escape a string from secret interpolation, put `^` in front of the value (like mentioned previously). For example, `Jenkins: "^${some_var}"` will produce the literal `Jenkins: "${some_var}"`.
 
 We can provide these initial secrets in the following ways:
 
