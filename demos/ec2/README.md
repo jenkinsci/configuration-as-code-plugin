@@ -12,6 +12,10 @@ jenkins:
         credentialsId: "jenkins-aws"
         privateKey: "${EC2_PRIVATE_KEY}"
         region: "eu-central-1"
+        instanceCapStr: ""
+        roleArn: ""
+        roleSessionName: ""
+        noDelayProvisioning: true        
         useInstanceProfileForCredentials: false
         templates:
           - ami: "ami-xyz"
@@ -20,12 +24,13 @@ jenkins:
                 sshPort: "22"
             associatePublicIp: false
             connectBySSHProcess: false
-            connectUsingPublicIp: false
+            connectionStrategy: PRIVATE_IP
             deleteRootOnTermination: false
             description: "docker"
             ebsOptimized: false
             idleTerminationMinutes: "10"
             labelString: "docker ubuntu linux"
+            maxTotalUses: -1
             mode: NORMAL
             monitoring: false
             numExecutors: 1
@@ -35,5 +40,4 @@ jenkins:
             type: T2Micro
             useDedicatedTenancy: false
             useEphemeralDevices: false
-            usePrivateDnsName: false
 ```
