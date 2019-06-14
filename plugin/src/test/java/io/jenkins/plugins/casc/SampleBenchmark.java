@@ -15,7 +15,13 @@ public class SampleBenchmark {
         @Nonnull
         @Override
         protected String getResourcePath() {
-            return "io/jenkins/plugins/casc/benchmarks.yml";
+            return "benchmarks.yml";
+        }
+
+        @Nonnull
+        @Override
+        protected Class<?> getEnclosingClass() {
+            return SampleBenchmark.class;
         }
     }
 
