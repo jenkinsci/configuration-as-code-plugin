@@ -69,12 +69,6 @@
       <version>1.10.6</version>
       <scope>test</scope>
     </dependency>
-
-    <dependency>
-      <groupId>org.jenkins-ci.main</groupId>
-      <artifactId>jenkins-test-harness</artifactId>
-      <version>2.50-rc1168.d591189fccf7</version>
-    </dependency>
   </dependencies>
 
   <build>
