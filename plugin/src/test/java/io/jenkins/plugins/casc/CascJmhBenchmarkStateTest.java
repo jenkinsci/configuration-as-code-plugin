@@ -1,4 +1,4 @@
-package jenkins.benchmark.jmh;
+package io.jenkins.plugins.casc;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
