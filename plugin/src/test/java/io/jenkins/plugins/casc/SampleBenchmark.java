@@ -1,7 +1,6 @@
 package io.jenkins.plugins.casc;
 
 import io.jenkins.plugins.casc.misc.jmh.CascJmhBenchmarkState;
-import java.io.IOException;
 import javax.annotation.Nonnull;
 import jenkins.benchmark.jmh.JmhBenchmark;
 import jenkins.model.Jenkins;
@@ -26,7 +25,7 @@ public class SampleBenchmark {
     }
 
     @Benchmark
-    public void benchmark(MyState state) throws IOException {
+    public void benchmark(MyState state) {
         Jenkins jenkins = state.getJenkins();
         assertEquals("Benchmark started with Configuration as Code", jenkins.getSystemMessage());
         assertEquals(22, jenkins.getNumExecutors());
