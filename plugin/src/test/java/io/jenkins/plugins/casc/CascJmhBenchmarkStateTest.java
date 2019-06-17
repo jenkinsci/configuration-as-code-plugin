@@ -40,7 +40,7 @@ public class CascJmhBenchmarkStateTest {
                         .shouldFailOnError(true)
                         .result(reportPath)
                         .timeUnit(TimeUnit.MICROSECONDS)
-                        .resultFormat(ResultFormatType.JSON);;
+                        .resultFormat(ResultFormatType.JSON);
         BenchmarkFinder.findBenchmarks(optionsBuilder);
         new Runner(optionsBuilder.build()).run();
 
