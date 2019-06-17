@@ -86,6 +86,14 @@ public class Attribute<Owner, Type> {
         return deprecated;
     }
 
+    public boolean isIgnoredOnExport() {
+        return isDeprecated() || isRestricted() || isBlackListedForExport();
+    }
+
+    private boolean isBlackListedForExport() {
+        return toString().equals("defaultProperties(class: class hudson.tools.ToolProperty, multiple: true)");
+    }
+
 
     private static final Class[] EMPTY = new Class[0];
 
