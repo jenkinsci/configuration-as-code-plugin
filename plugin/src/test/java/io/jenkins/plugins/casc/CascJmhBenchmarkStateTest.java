@@ -41,7 +41,7 @@ public class CascJmhBenchmarkStateTest {
                         .result(reportPath)
                         .timeUnit(TimeUnit.MICROSECONDS)
                         .resultFormat(ResultFormatType.JSON);
-        BenchmarkFinder.findBenchmarks(optionsBuilder);
+        new BenchmarkFinder(getClass()).findBenchmarks(optionsBuilder);
         new Runner(optionsBuilder.build()).run();
 
         assertTrue(Files.exists(Paths.get(reportPath)));
