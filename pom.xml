@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>3.45</version>
+    <version>3.46</version>
     <relativePath />
   </parent>
   <groupId>io.jenkins.configuration-as-code</groupId>
@@ -24,7 +24,6 @@
     <jenkins.version>2.60.3</jenkins.version>
     <java.level>8</java.level>
     <tagNameFormat>configuration-as-code-@{project.version}</tagNameFormat>
-    <jenkins-test-harness.version>2.51-rc1190.0446fa11a41f</jenkins-test-harness.version>
   </properties>
 
   <name>Configuration as Code Parent</name>
