@@ -69,7 +69,6 @@
       <version>1.10.6</version>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
 
   <build>

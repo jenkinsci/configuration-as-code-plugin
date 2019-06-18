@@ -1,0 +1,3 @@
+jenkins:
+  systemMessage: "Benchmark started with Configuration as Code"
+  numExecutors: 22
