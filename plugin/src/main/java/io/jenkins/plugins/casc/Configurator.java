@@ -120,7 +120,7 @@ public interface Configurator<T> {
     @NonNull
     default List<Attribute<T,?>> getAttributes() {
         return describe().stream()
-                .filter(a -> !a.isIgnoredOnExport())
+                .filter(a -> !a.isIgnored())
                 .sorted(Comparator.comparing(a -> a.name))
                 .collect(Collectors.toList());
     }

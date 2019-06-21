@@ -5,6 +5,7 @@ import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.model.CNode;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.jvnet.hudson.test.Issue;
 
 import static io.jenkins.plugins.casc.misc.Util.getToolRoot;
 import static io.jenkins.plugins.casc.misc.Util.toStringFromYamlFile;
@@ -19,6 +20,7 @@ public class ToolDefaultPropertiesExportBlacklistTest {
     public static JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 
     @Test
+    @Issue("JENKINS-57122")
     public void export_tool_configuration() throws Exception {
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         ConfigurationContext context = new ConfigurationContext(registry);
