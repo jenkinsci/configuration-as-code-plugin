@@ -10,6 +10,7 @@ import hudson.util.FormValidation;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -59,10 +60,10 @@ public class ConfigurationAsCodeTest {
 
         try {
             Files.createSymbolicLink(newLink, target);
-        } catch (Exception e) {
+        } catch (IOException e) {
             Assume.assumeFalse(Functions.isWindows());
         }
-        
+
         // should *NOT* be picked up
         tempFolder.newFolder("folder.yaml");
 
