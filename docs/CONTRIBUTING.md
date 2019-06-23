@@ -30,3 +30,15 @@ Whenever you report a problem please provide information about:
   - Remember to title your pull request properly as it is used for release notes
 
 Never push directly to this repository!
+
+### Newbie-friendly issues
+
+If you are just starting with contribution to Jenkins, 
+we have identified some newbie-friendly issues related to Configuration-as-Code. 
+Here are some queries you can use to find such issues:
+
+- [GitHub Issues](https://github.com/jenkinsci/configuration-as-code-plugin/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
+- [Jenkins JIRA Query](https://issues.jenkins-ci.org/issues/?filter=18649&jql=project%20%3D%20JENKINS%20AND%20status%20in%20(Open%2C%20Reopened)%20AND%20labels%20%3D%20newbie-friendly%20AND%20(labels%20in%20(jcasc-compatibility%2C%20jcasc-devtools-compatibility)%20or%20component%20in%20(configuration-as-code-plugin%2C%20configuration-as-code-groovy-plugin%2C%20configuration-as-code-secret-ssm-plugin)%20))
+
+Somebody keeps fixing these issues all the time 😱. If the lists are empty,
+just ask in [our Gitter Channel](https://gitter.im/jenkinsci/configuration-as-code-plugin).
