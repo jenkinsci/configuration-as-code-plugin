@@ -5,6 +5,7 @@ import com.gargoylesoftware.htmlunit.WebResponse;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import hudson.Functions;
 import hudson.util.FormValidation;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
@@ -16,6 +17,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -54,8 +56,13 @@ public class ConfigurationAsCodeTest {
         // should be picked up
         Path target = Paths.get("jenkins.tmp");
         Path newLink = Paths.get(tempFolder.getRoot().getAbsolutePath(), "jenkins_5.yaml");
-        Files.createSymbolicLink(newLink, target);
 
+        try {
+            Files.createSymbolicLink(newLink, target);
+        } catch (Exception e) {
+            Assume.assumeFalse(Functions.isWindows());
+        }
+        
         // should *NOT* be picked up
         tempFolder.newFolder("folder.yaml");
 
