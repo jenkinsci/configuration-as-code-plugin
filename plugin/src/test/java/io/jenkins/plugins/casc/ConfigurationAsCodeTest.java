@@ -61,6 +61,7 @@ public class ConfigurationAsCodeTest {
         try {
             Files.createSymbolicLink(newLink, target);
         } catch (IOException e) {
+            // often fails on windows due to non admin users not having symlink permission by default, see: https://stackoverflow.com/questions/23217460/how-to-create-soft-symbolic-link-using-java-nio-files/24353758#24353758
             Assume.assumeFalse(Functions.isWindows());
         }
 
