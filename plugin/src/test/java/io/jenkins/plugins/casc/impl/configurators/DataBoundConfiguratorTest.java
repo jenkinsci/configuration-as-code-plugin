@@ -1,15 +1,13 @@
 package io.jenkins.plugins.casc.impl.configurators;
 
-import io.jenkins.plugins.casc.ConfigurationAsCode;
-import io.jenkins.plugins.casc.ConfigurationContext;
-import io.jenkins.plugins.casc.Configurator;
-import io.jenkins.plugins.casc.ConfiguratorRegistry;
+import io.jenkins.plugins.casc.*;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import io.jenkins.plugins.casc.model.Sequence;
 import javax.annotation.PostConstruct;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -88,6 +86,18 @@ public class DataBoundConfiguratorTest {
         assertEquals(7, otherListViewColumns.size());
         assertEquals("loggedInUsersCanDoAnything", configNode.getScalarValue("authorizationStrategy"));
         assertEquals("plainText", configNode.getScalarValue("markupFormatter"));
+    }
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
+    @Test
+    public void shouldThrowConfiguratorException() throws ConfiguratorException{
+        expectedException.expect(ConfiguratorException.class);
+        expectedException.expectMessage("Message assertion");
+
+        //Need a way to throw the exception here using the same databound config params.
+        throw new ConfiguratorException();
     }
 
     public static class Foo {
