@@ -153,8 +153,8 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                     "Failed to construct instance of " + target +
                             ".\n Constructor: " + constructor.toString() +
                             ".\n Arguments: " + argumentTypes +
-                            ".\n Expected ParamNames: " + names +
-                            ".\n Expected Params: " + parameterTypes, ex);
+                            ".\n Expected Names of Parameters: " + String.join(", ", names) +
+                            ".\n Expected Type of Parameters: " + String.join(", ", parameterTypes), ex);
         }
 
         // constructor was successful, so let's removed configuration elements we have consumed doing so.
