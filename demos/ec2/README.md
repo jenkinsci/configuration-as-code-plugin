@@ -12,10 +12,7 @@ jenkins:
         credentialsId: "jenkins-aws"
         privateKey: "${EC2_PRIVATE_KEY}"
         region: "eu-central-1"
-        instanceCapStr: ""
-        roleArn: ""
-        roleSessionName: ""
-        noDelayProvisioning: true        
+        noDelayProvisioning: true
         useInstanceProfileForCredentials: false
         templates:
           - ami: "ami-xyz"

@@ -53,7 +53,7 @@
       <version>1.20</version>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>active-directory</artifactId>
@@ -87,7 +87,7 @@
         </exclusion>
       </exclusions>
     </dependency>
-    
+
     <dependency>
       <groupId>org.csanchez.jenkins.plugins</groupId>
       <artifactId>kubernetes</artifactId>
@@ -140,7 +140,7 @@
       <version>2.7.1</version>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>apache-httpcomponents-client-4-api</artifactId>
@@ -154,7 +154,7 @@
       <version>2.2.3</version>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-cps-global-lib</artifactId>
@@ -335,7 +335,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>ec2</artifactId>
-      <version>1.39</version>
+      <version>1.44</version>
       <scope>test</scope>
     </dependency>
 
