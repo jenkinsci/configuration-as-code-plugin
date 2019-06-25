@@ -2,6 +2,7 @@ package io.jenkins.plugins.casc.impl.configurators;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import hudson.DescriptorExtensionList;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
 import hudson.security.HudsonPrivateSecurityRealm;
@@ -19,7 +20,10 @@ import io.vavr.Tuple2;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.Stream;
 import io.vavr.control.Option;
+
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -133,8 +137,47 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
                 .getOrElseThrow(() -> new IllegalStateException("No configurator implementation to manage " + klazz));
     }
 
+    /**
+     * Matches suitable descriptors for the target.
+     * The fetch is trivial when the target implements a root {@link Describable} object.
+     * If not, we iterate to parent classes until we find a class which can provide the descriptor list in {@link Jenkins#getDescriptorList(Class)}.
+     * Then we go through all the descriptors and fined ones compliant with the target.
+     * @return Stream of descriptors which match the target
+     */
     private Stream<Descriptor<T>> getDescriptors() {
-        return Stream.ofAll(Jenkins.getInstance().getDescriptorList(target));
+        DescriptorExtensionList<T, Descriptor<T>> descriptorList = Jenkins.getInstance().getDescriptorList(target);
+        if (!descriptorList.isEmpty()) { // fast fetch for root objects
+            return Stream.ofAll(descriptorList);
+        }
+
+        DescriptorExtensionList parentDescriptorClassList = descriptorList;
+        Class<?> effectiveTarget = target;
+        while (parentDescriptorClassList.isEmpty() && effectiveTarget != null) {
+            final Class<Describable> match;
+            try {
+                match = (Class<Describable>)effectiveTarget;
+            } catch (Exception ex) {
+                break;
+            }
+            parentDescriptorClassList = Jenkins.getInstance().getDescriptorList(match);
+            effectiveTarget = effectiveTarget.getSuperclass();
+        }
+
+        if (parentDescriptorClassList.isEmpty()) {
+            return Stream.empty();
+        }
+
+        List<Descriptor<T>> descriptorsWithProperType = new ArrayList<>();
+        Iterator<Descriptor> iterator = parentDescriptorClassList.iterator();
+        while (iterator.hasNext()) {
+            Descriptor<?> d = iterator.next();
+            try {
+                descriptorsWithProperType.add((Descriptor<T>) d);
+            } catch (ClassCastException ignored) {
+                // ignored
+            }
+        }
+        return Stream.ofAll(descriptorsWithProperType);
     }
 
     @SuppressWarnings("unchecked")
