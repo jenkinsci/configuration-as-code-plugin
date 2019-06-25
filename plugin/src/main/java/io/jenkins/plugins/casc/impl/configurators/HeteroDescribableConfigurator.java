@@ -20,7 +20,6 @@ import io.vavr.Tuple2;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.Stream;
 import io.vavr.control.Option;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
