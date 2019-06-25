@@ -115,13 +115,12 @@ public interface Configurator<T> {
 
     /**
      * @return Ordered version of {@link #describe()} for documentation generation.
-     * Only include non-deprecated, non-restricted attribute
+     * Only include non-ignored attribute
      */
     @NonNull
     default List<Attribute<T,?>> getAttributes() {
         return describe().stream()
-                .filter(a -> !a.isRestricted())
-                .filter(a -> !a.isDeprecated())
+                .filter(a -> !a.isIgnored())
                 .sorted(Comparator.comparing(a -> a.name))
                 .collect(Collectors.toList());
     }

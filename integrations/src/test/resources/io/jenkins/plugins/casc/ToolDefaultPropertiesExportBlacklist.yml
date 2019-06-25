@@ -1,0 +1,5 @@
+tool:
+  jdk:
+    installations:
+      - name: default
+        home: "/jdk" # only needed so that in the export test it has a fixed path, otherwise it uses your actual JDK location
