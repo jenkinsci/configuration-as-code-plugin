@@ -9,6 +9,8 @@ import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.workflow.libs.GlobalLibraries;
 import org.jenkinsci.plugins.workflow.libs.LibraryConfiguration;
 import org.jenkinsci.plugins.workflow.libs.SCMRetriever;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
@@ -16,12 +18,11 @@ import org.junit.rules.RuleChain;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.LoggerRule;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import static org.junit.Assert.assertEquals;
 
-
+/**
+ * Tests for Git plugin global configurations.
+ */
 public class GitTest {
 
     public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
