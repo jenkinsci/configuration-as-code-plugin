@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import jenkins.model.Jenkins;
 import org.jenkinsci.Symbol;
@@ -149,13 +150,22 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
             return Stream.ofAll(descriptorList);
         }
 
+        LOGGER.log(Level.FINEST, "getDescriptors(): Cannot find descriptors for {0}." +
+                "Will try parent classes to find proper extension points", target);
         DescriptorExtensionList parentDescriptorClassList = descriptorList;
         Class<?> effectiveTarget = target.getSuperclass();
         while (parentDescriptorClassList.isEmpty() && effectiveTarget != Object.class) {
             final Class<Describable> match;
+            LOGGER.log(Level.FINEST, "getDescriptors() for {0}: Trying parent class {1}",
+                    new Object[] {target, effectiveTarget});
             try {
                 match = (Class<Describable>)effectiveTarget;
             } catch (Exception ex) {
+                if (LOGGER.isLoggable(Level.FINEST)) {
+                    LOGGER.log(Level.FINEST,
+                            String.format("getDescriptors() for %s: Class %s is not describable, interrupting search", target, effectiveTarget),
+                            ex);
+                }
                 break;
             }
             parentDescriptorClassList = Jenkins.getInstance().getDescriptorList(match);
@@ -172,8 +182,15 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
             Descriptor<?> d = iterator.next();
             try {
                 descriptorsWithProperType.add((Descriptor<T>) d);
-            } catch (ClassCastException ignored) {
+                LOGGER.log(Level.FINEST, "getDescriptors() for {0}: Accepting {1} as a suitable descriptor",
+                        new Object[] {target, d});
+            } catch (ClassCastException ex) {
                 // ignored
+                if (LOGGER.isLoggable(Level.FINEST)) {
+                    LOGGER.log(Level.FINEST,
+                            String.format("getDescriptors() for %s: Ignoring %s, because it is not a proper describable type", target, d),
+                            ex);
+                }
             }
         }
         return Stream.ofAll(descriptorsWithProperType);
