@@ -5,25 +5,19 @@ import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.Configurator;
 import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.ConfiguratorRegistry;
-import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
-import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import io.jenkins.plugins.casc.model.Sequence;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import javax.annotation.PostConstruct;
-
-import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
 import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -96,18 +90,18 @@ public class DataBoundConfiguratorTest {
         assertEquals("loggedInUsersCanDoAnything", configNode.getScalarValue("authorizationStrategy"));
         assertEquals("plainText", configNode.getScalarValue("markupFormatter"));
     }
-    
-    @Rule
-    public JenkinsConfiguredWithCodeRule jenkinsConfiguredWithCodeRule = new JenkinsConfiguredWithCodeRule();
 
     @Test
-    @ConfiguredWithCode(value = "ConfiguratorException.yml", expected = ConfiguratorException.class)
-    public void shouldThrowConfiguratorException() throws ConfiguratorException {
-
+    public void shouldThrowConfiguratorException() {
+        Mapping config = new Mapping();
+        config.put("fooo", "foo");
+        config.put("barr", "true");
+        config.put("qixz", "123");
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         try {
-           jenkinsConfiguredWithCodeRule.getInstance().getNumExecutors();
-        } catch (Exception e) {
-            e.printStackTrace();
+            registry.lookupOrFail(Foo.class).configure(config, new ConfigurationContext(registry));
+        } catch (ConfiguratorException e) {
+            assertThat(e.getMessage(), containsString("Available attributes : bar, foo, other, qix, zot"));
         }
     }
 
