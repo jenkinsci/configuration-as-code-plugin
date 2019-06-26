@@ -140,7 +140,7 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
      * Matches suitable descriptors for the target.
      * The fetch is trivial when the target implements a root {@link Describable} object.
      * If not, we iterate to parent classes until we find a class which can provide the descriptor list in {@link Jenkins#getDescriptorList(Class)}.
-     * Then we go through all the descriptors and fined ones compliant with the target.
+     * Then we go through all the descriptors and find ones compliant with the target.
      * @return Stream of descriptors which match the target
      */
     private Stream<Descriptor<T>> getDescriptors() {

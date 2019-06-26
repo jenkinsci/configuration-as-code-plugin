@@ -10,6 +10,7 @@ unclassified:
                 branches:
                   - name: "*/myprodbranch"
                 browser:
+                  # Reproduces JENKINS-57604
                   assemblaWeb:
                     repoUrl: "assembla.acmecorp.com"
                 buildChooser: "default"
