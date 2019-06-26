@@ -150,8 +150,8 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
         }
 
         DescriptorExtensionList parentDescriptorClassList = descriptorList;
-        Class<?> effectiveTarget = target;
-        while (parentDescriptorClassList.isEmpty() && effectiveTarget != null) {
+        Class<?> effectiveTarget = target.getSuperclass();
+        while (parentDescriptorClassList.isEmpty() && effectiveTarget != Object.class) {
             final Class<Describable> match;
             try {
                 match = (Class<Describable>)effectiveTarget;
