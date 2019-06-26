@@ -1,0 +1,11 @@
+configuration-as-code:
+  version: 1
+  deprecated: warn
+  restricted: warn
+  unknown: warn
+
+jenkins:
+  systemMessage: "Jenkins configured automatically by Jenkins Configuration as Code plugin\n\n"
+  numExecutors: "Hello world"
+  scmCheckoutRetryCount: 2
+  mode: NORMAL

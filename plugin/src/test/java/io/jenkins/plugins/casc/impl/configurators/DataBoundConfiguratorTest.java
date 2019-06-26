@@ -1,10 +1,20 @@
 package io.jenkins.plugins.casc.impl.configurators;
 
-import io.jenkins.plugins.casc.*;
+import io.jenkins.plugins.casc.ConfigurationAsCode;
+import io.jenkins.plugins.casc.ConfigurationContext;
+import io.jenkins.plugins.casc.Configurator;
+import io.jenkins.plugins.casc.ConfiguratorException;
+import io.jenkins.plugins.casc.ConfiguratorRegistry;
+import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
+import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import io.jenkins.plugins.casc.model.Sequence;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import javax.annotation.PostConstruct;
+
+import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -20,7 +30,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
@@ -88,16 +97,27 @@ public class DataBoundConfiguratorTest {
         assertEquals("plainText", configNode.getScalarValue("markupFormatter"));
     }
 
+
+//    @Test
+//    public void shouldThrowConfiguratorException() throws ConfiguratorException {
+////        expectedException.expect(ConfiguratorException.class);
+////        expectedException.expectMessage("Message asserti
+//    }
+
+    //    @ConfiguredWithCode("ConfiguratorException.yml")
+
     @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+    public JenkinsConfiguredWithCodeRule jenkinsConfiguredWithCodeRule = new JenkinsConfiguredWithCodeRule();
 
     @Test
-    public void shouldThrowConfiguratorException() throws ConfiguratorException{
-        expectedException.expect(ConfiguratorException.class);
-        expectedException.expectMessage("Message assertion");
+    @ConfiguredWithCode(value = "ConfiguratorException.yml", expected = ConfiguratorException.class)
+    public void shouldThrowConfiguratorException() throws ConfiguratorException {
 
-        //Need a way to throw the exception here using the same databound config params.
-        throw new ConfiguratorException();
+        try {
+           jenkinsConfiguredWithCodeRule.getInstance().getNumExecutors();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static class Foo {
