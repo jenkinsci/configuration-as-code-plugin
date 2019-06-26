@@ -96,16 +96,7 @@ public class DataBoundConfiguratorTest {
         assertEquals("loggedInUsersCanDoAnything", configNode.getScalarValue("authorizationStrategy"));
         assertEquals("plainText", configNode.getScalarValue("markupFormatter"));
     }
-
-
-//    @Test
-//    public void shouldThrowConfiguratorException() throws ConfiguratorException {
-////        expectedException.expect(ConfiguratorException.class);
-////        expectedException.expectMessage("Message asserti
-//    }
-
-    //    @ConfiguredWithCode("ConfiguratorException.yml")
-
+    
     @Rule
     public JenkinsConfiguredWithCodeRule jenkinsConfiguredWithCodeRule = new JenkinsConfiguredWithCodeRule();
 
