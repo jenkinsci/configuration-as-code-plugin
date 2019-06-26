@@ -104,7 +104,8 @@ public class DataBoundConfiguratorTest {
             registry.lookupOrFail(Foo.class).configure(config, new ConfigurationContext(registry));
             fail("above action is excepted to throw ConfiguratorException!");
         } catch (ConfiguratorException e) {
-            assertThat(e.getMessage(), containsString("Available attributes : bar, foo, other, qix, zot"));
+            assertThat(e.getMessage(), is("Invalid configuration elements for type class io.jenkins.plugins.casc.impl.configurators.DataBoundConfiguratorTest$Foo : barr,fooo,qixz.\n"
+                + "Available attributes : bar, foo, other, qix, zot"));
         }
     }
 
