@@ -24,6 +24,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
@@ -100,6 +102,7 @@ public class DataBoundConfiguratorTest {
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         try {
             registry.lookupOrFail(Foo.class).configure(config, new ConfigurationContext(registry));
+            fail("above action is excepted to throw ConfiguratorException!");
         } catch (ConfiguratorException e) {
             assertThat(e.getMessage(), containsString("Available attributes : bar, foo, other, qix, zot"));
         }
