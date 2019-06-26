@@ -5,10 +5,12 @@ import com.gargoylesoftware.htmlunit.WebResponse;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import hudson.Functions;
 import hudson.util.FormValidation;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,6 +18,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -54,7 +57,14 @@ public class ConfigurationAsCodeTest {
         // should be picked up
         Path target = Paths.get("jenkins.tmp");
         Path newLink = Paths.get(tempFolder.getRoot().getAbsolutePath(), "jenkins_5.yaml");
-        Files.createSymbolicLink(newLink, target);
+
+        try {
+            Files.createSymbolicLink(newLink, target);
+        } catch (IOException e) {
+            // often fails on windows due to non admin users not having symlink permission by default, see: https://stackoverflow.com/questions/23217460/how-to-create-soft-symbolic-link-using-java-nio-files/24353758#24353758
+            Assume.assumeFalse(Functions.isWindows());
+            throw e;
+        }
 
         // should *NOT* be picked up
         tempFolder.newFolder("folder.yaml");
