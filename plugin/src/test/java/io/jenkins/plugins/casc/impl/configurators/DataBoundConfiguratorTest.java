@@ -106,8 +106,7 @@ public class DataBoundConfiguratorTest {
             assertThat(e.getMessage(), is("foo: Failed to construct instance of class io.jenkins.plugins.casc.impl.configurators.DataBoundConfiguratorTest$Foo.\n" +
                     " Constructor: public io.jenkins.plugins.casc.impl.configurators.DataBoundConfiguratorTest$Foo(java.lang.String,boolean,int).\n" +
                     " Arguments: [java.lang.String, java.lang.Boolean, java.lang.Integer].\n" +
-                    " Expected Names of Parameters: foo, bar, qix.\n" +
-                    " Expected Type of Parameters: java.lang.String, boolean, int"));
+                    " Expected Parameters: foo java.lang.String, bar boolean, qix int"));
         }
     }
 
