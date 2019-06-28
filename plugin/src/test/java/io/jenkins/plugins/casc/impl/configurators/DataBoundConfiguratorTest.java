@@ -95,16 +95,19 @@ public class DataBoundConfiguratorTest {
     @Test
     public void shouldThrowConfiguratorException() {
         Mapping config = new Mapping();
-        config.put("fooo", "foo");
-        config.put("barr", "true");
-        config.put("qixz", "123");
+        config.put("foo", "foo");
+        config.put("bar", "abcd");
+        config.put("qix", "99");
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         try {
             registry.lookupOrFail(Foo.class).configure(config, new ConfigurationContext(registry));
             fail("above action is excepted to throw ConfiguratorException!");
         } catch (ConfiguratorException e) {
-            assertThat(e.getMessage(), is("Invalid configuration elements for type class io.jenkins.plugins.casc.impl.configurators.DataBoundConfiguratorTest$Foo : barr,fooo,qixz.\n"
-                + "Available attributes : bar, foo, other, qix, zot"));
+            assertThat(e.getMessage(), is("foo: Failed to construct instance of class io.jenkins.plugins.casc.impl.configurators.DataBoundConfiguratorTest$Foo.\n" +
+                    " Constructor: public io.jenkins.plugins.casc.impl.configurators.DataBoundConfiguratorTest$Foo(java.lang.String,boolean,int).\n" +
+                    " Arguments: [java.lang.String, java.lang.Boolean, java.lang.Integer].\n" +
+                    " Expected Names of Parameters: foo, bar, qix.\n" +
+                    " Expected Type of Parameters: java.lang.String, boolean, int"));
         }
     }
 
@@ -122,6 +125,9 @@ public class DataBoundConfiguratorTest {
             this.foo = foo;
             this.bar = bar;
             this.qix = qix;
+            if (qix == 99) {
+                throw new NullPointerException("Magic test fail");
+            }
         }
 
         @DataBoundSetter
