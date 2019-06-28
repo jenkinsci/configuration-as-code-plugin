@@ -1,38 +1,59 @@
 package io.jenkins.plugins.casc;
 
+import hudson.ExtensionList;
 import hudson.model.JDK;
 import hudson.tools.InstallSourceProperty;
 import hudson.tools.JDKInstaller;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
-import org.junit.Assert;
-import org.junit.Rule;
+import io.jenkins.plugins.casc.model.CNode;
+import org.junit.ClassRule;
 import org.junit.Test;
+
+import static io.jenkins.plugins.casc.misc.Util.getToolRoot;
+import static io.jenkins.plugins.casc.misc.Util.toStringFromYamlFile;
+import static io.jenkins.plugins.casc.misc.Util.toYamlString;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author <a href="mailto:vektory79@gmail.com">Viktor Verbitsky</a>
  */
 public class JdkConfiguratorTest {
 
-    @Rule
-    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+    @ClassRule
+    @ConfiguredWithCode("JdkConfiguratorTest.yml")
+    public static JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 
     @Test
-    @ConfiguredWithCode("JdkConfiguratorTest.yml")
-    public void should_configure_maven_tools_and_global_config() {
-        final Object descriptor = j.jenkins.getDescriptorOrDie(JDK.class);
-        Assert.assertNotNull(descriptor);
-        Assert.assertEquals(1, ((JDK.DescriptorImpl) descriptor).getInstallations().length);
+    public void configure_jdk_tool() {
+        final JDK.DescriptorImpl descriptor = ExtensionList.lookupSingleton(JDK.DescriptorImpl.class);
+        assertEquals(1, descriptor.getInstallations().length);
 
-        JDK jdk = ((JDK.DescriptorImpl) descriptor).getInstallations()[0];
-        Assert.assertEquals("jdk8", jdk.getName());
-        Assert.assertEquals("/jdk", jdk.getHome());
+        JDK jdk = descriptor.getInstallations()[0];
+        assertEquals("jdk8", jdk.getName());
+        assertEquals("/jdk", jdk.getHome());
 
         InstallSourceProperty installSourceProperty = jdk.getProperties().get(InstallSourceProperty.class);
-        Assert.assertEquals(1, installSourceProperty.installers.size());
+        assertEquals(1, installSourceProperty.installers.size());
 
         JDKInstaller installer = installSourceProperty.installers.get(JDKInstaller.class);
-        Assert.assertEquals("jdk-8u181-oth-JPR", installer.id);
-        Assert.assertTrue(installer.acceptLicense);
+        assertEquals("jdk-8u181-oth-JPR", installer.id);
+        assertTrue(installer.acceptLicense);
+    }
+
+    @Test
+    public void export_jdk_tool() throws Exception {
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        ConfigurationContext context = new ConfigurationContext(registry);
+        CNode yourAttribute = getToolRoot(context).get("jdk");
+
+        String exported = toYamlString(yourAttribute);
+
+        String expected = toStringFromYamlFile(this, "JdkConfiguratorTestExpected.yml");
+
+        assertThat(exported, is(expected));
     }
 }

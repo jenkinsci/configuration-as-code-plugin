@@ -27,6 +27,7 @@ import org.kohsuke.accmod.AccessRestriction;
 import org.kohsuke.stapler.export.Exported;
 
 import static io.jenkins.plugins.casc.ConfigurationAsCode.printThrowable;
+import static io.jenkins.plugins.casc.Blacklist.isBlacklisted;
 
 /**
  * One attribute of {@link Configurator}.
@@ -86,6 +87,9 @@ public class Attribute<Owner, Type> {
         return deprecated;
     }
 
+    boolean isIgnored() {
+        return isDeprecated() || isRestricted() || isBlacklisted(this);
+    }
 
     private static final Class[] EMPTY = new Class[0];
 
