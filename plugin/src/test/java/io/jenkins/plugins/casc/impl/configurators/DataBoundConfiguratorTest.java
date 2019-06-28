@@ -126,7 +126,7 @@ public class DataBoundConfiguratorTest {
             this.bar = bar;
             this.qix = qix;
             if (qix == 99) {
-                throw new NullPointerException("Magic test fail");
+                throw new RuntimeException("Magic test fail");
             }
         }
 
