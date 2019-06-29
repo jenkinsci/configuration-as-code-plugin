@@ -145,10 +145,20 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
             for (Object arg : args) {
                 argumentTypes.add(arg != null ? arg.getClass().getName() : "null");
             }
+            List<String> parameterTypes = new ArrayList<>(parameters.length);
+            for (Parameter parameter: parameters){
+                parameterTypes.add(parameter.getParameterizedType().getTypeName());
+            }
+            List<String> expectedParamList = new ArrayList<>(parameters.length);
+            for(int i = 0; i < parameters.length; i++){
+                expectedParamList.add(names[i] + " " + parameterTypes.get(i));
+            }
             throw new ConfiguratorException(this,
                     "Failed to construct instance of " + target +
                             ".\n Constructor: " + constructor.toString() +
-                            ".\n Arguments: " + argumentTypes, ex);
+                            ".\n Arguments: " + argumentTypes +
+                            ".\n Expected Parameters: " + String.join(", ",expectedParamList)
+                    , ex);
         }
 
         // constructor was successful, so let's removed configuration elements we have consumed doing so.

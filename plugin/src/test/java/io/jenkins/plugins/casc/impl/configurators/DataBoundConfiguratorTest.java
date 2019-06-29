@@ -3,6 +3,7 @@ package io.jenkins.plugins.casc.impl.configurators;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.Configurator;
+import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.ConfiguratorRegistry;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
@@ -22,6 +23,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -90,6 +92,24 @@ public class DataBoundConfiguratorTest {
         assertEquals("plainText", configNode.getScalarValue("markupFormatter"));
     }
 
+    @Test
+    public void shouldThrowConfiguratorException() {
+        Mapping config = new Mapping();
+        config.put("foo", "foo");
+        config.put("bar", "abcd");
+        config.put("qix", "99");
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        try {
+            registry.lookupOrFail(Foo.class).configure(config, new ConfigurationContext(registry));
+            fail("above action is excepted to throw ConfiguratorException!");
+        } catch (ConfiguratorException e) {
+            assertThat(e.getMessage(), is("foo: Failed to construct instance of class io.jenkins.plugins.casc.impl.configurators.DataBoundConfiguratorTest$Foo.\n" +
+                    " Constructor: public io.jenkins.plugins.casc.impl.configurators.DataBoundConfiguratorTest$Foo(java.lang.String,boolean,int).\n" +
+                    " Arguments: [java.lang.String, java.lang.Boolean, java.lang.Integer].\n" +
+                    " Expected Parameters: foo java.lang.String, bar boolean, qix int"));
+        }
+    }
+
     public static class Foo {
 
         final String foo;
@@ -104,6 +124,9 @@ public class DataBoundConfiguratorTest {
             this.foo = foo;
             this.bar = bar;
             this.qix = qix;
+            if (qix == 99) {
+                throw new IllegalArgumentException("Magic test fail");
+            }
         }
 
         @DataBoundSetter
