@@ -10,8 +10,8 @@ Support easy copy with select all keyboard shortcut
 }
 
 code.language-yaml, code.language-yaml > .token {
-  -webkit-user-select: auto;
-  -moz-user-select: auto;
-  -ms-user-select: auto;
-  user-select: auto;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
 }
