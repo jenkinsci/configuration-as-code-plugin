@@ -183,7 +183,7 @@ public class Attribute<Owner, Type> {
     public CNode describe(Owner instance, ConfigurationContext context) throws ConfiguratorException {
         final Configurator c = context.lookup(type);
         if (c == null) {
-            return new Scalar("FAILED TO EXPORT " + instance.getClass().getName()+"#"+name +
+            return new Scalar("FAILED TO EXPORT\n" + instance.getClass().getName()+"#"+name +
                     ": No configurator found for type " + type);
         }
         try {
@@ -203,7 +203,7 @@ public class Attribute<Owner, Type> {
         } catch (Exception | /* Jenkins.getDescriptorOrDie */AssertionError e) {
             // Don't fail the whole export, prefer logging this error
             LOGGER.log(Level.WARNING, "Failed to export", e);
-            return new Scalar("FAILED TO EXPORT " + instance.getClass().getName() + "#" + name + ": "
+            return new Scalar("FAILED TO EXPORT\n" + instance.getClass().getName() + "#" + name + ": "
                 + printThrowable(e));
         }
     }

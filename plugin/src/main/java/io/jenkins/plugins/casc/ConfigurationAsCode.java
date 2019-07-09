@@ -768,7 +768,7 @@ public class ConfigurationAsCode extends ManagementLink {
     public static String printThrowable(@NonNull Throwable t) {
         String s = Functions.printThrowable(t)
             .split("at io.jenkins.plugins.casc.ConfigurationAsCode.export")[0]
-            .replaceAll("\n\t", "  ");
+            .replaceAll("\t", "  ");
         return s.substring(0, s.lastIndexOf(")") + 1);
     }
 
