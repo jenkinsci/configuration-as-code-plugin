@@ -209,8 +209,6 @@ public class ConfigurationAsCodeTest {
         assertThat(ConfigurationAsCode.isSupportedURI("C:\\jenkins\\casc"), is(false));
     }
 
-
-
     @Test
     @ConfiguredWithCode("multi-line1.yml")
     public void multiline_literal_stays_literal_in_export() throws Exception {
