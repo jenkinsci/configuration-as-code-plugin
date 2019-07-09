@@ -494,17 +494,16 @@ public class ConfigurationAsCode extends ManagementLink {
 
                 final DumperOptions.ScalarStyle style = scalar.isRaw() ? PLAIN : DOUBLE_QUOTED;
 
-                return new ScalarNode(getTag(scalar), value, null, null, style);
+                return new ScalarNode(getTag(scalar.getFormat()), value, null, null, style);
         }
     }
 
-    private Tag getTag(Scalar scalar) {
-        switch (scalar.getFormat()) {
+    private Tag getTag(Scalar.Format format) {
+        switch (format) {
             case NUMBER:
-                if (scalar.getValue().matches("^-?[0-9]+$"))
-                    return Tag.INT;
-                else
-                    return Tag.FLOAT;
+                return Tag.INT;
+            case FLOATING:
+                return Tag.FLOAT;
             case BOOLEAN:
                 return Tag.BOOL;
             case STRING:
