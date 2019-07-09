@@ -17,6 +17,7 @@ import io.jenkins.plugins.casc.impl.DefaultConfiguratorRegistry;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import io.jenkins.plugins.casc.model.Scalar;
+import io.jenkins.plugins.casc.model.Scalar.Format;
 import io.jenkins.plugins.casc.model.Sequence;
 import io.jenkins.plugins.casc.model.Source;
 import io.jenkins.plugins.casc.snakeyaml.DumperOptions;
@@ -87,6 +88,7 @@ import org.kohsuke.stapler.verb.POST;
 
 import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.FlowStyle.BLOCK;
 import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.DOUBLE_QUOTED;
+import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.LITERAL;
 import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.PLAIN;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
@@ -492,7 +494,14 @@ public class ConfigurationAsCode extends ManagementLink {
                 final String value = scalar.getValue();
                 if (value == null || value.length() == 0) return null;
 
-                final DumperOptions.ScalarStyle style = scalar.isRaw() ? PLAIN : DOUBLE_QUOTED;
+                final DumperOptions.ScalarStyle style;
+                if (scalar.getFormat().equals(Format.MULTILINESTRING) && !scalar.isRaw()) {
+                    style = LITERAL;
+                } else if (scalar.isRaw()) {
+                    style = PLAIN;
+                } else {
+                    style = DOUBLE_QUOTED;
+                }
 
                 return new ScalarNode(getTag(scalar.getFormat()), value, null, null, style);
         }
@@ -507,6 +516,7 @@ public class ConfigurationAsCode extends ManagementLink {
             case BOOLEAN:
                 return Tag.BOOL;
             case STRING:
+            case MULTILINESTRING:
             default:
                 return Tag.STR;
         }
@@ -758,7 +768,7 @@ public class ConfigurationAsCode extends ManagementLink {
     public static String printThrowable(@NonNull Throwable t) {
         String s = Functions.printThrowable(t)
             .split("at io.jenkins.plugins.casc.ConfigurationAsCode.export")[0]
-            .replaceAll("\n\t", "  ");
+            .replaceAll("\t", "  ");
         return s.substring(0, s.lastIndexOf(")") + 1);
     }
 

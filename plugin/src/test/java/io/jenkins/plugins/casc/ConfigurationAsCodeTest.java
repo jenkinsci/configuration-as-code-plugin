@@ -9,6 +9,7 @@ import hudson.Functions;
 import hudson.util.FormValidation;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.model.CNode;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,6 +28,8 @@ import org.jvnet.hudson.test.JenkinsRule.WebClient;
 
 import static com.gargoylesoftware.htmlunit.HttpMethod.POST;
 import static io.jenkins.plugins.casc.ConfigurationAsCode.CASC_JENKINS_CONFIG_PROPERTY;
+import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
+import static io.jenkins.plugins.casc.misc.Util.toYamlString;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -204,5 +207,39 @@ public class ConfigurationAsCodeTest {
     public void isSupportedURI_should_not_throw_on_invalid_uri() {
         //for example, a Windows path is not a valid URI
         assertThat(ConfigurationAsCode.isSupportedURI("C:\\jenkins\\casc"), is(false));
+    }
+
+    @Test
+    @ConfiguredWithCode("multi-line1.yml")
+    public void multiline_literal_stays_literal_in_export() throws Exception {
+        assertEquals("Welcome to our build server.\n\n"
+                + "This Jenkins is 100% configured and managed 'as code'.\n",
+            j.jenkins.getSystemMessage());
+
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        ConfigurationContext context = new ConfigurationContext(registry);
+        CNode systemMessage = getJenkinsRoot(context).get("systemMessage");
+        String exported = toYamlString(systemMessage);
+        String expected = "|\n"
+            + "  Welcome to our build server.\n\n"
+            + "  This Jenkins is 100% configured and managed 'as code'.\n";
+        assertThat(exported, is(expected));
+    }
+
+    @Test
+    @ConfiguredWithCode("multi-line2.yml")
+    public void string_to_literal_in_export() throws Exception {
+        assertEquals("Welcome to our build server.\n\n"
+                + "This Jenkins is 100% configured and managed 'as code'.\n",
+            j.jenkins.getSystemMessage());
+
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        ConfigurationContext context = new ConfigurationContext(registry);
+        CNode systemMessage = getJenkinsRoot(context).get("systemMessage");
+        String exported = toYamlString(systemMessage);
+        String expected = "|\n"
+            + "  Welcome to our build server.\n\n"
+            + "  This Jenkins is 100% configured and managed 'as code'.\n";
+        assertThat(exported, is(expected));
     }
 }

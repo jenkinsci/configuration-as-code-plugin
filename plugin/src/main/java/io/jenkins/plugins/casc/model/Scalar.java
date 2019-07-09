@@ -14,7 +14,7 @@ public final class Scalar implements CNode, CharSequence {
     private boolean raw;
     private Source source;
 
-    public enum Format { STRING, BOOLEAN, NUMBER, FLOATING }
+    public enum Format { STRING, MULTILINESTRING, BOOLEAN, NUMBER, FLOATING }
 
     public Scalar(String value, Source source) {
         this(value);
@@ -23,7 +23,7 @@ public final class Scalar implements CNode, CharSequence {
 
     public Scalar(String value) {
         this.value = value;
-        this.format = Format.STRING;
+        this.format = value.contains("\n") ? Format.MULTILINESTRING : Format.STRING;
         this.raw = false;
     }
 
