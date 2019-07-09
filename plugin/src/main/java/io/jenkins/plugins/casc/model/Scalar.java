@@ -14,7 +14,7 @@ public final class Scalar implements CNode, CharSequence {
     private boolean raw;
     private Source source;
 
-    public enum Format { STRING, BOOLEAN, NUMBER }
+    public enum Format { STRING, BOOLEAN, NUMBER, FLOATING }
 
     public Scalar(String value, Source source) {
         this(value);
@@ -41,8 +41,12 @@ public final class Scalar implements CNode, CharSequence {
 
     public Scalar(Number instance) {
         this.value = String.valueOf(instance);
-        this.format = Format.NUMBER;
         this.raw = true;
+        if (instance instanceof Float || instance instanceof Double) {
+            this.format = Format.FLOATING;
+        } else {
+            this.format = Format.NUMBER;
+        }
     }
 
     @Override

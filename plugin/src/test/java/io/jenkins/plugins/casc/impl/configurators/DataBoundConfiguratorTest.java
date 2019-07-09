@@ -5,6 +5,7 @@ import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.Configurator;
 import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.ConfiguratorRegistry;
+import io.jenkins.plugins.casc.misc.Util;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import io.jenkins.plugins.casc.model.Sequence;
@@ -53,6 +54,7 @@ public class DataBoundConfiguratorTest {
     public void exportYaml() throws Exception {
         Foo foo = new Foo("foo", true, 42);
         foo.setZot("zot");
+        foo.setDbl(12.34);
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         final Configurator c = registry.lookupOrFail(Foo.class);
         final ConfigurationContext context = new ConfigurationContext(registry);
@@ -64,6 +66,12 @@ public class DataBoundConfiguratorTest {
         assertEquals(map.get("bar").toString(), "true");
         assertEquals(map.get("qix").toString(), "42");
         assertEquals(map.get("zot").toString(), "zot");
+        assertEquals(map.get("dbl").toString(), "12.34");
+        assertEquals(Util.toYamlString(map.get("foo")).trim(), "\"foo\"");
+        assertEquals(Util.toYamlString(map.get("bar")).trim(), "true");
+        assertEquals(Util.toYamlString(map.get("qix")).trim(), "42");
+        assertEquals(Util.toYamlString(map.get("zot")).trim(), "\"zot\"");
+        assertEquals(Util.toYamlString(map.get("dbl")).trim(), "12.34");
         assertFalse(map.containsKey("other"));
     }
 
@@ -117,6 +125,7 @@ public class DataBoundConfiguratorTest {
         final int qix;
         String zot;
         String other;
+        double dbl;
         boolean initialized;
 
         @DataBoundConstructor
@@ -137,6 +146,11 @@ public class DataBoundConfiguratorTest {
         @DataBoundSetter
         public void setOther(String other) {
             this.other = other;
+        }
+
+        @DataBoundSetter
+        public void setDbl(double dbl) {
+            this.dbl = dbl;
         }
 
         @PostConstruct
@@ -162,6 +176,10 @@ public class DataBoundConfiguratorTest {
 
         public String getOther() {
             return other;
+        }
+
+        public double getDbl() {
+            return dbl;
         }
     }
 
