@@ -1,0 +1,7 @@
+unclassified:
+  extendedEmailPublisher:
+    smtpUsername: email@acmecorp.com
+    smtpPassword: myPassword
+    defaultContentType: text/plain
+    defaultSubject: "Build $BUILD_NUMBER - $BUILD_STATUS"
+    defaultBody: "Check console output at $BUILD_URL"

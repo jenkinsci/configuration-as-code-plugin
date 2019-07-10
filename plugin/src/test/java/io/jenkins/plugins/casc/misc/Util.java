@@ -19,8 +19,11 @@ import java.nio.file.Paths;
 import java.util.Objects;
 import jenkins.model.GlobalConfigurationCategory;
 import jenkins.tools.ToolConfigurationCategory;
+import org.jvnet.hudson.test.LoggerRule;
 
 import static io.jenkins.plugins.casc.ConfigurationAsCode.serializeYamlNode;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class Util {
 
@@ -157,5 +160,27 @@ public class Util {
 
         byte[] bytes = Files.readAllBytes(Paths.get(resource.toURI()));
         return new String(bytes, StandardCharsets.UTF_8).replaceAll("\r\n?", "\n");
+    }
+
+    /**
+     * Checks whether {@link LoggerRule} has not recorded the message.
+     * @param logging Logger rule
+     * @param unexpectedText Text to check
+     * @since TODO
+     */
+    public static void assertNotInLog(LoggerRule logging, String unexpectedText) {
+        assertFalse("The log should not contain '" + unexpectedText + "'",
+                logging.getMessages().stream().anyMatch(m -> m.contains(unexpectedText)));
+    }
+
+    /**
+     * Checks whether {@link LoggerRule} has recorded the message.
+     * @param logging Logger rule
+     * @param expectedText Text to check
+     * @since TODO
+     */
+    public static void assertLogContains(LoggerRule logging, String expectedText) {
+        assertTrue("The log should contain '" + expectedText + "'",
+                logging.getMessages().stream().anyMatch(m -> m.contains(expectedText)));
     }
 }
