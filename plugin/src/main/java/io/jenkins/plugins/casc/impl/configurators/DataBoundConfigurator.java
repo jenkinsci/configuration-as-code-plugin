@@ -260,12 +260,10 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                 Object converted = Stapler.CONVERT_UTILS.convert(value, a.getType());
                 if (converted instanceof Collection || !a.isMultiple()) {
                     args[i] = converted;
+                } else if (Set.class.isAssignableFrom(p.getType())) {
+                    args[i] = Collections.singleton(converted);
                 } else {
-                    if (Set.class.isAssignableFrom(p.getType())) {
-                        args[i] = Collections.singleton(converted);
-                    } else {
-                        args[i] = Collections.singletonList(converted);
-                    }
+                    args[i] = Collections.singletonList(converted);
                 }
             }
             if (args[i] == null && p.getType().isPrimitive()) {
