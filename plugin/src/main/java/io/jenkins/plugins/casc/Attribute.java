@@ -1,9 +1,11 @@
 package io.jenkins.plugins.casc;
 
+import com.google.common.annotations.VisibleForTesting;
 import hudson.util.Secret;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Scalar;
 import io.jenkins.plugins.casc.model.Sequence;
+import io.jenkins.plugins.casc.util.ExtraFieldUtils;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -20,9 +22,10 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.reflect.FieldUtils;
 import org.kohsuke.accmod.AccessRestriction;
 import org.kohsuke.stapler.export.Exported;
 
@@ -40,12 +43,17 @@ public class Attribute<Owner, Type> {
 
     private static final Logger LOGGER = Logger.getLogger(Attribute.class.getName());
 
+    //TODO: Concurrent cache?
+    //private static final HashMap<Class, Boolean> SECRET_ATTRIBUTE_CACHE =
+    //        new HashMap<>();
+
     protected final String name;
     protected final Class type;
     protected boolean multiple;
     protected String preferredName;
     private Setter<Owner, Type> setter;
     private Getter<Owner, Type> getter;
+    private boolean secret;
 
     private boolean deprecated;
 
@@ -60,6 +68,7 @@ public class Attribute<Owner, Type> {
         this.setter = this::_setValue;
         this.aliases = new ArrayList<>();
         this.aliases.add(name);
+        this.secret = type == Secret.class || calculateIfSecret(null, this.name);
     }
 
     @SuppressWarnings("unchecked")
@@ -134,6 +143,17 @@ public class Attribute<Owner, Type> {
         return this;
     }
 
+    /**
+     * Sets whether the attribute is secret.
+     * If so, various outputs will be suppressed (exports, logging).
+     * @param secret {@code true} to make an attribute secret
+     * @since TODO
+     */
+    public Attribute<Owner, Type> secret(boolean secret) {
+        this.secret = secret;
+        return this;
+    }
+
     public Attribute deprecated(boolean deprecated) {
         this.deprecated = deprecated;
         return this;
@@ -170,9 +190,21 @@ public class Attribute<Owner, Type> {
         return Collections.EMPTY_LIST;
     }
 
+    /**
+     * Checks whether an attribute is considered a secret one.
+     * @return {@code true} if the attribute is secret
+     * @param target Target object.
+     *               If {@code null}, only the attribute metadata is checked
+     * @since TODO
+     */
+    public boolean isSecret(@CheckForNull Owner target) {
+        // This.secret should be always true for the first condition, but getType() is overridable
+        // Here we define an additional check just in case getType() is overridden in another implementation
+        return secret || calculateIfSecret(target != null ? target.getClass() : null, this.name);
+    }
 
     public void setValue(Owner target, Type value) throws Exception {
-        LOGGER.info("Setting " + target + '.' + name + " = " + (getType() == Secret.class ? "****" : value));
+        LOGGER.info("Setting " + target + '.' + name + " = " + (isSecret(target) ? "****" : value));
         setter.setValue(target, value);
     }
 
@@ -226,7 +258,6 @@ public class Attribute<Owner, Type> {
     @FunctionalInterface
     public interface Setter<O,T> {
         void setValue(O target, T value) throws Exception;
-
         Setter NOP =  (o,v) -> {};
     }
 
@@ -238,32 +269,103 @@ public class Attribute<Owner, Type> {
         T getValue(O target) throws Exception;
     }
 
+    @CheckForNull
+    private static Method locateGetter(Class<?> clazz, @Nonnull String fieldName) {
+        final String upname = StringUtils.capitalize(fieldName);
+        final List<String> accessors = Arrays.asList("get" + upname, "is" + upname);
+
+        for (Method method : clazz.getMethods()) {
+            if (method.getParameterCount() != 0) continue;
+            if (accessors.contains(method.getName())) {
+                return method;
+            }
+
+            final Exported exported = method.getAnnotation(Exported.class);
+            if (exported != null && exported.name().equalsIgnoreCase(fieldName)) {
+                return method;
+            }
+        }
+        return null;
+    }
+
+    @CheckForNull
+    private static Field locatePublicField(Class<?> clazz, @Nonnull String fieldName) {
+        return ExtraFieldUtils.getField(clazz, fieldName, false);
+    }
+
+    @CheckForNull
+    private static Field locatePrivateFieldInHierarchy(Class<?> clazz, @Nonnull String fieldName) {
+        return ExtraFieldUtils.getFieldNoForce(clazz, fieldName);
+    }
+
+    //TODO: consider Boolean and third condition
+    /**
+     * This is a method which tries to guess whether an attribute is {@link Secret}.
+     * @param targetClass Class of the target object. {@code null} if unknown
+     * @param fieldName Field name
+     * @return {@code true} if the attribute is secret
+     *         {@code false} if not or if there is no conclusive answer.
+     */
+    @VisibleForTesting
+    /*package*/ static boolean calculateIfSecret(@CheckForNull Class<?> targetClass, @Nonnull String fieldName) {
+        if (targetClass == Secret.class) { // Class is final, so the check is safe
+            LOGGER.log(Level.FINER, "Attribute {0}#{1} is secret, because it has a Secret type",
+                    new Object[] {targetClass.getName(), fieldName});
+            return true;
+        }
+
+        if (targetClass == null) {
+            LOGGER.log(Level.FINER, "Attribute {0} is assumed to be non-secret, because there is no class instance in the call. " +
+                            "This call is used only for fast-fetch caching, and the result may be adjusted later",
+                    new Object[] {fieldName});
+            return false; // All methods below require a known target class
+        }
+
+        //TODO: Cache decisions?
+
+        Method m = locateGetter(targetClass, fieldName);
+        if (m != null && m.getReturnType() == Secret.class) {
+            LOGGER.log(Level.FINER, "Attribute {0}#{1} is secret, because there is a getter {2} which returns a Secret type",
+                    new Object[] {targetClass.getName(), fieldName, m});
+            return true;
+        }
+
+        Field f = locatePublicField(targetClass, fieldName);
+        if (f != null && f.getType() == Secret.class) {
+            LOGGER.log(Level.FINER, "Attribute {0}#{1} is secret, because there is a public field {2} which has a Secret type",
+                    new Object[] {targetClass.getName(), fieldName, f});
+            return true;
+        }
+
+        f = locatePrivateFieldInHierarchy(targetClass, fieldName);
+        if (f != null && f.getType() == Secret.class) {
+            LOGGER.log(Level.FINER, "Attribute {0}#{1} is secret, because there is a private field {2} which has a Secret type",
+                    new Object[] {targetClass.getName(), fieldName, f});
+            return true;
+        }
+
+        // TODO(oleg_nenashev): Consider setters? Gonna be more interesting since there might be many of them
+        LOGGER.log(Level.FINER, "Attribute {0}#{1} is not a secret, because all checks have passed",
+                new Object[] {targetClass.getName(), fieldName});
+        return false;
+    }
+
     private Type _getValue(Owner target) throws ConfiguratorException {
+        final Class<?> clazz = target.getClass();
+
         try {
-            final Class<?> clazz = target.getClass();
-            final String upname = StringUtils.capitalize(name);
-            final List<String> accessors = Arrays.asList("get" + upname, "is" + upname);
-
-            for (Method method : clazz.getMethods()) {
-                if (method.getParameterCount() != 0) continue;
-                if (accessors.contains(method.getName())) {
-                    return (Type) method.invoke(target);
-                }
-
-                final Exported exported = method.getAnnotation(Exported.class);
-                if (exported != null && exported.name().equalsIgnoreCase(name)) {
-                    return (Type) method.invoke(target);
-                }
+            final Method method = locateGetter(clazz, this.name);
+            if (method != null) {
+                return (Type) method.invoke(target);
             }
 
             // If this is a public final field, developers don't define getters as jelly can use them as-is
-            final Field field = FieldUtils.getField(clazz, name, true);
-            if (field == null) {
-                throw new ConfiguratorException("Can't read attribute '" + name + "' from "+ target);
+            final Field field = ExtraFieldUtils.getField(clazz, this.name, true);
+            if (field != null) {
+                return (Type) field.get(target);
             }
 
-            return (Type) field.get(target);
-
+            throw new ConfiguratorException("Can't read attribute '" + name + "' from "+ target);
         } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
             throw new ConfiguratorException("Can't read attribute '" + name + "' from "+ target, e);
         }

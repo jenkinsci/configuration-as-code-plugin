@@ -2,19 +2,25 @@ package io.jenkins.plugins.casc;
 
 import com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
+import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.cloudbees.plugins.credentials.casc.CredentialsRootConfigurator;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
+import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 import hudson.ExtensionList;
 import hudson.util.Secret;
+import io.jenkins.plugins.casc.impl.configurators.DataBoundConfigurator;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import javax.annotation.Nonnull;
 import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
+import org.jvnet.hudson.test.Issue;
 
 import static java.util.Objects.requireNonNull;
 import static org.hamcrest.Matchers.is;
@@ -22,6 +28,7 @@ import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class CredentialsTest {
 
@@ -97,6 +104,26 @@ public class CredentialsTest {
 
         assertThat(sshKeyExported, not("sp0ds9d+skkfjf"));
         assertThat(requireNonNull(Secret.decrypt(sshKeyExported)).getPlainText(), is("sp0ds9d+skkfjf"));
+    }
+
+    @Test
+    @Issue("SECURITY-1404")
+    public void checkUsernamePasswordIsSecret() {
+        Attribute a = getFromDatabound(UsernamePasswordCredentialsImpl.class, "password");
+        assertTrue("Attribute 'password' should be secret", a.isSecret(
+                new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL, "1", "2", "3", "4")));
+    }
+
+    @Nonnull
+    private <T> Attribute<T,?> getFromDatabound(Class<T> clazz, @Nonnull String attributeName) {
+        DataBoundConfigurator<T> cfg = new DataBoundConfigurator<T>(clazz);
+        Set<Attribute<T,?>> attributes = cfg.describe();
+        for (Attribute<T,?> a : attributes) {
+            if(attributeName.equals(a.getName())) {
+                return a;
+            }
+        }
+        throw new AssertionError("Cannot find databound attribute " + attributeName + " in " + clazz);
     }
 
 }

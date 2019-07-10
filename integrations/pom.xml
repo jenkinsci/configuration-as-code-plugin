@@ -53,6 +53,13 @@
       <version>1.20</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>email-ext</artifactId>
+      <version>2.66</version>
+      <scope>test</scope>
+    </dependency>
+    
 
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
@@ -98,6 +105,13 @@
       <groupId>org.jenkinsci.plugins</groupId>
       <artifactId>pipeline-model-extensions</artifactId>
       <version>1.1.2</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>ssh-credentials</artifactId>
+      <version>1.17</version>
       <scope>test</scope>
     </dependency>
 
