@@ -3,7 +3,7 @@
 <j:choose>
   <j:when test="${it.type.enum}">
     <j:choose>
-      <j:when test="${it.type.values().length == 0}">
+      <j:when test="${it.type.getEnumConstants().size() == 0}">
         "type": "string"
       </j:when>
       <j:otherwise>
