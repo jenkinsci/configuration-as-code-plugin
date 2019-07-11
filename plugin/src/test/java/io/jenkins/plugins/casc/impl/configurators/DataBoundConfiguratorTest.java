@@ -8,7 +8,10 @@ import io.jenkins.plugins.casc.ConfiguratorRegistry;
 import io.jenkins.plugins.casc.misc.Util;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
+import io.jenkins.plugins.casc.model.Scalar;
 import io.jenkins.plugins.casc.model.Sequence;
+import java.util.HashSet;
+import java.util.Set;
 import javax.annotation.PostConstruct;
 import org.junit.Rule;
 import org.junit.Test;
@@ -74,6 +77,50 @@ public class DataBoundConfiguratorTest {
         assertEquals(Util.toYamlString(map.get("dbl")).trim(), "12.34");
         assertFalse(map.containsKey("other"));
     }
+
+    @Test
+    public void configureWithSets() throws Exception {
+        Mapping config = new Mapping();
+        Sequence sequence = new Sequence();
+        sequence.add(new Scalar("bar"));
+        sequence.add(new Scalar("foo"));
+        config.put("strings", sequence);
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        final Bar configured = (Bar) registry.lookupOrFail(Bar.class).configure(config, new ConfigurationContext(registry));
+        Set<String> strings = configured.getStrings();
+        assertTrue(strings.contains("foo"));
+        assertTrue(strings.contains("bar"));
+        assertFalse(strings.contains("baz"));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void exportWithSets() throws Exception {
+        HashSet<String> set = new HashSet<>();
+        set.add("foo");
+
+        Bar bar = new Bar(set);
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        final Configurator c = registry.lookupOrFail(Bar.class);
+        final ConfigurationContext context = new ConfigurationContext(registry);
+        CNode node = c.describe(bar, context);
+        assertNotNull(node);
+        assertTrue(node instanceof Mapping);
+        Mapping map = (Mapping) node;
+        assertEquals(map.get("strings").toString(), "[foo]");
+        assertEquals(Util.toYamlString(map.get("strings")).trim(),"- \"foo\"");
+        assertFalse(map.containsKey("other"));
+
+        // now with two elements
+        set.add("bar");
+        node = c.describe(bar, context);
+        assertNotNull(node);
+        assertTrue(node instanceof Mapping);
+        map = (Mapping) node;
+        assertEquals(map.get("strings").toString(), "[bar, foo]");
+        assertEquals(Util.toYamlString(map.get("strings")).trim(), "- \"bar\"\n- \"foo\"");
+    }
+
 
     @SuppressWarnings("unchecked")
     @Test
@@ -180,6 +227,19 @@ public class DataBoundConfiguratorTest {
 
         public double getDbl() {
             return dbl;
+        }
+    }
+
+    public static class Bar {
+        final Set<String> strings;
+
+        @DataBoundConstructor
+        public Bar(Set<String> strings) {
+            this.strings = strings;
+        }
+
+        public Set<String> getStrings() {
+            return strings;
         }
     }
 

@@ -21,6 +21,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -118,11 +119,18 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                         final Type pt = parameters[i].getParameterizedType();
                         final Configurator lookup = context.lookupOrFail(pt);
 
-                        final ArrayList<Object> list = new ArrayList<>();
-                        for (CNode o : value.asSequence()) {
-                            list.add(lookup.configure(o, context));
+                        final Collection<Object> collection;
+
+                        if (Set.class.isAssignableFrom(parameters[i].getType())) {
+                            collection = new HashSet<>();
+                        } else {
+                            collection = new ArrayList<>();
                         }
-                        args[i] = list;
+
+                        for (CNode o : value.asSequence()) {
+                            collection.add(lookup.configure(o, context));
+                        }
+                        args[i] = collection;
 
                     } else {
                         final Type pt = parameters[i].getParameterizedType();
@@ -250,8 +258,10 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
             Object value = a.getValue(instance);
             if (value != null) {
                 Object converted = Stapler.CONVERT_UTILS.convert(value, a.getType());
-                if (converted instanceof List || !a.isMultiple()) {
+                if (converted instanceof Collection || !a.isMultiple()) {
                     args[i] = converted;
+                } else if (Set.class.isAssignableFrom(p.getType())) {
+                    args[i] = Collections.singleton(converted);
                 } else {
                     args[i] = Collections.singletonList(converted);
                 }
