@@ -26,7 +26,7 @@ public class ToolDefaultPropertiesExportBlacklistTest {
         ConfigurationContext context = new ConfigurationContext(registry);
         CNode yourAttribute = getToolRoot(context);
 
-        String exported = toYamlString(yourAttribute);
+        String exported = toYamlString(yourAttribute).replaceAll("git\\.exe", "git");
 
         String expected = toStringFromYamlFile(this, "ToolDefaultPropertiesExportBlacklistExpected.yml");
 
