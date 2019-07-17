@@ -1,7 +1,7 @@
 ---
 name: "❓ Need help"
 labels: question
-about: Please ask in https://gitter.im/jenkinsci/configuration-as-code-plugin first
+about: Please ask in [our Gitter channel](https://gitter.im/jenkinsci/configuration-as-code-plugin) first
 ---
 
 <!--
