@@ -12,6 +12,7 @@ import io.jenkins.plugins.casc.model.Scalar;
 import io.jenkins.plugins.casc.model.Sequence;
 import java.util.HashSet;
 import java.util.Set;
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.PostConstruct;
 import org.junit.Rule;
 import org.junit.Test;
@@ -91,6 +92,15 @@ public class DataBoundConfiguratorTest {
         assertTrue(strings.contains("foo"));
         assertTrue(strings.contains("bar"));
         assertFalse(strings.contains("baz"));
+    }
+
+    @Test
+    public void configureWithEmptySet() throws Exception {
+        Mapping config = new Mapping();
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        final Bar configured = (Bar) registry.lookupOrFail(Bar.class).configure(config, new ConfigurationContext(registry));
+        Set<String> strings = configured.getStrings();
+        assertEquals(0, strings.size());
     }
 
     @Test
@@ -234,6 +244,7 @@ public class DataBoundConfiguratorTest {
         final Set<String> strings;
 
         @DataBoundConstructor
+        @ParametersAreNonnullByDefault
         public Bar(Set<String> strings) {
             this.strings = strings;
         }

@@ -24,13 +24,16 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.PostConstruct;
 import jenkins.model.Jenkins;
 import org.kohsuke.stapler.ClassDescriptor;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.Stapler;
+import org.springframework.beans.factory.annotation.Required;
 
 import static com.google.common.base.Defaults.defaultValue;
 
@@ -110,10 +113,28 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
 
             for (int i = 0; i < names.length; i++) {
                 final CNode value = config.get(names[i]);
-                if (value == null && parameters[i].getAnnotation(Nonnull.class) != null) {
-                    throw new ConfiguratorException(names[i] + " is required to configure " + target);
-                }
                 final Class t = parameters[i].getType();
+
+                if (value == null) {
+                    Class<?> clazz = constructor.getDeclaringClass();
+                    if (parameters[i].isAnnotationPresent(Required.class)) {
+                        throw new ConfiguratorException(names[i] + " is required to configure " + target);
+                    } else if (Collection.class.isAssignableFrom(t) &&
+                               (parameters[i].isAnnotationPresent(Nonnull.class) ||
+                               constructor.isAnnotationPresent(ParametersAreNonnullByDefault.class) ||
+                               clazz.isAnnotationPresent(ParametersAreNonnullByDefault.class) ||
+                               clazz.getPackage().isAnnotationPresent(ParametersAreNonnullByDefault.class))) {
+                        LOGGER.log(Level.INFO, "The parameter to be set is @Nonnull and is a collection" +
+                                                       "but is not present; setting equal to empty collection.");
+                        if (Set.class.isAssignableFrom(t)) {
+                            args[i] = Collections.emptySet();
+                        } else if (List.class.isAssignableFrom(t)) {
+                            args[i] = Collections.emptyList();
+                        }
+                        continue;
+                    }
+                }
+
                 if (value != null) {
                     if (Collection.class.isAssignableFrom(t)) {
                         final Type pt = parameters[i].getParameterizedType();
@@ -121,7 +142,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
 
                         final Collection<Object> collection;
 
-                        if (Set.class.isAssignableFrom(parameters[i].getType())) {
+                        if (Set.class.isAssignableFrom(t)) {
                             collection = new HashSet<>();
                         } else {
                             collection = new ArrayList<>();
