@@ -33,7 +33,6 @@ import jenkins.model.Jenkins;
 import org.kohsuke.stapler.ClassDescriptor;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.Stapler;
-import org.springframework.beans.factory.annotation.Required;
 
 import static com.google.common.base.Defaults.defaultValue;
 
@@ -115,24 +114,26 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                 final CNode value = config.get(names[i]);
                 final Class t = parameters[i].getType();
 
-                if (value == null) {
-                    Class<?> clazz = constructor.getDeclaringClass();
-                    if (parameters[i].isAnnotationPresent(Required.class)) {
+                Class<?> clazz = constructor.getDeclaringClass();
+                if (value == null && (parameters[i].isAnnotationPresent(Nonnull.class)   ||
+                    constructor.isAnnotationPresent(ParametersAreNonnullByDefault.class) ||
+                    clazz.isAnnotationPresent(ParametersAreNonnullByDefault.class)       ||
+                    clazz.getPackage().isAnnotationPresent(ParametersAreNonnullByDefault.class))) {
+
+                    if (Set.class.isAssignableFrom(t)) {
+                        LOGGER.log(Level.INFO, "The parameter to be set is @Nonnull but is not present; " +
+                                                           "setting equal to empty set.");
+                        args[i] = Collections.emptySet();
+                    } else if (List.class.isAssignableFrom(t)) {
+                        LOGGER.log(Level.INFO, "The parameter to be set is @Nonnull but is not present; " +
+                                                           "setting equal to empty list.");
+                        args[i] = Collections.emptyList();
+                    } else if (String.class.isAssignableFrom(t)) {
+                        args[i] = "";
+                    } else {
                         throw new ConfiguratorException(names[i] + " is required to configure " + target);
-                    } else if (Collection.class.isAssignableFrom(t) &&
-                               (parameters[i].isAnnotationPresent(Nonnull.class) ||
-                               constructor.isAnnotationPresent(ParametersAreNonnullByDefault.class) ||
-                               clazz.isAnnotationPresent(ParametersAreNonnullByDefault.class) ||
-                               clazz.getPackage().isAnnotationPresent(ParametersAreNonnullByDefault.class))) {
-                        LOGGER.log(Level.INFO, "The parameter to be set is @Nonnull and is a collection" +
-                                                       "but is not present; setting equal to empty collection.");
-                        if (Set.class.isAssignableFrom(t)) {
-                            args[i] = Collections.emptySet();
-                        } else if (List.class.isAssignableFrom(t)) {
-                            args[i] = Collections.emptyList();
-                        }
-                        continue;
                     }
+                    continue;
                 }
 
                 if (value != null) {
