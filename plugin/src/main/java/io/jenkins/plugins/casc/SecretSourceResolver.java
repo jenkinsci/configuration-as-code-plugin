@@ -3,6 +3,8 @@ package io.jenkins.plugins.casc;
 import io.vavr.Tuple;
 import io.vavr.control.Try;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 import org.bigtesting.interpolatd.Interpolator;
 
@@ -13,6 +15,8 @@ public class SecretSourceResolver {
     private static final String enclosedIn = "}";
     private static final String escapedWith = "^";
     private static final String defaultDelimiter = ":-";
+
+    private static final Logger LOGGER = Logger.getLogger(SecretSourceResolver.class.getName());
 
     public static String resolve(ConfigurationContext context, String toInterpolate) {
         return interpolator(context).interpolate(toInterpolate, "");
@@ -31,7 +35,13 @@ public class SecretSourceResolver {
             (toReveal, defaultValue) -> reveal(context, toReveal)
                 .map(Optional::of)
                 .orElse(defaultValue)
-                .orElse(""));
+                .orElseGet(() -> handleUndefinedVariable(captured)));
+    }
+
+    private static String handleUndefinedVariable(String captured) {
+        LOGGER.log(Level.WARNING, "Configuration import: Found unresolved variable {0}. " +
+                "Will default to empty string", captured);
+        return "";
     }
 
     private static Optional<String> reveal(ConfigurationContext context, String captured) {
