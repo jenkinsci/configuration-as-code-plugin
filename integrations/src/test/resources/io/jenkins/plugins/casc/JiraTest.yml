@@ -1,7 +1,5 @@
 unclassified:
-  jiraProjectProperty:
+  jiraGlobalConfiguration:
     sites:
-      url: "http://jira.codehaus.org/"
-# see https://issues.jenkins.io/browse/JENKINS-52906
-#      - url: "http://jira.codehaus.org/"
-#      - url: "http://issues.jenkins.io/"
+      - url: "http://jira.codehaus.org/"
+      - url: "http://issues.jenkins.io/"
