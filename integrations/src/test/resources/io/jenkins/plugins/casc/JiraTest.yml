@@ -2,5 +2,4 @@ unclassified:
   jiraGlobalConfiguration:
     sites:
       - url: "http://jira.codehaus.org/"
-      # see https://issues.jenkins.io/browse/JENKINS-52906
       - url: "http://issues.jenkins.io/"
