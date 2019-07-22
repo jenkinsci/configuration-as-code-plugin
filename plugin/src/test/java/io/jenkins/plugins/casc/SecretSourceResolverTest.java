@@ -1,14 +1,19 @@
 package io.jenkins.plugins.casc;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.LoggerRule;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class SecretSourceResolverTest {
 
@@ -17,6 +22,14 @@ public class SecretSourceResolverTest {
 
     @Rule
     public final EnvironmentVariables environment = new EnvironmentVariables();
+
+    @Rule
+    public LoggerRule logging = new LoggerRule();
+
+    @Before
+    public void initLogging() {
+        logging.record(Logger.getLogger(SecretSourceResolver.class.getName()), Level.INFO).capture(2048);
+    }
 
     private static ConfigurationContext context;
 
@@ -35,6 +48,11 @@ public class SecretSourceResolverTest {
     @Test
     public void resolve_singleEntryWithoutDefaultValue() {
         assertThat(SecretSourceResolver.resolve(context, "${FOO}"), equalTo(""));
+
+        // TODO: Create a new utility method?
+        final String expectedText ="Configuration import: Found unresolved variable FOO";
+        assertTrue("The log should contain '" + expectedText + "'",
+                logging.getMessages().stream().anyMatch(m -> m.contains(expectedText)));
     }
 
     @Test
