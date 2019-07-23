@@ -24,8 +24,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.PostConstruct;
 import jenkins.model.Jenkins;
 import org.kohsuke.stapler.ClassDescriptor;
@@ -110,10 +112,30 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
 
             for (int i = 0; i < names.length; i++) {
                 final CNode value = config.get(names[i]);
-                if (value == null && parameters[i].getAnnotation(Nonnull.class) != null) {
-                    throw new ConfiguratorException(names[i] + " is required to configure " + target);
-                }
                 final Class t = parameters[i].getType();
+
+                Class<?> clazz = constructor.getDeclaringClass();
+                if (value == null && (parameters[i].isAnnotationPresent(Nonnull.class)   ||
+                    constructor.isAnnotationPresent(ParametersAreNonnullByDefault.class) ||
+                    clazz.isAnnotationPresent(ParametersAreNonnullByDefault.class)       ||
+                    clazz.getPackage().isAnnotationPresent(ParametersAreNonnullByDefault.class))) {
+
+                    if (Set.class.isAssignableFrom(t)) {
+                        LOGGER.log(Level.INFO, "The parameter to be set is @Nonnull but is not present; " +
+                                                           "setting equal to empty set.");
+                        args[i] = Collections.emptySet();
+                    } else if (List.class.isAssignableFrom(t)) {
+                        LOGGER.log(Level.INFO, "The parameter to be set is @Nonnull but is not present; " +
+                                                           "setting equal to empty list.");
+                        args[i] = Collections.emptyList();
+                    } else if (String.class.isAssignableFrom(t)) {
+                        args[i] = "";
+                    } else {
+                        throw new ConfiguratorException(names[i] + " is required to configure " + target);
+                    }
+                    continue;
+                }
+
                 if (value != null) {
                     if (Collection.class.isAssignableFrom(t)) {
                         final Type pt = parameters[i].getParameterizedType();
@@ -121,7 +143,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
 
                         final Collection<Object> collection;
 
-                        if (Set.class.isAssignableFrom(parameters[i].getType())) {
+                        if (Set.class.isAssignableFrom(t)) {
                             collection = new HashSet<>();
                         } else {
                             collection = new ArrayList<>();

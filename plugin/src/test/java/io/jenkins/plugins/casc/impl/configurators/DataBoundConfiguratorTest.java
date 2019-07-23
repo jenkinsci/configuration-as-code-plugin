@@ -5,6 +5,9 @@ import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.Configurator;
 import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.ConfiguratorRegistry;
+import io.jenkins.plugins.casc.impl.configurators.nonnull.ClassParametersAreNonnullByDefault;
+import io.jenkins.plugins.casc.impl.configurators.nonnull.NonnullParameterConstructor;
+import io.jenkins.plugins.casc.impl.configurators.nonnull.nonnullparampackage.PackageParametersAreNonnullByDefault;
 import io.jenkins.plugins.casc.misc.Util;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
@@ -12,6 +15,7 @@ import io.jenkins.plugins.casc.model.Scalar;
 import io.jenkins.plugins.casc.model.Sequence;
 import java.util.HashSet;
 import java.util.Set;
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.PostConstruct;
 import org.junit.Rule;
 import org.junit.Test;
@@ -91,6 +95,45 @@ public class DataBoundConfiguratorTest {
         assertTrue(strings.contains("foo"));
         assertTrue(strings.contains("bar"));
         assertFalse(strings.contains("baz"));
+    }
+
+    @Test
+    public void configureWithEmptySet() throws Exception {
+        Mapping config = new Mapping();
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        final Bar configured = (Bar) registry.lookupOrFail(Bar.class).configure(config, new ConfigurationContext(registry));
+        Set<String> strings = configured.getStrings();
+        assertEquals(0, strings.size());
+    }
+
+    @Test
+    public void nonnullConstructorParameter() throws Exception {
+        Mapping config = new Mapping();
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        final NonnullParameterConstructor configured = (NonnullParameterConstructor) registry
+                                                        .lookupOrFail(NonnullParameterConstructor.class)
+                                                        .configure(config, new ConfigurationContext(registry));
+        assertEquals(0, configured.getStrings().size());
+    }
+
+    @Test
+    public void classParametersAreNonnullByDefault() throws Exception {
+        Mapping config = new Mapping();
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        final ClassParametersAreNonnullByDefault configured = (ClassParametersAreNonnullByDefault) registry
+                                                        .lookupOrFail(ClassParametersAreNonnullByDefault.class)
+                                                        .configure(config, new ConfigurationContext(registry));
+        assertEquals(0, configured.getStrings().size());
+    }
+
+    @Test
+    public void packageParametersAreNonnullByDefault() throws Exception {
+        Mapping config = new Mapping();
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        final PackageParametersAreNonnullByDefault configured = (PackageParametersAreNonnullByDefault) registry
+                                                        .lookupOrFail(PackageParametersAreNonnullByDefault.class)
+                                                        .configure(config, new ConfigurationContext(registry));
+        assertTrue(configured.getString().isEmpty());
     }
 
     @Test
@@ -234,6 +277,7 @@ public class DataBoundConfiguratorTest {
         final Set<String> strings;
 
         @DataBoundConstructor
+        @ParametersAreNonnullByDefault
         public Bar(Set<String> strings) {
             this.strings = strings;
         }
