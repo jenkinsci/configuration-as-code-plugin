@@ -92,7 +92,8 @@ public class CredentialsTest {
 
         String passphrase = sshCredential.getScalarValue("passphrase");
         assertThat(passphrase, not("password"));
-        assertThat(requireNonNull(Secret.decrypt(passphrase)).getPlainText(), is("password"));
+        assertThat(requireNonNull(Secret.decrypt(passphrase), "Failed to decrypt the password from " + passphrase)
+                .getPlainText(), is("password"));
 
         String sshKeyExported = sshCredential.get("privateKeySource")
                 .asMapping()

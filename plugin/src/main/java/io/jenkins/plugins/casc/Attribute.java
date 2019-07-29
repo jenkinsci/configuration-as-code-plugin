@@ -223,21 +223,43 @@ public class Attribute<Owner, Type> {
             if (o == null) {
                 return null;
             }
+
+            // In Export we sensitive only those values which do not get rendered as secrets
+            boolean shouldBeMasked = isSecret(instance);
             if (multiple) {
                 Sequence seq = new Sequence();
                 if (o.getClass().isArray()) o = Arrays.asList((Object[]) o);
                 for (Object value : (Iterable) o) {
-                    seq.add(c.describe(value, context));
+                    seq.add(_describe(c, context, value, shouldBeMasked));
                 }
                 return seq;
             }
-            return c.describe(o, context);
+            return _describe(c, context, o, shouldBeMasked);
         } catch (Exception | /* Jenkins.getDescriptorOrDie */AssertionError e) {
             // Don't fail the whole export, prefer logging this error
             LOGGER.log(Level.WARNING, "Failed to export", e);
             return new Scalar("FAILED TO EXPORT\n" + instance.getClass().getName() + "#" + name + ": "
                 + printThrowable(e));
         }
+    }
+
+    /**
+     * Describes a node.
+     * @param c Configurator
+     * @param context Context to be passed
+     * @param value Value
+     * @param shouldBeMasked If {@code true}, the value should be masked in the output.
+     *                       It will be applied to {@link Scalar} nodes only.
+     * @throws Exception export error
+     * @return Node
+     */
+    private CNode _describe(Configurator c, ConfigurationContext context, Object value, boolean shouldBeMasked)
+            throws Exception {
+        CNode node = c.describe(value, context);
+        if (shouldBeMasked && node instanceof Scalar) {
+            ((Scalar)node).sensitive(true);
+        }
+        return node;
     }
 
     public boolean equals(Owner o1, Owner o2) throws Exception {

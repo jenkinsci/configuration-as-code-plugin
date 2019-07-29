@@ -9,10 +9,14 @@ import java.util.stream.IntStream;
 
 public final class Scalar implements CNode, CharSequence {
 
+    private static final String SECRET_VALUE_STRING = "****";
+
     private String value;
     private Format format;
     private boolean raw;
     private Source source;
+    private boolean sensitive;
+    private boolean encrypted;
 
     public enum Format { STRING, MULTILINESTRING, BOOLEAN, NUMBER, FLOATING }
 
@@ -67,8 +71,52 @@ public final class Scalar implements CNode, CharSequence {
         return this;
     }
 
+    /**
+     * Gets value of the scalar for export.
+     * @return Value of the scalar if not {@link #isMasked()},
+     *         {@link #SECRET_VALUE_STRING} otherwise.
+     *         Encrypted sensitive data will be returned as is.
+     *
+     */
     public String getValue() {
-        return value;
+        return isMasked() ? SECRET_VALUE_STRING : value;
+    }
+
+    /**
+     * Check whether the scalar value should be masked in the output.
+     * @return {@code true} if the value is masked
+     * @since TODO
+     */
+    public boolean isMasked() {
+        return sensitive && !encrypted;
+    }
+
+    /**
+     * Sets the sensitive flag.
+     * It indicates that the scalar represents a sensitive argument (secret or other restricted data).
+     * @param sensitive value to set
+     * @return Object instance
+     * @since TODO
+     */
+    public Scalar sensitive(boolean sensitive) {
+        this.sensitive = sensitive;
+        return this;
+    }
+
+    /**
+     * Indicates that the data is encrypted and hence safe to be exported.
+     * @param encrypted Value to set
+     * @return Object instance
+     * @since TODO
+     */
+    public Scalar encrypted(boolean encrypted) {
+        this.encrypted = encrypted;
+        return this;
+    }
+
+    @Override
+    public boolean isSensitiveData() {
+        return sensitive;
     }
 
     @NonNull
@@ -116,5 +164,7 @@ public final class Scalar implements CNode, CharSequence {
         this.format = it.format;
         this.raw = it.raw;
         this.source = it.source;
+        this.sensitive = it.sensitive;
+        this.encrypted = it.encrypted;
     }
 }
