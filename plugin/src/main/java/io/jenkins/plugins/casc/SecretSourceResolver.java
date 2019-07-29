@@ -6,36 +6,69 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
-import org.bigtesting.interpolatd.Interpolator;
+import javax.annotation.CheckForNull;
+import org.apache.commons.lang.text.StrLookup;
+import org.apache.commons.lang.text.StrSubstitutor;
 
 import static io.vavr.API.unchecked;
 
+/**
+ * Resolves secret variables and converts escaped internal variables.
+ */
 public class SecretSourceResolver {
     private static final String enclosedBy = "${";
     private static final String enclosedIn = "}";
-    private static final String escapedWith = "^";
+    private static final char escapedWith = '^';
     private static final String defaultDelimiter = ":-";
 
     private static final Logger LOGGER = Logger.getLogger(SecretSourceResolver.class.getName());
 
+    /**
+     * Encodes String so that it can be safely represented in the YAML after export.
+     * @param toEncode String to encode
+     * @return Encoded string
+     * @since TODO
+     */
+    public static String encode(@CheckForNull String toEncode) {
+        if (toEncode == null) {
+            return null;
+        }
+        return toEncode.replace("${", "^${");
+    }
+
     public static String resolve(ConfigurationContext context, String toInterpolate) {
-        return interpolator(context).interpolate(toInterpolate, "");
+        return substitutor(context).replace(toInterpolate);
     }
 
-    private static Interpolator<String> interpolator(ConfigurationContext context) {
-        Interpolator<String> interpolator = new Interpolator<>();
-        interpolator.when().enclosedBy(enclosedBy).and(enclosedIn).handleWith((captured, argument) -> handle(context, captured));
-        interpolator.escapeWith(escapedWith);
-        return interpolator;
+    private static StrSubstitutor substitutor(ConfigurationContext context) {
+        StrSubstitutor substitutor = new StrSubstitutor(new ConfigurationContextStrLookup(context));
+        substitutor.setEscapeChar(escapedWith);
+        substitutor.setVariablePrefix(enclosedBy);
+        substitutor.setVariableSuffix(enclosedIn);
+        return substitutor;
     }
 
-    private static String handle(ConfigurationContext context, String captured) {
-        String[] split = captured.split(defaultDelimiter, 2);
-        return Tuple.of(split[0], Try.of(() -> split[1]).toJavaOptional()).apply(
-            (toReveal, defaultValue) -> reveal(context, toReveal)
-                .map(Optional::of)
-                .orElse(defaultValue)
-                .orElseGet(() -> handleUndefinedVariable(captured)));
+    private static String handleJenkinsVariableDeclaration(ConfigurationContext context, String captured) {
+        return enclosedBy + captured + enclosedIn;
+    }
+
+    private static class ConfigurationContextStrLookup extends StrLookup {
+
+        private final ConfigurationContext context;
+
+        public ConfigurationContextStrLookup(ConfigurationContext context) {
+            this.context = context;
+        }
+
+        @Override
+        public String lookup(String key) {
+            String[] split = key.split(defaultDelimiter, 2);
+            return Tuple.of(split[0], Try.of(() -> split[1]).toJavaOptional()).apply(
+                    (toReveal, defaultValue) -> reveal(context, toReveal)
+                            .map(Optional::of)
+                            .orElse(defaultValue)
+                            .orElseGet(() -> handleUndefinedVariable(key)));
+        }
     }
 
     private static String handleUndefinedVariable(String captured) {

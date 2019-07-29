@@ -17,6 +17,11 @@
   <description>Manage Jenkins master configuration as code</description>
   <url>https://wiki.jenkins.io/display/JENKINS/Configuration+as+Code+Plugin</url>
 
+  <properties>
+    <!-- SECURITY-1446 and SECURITY-1290 are considered as breaking changes. Others also contain a risk of regressions -->
+    <hpi.compatibleSinceVersion>1.25</hpi.compatibleSinceVersion>
+  </properties>
+
   <developers>
     <developer>
       <id>casz</id>
@@ -44,6 +49,7 @@
       <version>4.0.0</version>
     </dependency>
 
+    <!--TODO: Not longer used, remove it? -->
     <dependency>
       <groupId>org.bigtesting</groupId>
       <artifactId>interpolatd</artifactId>

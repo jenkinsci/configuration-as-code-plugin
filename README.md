@@ -222,6 +222,8 @@ Currently, you can provide initial secrets to JCasC that all rely on <key,value>
 substitution of strings in the configuration. For example, `Jenkins: "${some_var}"`. Default variable substitution
 using the `:-` operator from `bash` is also available. For example, `key: "${VALUE:-defaultvalue}"` will evaluate to `defaultvalue` if `$VALUE` is unset. To escape a string from secret interpolation, put `^` in front of the value. For example, `Jenkins: "^${some_var}"` will produce the literal `Jenkins: "${some_var}"`.
 
+## Secret sources
+
 We can provide these initial secrets in the following ways:
 
 - Using environment variables.
@@ -246,7 +248,30 @@ can be used as:
       secret: ${filename}
 ```
 
-- Using Vault, see following section.
+- Using Vault, see below.
+
+### Security and compatibility considerations
+
+<!-- TODO(oleg_nenashev): Add a link to the advisory once ready -->
+
+Jenkins configurations might include property definitions,
+e.g. for Token Macro resolution in Mail Ext Plugin.
+Such properties are not supposed to be resolved when importing configurations,
+but the JCasC plugin has no way to determine which variables should be resolved when reading the configurations.
+
+In some cases non-admin users can contribute to JCasC exports if they have some permissions
+(e.g. agent/view configuration or credentials management),
+and they could potentially inject variable expressions in plain text fields like descriptions 
+and then see the resolved secrets in Jenkins Web UI if the Jenkins admin exports and imports the configuration without checking contents.
+It led to a security vulnerability which was addressed in JCasC `1.25` (SECURITY-1446).
+
+* When reading configuration YAMLs, JCasC plugin will try to resolve
+  **all** variables having the `${VARNAME}` format.
+* Starting from JCasC `1.25`, JCasC export escapes the internal variable expressions,
+  e.g. as `^${VARNAME}`, so newly exported and then imported configurations are 
+  are not subject for this risk
+* For previously exported configurations, Jenkins admins are expected to manually
+  resolve the issues by putting the escape symbol `^` in front of variables which should not be resolved 
 
 ### Vault
 

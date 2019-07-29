@@ -69,7 +69,7 @@ public class PrimitiveConfigurator implements Configurator {
             return new Scalar((Enum) instance);
         }
 
-        return new Scalar(String.valueOf(instance));
+        return new Scalar(SecretSourceResolver.encode(String.valueOf(instance)));
     }
 
     @NonNull

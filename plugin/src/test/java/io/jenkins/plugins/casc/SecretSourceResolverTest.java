@@ -8,8 +8,10 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
+import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.LoggerRule;
+import org.jvnet.hudson.test.WithoutJenkins;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -72,6 +74,11 @@ public class SecretSourceResolverTest {
     }
 
     @Test
+    public void resolve_singleEntryDoubleEscaped() {
+        assertThat(SecretSourceResolver.resolve(context, "^^${FOO}"), equalTo("^${FOO}"));
+    }
+
+    @Test
     public void resolve_multipleEntries() {
         environment.set("FOO", "hello");
         environment.set("BAR", "world");
@@ -107,12 +114,12 @@ public class SecretSourceResolverTest {
 
     @Test
     public void resolve_nothingSpace() {
-        assertThat(SecretSourceResolver.resolve(context, "${ }"), equalTo("${ }"));
+        assertThat(SecretSourceResolver.resolve(context, "${ }"), equalTo(""));
     }
 
     @Test
     public void resolve_nothingBrackets() {
-        assertThat(SecretSourceResolver.resolve(context, "${}"), equalTo("${}"));
+        assertThat(SecretSourceResolver.resolve(context, "${}"), equalTo(""));
     }
 
     @Test
@@ -170,5 +177,19 @@ public class SecretSourceResolverTest {
     @Test
     public void resolve_mixedMultipleEntriesEscaped() {
         assertThat(SecretSourceResolver.resolve(context, "http://^${FOO}:^${BAR}"), equalTo("http://${FOO}:${BAR}"));
+    }
+
+    @Test
+    @Issue("SECURITY-1446")
+    @WithoutJenkins
+    public void shouldEncodeInternalVarsProperly() {
+        assertVarEncoding("^${TEST}", "${TEST}");
+        assertVarEncoding("^^${TEST}", "^${TEST}");
+        assertVarEncoding("$TEST", "$TEST");
+    }
+
+    private static void assertVarEncoding(String expected, String toEncode) {
+        String encoded = SecretSourceResolver.encode(toEncode);
+        assertThat(encoded, equalTo(expected));
     }
 }
