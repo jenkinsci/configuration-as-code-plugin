@@ -50,7 +50,7 @@ public class RoleStrategyTest {
         Folder folderA = j.jenkins.createProject(Folder.class, "A");
         FreeStyleProject jobA1 = folderA.createProject(FreeStyleProject.class, "1");
         Folder folderB = j.jenkins.createProject(Folder.class, "B");
-        FreeStyleProject jobB2 = folderB.createProject(FreeStyleProject.class, "2");
+        folderB.createProject(FreeStyleProject.class, "2");
 
         AuthorizationStrategy s = j.jenkins.getAuthorizationStrategy();
         assertThat("Authorization Strategy has been read incorrectly",

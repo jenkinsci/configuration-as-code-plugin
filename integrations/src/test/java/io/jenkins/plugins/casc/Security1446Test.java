@@ -60,7 +60,6 @@ public class Security1446Test {
         final String message = "Hello, world! PATH=${PATH} JAVA_HOME=^${JAVA_HOME}";
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         ConfigurationContext context = new ConfigurationContext(registry);
-        CredentialsRootConfigurator root = ExtensionList.lookupSingleton(CredentialsRootConfigurator.class);
 
         DataBoundConfigurator<UsernamePasswordCredentialsImpl> configurator = new DataBoundConfigurator<>(UsernamePasswordCredentialsImpl.class);
         UsernamePasswordCredentialsImpl creds = new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL, "test",

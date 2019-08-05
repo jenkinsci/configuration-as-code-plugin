@@ -27,10 +27,6 @@ public class YamlExportTest {
     @Test
     @Issue("SECURITY-1458")
     public void shouldDiscoverSecretsBasedOnTheAttributeType() throws Exception {
-        ConfigurationAsCode casc = ConfigurationAsCode.get();
-        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
-        ConfigurationContext context = new ConfigurationContext(registry);
-
         DataBoundConfigurator c = new DataBoundConfigurator<>(AttributeTest.SecretRenamedFieldFithSecretConstructor.class);
         Set<Attribute> attributes = c.describe();
         assertThat(attributes.size(), equalTo(1));
