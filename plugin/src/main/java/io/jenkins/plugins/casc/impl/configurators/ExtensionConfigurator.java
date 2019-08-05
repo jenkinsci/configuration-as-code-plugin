@@ -19,8 +19,6 @@ import org.kohsuke.accmod.restrictions.NoExternalUse;
 @Restricted(NoExternalUse.class)
 public class ExtensionConfigurator<T> extends BaseConfigurator<T> {
 
-    private static final Logger LOGGER = Logger.getLogger(ExtensionConfigurator.class.getName());
-
     private final Class<T> target;
 
     public ExtensionConfigurator(Class<T> clazz) {
