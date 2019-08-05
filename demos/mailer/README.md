@@ -22,4 +22,3 @@ unclassified:
 `hudson.task.Mailer.Descriptor` exposes global SMTP configuration parameters.
 It is identified as YAML root element `mailer` as this descriptor has a `global.jelly` UI view, so JCasC
 assumes it makes sense to expose it as a root element extension.
-
