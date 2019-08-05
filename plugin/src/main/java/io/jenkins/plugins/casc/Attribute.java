@@ -416,8 +416,10 @@ public class Attribute<Owner, Type> {
             }
         }
 
-        if (writeMethod == null)
-            throw new Exception("Default value setter cannot find Property Descriptor for " + setterId);
+        if (writeMethod == null) {
+            throw new IllegalStateException(
+                "Default value setter cannot find Property Descriptor for " + setterId);
+        }
 
         Object o = value;
         if (multiple) {
