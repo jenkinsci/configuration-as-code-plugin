@@ -26,5 +26,6 @@ public class SelfConfiguratorTest {
     @Test
     @ConfiguredWithCode(value = "SelfConfiguratorRestrictedTest.yml", expected = ConfiguratorException.class)
     public void self_configure_restricted() {
+        // expected to throw Configurator Exception
     }
 }

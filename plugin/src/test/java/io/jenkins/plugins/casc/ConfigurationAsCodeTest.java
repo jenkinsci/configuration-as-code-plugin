@@ -140,6 +140,7 @@ public class ConfigurationAsCodeTest {
     @Test
     @ConfiguredWithCode(value = {"merge1.yml", "merge2.yml"}, expected = ConfiguratorException.class)
     public void shouldReportConfigurationConflict() {
+        // expected to throw Configurator Exception
     }
 
     @Test
