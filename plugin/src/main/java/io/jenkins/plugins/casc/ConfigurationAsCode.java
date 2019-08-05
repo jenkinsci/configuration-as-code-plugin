@@ -112,6 +112,10 @@ public class ConfigurationAsCode extends ManagementLink {
     @Inject
     private DefaultConfiguratorRegistry registry;
 
+    private long lastTimeLoaded;
+
+    private List<String> sources = Collections.emptyList();
+
     @CheckForNull
     @Override
     public String getIconFileName() {
@@ -134,10 +138,6 @@ public class ConfigurationAsCode extends ManagementLink {
     public String getDescription() {
         return "Reload your configuration or update configuration source";
     }
-
-    private long lastTimeLoaded;
-
-    private List<String> sources = Collections.emptyList();
 
     public Date getLastTimeLoaded() {
         return new Date(lastTimeLoaded);

@@ -22,6 +22,8 @@ public class SecretSourceResolverTest {
     @ClassRule
     public static JenkinsRule j = new JenkinsRule();
 
+    private static ConfigurationContext context;
+
     @Rule
     public final EnvironmentVariables environment = new EnvironmentVariables();
 
@@ -32,8 +34,6 @@ public class SecretSourceResolverTest {
     public void initLogging() {
         logging.record(Logger.getLogger(SecretSourceResolver.class.getName()), Level.INFO).capture(2048);
     }
-
-    private static ConfigurationContext context;
 
     @BeforeClass
     public static void setup() {
