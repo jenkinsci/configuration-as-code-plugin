@@ -1,3 +1,5 @@
+<!-- Please describe your pull request here. -->
+
 <!--
 To mark your pull request as work in progress put the construction emoji 🚧 in your title. (hint: copy it)
 Helps us to block accidental merges of unfinished work.
@@ -8,20 +10,13 @@ Helps us to block accidental merges of unfinished work.
 🚨 Please review the [guidelines for contributing](../blob/master/docs/CONTRIBUTING.md) to this repository.
 
 - [ ] Make sure you are requesting to **pull a topic/feature/bugfix branch** (right side) and not your master branch!
-
+- [ ] Ensure that the pull request title represents the desired changelog entry
 - [ ] Please describe what you did
-
-- [ ] Link to relevant GitHub issues or pull requests
-
-- [ ] Link to relevant [Jenkins JIRA issues](https://issues.jenkins-ci.org)
-
+- [ ] Link to relevant issues in GitHub or in [Jenkins JIRA](https://issues.jenkins-ci.org)
+- [ ] Link to relevant pull requests, esp. upstream and downstream changes
 - [ ] Did you provide a test-case? That demonstrates feature works or fixes the issue.
 
 <!--
 Put an `x` into the [ ] to show you have filled the information below
 Describe your pull request below
 -->
-
-### Description
-
-Please describe your pull request here.
