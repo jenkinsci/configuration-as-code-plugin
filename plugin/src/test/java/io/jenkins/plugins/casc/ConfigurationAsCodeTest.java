@@ -30,6 +30,7 @@ import static io.jenkins.plugins.casc.ConfigurationAsCode.CASC_JENKINS_CONFIG_PR
 import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
 import static io.jenkins.plugins.casc.misc.Util.toYamlString;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -140,6 +141,8 @@ public class ConfigurationAsCodeTest {
     @ConfiguredWithCode(value = {"merge1.yml", "merge2.yml"}, expected = ConfiguratorException.class)
     public void shouldReportConfigurationConflict() {
         // expected to throw Configurator Exception
+        // nodes should be empty due to conflict
+        assertThat(j.jenkins.getNodes(), is(empty()));
     }
 
     @Test
