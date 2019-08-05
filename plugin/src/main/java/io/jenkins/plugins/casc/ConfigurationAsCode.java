@@ -630,11 +630,6 @@ public class ConfigurationAsCode extends ManagementLink {
             .anyMatch(subPath -> subPath.toString().startsWith("."));
     }
 
-    private static Stream<? extends Map.Entry<String, Object>> entries(Reader config) {
-        return ((Map<String, Object>) new Yaml().loadAs(config, Map.class)).entrySet().stream();
-    }
-
-
     @FunctionalInterface
     private interface ConfiguratorOperation {
 
