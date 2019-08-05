@@ -28,7 +28,7 @@ import java.io.IOException;
 /**
  * Exception type for {@link Configurator} issues.
  * @author Oleg Nenashev
- * @since TODO
+ * @since 1.0
  * @see Configurator#configure(CNode, ConfigurationContext)
  * @see Configurator
  */

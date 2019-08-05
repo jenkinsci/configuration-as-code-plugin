@@ -42,7 +42,7 @@ import static org.junit.Assert.assertTrue;
  * 3. A string that should be present in the logs (casc logger) that guarantees the config is loaded. Usually a weird
  *    text configured.
  *
- * @since TODO
+ * @since 1.20
  */
 public abstract class RoundTripAbstractTest {
     @Rule
