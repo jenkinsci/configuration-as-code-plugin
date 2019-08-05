@@ -51,6 +51,7 @@ public class JenkinsConfigTest {
     @Symbol("broken")
     public static class BrokenCrumbIssuer extends CrumbIssuer {
 
+        @SuppressWarnings("unused")
         @DataBoundConstructor
         public BrokenCrumbIssuer(String foo) {
 
