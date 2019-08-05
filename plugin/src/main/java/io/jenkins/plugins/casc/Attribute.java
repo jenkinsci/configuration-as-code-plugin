@@ -406,13 +406,13 @@ public class Attribute<Owner, Type> {
 
         Method writeMethod = null;
         for (Method method : target.getClass().getMethods()) {
-            if (method.getName().equals("set"+StringUtils.capitalize(name))) {
-                // Find most specialized variant of setter because the method
-                // can to have been overridden with concretized type
-                if (writeMethod == null
-                        || writeMethod.getParameterTypes()[0].isAssignableFrom(method.getParameterTypes()[0])) {
-                    writeMethod = method;
-                }
+            // Find most specialized variant of setter because the method
+            // can to have been overridden with concretized type
+            if (method.getName().equals("set" + StringUtils.capitalize(name)) && (
+                writeMethod == null
+                    || writeMethod.getParameterTypes()[0]
+                    .isAssignableFrom(method.getParameterTypes()[0]))) {
+                writeMethod = method;
             }
         }
 
