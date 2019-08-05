@@ -31,7 +31,7 @@ public class PrimitiveConfiguratorTest {
     private static ConfigurationContext context;
 
     @BeforeClass
-    public static void setup() {
+    public static void setUp() {
         registry = ConfiguratorRegistry.get();
         context = new ConfigurationContext(registry);
     }

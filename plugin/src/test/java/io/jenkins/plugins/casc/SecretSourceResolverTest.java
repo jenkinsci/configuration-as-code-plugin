@@ -36,7 +36,7 @@ public class SecretSourceResolverTest {
     }
 
     @BeforeClass
-    public static void setup() {
+    public static void setUp() {
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         context = new ConfigurationContext(registry);
     }
