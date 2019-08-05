@@ -2,9 +2,6 @@ package io.jenkins.plugins.casc.yaml;
 
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.AttributeTest;
-import io.jenkins.plugins.casc.ConfigurationAsCode;
-import io.jenkins.plugins.casc.ConfigurationContext;
-import io.jenkins.plugins.casc.ConfiguratorRegistry;
 import io.jenkins.plugins.casc.impl.configurators.DataBoundConfigurator;
 import java.util.Set;
 import org.junit.Rule;

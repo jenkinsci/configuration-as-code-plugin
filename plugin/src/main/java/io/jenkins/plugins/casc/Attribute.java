@@ -29,8 +29,8 @@ import org.apache.commons.lang.StringUtils;
 import org.kohsuke.accmod.AccessRestriction;
 import org.kohsuke.stapler.export.Exported;
 
-import static io.jenkins.plugins.casc.ConfigurationAsCode.printThrowable;
 import static io.jenkins.plugins.casc.Blacklist.isBlacklisted;
+import static io.jenkins.plugins.casc.ConfigurationAsCode.printThrowable;
 
 /**
  * One attribute of {@link Configurator}.
