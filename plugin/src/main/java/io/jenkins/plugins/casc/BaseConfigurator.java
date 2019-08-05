@@ -378,6 +378,8 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
 
                 case warn:
                     LOGGER.warning(message);
+                    break;
+                default: // All cases in the ENUM is covered
             }
         }
     }
