@@ -2,7 +2,7 @@
 
 Mailer plugin configuration belongs under `unclassified` root element
 
-Mailer plugin version required to allow setting `smtpHost`: 1.22+ (earilier versions won't allow it to be set)
+Mailer plugin version **required** to allow setting `smtpHost`: ***1.22+ (earilier versions won't allow it to be set)***
 
 ## sample configuration
 
