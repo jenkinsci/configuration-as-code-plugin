@@ -166,7 +166,7 @@ public class Util {
      * Checks whether {@link LoggerRule} has not recorded the message.
      * @param logging Logger rule
      * @param unexpectedText Text to check
-     * @since TODO
+     * @since 1.25
      */
     public static void assertNotInLog(LoggerRule logging, String unexpectedText) {
         assertFalse("The log should not contain '" + unexpectedText + "'",
@@ -177,7 +177,7 @@ public class Util {
      * Checks whether {@link LoggerRule} has recorded the message.
      * @param logging Logger rule
      * @param expectedText Text to check
-     * @since TODO
+     * @since 1.25
      */
     public static void assertLogContains(LoggerRule logging, String expectedText) {
         assertTrue("The log should contain '" + expectedText + "'",

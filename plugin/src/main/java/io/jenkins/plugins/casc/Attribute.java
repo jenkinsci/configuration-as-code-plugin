@@ -147,7 +147,7 @@ public class Attribute<Owner, Type> {
      * Sets whether the attribute is secret.
      * If so, various outputs will be suppressed (exports, logging).
      * @param secret {@code true} to make an attribute secret
-     * @since TODO
+     * @since 1.25
      */
     public Attribute<Owner, Type> secret(boolean secret) {
         this.secret = secret;
@@ -195,7 +195,7 @@ public class Attribute<Owner, Type> {
      * @return {@code true} if the attribute is secret
      * @param target Target object.
      *               If {@code null}, only the attribute metadata is checked
-     * @since TODO
+     * @since 1.25
      */
     public boolean isSecret(@CheckForNull Owner target) {
         // This.secret should be always true for the first condition, but getType() is overridable

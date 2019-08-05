@@ -13,7 +13,7 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * @author Mads Nielsen
- * @since TODO
+ * @since 1.0
  */
 public class GlobalMatrixAuthorizationTest {
 
