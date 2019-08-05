@@ -49,8 +49,7 @@ public class ExportTest {
     public void shouldNotExportValuesWithSecretConstructors() throws Exception {
         DataBoundConfigurator<DataBoundSecretConstructor> c = new DataBoundConfigurator<>(DataBoundSecretConstructor.class);
         String res = export(c, new DataBoundSecretConstructor(Secret.fromString("test")));
-        // TODO: uncomment after https://github.com/jenkinsci-cert/configuration-as-code-plugin/pull/5
-        // assertThat(res, not(containsString("test")));
+        assertThat(res, not(containsString("test")));
     }
 
     public <T> String export(DataBoundConfigurator<T> configurator, T object) throws Exception {
