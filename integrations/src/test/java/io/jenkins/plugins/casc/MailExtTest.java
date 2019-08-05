@@ -29,7 +29,7 @@ public class MailExtTest {
 
     @Rule
     public RuleChain chain= RuleChain
-            .outerRule(logging.record(Logger.getLogger(Attribute.class.getName()), Level.INFO).capture(2048))
+            .outerRule(logging.record(Logger.getLogger(Attribute.class.getName()), Level.FINER).capture(2048))
             .around(j);
 
     private static final String SMTP_PASSWORD = "myPassword";

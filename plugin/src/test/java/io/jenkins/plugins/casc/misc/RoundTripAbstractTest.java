@@ -114,7 +114,7 @@ public abstract class RoundTripAbstractTest {
 
             // Start recording the logs just before restarting, to avoid capture the previous startup. We're look there
             // if the "magic token" is there
-            logging.record("io.jenkins.plugins.casc", Level.INFO).capture(5);
+            logging.record("io.jenkins.plugins.casc", Level.FINER).capture(2048);
         });
 
         r.then(step -> {
