@@ -190,10 +190,10 @@ public class ConfigurationAsCodeTest {
         assertNotNull(descriptor);
         descriptor.setConfigurationPath(firstConfig);
         ConfigurationAsCode.get().configure();
-        Assert.assertThat(j.jenkins.getDescription(), is("configuration as code - JenkinsConfigTest"));
+        assertThat(j.jenkins.getDescription(), is("configuration as code - JenkinsConfigTest"));
         System.setProperty(CASC_JENKINS_CONFIG_PROPERTY, secondConfig);
         ConfigurationAsCode.get().configure();
-        Assert.assertThat(j.jenkins.getDescription(), is("Configured by Configuration as Code plugin"));
+        assertThat(j.jenkins.getDescription(), is("Configured by Configuration as Code plugin"));
         System.clearProperty(CASC_JENKINS_CONFIG_PROPERTY);
     }
 
