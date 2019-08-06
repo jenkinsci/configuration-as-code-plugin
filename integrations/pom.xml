@@ -414,6 +414,7 @@
         <groupId>org.jenkins-ci.modules</groupId>
         <artifactId>instance-identity</artifactId>
         <version>2.2</version>
+        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.jenkins-ci.plugins</groupId>
