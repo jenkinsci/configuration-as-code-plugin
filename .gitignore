@@ -1,6 +1,7 @@
 target/
 work/
-.idea/
+.idea/*
+!.idea/codeStyles/
 *.iml
 
 # ignore jenkins.yaml from root and plugin folder (used by many for testing)
