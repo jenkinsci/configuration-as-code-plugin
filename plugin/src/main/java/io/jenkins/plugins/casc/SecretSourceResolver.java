@@ -27,7 +27,7 @@ public class SecretSourceResolver {
      * Encodes String so that it can be safely represented in the YAML after export.
      * @param toEncode String to encode
      * @return Encoded string
-     * @since TODO
+     * @since 1.25
      */
     public static String encode(@CheckForNull String toEncode) {
         if (toEncode == null) {

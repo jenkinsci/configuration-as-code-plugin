@@ -30,7 +30,7 @@ import static org.junit.Assert.assertThat;
 
 /**
  * @author Oleg Nenashev
- * @since TODO
+ * @since 1.0
  */
 public class RoleStrategyTest {
 

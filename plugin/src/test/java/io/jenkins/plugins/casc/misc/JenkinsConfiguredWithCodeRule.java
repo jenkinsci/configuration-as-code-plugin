@@ -86,7 +86,7 @@ public class JenkinsConfiguredWithCodeRule extends JenkinsRule {
      * @param strict Fail if any export operation returns error
      * @throws Exception Export error
      * @throws AssertionError Failed to export the configuration
-     * @since TODO
+     * @since 1.25
      */
     public String exportToString(boolean strict) throws Exception {
         final ByteArrayOutputStream out = new ByteArrayOutputStream();

@@ -85,7 +85,7 @@ public final class Scalar implements CNode, CharSequence {
     /**
      * Check whether the scalar value should be masked in the output.
      * @return {@code true} if the value is masked
-     * @since TODO
+     * @since 1.25
      */
     public boolean isMasked() {
         return sensitive && !encrypted;
@@ -96,7 +96,7 @@ public final class Scalar implements CNode, CharSequence {
      * It indicates that the scalar represents a sensitive argument (secret or other restricted data).
      * @param sensitive value to set
      * @return Object instance
-     * @since TODO
+     * @since 1.25
      */
     public Scalar sensitive(boolean sensitive) {
         this.sensitive = sensitive;
@@ -107,7 +107,7 @@ public final class Scalar implements CNode, CharSequence {
      * Indicates that the data is encrypted and hence safe to be exported.
      * @param encrypted Value to set
      * @return Object instance
-     * @since TODO
+     * @since 1.25
      */
     public Scalar encrypted(boolean encrypted) {
         this.encrypted = encrypted;

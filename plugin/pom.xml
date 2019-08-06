@@ -49,13 +49,6 @@
       <version>4.0.0</version>
     </dependency>
 
-    <!--TODO: Not longer used, remove it? -->
-    <dependency>
-      <groupId>org.bigtesting</groupId>
-      <artifactId>interpolatd</artifactId>
-      <version>1.0.0</version>
-    </dependency>
-
     <dependency>
       <groupId>io.vavr</groupId>
       <artifactId>vavr</artifactId>
