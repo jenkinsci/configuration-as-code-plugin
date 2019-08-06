@@ -1,6 +1,5 @@
 package io.jenkins.plugins.casc;
 
-import com.google.common.annotations.VisibleForTesting;
 import hudson.util.Secret;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Scalar;
@@ -27,6 +26,8 @@ import javax.annotation.Nonnull;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.accmod.AccessRestriction;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.export.Exported;
 
 import static io.jenkins.plugins.casc.ConfigurationAsCode.printThrowable;
@@ -329,8 +330,8 @@ public class Attribute<Owner, Type> {
      * @return {@code true} if the attribute is secret
      *         {@code false} if not or if there is no conclusive answer.
      */
-    @VisibleForTesting
-    /*package*/ static boolean calculateIfSecret(@CheckForNull Class<?> targetClass, @Nonnull String fieldName) {
+    @Restricted(NoExternalUse.class)
+    public static boolean calculateIfSecret(@CheckForNull Class<?> targetClass, @Nonnull String fieldName) {
         if (targetClass == Secret.class) { // Class is final, so the check is safe
             LOGGER.log(Level.FINER, "Attribute {0}#{1} is secret, because it has a Secret type",
                     new Object[] {targetClass.getName(), fieldName});

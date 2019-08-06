@@ -160,8 +160,10 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                         final Configurator configurator = context.lookupOrFail(k);
                         args[i] = configurator.configure(value, context);
                     }
-                    LOGGER.log(Level.FINE, "Setting {0}. {1} = {2}",
-                        new Object[] {target, names[i], t == Secret.class ? "****" : value});
+                    if (LOGGER.isLoggable(Level.FINE)) {
+                        LOGGER.log(Level.FINE, "Setting {0}. {1} = {2}",
+                                new Object[]{target, names[i], t == Secret.class || Attribute.calculateIfSecret(target, names[i]) ? "****" : value});
+                    }
                 } else if (t.isPrimitive()) {
                     args[i] = defaultValue(t);
                 }

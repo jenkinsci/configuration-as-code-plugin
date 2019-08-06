@@ -1,5 +1,6 @@
 package io.jenkins.plugins.casc.impl.configurators;
 
+import hudson.util.Secret;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.Configurator;
@@ -15,15 +16,21 @@ import io.jenkins.plugins.casc.model.Scalar;
 import io.jenkins.plugins.casc.model.Sequence;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.PostConstruct;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.LoggerRule;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
+import static io.jenkins.plugins.casc.misc.Util.assertNotInLog;
+import static io.jenkins.plugins.casc.misc.Util.assertLogContains;
 import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
@@ -40,6 +47,14 @@ public class DataBoundConfiguratorTest {
 
     @Rule
     public JenkinsRule j = new JenkinsRule();
+
+    @Rule
+    public LoggerRule logging = new LoggerRule();
+
+    @Before
+    public void tearUp() {
+        logging.record(Logger.getLogger(DataBoundConfigurator.class.getName()), Level.FINEST).capture(2048);
+    }
 
     @Test
     public void configure_databound() throws Exception {
@@ -208,6 +223,27 @@ public class DataBoundConfiguratorTest {
         }
     }
 
+    @Test
+    public void shouldNotLogSecrets() throws Exception {
+        Mapping config = new Mapping();
+        config.put("secret", "mySecretValue");
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        registry.lookupOrFail(SecretHolder.class).configure(config, new ConfigurationContext(registry));
+        assertLogContains(logging, "secret");
+        assertNotInLog(logging, "mySecretValue");
+    }
+
+    @Test
+    @Issue("SECURITY-1497")
+    public void shouldNotLogSecretsForUndefinedConstructors() throws Exception {
+        Mapping config = new Mapping();
+        config.put("secret", "mySecretValue");
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        registry.lookupOrFail(SecretHolderWithString.class).configure(config, new ConfigurationContext(registry));
+        assertLogContains(logging, "secret");
+        assertNotInLog(logging, "mySecretValue");
+    }
+
     public static class Foo {
 
         final String foo;
@@ -287,4 +323,23 @@ public class DataBoundConfiguratorTest {
         }
     }
 
+    public static class SecretHolder {
+
+        Secret secret;
+
+        @DataBoundConstructor
+        public SecretHolder(Secret secret) {
+            this.secret = secret;
+        }
+    }
+
+    public static class SecretHolderWithString {
+
+        Secret secret;
+
+        @DataBoundConstructor
+        public SecretHolderWithString(String secret) {
+            this.secret = Secret.fromString(secret);
+        }
+    }
 }
