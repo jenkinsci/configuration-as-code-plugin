@@ -121,11 +121,11 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                     clazz.getPackage().isAnnotationPresent(ParametersAreNonnullByDefault.class))) {
 
                     if (Set.class.isAssignableFrom(t)) {
-                        LOGGER.log(Level.INFO, "The parameter to be set is @Nonnull but is not present; " +
+                        LOGGER.log(Level.FINER, "The parameter to be set is @Nonnull but is not present; " +
                                                            "setting equal to empty set.");
                         args[i] = Collections.emptySet();
                     } else if (List.class.isAssignableFrom(t)) {
-                        LOGGER.log(Level.INFO, "The parameter to be set is @Nonnull but is not present; " +
+                        LOGGER.log(Level.FINER, "The parameter to be set is @Nonnull but is not present; " +
                                                            "setting equal to empty list.");
                         args[i] = Collections.emptyList();
                     } else if (String.class.isAssignableFrom(t)) {
@@ -160,7 +160,8 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                         final Configurator configurator = context.lookupOrFail(k);
                         args[i] = configurator.configure(value, context);
                     }
-                    LOGGER.info("Setting " + target + "." + names[i] + " = " + (t == Secret.class ? "****" : value));
+                    LOGGER.log(Level.FINE, "Setting {0}. {1} = {2}",
+                        new Object[] {target, names[i], t == Secret.class ? "****" : value});
                 } else if (t.isPrimitive()) {
                     args[i] = defaultValue(t);
                 }
