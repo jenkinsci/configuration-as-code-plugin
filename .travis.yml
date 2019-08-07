@@ -1,6 +1,6 @@
 language: java
 
-dist: bionic
+dist: xenial
 
 services:
   - docker
