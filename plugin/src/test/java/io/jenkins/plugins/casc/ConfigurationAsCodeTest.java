@@ -18,7 +18,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
-import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,6 +30,7 @@ import static io.jenkins.plugins.casc.ConfigurationAsCode.CASC_JENKINS_CONFIG_PR
 import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
 import static io.jenkins.plugins.casc.misc.Util.toYamlString;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -140,6 +140,9 @@ public class ConfigurationAsCodeTest {
     @Test
     @ConfiguredWithCode(value = {"merge1.yml", "merge2.yml"}, expected = ConfiguratorException.class)
     public void shouldReportConfigurationConflict() {
+        // expected to throw Configurator Exception
+        // nodes should be empty due to conflict
+        assertThat(j.jenkins.getNodes(), is(empty()));
     }
 
     @Test
@@ -189,10 +192,10 @@ public class ConfigurationAsCodeTest {
         assertNotNull(descriptor);
         descriptor.setConfigurationPath(firstConfig);
         ConfigurationAsCode.get().configure();
-        Assert.assertThat(j.jenkins.getDescription(), is("configuration as code - JenkinsConfigTest"));
+        assertThat(j.jenkins.getDescription(), is("configuration as code - JenkinsConfigTest"));
         System.setProperty(CASC_JENKINS_CONFIG_PROPERTY, secondConfig);
         ConfigurationAsCode.get().configure();
-        Assert.assertThat(j.jenkins.getDescription(), is("Configured by Configuration as Code plugin"));
+        assertThat(j.jenkins.getDescription(), is("Configured by Configuration as Code plugin"));
         System.clearProperty(CASC_JENKINS_CONFIG_PROPERTY);
     }
 

@@ -13,7 +13,11 @@ import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.rules.RuleChain;
 import org.kohsuke.stapler.DataBoundConstructor;
 
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isEmptyOrNullString;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -42,8 +46,7 @@ public class JenkinsConfigTest {
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         ConfigurationAsCode.get().export(out);
         final String s = out.toString();
-        System.out.println(s);
-
+        assertThat(s, is(not(isEmptyOrNullString())));
     }
 
 
@@ -51,6 +54,7 @@ public class JenkinsConfigTest {
     @Symbol("broken")
     public static class BrokenCrumbIssuer extends CrumbIssuer {
 
+        @SuppressWarnings("unused")
         @DataBoundConstructor
         public BrokenCrumbIssuer(String foo) {
 

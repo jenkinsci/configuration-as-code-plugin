@@ -48,10 +48,6 @@ public class SecretSourceResolver {
         return substitutor;
     }
 
-    private static String handleJenkinsVariableDeclaration(ConfigurationContext context, String captured) {
-        return enclosedBy + captured + enclosedIn;
-    }
-
     private static class ConfigurationContextStrLookup extends StrLookup {
 
         private final ConfigurationContext context;

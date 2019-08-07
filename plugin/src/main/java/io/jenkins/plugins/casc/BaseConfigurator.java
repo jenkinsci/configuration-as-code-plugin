@@ -239,7 +239,6 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
                 } else {
                     c = (Class) ((TypeVariable) t).getBounds()[0];
                 }
-                TypeVariable tv = (TypeVariable) t;
             } else {
                 return null;
             }
@@ -379,6 +378,8 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
 
                 case warn:
                     LOGGER.warning(message);
+                    break;
+                default: // All cases in the ENUM is covered
             }
         }
     }

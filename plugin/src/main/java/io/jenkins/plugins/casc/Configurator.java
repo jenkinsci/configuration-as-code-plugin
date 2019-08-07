@@ -45,12 +45,13 @@ public interface Configurator<T> {
 
     @NonNull
     static String normalize(@NonNull String name) {
-        if (name.toUpperCase().equals(name)) {
-            name = name.toLowerCase();
+        String result = name;
+        if (result.toUpperCase().equals(name)) {
+            result = result.toLowerCase();
         } else {
-            name = StringUtils.uncapitalize(name);
+            result = StringUtils.uncapitalize(name);
         }
-        return name;
+        return result;
     }
 
     /**

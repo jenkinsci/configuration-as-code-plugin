@@ -42,7 +42,7 @@ public abstract class CascJmhBenchmarkState extends JmhBenchmarkState {
         Class<?> enclosingClass = getEnclosingClass();
 
         if (!enclosingClass.isAnnotationPresent(JmhBenchmark.class)) {
-            throw new Exception("The enclosing class must be annotated with @JmhBenchmark");
+            throw new IllegalStateException("The enclosing class must be annotated with @JmhBenchmark");
         }
 
         String config = Objects.requireNonNull(getEnclosingClass().getResource(getResourcePath()),

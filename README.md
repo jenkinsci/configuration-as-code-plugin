@@ -265,12 +265,12 @@ and they could potentially inject variable expressions in plain text fields like
 and then see the resolved secrets in Jenkins Web UI if the Jenkins admin exports and imports the configuration without checking contents.
 It led to a security vulnerability which was addressed in JCasC `1.25` (SECURITY-1446).
 
-* When reading configuration YAMLs, JCasC plugin will try to resolve
+- When reading configuration YAMLs, JCasC plugin will try to resolve
   **all** variables having the `${VARNAME}` format.
-* Starting from JCasC `1.25`, JCasC export escapes the internal variable expressions,
+- Starting from JCasC `1.25`, JCasC export escapes the internal variable expressions,
   e.g. as `^${VARNAME}`, so newly exported and then imported configurations are 
   are not subject for this risk
-* For previously exported configurations, Jenkins admins are expected to manually
+- For previously exported configurations, Jenkins admins are expected to manually
   resolve the issues by putting the escape symbol `^` in front of variables which should not be resolved 
 
 ### Vault

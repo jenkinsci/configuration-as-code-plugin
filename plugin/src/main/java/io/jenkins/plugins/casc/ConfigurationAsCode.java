@@ -21,7 +21,6 @@ import io.jenkins.plugins.casc.model.Scalar.Format;
 import io.jenkins.plugins.casc.model.Sequence;
 import io.jenkins.plugins.casc.model.Source;
 import io.jenkins.plugins.casc.snakeyaml.DumperOptions;
-import io.jenkins.plugins.casc.snakeyaml.Yaml;
 import io.jenkins.plugins.casc.snakeyaml.emitter.Emitter;
 import io.jenkins.plugins.casc.snakeyaml.error.YAMLException;
 import io.jenkins.plugins.casc.snakeyaml.nodes.MappingNode;
@@ -39,7 +38,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.Reader;
 import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -112,6 +110,10 @@ public class ConfigurationAsCode extends ManagementLink {
     @Inject
     private DefaultConfiguratorRegistry registry;
 
+    private long lastTimeLoaded;
+
+    private List<String> sources = Collections.emptyList();
+
     @CheckForNull
     @Override
     public String getIconFileName() {
@@ -134,10 +136,6 @@ public class ConfigurationAsCode extends ManagementLink {
     public String getDescription() {
         return "Reload your configuration or update configuration source";
     }
-
-    private long lastTimeLoaded;
-
-    private List<String> sources = Collections.emptyList();
 
     public Date getLastTimeLoaded() {
         return new Date(lastTimeLoaded);
@@ -629,11 +627,6 @@ public class ConfigurationAsCode extends ManagementLink {
             .mapToObj(path::getName)
             .anyMatch(subPath -> subPath.toString().startsWith("."));
     }
-
-    private static Stream<? extends Map.Entry<String, Object>> entries(Reader config) {
-        return ((Map<String, Object>) new Yaml().loadAs(config, Map.class)).entrySet().stream();
-    }
-
 
     @FunctionalInterface
     private interface ConfiguratorOperation {

@@ -18,6 +18,14 @@ public class ConfigurationContext implements ConfiguratorRegistry {
     private Restriction restriction = Restriction.reject;
     private Unknown unknown = Unknown.reject;
 
+    /**
+     * the model-introspection model to be applied by configuration-as-code.
+     * as we move forward, we might need to introduce some breaking change in the way we discover
+     * configurable data model from live jenkins instance. At this time, 'new' mechanism will
+     * only be enabled if yaml source do include adequate 'version: x'.
+     */
+    private Version version = Version.ONE;
+
     private transient List<Listener> listeners = new ArrayList<>();
 
     private transient final ConfiguratorRegistry registry;
@@ -75,14 +83,6 @@ public class ConfigurationContext implements ConfiguratorRegistry {
     public <T> Configurator<T> lookup(Type type) {
         return registry.lookup(type);
     }
-
-    /**
-     * the model-introspection model to be applied by configuration-as-code.
-     * as we move forward, we might need to introduce some breaking change in the way we discover
-     * configurable data model from live jenkins instance. At this time, 'new' mechanism will
-     * only be enabled if yaml source do include adequate 'version: x'.
-     */
-    private Version version = Version.ONE;
 
     public void setVersion(Version version) {
         this.version = version;

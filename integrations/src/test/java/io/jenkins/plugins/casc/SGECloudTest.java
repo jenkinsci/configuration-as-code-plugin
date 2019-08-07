@@ -21,8 +21,6 @@ public class SGECloudTest {
     @Issue("SECURITY-1458")
     public void shouldNotExportPassword() throws Exception {
         ConfigurationAsCode casc = ConfigurationAsCode.get();
-        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
-        ConfigurationContext context = new ConfigurationContext(registry);
 
         final String passwordText = "Hello, world!";
         BatchCloud cloud = new BatchCloud("testBatchCloud", "whatever",

@@ -7,7 +7,6 @@ import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
-import java.util.logging.Logger;
 import jenkins.model.Jenkins;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
@@ -18,8 +17,6 @@ import org.kohsuke.accmod.restrictions.NoExternalUse;
  */
 @Restricted(NoExternalUse.class)
 public class ExtensionConfigurator<T> extends BaseConfigurator<T> {
-
-    private static final Logger LOGGER = Logger.getLogger(ExtensionConfigurator.class.getName());
 
     private final Class<T> target;
 

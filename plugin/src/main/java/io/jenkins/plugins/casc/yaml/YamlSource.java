@@ -18,6 +18,20 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class YamlSource<T> {
 
+    public static final YamlReader<String> READ_FROM_URL = config -> {
+        final URL url = URI.create(config).toURL();
+        return new InputStreamReader(url.openStream(), UTF_8);
+    };
+
+    public static final YamlReader<Path> READ_FROM_PATH = Files::newBufferedReader;
+
+    public static final YamlReader<InputStream> READ_FROM_INPUTSTREAM = in -> new InputStreamReader(in, UTF_8);
+
+    public static final YamlReader<HttpServletRequest> READ_FROM_REQUEST = req -> {
+        // TODO get encoding from req.getContentType()
+        return new InputStreamReader(req.getInputStream(), UTF_8);
+    };
+
     public final T source;
 
     public final YamlReader<T> reader;
@@ -54,20 +68,6 @@ public class YamlSource<T> {
     public String source() {
         return source.toString();
     }
-
-    public static final YamlReader<String> READ_FROM_URL = config -> {
-        final URL url = URI.create(config).toURL();
-        return new InputStreamReader(url.openStream(), UTF_8);
-    };
-
-    public static final YamlReader<Path> READ_FROM_PATH = Files::newBufferedReader;
-
-    public static final YamlReader<InputStream> READ_FROM_INPUTSTREAM = in -> new InputStreamReader(in, UTF_8);
-
-    public static final YamlReader<HttpServletRequest> READ_FROM_REQUEST = req -> {
-        // TODO get encoding from req.getContentType()
-        return new InputStreamReader(req.getInputStream(), UTF_8);
-    };
 
     @Override
     public String toString() {

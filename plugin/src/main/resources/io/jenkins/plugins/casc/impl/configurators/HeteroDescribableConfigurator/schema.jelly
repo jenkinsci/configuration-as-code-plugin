@@ -1,5 +1,5 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler">
+<j:jelly xmlns:j="jelly:core">
   "${it.target.name}": {
     "type": "object"
     <j:if test="${it.implementors.size() > 0}">

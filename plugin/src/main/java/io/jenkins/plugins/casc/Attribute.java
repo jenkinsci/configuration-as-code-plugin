@@ -30,8 +30,8 @@ import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.export.Exported;
 
-import static io.jenkins.plugins.casc.ConfigurationAsCode.printThrowable;
 import static io.jenkins.plugins.casc.Blacklist.isBlacklisted;
+import static io.jenkins.plugins.casc.ConfigurationAsCode.printThrowable;
 
 /**
  * One attribute of {@link Configurator}.
@@ -43,6 +43,12 @@ import static io.jenkins.plugins.casc.Blacklist.isBlacklisted;
 public class Attribute<Owner, Type> {
 
     private static final Logger LOGGER = Logger.getLogger(Attribute.class.getName());
+    private static final Class[] EMPTY = new Class[0];
+
+    /** For pseudo-attributes which are actually managed directly as singletons, not set on some owner component */
+    private static final Setter NOOP = (target, value) -> {
+        // Nop
+    };
 
     //TODO: Concurrent cache?
     //private static final HashMap<Class, Boolean> SECRET_ATTRIBUTE_CACHE =
@@ -100,8 +106,6 @@ public class Attribute<Owner, Type> {
     boolean isIgnored() {
         return isDeprecated() || isRestricted() || isBlacklisted(this);
     }
-
-    private static final Class[] EMPTY = new Class[0];
 
     public Class<? extends AccessRestriction>[] getRestrictions() {
         return restrictions != null ? restrictions : EMPTY;
@@ -281,8 +285,8 @@ public class Attribute<Owner, Type> {
      */
     @FunctionalInterface
     public interface Setter<O,T> {
-        void setValue(O target, T value) throws Exception;
         Setter NOP =  (o,v) -> {};
+        void setValue(O target, T value) throws Exception;
     }
 
     /**
@@ -404,18 +408,20 @@ public class Attribute<Owner, Type> {
 
         Method writeMethod = null;
         for (Method method : target.getClass().getMethods()) {
-            if (method.getName().equals("set"+StringUtils.capitalize(name))) {
-                // Find most specialized variant of setter because the method
-                // can to have been overridden with concretized type
-                if (writeMethod == null
-                        || writeMethod.getParameterTypes()[0].isAssignableFrom(method.getParameterTypes()[0])) {
-                    writeMethod = method;
-                }
+            // Find most specialized variant of setter because the method
+            // can to have been overridden with concretized type
+            if (method.getName().equals("set" + StringUtils.capitalize(name)) && (
+                writeMethod == null
+                    || writeMethod.getParameterTypes()[0]
+                    .isAssignableFrom(method.getParameterTypes()[0]))) {
+                writeMethod = method;
             }
         }
 
-        if (writeMethod == null)
-            throw new Exception("Default value setter cannot find Property Descriptor for " + setterId);
+        if (writeMethod == null) {
+            throw new IllegalStateException(
+                "Default value setter cannot find Property Descriptor for " + setterId);
+        }
 
         Object o = value;
         if (multiple) {
@@ -452,12 +458,6 @@ public class Attribute<Owner, Type> {
     public int hashCode() {
         return name.hashCode();
     }
-
-
-    /** For pseudo-attributes which are actually managed directly as singletons, not set on some owner component */
-    private static final Setter NOOP = (target, value) -> {
-        // Nop
-    };
 
     public static final <T,V> Setter<T,V> noop() {
         return NOOP;
