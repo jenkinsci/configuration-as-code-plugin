@@ -38,10 +38,10 @@ public class SchemaTest {
         WebResponse response = client.loadWebResponse(request);
         assertThat(response.getStatusCode(), is(200));
         String schema = response.getContentAsString();
-        String contents = new String(Files.readAllBytes(Paths.get("./src/test/resources/io/jenkins/plugins/casc/SchemaTest.yml")));
+        System.out.println("This is the schema" + schema);
+        String contents = new String(Files.readAllBytes(Paths.get(getClass().getResource("SchemaTest.yml").toURI())));
         String json = convertYamlToJson((contents));
         validateJsonData(schema,json);
-
     }
 
     String convertYamlToJson(String yaml) throws IOException {
