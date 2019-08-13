@@ -50,6 +50,15 @@ public class Attribute<Owner, Type> {
         // Nop
     };
 
+    // TODO: Make the list configurable via system property
+    // TODO: Move secret-related logic to SecretsHelper
+    private static final Set<String> SUSPECTED_SECRET_ATTRIBUTE_NAMES_AND_SUFFIXES =
+            Collections.unmodifiableSet(new HashSet<>(
+                    Arrays.asList("password", "passphrase", "passwd", "pwd",
+                            "secret", "secretkey", "privatekey",
+                            "token", "accesstoken", "apitoken")));
+
+
     //TODO: Concurrent cache?
     //private static final HashMap<Class, Boolean> SECRET_ATTRIBUTE_CACHE =
     //        new HashMap<>();
@@ -262,8 +271,15 @@ public class Attribute<Owner, Type> {
     private CNode _describe(Configurator c, ConfigurationContext context, Object value, boolean shouldBeMasked)
             throws Exception {
         CNode node = c.describe(value, context);
-        if (shouldBeMasked && node instanceof Scalar) {
-            ((Scalar)node).sensitive(true);
+        if (node instanceof Scalar) {
+            Scalar scalar = (Scalar)node;
+            if (shouldBeMasked) {
+                scalar.sensitive(true);
+                scalar.encrypted(this.getter.encrypted());
+            }
+            if (type == Secret.class) {
+                scalar.encrypted(true);
+            }
         }
         return node;
     }
@@ -295,6 +311,14 @@ public class Attribute<Owner, Type> {
     @FunctionalInterface
     public interface Getter<O,T> {
         T getValue(O target) throws Exception;
+
+        /**
+         * Checks whether getter returns encrypted value.
+         * @return {@code true} if {@link #getValue(Object)} returns encrypted value instead of the original value.
+         *         {@code false} will be returned for {@link Secret} getters since they do not encrypt the value on their own
+         * @since TODO
+         */
+        default boolean encrypted() {return false;}
     }
 
     @CheckForNull
@@ -340,6 +364,16 @@ public class Attribute<Owner, Type> {
             LOGGER.log(Level.FINER, "Attribute {0}#{1} is secret, because it has a Secret type",
                     new Object[] {targetClass.getName(), fieldName});
             return true;
+        }
+
+        // try attributes and suffixes
+        String lowerCaseFieldName = fieldName.toLowerCase();
+        for (String suffix : SUSPECTED_SECRET_ATTRIBUTE_NAMES_AND_SUFFIXES) {
+            if (lowerCaseFieldName.endsWith(suffix)) {
+                LOGGER.log(Level.FINER, "Attribute {0} is secret, because '{1}' is in the list of common Secret attribute names and suffixes",
+                        new Object[]{fieldName, suffix});
+                return true;
+            }
         }
 
         if (targetClass == null) {
