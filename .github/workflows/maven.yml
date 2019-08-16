@@ -10,10 +10,13 @@ jobs:
       matrix:
         java: [1.8, 11]
         os: [ubuntu-latest]
-        jenkins-version: [2.60.3, 2.164.1]
-        exclude:
+        include:
         - java: '11'
-          jenkins-version: '2.60.3'
+          jenkins-version: '2.164.1'
+        - java: '8'
+          jenkins-version: '2.164.1'
+        - java: '8'
+          jenkins-version: ''
 
     steps:
     - uses: actions/checkout@v1
