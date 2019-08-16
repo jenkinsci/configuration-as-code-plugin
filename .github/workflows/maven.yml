@@ -10,13 +10,16 @@ jobs:
       matrix:
         java: [1.8, 11]
         os: [ubuntu-latest]
+        jenkins-version: [2.60.3, 2.164.1]
         include:
         - java: '11'
+          flags: '-Djenkins.version=${{ matrix.jenkins-version }}'
+        - java: '1.8'
           jenkins-version: '2.164.1'
-        - java: '8'
-          jenkins-version: '2.164.1'
-        - java: '8'
-          jenkins-version: ''
+          flags: '-Djenkins.version=${{ matrix.jenkins-version }}'
+        exclude:
+        - java: '11'
+          jenkins-version: '2.60.3'
 
     steps:
     - uses: actions/checkout@v1
@@ -26,4 +29,4 @@ jobs:
         java-version: ${{ matrix.java }}
     - name: Build with Maven
       run: |
-        mvn install -B -V --no-transfer-progress -Djenkins.version=${{ matrix.jenkins-version }}
+        mvn install -B -V --no-transfer-progress ${{ matrix.flags }}
