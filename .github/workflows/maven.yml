@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         java: [1.8, 11]
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, windows-latest]
         jenkins-version: [2.60.3, 2.164.1]
         include:
         - java: '11'

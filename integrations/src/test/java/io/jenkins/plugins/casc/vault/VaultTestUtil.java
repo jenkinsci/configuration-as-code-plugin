@@ -16,6 +16,8 @@ import org.testcontainers.utility.MountableFile;
 import org.testcontainers.utility.TestEnvironment;
 import org.testcontainers.vault.VaultContainer;
 
+import static hudson.Functions.isWindows;
+
 @SuppressWarnings("WeakerAccess")
 class VaultTestUtil {
 
@@ -42,7 +44,7 @@ class VaultTestUtil {
 
     public static boolean hasDockerDaemon() {
         try {
-            return TestEnvironment.dockerApiAtLeast("1.10");
+            return !isWindows() && TestEnvironment.dockerApiAtLeast("1.10");
         } catch (IllegalStateException e) {
             return false;
         }
