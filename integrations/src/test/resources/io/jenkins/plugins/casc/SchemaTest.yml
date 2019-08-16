@@ -1,5 +1,6 @@
-Jenkins:
-  systemMessage: "Jenkins configured automatically by Jenkins Configuration as Code plugin\n\n"
-  numExecutors: 2
-  scmCheckoutRetryCount: 2
-  mode: NORMAL
+jenkins:
+  globalNodeProperties:
+    - envVars:
+        env:
+          - key: FOO
+            value: BAR
