@@ -13,10 +13,10 @@ jobs:
         jenkins-version: [2.60.3, 2.164.1]
         include:
         - java: '11'
-          flags: '-Djenkins.version=${{ matrix.jenkins-version }}'
+          flags: '-Djenkins.version=2.164.1'
         - java: '1.8'
           jenkins-version: '2.164.1'
-          flags: '-Djenkins.version=${{ matrix.jenkins-version }}'
+          flags: '-Djenkins.version=2.164.1'
         exclude:
         - java: '11'
           jenkins-version: '2.60.3'
