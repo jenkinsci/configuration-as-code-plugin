@@ -1,0 +1,26 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: Build on Jenkins ${{ matrix.jenkins-version }}, JDK ${{ matrix.java }} and ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        java: [1.8, 11]
+        os: [ubuntu-latest]
+        jenkins-version: [2.60.3, 2.164.1]
+        exclude:
+        - java: '11'
+          jenkins-version: '2.60.3'
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up JDK ${{ matrix.java }}
+      uses: actions/setup-java@v1
+      with:
+        java-version: ${{ matrix.java }}
+    - name: Build with Maven
+      run: |
+        mvn install -B -V --no-transfer-progress -Djenkins.version=${{ matrix.jenkins-version }}
