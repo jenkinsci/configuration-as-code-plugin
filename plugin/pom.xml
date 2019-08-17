@@ -80,18 +80,6 @@
           <version>2.2.0</version>
           <scope>compile</scope>
       </dependency>
-    <dependency>
-      <groupId>io.jenkins</groupId>
-      <artifactId>configuration-as-code</artifactId>
-      <version>1.28-SNAPSHOT</version>
-      <scope>compile</scope>
-    </dependency>
-      <dependency>
-          <groupId>io.jenkins</groupId>
-          <artifactId>configuration-as-code</artifactId>
-          <version>1.28-SNAPSHOT</version>
-          <scope>compile</scope>
-      </dependency>
   </dependencies>
 
   <build>
