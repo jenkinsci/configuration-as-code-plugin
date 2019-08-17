@@ -33,6 +33,7 @@ import io.jenkins.plugins.casc.snakeyaml.resolver.Resolver;
 import io.jenkins.plugins.casc.snakeyaml.serializer.Serializer;
 import io.jenkins.plugins.casc.yaml.YamlSource;
 import io.jenkins.plugins.casc.yaml.YamlUtils;
+import io.jenkins.plugins.systemreadpermission.SystemReadPermission;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -388,7 +389,7 @@ public class ConfigurationAsCode extends ManagementLink {
     @RequirePOST
     public void doExport(StaplerRequest req, StaplerResponse res) throws Exception {
 
-        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+        if (!Jenkins.getInstance().hasPermission(SystemReadPermission.SYSTEM_READ)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -400,7 +401,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
     @RequirePOST
     public void doViewExport(StaplerRequest req, StaplerResponse res) throws Exception {
-        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+        if (!Jenkins.getInstance().hasPermission(SystemReadPermission.SYSTEM_READ)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -413,7 +414,7 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     public void doReference(StaplerRequest req, StaplerResponse res) throws Exception {
-        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+        if (!Jenkins.getInstance().hasPermission(SystemReadPermission.SYSTEM_READ)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -422,7 +423,7 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     public void doSchema(StaplerRequest req, StaplerResponse res) throws Exception {
-        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+        if (!Jenkins.getInstance().hasPermission(SystemReadPermission.SYSTEM_READ)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
