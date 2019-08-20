@@ -27,6 +27,14 @@
       <id>casz</id>
       <name>Joseph Petersen</name>
     </developer>
+    <developer>
+      <id>timja</id>
+      <name>Tim Jacomb</name>
+    </developer>
+    <developer>
+      <id>oleg_nenashev</id>
+      <name>Oleg Nenashev</name>
+    </developer>
   </developers>
 
   <dependencies>
