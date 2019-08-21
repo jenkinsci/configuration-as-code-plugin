@@ -62,3 +62,7 @@ labels:
   - name: deprecated
     color: e2b626
     description: A PR that deprecates code - used by Release Drafter
+  - name: dev-tools
+    color: 551a8b
+    description: JCasC Community Bridge Dev-Tools Project
+
