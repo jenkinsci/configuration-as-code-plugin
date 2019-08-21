@@ -64,5 +64,5 @@ labels:
     description: A PR that deprecates code - used by Release Drafter
   - name: dev-tools
     color: 551a8b
-    description: A PR that refers to the JCasC Community Bridge Dev-Tools Project
+    description: JCasC Community Bridge Dev-Tools Project
 
