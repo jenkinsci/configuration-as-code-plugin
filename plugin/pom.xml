@@ -19,7 +19,7 @@
 
   <properties>
     <!-- SECURITY-1446 and SECURITY-1290 are considered as breaking changes. Others also contain a risk of regressions -->
-    <hpi.compatibleSinceVersion>1.25</hpi.compatibleSinceVersion>
+    <hpi.compatibleSinceVersion>1.28</hpi.compatibleSinceVersion>
   </properties>
 
   <developers>
