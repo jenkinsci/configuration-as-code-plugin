@@ -73,11 +73,13 @@ public class SchemaGeneration {
                         descriptorExtensionList = Jenkins.getInstance().getDescriptorList(dataBoundConfigurator.getTarget());
                     }
 
-//                    }  else if (configurator instanceof JenkinsConfigurator) {
+//                      else if (configurator instanceof JenkinsConfigurator) {
 //                        JenkinsConfigurator jenkinsConfigurator = (JenkinsConfigurator) configurator;
 //                        descriptorExtensionList = Jenkins.getInstance().getDescriptorList(jenkinsConfigurator.getTarget());
 //
-//                    }  else if (configurator instanceof GlobalConfigurationCategoryConfigurator) {
+//                    }
+//
+//                    else if (configurator instanceof GlobalConfigurationCategoryConfigurator) {
 //                        GlobalConfigurationCategoryConfigurator globalConfigurationCategoryConfigurator = (GlobalConfigurationCategoryConfigurator) configurator;
 //                        descriptorExtensionList = Jenkins.getInstance().getDescriptorList(globalConfigurationCategoryConfigurator.getTarget());
 //
