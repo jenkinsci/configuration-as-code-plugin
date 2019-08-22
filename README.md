@@ -275,7 +275,7 @@ It led to a security vulnerability which was addressed in JCasC `1.25` (SECURITY
 
 ### Vault
 
-Prerequisites:
+Prerequisites: [HashiCorp Vault plugin](https://github.com/jenkinsci/hashicorp-vault-plugin) v2.4.0+
 
 - The environment variable `CASC_VAULT_PW` must be present, if token is not used and appRole/Secret is not used. (Vault password.)
 - The environment variable `CASC_VAULT_USER` must be present, if token is not used and appRole/Secret is not used. (Vault username.)
@@ -336,7 +336,7 @@ secrets:
 **TODO**: Provide a Dockerfile to generate documentation from specified jenkins-core release and plugins.
 
 ## Installing plugins
-
+    
 We don't support installing plugins with JCasC you need to use something else for this,
 
 Dockers users can use:  

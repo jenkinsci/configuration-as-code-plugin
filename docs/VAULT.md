@@ -5,6 +5,7 @@
 - An instance of [Hashicorps Vault](https://www.vaultproject.io/) running
   - Using a docker-based approach is described [here](vault/setup-vault-using-docker.md)
 - A token (or username and password) as credentials for accessing Vault
+- [HashiCorp Vault plugin](https://github.com/jenkinsci/hashicorp-vault-plugin) v2.4.0+
 
 ## Put stuff into Vault
 
