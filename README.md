@@ -336,7 +336,7 @@ secrets:
 **TODO**: Provide a Dockerfile to generate documentation from specified jenkins-core release and plugins.
 
 ## Installing plugins
-    
+
 We don't support installing plugins with JCasC you need to use something else for this,
 
 Dockers users can use:  
