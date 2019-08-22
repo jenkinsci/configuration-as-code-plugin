@@ -1,8 +1,6 @@
 package io.jenkins.plugins.casc;
 
 import hudson.DescriptorExtensionList;
-import io.jenkins.plugins.casc.impl.configurators.DataBoundConfigurator;
-import io.jenkins.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -11,7 +9,7 @@ import jenkins.model.Jenkins;
 
 public class SchemaGeneration {
 
-    public String generateSchema() {
+    public static String generateSchema() {
 
         LinkedHashSet linkedHashSet = new LinkedHashSet<>(ConfigurationAsCode.get().getRootConfigurators());
         Iterator<RootElementConfigurator> i = linkedHashSet.iterator();
@@ -58,20 +56,15 @@ public class SchemaGeneration {
                 "    \"oneOf\": [");
 
         ConfigurationAsCode configurationAsCode = ConfigurationAsCode.get();
-        configurationAsCode.getConfigurators()
-                .stream()
-                .forEach(configurator -> {
+        for (Object configurator : configurationAsCode.getConfigurators()) {
+            DescriptorExtensionList descriptorExtensionList = null;
+            System.out.println(configurator.getClass().getName());
+            if (configurator instanceof Configurator<?>) {
+                Configurator c = (Configurator) configurator;
+                descriptorExtensionList = Jenkins.getInstance()
+                    .getDescriptorList(c.getTarget());
 
-                    DescriptorExtensionList descriptorExtensionList = null;
-                    System.out.println(configurator.getClass().getName());
-                    if(configurator instanceof HeteroDescribableConfigurator) {
-                        HeteroDescribableConfigurator heteroDescribableConfigurator = (HeteroDescribableConfigurator) configurator;
-                        descriptorExtensionList = Jenkins.getInstance().getDescriptorList(heteroDescribableConfigurator.getTarget());
-
-                    } else if (configurator instanceof DataBoundConfigurator) {
-                        DataBoundConfigurator dataBoundConfigurator = (DataBoundConfigurator) configurator;
-                        descriptorExtensionList = Jenkins.getInstance().getDescriptorList(dataBoundConfigurator.getTarget());
-                    }
+            }
 
 //                      else if (configurator instanceof JenkinsConfigurator) {
 //                        JenkinsConfigurator jenkinsConfigurator = (JenkinsConfigurator) configurator;
@@ -111,19 +104,20 @@ public class SchemaGeneration {
 //                        MavenConfigurator mavenConfigurator = (MavenConfigurator) configurator;
 //                        descriptorExtensionList = Jenkins.getInstance().getDescriptorList(mavenConfigurator.getTarget());
 //                    }
-                    /**
-                     * Iterate over the list and generate the schema
-                     */
+            /**
+             * Iterate over the list and generate the schema
+             */
 
-                    for (Object obj: descriptorExtensionList) {
-                        schemaString.append("{\n" +
-                                "      \"properties\" : {" +
-                                "      \"" + obj.getClass().getName() +"\"" + ": { \"$ref\" : \"#/definitions/" +
-                                obj.toString() + "\" }" +
-                                " }");
-                    }
-                });
+            for (Object obj : descriptorExtensionList) {
+                schemaString.append("{\n" +
+                    "      \"properties\" : {" +
+                    "      \"" + obj.getClass().getName() + "\"" + ": { \"$ref\" : \"#/definitions/"
+                    +
+                    obj.toString() + "\" }" +
+                    " }");
+            }
+        }
 
-            return schemaString.toString();
+        return schemaString.toString();
     }
 }
