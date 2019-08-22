@@ -1,6 +1,7 @@
 package io.jenkins.plugins.casc.vault;
 
 
+import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.ConfiguratorRegistry;
@@ -17,13 +18,16 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.hamcrest.MatcherAssert;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
+import org.jvnet.hudson.test.Issue;
 import org.testcontainers.vault.VaultContainer;
 
 import static io.jenkins.plugins.casc.vault.VaultTestUtil.VAULT_APPROLE_FILE;
@@ -41,7 +45,9 @@ import static io.jenkins.plugins.casc.vault.VaultTestUtil.createVaultContainer;
 import static io.jenkins.plugins.casc.vault.VaultTestUtil.hasDockerDaemon;
 import static io.jenkins.plugins.casc.vault.VaultTestUtil.runCommand;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
 // Inspired by https://github.com/BetterCloud/vault-java-driver/blob/master/src/test-integration/java/com/bettercloud/vault/util/VaultContainer.java
@@ -80,6 +86,25 @@ public class VaultSecretSourceTest {
         // Setup Jenkins
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         context = new ConfigurationContext(registry);
+    }
+
+    @Test
+    @Envs({
+        @Env(name = "CASC_VAULT_USER", value = VAULT_USER),
+        @Env(name = "CASC_VAULT_PW", value = VAULT_PW),
+        @Env(name = "CASC_VAULT_PATHS", value = VAULT_PATH_KV1_1 + "," + VAULT_PATH_KV1_2),
+        @Env(name = "CASC_VAULT_ENGINE_VERSION", value = "1")
+    })
+    @Ignore
+    @Issue("JENKINS-48885")
+    public void vaultPluginDetected() {
+        MatcherAssert.assertThat(System.getenv("CASC_VAULT_PW"), is(VAULT_PW));
+        try {
+            ConfigurationAsCode.get().configure(getClass().getResource("vault.yml").toExternalForm());
+            assertThat(SecretSourceResolver.resolve(context, "${key1}"), equalTo("123"));
+        } catch (ConfiguratorException e) {
+            fail("exception should not be caught");
+        }
     }
 
     @Test
