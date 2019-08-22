@@ -1,19 +1,19 @@
 package io.jenkins.plugins.casc;
 
 import hudson.DescriptorExtensionList;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
+
+import java.util.*;
+
+import io.jenkins.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
 import jenkins.model.Jenkins;
 
 public class SchemaGeneration {
 
     public static String generateSchema() {
 
-        LinkedHashSet linkedHashSet = new LinkedHashSet<>(ConfigurationAsCode.get().getRootConfigurators());
-        Iterator<RootElementConfigurator> i = linkedHashSet.iterator();
-
+        /**
+         * The initial template for the JSON Schema
+         */
         StringBuilder schemaString = new StringBuilder();
         schemaString.append("{\n" +
                 "  \"$schema\": \"http://json-schema.org/draft-06/schema#\",\n" +
@@ -23,62 +23,56 @@ public class SchemaGeneration {
                 "  \"properties\": {\n" +
                 "");
 
-        while (i.hasNext()) {
-
-            List<Attribute> attributeList = new ArrayList<>(i.next().getAttributes());
-            for (Attribute a : attributeList) {
-                String type;
-                if (a.type.toString().equals("int")) {
-                    type = "int";
-                } else if (a.type.toString().equals("class java.lang.String")) {
-                    type = "string";
-                } else if (a.type.toString().equals("boolean")) {
-                    type = "boolean";
-                } else {
-                    type = "object";
-                }
-                schemaString.append(a.name + ": " + "{\n" +
-                        "      \"type\": \"" + type + "\",\n" +
-                        "      \"$ref\": \"#/definitions/" + a.type.getName() + "\"\n" +
-                        "    },");
-            }
-        }
-        System.out.println(schemaString);
 
         /**
-         * Used to generate the schema for the descriptors
-         * Finds out the instance of each of the configurators
-         * and gets the required descriptors from the instance method.
-         * Appending the oneOf tag to the schema.
+         * This generates the schema for the root configurators
          */
 
-        schemaString.append("schema\" : {\n" +
-                "    \"oneOf\": [");
-
-        ConfigurationAsCode configurationAsCode = ConfigurationAsCode.get();
-        for (Object configurator : configurationAsCode.getConfigurators()) {
-            DescriptorExtensionList descriptorExtensionList = null;
-            if (configurator instanceof Configurator<?>) {
-                Configurator c = (Configurator) configurator;
-                descriptorExtensionList = Jenkins.getInstance()
-                    .getDescriptorList(c.getTarget());
-
-            }
-
-            /**
-             * Iterate over the list and generate the schema
-             */
-
-            for (Object obj : descriptorExtensionList) {
-                schemaString.append("{\n" +
-                    "      \"properties\" : {\n" +
-                    "      \"" + obj.getClass().getName() + "\"" + ": { \"$ref\" : \"#/definitions/"
-                    +
-                    obj.toString() + "\" }\n" +
-                    " }");
-            }
+        LinkedHashSet linkedHashSet = new LinkedHashSet<>(ConfigurationAsCode.get().getRootConfigurators());
+        Iterator<RootElementConfigurator> i = linkedHashSet.iterator();
+        while (i.hasNext()) {
+            RootElementConfigurator rootElementConfigurator = i.next();
+            schemaString.append("\"" + rootElementConfigurator.getName() + "\": {" + "\"type\": \"object\",\n" +
+                    "    },");
         }
+        schemaString.append("},\n");
+        Set configObjects = new LinkedHashSet<>(ConfigurationAsCode.get().getConfigurators());
+        System.out.println(configObjects.size());
+        Iterator<Objects> obj = configObjects.iterator();
 
+        /**
+         * Used to generate the schema for the implementors of
+         * the HetroDescribable Configurator
+         * It mimics the HetroDescribable Configurator
+         */
+        ConfigurationAsCode configurationAsCode = ConfigurationAsCode.get();
+        configurationAsCode.getConfigurators()
+                .stream()
+                .forEach(configurator -> {
+                    if(configurator instanceof HeteroDescribableConfigurator) {
+                        HeteroDescribableConfigurator heteroDescribableConfigurator = (HeteroDescribableConfigurator) configurator;
+                        Map<String,Class> implementorsMap = heteroDescribableConfigurator.getImplementors();
+
+                        if(implementorsMap.size() != 0) {
+                            schemaString.append("\"" + heteroDescribableConfigurator.getTarget().getName() + "\": {\n" +
+                                    " \"type\": \"object\"\n" +
+                                            "    ," + "\"oneOf\" : [");
+                            Iterator<Map.Entry<String, Class>> itr = implementorsMap.entrySet().iterator();
+                            while (itr.hasNext()) {
+                                Map.Entry<String, Class> entry = itr.next();
+                                schemaString.append("{\n" +
+                                        "      \"properties\" : {\n" +
+                                        "        \"" + entry.getKey() + "\" : { \"$ref\" : \"#/definitions/ " + entry.getValue() + "\" }\n" +
+                                        "      }\n" +
+                                        "    }\n" +
+                                        "    ,");
+                            }
+                            schemaString.append("]\n" + "  \n" + "  }\n" + ",");
+                        }
+                    }
+                });
+
+        schemaString.append("}");
         return schemaString.toString();
     }
 }
