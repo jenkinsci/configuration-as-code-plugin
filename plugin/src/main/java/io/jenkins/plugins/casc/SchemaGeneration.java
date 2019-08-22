@@ -58,7 +58,6 @@ public class SchemaGeneration {
         ConfigurationAsCode configurationAsCode = ConfigurationAsCode.get();
         for (Object configurator : configurationAsCode.getConfigurators()) {
             DescriptorExtensionList descriptorExtensionList = null;
-            System.out.println(configurator.getClass().getName());
             if (configurator instanceof Configurator<?>) {
                 Configurator c = (Configurator) configurator;
                 descriptorExtensionList = Jenkins.getInstance()
@@ -66,54 +65,16 @@ public class SchemaGeneration {
 
             }
 
-//                      else if (configurator instanceof JenkinsConfigurator) {
-//                        JenkinsConfigurator jenkinsConfigurator = (JenkinsConfigurator) configurator;
-//                        descriptorExtensionList = Jenkins.getInstance().getDescriptorList(jenkinsConfigurator.getTarget());
-//
-//                    }
-//
-//                    else if (configurator instanceof GlobalConfigurationCategoryConfigurator) {
-//                        GlobalConfigurationCategoryConfigurator globalConfigurationCategoryConfigurator = (GlobalConfigurationCategoryConfigurator) configurator;
-//                        descriptorExtensionList = Jenkins.getInstance().getDescriptorList(globalConfigurationCategoryConfigurator.getTarget());
-//
-//                    }  else if (configurator instanceof UnsecuredAuthorizationStrategyConfigurator) {
-//                        UnsecuredAuthorizationStrategyConfigurator unsecuredAuthorizationStrategyConfigurator = (UnsecuredAuthorizationStrategyConfigurator) configurator;
-//                        descriptorExtensionList = Jenkins.getInstance().getDescriptorList(unsecuredAuthorizationStrategyConfigurator.getTarget());
-//
-//                    } else if (configurator instanceof UpdateCenterConfigurator) {
-//                        UpdateCenterConfigurator updateCenterConfigurator = (UpdateCenterConfigurator) configurator;
-//                        descriptorExtensionList = Jenkins.getInstance().getDescriptorList(updateCenterConfigurator.getTarget());
-//
-//                    } else if (configurator instanceof HudsonPrivateSecurityRealmConfigurator) {
-//                        HudsonPrivateSecurityRealmConfigurator hudsonPConfigurator = (HudsonPrivateSecurityRealmConfigurator) configurator;
-//                        descriptorExtensionList = Jenkins.getInstance().getDescriptorList(hudsonPConfigurator.getTarget());
-//
-//                    } else if (configurator instanceof UpdateSiteConfigurator) {
-//                        UpdateSiteConfigurator updateSiteConfigurator = (UpdateSiteConfigurator) configurator;
-//                        descriptorExtensionList = Jenkins.getInstance().getDescriptorList(updateSiteConfigurator.getTarget());
-//
-//                    } else if (configurator instanceof JNLPLauncherConfigurator) {
-//                        JNLPLauncherConfigurator jLaunchConfigurator = (JNLPLauncherConfigurator) configurator;
-//                        descriptorExtensionList = Jenkins.getInstance().getDescriptorList(jLaunchConfigurator.getTarget());
-//
-//                    } else if (configurator instanceof AdminWhitelistRuleConfigurator) {
-//                        AdminWhitelistRuleConfigurator adminWhitelistRuleConfigurator = (AdminWhitelistRuleConfigurator) configurator;
-//                        descriptorExtensionList = Jenkins.getInstance().getDescriptorList(adminWhitelistRuleConfigurator.getTarget());
-//
-//                    } else if(configurator instanceof MavenConfigurator ) {
-//                        MavenConfigurator mavenConfigurator = (MavenConfigurator) configurator;
-//                        descriptorExtensionList = Jenkins.getInstance().getDescriptorList(mavenConfigurator.getTarget());
-//                    }
             /**
              * Iterate over the list and generate the schema
              */
 
             for (Object obj : descriptorExtensionList) {
                 schemaString.append("{\n" +
-                    "      \"properties\" : {" +
+                    "      \"properties\" : {\n" +
                     "      \"" + obj.getClass().getName() + "\"" + ": { \"$ref\" : \"#/definitions/"
                     +
-                    obj.toString() + "\" }" +
+                    obj.toString() + "\" }\n" +
                     " }");
             }
         }
