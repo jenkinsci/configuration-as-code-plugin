@@ -28,8 +28,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.jvnet.hudson.test.Issue;
+import org.jvnet.hudson.test.LoggerRule;
 import org.testcontainers.vault.VaultContainer;
 
+import static io.jenkins.plugins.casc.misc.Util.assertLogContains;
+import static io.jenkins.plugins.casc.misc.Util.assertNotInLog;
 import static io.jenkins.plugins.casc.vault.VaultTestUtil.VAULT_APPROLE_FILE;
 import static io.jenkins.plugins.casc.vault.VaultTestUtil.VAULT_PATH_KV1_1;
 import static io.jenkins.plugins.casc.vault.VaultTestUtil.VAULT_PATH_KV1_2;
@@ -58,9 +61,12 @@ public class VaultSecretSourceTest {
     @ClassRule
     public static VaultContainer vaultContainer = createVaultContainer();
 
+    public LoggerRule loggerRule = new LoggerRule();
+
     @Rule
     public RuleChain chain = RuleChain
-        .outerRule(new EnvVarsRule()
+        .outerRule(loggerRule.record(Logger.getLogger(ConfigurationAsCode.class.getName()), Level.SEVERE).capture(2048))
+        .around(new EnvVarsRule()
             .set("CASC_VAULT_FILE", getClass().getResource("vaultTest_cascFile").getPath()))
         .around(new JenkinsConfiguredWithCodeRule());
 
@@ -101,6 +107,7 @@ public class VaultSecretSourceTest {
         MatcherAssert.assertThat(System.getenv("CASC_VAULT_PW"), is(VAULT_PW));
         try {
             ConfigurationAsCode.get().configure(getClass().getResource("vault.yml").toExternalForm());
+            assertNotInLog(loggerRule, "Vault secret resolver is not installed, consider installing hashicorp-vault-plugin v2.4.0 or higher");
             assertThat(SecretSourceResolver.resolve(context, "${key1}"), equalTo("123"));
         } catch (ConfiguratorException e) {
             fail("exception should not be caught");

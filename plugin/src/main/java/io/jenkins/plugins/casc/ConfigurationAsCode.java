@@ -268,6 +268,7 @@ public class ConfigurationAsCode extends ManagementLink {
      */
     @Initializer(after = InitMilestone.EXTENSIONS_AUGMENTED, before = InitMilestone.JOB_LOADED)
     public static void init() throws Exception {
+        detectVaultPluginMissing();
         get().configure();
     }
 
@@ -673,18 +674,17 @@ public class ConfigurationAsCode extends ManagementLink {
         }
     }
 
-    private void detectVaultPluginMissing() throws ConfiguratorException {
+    private static void detectVaultPluginMissing() {
         PluginManager pluginManager = Jenkins.getInstance().getPluginManager();
         Set<String> envKeys = System.getenv().keySet();
         if (envKeys.stream().anyMatch(s -> s.startsWith("CASC_VAULT_"))
             && pluginManager.getPlugin("hashicorp-vault-plugin") == null) {
-            throw new ConfiguratorException(
+            LOGGER.log(Level.SEVERE,
                 "Vault secret resolver is not installed, consider installing hashicorp-vault-plugin v2.4.0 or higher\nor consider removing any 'CASC_VAULT_' variables");
         }
     }
 
     private void configureWith(Mapping entries) throws ConfiguratorException {
-        detectVaultPluginMissing();
         // Check input before actually applying changes,
         // so we don't let master in a weird state after some ConfiguratorException has been thrown
         final Mapping clone = entries.clone();
