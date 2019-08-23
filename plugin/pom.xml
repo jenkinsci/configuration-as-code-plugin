@@ -20,6 +20,8 @@
   <properties>
     <!-- SECURITY-1446 and SECURITY-1290 are considered as breaking changes. Others also contain a risk of regressions -->
     <hpi.compatibleSinceVersion>1.25</hpi.compatibleSinceVersion>
+    <hpi.pluginChagelogUrl>https://github.com/jenkinsci/configuration-as-code-plugin/releases</hpi.pluginChagelogUrl>
+    <hpi.pluginLogoUrl>https://raw.githubusercontent.com/jenkinsci/configuration-as-code-plugin/master/plugin/src/main/webapp/img/logo-head.svg</hpi.pluginLogoUrl>
   </properties>
 
   <developers>
