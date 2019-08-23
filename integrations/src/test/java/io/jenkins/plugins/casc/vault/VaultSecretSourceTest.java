@@ -1,6 +1,7 @@
 package io.jenkins.plugins.casc.vault;
 
 
+import com.datapipe.jenkins.vault.jcasc.secrets.VaultSecretSource;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.ConfiguratorException;
@@ -30,6 +31,7 @@ import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.LoggerRule;
 import org.testcontainers.vault.VaultContainer;
 
+import static io.jenkins.plugins.casc.misc.Util.assertLogContains;
 import static io.jenkins.plugins.casc.misc.Util.assertNotInLog;
 import static io.jenkins.plugins.casc.vault.VaultTestUtil.VAULT_APPROLE_FILE;
 import static io.jenkins.plugins.casc.vault.VaultTestUtil.VAULT_PATH_KV1_1;
@@ -63,7 +65,10 @@ public class VaultSecretSourceTest {
 
     @Rule
     public RuleChain chain = RuleChain
-        .outerRule(loggerRule.record(Logger.getLogger(ConfigurationAsCode.class.getName()), Level.SEVERE).capture(2048))
+        .outerRule(loggerRule
+            .record(Logger.getLogger(ConfigurationAsCode.class.getName()), Level.SEVERE)
+            .record(Logger.getLogger(VaultSecretSource.class.getName()), Level.SEVERE)
+            .capture(2048))
         .around(new EnvVarsRule()
             .set("CASC_VAULT_FILE", getClass().getResource("vaultTest_cascFile").getPath()))
         .around(new JenkinsConfiguredWithCodeRule());
@@ -266,7 +271,6 @@ public class VaultSecretSourceTest {
         assertThat(SecretSourceResolver.resolve(context, "${key1}"), equalTo("re-auth-test"));
     }
 
-    // TODO: used to check for backwards compatibility. Deprecate!
     @Test
     @ConfiguredWithCode("vault.yml")
     @EnvsFromFile(VAULT_APPROLE_FILE)
@@ -274,7 +278,8 @@ public class VaultSecretSourceTest {
         @Env(name = "CASC_VAULT_PATH", value = VAULT_PATH_KV1_1 + "," + VAULT_PATH_KV1_2),
         @Env(name = "CASC_VAULT_ENGINE_VERSION", value = "1")
     })
-    public void kv2WithUserDeprecatedPath() {
-        assertThat(SecretSourceResolver.resolve(context, "${key3}"), equalTo("789"));
+    public void kv2WithUserDeprecatedPathDoesNotResolveCorrectly() {
+        assertLogContains(loggerRule,"CASC_VAULT_PATH is deprecated, please switch to CASC_VAULT_PATHS");
+        assertThat(SecretSourceResolver.resolve(context, "${key3}"), equalTo(""));
     }
 }
