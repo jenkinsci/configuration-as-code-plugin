@@ -1,9 +1,12 @@
 package io.jenkins.plugins.casc;
 
 import java.util.*;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import io.jenkins.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class SchemaGeneration {
 
@@ -20,7 +23,7 @@ public class SchemaGeneration {
                 "  \"type\": \"object\",\n" +
                 "  \"properties\": {\n" +
                 "");
-        
+
         /**
          * This generates the schema for the root configurators
          * Iterates over the root elements and adds them to the schema.
@@ -32,7 +35,7 @@ public class SchemaGeneration {
             schemaString.append("\"" + rootElementConfigurator.getName() + "\": {" + "\"type\": \"object\",\n" +
                     "    },");
         }
-        schemaString.append("},\n");
+        schemaString.append("},\n\"definitions\": {");
 
 
         /**
@@ -40,65 +43,71 @@ public class SchemaGeneration {
          * Iterates over the base configurators and adds them to the schema.
          */
 
-        String output = "{";
-        String output1="";
         ConfigurationAsCode configurationAsCodeObject = ConfigurationAsCode.get();
           for (Object configuratorObject : configurationAsCodeObject.getConfigurators()) {
                 if (configuratorObject instanceof BaseConfigurator) {
                     BaseConfigurator baseConfigurator = (BaseConfigurator) configuratorObject;
                     List<Attribute> baseConfigAttributeList = baseConfigurator.getAttributes();
                     if(baseConfigAttributeList.size() == 0 ) {
-                        output += "\"" + ((BaseConfigurator) configuratorObject).getTarget().toString() +
-                        "\":{" + "\"type\": \"object\"," + "\"properties\": {}},";
+                         schemaString.append("\"" + ((BaseConfigurator) configuratorObject).getTarget().toString() +
+                        "\":{" + "\"type\": \"object\"," + "\"properties\": {}},");
                     } else {
                         for (Attribute attribute:baseConfigAttributeList) {
                             if(attribute.multiple) {
-//                                System.out.println("Attribute type is multiple");
+                                schemaString.append("\"" + attribute.getName() + "\":");
+
+                                if(attribute.type.getName().equals("java.lang.String")) {
+                                    schemaString.append("{\"type\": \"string\"},");
+                                } else {
+                                     schemaString.append("{\"type\":  \"object\"," +
+                                            "\"$ref\": \"#/definitions/" + attribute.type.getName() + "\"},");
+                                }
                             } else {
                                 if(attribute.type.isEnum()) {
                                     if(attribute.type.getEnumConstants().length == 0){
-                                        output += "\"" + attribute.getName() + "\":" + " {" +
-                                                "\"type\": \"string\"}";
+                                        schemaString.append("\"" + attribute.getName() + "\":" + " {" +
+                                                "\"type\": \"string\"}");
                                     }
                                     else {
-                                        output += "\"" + attribute.getName() + "\":" + " {" +
-                                                "\"type\": \"string\"," + "\"enum\": [";
+                                        schemaString.append("\"" + attribute.getName() + "\":" + " {" +
+                                                "\"type\": \"string\"," + "\"enum\": [");
+
                                         for (Object obj : attribute.type.getEnumConstants()) {
-                                            output += "\"" + obj + "\",";
+                                            schemaString.append("\"" + obj + "\",");
                                         }
-                                        output += "]},";
+                                         schemaString.append("]},");
                                     }
                                 } else {
-                                    output += "\"" + attribute.getName() + "\":";
+                                    schemaString.append("\"" + attribute.getName() + "\":");
                                     switch (attribute.type.getName()){
 
                                         case "java.lang.String":
-                                            output += "{\"type\": \"string\"},";
+                                            schemaString.append("{\n\"type\": \"string\"},\n");
                                             break;
 
                                         case "int":
-                                            output += "{\"type\": \"integer\"},";
+                                            schemaString.append("{\n\"type\": \"integer\"},\n");
                                             break;
 
                                         case "boolean":
-                                            output += "{\"type\": \"boolean\"},";
+                                             schemaString.append("{\n\"type\": \"boolean\"},\n");
                                             break;
 
                                         case "java.lang.Boolean":
-                                            output += "{\"type\": \"boolean\"},";
+                                            schemaString.append("{\"type\": \"boolean\"},\n");
                                             break;
 
                                         case "java.lang.Integer":
-                                            output += "{\"type\": \"integer\"},";
+                                            schemaString.append("{\n\"type\": \"integer\"},\n");
                                             break;
 
                                         case "java.lang.Long":
-                                            output += "{\"type\": \"integer\"},";
+                                            schemaString.append("{\n\"type\": \"integer\"},\n");
                                             break;
 
                                         default:
-                                            output += "{\"type\":  \"object\"," +
-                                                    "\"$ref\": \"#/definitions/" + attribute.type.getName() + "\"},";
+                                            schemaString.append("{\n\"type\":  \"object\",\n" +
+                                                    "\"$ref\": \"#/definitions/" + attribute.type.getName() + "\"},\n");
                                             break;
                                     }
 
@@ -108,16 +117,6 @@ public class SchemaGeneration {
                     }
                 }
           }
-        output += "}";
-        System.out.println("Look at the beautiful Json data");
-        System.out.println(output1);
-        try {
-            String indented = (new JSONObject(output)).toString(4);
-            System.out.println(indented);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
 
         /**
          * Used to generate the schema for the implementors of
@@ -151,7 +150,7 @@ public class SchemaGeneration {
                     }
                 });
 
-        schemaString.append("}");
+        schemaString.append("}\n}");
         return schemaString.toString();
     }
 }

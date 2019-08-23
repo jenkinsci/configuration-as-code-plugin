@@ -29,10 +29,10 @@ public class SchemaGenerationTest{
          */
         String s = generateSchema();
         System.out.println(s);
-//        String fileName = "Schema";
-//        BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
-//        writer.write(s);
-//        writer.close();
+        String fileName = "Schema";
+        BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
+        writer.write(s);
+        writer.close();
     }
 
     @Test
@@ -46,5 +46,21 @@ public class SchemaGenerationTest{
         writer.write(response.getContentAsString()
         );
         writer.close();
+    }
+
+
+    @Test
+    public void validateSchema() {
+
+    }
+
+    @Test
+    public void checkRootConfigurators() {
+
+    }
+
+    @Test
+    public void checkInitialTemplate() {
+
     }
 }
