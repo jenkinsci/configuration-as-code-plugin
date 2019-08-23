@@ -1,8 +1,5 @@
 package io.jenkins.plugins.casc;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import hudson.DescriptorExtensionList;
-
 import java.util.*;
 import io.jenkins.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
 import org.json.JSONException;
@@ -45,13 +42,36 @@ public class SchemaGeneration {
          */
 
         String output = "{";
-        ConfigurationAsCode configurationAsCode1 = ConfigurationAsCode.get();
-          for (Object configurator1 : configurationAsCode1.getConfigurators()) {
-                if (configurator1 instanceof BaseConfigurator) {
-                    BaseConfigurator baseConfigurator = (BaseConfigurator) configurator1;
-                    if(baseConfigurator.getAttributes().size() ==0 ) {
-                        output += "\"" + ((BaseConfigurator) configurator1).getTarget().toString() +
+        ConfigurationAsCode configurationAsCodeObject = ConfigurationAsCode.get();
+          for (Object configuratorObject : configurationAsCodeObject.getConfigurators()) {
+                if (configuratorObject instanceof BaseConfigurator) {
+                    BaseConfigurator baseConfigurator = (BaseConfigurator) configuratorObject;
+                    List<Attribute> baseConfigAttributeList = baseConfigurator.getAttributes();
+                    if(baseConfigAttributeList.size() == 0 ) {
+                        output += "\"" + ((BaseConfigurator) configuratorObject).getTarget().toString() +
                         "\":{" + "\"type\": \"object\"," + "\"properties\": {}},";
+                    } else {
+                        for (Attribute attribute:baseConfigAttributeList) {
+                            if(attribute.multiple) {
+//                                System.out.println("Attribute type is multiple");
+                            } else {
+                                if(attribute.type.isEnum()) {
+                                    if(attribute.type.getEnumConstants().length == 0){
+                                        output += "\"" + attribute.getName() + "\":" + " {" +
+                                                "        \"type\": \"string\"}";
+                                    }
+                                    else {
+                                        output += "\"" + attribute.getName() + "\":" + " {" +
+                                                "        \"type\": \"string\"," + "\"enum\": [";
+                                        for (Object obj : attribute.type.getEnumConstants()) {
+                                            System.out.println(obj + " " + attribute.getName());
+                                            output += "\"" + obj + "\",";
+                                        }
+                                        output += "]},";
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
           }
