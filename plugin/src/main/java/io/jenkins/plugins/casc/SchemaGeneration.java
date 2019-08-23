@@ -20,8 +20,7 @@ public class SchemaGeneration {
                 "  \"type\": \"object\",\n" +
                 "  \"properties\": {\n" +
                 "");
-
-
+        
         /**
          * This generates the schema for the root configurators
          * Iterates over the root elements and adds them to the schema.
@@ -42,6 +41,7 @@ public class SchemaGeneration {
          */
 
         String output = "{";
+        String output1="";
         ConfigurationAsCode configurationAsCodeObject = ConfigurationAsCode.get();
           for (Object configuratorObject : configurationAsCodeObject.getConfigurators()) {
                 if (configuratorObject instanceof BaseConfigurator) {
@@ -58,17 +58,50 @@ public class SchemaGeneration {
                                 if(attribute.type.isEnum()) {
                                     if(attribute.type.getEnumConstants().length == 0){
                                         output += "\"" + attribute.getName() + "\":" + " {" +
-                                                "        \"type\": \"string\"}";
+                                                "\"type\": \"string\"}";
                                     }
                                     else {
                                         output += "\"" + attribute.getName() + "\":" + " {" +
-                                                "        \"type\": \"string\"," + "\"enum\": [";
+                                                "\"type\": \"string\"," + "\"enum\": [";
                                         for (Object obj : attribute.type.getEnumConstants()) {
-                                            System.out.println(obj + " " + attribute.getName());
                                             output += "\"" + obj + "\",";
                                         }
                                         output += "]},";
                                     }
+                                } else {
+                                    output += "\"" + attribute.getName() + "\":";
+                                    switch (attribute.type.getName()){
+
+                                        case "java.lang.String":
+                                            output += "{\"type\": \"string\"},";
+                                            break;
+
+                                        case "int":
+                                            output += "{\"type\": \"integer\"},";
+                                            break;
+
+                                        case "boolean":
+                                            output += "{\"type\": \"boolean\"},";
+                                            break;
+
+                                        case "java.lang.Boolean":
+                                            output += "{\"type\": \"boolean\"},";
+                                            break;
+
+                                        case "java.lang.Integer":
+                                            output += "{\"type\": \"integer\"},";
+                                            break;
+
+                                        case "java.lang.Long":
+                                            output += "{\"type\": \"integer\"},";
+                                            break;
+
+                                        default:
+                                            output += "{\"type\":  \"object\"," +
+                                                    "\"$ref\": \"#/definitions/" + attribute.type.getName() + "\"},";
+                                            break;
+                                    }
+
                                 }
                             }
                         }
@@ -77,7 +110,7 @@ public class SchemaGeneration {
           }
         output += "}";
         System.out.println("Look at the beautiful Json data");
-        System.out.println(output);
+        System.out.println(output1);
         try {
             String indented = (new JSONObject(output)).toString(4);
             System.out.println(indented);
