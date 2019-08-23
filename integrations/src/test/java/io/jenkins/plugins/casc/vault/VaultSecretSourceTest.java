@@ -31,7 +31,6 @@ import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.LoggerRule;
 import org.testcontainers.vault.VaultContainer;
 
-import static io.jenkins.plugins.casc.misc.Util.assertLogContains;
 import static io.jenkins.plugins.casc.misc.Util.assertNotInLog;
 import static io.jenkins.plugins.casc.vault.VaultTestUtil.VAULT_APPROLE_FILE;
 import static io.jenkins.plugins.casc.vault.VaultTestUtil.VAULT_PATH_KV1_1;

@@ -29,8 +29,8 @@ import org.jvnet.hudson.test.LoggerRule;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
-import static io.jenkins.plugins.casc.misc.Util.assertNotInLog;
 import static io.jenkins.plugins.casc.misc.Util.assertLogContains;
+import static io.jenkins.plugins.casc.misc.Util.assertNotInLog;
 import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
