@@ -103,7 +103,7 @@ public class VaultSecretSourceTest {
     @Ignore
     @Issue("JENKINS-48885")
     public void vaultPluginDetected() {
-        MatcherAssert.assertThat(System.getenv("CASC_VAULT_PW"), is(VAULT_PW));
+        assertThat(System.getenv("CASC_VAULT_PW"), is(VAULT_PW));
         try {
             ConfigurationAsCode.get().configure(getClass().getResource("vault.yml").toExternalForm());
             assertNotInLog(loggerRule, "Vault secret resolver is not installed, consider installing hashicorp-vault-plugin v2.4.0 or higher");
