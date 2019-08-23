@@ -1,11 +1,12 @@
 package io.jenkins.plugins.casc;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import hudson.DescriptorExtensionList;
 
 import java.util.*;
-
 import io.jenkins.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
-import jenkins.model.Jenkins;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class SchemaGeneration {
 
@@ -26,8 +27,8 @@ public class SchemaGeneration {
 
         /**
          * This generates the schema for the root configurators
+         * Iterates over the root elements and adds them to the schema.
          */
-
         LinkedHashSet linkedHashSet = new LinkedHashSet<>(ConfigurationAsCode.get().getRootConfigurators());
         Iterator<RootElementConfigurator> i = linkedHashSet.iterator();
         while (i.hasNext()) {
@@ -36,9 +37,34 @@ public class SchemaGeneration {
                     "    },");
         }
         schemaString.append("},\n");
-        Set configObjects = new LinkedHashSet<>(ConfigurationAsCode.get().getConfigurators());
-        System.out.println(configObjects.size());
-        Iterator<Objects> obj = configObjects.iterator();
+
+
+        /**
+         * This generates the schema for the base configurators
+         * Iterates over the base configurators and adds them to the schema.
+         */
+
+        String output = "{";
+        ConfigurationAsCode configurationAsCode1 = ConfigurationAsCode.get();
+          for (Object configurator1 : configurationAsCode1.getConfigurators()) {
+                if (configurator1 instanceof BaseConfigurator) {
+                    BaseConfigurator baseConfigurator = (BaseConfigurator) configurator1;
+                    if(baseConfigurator.getAttributes().size() ==0 ) {
+                        output += "\"" + ((BaseConfigurator) configurator1).getTarget().toString() +
+                        "\":{" + "\"type\": \"object\"," + "\"properties\": {}},";
+                    }
+                }
+          }
+        output += "}";
+        System.out.println("Look at the beautiful Json data");
+        System.out.println(output);
+        try {
+            String indented = (new JSONObject(output)).toString(4);
+            System.out.println(indented);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
 
         /**
          * Used to generate the schema for the implementors of
