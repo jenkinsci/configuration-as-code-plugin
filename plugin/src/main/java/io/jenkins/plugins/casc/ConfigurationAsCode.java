@@ -5,6 +5,7 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.Functions;
+import hudson.PluginManager;
 import hudson.Util;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
@@ -267,6 +268,7 @@ public class ConfigurationAsCode extends ManagementLink {
      */
     @Initializer(after = InitMilestone.EXTENSIONS_AUGMENTED, before = InitMilestone.JOB_LOADED)
     public static void init() throws Exception {
+        detectVaultPluginMissing();
         get().configure();
     }
 
@@ -669,6 +671,16 @@ public class ConfigurationAsCode extends ManagementLink {
         if (!entries.isEmpty()) {
             final Map.Entry<String, CNode> next = entries.entrySet().iterator().next();
             throw new ConfiguratorException(format("No configurator for root element <%s>", next.getKey()));
+        }
+    }
+
+    private static void detectVaultPluginMissing() {
+        PluginManager pluginManager = Jenkins.getInstance().getPluginManager();
+        Set<String> envKeys = System.getenv().keySet();
+        if (envKeys.stream().anyMatch(s -> s.startsWith("CASC_VAULT_"))
+            && pluginManager.getPlugin("hashicorp-vault-plugin") == null) {
+            LOGGER.log(Level.SEVERE,
+                "Vault secret resolver is not installed, consider installing hashicorp-vault-plugin v2.4.0 or higher\nor consider removing any 'CASC_VAULT_' variables");
         }
     }
 

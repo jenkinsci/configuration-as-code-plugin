@@ -18,8 +18,14 @@
   <url>https://wiki.jenkins.io/display/JENKINS/Configuration+as+Code+Plugin</url>
 
   <properties>
-    <!-- SECURITY-1446 and SECURITY-1290 are considered as breaking changes. Others also contain a risk of regressions -->
-    <hpi.compatibleSinceVersion>1.25</hpi.compatibleSinceVersion>
+    <!-- Breaking changes log
+      In v1.14 we removed Job-DSL support and moved it to job-dsl-plugin. https://github.com/jenkinsci/job-dsl-plugin
+      In v1.18 we removed Credentials support and moved it to credentials-plugin. https://github.com/jenkinsci/credentials-plugin
+      In v1.18 we also removed Role strategy support and moved it to role-strategy-plugin. https://github.com/jenkinsci/role-strategy-plugin
+      In v1.25 we added SECURITY-1446 and SECURITY-1290 which are considered as breaking changes. Others also contain a risk of regressions.
+      In v1.28 we removed vault secret resolver and moved it to the hashicorp-vault-plugin. https://github.com/jenkinsci/hashicorp-vault-plugin
+    -->
+    <hpi.compatibleSinceVersion>1.28</hpi.compatibleSinceVersion>
     <hpi.pluginChagelogUrl>https://github.com/jenkinsci/configuration-as-code-plugin/releases</hpi.pluginChagelogUrl>
     <hpi.pluginLogoUrl>https://raw.githubusercontent.com/jenkinsci/configuration-as-code-plugin/master/plugin/src/main/webapp/img/logo-head.svg</hpi.pluginLogoUrl>
   </properties>
@@ -69,13 +75,6 @@
       <groupId>com.github.stefanbirkner</groupId>
       <artifactId>system-rules</artifactId>
       <version>1.19.0</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>vault</artifactId>
-      <version>1.10.6</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
