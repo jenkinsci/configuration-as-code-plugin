@@ -1,8 +1,11 @@
 package io.jenkins.plugins.casc;
 
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.gargoylesoftware.htmlunit.WebRequest;
 import com.gargoylesoftware.htmlunit.WebResponse;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.misc.Util;
 import java.net.URISyntaxException;
@@ -14,8 +17,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
+
 import java.io.IOException;
 
 import static com.gargoylesoftware.htmlunit.HttpMethod.POST;
@@ -39,33 +41,39 @@ public class SchemaGenerationTest{
 
     @Test
     public void validateSchema() throws IOException {
-        String schema = generateSchema();
-        JSONObject jsonSchema = new JSONObject(
-            new JSONTokener(schema));
+        JSONObject schemaObject  = generateSchema();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        JsonParser jp = new JsonParser();
+        JsonElement je = jp.parse(schemaObject.toString());
+        String prettyJsonString = gson.toJson(je);
+        System.out.println(prettyJsonString);
+        
+//        JSONObject jsonSchema = new JSONObject(
+//            new JSONTokener(schema));
 
-        String answer = "";
-        try {
-            answer = Util.toStringFromYamlFile(this, "merge3.yml");
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        System.out.println(answer);
+//        String yamlContents = "";
+//        try {
+//            yamlContents = Util.toStringFromYamlFile(this, "merge3.yml");
+//        } catch (URISyntaxException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        System.out.println(yamlContents);
     }
 
 
-//    @Test
-//    public void checkRootConfigurators() {
-//
-//
-//    }
-//
-//    @Test
-//    public void checkInitialTemplate() {
-//
-//    }
+    @Test
+    public void checkRootConfigurators() {
+
+
+    }
+
+    @Test
+    public void checkInitialTemplate() {
+
+    }
 
 
 }

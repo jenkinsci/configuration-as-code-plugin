@@ -69,10 +69,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>vault</artifactId>
-      <version>1.10.6</version>
-      <scope>test</scope>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.5</version>
     </dependency>
   </dependencies>
 
