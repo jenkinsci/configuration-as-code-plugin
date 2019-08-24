@@ -68,4 +68,6 @@ labels:
   - name: dev-tools
     color: 551a8b
     description: JCasC Community Bridge Dev-Tools Project
-
+  - name: dependencies
+    color: 0366d6
+    description: A PR that updates dependencies - used by Release Drafter
