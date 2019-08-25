@@ -337,7 +337,7 @@
     <dependency>
       <groupId>io.netty</groupId>
       <artifactId>netty-handler</artifactId>
-      <version>4.1.17.Final</version>
+      <version>4.1.39.Final</version>
       <scope>test</scope>
     </dependency>
     <dependency>
