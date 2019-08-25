@@ -685,6 +685,9 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     private void configureWith(Mapping entries) throws ConfiguratorException {
+        // Initialize secret sources
+        SecretSource.all().forEach(SecretSource::init);
+
         // Check input before actually applying changes,
         // so we don't let master in a weird state after some ConfiguratorException has been thrown
         final Mapping clone = entries.clone();
@@ -694,7 +697,6 @@ public class ConfigurationAsCode extends ManagementLink {
         monitor.reset();
         ConfigurationContext context = new ConfigurationContext(registry);
         context.addListener(monitor::record);
-        context.getSecretSources().forEach(SecretSource::init);
         try (ACLContext acl = ACL.as(ACL.SYSTEM)) {
             invokeWith(entries, (configurator, config) -> configurator.configure(config, context));
         }
