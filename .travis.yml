@@ -2,6 +2,11 @@ language: java
 
 dist: xenial
 
+if: |
+  repo != jenkinsci/configuration-as-code-plugin OR \
+  type = pull_request OR \
+  branch = master
+
 services:
   - docker
 
