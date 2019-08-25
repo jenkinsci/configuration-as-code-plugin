@@ -58,13 +58,6 @@
       </exclusions>
     </dependency>
 
-    <!--TODO: This should be in a separate plugin at some point -->
-    <dependency>
-      <groupId>com.bettercloud</groupId>
-      <artifactId>vault-java-driver</artifactId>
-      <version>4.0.0</version>
-    </dependency>
-
     <dependency>
       <groupId>io.vavr</groupId>
       <artifactId>vavr</artifactId>
