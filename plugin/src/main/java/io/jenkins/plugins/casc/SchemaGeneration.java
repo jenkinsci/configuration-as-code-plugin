@@ -1,12 +1,5 @@
 package io.jenkins.plugins.casc;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import io.jenkins.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -63,21 +56,22 @@ public class SchemaGeneration {
                 List<Attribute> baseConfigAttributeList = baseConfigurator.getAttributes();
                 if (baseConfigAttributeList.size() == 0) {
                     schemaConfiguratorObjects
-                        .put(((BaseConfigurator) configuratorObject).getTarget().toString(),
+                        .put(((BaseConfigurator) configuratorObject).getTarget().getName(),
                             new JSONObject()
                                 .put("type", "object")
-                                .put("properties", "{}"));
+                                .put("properties", new JSONObject()));
 
                 } else {
+                    JSONObject attributeSchema = new JSONObject();
                     for (Attribute attribute : baseConfigAttributeList) {
                         if (attribute.multiple) {
 
                             if (attribute.type.getName().equals("java.lang.String")) {
-                                schemaConfiguratorObjects.put(attribute.getName(),
+                                attributeSchema.put(attribute.getName(),
                                     new JSONObject()
                                         .put("type", "string"));
                             } else {
-                                schemaConfiguratorObjects.put(attribute.getName(),
+                                attributeSchema.put(attribute.getName(),
                                     new JSONObject()
                                         .put("type", "object")
                                         .put("$ref", "#/definitions/" + attribute.type.getName()));
@@ -85,7 +79,7 @@ public class SchemaGeneration {
                         } else {
                             if (attribute.type.isEnum()) {
                                 if (attribute.type.getEnumConstants().length == 0) {
-                                    schemaConfiguratorObjects.put(attribute.getName(),
+                                    attributeSchema.put(attribute.getName(),
                                         new JSONObject()
                                             .put("type", "string"));
                                 } else {
@@ -94,7 +88,7 @@ public class SchemaGeneration {
                                     for (Object obj : attribute.type.getEnumConstants()) {
                                         attributeList.add(obj.toString());
                                     }
-                                    schemaConfiguratorObjects.put(attribute.getName(),
+                                    attributeSchema.put(attribute.getName(),
                                         new JSONObject()
                                             .put("type", "string")
                                             .put("enum", new JSONArray(attributeList)));
@@ -134,8 +128,12 @@ public class SchemaGeneration {
                                         break;
                                 }
 
-                                schemaConfiguratorObjects.put(attribute.getName(), attributeType);
-
+                                attributeSchema.put(attribute.getName(), attributeType);
+                                schemaConfiguratorObjects
+                                    .put(((BaseConfigurator) configuratorObject).getTarget().getName(),
+                                        new JSONObject()
+                                            .put("type", "object")
+                                            .put("properties", attributeSchema));
                             }
                         }
                     }
@@ -155,20 +153,20 @@ public class SchemaGeneration {
                 if (implementorsMap.size() != 0) {
                     Iterator<Map.Entry<String, Class>> itr = implementorsMap.entrySet().iterator();
 
-                    JSONObject implementorObject = new JSONObject();
-                    implementorObject.put("type", "object");
+                    JSONArray oneOfJsonArray = new JSONArray();
+                    JSONObject finalHetroConfiguratorObject = new JSONObject();
                     while (itr.hasNext()) {
                         Map.Entry<String, Class> entry = itr.next();
+                        JSONObject implementorObject = new JSONObject();
                         implementorObject.put("properties",
-                            new JSONObject().put(entry.getKey(),
-                            new JSONObject().put("$ref","#/definitions/" + entry.getValue())));
+                            new JSONObject().put(entry.getKey(), new JSONObject().put("$ref","#/definitions/" + entry.getValue().getName())));
+                        oneOfJsonArray.put(implementorObject);
                     }
 
-                    JSONArray oneOfJsonArray = new JSONArray();
-                    oneOfJsonArray.put(implementorObject);
-                    implementorObject.put("oneOf", oneOfJsonArray);
+                    finalHetroConfiguratorObject.put("type","object");
+                    finalHetroConfiguratorObject.put("oneOf",oneOfJsonArray);
 
-                    schemaConfiguratorObjects.put(heteroDescribableConfigurator.getTarget().getName(), implementorObject);
+                    schemaConfiguratorObjects.put(heteroDescribableConfigurator.getTarget().getName(), finalHetroConfiguratorObject);
                 }
             }
         }

@@ -8,22 +8,18 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.misc.Util;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import org.everit.json.schema.Schema;
+import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
-
-import java.io.IOException;
-
 import static com.gargoylesoftware.htmlunit.HttpMethod.POST;
 import static io.jenkins.plugins.casc.SchemaGeneration.generateSchema;
 
-public class SchemaGenerationTest{
+public class SchemaGenerationTest {
 
 
     @Rule
@@ -33,40 +29,58 @@ public class SchemaGenerationTest{
     public void downloadOldSchema() throws Exception {
 
         JenkinsRule.WebClient client = j.createWebClient();
-        WebRequest request = new WebRequest(client.createCrumbedUrl("configuration-as-code/schema"), POST);
+        WebRequest request = new WebRequest(client.createCrumbedUrl("configuration-as-code/schema"),
+            POST);
         WebResponse response = client.loadWebResponse(request);
         System.out.println(response);
     }
 
 
     @Test
-    public void validateSchema() throws IOException {
-        JSONObject schemaObject  = generateSchema();
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        JsonParser jp = new JsonParser();
-        JsonElement je = jp.parse(schemaObject.toString());
-        String prettyJsonString = gson.toJson(je);
-        System.out.println(prettyJsonString);
-        
-//        JSONObject jsonSchema = new JSONObject(
-//            new JSONTokener(schema));
+    public void validSchemaShouldSucceed() throws Exception {
 
-//        String yamlContents = "";
-//        try {
-//            yamlContents = Util.toStringFromYamlFile(this, "merge3.yml");
-//        } catch (URISyntaxException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//        System.out.println(yamlContents);
+        JSONObject schemaObject = generateSchema();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        JsonParser jsonParser = new JsonParser();
+        JsonElement jsonElement = jsonParser.parse(schemaObject.toString());
+        String prettyJsonString = gson.toJson(jsonElement);
+
+        System.out.println(prettyJsonString);
+
+        JSONObject jsonSchema = new JSONObject(
+            new JSONTokener(prettyJsonString));
+
+        String yamlStringContents = Util.toStringFromYamlFile(this, "validSchemaConfig.yml");
+        JSONObject jsonSubject = new JSONObject(
+            new JSONTokener(Util.convertToJson(yamlStringContents)));
+        Schema schema = SchemaLoader.load(jsonSchema);
+        schema.validate(jsonSubject);
     }
+
+    @Test
+    public void invalidSchemaShouldNotSucceed() throws Exception {
+
+        JSONObject schemaObject = generateSchema();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        JsonParser jsonParser = new JsonParser();
+        JsonElement jsonElement = jsonParser.parse(schemaObject.toString());
+        String prettyJsonString = gson.toJson(jsonElement);
+        JSONObject jsonSchema = new JSONObject(
+            new JSONTokener(prettyJsonString));
+        String yamlStringContents = Util.toStringFromYamlFile(this, "invalidSchemaConfig.yml");
+        System.out.println(Util.convertToJson(yamlStringContents));
+        JSONObject jsonSubject = new JSONObject(
+            new JSONTokener(Util.convertToJson(yamlStringContents)));
+        Schema schema = SchemaLoader.load(jsonSchema);
+        schema.validate(jsonSubject);
+    }
+
+
+
 
 
     @Test
     public void checkRootConfigurators() {
-
 
     }
 
@@ -74,6 +88,7 @@ public class SchemaGenerationTest{
     public void checkInitialTemplate() {
 
     }
+
 
 
 }
