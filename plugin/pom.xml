@@ -15,7 +15,7 @@
 
   <name>Configuration as Code Plugin</name>
   <description>Manage Jenkins master configuration as code</description>
-  <url>https://wiki.jenkins.io/display/JENKINS/Configuration+as+Code+Plugin</url>
+  <url>https://github.com/jenkinsci/configuration-as-code-plugin</url>
 
   <properties>
     <!-- Breaking changes log
