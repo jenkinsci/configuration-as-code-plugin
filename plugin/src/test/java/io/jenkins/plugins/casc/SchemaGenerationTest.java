@@ -1,7 +1,5 @@
 package io.jenkins.plugins.casc;
 
-import com.gargoylesoftware.htmlunit.WebRequest;
-import com.gargoylesoftware.htmlunit.WebResponse;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -9,12 +7,13 @@ import com.google.gson.JsonParser;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.misc.Util;
 import org.everit.json.schema.Schema;
+import org.everit.json.schema.ValidationException;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.junit.Rule;
 import org.junit.Test;
-import org.everit.json.schema.ValidationException;
+
 import static io.jenkins.plugins.casc.SchemaGeneration.generateSchema;
 import static org.junit.Assert.fail;
 
