@@ -16,7 +16,7 @@ public class SchemaGeneration {
         .put("id", "http://jenkins.io/configuration-as-code#")
         .put("description", "Jenkins Configuration as Code")
         .put("type", "object");
-    
+
     public static JSONObject generateSchema() {
 
         /**
@@ -181,7 +181,5 @@ public class SchemaGeneration {
                     .put("enum", new JSONArray(attributeList)));
         }
     }
-
-
 }
 
