@@ -16,6 +16,7 @@ public class SchemaGeneration {
         .put("id", "http://jenkins.io/configuration-as-code#")
         .put("description", "Jenkins Configuration as Code")
         .put("type", "object");
+    
     public static JSONObject generateSchema() {
 
         /**
@@ -48,32 +49,10 @@ public class SchemaGeneration {
                     JSONObject attributeSchema = new JSONObject();
                     for (Attribute attribute : baseConfigAttributeList) {
                         if (attribute.multiple) {
-                            if (attribute.type.getName().equals("java.lang.String")) {
-                                attributeSchema.put(attribute.getName(),
-                                    new JSONObject()
-                                        .put("type", "string"));
-                            } else {
-                                attributeSchema.put(attribute.getName(),
-                                    new JSONObject()
-                                        .put("type", "object")
-                                        .put("$id", "#/definitions/" + attribute.type.getName()));
-                            }
+                            generateMultipleAttributeSchema(attributeSchema, attribute);
                         } else {
                             if (attribute.type.isEnum()) {
-                                if (attribute.type.getEnumConstants().length == 0) {
-                                    attributeSchema.put(attribute.getName(),
-                                        new JSONObject()
-                                            .put("type", "string"));
-                                } else {
-                                    ArrayList<String> attributeList = new ArrayList<>();
-                                    for (Object obj : attribute.type.getEnumConstants()) {
-                                        attributeList.add(obj.toString());
-                                    }
-                                    attributeSchema.put(attribute.getName(),
-                                        new JSONObject()
-                                            .put("type", "string")
-                                            .put("enum", new JSONArray(attributeList)));
-                                }
+                                generateEnumAttributeSchema(attributeSchema, attribute);
                             } else {
                                 attributeSchema.put(attribute.getName(), generateNonEnumAttributeObject(attribute));
                                 schemaConfiguratorObjects
@@ -172,5 +151,37 @@ public class SchemaGeneration {
         }
         return rootConfiguratorObject;
     }
+
+    private static void generateMultipleAttributeSchema(JSONObject attributeSchema, Attribute attribute) {
+        if (attribute.type.getName().equals("java.lang.String")) {
+            attributeSchema.put(attribute.getName(),
+                new JSONObject()
+                    .put("type", "string"));
+        } else {
+            attributeSchema.put(attribute.getName(),
+                new JSONObject()
+                    .put("type", "object")
+                    .put("$id", "#/definitions/" + attribute.type.getName()));
+        }
+    }
+
+    private static void generateEnumAttributeSchema(JSONObject attributeSchemaTemplate, Attribute attribute) {
+        if (attribute.type.getEnumConstants().length == 0) {
+            attributeSchemaTemplate.put(attribute.getName(),
+                new JSONObject()
+                    .put("type", "string"));
+        } else {
+            ArrayList<String> attributeList = new ArrayList<>();
+            for (Object obj : attribute.type.getEnumConstants()) {
+                attributeList.add(obj.toString());
+            }
+            attributeSchemaTemplate.put(attribute.getName(),
+                new JSONObject()
+                    .put("type", "string")
+                    .put("enum", new JSONArray(attributeList)));
+        }
+    }
+
+
 }
 
