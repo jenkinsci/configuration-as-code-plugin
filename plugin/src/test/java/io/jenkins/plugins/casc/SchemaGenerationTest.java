@@ -18,8 +18,6 @@ import static io.jenkins.plugins.casc.SchemaGeneration.generateSchema;
 import static org.junit.Assert.fail;
 
 public class SchemaGenerationTest {
-
-
     @Rule
     public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 
@@ -32,12 +30,15 @@ public class SchemaGenerationTest {
         JSONObject jsonSubject = new JSONObject(
             new JSONTokener(Util.convertToJson(yamlStringContents)));
         Schema schema = SchemaLoader.load(jsonSchema);
-        schema.validate(jsonSubject);
+        try {
+            schema.validate(jsonSubject);
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
     }
 
     @Test
     public void invalidSchemaShouldNotSucceed() throws Exception {
-
         JSONObject schemaObject = generateSchema();
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         JsonParser jsonParser = new JsonParser();
