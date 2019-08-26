@@ -9,6 +9,8 @@ update_configs:
     - match:
         dependency_name: "org.jenkins-ci.plugins*"
     - match:
+        dependency_name: "org.jenkinsci.plugins*"
+    - match:
         dependency_name: "io.jenkins.plugins*"
     - match:
         dependency_name: "io.jenkins.docker:docker-plugin"
