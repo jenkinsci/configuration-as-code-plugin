@@ -13,7 +13,7 @@ public class SchemaGeneration {
 
 
     final static JSONObject schemaTemplateObject = new JSONObject()
-        .put("$schema", "http://json-schema.org/draft-06/schema#")
+        .put("$schema", "http://json-schema.org/draft-07/schema#")
         .put("id", "http://jenkins.io/configuration-as-code#")
         .put("description", "Jenkins Configuration as Code")
         .put("type", "object");
@@ -78,7 +78,7 @@ public class SchemaGeneration {
                                 attributeSchema.put(attribute.getName(),
                                     new JSONObject()
                                         .put("type", "object")
-                                        .put("$ref", "#/definitions/" + attribute.type.getName()));
+                                        .put("$id", "#/definitions/" + attribute.type.getName()));
                             }
                         } else {
                             if (attribute.type.isEnum()) {
@@ -127,7 +127,7 @@ public class SchemaGeneration {
 
                                     default:
                                         attributeType.put("type", "object");
-                                        attributeType.put("$ref",
+                                        attributeType.put("$id",
                                             "#/definitions/" + attribute.type.getName());
                                         break;
                                 }
@@ -163,7 +163,7 @@ public class SchemaGeneration {
                         Map.Entry<String, Class> entry = itr.next();
                         JSONObject implementorObject = new JSONObject();
                         implementorObject.put("properties",
-                            new JSONObject().put(entry.getKey(), new JSONObject().put("$ref","#/definitions/" + entry.getValue().getName())));
+                            new JSONObject().put(entry.getKey(), new JSONObject().put("$id","#/definitions/" + entry.getValue().getName())));
                         oneOfJsonArray.put(implementorObject);
                     }
 
@@ -175,7 +175,7 @@ public class SchemaGeneration {
             }
         }
 
-        schemaObject.put("definitions", schemaConfiguratorObjects);
+        schemaObject.put("properties", schemaConfiguratorObjects);
         return schemaObject;
     }
 }

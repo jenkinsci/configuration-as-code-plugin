@@ -14,10 +14,9 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.junit.Rule;
 import org.junit.Test;
-import org.jvnet.hudson.test.JenkinsRule;
-
-import static com.gargoylesoftware.htmlunit.HttpMethod.POST;
+import org.everit.json.schema.ValidationException;
 import static io.jenkins.plugins.casc.SchemaGeneration.generateSchema;
+import static org.junit.Assert.fail;
 
 public class SchemaGenerationTest {
 
@@ -26,30 +25,10 @@ public class SchemaGenerationTest {
     public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 
     @Test
-    public void downloadOldSchema() throws Exception {
-
-        JenkinsRule.WebClient client = j.createWebClient();
-        WebRequest request = new WebRequest(client.createCrumbedUrl("configuration-as-code/schema"),
-            POST);
-        WebResponse response = client.loadWebResponse(request);
-        System.out.println(response);
-    }
-
-
-    @Test
     public void validSchemaShouldSucceed() throws Exception {
-
         JSONObject schemaObject = generateSchema();
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        JsonParser jsonParser = new JsonParser();
-        JsonElement jsonElement = jsonParser.parse(schemaObject.toString());
-        String prettyJsonString = gson.toJson(jsonElement);
-
-        System.out.println(prettyJsonString);
-
         JSONObject jsonSchema = new JSONObject(
-            new JSONTokener(prettyJsonString));
-
+            new JSONTokener(schemaObject.toString()));
         String yamlStringContents = Util.toStringFromYamlFile(this, "validSchemaConfig.yml");
         JSONObject jsonSubject = new JSONObject(
             new JSONTokener(Util.convertToJson(yamlStringContents)));
@@ -68,27 +47,14 @@ public class SchemaGenerationTest {
         JSONObject jsonSchema = new JSONObject(
             new JSONTokener(prettyJsonString));
         String yamlStringContents = Util.toStringFromYamlFile(this, "invalidSchemaConfig.yml");
-        System.out.println(Util.convertToJson(yamlStringContents));
         JSONObject jsonSubject = new JSONObject(
             new JSONTokener(Util.convertToJson(yamlStringContents)));
         Schema schema = SchemaLoader.load(jsonSchema);
-        schema.validate(jsonSubject);
+        try {
+            schema.validate(jsonSubject);
+            fail();
+        } catch (ValidationException ve) {
+            ve.printStackTrace();
+        }
     }
-
-
-
-
-
-    @Test
-    public void checkRootConfigurators() {
-
-    }
-
-    @Test
-    public void checkInitialTemplate() {
-
-    }
-
-
-
 }
