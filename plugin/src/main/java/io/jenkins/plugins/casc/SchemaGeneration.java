@@ -55,13 +55,17 @@ public class SchemaGeneration {
                 BaseConfigurator baseConfigurator = (BaseConfigurator) configuratorObject;
                 List<Attribute> baseConfigAttributeList = baseConfigurator.getAttributes();
                 if (baseConfigAttributeList.size() == 0) {
+
+
                     schemaConfiguratorObjects
-                        .put(((BaseConfigurator) configuratorObject).getTarget().getName(),
+                        .put(((BaseConfigurator) configuratorObject).getTarget().getSimpleName().toLowerCase(),
                             new JSONObject()
                                 .put("type", "object")
                                 .put("properties", new JSONObject()));
 
                 } else {
+
+
                     JSONObject attributeSchema = new JSONObject();
                     for (Attribute attribute : baseConfigAttributeList) {
                         if (attribute.multiple) {
@@ -130,7 +134,7 @@ public class SchemaGeneration {
 
                                 attributeSchema.put(attribute.getName(), attributeType);
                                 schemaConfiguratorObjects
-                                    .put(((BaseConfigurator) configuratorObject).getTarget().getName(),
+                                    .put(((BaseConfigurator) configuratorObject).getTarget().getSimpleName().toLowerCase(),
                                         new JSONObject()
                                             .put("type", "object")
                                             .put("properties", attributeSchema));
@@ -166,7 +170,7 @@ public class SchemaGeneration {
                     finalHetroConfiguratorObject.put("type","object");
                     finalHetroConfiguratorObject.put("oneOf",oneOfJsonArray);
 
-                    schemaConfiguratorObjects.put(heteroDescribableConfigurator.getTarget().getName(), finalHetroConfiguratorObject);
+                    schemaConfiguratorObjects.put(heteroDescribableConfigurator.getTarget().getSimpleName().toLowerCase(), finalHetroConfiguratorObject);
                 }
             }
         }
