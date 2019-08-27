@@ -118,15 +118,18 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
     }
 
     @CheckForNull
-    public void describeStructure(T instance, ConfigurationContext context) {
+    public String describeStructure(T instance, ConfigurationContext context) {
         lookupConfigurator(context, instance.getClass())
             .map(configurator -> convertToNode(context, configurator, instance))
             .filter(Objects::nonNull)
             .map(node -> {
-                    return new Scalar(preferredSymbol(instance.getDescriptor()));
+                if(node.getClass().isEnum()){
+                    return instance.getDescriptor().getDisplayName();
+            } else {
+                     return null;
+                }
             }).getOrNull();
 
-        System.out.println(instance.getDescriptor());
     }
 
     @SuppressWarnings("unused")
