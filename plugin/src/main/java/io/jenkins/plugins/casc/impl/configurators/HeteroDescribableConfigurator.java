@@ -5,6 +5,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.DescriptorExtensionList;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
+import hudson.model.Job.LastItemListener;
 import hudson.security.HudsonPrivateSecurityRealm;
 import hudson.security.SecurityRealm;
 import io.jenkins.plugins.casc.Attribute;
@@ -23,6 +24,7 @@ import io.vavr.control.Option;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -118,18 +120,23 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
     }
 
     @CheckForNull
-    public String describeStructure(T instance, ConfigurationContext context) {
+    public Map<String,List<String>> describeStructure(T instance, ConfigurationContext context) {
+        Map<String, List<String>> heteroConfigurationMapper = new LinkedHashMap<>();
         lookupConfigurator(context, instance.getClass())
             .map(configurator -> convertToNode(context, configurator, instance))
             .filter(Objects::nonNull)
             .map(node -> {
-                if(node.getClass().isEnum()){
-                    return instance.getDescriptor().getDisplayName();
-            } else {
-                     return null;
-                }
+
+                //Could something like this be done
+                    String BaseConfiguratorNode =  node.getClass().getName();
+                    List<String> propertiesList = new ArrayList<>();
+                    for(CNode cNode: node) {
+                        propertiesList.add(cNode.toString());
+                    }
+                 return heteroConfigurationMapper;
             }).getOrNull();
 
+        return null;
     }
 
     @SuppressWarnings("unused")
