@@ -117,6 +117,18 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
                 }).getOrNull();
     }
 
+    @CheckForNull
+    public void describeStructure(T instance, ConfigurationContext context) {
+        lookupConfigurator(context, instance.getClass())
+            .map(configurator -> convertToNode(context, configurator, instance))
+            .filter(Objects::nonNull)
+            .map(node -> {
+                    return new Scalar(preferredSymbol(instance.getDescriptor()));
+            }).getOrNull();
+
+        System.out.println(instance.getDescriptor());
+    }
+
     @SuppressWarnings("unused")
     public Map<String, Class<T>> getImplementors() {
         return getDescriptors()
