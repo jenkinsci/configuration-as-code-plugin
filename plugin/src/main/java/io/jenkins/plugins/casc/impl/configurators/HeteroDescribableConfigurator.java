@@ -3,6 +3,7 @@ package io.jenkins.plugins.casc.impl.configurators;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.DescriptorExtensionList;
+import hudson.ExtensionList;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
 import hudson.model.Job.LastItemListener;
@@ -120,23 +121,13 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
     }
 
     @CheckForNull
-    public Map<String,List<String>> describeStructure(T instance, ConfigurationContext context) {
-        Map<String, List<String>> heteroConfigurationMapper = new LinkedHashMap<>();
-        lookupConfigurator(context, instance.getClass())
-            .map(configurator -> convertToNode(context, configurator, instance))
-            .filter(Objects::nonNull)
-            .map(node -> {
-
-                //Could something like this be done
-                    String BaseConfiguratorNode =  node.getClass().getName();
-                    List<String> propertiesList = new ArrayList<>();
-                    for(CNode cNode: node) {
-                        propertiesList.add(cNode.toString());
-                    }
-                 return heteroConfigurationMapper;
-            }).getOrNull();
-
-        return null;
+    public CNode describeStructure(T instance, ConfigurationContext context) {
+        return lookupConfigurator(context, instance.getClass())
+                            .map(configurator -> convertToNode(context, configurator, instance))
+                            .filter(Objects::nonNull)
+                            .map(node->{
+                              return new Scalar(preferredSymbol(instance.getDescriptor()));
+                            }).getOrNull();
     }
 
     @SuppressWarnings("unused")
