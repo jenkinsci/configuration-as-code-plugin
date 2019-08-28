@@ -6,6 +6,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.misc.Util;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.ValidationException;
 import org.everit.json.schema.loader.SchemaLoader;
@@ -57,4 +59,29 @@ public class SchemaGenerationTest {
             ve.printStackTrace();
         }
     }
-}
+
+    @Test
+    public void invalidJenkinsDataForBaseConfig() throws Exception {
+        String yamlStringContents = Util.toStringFromYamlFile(this, "invalidDataFormat.yml");
+    }
+
+    @Test
+    public void validJenkinsDataForBaseConfig() throws Exception {
+        String yamlStringContents = Util.toStringFromYamlFile(this, "validDataFormat.yml");
+    }
+
+    @Test
+    public void validToolDataForBaseConfig() throws Exception {
+        String yamlStringContents = Util.toStringFromYamlFile(this, "validToolBaseConfig.yml");
+    }
+
+    @Test
+    public void invalidToolDataForBaseConfig() throws Exception {
+        String yamlStringContents = Util.toStringFromYamlFile(this, "invalidToolBaseConfig.yml");
+    }
+
+    @Test
+    public void invalidEmptyToolForBaseConfig() throws Exception {
+        String yamlStringContents = Util.toStringFromYamlFile(this, "emptyToolBaseConfig.yml");
+    }
+ }

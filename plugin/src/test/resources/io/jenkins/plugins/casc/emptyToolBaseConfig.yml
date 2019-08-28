@@ -1,0 +1,13 @@
+tool:
+  maven:
+    settingsProvider:
+      filePath:
+        path: /usr/share/maven-settings.xml
+    installations:
+      - name: maven
+        home: /usr/share/maven
+        properties:
+          - installSourceProperty:
+              installers:
+                - mavenInstaller:
+                    id:
