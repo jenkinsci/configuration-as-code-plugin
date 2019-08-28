@@ -8,12 +8,14 @@ import java.util.List;
 import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 
+@Restricted(NoExternalUse.class)
 public class SchemaGeneration {
 
     final static JSONObject schemaTemplateObject = new JSONObject()
         .put("$schema", "http://json-schema.org/draft-07/schema#")
-        .put("id", "http://jenkins.io/configuration-as-code#")
         .put("description", "Jenkins Configuration as Code")
         .put("type", "object");
 
