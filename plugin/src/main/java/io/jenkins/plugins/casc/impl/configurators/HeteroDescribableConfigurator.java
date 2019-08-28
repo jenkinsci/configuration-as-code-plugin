@@ -122,12 +122,7 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
 
     @CheckForNull
     public CNode describeStructure(T instance, ConfigurationContext context) {
-        return lookupConfigurator(context, instance.getClass())
-                            .map(configurator -> convertToNode(context, configurator, instance))
-                            .filter(Objects::nonNull)
-                            .map(node->{
-                              return new Scalar(preferredSymbol(instance.getDescriptor()));
-                            }).getOrNull();
+        return lookupConfigurator(context, instance.getClass()).map(configurator-> convertToNode(context, configurator, instance)).getOrNull();
     }
 
     @SuppressWarnings("unused")

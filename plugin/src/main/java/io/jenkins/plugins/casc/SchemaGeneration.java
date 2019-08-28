@@ -1,17 +1,16 @@
 package io.jenkins.plugins.casc;
 
+import hudson.ProxyConfiguration;
 import io.jenkins.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import jenkins.model.Jenkins;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.NoExternalUse;
 
-@Restricted(NoExternalUse.class)
 public class SchemaGeneration {
 
     final static JSONObject schemaTemplateObject = new JSONObject()
@@ -103,7 +102,13 @@ public class SchemaGeneration {
             finalHetroConfiguratorObject.put("type", "object");
             finalHetroConfiguratorObject.put("oneOf", oneOfJsonArray);
         }
+
+        /*For testing purposes*/
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        ConfigurationContext context = new ConfigurationContext(registry);
+        System.out.println(heteroDescribableConfiguratorObject.describeStructure(Jenkins.getInstance(), context));
             return finalHetroConfiguratorObject;
+
     }
 
     private static JSONObject generateNonEnumAttributeObject(Attribute attribute) {
