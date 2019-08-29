@@ -1,9 +1,16 @@
 package io.jenkins.plugins.casc;
 
+import com.google.inject.Inject;
 import hudson.ExtensionList;
 import hudson.security.HudsonPrivateSecurityRealm;
+import io.jenkins.plugins.casc.impl.DefaultConfiguratorRegistry;
 import io.jenkins.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
 import io.jenkins.plugins.casc.model.CNode;
+import io.jenkins.plugins.casc.model.Mapping;
+import io.jenkins.plugins.casc.snakeyaml.nodes.Node;
+import io.jenkins.plugins.casc.snakeyaml.nodes.NodeTuple;
+import io.jenkins.plugins.casc.snakeyaml.nodes.ScalarNode;
+import io.jenkins.plugins.casc.snakeyaml.nodes.Tag;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -12,6 +19,8 @@ import java.util.Map;
 import jenkins.model.Jenkins;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.PLAIN;
 
 public class SchemaGeneration {
 
@@ -106,11 +115,6 @@ public class SchemaGeneration {
             finalHetroConfiguratorObject.put("oneOf", oneOfJsonArray);
         }
 
-        /*For testing purposes*/
-        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
-        ConfigurationContext context = new ConfigurationContext(registry);
-        final Configurator c = context.lookupOrFail(HudsonPrivateSecurityRealm.class);
-        System.out.println(heteroDescribableConfiguratorObject.describeStruct(Jenkins.getInstance(), context));
             return finalHetroConfiguratorObject;
 
     }
@@ -191,6 +195,19 @@ public class SchemaGeneration {
                 new JSONObject()
                     .put("type", "string")
                     .put("enum", new JSONArray(attributeList)));
+        }
+    }
+
+    public static void rootConfigGeneration() throws Exception {
+        DefaultConfiguratorRegistry registry = new DefaultConfiguratorRegistry();
+        final ConfigurationContext context = new ConfigurationContext(registry);
+        for (RootElementConfigurator root : RootElementConfigurator.all()) {
+            final CNode config = root.describeStructure(root.getTargetComponent(context), context);
+            final Mapping mapping = config.asMapping();
+            final List<Map.Entry<String, CNode>> entries = new ArrayList<>(mapping.entrySet());
+            for (Map.Entry<String, CNode> entry : entries) {
+                System.out.println(entry.getKey() + " " + entry.getValue().toString());
+            }
         }
     }
 }

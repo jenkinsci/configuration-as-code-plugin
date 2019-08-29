@@ -171,19 +171,17 @@ public interface Configurator<T> {
         return mapping;
     }
 
-
     @CheckForNull
-    default CNode describeStruct(T instance, ConfigurationContext context) {
-        return lookupConfig(context, instance.getClass()).map(configurator-> convertToNod(context, configurator, (Describable) instance)).getOrNull();
+    default CNode describeStructure(T instance, ConfigurationContext context)
+        throws Exception {
+        Mapping mapping = new Mapping();
+        for (Attribute attribute : getAttributes()) {
+            CNode value = attribute.describe(instance, context);
+            if (value != null) {
+                mapping.put(attribute.getName(), attribute.getType().getSimpleName());
+            }
+        }
+        return mapping;
     }
 
-
-    @NonNull
-    default Option<Configurator<T>> lookupConfig(ConfigurationContext context, Class<?> descriptor) {
-        return Option.of(context.lookup(descriptor));
-    }
-
-    default CNode convertToNod(ConfigurationContext context, Configurator configurator, Describable instance) {
-        return unchecked(() -> configurator.describe(instance, context)).apply();
-    }
 }
