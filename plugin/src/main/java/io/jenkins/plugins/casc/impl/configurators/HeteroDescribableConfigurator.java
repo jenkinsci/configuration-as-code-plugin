@@ -119,11 +119,11 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
                     }
                 }).getOrNull();
     }
-
-    @CheckForNull
-    public CNode describeStructure(T instance, ConfigurationContext context) {
-        return lookupConfigurator(context, instance.getClass()).map(configurator-> convertToNode(context, configurator, instance)).getOrNull();
-    }
+//
+//    @CheckForNull
+//    public CNode describeStructure(T instance, ConfigurationContext context) {
+//        return r
+//    }
 
     @SuppressWarnings("unused")
     public Map<String, Class<T>> getImplementors() {

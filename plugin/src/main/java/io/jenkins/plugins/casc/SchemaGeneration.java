@@ -1,7 +1,9 @@
 package io.jenkins.plugins.casc;
 
-import hudson.ProxyConfiguration;
+import hudson.ExtensionList;
+import hudson.security.HudsonPrivateSecurityRealm;
 import io.jenkins.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
+import io.jenkins.plugins.casc.model.CNode;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -19,7 +21,7 @@ public class SchemaGeneration {
         .put("description", "Jenkins Configuration as Code")
         .put("type", "object");
 
-    public static JSONObject generateSchema() {
+    public static JSONObject generateSchema() throws Exception {
 
         /**
          * The initial template for the JSON Schema
@@ -82,7 +84,8 @@ public class SchemaGeneration {
         return schemaObject;
     }
 
-    private static JSONObject generateHetroDescribableConfigObject(HeteroDescribableConfigurator heteroDescribableConfiguratorObject) {
+    private static JSONObject generateHetroDescribableConfigObject(HeteroDescribableConfigurator heteroDescribableConfiguratorObject)
+        throws Exception {
         Map<String, Class> implementorsMap = heteroDescribableConfiguratorObject
             .getImplementors();
         JSONObject finalHetroConfiguratorObject = new JSONObject();
@@ -106,7 +109,8 @@ public class SchemaGeneration {
         /*For testing purposes*/
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         ConfigurationContext context = new ConfigurationContext(registry);
-        System.out.println(heteroDescribableConfiguratorObject.describeStructure(Jenkins.getInstance(), context));
+        final Configurator c = context.lookupOrFail(HudsonPrivateSecurityRealm.class);
+        System.out.println(heteroDescribableConfiguratorObject.describeStruct(Jenkins.getInstance(), context));
             return finalHetroConfiguratorObject;
 
     }

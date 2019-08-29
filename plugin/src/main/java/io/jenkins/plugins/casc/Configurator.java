@@ -24,8 +24,10 @@ package io.jenkins.plugins.casc;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.ExtensionPoint;
+import hudson.model.Describable;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
+import io.vavr.control.Option;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -33,6 +35,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
+
+import static io.vavr.API.unchecked;
 
 /**
  * Define a {@link Configurator} which handles a configuration element, identified by name.
@@ -167,4 +171,19 @@ public interface Configurator<T> {
         return mapping;
     }
 
+
+    @CheckForNull
+    default CNode describeStruct(T instance, ConfigurationContext context) {
+        return lookupConfig(context, instance.getClass()).map(configurator-> convertToNod(context, configurator, (Describable) instance)).getOrNull();
+    }
+
+
+    @NonNull
+    default Option<Configurator<T>> lookupConfig(ConfigurationContext context, Class<?> descriptor) {
+        return Option.of(context.lookup(descriptor));
+    }
+
+    default CNode convertToNod(ConfigurationContext context, Configurator configurator, Describable instance) {
+        return unchecked(() -> configurator.describe(instance, context)).apply();
+    }
 }
