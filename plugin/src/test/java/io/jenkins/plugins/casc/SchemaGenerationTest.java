@@ -86,4 +86,9 @@ public class SchemaGenerationTest {
     public void invalidEmptyToolForBaseConfig() throws Exception {
         String yamlStringContents = Util.toStringFromYamlFile(this, "emptyToolBaseConfig.yml");
     }
+
+
+    private void validateYamlAgainstSchema(String yamlString) {
+
+    }
  }

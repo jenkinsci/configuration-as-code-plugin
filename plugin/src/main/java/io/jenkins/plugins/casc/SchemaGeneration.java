@@ -199,8 +199,11 @@ public class SchemaGeneration {
     }
 
     public static void rootConfigGeneration() throws Exception {
+
+
         DefaultConfiguratorRegistry registry = new DefaultConfiguratorRegistry();
         final ConfigurationContext context = new ConfigurationContext(registry);
+        context.setMode("JSONSchema");
         for (RootElementConfigurator root : RootElementConfigurator.all()) {
             final CNode config = root.describeStructure(root.getTargetComponent(context), context);
             final Mapping mapping = config.asMapping();
@@ -208,6 +211,14 @@ public class SchemaGeneration {
             for (Map.Entry<String, CNode> entry : entries) {
                 System.out.println(entry.getKey() + " " + entry.getValue().toString());
             }
+
+            /*
+            * Create a separate mode for the Attribute
+            * Context configuration         *
+            * Add the correct context.(Mode)
+            *
+            * */
+
         }
     }
 }

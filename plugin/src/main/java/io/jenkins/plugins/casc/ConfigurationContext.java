@@ -30,6 +30,8 @@ public class ConfigurationContext implements ConfiguratorRegistry {
 
     private transient final ConfiguratorRegistry registry;
 
+    private String mode;
+
     public ConfigurationContext(ConfiguratorRegistry registry) {
         this.registry = registry;
     }
@@ -61,6 +63,15 @@ public class ConfigurationContext implements ConfiguratorRegistry {
     public void setUnknown(Unknown unknown) {
         this.unknown = unknown;
     }
+
+    public String getMode() {
+        return mode;
+    }
+
+    public void setMode(String mode) {
+        this.mode = mode;
+    }
+
 
 
     // --- delegate methods for ConfigurationContext

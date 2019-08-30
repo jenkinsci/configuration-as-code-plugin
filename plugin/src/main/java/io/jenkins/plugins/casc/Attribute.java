@@ -61,6 +61,7 @@ public class Attribute<Owner, Type> {
     private Setter<Owner, Type> setter;
     private Getter<Owner, Type> getter;
     private boolean secret;
+    private boolean isJsonSchema;
 
     private boolean deprecated;
 
@@ -109,6 +110,10 @@ public class Attribute<Owner, Type> {
 
     public Class<? extends AccessRestriction>[] getRestrictions() {
         return restrictions != null ? restrictions : EMPTY;
+    }
+
+    public void setJsonSchema(boolean jsonSchema) {
+        isJsonSchema = jsonSchema;
     }
 
     public boolean isRestricted() {
@@ -225,9 +230,17 @@ public class Attribute<Owner, Type> {
                     ": No configurator found for type " + type);
         }
         try {
-            Object o = getValue(instance);
-            if (o == null) {
-                return null;
+            Object o;
+            if(isJsonSchema) {
+                 o = getType();
+                if (o == null) {
+                    return null;
+                }
+            } else {
+                 o = getValue(instance);
+                if (o == null) {
+                    return null;
+                }
             }
 
             // In Export we sensitive only those values which do not get rendered as secrets
@@ -248,6 +261,7 @@ public class Attribute<Owner, Type> {
                 + printThrowable(e));
         }
     }
+
 
     /**
      * Describes a node.

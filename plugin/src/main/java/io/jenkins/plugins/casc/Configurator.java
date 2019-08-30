@@ -176,6 +176,9 @@ public interface Configurator<T> {
         throws Exception {
         Mapping mapping = new Mapping();
         for (Attribute attribute : getAttributes()) {
+            if(context.getMode().equals("JSONSchema")) {
+                attribute.setJsonSchema(true);
+            }
             CNode value = attribute.describe(instance, context);
             if (value != null) {
                 mapping.put(attribute.getName(), attribute.getType().getSimpleName());
