@@ -3,6 +3,8 @@ jobs:
       multibranchPipelineJob('image-jenkins') {
         branchSources {
           github {
+            // The id option in the Git and GitHub branch source contexts is now mandatory (JENKINS-43693).
+            id('12312313') // IMPORTANT: use a constant and unique identifier
             scanCredentialsId('github')
             repoOwner('my-org')
             repository('my-repository')
