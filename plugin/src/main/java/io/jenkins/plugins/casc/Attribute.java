@@ -248,8 +248,11 @@ public class Attribute<Owner, Type> {
             if (multiple) {
                 Sequence seq = new Sequence();
                 if (o.getClass().isArray()) o = Arrays.asList((Object[]) o);
-                for (Object value : (Iterable) o) {
-                    seq.add(_describe(c, context, value, shouldBeMasked));
+                if(o instanceof Iterable) {
+                    System.out.println("This is iterable");
+                    for (Object value : (Iterable) o) {
+                        seq.add(_describe(c, context, value, shouldBeMasked));
+                    }
                 }
                 return seq;
             }
@@ -260,6 +263,51 @@ public class Attribute<Owner, Type> {
             return new Scalar("FAILED TO EXPORT\n" + instance.getClass().getName() + "#" + name + ": "
                 + printThrowable(e));
         }
+    }
+
+
+    /**
+     * This function is for the JSONSchemaGeneration
+     * @param instance
+     * @param context
+     * @return
+     */
+    public CNode describeStructure(Owner instance, ConfigurationContext context) {
+
+        final Configurator c = context.lookup(type);
+        if (c == null) {
+            return new Scalar("FAILED TO EXPORT\n" + instance.getClass().getName()+"#"+name +
+                ": No configurator found for type " + type);
+        }
+        try {
+            Object o = new Object();
+            if(isJsonSchema) {
+                o = getType();
+                if (o == null) {
+                    return null;
+                }
+            }
+
+            // In Export we sensitive only those values which do not get rendered as secrets
+            boolean shouldBeMasked = isSecret(instance);
+            if (multiple) {
+                Sequence seq = new Sequence();
+                if (o.getClass().isArray()) o = Arrays.asList((Object[]) o);
+                if(o instanceof Iterable) {
+                    for (Object value : (Iterable) o) {
+                        seq.add(_describe(c, context, value, shouldBeMasked));
+                    }
+                }
+                return seq;
+            }
+            return _describe(c, context, o, shouldBeMasked);
+        } catch (Exception | /* Jenkins.getDescriptorOrDie */AssertionError e) {
+            // Don't fail the whole export, prefer logging this error
+            LOGGER.log(Level.WARNING, "Failed to export", e);
+            return new Scalar("FAILED TO EXPORT\n" + instance.getClass().getName() + "#" + name + ": "
+                + printThrowable(e));
+        }
+
     }
 
 
@@ -275,7 +323,12 @@ public class Attribute<Owner, Type> {
      */
     private CNode _describe(Configurator c, ConfigurationContext context, Object value, boolean shouldBeMasked)
             throws Exception {
-        CNode node = c.describe(value, context);
+        CNode node;
+        if(isJsonSchema) {
+            node = c.describeStructure(value, context);
+        } else {
+            node = c.describe(value, context);
+        }
         if (shouldBeMasked && node instanceof Scalar) {
             ((Scalar)node).sensitive(true);
         }

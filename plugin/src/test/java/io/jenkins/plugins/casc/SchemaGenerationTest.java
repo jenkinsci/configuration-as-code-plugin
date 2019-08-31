@@ -58,7 +58,7 @@ public class SchemaGenerationTest {
     }
 
     @Test
-    public void describeStructtest() throws Exception {
+    public void describeStructTest() throws Exception {
          rootConfigGeneration();
     }
 
