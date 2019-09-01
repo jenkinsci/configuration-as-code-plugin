@@ -88,6 +88,8 @@ import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.FlowStyle.BLOCK;
 import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.DOUBLE_QUOTED;
 import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.LITERAL;
 import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.PLAIN;
+import static io.jenkins.plugins.casc.SchemaGeneration.writeJSONSchema;
+
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 
@@ -397,6 +399,25 @@ public class ConfigurationAsCode extends ManagementLink {
         res.addHeader("Content-Disposition", "attachment; filename=jenkins.yaml");
         export(res.getOutputStream());
     }
+
+    /**
+     * Export JSONSchema to URL
+     * @throws Exception
+     */
+    @RequirePOST
+    public void doExportJSONSchema(StaplerRequest req, StaplerResponse res) throws Exception {
+
+        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+            res.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+        writeJSONSchema();
+        res.setContentType("application/x-yaml; charset=utf-8");
+        res.addHeader("Content-Disposition", "attachment; filename=JSONSchema.json");
+        export(res.getOutputStream());
+    }
+
+
 
     @RequirePOST
     public void doViewExport(StaplerRequest req, StaplerResponse res) throws Exception {

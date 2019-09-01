@@ -1,6 +1,12 @@
 package io.jenkins.plugins.casc;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import io.jenkins.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -8,11 +14,10 @@ import java.util.List;
 import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.NoExternalUse;
 
-@Restricted(NoExternalUse.class)
 public class SchemaGeneration {
+
+    private final static String JSONSchemaFilename = "JSONSchema.json";
 
     final static JSONObject schemaTemplateObject = new JSONObject()
         .put("$schema", "http://json-schema.org/draft-07/schema#")
@@ -80,6 +85,17 @@ public class SchemaGeneration {
             }
         schemaObject.put("properties", schemaConfiguratorObjects);
         return schemaObject;
+    }
+
+    public static void writeJSONSchema() throws Exception{
+        JSONObject schemaObject = generateSchema();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        JsonParser jsonParser = new JsonParser();
+        JsonElement jsonElement = jsonParser.parse(schemaObject.toString());
+        String prettyJsonString = gson.toJson(jsonElement);
+        BufferedWriter writer = new BufferedWriter(new FileWriter(JSONSchemaFilename));
+        writer.write(prettyJsonString);
+        writer.close();
     }
 
     private static JSONObject generateHetroDescribableConfigObject(HeteroDescribableConfigurator heteroDescribableConfiguratorObject) {
