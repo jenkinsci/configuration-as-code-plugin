@@ -11,10 +11,6 @@
 
 <img src="plugin/src/main/webapp/img/logo-head.svg" width="192">
 
-See [presentation slides](https://docs.google.com/presentation/d/1VsvDuffinmxOjg0a7irhgJSRWpCzLg_Yskf7Fw7FpBg/edit?usp=sharing) from Jenkins World 2018.
-
-Join our Jenkins Configuration as Code office hours meeting scheduled for every second Wednesday. Use the Hangout on Air link from our [Gitter](https://gitter.im/jenkinsci/configuration-as-code-plugin) chat channel. As an alternative, use the link from the [invitation](https://calendar.google.com/event?action=TEMPLATE&tmeid=MmdwdTE1cTFvaGw1NGUycGxqdWUwcXExaWFfMjAxODA3MjVUMDcwMDAwWiBld2VAcHJhcW1hLm5ldA&tmsrc=ewe%40praqma.net&scp=ALL). See previous [meeting minutes](https://docs.google.com/document/d/1Hm07Q1egWL6VVAqNgu27bcMnqNZhYJmXKRvknVw4Y84/edit?usp=sharing).
-
 ## Introduction
 
 Setting up Jenkins is a complex process, as both Jenkins and its plugins require some tuning and configuration,
@@ -47,6 +43,8 @@ jenkins:
 
 In addition, we want to have a well documented syntax file, and tooling to assist in writing and testing,
 so end users have full guidance in using this tool set and do not have to search for examples on the Internet.
+
+Also see the [presentation slides](https://docs.google.com/presentation/d/1VsvDuffinmxOjg0a7irhgJSRWpCzLg_Yskf7Fw7FpBg/edit?usp=sharing) from DevOps World - Jenkins World 2018 for overview.
 
 ## Getting Started
 
