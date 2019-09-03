@@ -405,16 +405,14 @@ public class ConfigurationAsCode extends ManagementLink {
      * @throws Exception
      */
     @RequirePOST
-    public void doExportJSONSchema(StaplerRequest req, StaplerResponse res) throws Exception {
+    public void doExportNewJSONSchema(StaplerRequest req, StaplerResponse res) throws Exception {
 
         if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
-        writeJSONSchema();
-        res.setContentType("application/x-yaml; charset=utf-8");
-        res.addHeader("Content-Disposition", "attachment; filename=JSONSchema.json");
-        export(res.getOutputStream());
+        res.setContentType("application/json; charset=utf-8");
+        res.getWriter().write(writeJSONSchema());
     }
 
 

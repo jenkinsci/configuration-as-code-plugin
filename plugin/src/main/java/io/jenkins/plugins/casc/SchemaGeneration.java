@@ -87,15 +87,13 @@ public class SchemaGeneration {
         return schemaObject;
     }
 
-    public static void writeJSONSchema() throws Exception{
+    public static String writeJSONSchema() throws Exception{
         JSONObject schemaObject = generateSchema();
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         JsonParser jsonParser = new JsonParser();
         JsonElement jsonElement = jsonParser.parse(schemaObject.toString());
         String prettyJsonString = gson.toJson(jsonElement);
-        BufferedWriter writer = new BufferedWriter(new FileWriter(JSONSchemaFilename));
-        writer.write(prettyJsonString);
-        writer.close();
+        return prettyJsonString;
     }
 
     private static JSONObject generateHetroDescribableConfigObject(HeteroDescribableConfigurator heteroDescribableConfiguratorObject) {
