@@ -89,7 +89,6 @@ import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.FlowStyle.BLOCK;
 import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.DOUBLE_QUOTED;
 import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.LITERAL;
 import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.PLAIN;
-import static io.jenkins.plugins.casc.SchemaGeneration.writeJSONSchema;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 
@@ -406,17 +405,18 @@ public class ConfigurationAsCode extends ManagementLink {
      * @throws Exception
      */
     @RequirePOST
-    public void doExportNewJSONSchema(StaplerRequest req, StaplerResponse res) throws Exception {
+    public void doNewSchema(StaplerRequest req, StaplerResponse res) throws Exception {
 
         if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
-        res.setContentType("application/json; charset=utf-8");
-        res.getWriter().write(writeJSONSchema());
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        export(out);
+
+        req.setAttribute("export", out.toString(StandardCharsets.UTF_8.name()));
+        req.getView(this, "viewExport.jelly").forward(req, res);
     }
-
-
 
     @RequirePOST
     public void doViewExport(StaplerRequest req, StaplerResponse res) throws Exception {
