@@ -90,7 +90,6 @@ import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.DOUBLE
 import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.LITERAL;
 import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.PLAIN;
 import static io.jenkins.plugins.casc.SchemaGeneration.writeJSONSchema;
-
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 
