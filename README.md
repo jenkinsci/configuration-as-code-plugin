@@ -11,10 +11,6 @@
 
 <img src="plugin/src/main/webapp/img/logo-head.svg" width="192">
 
-View the [wiki](https://wiki.jenkins.io/display/JENKINS/configuration+as+code+plugin) page. See [presentation slides](https://docs.google.com/presentation/d/1VsvDuffinmxOjg0a7irhgJSRWpCzLg_Yskf7Fw7FpBg/edit?usp=sharing) from Jenkins World 2018.
-
-Join our Jenkins Configuration as Code office hours meeting scheduled for every second Wednesday. Use the Hangout on Air link from our [Gitter](https://gitter.im/jenkinsci/configuration-as-code-plugin) chat channel. As an alternative, use the link from the [invitation](https://calendar.google.com/event?action=TEMPLATE&tmeid=MmdwdTE1cTFvaGw1NGUycGxqdWUwcXExaWFfMjAxODA3MjVUMDcwMDAwWiBld2VAcHJhcW1hLm5ldA&tmsrc=ewe%40praqma.net&scp=ALL). See previous [meeting minutes](https://docs.google.com/document/d/1Hm07Q1egWL6VVAqNgu27bcMnqNZhYJmXKRvknVw4Y84/edit?usp=sharing).
-
 ## Introduction
 
 Setting up Jenkins is a complex process, as both Jenkins and its plugins require some tuning and configuration,
@@ -47,6 +43,8 @@ jenkins:
 
 In addition, we want to have a well documented syntax file, and tooling to assist in writing and testing,
 so end users have full guidance in using this tool set and do not have to search for examples on the Internet.
+
+Also see the [presentation slides](https://docs.google.com/presentation/d/1VsvDuffinmxOjg0a7irhgJSRWpCzLg_Yskf7Fw7FpBg/edit?usp=sharing) from DevOps World - Jenkins World 2018 for overview.
 
 ## Getting Started
 
@@ -275,7 +273,7 @@ It led to a security vulnerability which was addressed in JCasC `1.25` (SECURITY
 
 ### Vault
 
-Prerequisites:
+Prerequisites: [HashiCorp Vault plugin](https://github.com/jenkinsci/hashicorp-vault-plugin) v2.4.0+
 
 - The environment variable `CASC_VAULT_PW` must be present, if token is not used and appRole/Secret is not used. (Vault password.)
 - The environment variable `CASC_VAULT_USER` must be present, if token is not used and appRole/Secret is not used. (Vault username.)
@@ -364,6 +362,16 @@ You have the following option to trigger a configuration reload:
   query parameter named `casc-reload-token`, i.e. `JENKINS_URL/reload-configuration-as-code/?casc-reload-token=32424324rdsadsa`.
 
   `curl  -X POST "JENKINS_URL:8080/reload-configuration-as-code/?casc-reload-token=32424324rdsadsa"`
+  
+## Configuration-as-Code extension plugins
+
+- [configuration-as-code-groovy-plugin](https://github.com/jenkinsci/configuration-as-code-groovy-plugin)
+  Allows to specify groovy code that should run on during configuration.
+- [configuration-as-code-secret-ssm-plugin](https://github.com/jenkinsci/configuration-as-code-secret-ssm-plugin)
+  Allows to resolve secrets from AWS' SSM secrets
+- [hashicorp-vault-plugin](https://github.com/jenkinsci/hashicorp-vault-plugin)
+  Allows to resolve secrets from Hashicorp vault
+  
 
 ## Jenkins Enhancement Proposal
 
