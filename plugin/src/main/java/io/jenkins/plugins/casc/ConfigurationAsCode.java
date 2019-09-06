@@ -85,6 +85,7 @@ import org.kohsuke.stapler.interceptor.RequirePOST;
 import org.kohsuke.stapler.lang.Klass;
 import org.kohsuke.stapler.verb.POST;
 
+import static io.jenkins.plugins.casc.SchemaGeneration.writeJSONSchema;
 import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.FlowStyle.BLOCK;
 import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.DOUBLE_QUOTED;
 import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.LITERAL;
@@ -411,11 +412,9 @@ public class ConfigurationAsCode extends ManagementLink {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        export(out);
 
-        req.setAttribute("export", out.toString(StandardCharsets.UTF_8.name()));
-        req.getView(this, "viewExport.jelly").forward(req, res);
+        res.setContentType("application/json; charset=utf-8");
+        res.getWriter().print(writeJSONSchema());
     }
 
     @RequirePOST
