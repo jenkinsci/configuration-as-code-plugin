@@ -45,22 +45,10 @@ public class SchemaGeneration {
             if (configuratorObject instanceof BaseConfigurator) {
                 BaseConfigurator baseConfigurator = (BaseConfigurator) configuratorObject;
                 List<Attribute> baseConfigAttributeList = baseConfigurator.getAttributes();
-//
-//                /*Get rid of this*/
-//                DefaultConfiguratorRegistry registry = new DefaultConfiguratorRegistry();
-//                final ConfigurationContext context = new ConfigurationContext(registry);
-//                List<Configurator> configurators = new ArrayList<>(baseConfigurator.getConfigurators(context)) ;
-//                for(Configurator configurator : configurators) {
-//                    System.out.println("BaseConfig is " + configurator.getName());
-//                }
-//                /*Get rid of this*/
-
-                System.out.println("Base Configurator: " + baseConfigurator.getName());
-
 
                 if (baseConfigAttributeList.size() == 0) {
                     schemaConfiguratorObjects
-                        .put(((BaseConfigurator) configuratorObject).getTarget().getSimpleName().toLowerCase(),
+                        .put(baseConfigurator.getName().toLowerCase(),
                             new JSONObject()
                                 .put("type", "object")
                                 .put("properties", new JSONObject()));
@@ -68,10 +56,6 @@ public class SchemaGeneration {
                 } else {
                     JSONObject attributeSchema = new JSONObject();
                     for (Attribute attribute : baseConfigAttributeList) {
-                        System.out.println("       Attribute : " + attribute.getName().toLowerCase() + "Attr Type: "  + attribute.getType().getSimpleName());
-
-
-
                         if (attribute.multiple) {
                             generateMultipleAttributeSchema(attributeSchema, attribute);
                         } else {
@@ -95,22 +79,7 @@ public class SchemaGeneration {
              * It mimics the HetroDescribable Configurator.jelly
              */
             else if (configuratorObject instanceof HeteroDescribableConfigurator) {
-
                 HeteroDescribableConfigurator heteroDescribableConfigurator = (HeteroDescribableConfigurator) configuratorObject;
-
-                /*Get rid of this*/
-                System.out.println("HeteroDescribableConfigurator: " + heteroDescribableConfigurator.getTarget().getSimpleName().toLowerCase());
-
-                DefaultConfiguratorRegistry registry = new DefaultConfiguratorRegistry();
-                final ConfigurationContext context = new ConfigurationContext(registry);
-                List<Configurator> configurators = new ArrayList<>(heteroDescribableConfigurator.getConfigurators(context)) ;
-
-                for(Configurator configurator : configurators) {
-                    System.out.println("     Descriptor is " + configurator.getName());
-                }
-                /*Get rid of this*/
-
-
                 schemaConfiguratorObjects.put(heteroDescribableConfigurator.getTarget().getSimpleName().toLowerCase(),
                     generateHetroDescribableConfigObject(heteroDescribableConfigurator));
                 }
@@ -126,14 +95,10 @@ public class SchemaGeneration {
         JSONObject finalHetroConfiguratorObject = new JSONObject();
         if (implementorsMap.size() != 0) {
             Iterator<Map.Entry<String, Class>> itr = implementorsMap.entrySet().iterator();
-
             JSONArray oneOfJsonArray = new JSONArray();
             while (itr.hasNext()) {
-
-
                 Map.Entry<String, Class> entry = itr.next();
                 JSONObject implementorObject = new JSONObject();
-                System.out.println("    SubHetro :"  + entry.getValue().getName());
                 implementorObject.put("properties",
                     new JSONObject().put(entry.getKey(), new JSONObject()
                         .put("$id", "#/definitions/" + entry.getValue().getName())));
@@ -171,6 +136,10 @@ public class SchemaGeneration {
                 attributeType.put("type", "integer");
                 break;
 
+            case "hudson.Secret":
+                attributeType.put("type", "string");
+                break;
+
             case "java.lang.Long":
                 attributeType.put("type", "integer");
                 break;
@@ -194,6 +163,7 @@ public class SchemaGeneration {
             rootConfiguratorObject
                 .put(rootElementConfigurator.getName(), new JSONObject().put("type", "object"));
         }
+
         return rootConfiguratorObject;
     }
 
@@ -213,7 +183,6 @@ public class SchemaGeneration {
 
     private static void generateEnumAttributeSchema(JSONObject attributeSchemaTemplate, Attribute attribute) {
         if (attribute.type.getEnumConstants().length == 0) {
-            System.out.println("     Sub-Enum Attribute : " + attribute.getName().toLowerCase() );
             attributeSchemaTemplate.put(attribute.getName(),
                 new JSONObject()
                     .put("type", "string"));
@@ -242,6 +211,28 @@ public class SchemaGeneration {
                 System.out.println(entry.getKey() + " " + entry.getValue().toString());
             }
         }
+    }
+
+    public static void lookupBaseConfigurator(String configName) throws Exception {
+        ConfigurationAsCode configurationAsCodeObject = ConfigurationAsCode.get();
+        for (Object configuratorObject : configurationAsCodeObject.getConfigurators()) {
+            if (configuratorObject instanceof BaseConfigurator) {
+                BaseConfigurator baseConfigurator = (BaseConfigurator) configuratorObject;
+                if(configName.equals(baseConfigurator.getName())){
+                    List<Attribute> baseConfigAttributeList = baseConfigurator.getAttributes();
+                    /*
+                    * Recursively iterate to get information
+                    * But this does not quite get us all of the information we require.
+                    * We would still need to iterate over heterodescribable configurators as well
+                    * */
+                }
+
+
+            }
+        }
+
+
+
     }
 
 
