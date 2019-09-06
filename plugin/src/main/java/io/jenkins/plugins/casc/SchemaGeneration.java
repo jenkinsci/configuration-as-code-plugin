@@ -14,9 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class SchemaGeneration {
-
-    private final static String JSONSchemaFilename = "JSONSchema.json";
-
+    
     final static JSONObject schemaTemplateObject = new JSONObject()
         .put("$schema", "http://json-schema.org/draft-07/schema#")
         .put("description", "Jenkins Configuration as Code")
