@@ -36,8 +36,8 @@ public class SchemaGeneration {
          * Iterates over the base configurators and adds them to the schema.
          */
         JSONObject schemaConfiguratorObjects = new JSONObject();
-        ConfigurationAsCode configurationAsCodeObject = ConfigurationAsCode.get();
-        for (Object configuratorObject : configurationAsCodeObject.getConfigurators()) {
+        ConfigurationAsCode configurationAsCode = ConfigurationAsCode.get();
+        for (Object configuratorObject : configurationAsCode.getConfigurators()) {
             if (configuratorObject instanceof BaseConfigurator) {
                 BaseConfigurator baseConfigurator = (BaseConfigurator) configuratorObject;
                 List<Attribute> baseConfigAttributeList = baseConfigurator.getAttributes();
@@ -70,13 +70,13 @@ public class SchemaGeneration {
             }
             /**
              * Used to generate the schema for the implementors of
-             * the HetroDescribable Configurator
-             * It mimics the HetroDescribable Configurator.jelly
+             * the HeteroDescribable Configurator
+             * It mimics the HeteroDescribable Configurator.jelly
              */
             else if (configuratorObject instanceof HeteroDescribableConfigurator) {
                 HeteroDescribableConfigurator heteroDescribableConfigurator = (HeteroDescribableConfigurator) configuratorObject;
                 schemaConfiguratorObjects.put(heteroDescribableConfigurator.getTarget().getSimpleName().toLowerCase(),
-                    generateHetroDescribableConfigObject(heteroDescribableConfigurator));
+                    generateHeteroDescribableConfigObject(heteroDescribableConfigurator));
                 }
             }
         schemaObject.put("properties", schemaConfiguratorObjects);
@@ -92,11 +92,11 @@ public class SchemaGeneration {
         return prettyJsonString;
     }
 
-    private static JSONObject generateHetroDescribableConfigObject(HeteroDescribableConfigurator heteroDescribableConfiguratorObject) {
+    private static JSONObject generateHeteroDescribableConfigObject(HeteroDescribableConfigurator heteroDescribableConfiguratorObject) {
         Map<String, Class> implementorsMap = heteroDescribableConfiguratorObject
             .getImplementors();
-        JSONObject finalHetroConfiguratorObject = new JSONObject();
-        if (implementorsMap.size() != 0) {
+        JSONObject finalHeteroConfiguratorObject = new JSONObject();
+        if (!implementorsMap.isEmpty()) {
             Iterator<Map.Entry<String, Class>> itr = implementorsMap.entrySet().iterator();
 
             JSONArray oneOfJsonArray = new JSONArray();
@@ -109,10 +109,10 @@ public class SchemaGeneration {
                 oneOfJsonArray.put(implementorObject);
             }
 
-            finalHetroConfiguratorObject.put("type", "object");
-            finalHetroConfiguratorObject.put("oneOf", oneOfJsonArray);
+            finalHeteroConfiguratorObject.put("type", "object");
+            finalHeteroConfiguratorObject.put("oneOf", oneOfJsonArray);
         }
-            return finalHetroConfiguratorObject;
+            return finalHeteroConfiguratorObject;
     }
 
     private static JSONObject generateNonEnumAttributeObject(Attribute attribute) {
