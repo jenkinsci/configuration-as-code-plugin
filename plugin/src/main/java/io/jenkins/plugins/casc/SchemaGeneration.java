@@ -67,13 +67,7 @@ public class SchemaGeneration {
                         }
                     }
                 }
-            }
-            /**
-             * Used to generate the schema for the implementors of
-             * the HeteroDescribable Configurator
-             * It mimics the HeteroDescribable Configurator.jelly
-             */
-            else if (configuratorObject instanceof HeteroDescribableConfigurator) {
+            } else if (configuratorObject instanceof HeteroDescribableConfigurator) {
                 HeteroDescribableConfigurator heteroDescribableConfigurator = (HeteroDescribableConfigurator) configuratorObject;
                 schemaConfiguratorObjects.put(heteroDescribableConfigurator.getTarget().getSimpleName().toLowerCase(),
                     generateHeteroDescribableConfigObject(heteroDescribableConfigurator));
