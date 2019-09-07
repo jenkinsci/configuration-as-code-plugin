@@ -406,7 +406,7 @@ public class ConfigurationAsCode extends ManagementLink {
      * @throws Exception
      */
     @RequirePOST
-    public void doNewSchema(StaplerRequest req, StaplerResponse res) throws Exception {
+    public void dov2Schema(StaplerRequest req, StaplerResponse res) throws Exception {
 
         if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
