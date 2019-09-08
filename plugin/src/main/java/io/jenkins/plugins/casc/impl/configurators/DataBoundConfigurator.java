@@ -161,7 +161,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                         args[i] = configurator.configure(value, context);
                     }
                     if (LOGGER.isLoggable(Level.FINE)) {
-                        LOGGER.log(Level.FINE, "Setting {0}. {1} = {2}",
+                        LOGGER.log(Level.FINE, "Setting {0}.{1} = {2}",
                                 new Object[]{target, names[i], t == Secret.class || Attribute.calculateIfSecret(target, names[i]) ? "****" : value});
                     }
                 } else if (t.isPrimitive()) {

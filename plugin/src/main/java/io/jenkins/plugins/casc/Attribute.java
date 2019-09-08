@@ -209,7 +209,7 @@ public class Attribute<Owner, Type> {
     }
 
     public void setValue(Owner target, Type value) throws Exception {
-        LOGGER.log(Level.FINE, "Setting {0}. {1} = {2}",
+        LOGGER.log(Level.FINE, "Setting {0}.{1} = {2}",
                 new Object[] {target, name, (isSecret(target) ? "****" : value)});
         setter.setValue(target, value);
     }
