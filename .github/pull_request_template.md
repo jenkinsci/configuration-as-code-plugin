@@ -17,6 +17,5 @@ Helps us to block accidental merges of unfinished work.
 - [ ] Did you provide a test-case? That demonstrates feature works or fixes the issue.
 
 <!--
-Put an `x` into the [ ] to show you have filled the information below
-Describe your pull request below
+Put an `x` into the [ ] to show you have filled the information
 -->
