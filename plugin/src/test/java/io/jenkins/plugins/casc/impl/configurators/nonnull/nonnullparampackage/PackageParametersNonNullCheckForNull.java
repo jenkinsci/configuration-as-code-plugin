@@ -6,7 +6,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
  * Checks the behaviour of {@link io.jenkins.plugins.casc.impl.configurators.DataBoundConfigurator} with non null
- * {@link String} when using package-level {@link javax.annotation.ParametersAreNonnullByDefault} annotations.
+ * {@link Secret} when using package-level {@link javax.annotation.ParametersAreNonnullByDefault} annotations.
  */
 public class PackageParametersNonNullCheckForNull {
     private Secret secret;
