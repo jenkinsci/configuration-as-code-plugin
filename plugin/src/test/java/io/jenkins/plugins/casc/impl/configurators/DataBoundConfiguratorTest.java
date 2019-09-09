@@ -9,6 +9,7 @@ import io.jenkins.plugins.casc.ConfiguratorRegistry;
 import io.jenkins.plugins.casc.impl.configurators.nonnull.ClassParametersAreNonnullByDefault;
 import io.jenkins.plugins.casc.impl.configurators.nonnull.NonnullParameterConstructor;
 import io.jenkins.plugins.casc.impl.configurators.nonnull.nonnullparampackage.PackageParametersAreNonnullByDefault;
+import io.jenkins.plugins.casc.impl.configurators.nonnull.nonnullparampackage.PackageParametersNonNullCheckForNull;
 import io.jenkins.plugins.casc.misc.Util;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
@@ -36,6 +37,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -149,6 +151,17 @@ public class DataBoundConfiguratorTest {
                                                         .lookupOrFail(PackageParametersAreNonnullByDefault.class)
                                                         .configure(config, new ConfigurationContext(registry));
         assertTrue(configured.getString().isEmpty());
+    }
+
+    @Test
+    @Issue("#1025")
+    public void packageParametersAreNonnullByDefaultButCanBeNullable() throws Exception {
+        Mapping config = new Mapping();
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        final PackageParametersNonNullCheckForNull configured = (PackageParametersNonNullCheckForNull) registry
+            .lookupOrFail(PackageParametersNonNullCheckForNull.class)
+            .configure(config, new ConfigurationContext(registry));
+        assertNull(configured.getSecret());
     }
 
     @Test
