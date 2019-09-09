@@ -2,12 +2,19 @@
 <j:jelly xmlns:j="jelly:core">
 <j:choose>
   <j:when test="${it.type.enum}">
-    "type": "string",
-    "enum": [ 
-<j:forEach items="${it.type.getEnumConstants()}" var="v" varStatus="st">
-    "${v}"<j:if test="${!st.last}">,</j:if>
-</j:forEach>
-    ]
+    <j:choose>
+      <j:when test="${it.type.getEnumConstants().size() == 0}">
+        "type": "string"
+      </j:when>
+      <j:otherwise>
+        "type": "string",
+        "enum": [ 
+        <j:forEach items="${it.type.getEnumConstants()}" var="v" varStatus="st">
+          "${v}"<j:if test="${!st.last}">,</j:if>
+        </j:forEach>
+        ]
+      </j:otherwise>
+    </j:choose>
   </j:when>
   <j:otherwise>
     <j:switch on="${it.type.name}">
@@ -21,24 +28,20 @@
         "type": "boolean"
       </j:case>
       <j:case value="int">
-        "type": "integer",
-        "format": "uint32"
+        "type": "integer"
       </j:case>
       <j:case value="java.lang.Integer">
-        "type": "integer",
-        "format": "uint32"
+        "type": "integer"
       </j:case>
       <j:case value="long">
-        "type": "integer",
-        "format": "uint64"
+        "type": "integer"
       </j:case>
       <j:case value="java.lang.Long">
-        "type": "integer",
-        "format": "uint64"
+        "type": "integer"
       </j:case>
       <j:default>
         "type":  "object",
-        "ref": "#/definitions/${it.type.name}"
+        "$$ref": "#/definitions/${it.type.name}"
       </j:default>
     </j:switch>
   </j:otherwise>

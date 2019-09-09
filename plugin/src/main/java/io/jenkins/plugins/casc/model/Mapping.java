@@ -1,7 +1,6 @@
 package io.jenkins.plugins.casc.model;
 
 import io.jenkins.plugins.casc.ConfiguratorException;
-
 import java.util.HashMap;
 
 /**
@@ -68,7 +67,11 @@ public final class Mapping extends HashMap<String, CNode> implements CNode {
     @Override
     public Mapping clone() {
         final Mapping clone = new Mapping();
-        entrySet().stream().forEach(e -> clone.put(e.getKey(), e.getValue().clone()));
+        forEach((key, value) -> {
+            if (value != null) {
+                clone.put(key, value.clone());
+            }
+        });
         return clone;
     }
 }

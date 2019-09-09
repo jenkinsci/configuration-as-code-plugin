@@ -1,14 +1,11 @@
 package io.jenkins.plugins.casc;
 
 import hudson.ExtensionPoint;
-import jenkins.model.Jenkins;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import jenkins.model.Jenkins;
 
 /**
  * Resolves variable references in configuration file of the form "${abc}"
@@ -19,17 +16,8 @@ import java.util.regex.Pattern;
 
 public abstract class SecretSource implements ExtensionPoint {
 
-    // TODO we probably will quickly reach some limits using regexp
-    // Maybe we could adopt https://github.com/AndersDJohnson/brace-expansion-java or implement something comparable
-    public static final Pattern SECRET_PATTERN = Pattern.compile("(?<!\\\\)\\$\\{([^:\\s]*)(?::-)?([^}\\s]*)?\\}");
-
-    //We need to compile the matcher once for every key we examine.
-    public static Optional<String> requiresReveal(String key) {
-        Matcher m = SECRET_PATTERN.matcher(key);
-        if(m.matches()) {
-            return Optional.of(m.group(1));
-        }
-        return Optional.empty();
+    public void init() {
+        // NOOP
     }
 
     public abstract Optional<String> reveal(String secret) throws IOException;
@@ -39,13 +27,4 @@ public abstract class SecretSource implements ExtensionPoint {
         all.addAll(Jenkins.getInstance().getExtensionList(SecretSource.class));
         return all;
     }
-
-    public static Optional<String> defaultValue(String key) {
-        Matcher m = SECRET_PATTERN.matcher(key);
-        if(m.matches() && m.groupCount() == 2) {
-            return Optional.ofNullable(m.group(2));
-        }
-        return Optional.empty();
-    }
-
 }

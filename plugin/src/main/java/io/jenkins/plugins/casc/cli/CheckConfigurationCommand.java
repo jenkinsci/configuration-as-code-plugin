@@ -5,12 +5,10 @@ import hudson.cli.CLICommand;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.model.Source;
 import io.jenkins.plugins.casc.yaml.YamlSource;
+import java.util.Map;
 import jenkins.model.Jenkins;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
-
-import java.io.InputStream;
-import java.util.Map;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -31,7 +29,7 @@ public class CheckConfigurationCommand extends CLICommand {
             return -1;
         }
 
-        final Map<Source, String> issues = ConfigurationAsCode.get().checkWith(new YamlSource<InputStream>(stdin, YamlSource.READ_FROM_INPUTSTREAM));
+        final Map<Source, String> issues = ConfigurationAsCode.get().checkWith(YamlSource.of(stdin));
         for (Map.Entry<Source, String> entry : issues.entrySet()) {
             stderr.printf("warning: line %d %s", entry.getKey().line, entry.getValue());
         }

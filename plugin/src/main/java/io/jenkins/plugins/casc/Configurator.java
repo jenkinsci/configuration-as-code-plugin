@@ -21,18 +21,18 @@
 
 package io.jenkins.plugins.casc;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.ExtensionPoint;
 import io.jenkins.plugins.casc.model.CNode;
-import org.apache.commons.lang.StringUtils;
-import org.jenkinsci.Symbol;
-
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import io.jenkins.plugins.casc.model.Mapping;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.Symbol;
 
 /**
  * Define a {@link Configurator} which handles a configuration element, identified by name.
@@ -43,21 +43,22 @@ import java.util.stream.Collectors;
 
 public interface Configurator<T> {
 
-    @Nonnull
-    static String normalize(@Nonnull String name) {
-        if (name.toUpperCase().equals(name)) {
-            name = name.toLowerCase();
+    @NonNull
+    static String normalize(@NonNull String name) {
+        String result = name;
+        if (result.toUpperCase().equals(name)) {
+            result = result.toLowerCase();
         } else {
-            name = StringUtils.uncapitalize(name);
+            result = StringUtils.uncapitalize(name);
         }
-        return name;
+        return result;
     }
 
     /**
      * Get a configurator name.
      * @return short name for this component when used in a configuration.yaml file
      */
-    @Nonnull
+    @NonNull
     default String getName() {
         final Symbol annotation = getTarget().getAnnotation(Symbol.class);
         if (annotation != null) return annotation.value()[0];
@@ -88,18 +89,18 @@ public interface Configurator<T> {
      * @return The API implemented by target type, i.e. implemented {@link ExtensionPoint} for components to implement
      * some jenkins APIs, or raw type for others.
      */
-    @Nonnull
+    @NonNull
     default Class getImplementedAPI() {
         return getTarget();
     }
 
 
     /**
-     * @return list of {@link }Configurator}s to be considered so one can fully configure this component.
+     * @return list of {@link Configurator<T>}s to be considered so one can fully configure this component.
      * Typically, configurator for an abstract extension point will return Configurators for available implementations.
      */
-    @Nonnull
-    default List<Configurator> getConfigurators(ConfigurationContext context) {
+    @NonNull
+    default List<Configurator<T>> getConfigurators(ConfigurationContext context) {
         return Collections.singletonList(this);
     }
 
@@ -109,19 +110,18 @@ public interface Configurator<T> {
      *
      * @return A set of {@link Attribute}s that describes this object
      */
-    @Nonnull
+    @NonNull
     Set<Attribute<T,?>> describe();
 
 
     /**
      * @return Ordered version of {@link #describe()} for documentation generation.
-     * Only include non-deprecated, non-restricted attribute
+     * Only include non-ignored attribute
      */
-    @Nonnull
+    @NonNull
     default List<Attribute<T,?>> getAttributes() {
         return describe().stream()
-                .filter(a -> !a.isRestricted())
-                .filter(a -> !a.isDeprecated())
+                .filter(a -> !a.isIgnored())
                 .sorted(Comparator.comparing(a -> a.name))
                 .collect(Collectors.toList());
     }
@@ -138,12 +138,12 @@ public interface Configurator<T> {
      *      if no new objects got created, but some existing objects may have been modified, return updated target object.
      * @throws ConfiguratorException if something went wrong, depends on the concrete implementation
      */
-    @Nonnull
+    @NonNull
     T configure(CNode config, ConfigurationContext context) throws ConfiguratorException;
 
     /**
      * Run the same logic as {@link #configure(CNode, ConfigurationContext)} in dry-run mode.
-     * Used to verify configuration is fine before being acutally applied to a live jenkins master.
+     * Used to verify configuration is fine before being actually applied to a live jenkins master.
      * @param config
      * @param context
      * @throws ConfiguratorException
@@ -156,6 +156,15 @@ public interface Configurator<T> {
      * Only export attributes which are <b>not</b> set to default value.
      */
     @CheckForNull
-    CNode describe(T instance, ConfigurationContext context) throws Exception;
+    default CNode describe(T instance, ConfigurationContext context) throws Exception {
+        Mapping mapping = new Mapping();
+        for (Attribute attribute : getAttributes()) {
+            CNode value = attribute.describe(instance, context);
+            if (value != null) {
+                mapping.put(attribute.getName(), value);
+            }
+        }
+        return mapping;
+    }
 
 }

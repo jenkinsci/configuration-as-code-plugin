@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.2//EN" "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
+<module name="Checker">
+  <module name="FileTabCharacter" />
+  <module name="NewlineAtEndOfFile">
+    <property name="lineSeparator" value="lf" />
+  </module>
+  <module name="RegexpSingleline">
+    <property name="format" value="\s+$"/>
+    <property name="message" value="Trailing spaces are not allowed."/>
+  </module>
+  <module name="TreeWalker">
+    <module name="ImportOrder">
+      <property name="separatedStaticGroups" value="true" />
+      <property name="option" value="bottom" />
+    </module>
+    <module name="UnusedImports" />
+    <module name="AvoidStarImport" />
+  </module>
+</module>

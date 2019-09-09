@@ -20,7 +20,7 @@ public class MailerTest {
     @Test
     @ConfiguredWithCode("MailerTest.yml")
     public void configure_mailer() throws Exception {
-        final Jenkins jenkins = Jenkins.getInstance();
+        final Jenkins jenkins = Jenkins.get();
         final Mailer.DescriptorImpl descriptor = (Mailer.DescriptorImpl) jenkins.getDescriptor(Mailer.class);
         assertEquals("4441", descriptor.getSmtpPort());
         assertEquals("do-not-reply@acme.org", descriptor.getReplyToAddress());

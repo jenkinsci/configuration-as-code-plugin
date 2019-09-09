@@ -1,16 +1,16 @@
 package io.jenkins.plugins.casc.impl.configurators;
 
+import com.google.common.base.CaseFormat;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Descriptor;
 import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.RootElementConfigurator;
-import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
+import java.util.Optional;
 import org.jenkinsci.Symbol;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
-
-import javax.annotation.CheckForNull;
 
 /**
  * Define a Configurator for a Descriptor
@@ -27,17 +27,10 @@ public class DescriptorConfigurator extends BaseConfigurator<Descriptor> impleme
     public DescriptorConfigurator(Descriptor descriptor) {
         this.descriptor = descriptor;
         this.target = descriptor.getClass();
-        final Symbol symbol = descriptor.getClass().getAnnotation(Symbol.class);
-        if (symbol != null) {
-            this.name = symbol.value()[0];
-        } else {
-            final String cl = descriptor.getKlass().toJavaClass().getSimpleName();
-            // TODO extract Descriptor parameter type, ie DescriptorImpl extends Descriptor<XX> -> XX
-            // so that if cl = fooXX we get natural name "foo"
-            this.name = cl.toLowerCase();
-        }
+        this.name = resolveName(descriptor);
     }
 
+    @NonNull
     @Override
     public String getName() {
         return name;
@@ -58,12 +51,14 @@ public class DescriptorConfigurator extends BaseConfigurator<Descriptor> impleme
         return descriptor;
     }
 
-    @CheckForNull
-    @Override
-    public CNode describe(Descriptor instance, ConfigurationContext context) throws Exception {
-        final Descriptor ref = (Descriptor) target.newInstance();
-        return compare(instance, ref, context);
+    private String resolveName(Descriptor descriptor) {
+        return Optional.ofNullable(descriptor.getClass().getAnnotation(Symbol.class))
+                .map(s -> s.value()[0])
+                .orElseGet(() -> {
+                    /* TODO: extract Descriptor parameter type such that DescriptorImpl extends Descriptor<XX> returns XX.
+                     * Then, if `baseClass == fooXX` we get natural name `foo`.
+                     */
+                    return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, descriptor.getKlass().toJavaClass().getSimpleName());
+                });
     }
-
-
 }

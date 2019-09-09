@@ -8,8 +8,6 @@ metadata:
 data:
   configuration-as-code.yaml: |
     jenkins:
-      location:
-        url: http://jenkins/
       clouds:
         - kubernetes:
             name: kubernetes
@@ -23,7 +21,9 @@ data:
                     ttyEnabled: true
                     command: cat
                     args: ""
-
+    unclassified:
+      location:
+        url: http://jenkins/
     jobs:
       - script: >
         pipelineJob('configuration-as-code') {

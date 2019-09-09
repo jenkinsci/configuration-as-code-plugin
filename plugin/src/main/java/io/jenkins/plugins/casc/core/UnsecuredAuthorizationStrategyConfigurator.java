@@ -1,5 +1,7 @@
 package io.jenkins.plugins.casc.core;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.security.AuthorizationStrategy;
 import hudson.security.AuthorizationStrategy.Unsecured;
@@ -10,9 +12,6 @@ import io.jenkins.plugins.casc.model.Mapping;
 import jenkins.model.Jenkins;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
-
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 
 /**
  * Handles {@link AuthorizationStrategy.Unsecured} that requires a special treatment due to its singleton semantics.
@@ -27,7 +26,7 @@ public class UnsecuredAuthorizationStrategyConfigurator extends BaseConfigurator
         return Unsecured.class;
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public Class getImplementedAPI() {
         return AuthorizationStrategy.class;

@@ -2,19 +2,22 @@ package io.jenkins.plugins.casc;
 
 import hudson.security.csrf.CrumbIssuer;
 import hudson.security.csrf.CrumbIssuerDescriptor;
-import io.jenkins.plugins.casc.misc.EnvVarsRule;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import java.io.ByteArrayOutputStream;
+import javax.servlet.ServletRequest;
 import jenkins.model.Jenkins;
 import org.jenkinsci.Symbol;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.rules.RuleChain;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import javax.servlet.ServletRequest;
-import java.io.ByteArrayOutputStream;
-
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isEmptyOrNullString;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -23,8 +26,8 @@ public class JenkinsConfigTest {
 
 
     @Rule
-    public RuleChain chain = RuleChain.outerRule( new EnvVarsRule()
-            .env("CASC_JENKINS_CONFIG", getClass().getResource("JenkinsConfigTest.yml").toExternalForm()))
+    public RuleChain chain = RuleChain.outerRule( new EnvironmentVariables()
+            .set("CASC_JENKINS_CONFIG", getClass().getResource("JenkinsConfigTest.yml").toExternalForm()))
             .around(new JenkinsConfiguredWithCodeRule());
 
 
@@ -43,8 +46,7 @@ public class JenkinsConfigTest {
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         ConfigurationAsCode.get().export(out);
         final String s = out.toString();
-        System.out.println(s);
-
+        assertThat(s, is(not(isEmptyOrNullString())));
     }
 
 
@@ -52,6 +54,7 @@ public class JenkinsConfigTest {
     @Symbol("broken")
     public static class BrokenCrumbIssuer extends CrumbIssuer {
 
+        @SuppressWarnings("unused")
         @DataBoundConstructor
         public BrokenCrumbIssuer(String foo) {
 

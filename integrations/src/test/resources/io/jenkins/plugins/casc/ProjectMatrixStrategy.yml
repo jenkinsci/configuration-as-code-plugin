@@ -1,19 +1,17 @@
 jenkins:
   systemMessage: "Welcome!"
   numExecutors: 4
-  scmCheckoutRetryCount: 2
   mode: NORMAL
   scmCheckoutRetryCount: 4
   securityRealm:
     local:
       allowsSignup: false
       users:
-       - id: test
-         password: test
+        - id: test
+          password: test
 
   authorizationStrategy:
     projectMatrix:
-      grantedPermissions:
+      permissions:
         - "Overall/Read:anonymous"
         - "Overall/Administer:authenticated"
-

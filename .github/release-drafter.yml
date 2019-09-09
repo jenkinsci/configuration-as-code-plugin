@@ -1,0 +1,3 @@
+_extends: .github
+name-template: v$NEXT_MINOR_VERSION 🌈
+tag-template: configuration-as-code-$NEXT_MINOR_VERSION

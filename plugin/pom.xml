@@ -15,29 +15,61 @@
 
   <name>Configuration as Code Plugin</name>
   <description>Manage Jenkins master configuration as code</description>
-  <url>https://wiki.jenkins-ci.org/display/JENKINS/Configuration+as+Code+Plugin</url>
+  <url>https://github.com/jenkinsci/configuration-as-code-plugin</url>
+
+  <properties>
+    <!-- Breaking changes log
+      In v1.14 we removed Job-DSL support and moved it to job-dsl-plugin. https://github.com/jenkinsci/job-dsl-plugin
+      In v1.18 we removed Credentials support and moved it to credentials-plugin. https://github.com/jenkinsci/credentials-plugin
+      In v1.18 we also removed Role strategy support and moved it to role-strategy-plugin. https://github.com/jenkinsci/role-strategy-plugin
+      In v1.25 we added SECURITY-1446 and SECURITY-1290 which are considered as breaking changes. Others also contain a risk of regressions.
+      In v1.28 we removed vault secret resolver and moved it to the hashicorp-vault-plugin. https://github.com/jenkinsci/hashicorp-vault-plugin
+    -->
+    <hpi.compatibleSinceVersion>1.28</hpi.compatibleSinceVersion>
+    <hpi.pluginChagelogUrl>https://github.com/jenkinsci/configuration-as-code-plugin/releases</hpi.pluginChagelogUrl>
+    <hpi.pluginLogoUrl>https://raw.githubusercontent.com/jenkinsci/configuration-as-code-plugin/master/plugin/src/main/webapp/img/logo-head.svg</hpi.pluginLogoUrl>
+  </properties>
+
+  <developers>
+    <developer>
+      <id>casz</id>
+      <name>Joseph Petersen</name>
+    </developer>
+    <developer>
+      <id>timja</id>
+      <name>Tim Jacomb</name>
+    </developer>
+    <developer>
+      <id>oleg_nenashev</id>
+      <name>Oleg Nenashev</name>
+    </developer>
+  </developers>
 
   <dependencies>
     <dependency>
       <groupId>io.jenkins.configuration-as-code</groupId>
       <artifactId>snakeyaml</artifactId>
       <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.yaml</groupId>
+          <artifactId>snakeyaml</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
-    <!--TODO: This should be in a seperate plugin at some point -->
     <dependency>
-      <groupId>com.bettercloud</groupId>
-      <artifactId>vault-java-driver</artifactId>
-      <version>3.1.0</version>
+      <groupId>io.vavr</groupId>
+      <artifactId>vavr</artifactId>
+      <version>0.10.2</version>
     </dependency>
 
     <dependency>
       <groupId>com.github.stefanbirkner</groupId>
       <artifactId>system-rules</artifactId>
-      <version>1.17.1</version>
+      <version>1.19.0</version>
       <scope>test</scope>
     </dependency>
-    
   </dependencies>
 
   <build>
@@ -51,9 +83,9 @@
               <goal>test-jar</goal>
             </goals>
             <configuration>
-              <excludes>
-                <exclude>test-dependencies/index</exclude>
-              </excludes>
+              <includes>
+                <include>io/jenkins/plugins/casc/misc/**</include>
+              </includes>
             </configuration>
           </execution>
         </executions>
@@ -63,26 +95,6 @@
         <configuration>
           <failOnError>false</failOnError>
         </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>display-info</id>
-            <configuration>
-              <rules>
-                <requireUpperBoundDeps>
-                  <excludes combine.children="append">
-                    <!-- Safe, https://github.com/jenkinsci/active-directory-plugin/pull/84 -->
-                    <exclude>org.jvnet.com4j:com4j</exclude>
-                    <!-- Docker Java API Plugin issues, https://issues.jenkins-ci.org/browse/JENKINS-49369 -->
-                    <exclude>org.apache.commons:commons-compress</exclude>
-                  </excludes>
-                </requireUpperBoundDeps>
-              </rules>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>

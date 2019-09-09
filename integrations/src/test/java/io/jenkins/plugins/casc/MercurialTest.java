@@ -1,11 +1,8 @@
 package io.jenkins.plugins.casc;
 
-import hudson.model.JDK;
 import hudson.plugins.mercurial.MercurialInstallation;
 import hudson.tools.CommandInstaller;
 import hudson.tools.InstallSourceProperty;
-import hudson.tools.JDKInstaller;
-import io.jenkins.plugins.casc.core.MavenConfigurator;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import org.junit.Assert;

@@ -3,13 +3,11 @@ package io.jenkins.plugins.casc.impl.secrets;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import io.jenkins.plugins.casc.SecretSource;
-import org.apache.commons.io.FileUtils;
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.Beta;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * {@link SecretSource} implementation relying on <a href="https://docs.docker.com/engine/swarm/secrets">docker secrets</a>.
@@ -31,6 +29,7 @@ public class DockerSecretSource extends SecretSource {
 
     @Override
     public Optional<String> reveal(String secret) throws IOException {
+        if (StringUtils.isBlank(secret)) return Optional.empty();
         final File file = new File(secrets, secret);
         if (file.exists()) {
             return Optional.of(FileUtils.readFileToString(file).trim());

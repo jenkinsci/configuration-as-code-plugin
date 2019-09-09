@@ -1,14 +1,18 @@
 jenkins:
-  systemMessage: "Jenkins configured automatically by Jenkins Configuration as Code Plugin\n\n"
+  systemMessage: "Jenkins configured automatically by Jenkins Configuration as Code plugin\n\n"
   numExecutors: 5
   scmCheckoutRetryCount: 2
   mode: NORMAL
-  
+
   globalNodeProperties:
     - envVars:
         env:
           - key: FOO
             value: BAR
+
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
 
   clouds:
     - docker:
@@ -32,8 +36,6 @@ jenkins:
                 user: "jenkins"
             instanceCapStr: "10"
 
-  
-
 tool:
   git:
     installations:
@@ -41,11 +43,10 @@ tool:
         home: /usr/local/bin/git
 
 security:
-    remotingCLI:
-          enabled: false
+  remotingCLI:
+    enabled: false
 
 unclassified:
-  
   artifactorybuilder:
     useCredentialsPlugin: true
     artifactoryServers:
@@ -55,7 +56,7 @@ unclassified:
         resolverCredentialsConfig:
           username: artifactory_user
           password: ${ARTIFACTORY_PASSWORD}
-          
+
   globalLibraries:
     libraries:
       - name: "awesome-lib"

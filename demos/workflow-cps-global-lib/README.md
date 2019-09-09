@@ -5,8 +5,6 @@ Global Pipeline Libraries plugin configuration belongs under `unclassified` root
 ## Sample configuration
 
 ```yaml
-jenkins:
-  [...]
 unclassified:
   globalLibraries:
     libraries:
@@ -21,16 +19,14 @@ unclassified:
 ## Using credentials
 
 ```yaml
-jenkins:
-  [...]
 unclassified:
   globalLibraries:
     libraries:
-      - name: 'internal-pipeline-library'
+      - name: "internal-pipeline-library"
         retriever:
           modernSCM:
             scm:
               git:
-                remote: 'git@github.com:furry-octo-lamp-inc/pipeline-library.git'
-                credentialsId: 'reimagined-parakeet-ssh'
+                remote: "git@github.com:furry-octo-lamp-inc/pipeline-library.git"
+                credentialsId: "reimagined-parakeet-ssh"
 ```

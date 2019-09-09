@@ -1,7 +1,6 @@
 package io.jenkins.plugins.casc.impl.attributes;
 
 import hudson.util.PersistedList;
-
 import java.util.Collection;
 
 /**

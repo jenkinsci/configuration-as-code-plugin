@@ -1,13 +1,12 @@
 jenkins:
-
   securityRealm:
     activeDirectory:
       domains:
-      - name: "acme"
-        servers: "ad1.acme.com:123,ad2.acme.com:456"
-        site: "site"
-        bindName: "admin"
-        bindPassword: "${BIND_PASSWORD}"
+        - name: "acme"
+          servers: "ad1.acme.com:123,ad2.acme.com:456"
+          site: "site"
+          bindName: "admin"
+          bindPassword: "${BIND_PASSWORD}"
       groupLookupStrategy: "RECURSIVE"
       removeIrrelevantGroups: true
       customDomain: true

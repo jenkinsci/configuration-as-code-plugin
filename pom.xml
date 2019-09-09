@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>3.18</version>
+    <version>3.49</version>
     <relativePath />
   </parent>
   <groupId>io.jenkins.configuration-as-code</groupId>
@@ -13,10 +13,11 @@
   <packaging>pom</packaging>
 
   <properties>
-    <revision>1.4</revision>
+    <revision>1.31</revision>
     <changelist>-SNAPSHOT</changelist>
     <jenkins.version>2.60.3</jenkins.version>
     <java.level>8</java.level>
+    <tagNameFormat>configuration-as-code-@{project.version}</tagNameFormat>
   </properties>
 
   <name>Configuration as Code Parent</name>
@@ -27,14 +28,6 @@
       <url>http://opensource.org/licenses/MIT</url>
     </license>
   </licenses>
-
-  <developers>
-    <developer>
-      <id>ndeloof</id>
-      <name>Nicolas De Loof</name>
-      <email>nicolas.deloof@gmail.com</email>
-    </developer>
-  </developers>
 
   <scm>
     <connection>scm:git:git://github.com/jenkinsci/configuration-as-code-plugin.git</connection>
@@ -56,6 +49,46 @@
     </pluginRepository>
   </pluginRepositories>
 
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>3.1.0</version>
+          <dependencies>
+            <dependency>
+              <groupId>com.puppycrawl.tools</groupId>
+              <artifactId>checkstyle</artifactId>
+              <version>8.24</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      <plugin>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <configLocation>${maven.multiModuleProjectDirectory}/.mvn/checkstyle.xml</configLocation>
+          <includeTestSourceDirectory>true</includeTestSourceDirectory>
+          <sourceDirectories>
+            <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
+          </sourceDirectories>
+          <testSourceDirectories>
+            <sourceDirectory>${project.build.testSourceDirectory}</sourceDirectory>
+          </testSourceDirectories>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
   <profiles>
     <profile>
       <id>default</id>
@@ -65,7 +98,6 @@
        <modules>
          <module>snakeyaml</module>
          <module>plugin</module>
-         <module>support</module>
          <module>integrations</module>
          <module>demos</module>
        </modules>

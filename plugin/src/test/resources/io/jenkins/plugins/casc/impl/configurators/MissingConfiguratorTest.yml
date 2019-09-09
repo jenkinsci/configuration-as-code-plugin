@@ -3,9 +3,9 @@ jenkins:
     local:
       allowsSignup: false
       users:
-       - id: admin
-         password: ${adminpw:-passw0rd}
+        - id: admin
+          password: ${adminpw:-passw0rd}
   authorizationStrategy:
     globalMatrix:
-      grantedPermissions:
+      permissions:
         - "Overall/Administer:authenticated"

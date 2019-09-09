@@ -1,5 +1,7 @@
 package io.jenkins.plugins.casc.core;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.model.Descriptor;
 import hudson.tasks.Maven;
@@ -10,15 +12,12 @@ import io.jenkins.plugins.casc.Configurator;
 import io.jenkins.plugins.casc.impl.configurators.DescriptorConfigurator;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
+import java.util.Set;
 import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
 import jenkins.mvn.GlobalMavenConfig;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
-
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-import java.util.Set;
 
 /**
  *  A mix-in configurator to support both {@link Maven.DescriptorImpl} and {@link GlobalMavenConfig} which both are are
@@ -26,7 +25,7 @@ import java.util.Set;
  *  <p>
  *  We can't blame them for this, as the former is a {@link hudson.tasks.BuildStepDescriptor} while the later is a
  *  {@link GlobalConfiguration}, so from their point of view the symbol is unique for implemented extension point. Just
- *  we don't distinguish dreived classes from {@link Descriptor} as distinct APIs.
+ *  we don't distinguish derived classes from {@link Descriptor} as distinct APIs.
  *
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
@@ -45,7 +44,7 @@ public class MavenConfigurator extends BaseConfigurator<GlobalMavenConfig> {
         return GlobalMavenConfig.get();
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public Set<Attribute<GlobalMavenConfig,?>> describe() {
         final Set<Attribute<GlobalMavenConfig,?>> attributes = super.describe();

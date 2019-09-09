@@ -12,7 +12,6 @@ import io.jenkins.plugins.casc.snakeyaml.nodes.ScalarNode;
 import io.jenkins.plugins.casc.snakeyaml.nodes.SequenceNode;
 import io.jenkins.plugins.casc.snakeyaml.parser.ParserImpl;
 import io.jenkins.plugins.casc.snakeyaml.resolver.Resolver;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Iterator;
@@ -37,7 +36,9 @@ public final class YamlUtils {
                 if (root == null) {
                     root = node;
                 } else {
-                    merge(root, node, source.toString());
+                    if (node != null) {
+                        merge(root, node, source.toString());
+                    }
                 }
             } catch (IOException io) {
                 throw new ConfiguratorException("Failed to read " + source, io);
@@ -93,7 +94,7 @@ public final class YamlUtils {
                 return;
             default:
                 throw new ConfiguratorException(
-                        String.format("Found conflicting configuration at %s %s", source.toString(), node.getStartMark()));
+                        String.format("Found conflicting configuration at %s %s", source, node.getStartMark()));
         }
 
     }

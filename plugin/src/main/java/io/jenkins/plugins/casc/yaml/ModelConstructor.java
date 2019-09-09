@@ -4,7 +4,6 @@ import io.jenkins.plugins.casc.model.Mapping;
 import io.jenkins.plugins.casc.model.Scalar;
 import io.jenkins.plugins.casc.model.Sequence;
 import io.jenkins.plugins.casc.model.Source;
-import org.apache.commons.collections.map.AbstractMapDecorator;
 import io.jenkins.plugins.casc.snakeyaml.constructor.AbstractConstruct;
 import io.jenkins.plugins.casc.snakeyaml.constructor.Construct;
 import io.jenkins.plugins.casc.snakeyaml.constructor.Constructor;
@@ -14,10 +13,11 @@ import io.jenkins.plugins.casc.snakeyaml.nodes.Node;
 import io.jenkins.plugins.casc.snakeyaml.nodes.ScalarNode;
 import io.jenkins.plugins.casc.snakeyaml.nodes.SequenceNode;
 import io.jenkins.plugins.casc.snakeyaml.nodes.Tag;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.collections.map.AbstractMapDecorator;
+import org.apache.commons.lang.ObjectUtils;
 
 
 /**
@@ -52,10 +52,10 @@ class ModelConstructor extends Constructor {
         return new Mapping(initSize);
     }
 
-    @Override
     /**
      * Enforce Map keys are only Scalars and can be used as {@link String} keys in {@link Mapping}
      */
+    @Override
     protected void constructMapping2ndStep(MappingNode node, final Map mapping) {
         ((Mapping) mapping).setSource(getSource(node));
         super.constructMapping2ndStep(node,
@@ -63,11 +63,11 @@ class ModelConstructor extends Constructor {
             @Override
             public Object put(Object key, Object value) {
                 if (!(key instanceof Scalar)) throw new IllegalStateException("We only support scalar map keys");
+                Object scalar = ObjectUtils.clone(value);
+                if (scalar instanceof Number) scalar = new Scalar(scalar.toString());
+                else if (scalar instanceof Boolean) scalar = new Scalar(scalar.toString());
 
-                if (value instanceof Number) value = new Scalar(value.toString());
-                else if (value instanceof Boolean) value = new Scalar(value.toString());
-
-                return mapping.put(key.toString(), value);
+                return mapping.put(key.toString(), scalar);
             }
         });
     }

@@ -21,21 +21,19 @@
 package io.jenkins.plugins.casc.core;
 
 import com.google.inject.Injector;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
-import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import jenkins.model.Jenkins;
 import jenkins.security.s2m.AdminWhitelistRule;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
-
-import javax.annotation.CheckForNull;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Virtual configurator for Remoting security settings.
@@ -46,6 +44,7 @@ import java.util.Set;
 @Restricted(NoExternalUse.class)
 public class AdminWhitelistRuleConfigurator extends BaseConfigurator<AdminWhitelistRule> {
 
+    @NonNull
     @Override
     public String getName() {
         return "remotingSecurity";
@@ -59,21 +58,19 @@ public class AdminWhitelistRuleConfigurator extends BaseConfigurator<AdminWhitel
     @Override
     protected AdminWhitelistRule instance(Mapping mapping, ConfigurationContext context) {
         Injector injector = Jenkins.getInstance().getInjector();
+        if (injector == null) {
+            throw new IllegalStateException("Required dependency injection container is not present");
+        }
         return injector.getInstance(AdminWhitelistRule.class);
     }
 
+    @NonNull
     @Override
     public Set<Attribute<AdminWhitelistRule,?>> describe() {
-        return new HashSet<>(Arrays.asList(
-                new Attribute<AdminWhitelistRule, Boolean>("enabled", Boolean.class)
-                        .getter(target -> !target.getMasterKillSwitch())
-                        .setter((target, value) -> target.setMasterKillSwitch(!(Boolean)value))
+        return new HashSet<>(Collections.singletonList(
+            new Attribute<AdminWhitelistRule, Boolean>("enabled", Boolean.class)
+                .getter(target -> !target.getMasterKillSwitch())
+                .setter((target, value) -> target.setMasterKillSwitch(!value))
         ));
-    }
-
-    @CheckForNull
-    @Override
-    public CNode describe(AdminWhitelistRule instance, ConfigurationContext context) {
-        return null; // FIXME
     }
 }

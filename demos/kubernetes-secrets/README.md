@@ -1,12 +1,14 @@
-# Configure Kubernetes secretes for Jenkins configuration-as-code plugin
+# Configure Kubernetes secrets for Jenkins Configuration as Code plugin
 
-### Prerequisites
+## Prerequisites
+
 1. `SECRETS` environment variable should provide a path to mounted secret volume.
 2. Kubernetes secrets with all required values.
 3. `volumeMounts` and `volumes` directives of Kubernetes manifest should have records for Kubernetes secrets mounts.
 
-### Sample configuration
-```
+## Sample configuration
+
+```yml
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -30,20 +32,17 @@ data:
 ---
 apiVersion: apps/v1beta1
 kind: StatefulSet
-...
       spec:
         containers:
           - name: jenkins
-            ...
             env:
               # Read the configuration-as-code from the ConfigMap
               - name: CASC_JENKINS_CONFIG
                 value: /var/jenkins_config/jenkins.yaml
               # With the help of SECRETS environment variable
-              # we points Jenkins configuration-as-code plugin the location of the secrets
+              # we point Jenkins Configuration as Code plugin the location of the secrets
               - name: SECRETS
                 value: /secrets/jenkins
-            ...
             # Mount the configuration-as-code ConfigMap
             volumeMounts:
               - name: jenkins-configuration-as-code
@@ -51,7 +50,6 @@ kind: StatefulSet
               - name: jenkins-secrets
                 mountPath: /secrets/jenkins
                 readOnly: true
-            ...
         volumes:
           # The configuration-as-code ConfigMap
           - name: jenkins-configuration-as-code

@@ -8,7 +8,9 @@ import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.github_branch_source.GitHubSCMNavigator;
 import org.junit.Rule;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -23,7 +25,7 @@ public class GithubOrganisationFolderTest {
     // Fails as Items do override submit() with manual data-binding implementation
     @ConfiguredWithCode("GithubOrganisationFolderTest.yml")
     public void configure_github_organisation_folder_seed_job() throws Exception {
-        final TopLevelItem job = Jenkins.getInstance().getItem("ndeloof");
+        final TopLevelItem job = Jenkins.get().getItem("ndeloof");
         assertNotNull(job);
         assertTrue(job instanceof OrganizationFolder);
         OrganizationFolder folder = (OrganizationFolder) job;

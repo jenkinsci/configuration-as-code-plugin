@@ -1,12 +1,14 @@
 # credentials plugin
 
+Requires `credentials` >= 2.2.0
+
 ## sample configuration
 
 ```yaml
 credentials:
   system:
     domainCredentials:
-      - domain :
+      - domain:
           name: "test.com"
           description: "test.com domain"
           specifications:
@@ -14,11 +16,10 @@ credentials:
                 includes: "*.test.com"
         credentials:
           - usernamePassword:
-              scope:    SYSTEM
-              id:       sudo_password
+              scope: SYSTEM
+              id: sudo_password
               username: root
               password: ${SUDO_PASSWORD}
-
 ```
 
 ## implementation note
@@ -37,6 +38,8 @@ we consider the `Impl` suffix as a common pattern to flag implementation class.
 A list of some of the more common credentials.
 
 ### SSH Credentials
+
+Requires `ssh-credentials` >= 1.16
 
 Example that uses the [SSH credentials plugin](https://plugins.jenkins.io/ssh-credentials).
 

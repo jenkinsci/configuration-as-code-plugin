@@ -11,7 +11,7 @@ jenkins:
         declineOfferDuration: 600
         description: "My Mesos Cloud"
         frameworkName: "Jenkins Framework"
-        # jenkinsURL is a mandatory field, jenkins fails without it. See https://github.com/jenkinsci/configuration-as-code-plugin/issues/578
+        # jenkinsURL is a mandatory field, Jenkins fails without it. See https://github.com/jenkinsci/configuration-as-code-plugin/issues/578
         jenkinsURL: "https://jenkins.mesos.cloud"
         master: 1.2.3.4:8000
         nativeLibraryPath: "/usr/lib/libmesos.so"
@@ -20,21 +20,7 @@ jenkins:
         role: "*"
         slavesUser: "jenkins"
         slaveInfos:
-          - labelString: 'docker'
-            slaveCpus: 0.1
-            slaveMem: 512
-            slaveAttributes: >
-                  {"rack":"jenkins-build-agents"}
-            executorCpus: 0.1
-            executorMem: 128
-            diskNeeded: 0.0
-            minExecutors: 1
-            maxExecutors: 2
-            remoteFSRoot: 'jenkins'
-            jvmArgs: ''
-            jnlpArgs: ''
-            defaultSlave: true
-            idleTerminationMinutes: 5
+          - labelString: "docker"
             containerInfo:
               type: "DOCKER"
               dockerImage: "cloudbees/java-with-docker-client:latest"
@@ -47,6 +33,20 @@ jenkins:
                 - containerPath: "/tmp/jenkins/workspace/"
                   hostPath: "/tmp/jenkins/workspace/"
                   readOnly: "false"
+            slaveCpus: 0.1
+            slaveMem: 512
+            executorCpus: 0.1
+            executorMem: 128
+            diskNeeded: 0.0
+            minExecutors: 1
+            maxExecutors: 2
+            remoteFSRoot: "jenkins"
+            jvmArgs: ""
+            jnlpArgs: ""
+            defaultSlave: true
+            idleTerminationMinutes: 5
+            slaveAttributes: >
+              {"rack":"jenkins-build-agents"}
 ```
 
 ## implementation note

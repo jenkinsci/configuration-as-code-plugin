@@ -7,13 +7,15 @@ import hudson.plugins.ec2.SlaveTemplate;
 import hudson.plugins.ec2.UnixData;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import java.util.List;
 import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.util.List;
-
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertNotNull;
@@ -27,7 +29,7 @@ public class EC2CloudTest {
     @Test
     @ConfiguredWithCode("EC2Cloud.yml")
     public void configure_ec2_cloud() throws Exception {
-        final AmazonEC2Cloud ec2Cloud = (AmazonEC2Cloud) Jenkins.getInstance().getCloud("ec2-ec2");
+        final AmazonEC2Cloud ec2Cloud = (AmazonEC2Cloud) Jenkins.get().getCloud("ec2-ec2");
         assertNotNull(ec2Cloud);
 
         assertTrue(ec2Cloud.isUseInstanceProfileForCredentials());
@@ -48,7 +50,7 @@ public class EC2CloudTest {
     @Test
     @ConfiguredWithCode("EC2CloudAMIType.yml")
     public void configure_ec2_cloud_with_custom_ami_type() throws Exception {
-        final AmazonEC2Cloud ec2Cloud = (AmazonEC2Cloud) Jenkins.getInstance().getCloud("ec2-ec2");
+        final AmazonEC2Cloud ec2Cloud = (AmazonEC2Cloud) Jenkins.get().getCloud("ec2-ec2");
         assertNotNull(ec2Cloud);
 
         assertTrue(ec2Cloud.isUseInstanceProfileForCredentials());

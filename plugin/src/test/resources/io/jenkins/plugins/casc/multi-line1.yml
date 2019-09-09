@@ -1,0 +1,5 @@
+jenkins:
+  systemMessage: |
+    Welcome to our build server.
+
+    This Jenkins is 100% configured and managed 'as code'.

@@ -1,5 +1,7 @@
 package io.jenkins.plugins.casc.impl.configurators;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
@@ -10,8 +12,6 @@ import io.jenkins.plugins.casc.model.Mapping;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
-import javax.annotation.CheckForNull;
-
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
@@ -19,6 +19,7 @@ import javax.annotation.CheckForNull;
 @Restricted(NoExternalUse.class)
 public class SelfConfigurator extends BaseConfigurator<ConfigurationContext> implements RootElementConfigurator<ConfigurationContext> {
 
+    @NonNull
     @Override
     public String getName() {
         return "configuration-as-code";

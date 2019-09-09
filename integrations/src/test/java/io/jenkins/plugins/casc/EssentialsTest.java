@@ -3,12 +3,11 @@ package io.jenkins.plugins.casc;
 import hudson.ExtensionList;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import java.util.List;
 import jenkins.metrics.api.MetricsAccessKey;
 import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
-
-import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -23,7 +22,7 @@ public class EssentialsTest {
     @Test
     @ConfiguredWithCode("EssentialsTest.yml")
     public void essentialsTest() throws Exception {
-        final Jenkins jenkins = Jenkins.getInstance();
+        final Jenkins jenkins = Jenkins.get();
         assertEquals("Welcome to Jenkins Essentials!", jenkins.getSystemMessage());
 
         final ExtensionList<MetricsAccessKey.DescriptorImpl> metricsDescriptors = ExtensionList.lookup(MetricsAccessKey.DescriptorImpl.class);
