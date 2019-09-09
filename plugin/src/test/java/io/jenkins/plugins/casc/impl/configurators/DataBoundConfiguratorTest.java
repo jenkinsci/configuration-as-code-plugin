@@ -24,6 +24,7 @@ import javax.annotation.PostConstruct;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.LoggerRule;
@@ -52,6 +53,9 @@ public class DataBoundConfiguratorTest {
 
     @Rule
     public LoggerRule logging = new LoggerRule();
+
+    @Rule
+    public ExpectedException exceptionRule = ExpectedException.none();
 
     @Before
     public void tearUp() {
@@ -140,17 +144,20 @@ public class DataBoundConfiguratorTest {
         final ClassParametersAreNonnullByDefault configured = (ClassParametersAreNonnullByDefault) registry
                                                         .lookupOrFail(ClassParametersAreNonnullByDefault.class)
                                                         .configure(config, new ConfigurationContext(registry));
-        assertEquals(0, configured.getStrings().size());
+        assertTrue(configured.getStrings().isEmpty());
     }
 
     @Test
     public void packageParametersAreNonnullByDefault() throws Exception {
         Mapping config = new Mapping();
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
-        final PackageParametersAreNonnullByDefault configured = (PackageParametersAreNonnullByDefault) registry
-                                                        .lookupOrFail(PackageParametersAreNonnullByDefault.class)
-                                                        .configure(config, new ConfigurationContext(registry));
-        assertTrue(configured.getString().isEmpty());
+
+        exceptionRule.expect(ConfiguratorException.class);
+        exceptionRule.expectMessage("string is required to configure class io.jenkins.plugins.casc.impl.configurators.nonnull.nonnullparampackage.PackageParametersAreNonnullByDefault");
+
+        registry
+            .lookupOrFail(PackageParametersAreNonnullByDefault.class)
+            .configure(config, new ConfigurationContext(registry));
     }
 
     @Test

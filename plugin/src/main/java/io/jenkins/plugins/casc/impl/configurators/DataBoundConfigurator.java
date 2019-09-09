@@ -129,8 +129,6 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                         LOGGER.log(Level.FINER, "The parameter to be set is @Nonnull but is not present; " +
                                                            "setting equal to empty list.");
                         args[i] = Collections.emptyList();
-                    } else if (String.class.isAssignableFrom(t)) {
-                        args[i] = "";
                     } else {
                         throw new ConfiguratorException(names[i] + " is required to configure " + target);
                     }
