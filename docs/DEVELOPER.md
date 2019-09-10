@@ -54,4 +54,3 @@ code to support alternate mechanisms.
 ## Useful links
 
 * [Javadoc](https://javadoc.jenkins.io/plugin/configuration-as-code/)
-* 
