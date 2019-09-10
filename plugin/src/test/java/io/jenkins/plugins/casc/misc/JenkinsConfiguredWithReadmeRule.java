@@ -1,6 +1,10 @@
 package io.jenkins.plugins.casc.misc;
 
 import io.jenkins.plugins.casc.ConfigurationAsCode;
+import org.apache.commons.lang.StringUtils;
+import org.hamcrest.core.StringContains;
+import org.jvnet.hudson.test.JenkinsRule;
+
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
@@ -8,9 +12,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import org.apache.commons.lang.StringUtils;
-import org.hamcrest.core.StringContains;
-import org.jvnet.hudson.test.JenkinsRule;
 
 import static java.lang.reflect.Modifier.isPublic;
 import static java.lang.reflect.Modifier.isStatic;
@@ -29,10 +30,10 @@ public class JenkinsConfiguredWithReadmeRule extends JenkinsRule {
             final Class<?> clazz = env.description().getTestClass();
             final String[] resource = configuredWithReadme.value();
 
-            // TODO: transform from README to Code
+            // TODO: transform from `value` to Code blocks
 
             final List<String> configs = Arrays.stream(resource)
-                .map(s -> clazz.getResource(s).toExternalForm())
+                .map(s -> clazz.getClassLoader().getResource(s).toExternalForm())
                 .collect(Collectors.toList());
 
             try {

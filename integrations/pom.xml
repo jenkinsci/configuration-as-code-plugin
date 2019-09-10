@@ -364,4 +364,12 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+
+  <build>
+    <resources>
+       <resource>
+         <directory>../demos</directory>
+       </resource>
+    </resources>
+  </build>
 </project>

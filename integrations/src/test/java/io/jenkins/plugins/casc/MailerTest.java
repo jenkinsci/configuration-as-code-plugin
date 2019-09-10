@@ -1,7 +1,7 @@
 package io.jenkins.plugins.casc;
 
 import hudson.tasks.Mailer;
-import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
+import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import jenkins.model.Jenkins;
 import org.junit.Rule;
@@ -18,7 +18,7 @@ public class MailerTest {
     public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 
     @Test
-    @ConfiguredWithCode("MailerTest.yml")
+    @ConfiguredWithReadme("demos/mailer/README.md")
     public void configure_mailer() throws Exception {
         final Jenkins jenkins = Jenkins.get();
         final Mailer.DescriptorImpl descriptor = (Mailer.DescriptorImpl) jenkins.getDescriptor(Mailer.class);
