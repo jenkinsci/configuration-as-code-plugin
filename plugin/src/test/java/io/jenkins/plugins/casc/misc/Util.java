@@ -1,5 +1,6 @@
 package io.jenkins.plugins.casc.misc;
 
+import com.fasterxml.jackson.dataformat.yaml.snakeyaml.Yaml;
 import hudson.ExtensionList;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfigurationContext;
@@ -16,9 +17,11 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Map;
 import java.util.Objects;
 import jenkins.model.GlobalConfigurationCategory;
 import jenkins.tools.ToolConfigurationCategory;
+import org.json.JSONObject;
 import org.jvnet.hudson.test.LoggerRule;
 
 import static io.jenkins.plugins.casc.ConfigurationAsCode.serializeYamlNode;
@@ -182,5 +185,22 @@ public class Util {
     public static void assertLogContains(LoggerRule logging, String expectedText) {
         assertTrue("The log should contain '" + expectedText + "'",
                 logging.getMessages().stream().anyMatch(m -> m.contains(expectedText)));
+    }
+
+    /**
+     * Converts a given yamlString into a JsonString.
+     * Example Usage:
+     * <pre>{@code
+     * String jsonString = convertToJson(yourYamlString);}
+     * </pre>
+     * @param yamlString
+     * @return JsonString
+     */
+
+    public static String convertToJson(String yamlString) {
+        Yaml yaml= new Yaml();
+        Map<String,Object> map= (Map<String, Object>) yaml.load(yamlString);
+        JSONObject jsonObject=new JSONObject(map);
+        return jsonObject.toString();
     }
 }

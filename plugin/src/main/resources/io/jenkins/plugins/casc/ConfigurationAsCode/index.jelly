@@ -54,7 +54,7 @@
     <h2>${%Reference}</h2>
     <dt>
       <dl><a href="reference">${%Documentation}</a></dl>
-      <dl><a href="schema">${%JSON schema}</a></dl>
+      <dl><a href="v2Schema">${%JSON schema}</a></dl>
     </dt>
 
   </div>
