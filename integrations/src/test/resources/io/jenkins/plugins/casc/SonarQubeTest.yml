@@ -6,6 +6,7 @@ unclassified:
         serverUrl: "http://url:9000"
         serverAuthenticationToken: "token"
         mojoVersion: "mojoVersion"
+        additionalProperties: "blah=blah"
         additionalAnalysisProperties: "additionalAnalysisProperties"
         triggers:
           skipScmCause: true

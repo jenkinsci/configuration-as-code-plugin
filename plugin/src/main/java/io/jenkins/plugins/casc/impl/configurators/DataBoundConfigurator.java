@@ -1,6 +1,5 @@
 package io.jenkins.plugins.casc.impl.configurators;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Descriptor;
 import hudson.util.Secret;
@@ -26,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.PostConstruct;
@@ -118,7 +118,8 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                 if (value == null && (parameters[i].isAnnotationPresent(Nonnull.class)   ||
                     constructor.isAnnotationPresent(ParametersAreNonnullByDefault.class) ||
                     clazz.isAnnotationPresent(ParametersAreNonnullByDefault.class)       ||
-                    clazz.getPackage().isAnnotationPresent(ParametersAreNonnullByDefault.class))) {
+                    clazz.getPackage().isAnnotationPresent(ParametersAreNonnullByDefault.class) &&
+                        !parameters[i].isAnnotationPresent(CheckForNull.class))) {
 
                     if (Set.class.isAssignableFrom(t)) {
                         LOGGER.log(Level.FINER, "The parameter to be set is @Nonnull but is not present; " +
@@ -128,8 +129,6 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                         LOGGER.log(Level.FINER, "The parameter to be set is @Nonnull but is not present; " +
                                                            "setting equal to empty list.");
                         args[i] = Collections.emptyList();
-                    } else if (String.class.isAssignableFrom(t)) {
-                        args[i] = "";
                     } else {
                         throw new ConfiguratorException(names[i] + " is required to configure " + target);
                     }
