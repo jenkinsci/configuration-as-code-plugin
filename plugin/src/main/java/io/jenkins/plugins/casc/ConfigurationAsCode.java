@@ -405,7 +405,6 @@ public class ConfigurationAsCode extends ManagementLink {
      * Export JSONSchema to URL
      * @throws Exception
      */
-    @RequirePOST
     public void dov2Schema(StaplerRequest req, StaplerResponse res) throws Exception {
 
         if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
