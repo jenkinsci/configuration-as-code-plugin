@@ -24,10 +24,8 @@ package io.jenkins.plugins.casc;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.ExtensionPoint;
-import hudson.model.Describable;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
-import io.vavr.control.Option;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -36,7 +34,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 
-import static io.vavr.API.unchecked;
 
 /**
  * Define a {@link Configurator} which handles a configuration element, identified by name.

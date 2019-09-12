@@ -1,7 +1,9 @@
 package io.jenkins.plugins.casc;
 
-import hudson.DescriptorExtensionList;
-import hudson.model.Descriptor;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import io.jenkins.plugins.casc.impl.DefaultConfiguratorRegistry;
 import io.jenkins.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
 import io.jenkins.plugins.casc.model.CNode;
@@ -11,8 +13,6 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import jenkins.model.Jenkins;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -20,11 +20,10 @@ public class SchemaGeneration {
 
     final static JSONObject schemaTemplateObject = new JSONObject()
         .put("$schema", "http://json-schema.org/draft-07/schema#")
-        .put("id", "http://jenkins.io/configuration-as-code#")
         .put("description", "Jenkins Configuration as Code")
         .put("type", "object");
 
-    public static JSONObject generateSchema() throws Exception {
+    public static JSONObject generateSchema() {
 
         /**
          * The initial template for the JSON Schema
@@ -72,29 +71,32 @@ public class SchemaGeneration {
                         }
                     }
                 }
-            }
-            /**
-             * Used to generate the schema for the implementors of
-             * the HetroDescribable Configurator
-             * It mimics the HetroDescribable Configurator.jelly
-             */
-            else if (configuratorObject instanceof HeteroDescribableConfigurator) {
+            } else if (configuratorObject instanceof HeteroDescribableConfigurator) {
                 HeteroDescribableConfigurator heteroDescribableConfigurator = (HeteroDescribableConfigurator) configuratorObject;
                 schemaConfiguratorObjects.put(heteroDescribableConfigurator.getTarget().getSimpleName().toLowerCase(),
-                    generateHetroDescribableConfigObject(heteroDescribableConfigurator));
+                    generateHeteroDescribableConfigObject(heteroDescribableConfigurator));
                 }
             }
         schemaObject.put("properties", schemaConfiguratorObjects);
         return schemaObject;
     }
 
-    private static JSONObject generateHetroDescribableConfigObject(HeteroDescribableConfigurator heteroDescribableConfiguratorObject)
-        throws Exception {
+    public static String writeJSONSchema() throws Exception{
+        JSONObject schemaObject = generateSchema();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        JsonParser jsonParser = new JsonParser();
+        JsonElement jsonElement = jsonParser.parse(schemaObject.toString());
+        String prettyJsonString = gson.toJson(jsonElement);
+        return prettyJsonString;
+    }
+
+    private static JSONObject generateHeteroDescribableConfigObject(HeteroDescribableConfigurator heteroDescribableConfiguratorObject) {
         Map<String, Class> implementorsMap = heteroDescribableConfiguratorObject
             .getImplementors();
-        JSONObject finalHetroConfiguratorObject = new JSONObject();
-        if (implementorsMap.size() != 0) {
+        JSONObject finalHeteroConfiguratorObject = new JSONObject();
+        if (!implementorsMap.isEmpty()) {
             Iterator<Map.Entry<String, Class>> itr = implementorsMap.entrySet().iterator();
+
             JSONArray oneOfJsonArray = new JSONArray();
             while (itr.hasNext()) {
                 Map.Entry<String, Class> entry = itr.next();
@@ -105,12 +107,10 @@ public class SchemaGeneration {
                 oneOfJsonArray.put(implementorObject);
             }
 
-            finalHetroConfiguratorObject.put("type", "object");
-            finalHetroConfiguratorObject.put("oneOf", oneOfJsonArray);
+            finalHeteroConfiguratorObject.put("type", "object");
+            finalHeteroConfiguratorObject.put("oneOf", oneOfJsonArray);
         }
-
-            return finalHetroConfiguratorObject;
-
+            return finalHeteroConfiguratorObject;
     }
 
     private static JSONObject generateNonEnumAttributeObject(Attribute attribute) {
@@ -163,12 +163,10 @@ public class SchemaGeneration {
             rootConfiguratorObject
                 .put(rootElementConfigurator.getName(), new JSONObject().put("type", "object"));
         }
-
         return rootConfiguratorObject;
     }
 
     private static void generateMultipleAttributeSchema(JSONObject attributeSchema, Attribute attribute) {
-
         if (attribute.type.getName().equals("java.lang.String")) {
             attributeSchema.put(attribute.getName(),
                 new JSONObject()
@@ -199,7 +197,6 @@ public class SchemaGeneration {
     }
 
     public static void rootConfigGeneration() throws Exception {
-
         DefaultConfiguratorRegistry registry = new DefaultConfiguratorRegistry();
         final ConfigurationContext context = new ConfigurationContext(registry);
         context.setMode("JSONSchema");
@@ -212,29 +209,5 @@ public class SchemaGeneration {
             }
         }
     }
-
-    public static void lookupBaseConfigurator(String configName) throws Exception {
-        ConfigurationAsCode configurationAsCodeObject = ConfigurationAsCode.get();
-        for (Object configuratorObject : configurationAsCodeObject.getConfigurators()) {
-            if (configuratorObject instanceof BaseConfigurator) {
-                BaseConfigurator baseConfigurator = (BaseConfigurator) configuratorObject;
-                if(configName.equals(baseConfigurator.getName())){
-                    List<Attribute> baseConfigAttributeList = baseConfigurator.getAttributes();
-                    /*
-                    * Recursively iterate to get information
-                    * But this does not quite get us all of the information we require.
-                    * We would still need to iterate over heterodescribable configurators as well
-                    * */
-                }
-
-
-            }
-        }
-
-
-
-    }
-
-
 }
 

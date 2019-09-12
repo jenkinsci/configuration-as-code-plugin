@@ -1,12 +1,7 @@
 package io.jenkins.plugins.casc;
 
-
-import hudson.security.HudsonPrivateSecurityRealm;
-import io.jenkins.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.misc.Util;
-import io.jenkins.plugins.casc.model.CNode;
-import jenkins.model.Jenkins;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.ValidationException;
 import org.everit.json.schema.loader.SchemaLoader;
@@ -16,8 +11,6 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import static io.jenkins.plugins.casc.SchemaGeneration.generateSchema;
-import static io.jenkins.plugins.casc.SchemaGeneration.lookupBaseConfigurator;
-import static io.jenkins.plugins.casc.SchemaGeneration.rootConfigGeneration;
 import static org.junit.Assert.fail;
 
 public class SchemaGenerationTest {
@@ -33,7 +26,6 @@ public class SchemaGenerationTest {
         JSONObject jsonSubject = new JSONObject(
             new JSONTokener(Util.convertToJson(yamlStringContents)));
         Schema schema = SchemaLoader.load(jsonSchema);
-
         try {
             schema.validate(jsonSubject);
         } catch (Exception e) {
@@ -56,16 +48,6 @@ public class SchemaGenerationTest {
         } catch (ValidationException ve) {
             ve.printStackTrace();
         }
-    }
-
-    @Test
-    public void describeStructTest() throws Exception {
-         rootConfigGeneration();
-    }
-
-    @Test
-    public void lookupConfigtest() throws Exception {
-        lookupBaseConfigurator("jenkins");
     }
 
     @Test
@@ -154,3 +136,4 @@ public class SchemaGenerationTest {
     }
 
  }
+

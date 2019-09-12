@@ -3,10 +3,8 @@ package io.jenkins.plugins.casc.impl.configurators;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.DescriptorExtensionList;
-import hudson.ExtensionList;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
-import hudson.model.Job.LastItemListener;
 import hudson.security.HudsonPrivateSecurityRealm;
 import hudson.security.SecurityRealm;
 import io.jenkins.plugins.casc.Attribute;
@@ -25,7 +23,6 @@ import io.vavr.control.Option;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -119,11 +116,7 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
                     }
                 }).getOrNull();
     }
-//
-//    @CheckForNull
-//    public CNode describeStructure(T instance, ConfigurationContext context) {
-//        return r
-//    }
+
 
     @SuppressWarnings("unused")
     public Map<String, Class<T>> getImplementors() {
