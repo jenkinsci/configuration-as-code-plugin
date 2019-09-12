@@ -16,7 +16,7 @@ The implementation may change in an incompatible way before the final release.
 
 The documentation below describes the new implementation.
 
-The new JSON Schema is structured to validate the yaml files that are loaded via JCasC.
+The new JSON Schema is structured to validate the YAML files that are loaded via JCasC.
 The structure and validation of the Schema is done based on the user-installed plugins.
 
 === Version
@@ -27,7 +27,7 @@ http://json-schema.org/draft-07/schema#
 === How to use
 
 * The schema will be available at /configuration-as-code/v2Schema
-* Users can use various online JSON validators to check against their yaml/json.
+* Users can use various online JSON validators to check against their YAML/json.
 
 === Progress
 
@@ -35,18 +35,18 @@ http://json-schema.org/draft-07/schema#
 * The schema validates any missing  configurator objects and invalid data formats.
 * It is built around the existing executable xml (jelly files) and follows the latest draft version of JSON.
 * The schema does not yet validate against deep nested configurations.
-* We are working towards supporting deep nested yml files.
+* We are working towards supporting deep nested YAML files.
 
 == Improvements
 
-* The Old Schema was generated using jelly files that did not generate a valid JSON Schema.
-* Without a valid schema it is not possible to validate a yaml file rendering the schema unusable.
+* The Old Schema was generated using Jelly files that did not generate a valid JSON Schema.
+* Without a valid schema it is not possible to validate a YAML file rendering the schema unusable.
 * The previous schema included an `"$ref":` for an `object` type, the new draft of the schema makes it mandatory
   to use `"$id":` hence the new schema uses it instead of ref.
 
 == What the schema does
 
-* The schema validates simple yaml files with root configurators.
+* The schema validates simple YAML files with root configurators.
 ```yaml
 # config truncated
 jenkins:
@@ -56,7 +56,7 @@ jenkins:
 
 == What the schema does not do
 
-* It cannot validated nested yml files, with multiple levels of configurators.
+* It cannot validate nested yml files, with multiple levels of configurators.
 ```yaml
 # config truncated
 jenkins:
@@ -67,6 +67,6 @@ jenkins:
         mode: NORMAL
         name: "agent1"
 ```
-* The above yaml has a deep level of nesting which the JSON Schema currently does not support.
+* The above YAML has a deep level of nesting which the JSON Schema currently does not support.
 
 
