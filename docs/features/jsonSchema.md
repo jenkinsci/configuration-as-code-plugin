@@ -26,7 +26,7 @@ http://json-schema.org/draft-07/schema#
 
 === How to use
 
-* The schema will be available at /configuration-as-code/newJSONSchema
+* The schema will be available at /configuration-as-code/v2Schema
 * Users can use various online JSON validators to check against their yaml/json.
 
 === Progress
