@@ -214,6 +214,7 @@ The configuration file format depends on the version of jenkins-core and install
 Documentation is generated from a live instance, as well as a JSON schema you can use to validate configuration file
 with your favourite YAML tools.
 
+The JSON Schema documentation can be found [here](./docs/features/jsonSchema.md).
 ## Handling Secrets
 
 Currently, you can provide initial secrets to JCasC that all rely on <key,value>
