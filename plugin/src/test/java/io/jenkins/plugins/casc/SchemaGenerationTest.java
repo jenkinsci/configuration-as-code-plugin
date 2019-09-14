@@ -11,6 +11,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import static io.jenkins.plugins.casc.SchemaGeneration.generateSchema;
+import static io.jenkins.plugins.casc.SchemaGeneration.rootConfigGeneration;
 import static org.junit.Assert.fail;
 
 public class SchemaGenerationTest {
@@ -133,6 +134,11 @@ public class SchemaGenerationTest {
         } catch (ValidationException ve) {
             ve.printStackTrace();
         }
+    }
+
+    @Test
+    public void testRootConfiguratorGeneration() throws Exception {
+        rootConfigGeneration();
     }
 
  }
