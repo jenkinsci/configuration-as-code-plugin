@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import jenkins.model.Jenkins;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -42,6 +43,7 @@ public class SchemaGeneration {
                 BaseConfigurator baseConfigurator = (BaseConfigurator) configuratorObject;
                 List<Attribute> baseConfigAttributeList = baseConfigurator.getAttributes();
                 if (baseConfigAttributeList.size() == 0) {
+                    System.out.println("Help file" + Jenkins.getInstance().getDescriptor(((BaseConfigurator) configuratorObject).getTarget()).getHelpFile());
                     schemaConfiguratorObjects
                         .put(((BaseConfigurator) configuratorObject).getTarget().getSimpleName().toLowerCase(),
                             new JSONObject()
