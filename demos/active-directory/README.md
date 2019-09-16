@@ -1,8 +1,12 @@
 # Configure activeDirectory Security Realm
 
-## Basic configuration of the [Active Directory plugin](https://wiki.jenkins.io/display/JENKINS/Active+Directory+Plugin)
+Basic configuration of the [Active Directory plugin](https://plugins.jenkins.io/active-directory)
 
-## For plugin version 2.12 and up:
+For plugin version 2.12 and up:
+
+## sample configuration
+
+```yaml
 jenkins:
   securityRealm:
     activeDirectory:
@@ -22,3 +26,4 @@ jenkins:
       tlsConfiguration: JDK_TRUSTSTORE
       internalUsersDatabase:
         jenkinsInternalUser: "jenkins"
+```
