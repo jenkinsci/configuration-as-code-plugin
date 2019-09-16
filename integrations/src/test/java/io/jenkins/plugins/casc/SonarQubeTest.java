@@ -3,8 +3,8 @@ package io.jenkins.plugins.casc;
 import hudson.plugins.sonar.SonarGlobalConfiguration;
 import hudson.plugins.sonar.SonarInstallation;
 import hudson.plugins.sonar.model.TriggersConfig;
-import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
-import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
+import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import jenkins.model.GlobalConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
@@ -18,10 +18,10 @@ import static org.junit.Assert.assertTrue;
 public class SonarQubeTest {
 
     @Rule
-    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+    public JenkinsConfiguredWithReadmeRule j = new JenkinsConfiguredWithReadmeRule();
 
     @Test
-    @ConfiguredWithCode("SonarQubeTest.yml")
+    @ConfiguredWithReadme("sonarqube/README.md")
     public void configure_sonar_globalconfig() throws Exception {
 
         final SonarGlobalConfiguration configuration = GlobalConfiguration.all().get(SonarGlobalConfiguration.class);
