@@ -25,9 +25,5 @@ public class MailerTest {
         assertEquals("4441", descriptor.getSmtpPort());
         assertEquals("do-not-reply@acme.org", descriptor.getReplyToAddress());
         assertEquals("smtp.acme.org", descriptor.getSmtpHost() );
-
-        // FIXME setAdminAddress is deprecated and should NOT be set this way
-        // see https://github.com/jenkinsci/mailer-plugin/pull/39
-        //assertEquals("admin@acme.org", descriptor.getAdminAddress());
     }
 }

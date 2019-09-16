@@ -79,7 +79,6 @@ unclassified:
     configFolderPerNode: true
 
   mailer:
-    adminAddress: admin@acme.org
     replyToAddress: do-not-reply@acme.org
     smtpHost: smtp.acme.org
     smtpPort: 4441
