@@ -53,13 +53,13 @@ public class JenkinsConfiguredWithReadmeRule extends JenkinsConfiguredRule {
                 .map(s -> {
                     try {
                         File codeBlockFile = File.createTempFile("integrations", "markdown");
-                        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(s);
+                        InputStream inputStream = clazz.getClassLoader().getResourceAsStream(s);
                         List<String> lines = Arrays.asList(transformFencedCodeBlockFromMarkdownToString(inputStream));
                         Path file = Paths.get(codeBlockFile.getCanonicalPath());
                         Files.write(file, lines, StandardCharsets.UTF_8);
                         return  codeBlockFile.toURI().toString();
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        throw new AssertionError("Exception when accessing the resources: " + s , e);
                     }
                 })
                 .collect(Collectors.toList());
