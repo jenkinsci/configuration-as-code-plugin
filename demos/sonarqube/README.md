@@ -6,7 +6,7 @@ Sample configuration for the [SonarQube plugin](https://plugins.jenkins.io/sonar
 
 *Below sample configuration willingly set all attributes values because of current issues with Sonar plugin 2.9 version. (cf. #982)*
 
-```yaml          
+```yaml
 unclassified:
   sonarglobalconfiguration:                  # mandatory
     buildWrapperEnabled: true
