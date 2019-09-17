@@ -439,15 +439,6 @@ public class ConfigurationAsCode extends ManagementLink {
         req.getView(this, "reference.jelly").forward(req, res);
     }
 
-    public void doSchema(StaplerRequest req, StaplerResponse res) throws Exception {
-        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
-            res.sendError(HttpServletResponse.SC_FORBIDDEN);
-            return;
-        }
-
-        req.getView(this, "schema.jelly").forward(req, res);
-    }
-
     @Restricted(NoExternalUse.class)
     public void export(OutputStream out) throws Exception {
 
