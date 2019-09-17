@@ -24,7 +24,7 @@ public class ActiveDirectoryTest {
             .around(new JenkinsConfiguredWithReadmeRule());
 
     @Test
-    @ConfiguredWithReadme(value = "active-directory/README.md")
+    @ConfiguredWithReadme("active-directory/README.md")
     public void configure_active_directory() throws Exception {
         final Jenkins jenkins = Jenkins.get();
         final ActiveDirectorySecurityRealm realm = (ActiveDirectorySecurityRealm) jenkins.getSecurityRealm();

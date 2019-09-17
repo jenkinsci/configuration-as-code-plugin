@@ -39,7 +39,6 @@ public class JenkinsConfiguredWithReadmeRule extends JenkinsConfiguredRule {
     );
     static final Parser PARSER = Parser.builder(OPTIONS).build();
 
-
     @Override
     public void before() throws Throwable {
         super.before();
@@ -109,7 +108,6 @@ public class JenkinsConfiguredWithReadmeRule extends JenkinsConfiguredRule {
         }
         return null;
     }
-
 
     private String transformFencedCodeBlockFromMarkdownToString(InputStream markdownContent) throws IOException {
         final MutableDataSet FORMAT_OPTIONS = new MutableDataSet();

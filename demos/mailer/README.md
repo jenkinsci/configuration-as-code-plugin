@@ -1,6 +1,6 @@
 # mailer plugin
 
-Requires `mailer-plugin` >= 1.24
+Requires `mailer-plugin` >= 1.25
 
 ## sample configuration
 
