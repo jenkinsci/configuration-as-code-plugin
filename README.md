@@ -338,10 +338,10 @@ secrets:
 
 We don't support installing plugins with JCasC you need to use something else for this,
 
-Dockers users can use:
+Dockers users can use:\
 [https://github.com/jenkinsci/docker/#preinstalling-plugins](https://github.com/jenkinsci/docker/#preinstalling-plugins)
 
-Kubernetes users:
+Kubernetes users:\
 [https://github.com/helm/charts/tree/master/stable/jenkins](https://github.com/helm/charts/tree/master/stable/jenkins)
 
 ## Supported Plugins
@@ -372,11 +372,11 @@ You have the following option to trigger a configuration reload:
 
 ## Configuration-as-Code extension plugins
 
-- [configuration-as-code-groovy-plugin](https://github.com/jenkinsci/configuration-as-code-groovy-plugin)
+- [configuration-as-code-groovy-plugin](https://github.com/jenkinsci/configuration-as-code-groovy-plugin)\
   Allows to specify groovy code that should run on during configuration.
-- [configuration-as-code-secret-ssm-plugin](https://github.com/jenkinsci/configuration-as-code-secret-ssm-plugin)
+- [configuration-as-code-secret-ssm-plugin](https://github.com/jenkinsci/configuration-as-code-secret-ssm-plugin)\
   Allows to resolve secrets from AWS' SSM secrets
-- [hashicorp-vault-plugin](https://github.com/jenkinsci/hashicorp-vault-plugin)
+- [hashicorp-vault-plugin](https://github.com/jenkinsci/hashicorp-vault-plugin)\
   Allows to resolve secrets from Hashicorp vault
 
 
