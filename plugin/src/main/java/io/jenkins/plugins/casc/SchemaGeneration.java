@@ -54,7 +54,7 @@ public class SchemaGeneration {
                     JSONObject attributeSchema = new JSONObject();
                     for (Attribute attribute : baseConfigAttributeList) {
                         if (attribute.multiple) {
-                            generateMultipleAttributeSchema(attributeSchema, attribute, baseConfigurator);
+                            generateMultipleAttributeSchema(attributeSchema, attribute, configuratorObject);
                         } else {
                             if (attribute.type.isEnum()) {
                                 generateEnumAttributeSchema(attributeSchema, attribute);
@@ -160,16 +160,17 @@ public class SchemaGeneration {
         return rootConfiguratorObject;
     }
 
-    private static void generateMultipleAttributeSchema(JSONObject attributeSchema, Attribute attribute, BaseConfigurator baseConfigurator) {
+    private static void generateMultipleAttributeSchema(JSONObject attributeSchema, Attribute attribute, Object configObject) {
         if (attribute.type.getName().equals("java.lang.String")) {
-            ConfigurationAsCode configurationAsCode = ConfigurationAsCode.get();
             attributeSchema.put(attribute.getName(),
                 new JSONObject()
                     .put("type", "string"));
         } else {
             ConfigurationAsCode configurationAsCode = ConfigurationAsCode.get();
             try {
-                System.out.println("DocString: " + configurationAsCode.getHtmlHelp(baseConfigurator.getTarget(), attribute.getName()));
+
+                System.out.println("DocString: " + configurationAsCode.getHtmlHelp(Jenkins.getInstance().getDescriptor().getClass()
+                    , attribute.getName()));
             } catch (IOException e) {
                 e.printStackTrace();
             }
