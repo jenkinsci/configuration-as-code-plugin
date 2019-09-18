@@ -16,6 +16,7 @@
 Setting up Jenkins is a complex process, as both Jenkins and its plugins require some tuning and configuration,
 with dozens of parameters to set within the web UI `manage` section.
 
+
 Experienced Jenkins users rely on groovy init scripts to customize Jenkins and enforce desired state. Those
 scripts directly invoke Jenkins API and as such can do everything (at your own risk). But they also require
 you know Jenkins internals, and are confident in writing groovy scripts on top of Jenkins API.
