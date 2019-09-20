@@ -177,6 +177,7 @@ public interface Configurator<T> {
                 attribute.setJsonSchema(true);
             }
             CNode value = attribute.describeStructure(instance, context);
+            System.out.println("This is " + value.asSequence());
             if (value != null) {
                 mapping.put(attribute.getName(), attribute.getType().getSimpleName());
             }
