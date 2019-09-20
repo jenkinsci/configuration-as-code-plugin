@@ -140,6 +140,5 @@ public class SchemaGenerationTest {
     public void testRootConfiguratorGeneration() throws Exception {
         rootConfigGeneration();
     }
-
  }
 

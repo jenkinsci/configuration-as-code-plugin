@@ -31,6 +31,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 
@@ -176,8 +177,9 @@ public interface Configurator<T> {
             if(context.getMode().equals("JSONSchema")) {
                 attribute.setJsonSchema(true);
             }
+            CNode cNode = context.lookup(attribute.getType()).describe(instance, context);
+//            System.out.println("Configurator name is: " + configurator.getName());
             CNode value = attribute.describeStructure(instance, context);
-            System.out.println("This is " + value.asSequence());
             if (value != null) {
                 mapping.put(attribute.getName(), attribute.getType().getSimpleName());
             }

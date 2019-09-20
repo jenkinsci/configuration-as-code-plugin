@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import jenkins.model.Jenkins;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -162,6 +163,7 @@ public class SchemaGeneration {
             RootElementConfigurator rootElementConfigurator = i.next();
             rootConfiguratorObject
                 .put(rootElementConfigurator.getName(), new JSONObject().put("type", "object"));
+            System.out.println("root Name" + rootElementConfigurator.getName());
         }
         return rootConfiguratorObject;
     }
@@ -209,5 +211,6 @@ public class SchemaGeneration {
             }
         }
     }
+
 }
 
