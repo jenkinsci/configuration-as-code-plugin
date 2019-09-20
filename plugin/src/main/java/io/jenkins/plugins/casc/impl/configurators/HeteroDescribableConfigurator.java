@@ -10,6 +10,7 @@ import hudson.security.SecurityRealm;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.Configurator;
+import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.ObsoleteConfigurationMonitor;
 import io.jenkins.plugins.casc.impl.attributes.DescribableAttribute;
 import io.jenkins.plugins.casc.model.CNode;
@@ -30,6 +31,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import jenkins.model.Jenkins;
 import org.jenkinsci.Symbol;
 import org.kohsuke.accmod.Restricted;
@@ -80,6 +82,27 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
     @NonNull
     @Override
     public T configure(CNode config, ConfigurationContext context) {
+        /*return preConfigure(config).apply((shortName, subConfig) ->
+            lookupDescriptor_new(shortName, config)
+                .find(descriptor -> {
+                        try {
+                            Configurator<T> configurator = forceLookupConfigurator(context, descriptor);
+                            //configurator.check(subConfig.getOrNull(), context);
+                            doConfigure(context, configurator, subConfig.getOrNull());
+                            return true;
+                        } catch (Exception e) {
+                            return false;
+                        }
+                    }
+                )
+                .map(descriptor -> forceLookupConfigurator(context, descriptor))
+                .map(configurator -> doConfigure(context, configurator, subConfig.getOrNull())))
+            .getOrNull();*/
+        /*return preConfigure(config).apply((shortName, subConfig) ->
+            lookupDescriptor(shortName, config, context)
+                .map(descriptor -> forceLookupConfigurator(context, descriptor))
+                .map(configurator -> doConfigure(context, configurator, subConfig.getOrNull())))
+            .getOrNull();*/
         return preConfigure(config).apply((shortName, subConfig) ->
             lookupDescriptor(shortName, config)
                 .map(descriptor -> forceLookupConfigurator(context, descriptor))
@@ -201,16 +224,69 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
         return descriptor.getKlass().toJavaClass();
     }
 
+    private Stream<Descriptor<T>> lookupDescriptor_new(String symbol, CNode config) {
+        Stream<Descriptor<T>> stream = getDescriptors()
+            .filter(descriptor -> findByPreferredSymbol(descriptor, symbol) || findBySymbols(descriptor, symbol, config))
+            .map(descriptor -> Tuple.of(preferredSymbol(descriptor), descriptor))
+            .foldLeft(HashMap.empty(), this::handleDuplicateSymbols)
+            .values();
+
+        if (!stream.nonEmpty()) {
+            throw new IllegalArgumentException("No " + target.getName() + " implementation found for " + symbol);
+        }
+
+        return stream;
+    }
+
+    private Option<Descriptor<T>> lookupDescriptor(String symbol, CNode config,
+        ConfigurationContext context) {
+        Stream<Descriptor<T>> descriptors = getDescriptors()
+            .filter(descriptor -> findByPreferredSymbol(descriptor, symbol) || findBySymbols(descriptor, symbol, config))
+            .map(descriptor -> Tuple.of(preferredSymbol(descriptor), descriptor))
+            .foldLeft(HashMap.empty(), this::handleDuplicateSymbols)
+            .values();
+
+        List l = descriptors.collect(Collectors.toList());
+
+        if (descriptors.nonEmpty() == false) {
+            throw new IllegalArgumentException("No " + target.getName() + " implementation found for " + symbol);
+        }
+
+        return descriptors.find(descriptor -> {
+            try {
+                // It cannot be null at this point
+                CNode subConfig = preConfigure(config.clone())._2().get();
+                forceLookupConfigurator(context, descriptor).check(subConfig, context);
+                return true;
+            } catch (ConfiguratorException e) {
+                return false;
+            }
+        }).orElse(() -> {
+            throw new IllegalArgumentException("No " + target.getName() + " implementation found for " + symbol);
+        });
+    }
+
     private Option<Descriptor<T>> lookupDescriptor(String symbol, CNode config) {
+        List<Descriptor> l = getDescriptors()
+            .filter(descriptor -> findByPreferredSymbol(descriptor, symbol) || findBySymbols(descriptor, symbol, config))
+            .collect(Collectors.toList());
+
+        List<Descriptor> l1 = getDescriptors()
+            .filter(descriptor -> findByPreferredSymbol(descriptor, symbol) || findBySymbols(descriptor, symbol, config))
+            .map(descriptor -> Tuple.of(preferredSymbol(descriptor), descriptor))
+            .foldLeft(HashMap.empty(), this::handleDuplicateSymbols)
+            .values()
+            .collect(Collectors.toList());
+
         return getDescriptors()
-                .filter(descriptor -> findByPreferredSymbol(descriptor, symbol) || findBySymbols(descriptor, symbol, config))
-                .map(descriptor -> Tuple.of(preferredSymbol(descriptor), descriptor))
-                .foldLeft(HashMap.empty(), this::handleDuplicateSymbols)
-                .values()
-                .headOption()
-                .orElse(() -> {
-                    throw new IllegalArgumentException("No " + target.getName() + " implementation found for " + symbol);
-                });
+            .filter(descriptor -> findByPreferredSymbol(descriptor, symbol) || findBySymbols(descriptor, symbol, config))
+            .map(descriptor -> Tuple.of(preferredSymbol(descriptor), descriptor))
+            .foldLeft(HashMap.empty(), this::handleDuplicateSymbols)
+            .values()
+            .headOption()
+            .orElse(() -> {
+                throw new IllegalArgumentException("No " + target.getName() + " implementation found for " + symbol);
+            });
     }
 
     private Boolean findByPreferredSymbol(Descriptor<T> descriptor, String symbol) {
