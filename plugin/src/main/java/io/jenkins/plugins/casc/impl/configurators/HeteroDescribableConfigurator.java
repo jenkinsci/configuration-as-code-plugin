@@ -203,14 +203,14 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
 
     private Option<Descriptor<T>> lookupDescriptor(String symbol, CNode config) {
         return getDescriptors()
-            .filter(descriptor -> findByPreferredSymbol(descriptor, symbol) || findBySymbols(descriptor, symbol, config))
-            .map(descriptor -> Tuple.of(preferredSymbol(descriptor), descriptor))
-            .foldLeft(HashMap.empty(), this::handleDuplicateSymbols)
-            .values()
-            .headOption()
-            .orElse(() -> {
-                throw new IllegalArgumentException("No " + target.getName() + " implementation found for " + symbol);
-            });
+                .filter(descriptor -> findByPreferredSymbol(descriptor, symbol) || findBySymbols(descriptor, symbol, config))
+                .map(descriptor -> Tuple.of(preferredSymbol(descriptor), descriptor))
+                .foldLeft(HashMap.empty(), this::handleDuplicateSymbols)
+                .values()
+                .headOption()
+                .orElse(() -> {
+                    throw new IllegalArgumentException("No " + target.getName() + " implementation found for " + symbol);
+                });
     }
 
     private Boolean findByPreferredSymbol(Descriptor<T> descriptor, String symbol) {
