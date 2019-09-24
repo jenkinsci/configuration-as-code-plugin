@@ -2,6 +2,7 @@ package io.jenkins.plugins.casc;
 
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.misc.Util;
+import java.util.logging.Logger;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.ValidationException;
 import org.everit.json.schema.loader.SchemaLoader;
@@ -15,6 +16,10 @@ import static io.jenkins.plugins.casc.SchemaGeneration.rootConfigGeneration;
 import static org.junit.Assert.fail;
 
 public class SchemaGenerationTest {
+
+    public static final Logger LOGGER = Logger.getLogger(TokenReloadAction.class.getName());
+    private final String failureMessage  = "The YAML file provided for this schema is invalid";
+
     @Rule
     public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 
@@ -45,6 +50,7 @@ public class SchemaGenerationTest {
         Schema schema = SchemaLoader.load(jsonSchema);
         try {
             schema.validate(jsonSubject);
+            LOGGER.warning(failureMessage);
             fail();
         } catch (ValidationException ve) {
             ve.printStackTrace();
@@ -62,6 +68,7 @@ public class SchemaGenerationTest {
         Schema schema = SchemaLoader.load(jsonSchema);
         try {
             schema.validate(jsonSubject);
+            LOGGER.warning(failureMessage);
             fail();
         } catch (ValidationException ve) {
             ve.printStackTrace();

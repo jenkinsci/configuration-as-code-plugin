@@ -13,7 +13,6 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import jenkins.model.Jenkins;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

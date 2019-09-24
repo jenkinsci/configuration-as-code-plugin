@@ -112,6 +112,10 @@ public class Attribute<Owner, Type> {
         return restrictions != null ? restrictions : EMPTY;
     }
 
+    /**
+     * Set jsonSchema is used to tell the describe function to call the describe structure
+     * so that it supports and returns a nested structure
+     */
     public void setJsonSchema(boolean jsonSchema) {
         isJsonSchema = jsonSchema;
     }
@@ -307,7 +311,6 @@ public class Attribute<Owner, Type> {
             return new Scalar("FAILED TO EXPORT\n" + instance.getClass().getName() + "#" + name + ": "
                 + printThrowable(e));
         }
-
     }
 
 
