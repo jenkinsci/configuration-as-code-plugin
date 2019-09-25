@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import io.jenkins.plugins.casc.impl.DefaultConfiguratorRegistry;
+import io.jenkins.plugins.casc.impl.configurators.DataBoundConfigurator;
 import io.jenkins.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
@@ -206,7 +207,37 @@ public class SchemaGeneration {
             final Mapping mapping = config.asMapping();
             final List<Map.Entry<String, CNode>> entries = new ArrayList<>(mapping.entrySet());
             for (Map.Entry<String, CNode> entry : entries) {
-                System.out.println(entry.getKey() + " " + entry.getValue().toString());
+                System.out.println(entry.getKey());
+            }
+            System.out.println("End of an iteration of configurators");
+        }
+    }
+
+    public static void storeConfiguratorNames() {
+        ConfigurationAsCode configurationAsCodeObject = ConfigurationAsCode.get();
+        for (Object configuratorObject : configurationAsCodeObject.getConfigurators()) {
+            if (configuratorObject instanceof BaseConfigurator) {
+                BaseConfigurator baseConfigurator = (BaseConfigurator) configuratorObject;
+                List<Attribute> baseConfigAttributeList = baseConfigurator.getAttributes();
+                for (Attribute attribute : baseConfigAttributeList) {
+                    if (attribute.multiple) {
+                        System.out.println(
+                            "This is a multiple attribute " + attribute.getType() + " " + attribute
+                                .getName());
+                    } else {
+                        if (attribute.type.isEnum()) {
+                            System.out.println("This is an enumeration attribute: ");
+                            if (attribute.type.getEnumConstants().length != 0) {
+                                System.out.println("Printing Enumeration constants for: " + attribute.getName());
+                                for (Object obj : attribute.type.getEnumConstants()) {
+                                    System.out.println("EConstant : " + obj.toString());
+                                }
+                            }
+                        }
+                    }
+                }
+            } else if (configuratorObject instanceof HeteroDescribableConfigurator) {
+                System.out.println("Instance of HeteroDescribable Configurator");
             }
         }
     }

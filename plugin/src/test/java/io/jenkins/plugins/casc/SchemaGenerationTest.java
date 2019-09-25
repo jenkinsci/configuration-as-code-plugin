@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import static io.jenkins.plugins.casc.SchemaGeneration.generateSchema;
 import static io.jenkins.plugins.casc.SchemaGeneration.rootConfigGeneration;
+import static io.jenkins.plugins.casc.SchemaGeneration.storeConfiguratorNames;
 import static org.junit.Assert.fail;
 
 public class SchemaGenerationTest {
@@ -146,6 +147,11 @@ public class SchemaGenerationTest {
     @Test
     public void testRootConfiguratorGeneration() throws Exception {
         rootConfigGeneration();
+    }
+
+    @Test
+    public void testStoreConfiguratorNames() throws Exception {
+        storeConfiguratorNames();
     }
  }
 
