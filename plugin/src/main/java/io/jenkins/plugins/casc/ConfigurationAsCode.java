@@ -85,6 +85,7 @@ import org.kohsuke.stapler.interceptor.RequirePOST;
 import org.kohsuke.stapler.lang.Klass;
 import org.kohsuke.stapler.verb.POST;
 
+import static io.jenkins.plugins.casc.SchemaGeneration.writeJSONSchema;
 import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.FlowStyle.BLOCK;
 import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.DOUBLE_QUOTED;
 import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.LITERAL;
@@ -400,6 +401,21 @@ public class ConfigurationAsCode extends ManagementLink {
         export(res.getOutputStream());
     }
 
+    /**
+     * Export JSONSchema to URL
+     * @throws Exception
+     */
+    public void doSchema(StaplerRequest req, StaplerResponse res) throws Exception {
+
+        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+            res.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+
+        res.setContentType("application/json; charset=utf-8");
+        res.getWriter().print(writeJSONSchema());
+    }
+
     @RequirePOST
     public void doViewExport(StaplerRequest req, StaplerResponse res) throws Exception {
         if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
@@ -421,15 +437,6 @@ public class ConfigurationAsCode extends ManagementLink {
         }
 
         req.getView(this, "reference.jelly").forward(req, res);
-    }
-
-    public void doSchema(StaplerRequest req, StaplerResponse res) throws Exception {
-        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
-            res.sendError(HttpServletResponse.SC_FORBIDDEN);
-            return;
-        }
-
-        req.getView(this, "schema.jelly").forward(req, res);
     }
 
     @Restricted(NoExternalUse.class)

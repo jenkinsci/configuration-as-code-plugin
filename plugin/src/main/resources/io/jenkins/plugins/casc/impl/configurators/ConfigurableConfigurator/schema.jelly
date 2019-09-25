@@ -1,4 +1,0 @@
-<?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler">
-  <st:include page="schema.jelly" class="${it.target}"/>
-</j:jelly>
