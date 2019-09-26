@@ -34,16 +34,10 @@ public class SchemaGeneration {
          */
         JSONObject schemaObject = new JSONObject(schemaTemplateObject.toString());
         /**
-         * This generates the schema for the root configurators
-         * Iterates over the root elements and adds them to the schema.
-         */
-        schemaObject.put("properties", generateRootConfiguratorObject());
-        /**
          * This generates the schema for the base configurators
          * Iterates over the base configurators and adds them to the schema.
          */
         JSONObject schemaConfiguratorObjects = new JSONObject();
-//        ConfigurationAsCode configurationAsCodeObject = ConfigurationAsCode.get();
         DefaultConfiguratorRegistry registry = new DefaultConfiguratorRegistry();
         final ConfigurationContext context = new ConfigurationContext(registry);
 
@@ -98,7 +92,7 @@ public class SchemaGeneration {
                             generateHeteroDescribableConfigObject(heteroDescribableConfigurator));
                 }
             }
-            schemaObject
+            schemaConfiguratorObjects
                 .put(rootElementConfigurator.getName(), rootConfiguratorProperties);
         }
         schemaObject.put("properties", schemaConfiguratorObjects);
@@ -187,7 +181,6 @@ public class SchemaGeneration {
             RootElementConfigurator rootElementConfigurator = i.next();
             rootConfiguratorObject
                 .put(rootElementConfigurator.getName(), new JSONObject().put("type", "object"));
-            System.out.println("root Name: " + rootElementConfigurator.getName());
         }
         return rootConfiguratorObject;
     }
