@@ -26,8 +26,9 @@ jenkins:
             instanceCapStr: "10"
 
 unclassified:
-  mailer:
+  location:
     adminAddress: admin@acme.org
+  mailer:
     replyToAddress: do-not-reply@acme.org
     smtpHost: smtp.acme.org
     smtpPort: 4441

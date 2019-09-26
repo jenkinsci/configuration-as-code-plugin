@@ -2,8 +2,8 @@ package io.jenkins.plugins.casc;
 
 import hudson.plugins.active_directory.ActiveDirectoryDomain;
 import hudson.plugins.active_directory.ActiveDirectorySecurityRealm;
-import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
-import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
+import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
@@ -21,10 +21,10 @@ public class ActiveDirectoryTest {
     @Rule
     public RuleChain chain = RuleChain.outerRule(new EnvironmentVariables()
             .set("BIND_PASSWORD", "ADMIN123"))
-            .around(new JenkinsConfiguredWithCodeRule());
+            .around(new JenkinsConfiguredWithReadmeRule());
 
     @Test
-    @ConfiguredWithCode(value = "ActiveDirectoryTest.yml")
+    @ConfiguredWithReadme("active-directory/README.md")
     public void configure_active_directory() throws Exception {
         final Jenkins jenkins = Jenkins.get();
         final ActiveDirectorySecurityRealm realm = (ActiveDirectorySecurityRealm) jenkins.getSecurityRealm();
