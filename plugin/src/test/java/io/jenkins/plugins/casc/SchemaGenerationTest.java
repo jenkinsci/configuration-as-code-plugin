@@ -2,6 +2,8 @@ package io.jenkins.plugins.casc;
 
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.misc.Util;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.util.logging.Logger;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.ValidationException;
@@ -12,8 +14,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import static io.jenkins.plugins.casc.SchemaGeneration.generateSchema;
-import static io.jenkins.plugins.casc.SchemaGeneration.rootConfigGeneration;
-import static io.jenkins.plugins.casc.SchemaGeneration.storeConfiguratorNames;
+import static io.jenkins.plugins.casc.SchemaGeneration.writeJSONSchema;
 import static org.junit.Assert.fail;
 
 public class SchemaGenerationTest {
@@ -144,14 +145,12 @@ public class SchemaGenerationTest {
         }
     }
 
+    //    For testing purposes.To be removed
     @Test
-    public void testRootConfiguratorGeneration() throws Exception {
-        rootConfigGeneration();
-    }
-
-    @Test
-    public void testStoreConfiguratorNames() throws Exception {
-        storeConfiguratorNames();
+    public void writeSchema() throws Exception {
+        BufferedWriter writer = new BufferedWriter(new FileWriter("schema.json"));
+        writer.write(writeJSONSchema());
+        writer.close();
     }
  }
 
