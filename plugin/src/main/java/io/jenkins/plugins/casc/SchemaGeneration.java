@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import hudson.model.Describable;
 import io.jenkins.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -168,9 +169,8 @@ public class SchemaGeneration {
         } else {
             ConfigurationAsCode configurationAsCode = ConfigurationAsCode.get();
             try {
-
-                System.out.println("DocString: " + configurationAsCode.getHtmlHelp(Jenkins.getInstance().getDescriptor().getClass()
-                    , attribute.getName()));
+                System.out.println("DocString: " + configurationAsCode.getHtmlHelp(attribute.getGetter().getClass() ,
+                    attribute.getName()));
             } catch (IOException e) {
                 e.printStackTrace();
             }
