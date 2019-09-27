@@ -1,13 +1,9 @@
 package io.jenkins.plugins.casc;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.misc.Util;
+import java.util.logging.Logger;
 import org.everit.json.schema.Schema;
-import org.everit.json.schema.ValidationException;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -18,43 +14,51 @@ import static io.jenkins.plugins.casc.SchemaGeneration.generateSchema;
 import static org.junit.Assert.fail;
 
 public class SchemaGenerationTest {
+
+    public static final Logger LOGGER = Logger.getLogger(TokenReloadAction.class.getName());
+    private final String failureMessage  = "The YAML file provided for this schema is invalid";
+
     @Rule
     public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 
     @Test
     public void validSchemaShouldSucceed() throws Exception {
-        JSONObject schemaObject = generateSchema();
-        JSONObject jsonSchema = new JSONObject(
-            new JSONTokener(schemaObject.toString()));
-        String yamlStringContents = Util.toStringFromYamlFile(this, "validSchemaConfig.yml");
-        JSONObject jsonSubject = new JSONObject(
-            new JSONTokener(Util.convertToJson(yamlStringContents)));
-        Schema schema = SchemaLoader.load(jsonSchema);
+        Schema schema = returnSchema();
         try {
-            schema.validate(jsonSubject);
+            validateSchema(schema, returnJSONSubject("validSchemaConfig.yml"));
         } catch (Exception e) {
+            LOGGER.warning(failureMessage);
             fail(e.getMessage());
         }
     }
 
     @Test
     public void invalidSchemaShouldNotSucceed() throws Exception {
+        Schema schema = returnSchema();
+        try {
+            validateSchema(schema, returnJSONSubject("invalidSchemaConfig.yml"));
+        } catch (Exception e) {
+            LOGGER.warning(failureMessage);
+            fail(e.getMessage());
+        }
+    }
+
+    private Schema returnSchema() {
         JSONObject schemaObject = generateSchema();
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        JsonParser jsonParser = new JsonParser();
-        JsonElement jsonElement = jsonParser.parse(schemaObject.toString());
-        String prettyJsonString = gson.toJson(jsonElement);
         JSONObject jsonSchema = new JSONObject(
-            new JSONTokener(prettyJsonString));
-        String yamlStringContents = Util.toStringFromYamlFile(this, "invalidSchemaConfig.yml");
+            new JSONTokener(schemaObject.toString()));
+        Schema schema = SchemaLoader.load(jsonSchema);
+        return schema;
+    }
+
+    private JSONObject returnJSONSubject(String yamlFile) throws Exception {
+        String yamlStringContents = Util.toStringFromYamlFile(this, yamlFile);
         JSONObject jsonSubject = new JSONObject(
             new JSONTokener(Util.convertToJson(yamlStringContents)));
-        Schema schema = SchemaLoader.load(jsonSchema);
-        try {
-            schema.validate(jsonSubject);
-            fail();
-        } catch (ValidationException ve) {
-            ve.printStackTrace();
-        }
+        return jsonSubject;
+    }
+
+    private void validateSchema(Schema schema, JSONObject jsonSubject) throws Exception {
+        schema.validate(jsonSubject);
     }
 }
