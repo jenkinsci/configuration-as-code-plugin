@@ -4,19 +4,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import io.jenkins.plugins.casc.impl.DefaultConfiguratorRegistry;
-import io.jenkins.plugins.casc.impl.configurators.DataBoundConfigurator;
 import io.jenkins.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
-import io.jenkins.plugins.casc.model.CNode;
-import io.jenkins.plugins.casc.model.Mapping;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -38,20 +31,8 @@ public class SchemaGeneration {
          * Iterates over the base configurators and adds them to the schema.
          */
         JSONObject schemaConfiguratorObjects = new JSONObject();
-        DefaultConfiguratorRegistry registry = new DefaultConfiguratorRegistry();
-        final ConfigurationContext context = new ConfigurationContext(registry);
-
-        for (RootElementConfigurator rootElementConfigurator : RootElementConfigurator.all()) {
-            Set<Object> elements = new LinkedHashSet<>();
-            listElements(elements, rootElementConfigurator.describe(), context);
-
-            JSONObject rootConfiguratorProperties = new JSONObject();
-            rootConfiguratorProperties.put("type", "object")
-                .put("additionalProperties", false)
-                .put("title", "Configuration base for the " + rootElementConfigurator.getName()
-                    + " classifier");
-
-            for (Object configuratorObject : elements) {
+        ConfigurationAsCode configurationAsCode = ConfigurationAsCode.get();
+        for (Object configuratorObject : configurationAsCode.getConfigurators()) {
                 if (configuratorObject instanceof BaseConfigurator) {
                     BaseConfigurator baseConfigurator = (BaseConfigurator) configuratorObject;
                     List<Attribute> baseConfigAttributeList = baseConfigurator.getAttributes();
@@ -87,13 +68,10 @@ public class SchemaGeneration {
                 } else if (configuratorObject instanceof HeteroDescribableConfigurator) {
                     HeteroDescribableConfigurator heteroDescribableConfigurator = (HeteroDescribableConfigurator) configuratorObject;
                     schemaConfiguratorObjects
-                        .put(
-                            heteroDescribableConfigurator.getTarget().getSimpleName().toLowerCase(),
+                        .put(heteroDescribableConfigurator.getTarget().getSimpleName().toLowerCase(),
                             generateHeteroDescribableConfigObject(heteroDescribableConfigurator));
                 }
-            }
-            schemaConfiguratorObjects
-                .put(rootElementConfigurator.getName(), rootConfiguratorProperties);
+            generateRootConfiguratorObject(schemaConfiguratorObjects);
         }
         schemaObject.put("properties", schemaConfiguratorObjects);
         return schemaObject;
@@ -172,15 +150,18 @@ public class SchemaGeneration {
         return attributeType;
     }
 
-    private static JSONObject generateRootConfiguratorObject() {
-        JSONObject rootConfiguratorObject = new JSONObject();
+    private static JSONObject generateRootConfiguratorObject(JSONObject rootConfiguratorObject) {
         LinkedHashSet linkedHashSet = new LinkedHashSet<>(
             ConfigurationAsCode.get().getRootConfigurators());
         Iterator<RootElementConfigurator> i = linkedHashSet.iterator();
         while (i.hasNext()) {
             RootElementConfigurator rootElementConfigurator = i.next();
             rootConfiguratorObject
-                .put(rootElementConfigurator.getName(), new JSONObject().put("type", "object"));
+                .put(rootElementConfigurator.getName(), new JSONObject().put("type", "object")
+                                                        .put("additionalProperties", false)
+                                                        .put("title", "Configuration base for the " + rootElementConfigurator.getName()
+                                                         + " classifier")
+                                                        .put("id", "#/definitions/" + rootElementConfigurator.getTarget().getSimpleName().toLowerCase()));
         }
         return rootConfiguratorObject;
     }
@@ -201,6 +182,7 @@ public class SchemaGeneration {
 
     private static void generateEnumAttributeSchema(JSONObject attributeSchemaTemplate,
         Attribute attribute) {
+
         if (attribute.type.getEnumConstants().length == 0) {
             attributeSchemaTemplate.put(attribute.getName(),
                 new JSONObject()
@@ -217,27 +199,13 @@ public class SchemaGeneration {
         }
     }
 
-    public static void rootConfigGeneration() throws Exception {
-        DefaultConfiguratorRegistry registry = new DefaultConfiguratorRegistry();
-        final ConfigurationContext context = new ConfigurationContext(registry);
-        context.setMode("JSONSchema");
-        for (RootElementConfigurator root : RootElementConfigurator.all()) {
-            final CNode config = root.describeStructure(root.getTargetComponent(context), context);
-            final Mapping mapping = config.asMapping();
-            final List<Map.Entry<String, CNode>> entries = new ArrayList<>(mapping.entrySet());
-            for (Map.Entry<String, CNode> entry : entries) {
-                System.out.println(entry.getKey());
-            }
-            System.out.println("End of an iteration of configurators");
-        }
-    }
-
     public static void storeConfiguratorNames() {
         ConfigurationAsCode configurationAsCodeObject = ConfigurationAsCode.get();
         for (Object configuratorObject : configurationAsCodeObject.getConfigurators()) {
             if (configuratorObject instanceof BaseConfigurator) {
                 BaseConfigurator baseConfigurator = (BaseConfigurator) configuratorObject;
                 List<Attribute> baseConfigAttributeList = baseConfigurator.getAttributes();
+
                 for (Attribute attribute : baseConfigAttributeList) {
                     if (attribute.multiple) {
                         System.out.println(
@@ -260,22 +228,6 @@ public class SchemaGeneration {
                 System.out.println("Instance of HeteroDescribable Configurator");
             }
         }
-    }
-
-    private static void listElements(Set<Object> elements, Set<Attribute<?, ?>> attributes,
-        ConfigurationContext context) {
-        attributes.stream()
-            .map(Attribute::getType)
-            .map(context::lookup)
-            .filter(Objects::nonNull)
-            .map(c -> c.getConfigurators(context))
-            .flatMap(Collection::stream)
-            .forEach(configurator -> {
-                if (elements.add(configurator)) {
-                    listElements(elements, ((Configurator) configurator).describe(),
-                        context);   // some unexpected type erasure force to cast here
-                }
-            });
     }
 
 }
