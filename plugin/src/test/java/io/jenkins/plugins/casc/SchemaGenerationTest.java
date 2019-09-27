@@ -37,9 +37,10 @@ public class SchemaGenerationTest {
         Schema schema = returnSchema();
         try {
             validateSchema(schema, returnJSONSubject("invalidSchemaConfig.yml"));
-        } catch (Exception e) {
             LOGGER.warning(failureMessage);
-            fail(e.getMessage());
+            fail();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
