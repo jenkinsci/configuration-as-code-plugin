@@ -4,7 +4,6 @@ import com.fasterxml.jackson.dataformat.yaml.snakeyaml.Yaml;
 import hudson.ExtensionList;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfigurationContext;
-import io.jenkins.plugins.casc.TokenReloadAction;
 import io.jenkins.plugins.casc.core.JenkinsConfigurator;
 import io.jenkins.plugins.casc.impl.configurators.GlobalConfigurationCategoryConfigurator;
 import io.jenkins.plugins.casc.model.CNode;
@@ -35,6 +34,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class Util {
+
+    private static final Logger LOGGER = Logger.getLogger(Util.class.getName());
+    private static final String failureMessage  = "The YAML file provided for this schema is invalid";
 
     /**
      * Gets the Jenkins configurator.
@@ -216,7 +218,6 @@ public class Util {
      *      * <pre>{@code
      *      * Schema jsonSchema = returnSchema();}
      *      * </pre>
-     * @return
      */
     public static Schema returnSchema() {
         JSONObject schemaObject = generateSchema();
@@ -235,12 +236,11 @@ public class Util {
      * @return boolean
      */
     public static boolean validateSchema(JSONObject jsonSubject) {
-        final Logger LOGGER = Logger.getLogger(TokenReloadAction.class.getName());
-        final String failureMessage  = "The YAML file provided for this schema is invalid";
+
         try {
             returnSchema().validate(jsonSubject);
         } catch (Exception ie) {
-            LOGGER.warning(failureMessage + ie);
+            LOGGER.warning(failureMessage);
             return false;
         }
         return true;
