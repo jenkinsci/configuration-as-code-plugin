@@ -52,6 +52,12 @@
     </dependency>
 
     <!-- tested plugins -->
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>artifactory</artifactId>
+      <version>3.4.0</version>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
