@@ -4,6 +4,7 @@ import com.fasterxml.jackson.dataformat.yaml.snakeyaml.Yaml;
 import hudson.ExtensionList;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfigurationContext;
+import io.jenkins.plugins.casc.TokenReloadAction;
 import io.jenkins.plugins.casc.core.JenkinsConfigurator;
 import io.jenkins.plugins.casc.impl.configurators.GlobalConfigurationCategoryConfigurator;
 import io.jenkins.plugins.casc.model.CNode;
@@ -19,12 +20,17 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Objects;
+import java.util.logging.Logger;
 import jenkins.model.GlobalConfigurationCategory;
 import jenkins.tools.ToolConfigurationCategory;
+import org.everit.json.schema.Schema;
+import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.jvnet.hudson.test.LoggerRule;
 
 import static io.jenkins.plugins.casc.ConfigurationAsCode.serializeYamlNode;
+import static io.jenkins.plugins.casc.SchemaGeneration.generateSchema;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -202,5 +208,41 @@ public class Util {
         Map<String,Object> map= (Map<String, Object>) yaml.load(yamlString);
         JSONObject jsonObject=new JSONObject(map);
         return jsonObject.toString();
+    }
+
+    /**
+     * Returns the JSON V7 schema for the running jenkins instance.
+     * Example Usage:
+     *      * <pre>{@code
+     *      * Schema jsonSchema = returnSchema();}
+     *      * </pre>
+     * @return
+     */
+    public static Schema returnSchema() {
+        JSONObject schemaObject = generateSchema();
+        JSONObject jsonSchema = new JSONObject(
+            new JSONTokener(schemaObject.toString()));
+        return SchemaLoader.load(jsonSchema);
+    }
+
+    /**
+     *Validates a given jsonObject against the schema generated for the current live jenkins instance
+     *      * Example Usage:
+     *      *      * <pre>{@code
+     *      *      * assertTrue(validateSchema(jsonSubject));}
+     *      *      * </pre>
+     * @param jsonSubject
+     * @return boolean
+     */
+    public static boolean validateSchema(JSONObject jsonSubject) {
+        final Logger LOGGER = Logger.getLogger(TokenReloadAction.class.getName());
+        final String failureMessage  = "The YAML file provided for this schema is invalid";
+        try {
+            returnSchema().validate(jsonSubject);
+        } catch (Exception ie) {
+            LOGGER.warning(failureMessage + ie);
+            return false;
+        }
+        return true;
     }
 }
