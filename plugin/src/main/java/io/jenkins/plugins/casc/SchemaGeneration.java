@@ -170,22 +170,6 @@ public class SchemaGeneration {
         return attributeType;
     }
 
-    private static JSONObject generateRootConfiguratorObject(JSONObject rootConfiguratorObject) {
-        LinkedHashSet linkedHashSet = new LinkedHashSet<>(
-            ConfigurationAsCode.get().getRootConfigurators());
-        Iterator<RootElementConfigurator> i = linkedHashSet.iterator();
-        while (i.hasNext()) {
-            RootElementConfigurator rootElementConfigurator = i.next();
-            rootConfiguratorObject
-                .put(rootElementConfigurator.getName(), new JSONObject().put("type", "object")
-                                                        .put("additionalProperties", false)
-                                                        .put("title", "Configuration base for the " + rootElementConfigurator.getName()
-                                                         + " classifier")
-                                                        .put("id", "#/definitions/" + rootElementConfigurator.getTarget().getName().toLowerCase()));
-        }
-        return rootConfiguratorObject;
-    }
-
     private static void generateMultipleAttributeSchema(JSONObject attributeSchema,
         Attribute attribute) {
         if (attribute.type.getName().equals("java.lang.String")) {
