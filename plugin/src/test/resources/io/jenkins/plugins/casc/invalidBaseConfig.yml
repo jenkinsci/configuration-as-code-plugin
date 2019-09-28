@@ -1,0 +1,6 @@
+security:
+  cli:
+    enabled: false
+invalidBaseConfigurator: "I do nothing"
+
+

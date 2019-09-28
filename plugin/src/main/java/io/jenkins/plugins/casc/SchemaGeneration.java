@@ -4,12 +4,14 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import io.jenkins.plugins.casc.impl.DefaultConfiguratorRegistry;
 import io.jenkins.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -18,6 +20,7 @@ public class SchemaGeneration {
     final static JSONObject schemaTemplateObject = new JSONObject()
         .put("$schema", "http://json-schema.org/draft-07/schema#")
         .put("description", "Jenkins Configuration as Code")
+        .put("additionalProperties", false)
         .put("type", "object");
 
     public static JSONObject generateSchema() {
@@ -30,9 +33,15 @@ public class SchemaGeneration {
          * This generates the schema for the base configurators
          * Iterates over the base configurators and adds them to the schema.
          */
-        JSONObject schemaConfiguratorObjects = new JSONObject();
-        ConfigurationAsCode configurationAsCode = ConfigurationAsCode.get();
-        for (Object configuratorObject : configurationAsCode.getConfigurators()) {
+        DefaultConfiguratorRegistry registry = new DefaultConfiguratorRegistry();
+        final ConfigurationContext context = new ConfigurationContext(registry);
+
+        JSONObject rootConfiguratorProperties = new JSONObject();
+        for(RootElementConfigurator rootElementConfigurator : RootElementConfigurator.all()) {
+            JSONObject schemaConfiguratorObjects = new JSONObject();
+            Set<Object> elements = new LinkedHashSet<>();
+            ConfigurationAsCode.get().listElements(elements, rootElementConfigurator.describe(), context);
+            for (Object configuratorObject : elements) {
                 if (configuratorObject instanceof BaseConfigurator) {
                     BaseConfigurator baseConfigurator = (BaseConfigurator) configuratorObject;
                     List<Attribute> baseConfigAttributeList = baseConfigurator.getAttributes();
@@ -41,6 +50,7 @@ public class SchemaGeneration {
                         schemaConfiguratorObjects
                             .put(baseConfigurator.getName().toLowerCase(),
                                 new JSONObject()
+                                    .put("additionalProperties", false)
                                     .put("type", "object")
                                     .put("properties", new JSONObject()));
 
@@ -59,6 +69,7 @@ public class SchemaGeneration {
                                         .put(((BaseConfigurator) configuratorObject).getTarget()
                                                 .getSimpleName().toLowerCase(),
                                             new JSONObject()
+                                                .put("additionalProperties", false)
                                                 .put("type", "object")
                                                 .put("properties", attributeSchema));
                                 }
@@ -68,16 +79,24 @@ public class SchemaGeneration {
                 } else if (configuratorObject instanceof HeteroDescribableConfigurator) {
                     HeteroDescribableConfigurator heteroDescribableConfigurator = (HeteroDescribableConfigurator) configuratorObject;
                     schemaConfiguratorObjects
-                        .put(heteroDescribableConfigurator.getTarget().getSimpleName().toLowerCase(),
+                        .put(
+                            heteroDescribableConfigurator.getTarget().getSimpleName().toLowerCase(),
                             generateHeteroDescribableConfigObject(heteroDescribableConfigurator));
                 }
-            generateRootConfiguratorObject(schemaConfiguratorObjects);
+            }
+
+           rootConfiguratorProperties.put(rootElementConfigurator.getName(),
+                                        new JSONObject().put("type", "object")
+                                                        .put("additionalProperties", false)
+                                                        .put("properties", schemaConfiguratorObjects)
+                                                        .put("title", "Configuration base for the " + rootElementConfigurator.getName()
+                                                            + " classifier"));
         }
-        schemaObject.put("properties", schemaConfiguratorObjects);
+        schemaObject.put("properties", rootConfiguratorProperties);
         return schemaObject;
     }
 
-    public static String writeJSONSchema() throws Exception {
+    public static String writeJSONSchema() {
         JSONObject schemaObject = generateSchema();
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         JsonParser jsonParser = new JsonParser();
@@ -98,6 +117,7 @@ public class SchemaGeneration {
             while (itr.hasNext()) {
                 Map.Entry<String, Class> entry = itr.next();
                 JSONObject implementorObject = new JSONObject();
+                implementorObject.put("additionalProperties", false);
                 implementorObject.put("properties",
                     new JSONObject().put(entry.getKey(), new JSONObject()
                         .put("$id", "#/definitions/" + entry.getValue().getName())));
@@ -161,7 +181,7 @@ public class SchemaGeneration {
                                                         .put("additionalProperties", false)
                                                         .put("title", "Configuration base for the " + rootElementConfigurator.getName()
                                                          + " classifier")
-                                                        .put("id", "#/definitions/" + rootElementConfigurator.getTarget().getSimpleName().toLowerCase()));
+                                                        .put("id", "#/definitions/" + rootElementConfigurator.getTarget().getName().toLowerCase()));
         }
         return rootConfiguratorObject;
     }
