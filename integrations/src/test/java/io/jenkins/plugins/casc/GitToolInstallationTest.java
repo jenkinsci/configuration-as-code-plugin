@@ -1,8 +1,8 @@
 package io.jenkins.plugins.casc;
 
 import hudson.plugins.git.GitTool;
-import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
-import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
+import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import io.jenkins.plugins.casc.model.CNode;
 import jenkins.model.Jenkins;
 import org.junit.ClassRule;
@@ -21,8 +21,8 @@ import static org.junit.Assert.assertThat;
 public class GitToolInstallationTest {
 
     @ClassRule
-    @ConfiguredWithCode("GitToolInstallationTest.yml")
-    public static JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+    @ConfiguredWithReadme("git/README.md")
+    public static JenkinsConfiguredWithReadmeRule j = new JenkinsConfiguredWithReadmeRule();
 
     @Test
     public void configure_git_installations() throws Exception {
