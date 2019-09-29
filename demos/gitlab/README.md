@@ -1,4 +1,6 @@
-# configure gitlab plugin
+# Configure gitlab plugin
+
+Basic configuration of the [Gitlab plugin](https://plugins.jenkins.io/gitlab-plugin)
 
 ## sample configuration
 
@@ -10,7 +12,7 @@ credentials:
           - gitLabApiTokenImpl:
               scope: SYSTEM
               id: gitlab_token
-              apiToken: "qwertyuiopasdfghjklzxcvbnm"
+              apiToken: "${BIND_TOKEN}"
               description: "Gitlab Token"
 unclassified:
   gitlabconnectionconfig:
