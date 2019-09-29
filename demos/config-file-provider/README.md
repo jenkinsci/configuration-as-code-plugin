@@ -1,6 +1,8 @@
 # configure config-file-provider files
 
-support for Configuration as Code is available from config-file-provider 3.4.1.
+Basic configuration of the [Config File Provider plugin](https://plugins.jenkins.io/config-file-provider)
+
+For plugin version 3.4.1 and up:
 
 ## sample configuration
 
