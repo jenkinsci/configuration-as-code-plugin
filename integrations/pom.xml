@@ -337,6 +337,18 @@
 
   <dependencyManagement>
     <dependencies>
+
+      <dependency>
+        <groupId>com.github.docker-java</groupId>
+        <artifactId>docker-java</artifactId>
+        <version>3.1.1</version>
+        <exclusions>
+          <exclusion> <!-- https://issues.jenkins-ci.org/browse/JENKINS-39689 -->
+            <groupId>org.glassfish.jersey.inject</groupId>
+            <artifactId>jersey-hk2</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
       <!-- force upper bound dependencies -->
       <dependency>
         <groupId>commons-codec</groupId>
