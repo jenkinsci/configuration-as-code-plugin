@@ -11,7 +11,7 @@
 
 <img src="plugin/src/main/webapp/img/logo-head.svg" width="192">
 
-## Introduction
+## Introduction 
 
 Setting up Jenkins is a complex process, as both Jenkins and its plugins require some tuning and configuration,
 with dozens of parameters to set within the web UI `manage` section.
