@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Objects;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import jenkins.model.GlobalConfigurationCategory;
 import jenkins.tools.ToolConfigurationCategory;
@@ -32,6 +33,7 @@ import static io.jenkins.plugins.casc.ConfigurationAsCode.serializeYamlNode;
 import static io.jenkins.plugins.casc.SchemaGeneration.generateSchema;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class Util {
 
@@ -213,12 +215,12 @@ public class Util {
     }
 
     /**
-     * Returns the JSON V7 schema for the running jenkins instance.
+     * Retrieves the JSON schema for the running jenkins instance.
      * Example Usage:
      *      * <pre>{@code
      *      * Schema jsonSchema = returnSchema();}
      *      * </pre>
-     * @return Schema Returns the schema for the current jenkins instance
+     * @return Schema the schema for the current jenkins instance
      */
     public static Schema returnSchema() {
         JSONObject schemaObject = generateSchema();
@@ -228,19 +230,19 @@ public class Util {
     }
 
     /**
-     *Validates a given jsonObject against the schema generated for the current live jenkins instance
+     * Validates a given jsonObject against the schema generated for the current live jenkins instance
      *      * Example Usage:
      *      *      * <pre>{@code
      *      *      * assertTrue(validateSchema(jsonSubject));}
      *      *      * </pre>
      * @param  jsonSubject The json Object that needs to be validated
-     * @return boolean returns true if its valid else returns false
+     * @return true if it's valid else returns false
      */
     public static boolean validateSchema(JSONObject jsonSubject) {
         try {
             returnSchema().validate(jsonSubject);
         } catch (Exception ie) {
-            LOGGER.warning(failureMessage);
+            LOGGER.log(Level.WARNING, failureMessage, ie);
             return false;
         }
         return true;
@@ -255,8 +257,8 @@ public class Util {
      * @param yamlFileName the name of the yaml file that needs to be converted
      * @return JSONObject pertaining to that yaml file.
      */
-     public static JSONObject convertYamlFileToJson(String yamlFileName) throws Exception {
-        String yamlStringContents = Util.toStringFromYamlFile(Util.class, yamlFileName);
-        return new JSONObject(new JSONTokener(Util.convertToJson(yamlStringContents)));
+     public static JSONObject convertYamlFileToJson(Object clazz, String yamlFileName) throws Exception {
+        String yamlStringContents = toStringFromYamlFile(clazz, yamlFileName);
+        return new JSONObject(new JSONTokener(convertToJson(yamlStringContents)));
     }
 }
