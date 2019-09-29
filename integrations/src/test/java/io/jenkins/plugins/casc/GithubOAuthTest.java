@@ -1,9 +1,7 @@
 package io.jenkins.plugins.casc;
 
 import hudson.security.SecurityRealm;
-import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
-import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.GithubSecurityRealm;
