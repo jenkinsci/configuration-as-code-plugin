@@ -16,11 +16,11 @@ public class SchemaGenerationTest {
 
     @Test
     public void validSchemaShouldSucceed() throws Exception {
-        assertTrue(validateSchema(convertYamlFileToJson("validSchemaConfig.yml")));
+        assertTrue(validateSchema(convertYamlFileToJson(SchemaGenerationTest.class, "validSchemaConfig.yml")));
     }
 
     @Test
     public void invalidSchemaShouldNotSucceed() throws Exception {
-        assertFalse(validateSchema(convertYamlFileToJson("invalidSchemaConfig.yml")));
+        assertFalse(validateSchema(convertYamlFileToJson(SchemaGenerationTest.class,"invalidSchemaConfig.yml")));
     }
 }
