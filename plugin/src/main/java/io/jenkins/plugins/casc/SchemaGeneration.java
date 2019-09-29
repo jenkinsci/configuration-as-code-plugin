@@ -81,13 +81,12 @@ public class SchemaGeneration {
         return schemaObject;
     }
 
-    public static String writeJSONSchema() throws Exception{
+    public static String writeJSONSchema() {
         JSONObject schemaObject = generateSchema();
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         JsonParser jsonParser = new JsonParser();
         JsonElement jsonElement = jsonParser.parse(schemaObject.toString());
-        String prettyJsonString = gson.toJson(jsonElement);
-        return prettyJsonString;
+        return gson.toJson(jsonElement);
     }
 
     private static JSONObject generateHeteroDescribableConfigObject(HeteroDescribableConfigurator heteroDescribableConfiguratorObject) {
@@ -115,40 +114,41 @@ public class SchemaGeneration {
 
     private static JSONObject generateNonEnumAttributeObject(Attribute attribute, BaseConfigurator baseConfigurator) {
         JSONObject attributeType = new JSONObject();
+        String description = retrieveDocStringFromAttribute(baseConfigurator.getTarget(), attribute.name);
         switch (attribute.type.getName()) {
             case "java.lang.String":
                 attributeType.put("type", "string");
-                attributeType.put("description", retrieveDocStringFromAttribute(baseConfigurator.getTarget(), attribute.name));
+                attributeType.put("description", description);
                 break;
 
             case "int":
                 attributeType.put("type", "integer");
-                attributeType.put("description", retrieveDocStringFromAttribute(baseConfigurator.getTarget(), attribute.name));
+                attributeType.put("description", description);
                 break;
 
             case "boolean":
                 attributeType.put("type", "boolean");
-                attributeType.put("description", retrieveDocStringFromAttribute(baseConfigurator.getTarget(), attribute.name));
+                attributeType.put("description", description);
                 break;
 
             case "java.lang.Boolean":
                 attributeType.put("type", "boolean");
-                attributeType.put("description", retrieveDocStringFromAttribute(baseConfigurator.getTarget(), attribute.name));
+                attributeType.put("description", description);
                 break;
 
             case "java.lang.Integer":
                 attributeType.put("type", "integer");
-                attributeType.put("description", retrieveDocStringFromAttribute(baseConfigurator.getTarget(), attribute.name));
+                attributeType.put("description", description);
                 break;
 
             case "java.lang.Long":
                 attributeType.put("type", "integer");
-                attributeType.put("description", retrieveDocStringFromAttribute(baseConfigurator.getTarget(), attribute.name));
+                attributeType.put("description", description);
                 break;
 
             default:
                 attributeType.put("type", "object");
-                attributeType.put("description", retrieveDocStringFromAttribute(baseConfigurator.getTarget(), attribute.name));
+                attributeType.put("description", description);
                 attributeType.put("$id",
                     "#/definitions/" + attribute.type.getName());
                 break;
@@ -204,16 +204,14 @@ public class SchemaGeneration {
     }
 
     public static String retrieveDocStringFromAttribute(Class baseConfigClass, String attributeName) {
-        String htmlDocString = null;
         try {
-            htmlDocString = ConfigurationAsCode.get().getHtmlHelp(baseConfigClass, attributeName);
+            String htmlDocString = ConfigurationAsCode.get().getHtmlHelp(baseConfigClass, attributeName);
+            htmlDocString = htmlDocString.replaceAll("\\<.*?\\>", "").trim();
+            return htmlDocString;
         } catch (IOException e) {
             LOGGER.warning("Error getting help document for attribute : " + e);
         }
-        if(htmlDocString!=null) {
-            htmlDocString = htmlDocString.replaceAll("\\<.*?\\>", "").trim();
-        }
-        return htmlDocString;
+        return null;
     }
 }
 
