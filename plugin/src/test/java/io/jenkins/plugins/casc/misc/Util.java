@@ -218,6 +218,7 @@ public class Util {
      *      * <pre>{@code
      *      * Schema jsonSchema = returnSchema();}
      *      * </pre>
+     * @return Schema Returns the schema for the current jenkins instance
      */
     public static Schema returnSchema() {
         JSONObject schemaObject = generateSchema();
@@ -232,11 +233,10 @@ public class Util {
      *      *      * <pre>{@code
      *      *      * assertTrue(validateSchema(jsonSubject));}
      *      *      * </pre>
-     * @param jsonSubject
-     * @return boolean
+     * @param  jsonSubject The json Object that needs to be validated
+     * @return boolean returns true if its valid else returns false
      */
     public static boolean validateSchema(JSONObject jsonSubject) {
-
         try {
             returnSchema().validate(jsonSubject);
         } catch (Exception ie) {
@@ -244,5 +244,19 @@ public class Util {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Converts a YAML file into a json object
+     * Example Usage:
+     *           * <pre>{@code
+     *           * JSONObject  jsonObject = convertYamlFileToJson("filename");}
+     *           * </pre>
+     * @param yamlFileName the name of the yaml file that needs to be converted
+     * @return JSONObject pertaining to that yaml file.
+     */
+     public static JSONObject convertYamlFileToJson(String yamlFileName) throws Exception {
+        String yamlStringContents = Util.toStringFromYamlFile(Util.class, yamlFileName);
+        return new JSONObject(new JSONTokener(Util.convertToJson(yamlStringContents)));
     }
 }
