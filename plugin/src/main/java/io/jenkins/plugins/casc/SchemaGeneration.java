@@ -203,14 +203,16 @@ public class SchemaGeneration {
         }
     }
 
-    private static String retrieveDocStringFromAttribute(Class baseConfigclass, String attributeName) {
+    public static String retrieveDocStringFromAttribute(Class baseConfigClass, String attributeName) {
         String htmlDocString = null;
         try {
-            htmlDocString = ConfigurationAsCode.get().getHtmlHelp(baseConfigclass, attributeName);
+            htmlDocString = ConfigurationAsCode.get().getHtmlHelp(baseConfigClass, attributeName);
         } catch (IOException e) {
             LOGGER.warning("Error getting help document for attribute : " + e);
         }
-        htmlDocString = htmlDocString.replaceAll("\\<.*?\\>", "").trim();
+        if(htmlDocString!=null) {
+            htmlDocString = htmlDocString.replaceAll("\\<.*?\\>", "").trim();
+        }
         return htmlDocString;
     }
 }

@@ -18,6 +18,8 @@ import org.junit.Test;
 
 import static io.jenkins.plugins.casc.SchemaGeneration.generateSchema;
 import static io.jenkins.plugins.casc.SchemaGeneration.writeJSONSchema;
+import static io.jenkins.plugins.casc.SchemaGeneration.retrieveDocStringFromAttribute;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 public class SchemaGenerationTest {
@@ -59,6 +61,13 @@ public class SchemaGenerationTest {
         } catch (ValidationException ve) {
             ve.printStackTrace();
         }
+    }
+
+    @Test
+    public void testRetrieveDocStringFromAttribute() {
+        String expectedDocString = "If checked, this will allow users who are not authenticated to access Jenkins in a read-only mode.";
+        String actualDocString = retrieveDocStringFromAttribute(hudson.security.FullControlOnceLoggedInAuthorizationStrategy.class, "allowAnonymousRead");
+        assertEquals(expectedDocString,actualDocString);
     }
 
     //    For testing purposes.To be removed
