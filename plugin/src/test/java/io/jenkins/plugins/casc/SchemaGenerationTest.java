@@ -6,6 +6,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.misc.Util;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.ValidationException;
 import org.everit.json.schema.loader.SchemaLoader;
@@ -15,6 +17,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import static io.jenkins.plugins.casc.SchemaGeneration.generateSchema;
+import static io.jenkins.plugins.casc.SchemaGeneration.writeJSONSchema;
 import static org.junit.Assert.fail;
 
 public class SchemaGenerationTest {
@@ -56,5 +59,13 @@ public class SchemaGenerationTest {
         } catch (ValidationException ve) {
             ve.printStackTrace();
         }
+    }
+
+    //    For testing purposes.To be removed
+    @Test
+    public void writeSchema() throws Exception {
+        BufferedWriter writer = new BufferedWriter(new FileWriter("schema.json"));
+        writer.write(writeJSONSchema());
+        writer.close();
     }
 }
