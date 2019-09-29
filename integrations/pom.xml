@@ -122,12 +122,20 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>github-branch-source</artifactId>
-      <version>2.3.2</version>
+      <version>2.5.7</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
           <groupId>com.infradna.tool</groupId>
           <artifactId>bridge-method-annotation</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.jenkins-ci.plugins</groupId>
+          <artifactId>jackson2-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.jenkins-ci.plugins</groupId>
+          <artifactId>display-url-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -289,23 +297,6 @@
       <artifactId>display-url-api</artifactId>
       <version>1.1.1</version>
       <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>github-branch-source</artifactId>
-      <version>2.5.7</version>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.jenkins-ci.plugins</groupId>
-          <artifactId>jackson2-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.jenkins-ci.plugins</groupId>
-          <artifactId>display-url-api</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
