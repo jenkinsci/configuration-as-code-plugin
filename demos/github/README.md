@@ -1,6 +1,6 @@
 # Configure GitHub
 
-Basic configuration of the [GitHub plugin](https://wiki.jenkins.io/display/JENKINS/GitHub+Plugin)
+Basic configuration of the [GitHub plugin](https://plugins.jenkins.io/github)
 
 ## sample configuration
 
