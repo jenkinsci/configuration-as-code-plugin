@@ -6,11 +6,14 @@ import com.cloudbees.plugins.credentials.domains.DomainCredentials;
 import com.dabsquared.gitlabjenkins.connection.GitLabApiToken;
 import com.dabsquared.gitlabjenkins.connection.GitLabConnection;
 import com.dabsquared.gitlabjenkins.connection.GitLabConnectionConfig;
-import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
-import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
+import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import java.util.List;
+import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
+import org.junit.rules.RuleChain;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -21,10 +24,12 @@ import static org.junit.Assert.assertTrue;
 public class GitLabConfigurationTest {
 
     @Rule
-    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+    public RuleChain chain = RuleChain.outerRule(new EnvironmentVariables()
+        .set("BIND_TOKEN", "qwertyuiopasdfghjklzxcvbnm"))
+        .around(new JenkinsConfiguredWithReadmeRule());
 
     @Test
-    @ConfiguredWithCode("GitLabTest.yml")
+    @ConfiguredWithReadme("gitlab/README.md")
     public void configure_gitlab_api_token() throws Exception {
         SystemCredentialsProvider systemCreds = SystemCredentialsProvider.getInstance();
         List<DomainCredentials> domainCredentials = systemCreds.getDomainCredentials();
@@ -38,9 +43,10 @@ public class GitLabConfigurationTest {
         assertEquals("Gitlab Token", apiToken.getDescription());
     }
     @Test
-    @ConfiguredWithCode("GitLabTest.yml")
+    @ConfiguredWithReadme("gitlab/README.md")
     public void configure_gitlab_connection() throws Exception {
-        final GitLabConnectionConfig gitLabConnections = j.jenkins.getDescriptorByType(GitLabConnectionConfig.class);
+        final Jenkins jenkins = Jenkins.get();
+        final GitLabConnectionConfig gitLabConnections = jenkins.getDescriptorByType(GitLabConnectionConfig.class);
         assertEquals(1, gitLabConnections.getConnections().size());
         final GitLabConnection gitLabConnection = gitLabConnections.getConnections().get(0);
         assertEquals("gitlab_token", gitLabConnection.getApiTokenId());
