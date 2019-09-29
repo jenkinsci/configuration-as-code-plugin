@@ -1,6 +1,6 @@
 # Configure github-oauth-plugin
 
-Basic configuration of the [Active Directory plugin](https://plugins.jenkins.io/github-oauth)
+Basic configuration of the [GitHub Authentication plugin](https://plugins.jenkins.io/github-oauth)
 
 ## sample-configuration
 
