@@ -2,8 +2,8 @@ package io.jenkins.plugins.casc;
 
 import hudson.plugins.jira.JiraProjectProperty;
 import hudson.plugins.jira.JiraProjectProperty.DescriptorImpl;
-import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
-import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
+import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
@@ -16,10 +16,10 @@ import static org.junit.Assert.assertEquals;
 public class JiraTest {
 
     @Rule
-    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+    public JenkinsConfiguredWithReadmeRule j = new JenkinsConfiguredWithReadmeRule();
 
     @Test
-    @ConfiguredWithCode("JiraTest.yml")
+    @ConfiguredWithReadme("jira/README.md")
     @Issue("JENKINS-52906")
     public void configure_jira_project_globalconfig() throws Exception {
 
