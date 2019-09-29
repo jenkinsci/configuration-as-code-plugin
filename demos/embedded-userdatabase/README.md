@@ -1,4 +1,4 @@
-# configure Jenkins’ own user database
+# Configure Jenkins’ own user database
 
 ## sample configuration
 
