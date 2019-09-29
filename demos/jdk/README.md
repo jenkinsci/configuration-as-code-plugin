@@ -1,3 +1,10 @@
+# Configure JDK
+
+Basic configuration of the [JDK](https://plugins.jenkins.io/jdk-tool)
+
+## sample configuration
+
+```yaml
 tool:
   jdk:
     installations:
@@ -9,3 +16,4 @@ tool:
                 - jdkInstaller:
                     id: "jdk-8u181-oth-JPR"
                     acceptLicense: true
+```
