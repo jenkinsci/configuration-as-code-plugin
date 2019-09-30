@@ -1,4 +1,6 @@
-# configure saml2.0 plugin
+# Configure saml2.0 plugin
+
+Basic configuration of the [SAML plugin](https://plugins.jenkins.io/saml)
 
 ## sample configuration
 
@@ -11,9 +13,9 @@ jenkins:
       emailAttributeName: "Email"
       groupsAttributeName: "http://schemas.xmlsoap.org/claims/Group"
       idpMetadataConfiguration:
+        xml: "<todo>for testing purposes</todo>" ## In order to test the demo within the integrations.
         period: 0
         url: "https://abc.com"
-
       maximumAuthenticationLifetime: 86400
       usernameAttributeName: "NameID"
       usernameCaseConversion: "none"
