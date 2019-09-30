@@ -77,6 +77,24 @@ public class SchemaGenerationTest {
         }
     }
 
+    @Test
+    public void validJenkinsBaseConfigurator() throws Exception {
+        JSONObject schemaObject = generateSchema();
+        JSONObject jsonSchema = new JSONObject(
+            new JSONTokener(schemaObject.toString()));
+        String yamlStringContents = Util.toStringFromYamlFile(this, "validJenkinsBaseConfig.yml");
+        JSONObject jsonSubject = new JSONObject(
+            new JSONTokener(Util.convertToJson(yamlStringContents)));
+        Schema schema = SchemaLoader.load(jsonSchema);
+        try {
+            schema.validate(jsonSubject);
+            LOGGER.warning(failureMessage);
+            fail();
+        } catch (ValidationException ve) {
+            ve.printStackTrace();
+        }
+    }
+
 
     //    For testing purposes.To be removed
     @Test
