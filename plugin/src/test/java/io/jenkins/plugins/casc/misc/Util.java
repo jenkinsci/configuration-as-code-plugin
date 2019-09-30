@@ -33,7 +33,6 @@ import static io.jenkins.plugins.casc.ConfigurationAsCode.serializeYamlNode;
 import static io.jenkins.plugins.casc.SchemaGeneration.generateSchema;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class Util {
 
