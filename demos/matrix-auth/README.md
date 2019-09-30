@@ -1,6 +1,6 @@
 # Configure Matrix Authorization Strategy
 
-Basic configuration of the [Matrix Matrix Authorization Strategy plugin](https://plugins.jenkins.io/matrix-auth)
+Basic configuration of the [Matrix Authorization Strategy plugin](https://plugins.jenkins.io/matrix-auth)
 
 ## sample configuration
 
