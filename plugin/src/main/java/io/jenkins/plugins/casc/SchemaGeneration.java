@@ -206,8 +206,7 @@ public class SchemaGeneration {
     public static String retrieveDocStringFromAttribute(Class baseConfigClass, String attributeName) {
         try {
             String htmlDocString = ConfigurationAsCode.get().getHtmlHelp(baseConfigClass, attributeName);
-            htmlDocString = htmlDocString.replaceAll("\\<.*?\\>", "").trim();
-            return htmlDocString;
+            return htmlDocString.replaceAll("\\<.*?\\>", "").trim();
         } catch (IOException e) {
             LOGGER.warning("Error getting help document for attribute : " + e);
         }
