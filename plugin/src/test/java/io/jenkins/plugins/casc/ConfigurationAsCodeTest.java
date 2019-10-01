@@ -27,6 +27,8 @@ import org.jvnet.hudson.test.JenkinsRule.WebClient;
 
 import static com.gargoylesoftware.htmlunit.HttpMethod.POST;
 import static io.jenkins.plugins.casc.ConfigurationAsCode.CASC_JENKINS_CONFIG_PROPERTY;
+import static io.jenkins.plugins.casc.ConfigurationAsCode.get;
+import static io.jenkins.plugins.casc.SchemaGeneration.retrieveDocStringFromAttribute;
 import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
 import static io.jenkins.plugins.casc.misc.Util.toYamlString;
 import static org.hamcrest.Matchers.contains;
@@ -244,5 +246,14 @@ public class ConfigurationAsCodeTest {
             + "  Welcome to our build server.\n\n"
             + "  This Jenkins is 100% configured and managed 'as code'.\n";
         assertThat(exported, is(expected));
+    }
+
+    @Test
+    public void testHtmlDocStringRetrieval() throws Exception {
+        String expectedDocString = "<div>\n"
+            + "  If checked, this will allow users who are not authenticated to access Jenkins in a read-only mode.\n"
+            + "</div>\n";
+        String actualDocString = ConfigurationAsCode.get().getHtmlHelp(hudson.security.FullControlOnceLoggedInAuthorizationStrategy.class, "allowAnonymousRead");
+        assertEquals(expectedDocString, actualDocString);
     }
 }
