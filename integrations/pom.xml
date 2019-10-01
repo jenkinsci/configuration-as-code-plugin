@@ -41,6 +41,7 @@
       <groupId>com.coravy.hudson.plugins.github</groupId>
       <artifactId>github</artifactId>
       <version>1.29.3</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
