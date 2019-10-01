@@ -1,40 +1,48 @@
-# configure Amazon EC2 plugin
+# Configure Amazon EC2 plugin
 
-[Amazon EC2 Plugin](https://wiki.jenkins.io/display/JENKINS/Amazon+EC2+Plugin)
+Basic configuration of the [Amazon EC2 Plugin](https://plugins.jenkins.io/ec2)
 
 ## sample configuration
 
 ```yaml
+
 jenkins:
   clouds:
     - amazonEC2:
-        cloudName: "docker-agents"
-        credentialsId: "jenkins-aws"
+        cloudName: "ec2"
+        instanceCapStr: 20
+        # this shouldn't be needed, since without explicit creds this should already be used
+        # but let's be explicit to avoid issues.
+        useInstanceProfileForCredentials: true
+        # Reminder: the following key has multiple lines
         privateKey: "${EC2_PRIVATE_KEY}"
-        region: "eu-central-1"
         noDelayProvisioning: true
-        useInstanceProfileForCredentials: false
+        region: "eu-central-1"
         templates:
-          - ami: "ami-xyz"
-            amiType:
-              unixData:
-                sshPort: "22"
+          - description: "Auto configured EC2 Agent, yay again"
             associatePublicIp: false
             connectBySSHProcess: false
             connectionStrategy: PRIVATE_IP
             deleteRootOnTermination: false
-            description: "docker"
             ebsOptimized: false
             idleTerminationMinutes: "10"
-            labelString: "docker ubuntu linux"
             maxTotalUses: -1
-            mode: NORMAL
             monitoring: false
             numExecutors: 1
-            remoteAdmin: "ubuntu"
-            securityGroups: "docker"
             stopOnTerminate: false
-            type: T2Micro
             useDedicatedTenancy: false
             useEphemeralDevices: false
+            zone: "us-east-1"
+            ami: "ami-0c6bb742864ffa3f3"
+            labelString: "test yey"
+            type: "T2Xlarge"
+            securityGroups: "some-group"
+            remoteFS: "/home/ec2-user"
+            remoteAdmin: "ec2-user"
+            mode: "NORMAL"
+            amiType:
+              unixData:
+                rootCommandPrefix: "sudo"
+                slaveCommandPrefix: "sudo -u jenkins"
+                sshPort: "61120"
 ```
