@@ -104,6 +104,8 @@ public abstract class RoundTripAbstractTest {
             String jenkinsConf = getResourceContent(resourcePath);
             assertConfigViaWebUI(jenkinsConf);
 
+            //Validate Schema before application
+
             // Apply configuration via Web UI
             applyConfigViaWebUI(jenkinsConf);
             assertConfiguredAsExpected(r, resourceContent);
