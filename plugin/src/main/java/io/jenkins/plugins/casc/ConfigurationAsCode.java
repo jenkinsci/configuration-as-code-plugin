@@ -14,6 +14,7 @@ import hudson.remoting.Which;
 import hudson.security.ACL;
 import hudson.security.ACLContext;
 import hudson.util.FormValidation;
+import io.jenkins.plugins.casc.core.JenkinsConfigurator;
 import io.jenkins.plugins.casc.impl.DefaultConfiguratorRegistry;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
@@ -757,8 +758,11 @@ public class ConfigurationAsCode extends ManagementLink {
                 .map(c -> c.getConfigurators(context))
                 .flatMap(Collection::stream)
                 .forEach(configurator -> {
-                    if (elements.add(configurator)) {
-                        listElements(elements, ((Configurator)configurator).describe(), context);   // some unexpected type erasure force to cast here
+                    if (!configurator.getTarget().getName().equals("jenkins.model.Jenkins")) {
+                        if (elements.add(configurator)) {
+                            listElements(elements, ((Configurator) configurator).describe(),
+                                context);   // some unexpected type erasure force to cast here
+                        }
                     }
                 });
     }
