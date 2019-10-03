@@ -283,6 +283,13 @@
       </exclusions>
     </dependency>
 
+    <dependency>
+      <groupId>org.jvnet.hudson.plugins</groupId>
+      <artifactId>warnings</artifactId>
+      <version>5.0.0</version>
+      <scope>test</scope>
+    </dependency>
+
     <!-- required to satisfy upper bound dependencies -->
 
     <dependency>
@@ -452,6 +459,16 @@
         <version>1.13.0</version>
       </dependency>
       <dependency>
+        <groupId>com.google.errorprone</groupId>
+        <artifactId>error_prone_annotations</artifactId>
+        <version>2.3.3</version>
+      </dependency>
+      <dependency>
+        <groupId>jaxen</groupId>
+        <artifactId>jaxen</artifactId>
+        <version>1.1.6</version>
+      </dependency>
+      <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-lang3</artifactId>
         <version>3.9</version>
@@ -487,6 +504,11 @@
         <version>2.17</version>
       </dependency>
       <dependency>
+        <groupId>org.jenkins-ci.main</groupId>
+        <artifactId>maven-plugin</artifactId>
+        <version>3.1.2</version>
+      </dependency>
+      <dependency>
         <groupId>org.jenkins-ci.modules</groupId>
         <artifactId>instance-identity</artifactId>
         <version>2.2</version>
@@ -496,6 +518,11 @@
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>aws-java-sdk</artifactId>
         <version>1.11.457</version>
+      </dependency>
+      <dependency>
+        <groupId>org.json</groupId>
+        <artifactId>json</artifactId>
+        <version>20180813</version>
       </dependency>
       <dependency>
         <groupId>joda-time</groupId>
