@@ -1,6 +1,6 @@
-# configure git plugin
+# Configure git plugin
 
-(actually, git-client plugin)
+Basic configuration of the [Git Client plugin](https://plugins.jenkins.io/git-client)
 
 ## sample configuration
 
@@ -9,6 +9,8 @@ tool:
   git:
     installations:
       - name: git
+        home: /bin/git
+      - name: another_git
         home: /usr/local/bin/git
 ```
 
