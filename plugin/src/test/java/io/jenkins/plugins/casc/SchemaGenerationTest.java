@@ -1,9 +1,5 @@
 package io.jenkins.plugins.casc;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.misc.Util;
 import org.everit.json.schema.Schema;
@@ -39,11 +35,7 @@ public class SchemaGenerationTest {
 
     @Test
     public void invalidSchemaShouldNotSucceed() throws Exception {
-        JSONObject schemaObject = generateSchema();
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        JsonParser jsonParser = new JsonParser();
-        JsonElement jsonElement = jsonParser.parse(schemaObject.toString());
-        String prettyJsonString = gson.toJson(jsonElement);
+        String prettyJsonString = generateSchema().toString(4);
         JSONObject jsonSchema = new JSONObject(
             new JSONTokener(prettyJsonString));
         String yamlStringContents = Util.toStringFromYamlFile(this, "invalidSchemaConfig.yml");
