@@ -11,6 +11,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import static io.jenkins.plugins.casc.SchemaGeneration.generateSchema;
+import static io.jenkins.plugins.casc.misc.Util.toStringFromYamlFile;
 import static org.junit.Assert.fail;
 
 public class SchemaGenerationTest {
@@ -22,7 +23,7 @@ public class SchemaGenerationTest {
         JSONObject schemaObject = generateSchema();
         JSONObject jsonSchema = new JSONObject(
             new JSONTokener(schemaObject.toString()));
-        String yamlStringContents = Util.toStringFromYamlFile(this, "validSchemaConfig.yml");
+        String yamlStringContents = toStringFromYamlFile(this, "validSchemaConfig.yml");
         JSONObject jsonSubject = new JSONObject(
             new JSONTokener(Util.convertToJson(yamlStringContents)));
         Schema schema = SchemaLoader.load(jsonSchema);
@@ -35,10 +36,10 @@ public class SchemaGenerationTest {
 
     @Test
     public void invalidSchemaShouldNotSucceed() throws Exception {
-        String prettyJsonString = generateSchema().toString(4);
+        JSONObject schemaObject = generateSchema();
         JSONObject jsonSchema = new JSONObject(
-            new JSONTokener(prettyJsonString));
-        String yamlStringContents = Util.toStringFromYamlFile(this, "invalidSchemaConfig.yml");
+            new JSONTokener(schemaObject.toString()));
+        String yamlStringContents = toStringFromYamlFile(this, "invalidSchemaConfig.yml");
         JSONObject jsonSubject = new JSONObject(
             new JSONTokener(Util.convertToJson(yamlStringContents)));
         Schema schema = SchemaLoader.load(jsonSchema);
