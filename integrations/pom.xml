@@ -168,6 +168,7 @@
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>external-workspace-manager</artifactId>
       <version>1.2.0</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
