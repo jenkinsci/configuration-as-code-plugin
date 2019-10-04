@@ -260,17 +260,17 @@ but the JCasC plugin has no way to determine which variables should be resolved 
 
 In some cases non-admin users can contribute to JCasC exports if they have some permissions
 (e.g. agent/view configuration or credentials management),
-and they could potentially inject variable expressions in plain text fields like descriptions 
+and they could potentially inject variable expressions in plain text fields like descriptions
 and then see the resolved secrets in Jenkins Web UI if the Jenkins admin exports and imports the configuration without checking contents.
 It led to a security vulnerability which was addressed in JCasC `1.25` (SECURITY-1446).
 
 - When reading configuration YAMLs, JCasC plugin will try to resolve
   **all** variables having the `${VARNAME}` format.
 - Starting from JCasC `1.25`, JCasC export escapes the internal variable expressions,
-  e.g. as `^${VARNAME}`, so newly exported and then imported configurations are 
+  e.g. as `^${VARNAME}`, so newly exported and then imported configurations are
   are not subject for this risk
 - For previously exported configurations, Jenkins admins are expected to manually
-  resolve the issues by putting the escape symbol `^` in front of variables which should not be resolved 
+  resolve the issues by putting the escape symbol `^` in front of variables which should not be resolved
 
 ### Vault
 
@@ -338,10 +338,10 @@ secrets:
 
 We don't support installing plugins with JCasC you need to use something else for this,
 
-Dockers users can use:  
+Dockers users can use:\
 [https://github.com/jenkinsci/docker/#preinstalling-plugins](https://github.com/jenkinsci/docker/#preinstalling-plugins)
 
-Kubernetes users:  
+Kubernetes users:\
 [https://github.com/helm/charts/tree/master/stable/jenkins](https://github.com/helm/charts/tree/master/stable/jenkins)
 
 ## Supported Plugins
@@ -363,16 +363,22 @@ You have the following option to trigger a configuration reload:
   query parameter named `casc-reload-token`, i.e. `JENKINS_URL/reload-configuration-as-code/?casc-reload-token=32424324rdsadsa`.
 
   `curl  -X POST "JENKINS_URL:8080/reload-configuration-as-code/?casc-reload-token=32424324rdsadsa"`
-  
+
+- via Groovy script
+  ```groovy
+  import io.jenkins.plugins.casc.ConfigurationAsCode;
+  ConfigurationAsCode.get().configure()
+  ```
+
 ## Configuration-as-Code extension plugins
 
-- [configuration-as-code-groovy-plugin](https://github.com/jenkinsci/configuration-as-code-groovy-plugin)
+- [configuration-as-code-groovy-plugin](https://github.com/jenkinsci/configuration-as-code-groovy-plugin)\
   Allows to specify groovy code that should run on during configuration.
-- [configuration-as-code-secret-ssm-plugin](https://github.com/jenkinsci/configuration-as-code-secret-ssm-plugin)
+- [configuration-as-code-secret-ssm-plugin](https://github.com/jenkinsci/configuration-as-code-secret-ssm-plugin)\
   Allows to resolve secrets from AWS' SSM secrets
-- [hashicorp-vault-plugin](https://github.com/jenkinsci/hashicorp-vault-plugin)
+- [hashicorp-vault-plugin](https://github.com/jenkinsci/hashicorp-vault-plugin)\
   Allows to resolve secrets from Hashicorp vault
-  
+
 
 ## Jenkins Enhancement Proposal
 
