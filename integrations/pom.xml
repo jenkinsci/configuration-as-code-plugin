@@ -21,6 +21,12 @@
       <groupId>io.jenkins</groupId>
       <artifactId>configuration-as-code</artifactId>
       <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.json</groupId>
+          <artifactId>json</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -28,6 +34,12 @@
       <artifactId>configuration-as-code</artifactId>
       <version>${project.version}</version>
       <type>test-jar</type>
+      <exclusions>
+        <exclusion>
+          <groupId>org.json</groupId>
+          <artifactId>json</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -457,11 +469,6 @@
         <groupId>com.squareup.okio</groupId>
         <artifactId>okio</artifactId>
         <version>1.13.0</version>
-      </dependency>
-      <dependency>
-        <groupId>com.google.errorprone</groupId>
-        <artifactId>error_prone_annotations</artifactId>
-        <version>2.3.3</version>
       </dependency>
       <dependency>
         <groupId>jaxen</groupId>
