@@ -1,4 +1,6 @@
-# configure simple-theme-plugin plugin
+# Configure simple-theme-plugin plugin
+
+Basic configuration of the [Simple Theme plugin](https://plugins.jenkins.io/simple-theme-plugin)
 
 ## sample configuration
 

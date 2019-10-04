@@ -18,9 +18,9 @@ import jenkins.model.Jenkins;
 public interface RootElementConfigurator<T> extends Configurator<T> {
 
     static List<RootElementConfigurator> all() {
-        List<RootElementConfigurator> configurators = new ArrayList<>();
         final Jenkins jenkins = Jenkins.getInstance();
-        configurators.addAll(jenkins.getExtensionList(RootElementConfigurator.class));
+        List<RootElementConfigurator> configurators = new ArrayList<>(
+            jenkins.getExtensionList(RootElementConfigurator.class));
 
         for (GlobalConfigurationCategory category : GlobalConfigurationCategory.all()) {
             configurators.add(new GlobalConfigurationCategoryConfigurator(category));
