@@ -20,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -53,7 +54,8 @@ public class JenkinsConfiguredWithReadmeRule extends JenkinsConfiguredRule {
                     try {
                         File codeBlockFile = File.createTempFile("integrations", "markdown");
                         InputStream inputStream = clazz.getClassLoader().getResourceAsStream(s);
-                        List<String> lines = Arrays.asList(transformFencedCodeBlockFromMarkdownToString(inputStream));
+                        List<String> lines = Collections.singletonList(
+                            transformFencedCodeBlockFromMarkdownToString(inputStream));
                         Path file = Paths.get(codeBlockFile.getCanonicalPath());
                         Files.write(file, lines, StandardCharsets.UTF_8);
                         return  codeBlockFile.toURI().toString();
