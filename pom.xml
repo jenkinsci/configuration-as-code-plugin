@@ -27,6 +27,8 @@
   </properties>
 
   <name>Configuration as Code Parent</name>
+  <description>The Configuration as Code plugin has been designed as an opinionated way to configure Jenkins based on human-readable declarative configuration files</description>
+  <url>https://github.com/jenkinsci/configuration-as-code-plugin</url>
 
   <licenses>
     <license>
