@@ -1,8 +1,10 @@
-# warnings-plugin
+# Configure Warnings
 
-Supported in plugin **version >= 5.00**
+Basic configuration of the [Warnings plugin](https://plugins.jenkins.io/warnings)
 
 Now present in the new `Groovy Based Warnings Parsers` section.
+
+For plugin version 5.00 and up:
 
 ## sample-configuration (Example parser from help)
 
