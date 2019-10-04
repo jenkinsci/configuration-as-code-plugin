@@ -26,6 +26,7 @@ expert, just translating into _code_ a configuration process one is used to exec
 
 ![configuration form](images/sample_form.png)
 
+
 This plugin aims to replace above user interface based configuration with the below text based configuration.
 
 ```yaml
