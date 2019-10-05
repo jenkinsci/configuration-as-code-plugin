@@ -179,7 +179,7 @@ public class ConfigurationAsCode extends ManagementLink {
                 }
                 LOGGER.log(Level.FINE, "Replace configuration with: " + normalizedSource);
             } else {
-                LOGGER.log(Level.INFO, "Provided sources could not be applied");
+                LOGGER.log(Level.WARNING, "Provided sources could not be applied");
                 // todo: show message in UI
             }
         } else {
