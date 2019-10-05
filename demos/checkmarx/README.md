@@ -1,4 +1,5 @@
 # configure checkmarx-plugin
+This is a basic configuration for the [Checkmarx plugin](https://plugins.jenkins.io/checkmarx).
 
 ## sample configuration
 Here is a sample configuration using a credential. It is also possible to specify a username and password in the cxscanbuilder section. 
