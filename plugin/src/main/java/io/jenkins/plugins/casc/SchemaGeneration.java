@@ -77,7 +77,7 @@ public class SchemaGeneration {
         return schemaObject;
     }
 
-    public static String writeJSONSchema() {
+    public static String writeJSONSchema() throws Exception{
         return generateSchema().toString(4);
     }
 

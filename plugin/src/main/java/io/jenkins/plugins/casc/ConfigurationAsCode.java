@@ -179,7 +179,7 @@ public class ConfigurationAsCode extends ManagementLink {
                 }
                 LOGGER.log(Level.FINE, "Replace configuration with: " + normalizedSource);
             } else {
-                LOGGER.log(Level.INFO, "Provided sources could not be applied");
+                LOGGER.log(Level.WARNING, "Provided sources could not be applied");
                 // todo: show message in UI
             }
         } else {
@@ -405,7 +405,7 @@ public class ConfigurationAsCode extends ManagementLink {
      * Export JSONSchema to URL
      * @throws Exception
      */
-    public void dov2Schema(StaplerRequest req, StaplerResponse res) throws Exception {
+    public void doSchema(StaplerRequest req, StaplerResponse res) throws Exception {
 
         if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
@@ -437,15 +437,6 @@ public class ConfigurationAsCode extends ManagementLink {
         }
 
         req.getView(this, "reference.jelly").forward(req, res);
-    }
-
-    public void doSchema(StaplerRequest req, StaplerResponse res) throws Exception {
-        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
-            res.sendError(HttpServletResponse.SC_FORBIDDEN);
-            return;
-        }
-
-        req.getView(this, "schema.jelly").forward(req, res);
     }
 
     @Restricted(NoExternalUse.class)

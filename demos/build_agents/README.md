@@ -14,6 +14,12 @@ jenkins:
         remoteFS: "/home/user1"
         launcher:
           jnlp:
+            workDirSettings:
+              disabled: true
+              failIfWorkDirIsMissing: false
+              internalDir: "remoting"
+              workDirPath: "/tmp"
+
     - permanent:
         labelString: "linux docker test"
         mode: NORMAL

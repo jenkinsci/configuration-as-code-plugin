@@ -4,8 +4,8 @@ import hudson.ExtensionList;
 import hudson.model.JDK;
 import hudson.tools.InstallSourceProperty;
 import hudson.tools.JDKInstaller;
-import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
-import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
+import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import io.jenkins.plugins.casc.model.CNode;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -24,8 +24,8 @@ import static org.junit.Assert.assertTrue;
 public class JdkConfiguratorTest {
 
     @ClassRule
-    @ConfiguredWithCode("JdkConfiguratorTest.yml")
-    public static JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+    @ConfiguredWithReadme("jdk/README.md")
+    public static JenkinsConfiguredWithReadmeRule j = new JenkinsConfiguredWithReadmeRule();
 
     @Test
     public void configure_jdk_tool() {

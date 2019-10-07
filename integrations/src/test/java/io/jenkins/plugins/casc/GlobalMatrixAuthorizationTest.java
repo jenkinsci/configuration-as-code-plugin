@@ -1,8 +1,8 @@
 package io.jenkins.plugins.casc;
 
 import hudson.security.GlobalMatrixAuthorizationStrategy;
-import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
-import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
+import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import java.util.ArrayList;
 import java.util.List;
 import jenkins.model.Jenkins;
@@ -18,10 +18,10 @@ import static org.junit.Assert.assertEquals;
 public class GlobalMatrixAuthorizationTest {
 
     @Rule
-    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+    public JenkinsConfiguredWithReadmeRule j = new JenkinsConfiguredWithReadmeRule();
 
     @Test
-    @ConfiguredWithCode("GlobalMatrixStrategy.yml")
+    @ConfiguredWithReadme("matrix-auth/README.md")
     public void checkCorrectlyConfiguredPermissions() throws Exception {
         assertEquals("The configured instance must use the Global Matrix Authentication Strategy", GlobalMatrixAuthorizationStrategy.class, Jenkins.get().getAuthorizationStrategy().getClass());
         GlobalMatrixAuthorizationStrategy gms = (GlobalMatrixAuthorizationStrategy) Jenkins.get().getAuthorizationStrategy();

@@ -1,4 +1,8 @@
-# configure docker plugin
+# Configure docker plugin
+
+Basic configuration of the [Docker plugin](https://plugins.jenkins.io/docker-plugin)
+
+For plugin version 1.1.2 and up:
 
 ## sample configuration
 
@@ -25,6 +29,8 @@ jenkins:
               attach:
                 user: "jenkins"
             instanceCapStr: "10"
+            retentionStrategy:
+              idleMinutes: 1
 ```
 
 ## implementation note
