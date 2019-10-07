@@ -16,7 +16,7 @@ public class SchemaGeneration {
         .put("description", "Jenkins Configuration as Code")
         .put("type", "object");
 
-    public static JSONObject generateSchema() {
+    public static JSONObject generateSchema() throws Exception {
 
         /**
          * The initial template for the JSON Schema
@@ -77,7 +77,8 @@ public class SchemaGeneration {
         return generateSchema().toString(4);
     }
 
-    private static JSONObject generateHeteroDescribableConfigObject(HeteroDescribableConfigurator heteroDescribableConfiguratorObject) {
+    private static JSONObject generateHeteroDescribableConfigObject(HeteroDescribableConfigurator heteroDescribableConfiguratorObject)
+    throws Exception{
         Map<String, Class> implementorsMap = heteroDescribableConfiguratorObject
             .getImplementors();
         JSONObject finalHeteroConfiguratorObject = new JSONObject();
@@ -100,7 +101,7 @@ public class SchemaGeneration {
             return finalHeteroConfiguratorObject;
     }
 
-    private static JSONObject generateNonEnumAttributeObject(Attribute attribute) {
+    private static JSONObject generateNonEnumAttributeObject(Attribute attribute){
         JSONObject attributeType = new JSONObject();
         switch (attribute.type.getName()) {
             case "java.lang.String":
@@ -136,7 +137,7 @@ public class SchemaGeneration {
         return attributeType;
     }
 
-    private static JSONObject generateRootConfiguratorObject() {
+    private static JSONObject generateRootConfiguratorObject()  {
         JSONObject rootConfiguratorObject = new JSONObject();
         LinkedHashSet linkedHashSet = new LinkedHashSet<>(
             ConfigurationAsCode.get().getRootConfigurators());

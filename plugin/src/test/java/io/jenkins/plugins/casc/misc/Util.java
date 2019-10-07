@@ -221,7 +221,7 @@ public class Util {
      *      * </pre>
      * @return Schema the schema for the current jenkins instance
      */
-    public static Schema returnSchema() {
+    public static Schema returnSchema() throws Exception{
         JSONObject schemaObject = generateSchema();
         JSONObject jsonSchema = new JSONObject(
             new JSONTokener(schemaObject.toString()));
