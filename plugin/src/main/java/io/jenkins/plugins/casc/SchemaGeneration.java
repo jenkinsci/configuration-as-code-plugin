@@ -1,9 +1,5 @@
 package io.jenkins.plugins.casc;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import io.jenkins.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -82,11 +78,7 @@ public class SchemaGeneration {
     }
 
     public static String writeJSONSchema() {
-        JSONObject schemaObject = generateSchema();
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        JsonParser jsonParser = new JsonParser();
-        JsonElement jsonElement = jsonParser.parse(schemaObject.toString());
-        return gson.toJson(jsonElement);
+        return generateSchema().toString(4);
     }
 
     private static JSONObject generateHeteroDescribableConfigObject(HeteroDescribableConfigurator heteroDescribableConfiguratorObject) {
