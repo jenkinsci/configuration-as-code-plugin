@@ -323,7 +323,7 @@ You can test if your YAML file validates against the schema.
 
 Create a YAML file for the configurators corresponding to the developed plugin.
 For eg: `validJenkinsConfigurator.yml`
-```
+```yaml
 jenkins:
     systemMessage: "Configured by Configuration as Code plugin"
     numExecutors: "Hello"

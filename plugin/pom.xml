@@ -99,11 +99,6 @@
       <version>0.50.40</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>com.vaadin.external.google</groupId>
-      <artifactId>android-json</artifactId>
-      <version>0.0.20131108.vaadin1</version>
-    </dependency>
   </dependencies>
 
   <build>
