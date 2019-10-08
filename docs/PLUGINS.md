@@ -335,7 +335,7 @@ jenkins:
 Add a test for the YAML file
 
 ```java
-@Test
+    @Test
     public void validSchemaShouldSucceed() throws Exception {
         assertTrue(validateSchema(convertYamlFileToJson(this, "validJenkinsConfigurator.yml")));
     }
