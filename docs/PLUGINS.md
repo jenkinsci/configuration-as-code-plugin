@@ -319,7 +319,7 @@ you can test that your plugin's example yaml file validates correctly by impleme
 
 You can test if your YAML file validates against the schema.
 
-#### Step 1
+Step 1
 
 Create a YAML file for the configurators corresponding to the developed plugin.
 For eg: `validJenkinsConfigurator.yml`
