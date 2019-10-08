@@ -330,7 +330,7 @@ jenkins:
 
 ```
 
-#### Step 2
+Step 2
 
 Add a test for the YAML file
 
