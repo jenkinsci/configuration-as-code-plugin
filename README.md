@@ -208,8 +208,9 @@ credentials:
 
 Also see [demos](demos) folder with various samples.
 
-<handling-secrets>
 ## Documentation
+
+<a name="handling-secrets"></a>
 
 You can find more documentation about JCasC here:
 
