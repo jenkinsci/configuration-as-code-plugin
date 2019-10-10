@@ -15,7 +15,7 @@ compliant with JCasC, you'll need to expose your configuration attributes as `@D
 
 Before you start, make sure the following pre-conditions are met:
 
-- The parent pom version of your plugin is aligned with the Configuration as Code [parent pom version](/pom.xml).
+- You are using a recent version of plugin [parent pom](https://github.com/jenkinsci/plugin-pom/releases).
 
 ```xml
 <parent>
