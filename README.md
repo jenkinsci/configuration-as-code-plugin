@@ -53,13 +53,6 @@ tool:
     installations:
       - name: git
         home: /usr/local/bin/git
-unclassified:
-  mailer:
-    adminAddress: admin@acme.org
-    replyToAddress: do-not-reply@acme.org
-    # Note that this does not work right now
-    #smtpHost: smtp.acme.org
-    smtpPort: 4441
 credentials:
   system:
     domainCredentials:
