@@ -160,7 +160,7 @@ public abstract class RoundTripAbstractTest {
         NameValuePair param = new NameValuePair("newSource", f.toURI().toURL().toExternalForm());
         request.setRequestParameters(Collections.singletonList(param));
         WebResponse response = client.loadWebResponse(request);
-        assertEquals(200, response.getStatusCode());
+        assertEquals("Failed to POST to " + request.getUrl().toString(), 200, response.getStatusCode());
         String res = response.getContentAsString();
         assertThat(res, containsString("The configuration can be applied"));
     }
@@ -177,7 +177,7 @@ public abstract class RoundTripAbstractTest {
         request.setRequestParameters(Collections.singletonList(param));
         request.setRequestParameters(Collections.singletonList(param));
         WebResponse response = client.loadWebResponse(request);
-        assertEquals(200, response.getStatusCode());
+        assertEquals("Failed to POST to " + request.getUrl().toString(), 200, response.getStatusCode());
         String res = response.getContentAsString();
         /* The result page has:
         Configuration loaded from :
