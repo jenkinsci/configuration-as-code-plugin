@@ -640,7 +640,7 @@
         <executions>
           <execution>
             <id>download.tfs.sdk.jar.locally</id>
-            <phase>clean</phase>
+            <phase>validate</phase>
             <goals>
               <goal>wget</goal>
             </goals>
@@ -659,7 +659,7 @@
         <executions>
           <execution>
             <id>install.tfs.sdk.jar.locally</id>
-            <phase>clean</phase>
+            <phase>validate</phase>
             <goals>
               <goal>install-file</goal>
             </goals>
@@ -671,6 +671,15 @@
               <packaging>jar</packaging>
               <generatePom>true</generatePom>
             </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>display-info</id>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>
