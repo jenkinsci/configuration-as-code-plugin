@@ -210,127 +210,19 @@ Also see [demos](demos) folder with various samples.
 
 ## Documentation
 
+<a name="handling-secrets"></a>
+
+You can find more documentation about JCasC here:
+
+- [Handling Secrets](./docs/features/secrets.adoc)
+- [Exporting configurations](./docs/features/configExport.md)
+- [Validating configurations](./docs/features/jsonSchema.md)
+
 The configuration file format depends on the version of jenkins-core and installed plugins.
 Documentation is generated from a live instance, as well as a JSON schema you can use to validate configuration file
 with your favourite YAML tools.
 
 The JSON Schema documentation can be found [here](./docs/features/jsonSchema.md).
-## Handling Secrets
-
-Currently, you can provide initial secrets to JCasC that all rely on <key,value>
-substitution of strings in the configuration. For example, `Jenkins: "${some_var}"`. Default variable substitution
-using the `:-` operator from `bash` is also available. For example, `key: "${VALUE:-defaultvalue}"` will evaluate to `defaultvalue` if `$VALUE` is unset. To escape a string from secret interpolation, put `^` in front of the value. For example, `Jenkins: "^${some_var}"` will produce the literal `Jenkins: "${some_var}"`.
-
-## Secret sources
-
-We can provide these initial secrets in the following ways:
-
-- Using environment variables.
-- Using docker-secrets, where files on path `/run/secrets/${KEY}` will be replaced by `${KEY}` in the configuration. The base folder `/run/secrets` can be overridden by setting the environment variable `SECRETS`. So this can be used as a file based secret, and not just docker secrets.
-- Using Kubernetes secrets, logic is the same as for docker-secrets. The secret needs to be mounted as a file to `/run/secrets/`, and then the filename can be used as the KEY. For example:
-
-```yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: secret-name
-data:
-  filename: {{ "encoded string" | b64enc }}
-```
-
-can be used as:
-
-```yaml
-- credentials:
-    - string:
-      id: "cred-id"
-      secret: ${filename}
-```
-
-- Using Vault, see below.
-
-### Security and compatibility considerations
-
-<!-- TODO(oleg_nenashev): Add a link to the advisory once ready -->
-
-Jenkins configurations might include property definitions,
-e.g. for Token Macro resolution in Mail Ext Plugin.
-Such properties are not supposed to be resolved when importing configurations,
-but the JCasC plugin has no way to determine which variables should be resolved when reading the configurations.
-
-In some cases non-admin users can contribute to JCasC exports if they have some permissions
-(e.g. agent/view configuration or credentials management),
-and they could potentially inject variable expressions in plain text fields like descriptions
-and then see the resolved secrets in Jenkins Web UI if the Jenkins admin exports and imports the configuration without checking contents.
-It led to a security vulnerability which was addressed in JCasC `1.25` (SECURITY-1446).
-
-- When reading configuration YAMLs, JCasC plugin will try to resolve
-  **all** variables having the `${VARNAME}` format.
-- Starting from JCasC `1.25`, JCasC export escapes the internal variable expressions,
-  e.g. as `^${VARNAME}`, so newly exported and then imported configurations are
-  are not subject for this risk
-- For previously exported configurations, Jenkins admins are expected to manually
-  resolve the issues by putting the escape symbol `^` in front of variables which should not be resolved
-
-### Vault
-
-Prerequisites: [HashiCorp Vault plugin](https://github.com/jenkinsci/hashicorp-vault-plugin) v2.4.0+
-
-- The environment variable `CASC_VAULT_PW` must be present, if token is not used and appRole/Secret is not used. (Vault password.)
-- The environment variable `CASC_VAULT_USER` must be present, if token is not used and appRole/Secret is not used. (Vault username.)
-- The environment variable `CASC_VAULT_APPROLE` must be present, if token is not used and U/P not used. (Vault AppRole ID.)
-- The environment variable `CASC_VAULT_APPROLE_SECRET` must be present, it token is not used and U/P not used. (Vault AppRole Secret ID.)
-- The environment variable `CASC_VAULT_TOKEN` must be present, if U/P is not used. (Vault token.)
-- The environment variable `CASC_VAULT_PATHS` must be present. (Comma separated vault key paths. For example, `secret/jenkins,secret/admin`.)
-- The environment variable `CASC_VAULT_URL` must be present. (Vault url, including port number.)
-- The environment variable `CASC_VAULT_MOUNT` is optional. (Vault auth mount. For example, `ldap` or another username & password authentication type, defaults to `userpass`.)
-- The environment variable `CASC_VAULT_NAMESPACE` is optional. If used, sets the Vault namespace for Enterprise Vaults.
-- The environment variable `CASC_VAULT_FILE` is optional, provides a way for the other variables to be read from a file instead of environment variables.
-- The environment variable `CASC_VAULT_ENGINE_VERSION` is optional. If unset, your vault path is assumed to be using kv version 2. If your vault path uses engine version 1, set this variable to `1`.
-- The issued token should have read access to vault path `auth/token/lookup-self` in order to determine its expiration time. JCasC will re-issue a token if its expiration is reached (except for `CASC_VAULT_TOKEN`).
-
-If the environment variables `CASC_VAULT_URL` and `CASC_VAULT_PATHS` are present, JCasC will try to gather initial secrets from Vault. However for it to work properly there is a need for authentication by either the combination of `CASC_VAULT_USER` and `CASC_VAULT_PW`, a `CASC_VAULT_TOKEN`, or the combination of `CASC_VAULT_APPROLE` and `CASC_VAULT_APPROLE_SECRET`. The authenticated user must have at least read access.
-
-You can also provide a `CASC_VAULT_FILE` environment variable where you load the secrets from a file.
-
-File should be in a Java Properties format
-
-```properties
-CASC_VAULT_PW=PASSWORD
-CASC_VAULT_USER=USER
-CASC_VAULT_TOKEN=TOKEN
-CASC_VAULT_PATHS=secret/jenkins/master,secret/admin
-CASC_VAULT_URL=https://vault.dot.com
-CASC_VAULT_MOUNT=ldap
-```
-
-A good use for `CASC_VAULT_FILE` would be together with docker secrets.
-
-```yaml
-version: "3.6"
-
-services:
-  jenkins:
-    environment:
-      CASC_VAULT_FILE: /run/secrets/jcasc_vault
-    restart: always
-    build: .
-    image: jenkins.master:v1.0
-    ports:
-      - 8080:8080
-      - 50000:50000
-    volumes:
-      - jenkins-home:/var/jenkins_home
-    secrets:
-      - jcasc_vault
-
-volumes:
-  jenkins-home:
-
-secrets:
-  jcasc_vault:
-    file: ./secrets/jcasc_vault
-```
 
 **TODO**: Provide a Dockerfile to generate documentation from specified jenkins-core release and plugins.
 
