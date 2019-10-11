@@ -127,4 +127,3 @@ INFO: Jenkins is fully up and running
 ```
 
 - Open <http://localhost:8080/jenkins/configuration-as-code/> to test the plugin locally.
-
