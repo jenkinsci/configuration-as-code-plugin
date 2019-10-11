@@ -1,4 +1,6 @@
-# TFS/Team Services plugin
+# Configure TFS/Team Services plugin
+
+Basic configuration of the [Team Foundation Server plugin](https://plugins.jenkins.io/tfs)
 
 TFS plugin configuration belongs under `unclassified` root element
 

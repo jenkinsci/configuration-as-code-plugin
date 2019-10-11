@@ -258,6 +258,13 @@
     </dependency>
 
     <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>tfs</artifactId>
+      <version>5.157.0</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-cps-global-lib</artifactId>
       <scope>test</scope>
@@ -499,6 +506,11 @@
         <version>2.3.3</version>
       </dependency>
       <dependency>
+        <groupId>com.google.code.gson</groupId>
+        <artifactId>gson</artifactId>
+        <version>2.5</version>
+      </dependency>
+      <dependency>
         <groupId>com.google.protobuf</groupId>
         <artifactId>protobuf-java</artifactId>
         <version>3.0.0-beta-2</version>
@@ -620,5 +632,48 @@
          <directory>../demos</directory>
        </resource>
     </resources>
+    <plugins>
+      <plugin>
+        <groupId>com.googlecode.maven-download-plugin</groupId>
+        <artifactId>download-maven-plugin</artifactId>
+        <version>1.4.2</version>
+        <executions>
+          <execution>
+            <id>download.tfs.sdk.jar.locally</id>
+            <phase>clean</phase>
+            <goals>
+              <goal>wget</goal>
+            </goals>
+            <configuration>
+              <url>https://github.com/jenkinsci/tfs-plugin/raw/master/tfs-sdk/src/com.microsoft.tfs.sdk-14.0.3.jar</url>
+              <md5>88d646750fe93030183ca12e61b3dca9</md5>
+              <outputFileName>com.microsoft.tfs.sdk-14.0.3.jar</outputFileName>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-install-plugin</artifactId>
+        <version>2.5.2</version>
+        <executions>
+          <execution>
+            <id>install.tfs.sdk.jar.locally</id>
+            <phase>clean</phase>
+            <goals>
+              <goal>install-file</goal>
+            </goals>
+            <configuration>
+              <file>${project.build.directory}/com.microsoft.tfs.sdk-14.0.3.jar</file>
+              <groupId>com.microsoft.tfs.sdk</groupId>
+              <artifactId>com.microsoft.tfs.sdk</artifactId>
+              <version>14.0.3</version>
+              <packaging>jar</packaging>
+              <generatePom>true</generatePom>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
 </project>
