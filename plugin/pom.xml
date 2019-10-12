@@ -97,6 +97,12 @@
       <version>0.50.40</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>credentials</artifactId>
+      <version>2.2.0</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
