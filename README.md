@@ -24,9 +24,7 @@ The Configuration as Code plugin has been designed as an _**opinionated**_ way t
 human-readable declarative configuration files. Writing such a file should be feasible without being a Jenkins
 expert, just translating into _code_ a configuration process one is used to executing in the web UI.
 
-![configuration form](images/sample_form.png)
-
-This plugin aims to replace above user interface based configuration with the below text based configuration.
+Below configuration file includes root entries for various components of your primary Jenkins installation. The `jenkins` one is for the root Jenkins object, and other ones are for various global configuration elements.
 
 ```yaml
 jenkins:
@@ -39,6 +37,32 @@ jenkins:
           inhibitInferRootDN: false
           rootDN: "dc=acme,dc=org"
           server: "ldaps://ldap.acme.org:1636"
+
+  nodes:
+    - permanent:
+        name: "static-agent"
+        remoteFS: "/home/jenkins"
+        launcher:
+          jnlp:
+
+  slaveAgentPort: 50000
+  agentProtocols:
+    - "jnlp2"
+tool:
+  git:
+    installations:
+      - name: git
+        home: /usr/local/bin/git
+credentials:
+  system:
+    domainCredentials:
+      credentials:
+        - certificate:
+            scope: SYSTEM
+            id: ssh_private_key
+            keyStoreSource:
+              fileOnMaster:
+                keyStoreFile: /docker/secret/id_rsa
 ```
 
 In addition, we want to have a well documented syntax file, and tooling to assist in writing and testing,
@@ -81,7 +105,11 @@ element.
 
 ## Examples
 
-This configuration file includes root entries for various components of your primary Jenkins installation. The `jenkins` one is for the root Jenkins object, and other ones are for various global configuration elements.
+### LDAP
+
+Replacing user interface based configuration for LDAP with the text based configuration.
+
+![configuration form](images/sample_form.png)
 
 ```yaml
 jenkins:
@@ -94,39 +122,6 @@ jenkins:
           inhibitInferRootDN: false
           rootDN: "dc=acme,dc=org"
           server: "ldaps://ldap.acme.org:1636"
-
-  nodes:
-    - permanent:
-        name: "static-agent"
-        remoteFS: "/home/jenkins"
-        launcher:
-          jnlp:
-
-  slaveAgentPort: 50000
-  agentProtocols:
-    - "jnlp2"
-tool:
-  git:
-    installations:
-      - name: git
-        home: /usr/local/bin/git
-unclassified:
-  mailer:
-    adminAddress: admin@acme.org
-    replyToAddress: do-not-reply@acme.org
-    # Note that this does not work right now
-    #smtpHost: smtp.acme.org
-    smtpPort: 4441
-credentials:
-  system:
-    domainCredentials:
-      credentials:
-        - certificate:
-            scope: SYSTEM
-            id: ssh_private_key
-            keyStoreSource:
-              fileOnMaster:
-                keyStoreFile: /docker/secret/id_rsa
 ```
 
 Also see [demos](demos) folder with various samples.
