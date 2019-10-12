@@ -1,4 +1,4 @@
-package io.jenkins.plugins.casc.impl.secrets;
+package io.jenkins.plugins.casc;
 
 import com.cloudbees.plugins.credentials.SystemCredentialsProvider;
 import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
@@ -18,7 +18,7 @@ public class PropertiesSecretSourceTest {
         .around(new JenkinsConfiguredWithCodeRule());
 
     @Test
-    @ConfiguredWithCode("configuration-as-code.yaml")
+    @ConfiguredWithCode("PropertiesSecretSourceTest.yaml")
     public void test_reading_secrets_from_properties() throws Exception {
         SystemCredentialsProvider scp = SystemCredentialsProvider.getInstance();
         UsernamePasswordCredentials credentials = (UsernamePasswordCredentials) scp.getCredentials().get(0);

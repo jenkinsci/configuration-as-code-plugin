@@ -46,6 +46,11 @@ public class PropertiesSecretSource extends SecretSource {
 
     @Override
     public Optional<String> reveal(String secret) throws IOException {
-        return Optional.of(secrets.getProperty(secret));
+        if (secrets.getProperty(secret) == null) {
+            return Optional.empty();
+        }
+        else {
+            return Optional.of(secrets.getProperty(secret));
+        }
     }
 }
