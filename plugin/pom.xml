@@ -102,6 +102,12 @@
       <artifactId>credentials</artifactId>
       <version>2.2.0</version>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.jenkins-ci</groupId>
+          <artifactId>symbol-annotation</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 
