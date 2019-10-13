@@ -56,6 +56,12 @@
       <artifactId>checkmarx</artifactId>
       <version>8.90.4</version>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>io.netty</groupId>
+          <artifactId>netty-common</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- tested plugins -->
