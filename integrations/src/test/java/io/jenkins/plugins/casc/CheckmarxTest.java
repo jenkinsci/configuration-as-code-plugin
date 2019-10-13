@@ -16,7 +16,7 @@ public class CheckmarxTest {
 
     @Test
     @ConfiguredWithReadme(value = "checkmarx/README.md")
-    public void configure_artifactory() throws Exception {
+    public void configure_checkmarx() throws Exception {
         final Jenkins jenkins = Jenkins.get();
         final CxScanBuilder.DescriptorImpl cxScanConfig = (CxScanBuilder.DescriptorImpl) jenkins.getDescriptor(CxScanBuilder.class);
         assertTrue(descriptor.getUseCredentialsPlugin());

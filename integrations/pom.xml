@@ -51,6 +51,13 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>com.checkmarx.jenkins</groupId>
+      <artifactId>checkmarx</artifactId>
+      <version>8.90.4</version>
+      <scope>test</scope>
+    </dependency>
+
     <!-- tested plugins -->
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
