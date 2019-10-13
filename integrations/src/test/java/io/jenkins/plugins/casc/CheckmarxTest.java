@@ -1,16 +1,11 @@
 package io.jenkins.plugins.casc;
 
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
-import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
-import java.util.List;
 import jenkins.model.Jenkins;
 
 import com.checkmarx.jenkins.CxScanBuilder;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
-import org.junit.rules.RuleChain;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
