@@ -319,7 +319,7 @@
     <dependency>
       <groupId>org.jvnet.hudson.plugins</groupId>
       <artifactId>warnings</artifactId>
-      <version>5.0.0</version>
+      <version>5.0.1</version>
       <scope>test</scope>
     </dependency>
 
