@@ -47,7 +47,15 @@ public final class Mapping extends HashMap<String, CNode> implements CNode {
         if (node != null) super.put(key, node);
     }
 
+    /**
+     * @deprecated Misspelled name, use {@link #putIfNotEmpty(String, Sequence)} instead.
+     */
+    @Deprecated
     public void putIfNotEmpry(String key, Sequence seq) {
+        this.putIfNotEmpty(key, seq);
+    }
+
+    public void putIfNotEmpty(String key, Sequence seq) {
         if (!seq.isEmpty()) super.put(key, seq);
     }
 
