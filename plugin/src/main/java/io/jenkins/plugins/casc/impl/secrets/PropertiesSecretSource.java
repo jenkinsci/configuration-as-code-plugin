@@ -10,6 +10,8 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 /**
  * This {@link SecretSource} implementation allows to use a .properties file for providing secrets.
@@ -17,8 +19,10 @@ import java.util.logging.Logger;
  * {@code SECRETS} environment variable.
  *
  * @author <a href="mailto:d.estermann.de@gmail.com">Daniel Estermann</a>
+ * @since 1.33
  */
 @Extension
+@Restricted(NoExternalUse.class)
 public class PropertiesSecretSource extends SecretSource {
 
     private static final Logger LOGGER = Logger.getLogger(PropertiesSecretSource.class.getName());
@@ -28,28 +32,29 @@ public class PropertiesSecretSource extends SecretSource {
      */
     public static final String SECRETS_DEFAULT_PATH = "/run/secrets/secrets.properties";
 
-    private final Properties secrets = new Properties();
-
-    public PropertiesSecretSource() {
-        final String secretsEnv = System.getenv("SECRETS");
-        final String secretsPath = secretsEnv == null ? SECRETS_DEFAULT_PATH : secretsEnv;
-        try (InputStream input = new FileInputStream(secretsPath)) {
-            secrets.load(input);
-        }
-        catch (FileNotFoundException fnfe) {
-            LOGGER.log(Level.WARNING, "Source properties file has not been found.", fnfe);
-        }
-        catch (IOException ioe) {
-            LOGGER.log(Level.WARNING, "Source properties file could not be loaded.", ioe);
-        }
-    }
+    private Properties secrets;
 
     @Override
-    public Optional<String> reveal(String secret) throws IOException {
+    public Optional<String> reveal(String secret) {
+        // lazy initialization
+        if (secrets == null) {
+            secrets = new Properties();
+            final String secretsEnv = System.getenv("SECRETS");
+            final String secretsPath = secretsEnv == null ? SECRETS_DEFAULT_PATH : secretsEnv;
+            try (InputStream input = new FileInputStream(secretsPath)) {
+                secrets.load(input);
+            } catch (FileNotFoundException fnfe) {
+                LOGGER.log(Level.WARNING,
+                    "Source properties file has not been found in the specified location: {0}",
+                    secretsPath);
+            } catch (IOException ioe) {
+                LOGGER.log(Level.WARNING, "Source properties file could not be loaded", ioe);
+            }
+        }
+
         if (secrets.getProperty(secret) == null) {
             return Optional.empty();
-        }
-        else {
+        } else {
             return Optional.of(secrets.getProperty(secret));
         }
     }
