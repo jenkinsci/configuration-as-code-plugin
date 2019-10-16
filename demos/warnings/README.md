@@ -27,7 +27,7 @@ unclassified:
 ```
 
 This `Example Parser` parser will parse the following warning from the console log:
-```
+```text
 somefile.txt:2:SeriousWarnings:SomethingWentWrong
 ```
 
@@ -35,13 +35,12 @@ It will produce a warning with the following properties:
 
 |property|value|
 |--------|-----|
-|file name|somefile.txt
-|line number|2
-|severity|NORMAL
-|category|SeriousWarnings
-|type|-
-|message|SomethingWentWrong
+|file name|somefile.txt|
+|line number|2|
+|severity|NORMAL|
+|category|SeriousWarnings|
+|type|-|
+|message|SomethingWentWrong|
 
 See [documentation](https://github.com/jenkinsci/warnings-ng-plugin/blob/master/doc/Documentation.md) of the
 Warnings Next Generation Plugin for more details about the parsers.
-
