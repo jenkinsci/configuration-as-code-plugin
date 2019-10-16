@@ -2,6 +2,7 @@ package io.jenkins.plugins.casc.impl.secrets;
 
 import hudson.Extension;
 import io.jenkins.plugins.casc.SecretSource;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -41,14 +42,13 @@ public class PropertiesSecretSource extends SecretSource {
             secrets = new Properties();
             final String secretsEnv = System.getenv("SECRETS");
             final String secretsPath = secretsEnv == null ? SECRETS_DEFAULT_PATH : secretsEnv;
-            try (InputStream input = new FileInputStream(secretsPath)) {
-                secrets.load(input);
-            } catch (FileNotFoundException fnfe) {
-                LOGGER.log(Level.WARNING,
-                    "Source properties file has not been found in the specified location: {0}",
-                    secretsPath);
-            } catch (IOException ioe) {
-                LOGGER.log(Level.WARNING, "Source properties file could not be loaded", ioe);
+            final File secretsFile = new File(secretsPath);
+            if (secretsFile.exists()) {
+                try (InputStream input = new FileInputStream(secretsFile)) {
+                    secrets.load(input);
+                } catch (IOException ioe) {
+                    LOGGER.log(Level.WARNING, "Source properties file could not be loaded", ioe);
+                }
             }
         }
 
