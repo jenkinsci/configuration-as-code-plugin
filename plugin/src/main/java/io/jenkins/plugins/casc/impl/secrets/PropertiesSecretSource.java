@@ -4,7 +4,6 @@ import hudson.Extension;
 import io.jenkins.plugins.casc.SecretSource;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
