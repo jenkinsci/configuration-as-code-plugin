@@ -15,8 +15,8 @@ import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 /**
  * This {@link SecretSource} implementation allows to use a .properties file for providing secrets.
- * The default file path is {@code /run/secrets/secrets.properties}, which can be changed via
- * {@code SECRETS} environment variable.
+ * The default file path is {@code /run/secrets/secrets.properties}, which can be changed via {@code
+ * SECRETS} environment variable.
  *
  * @author <a href="mailto:d.estermann.de@gmail.com">Daniel Estermann</a>
  * @since 1.33
@@ -46,7 +46,8 @@ public class PropertiesSecretSource extends SecretSource {
                 try (InputStream input = new FileInputStream(secretsFile)) {
                     secrets.load(input);
                 } catch (IOException ioe) {
-                    LOGGER.log(Level.WARNING, "Source properties file could not be loaded", ioe);
+                    LOGGER.log(Level.WARNING,
+                        "Source properties file " + secretsPath + " could not be loaded", ioe);
                 }
             }
         }
