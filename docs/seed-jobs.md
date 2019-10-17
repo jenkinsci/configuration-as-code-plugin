@@ -1,10 +1,10 @@
 # How to create initial "seed" job
 
-Configuration is not just about setting up Jenkins master, it's also about creating an initial set of jobs.
-For this purpose, we delegate to the popular [job-dsl-plugin](https://wiki.jenkins.io/display/JENKINS/Job+DSL+Plugin)
-and run a job-dsl script to create an initial set of jobs.
+Requires `job-dsl` >= 1.74
 
-Be aware that you also need [Configuration as Code Support](https://plugins.jenkins.io/configuration-as-code-support) besides [Configuration as Code](https://plugins.jenkins.io/configuration-as-code) plugin already installed, otherwise the `jobs` root element cannot be parsed.
+Configuration is not just about setting up Jenkins master, it's also about creating an initial set of jobs.
+For this purpose, we delegate to the popular [job-dsl-plugin](https://plugins.jenkins.io/job-dsl)
+and run a job-dsl script to create an initial set of jobs.
 
 Typical usage is to rely on a multi-branch, or organization folder job type, so further jobs will be dynamically
 created. So a multi-branch seed job will prepare a master to be fully configured for CI/CD targeting a repository

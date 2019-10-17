@@ -107,7 +107,7 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
             if (node != null) mapping.put(c.getName(), node);
         } catch (Exception e) {
             final Scalar scalar = new Scalar(
-                "FAILED TO EXPORT " + d.getClass().getName() + " : " + printThrowable(e));
+                "FAILED TO EXPORT\n" + d.getClass().getName() + " : " + printThrowable(e));
             mapping.put(c.getName(), scalar);
         }
     }

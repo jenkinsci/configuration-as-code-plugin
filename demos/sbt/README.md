@@ -1,6 +1,6 @@
 # Configure sbt plugin
 
-Basic configuration of the Sbt plugin
+Basic configuration of the [Sbt plugin](https://plugins.jenkins.io/sbt)
 
 ## Sample configuration
 

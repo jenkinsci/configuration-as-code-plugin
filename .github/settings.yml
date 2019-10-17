@@ -1,0 +1,73 @@
+repository:
+  name: configuration-as-code-plugin
+  description: Jenkins Configuration as Code Plugin
+  topics: 'configuration-as-code, jenkins, hacktoberfest, jenkins-configuration, jcasc'
+  private: false
+  default_branch: master
+  has_issues: true
+  has_wiki: false
+  allow_merge_commit: false
+  allow_squash_merge: true
+  allow_rebase_merge: true
+
+#TODO(oleg-nenashev): Consider moving to https://github.com/jenkinsci/.github once https://github.com/probot/settings/issues/107 is fixed
+labels:
+  - name: good first issue
+    color: 7057ff
+  - name: hackathon
+    color: 85f920
+  - name: help wanted
+    color: 008672
+  - name: question
+    color: D876E3
+  - name: wontfix
+    color: FFFFFF
+  - name: duplicate
+    color: CFD3D7
+  - name: bug
+    color: D73A4A
+  - name: documentation
+    color: 0e8a16
+    description: A PR that adds to documentation - used by Release Drafter
+  - name: hacktoberfest
+    color: bdff3a
+    description: 'Hacktoberfest. https://jenkins.io/blog/2018/10/01/hacktoberfest/'
+  - name: feature
+    color: 1d00ff
+    description: A PR that adds a feature - used by Release Drafter
+  - name: bugfix
+    oldname: fix
+    color: c9e85c
+    description: A PR that fixes a bug - used by Release Drafter
+  - name: chore
+    color: c9abea
+    description: a PR that adds to maintenance - used by Release Drafter
+  - name: test
+    color: d6e819
+    description: A PR that adds to testing - used by Release Drafter
+  - name: pinned
+    color: 5ed5e5
+    description: 'Used to avoid stale[bot] marking a issue/PR stale'
+  - name: plugin-compatibility
+    color: 8425c4
+  - name: stale
+    color: ffffff
+    description: 'Used by stale[bot] to mark a issue/PR stale'
+  - name: skip-changelog
+    color: f44271
+    description: A PR that is excluded from Release draft - used by Release Drafter
+  - name: removed
+    color: aa0f1c
+    description: A PR that removes code - used by Release Drafter
+  - name: deprecated
+    color: e2b626
+    description: A PR that deprecates code - used by Release Drafter
+  - name: breaking
+    color: 640910
+    description: A PR that is a breaking change - used by Release Drafter
+  - name: dev-tools
+    color: 551a8b
+    description: JCasC Community Bridge Dev-Tools Project
+  - name: dependencies
+    color: 0366d6
+    description: A PR that updates dependencies - used by Release Drafter

@@ -110,22 +110,20 @@ public class DefaultConfiguratorRegistry implements ConfiguratorRegistry {
             }
         }
 
-        if (Collection.class.isAssignableFrom(clazz)) {
-            //TODO: Only try to cast if we can actually get the parameterized type
-            if (type instanceof ParameterizedType) {
-                ParameterizedType pt = (ParameterizedType) type;
-                Type actualType = pt.getActualTypeArguments()[0];
-                if (actualType instanceof WildcardType) {
-                    actualType = ((WildcardType) actualType).getUpperBounds()[0];
-                }
-                if(actualType instanceof ParameterizedType){
-                    actualType = ((ParameterizedType)actualType).getRawType();
-                }
-                if (!(actualType instanceof Class)) {
-                    throw new IllegalStateException("Can't handle " + type);
-                }
-                return lookup(actualType);
+        //TODO: Only try to cast if we can actually get the parameterized type
+        if (Collection.class.isAssignableFrom(clazz) && type instanceof ParameterizedType) {
+            ParameterizedType pt = (ParameterizedType) type;
+            Type actualType = pt.getActualTypeArguments()[0];
+            if (actualType instanceof WildcardType) {
+                actualType = ((WildcardType) actualType).getUpperBounds()[0];
             }
+            if (actualType instanceof ParameterizedType) {
+                actualType = ((ParameterizedType) actualType).getRawType();
+            }
+            if (!(actualType instanceof Class)) {
+                throw new IllegalStateException("Can't handle " + type);
+            }
+            return lookup(actualType);
         }
 
         if (Configurable.class.isAssignableFrom(clazz)) {

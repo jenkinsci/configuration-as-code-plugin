@@ -5,29 +5,39 @@ import com.gargoylesoftware.htmlunit.WebResponse;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import hudson.Functions;
 import hudson.util.FormValidation;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.model.CNode;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule.WebClient;
 
 import static com.gargoylesoftware.htmlunit.HttpMethod.POST;
+import static io.jenkins.plugins.casc.ConfigurationAsCode.CASC_JENKINS_CONFIG_PROPERTY;
+import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
+import static io.jenkins.plugins.casc.misc.Util.toYamlString;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class ConfigurationAsCodeTest {
 
@@ -50,7 +60,14 @@ public class ConfigurationAsCodeTest {
         // should be picked up
         Path target = Paths.get("jenkins.tmp");
         Path newLink = Paths.get(tempFolder.getRoot().getAbsolutePath(), "jenkins_5.yaml");
-        Files.createSymbolicLink(newLink, target);
+
+        try {
+            Files.createSymbolicLink(newLink, target);
+        } catch (IOException e) {
+            // often fails on windows due to non admin users not having symlink permission by default, see: https://stackoverflow.com/questions/23217460/how-to-create-soft-symbolic-link-using-java-nio-files/24353758#24353758
+            Assume.assumeFalse(Functions.isWindows());
+            throw e;
+        }
 
         // should *NOT* be picked up
         tempFolder.newFolder("folder.yaml");
@@ -73,6 +90,23 @@ public class ConfigurationAsCodeTest {
     }
 
     @Test
+    public void test_ordered_config_loading() throws Exception {
+        ConfigurationAsCode casc = new ConfigurationAsCode();
+
+        tempFolder.newFile("0.yaml");
+        tempFolder.newFile("1.yaml");
+        tempFolder.newFile("a.yaml");
+        tempFolder.newFile("z.yaml");
+
+        final List<Path> foo = casc.configs(tempFolder.getRoot().getAbsolutePath());
+        assertThat(foo, hasSize(4));
+        assertTrue(foo.get(0).endsWith("0.yaml"));
+        assertTrue(foo.get(1).endsWith("1.yaml"));
+        assertTrue(foo.get(2).endsWith("a.yaml"));
+        assertTrue(foo.get(3).endsWith("z.yaml"));
+    }
+
+    @Test
     public void test_loads_single_file_from_hidden_folder() throws Exception {
         ConfigurationAsCode casc = ConfigurationAsCode.get();
 
@@ -82,8 +116,9 @@ public class ConfigurationAsCodeTest {
             Files.copy(configStream, singleFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         }
 
-        casc.configure(singleFile.getAbsolutePath());
-        assertThat(casc.getSources(), contains(singleFile.getAbsolutePath()));
+        String source = singleFile.toURI().toString();
+        casc.configure(source);
+        assertThat(casc.getSources(), contains(source));
         assertThat(j.jenkins.getSystemMessage(), equalTo("configuration as code - JenkinsConfigTest"));
     }
 
@@ -105,6 +140,9 @@ public class ConfigurationAsCodeTest {
     @Test
     @ConfiguredWithCode(value = {"merge1.yml", "merge2.yml"}, expected = ConfiguratorException.class)
     public void shouldReportConfigurationConflict() {
+        // expected to throw Configurator Exception
+        // nodes should be empty due to conflict
+        assertThat(j.jenkins.getNodes(), is(empty()));
     }
 
     @Test
@@ -143,5 +181,68 @@ public class ConfigurationAsCodeTest {
         WebClient loggedInClient = client.login(user, user);
         response = loggedInClient.loadWebResponse(request);
         assertThat(response.getStatusCode(), is(200));
+    }
+
+    @Test
+    @Issue("Issue #739")
+    public void preferEnvOverGlobalConfigForConfigPath() throws Exception {
+        String firstConfig = getClass().getResource("JenkinsConfigTest.yml").toExternalForm();
+        String secondConfig = getClass().getResource("merge3.yml").toExternalForm();
+        CasCGlobalConfig descriptor = (CasCGlobalConfig) j.jenkins.getDescriptor(CasCGlobalConfig.class);
+        assertNotNull(descriptor);
+        descriptor.setConfigurationPath(firstConfig);
+        ConfigurationAsCode.get().configure();
+        assertThat(j.jenkins.getDescription(), is("configuration as code - JenkinsConfigTest"));
+        System.setProperty(CASC_JENKINS_CONFIG_PROPERTY, secondConfig);
+        ConfigurationAsCode.get().configure();
+        assertThat(j.jenkins.getDescription(), is("Configured by Configuration as Code plugin"));
+        System.clearProperty(CASC_JENKINS_CONFIG_PROPERTY);
+    }
+
+    @Test
+    @ConfiguredWithCode(value = {"aNonEmpty.yml", "empty.yml"}) //file names matter for order!
+    public void test_non_first_yaml_file_empty() {
+        assertEquals("Configured by Configuration as Code plugin", j.jenkins.getSystemMessage());
+    }
+
+    @Test
+    @Issue("Issue #914")
+    public void isSupportedURI_should_not_throw_on_invalid_uri() {
+        //for example, a Windows path is not a valid URI
+        assertThat(ConfigurationAsCode.isSupportedURI("C:\\jenkins\\casc"), is(false));
+    }
+
+    @Test
+    @ConfiguredWithCode("multi-line1.yml")
+    public void multiline_literal_stays_literal_in_export() throws Exception {
+        assertEquals("Welcome to our build server.\n\n"
+                + "This Jenkins is 100% configured and managed 'as code'.\n",
+            j.jenkins.getSystemMessage());
+
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        ConfigurationContext context = new ConfigurationContext(registry);
+        CNode systemMessage = getJenkinsRoot(context).get("systemMessage");
+        String exported = toYamlString(systemMessage);
+        String expected = "|\n"
+            + "  Welcome to our build server.\n\n"
+            + "  This Jenkins is 100% configured and managed 'as code'.\n";
+        assertThat(exported, is(expected));
+    }
+
+    @Test
+    @ConfiguredWithCode("multi-line2.yml")
+    public void string_to_literal_in_export() throws Exception {
+        assertEquals("Welcome to our build server.\n\n"
+                + "This Jenkins is 100% configured and managed 'as code'.\n",
+            j.jenkins.getSystemMessage());
+
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        ConfigurationContext context = new ConfigurationContext(registry);
+        CNode systemMessage = getJenkinsRoot(context).get("systemMessage");
+        String exported = toYamlString(systemMessage);
+        String expected = "|\n"
+            + "  Welcome to our build server.\n\n"
+            + "  This Jenkins is 100% configured and managed 'as code'.\n";
+        assertThat(exported, is(expected));
     }
 }

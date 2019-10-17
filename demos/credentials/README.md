@@ -1,5 +1,7 @@
 # credentials plugin
 
+Requires `credentials` >= 2.2.0
+
 ## sample configuration
 
 ```yaml
@@ -36,6 +38,8 @@ we consider the `Impl` suffix as a common pattern to flag implementation class.
 A list of some of the more common credentials.
 
 ### SSH Credentials
+
+Requires `ssh-credentials` >= 1.16
 
 Example that uses the [SSH credentials plugin](https://plugins.jenkins.io/ssh-credentials).
 

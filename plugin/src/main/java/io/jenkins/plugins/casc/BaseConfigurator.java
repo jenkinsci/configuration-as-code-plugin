@@ -102,6 +102,12 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
 
             LOGGER.log(Level.FINER, "Processing {0} property", name);
 
+            if (Map.class.isAssignableFrom(type.rawType)) {
+                // yaml has support for Maps, but as nobody seem to like them we agreed not to support them
+                LOGGER.log(Level.FINER, "{0} is a Map<?,?>. We decided not to support Maps.", name);
+                continue;
+            }
+
             Attribute attribute = createAttribute(name, type);
             if (attribute == null) continue;
 
@@ -233,7 +239,6 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
                 } else {
                     c = (Class) ((TypeVariable) t).getBounds()[0];
                 }
-                TypeVariable tv = (TypeVariable) t;
             } else {
                 return null;
             }
@@ -373,6 +378,8 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
 
                 case warn:
                     LOGGER.warning(message);
+                    break;
+                default: // All cases in the ENUM is covered
             }
         }
     }

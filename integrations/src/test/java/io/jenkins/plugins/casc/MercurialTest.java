@@ -3,8 +3,8 @@ package io.jenkins.plugins.casc;
 import hudson.plugins.mercurial.MercurialInstallation;
 import hudson.tools.CommandInstaller;
 import hudson.tools.InstallSourceProperty;
-import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
-import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
+import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -15,10 +15,10 @@ import org.junit.Test;
 public class MercurialTest {
 
     @Rule
-    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+    public JenkinsConfiguredWithReadmeRule j = new JenkinsConfiguredWithReadmeRule();
 
     @Test
-    @ConfiguredWithCode("MercurialTest.yaml")
+    @ConfiguredWithReadme("mercurial/README.md")
     public void should_configure_maven_tools_and_global_config() {
         final Object descriptor = j.jenkins.getDescriptorOrDie(MercurialInstallation.class);
         Assert.assertNotNull(descriptor);

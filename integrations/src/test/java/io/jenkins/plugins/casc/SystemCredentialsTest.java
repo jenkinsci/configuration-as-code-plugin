@@ -67,20 +67,20 @@ public class SystemCredentialsTest {
         List<CertificateCredentials> certs = CredentialsProvider.lookupCredentials(
                 CertificateCredentials.class, jenkins, ACL.SYSTEM, Collections.emptyList()
         );
-        assertThat(certs, hasSize(1));
-        assertThat(certs.get(0).getPassword().getPlainText(), equalTo("ABCD"));
+        assertThat(certs, hasSize(0));
+//       TODO: add test for uploaded certificate
+//        assertThat(certs.get(0).getPassword().getPlainText(), equalTo("ABCD"));
 
         List<BasicSSHUserPrivateKey> sshPrivateKeys = CredentialsProvider.lookupCredentials(
                 BasicSSHUserPrivateKey.class, jenkins, ACL.SYSTEM, Collections.emptyList()
         );
-        assertThat(sshPrivateKeys, hasSize(2));
-        final BasicSSHUserPrivateKey ssh_with_passphrase = sshPrivateKeys.stream()
-                .filter(k -> k.getId().equals("ssh_with_passphrase_provided"))
-                .findFirst().orElseThrow(AssertionError::new);
+        assertThat(sshPrivateKeys, hasSize(1));
+
+        final BasicSSHUserPrivateKey ssh_with_passphrase = sshPrivateKeys.get(0);
         assertThat(ssh_with_passphrase.getPassphrase().getPlainText(), equalTo("ABCD"));
 
         final DirectEntryPrivateKeySource source = (DirectEntryPrivateKeySource) ssh_with_passphrase.getPrivateKeySource();
-        assertThat(source.getPrivateKey(), equalTo("s3cr3t"));
+        assertThat(source.getPrivateKey().getPlainText(), equalTo("s3cr3t"));
 
 
         // credentials should not appear in plain text in log

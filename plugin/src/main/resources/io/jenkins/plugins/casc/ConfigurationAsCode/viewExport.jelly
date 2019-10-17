@@ -2,7 +2,10 @@
 <j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout" xmlns:st="jelly:stapler">
   <l:layout norefresh="true" type="one-column" title="${%Configuration as Code}">
   <l:main-panel>
-    <st:adjunct includes="io.jenkins.plugins.casc.assets.prism"/>
+    <st:adjunct includes="
+      io.jenkins.plugins.casc.assets.prism,
+      io.jenkins.plugins.casc.assets.viewExport"
+    />
     <pre>
       <code class="language-yaml">${export}</code>
     </pre>

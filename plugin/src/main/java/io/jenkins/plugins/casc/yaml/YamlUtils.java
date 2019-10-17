@@ -36,7 +36,9 @@ public final class YamlUtils {
                 if (root == null) {
                     root = node;
                 } else {
-                    merge(root, node, source.toString());
+                    if (node != null) {
+                        merge(root, node, source.toString());
+                    }
                 }
             } catch (IOException io) {
                 throw new ConfiguratorException("Failed to read " + source, io);

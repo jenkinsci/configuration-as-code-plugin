@@ -4,6 +4,8 @@ This document describes the JCasC API and design for plugin developers who are i
 extending JCasC by implementing custom Configurators or re-using the configuration mechanism
 in another context.
 
+Also see the plugin's [Javadoc](https://javadoc.jenkins.io/plugin/configuration-as-code/) for more information about classes and methods referenced on this page.
+
 ## Using Configuration as Code
 
 ### Configurators
@@ -48,3 +50,7 @@ control the exposed data model.
 current value from a live instance (used by `export` feature). Here again JCasC offers as default
 implementation a JavaBean compliant implementation, but one could override get and/or set operation with custom
 code to support alternate mechanisms.
+
+## Useful links
+
+* [Javadoc](https://javadoc.jenkins.io/plugin/configuration-as-code/)

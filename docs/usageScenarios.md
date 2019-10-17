@@ -28,7 +28,9 @@ The devops team would like more traceability around changes, by completely movin
 
 From that point on they all have full traceability of all the changes made, and they are able to roll it back easily by reverting commits. They can review the changes simply by looking at the git diffs on commits.
 
-**Getting there and adopting Jenkins Configuration as Code** is also quite easy for the devops team. They will need to install the plug-in, and go the the Configuration as Code menu in Manage Jenkins, and use the export function to create the initial YAML files that represent their current global configuration and plug-in's installed. Export is not intended to offer a directly usable jenkins.yaml configuration. It can be used for inspiration writing your own, but be aware that export can be partial, or fail for some components.
+**Getting there and adopting Jenkins Configuration as Code** is also quite easy for the devops team. 
+They will need to install the plug-in, and go to the Configuration as Code menu in Manage Jenkins, 
+and use the [export function](/docs/features/configExport.md) to create the initial YAML files that represent their current global configuration.
 
 When the files are in git, they can point to the file in the repository in the Configuration as Code menu, and click reload so Jenkins updates its configuration accordingly.
 
@@ -47,7 +49,9 @@ Their Jenkins global configuration is the only piece not under version control, 
 
 **With Jenkins Configuration as Code plug-in** they can get their missing configuration under version control as well and their installed plug-in combinations and for this little full stack developer team it means they can always just redeploy their Jenkins, should something be wrong or failing, and their container orchestration tool will keep their Jenkins master always running for them completely automatically.
 
-**Migrating to use the Jenkins Configuration as Code plug-in** is easy if they can live with doing just few manual steps before it is all automated. They need to install the Jenkins Configuration as Code plug-in on their current master, then use the export functionality to create the `plugins.yml` and `jenkins.yml` file for them, which they need to add to a git repository.
+**Migrating to use the Jenkins Configuration as Code plug-in** is easy if they can live with doing just few manual steps before it is all automated. 
+They need to install the Jenkins Configuration as Code plug-in on their current master, 
+then use the [export functionality](/docs/features/configExport.md) to create the `jenkins.yml` file for them, which they need to add to a git repository.
 Then the last thing they need to do is to update their deployment recipe to use the customized Jenkins where the Jenkins Configuration as Code plug-in comes pre-installed, and have the recipe pass the URI to the `jenkins.yml` file when starting Jenkins.
 
 After that they only do changes in the configuration file through git, and Jenkins Configuration as Code will refresh global configuration. Should their infrastructure fail their orchestration tool will recreate their master from scratch, but still with the same configuration and without depending on old data sets.

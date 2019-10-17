@@ -29,8 +29,6 @@ https://issues.jenkins-ci.org/secure/CreateIssueDetails!init.jspa?pid=10172&issu
 
 - [ ] Link to plugin's GitHub repository
 
-- [x] Link to Plugin Compatibility Tracker #809
-
 <!--
 Put an `x` into the [ ] to show you have filled the information below
 Describe your issue below

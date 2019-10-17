@@ -48,8 +48,7 @@
     </f:form>
     <div class="alert alert-warning clear-action-forms">
       <img src="${rootURL}/images/16x16/warning.png"/>
-      Export is not intended to offer a directly usable jenkins.yaml configuration. It can be used for inspiration
-      writing your own, be aware export can be partial, or fail for some components.
+      ${%exportWarning}
     </div>
 
     <h2>${%Reference}</h2>

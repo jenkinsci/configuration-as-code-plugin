@@ -31,7 +31,7 @@ public class PrimitiveConfiguratorTest {
     private static ConfigurationContext context;
 
     @BeforeClass
-    public static void setup() {
+    public static void setUp() {
         registry = ConfiguratorRegistry.get();
         context = new ConfigurationContext(registry);
     }
@@ -54,7 +54,7 @@ public class PrimitiveConfiguratorTest {
     public void _Integer() throws Exception {
         Configurator c = registry.lookupOrFail(Integer.class);
         final Object value = c.configure(new Scalar("123"), context);
-        assertTrue(123 == (Integer) value);
+        assertEquals(123, (int) value);
     }
 
     @Test
@@ -87,7 +87,7 @@ public class PrimitiveConfiguratorTest {
         environment.set("ENV_FOR_TEST", "123");
         Configurator c = registry.lookupOrFail(Integer.class);
         final Object value = c.configure(new Scalar("${ENV_FOR_TEST}"), context);
-        assertTrue(123 == (Integer) value);
+        assertEquals(123, (int) value);
     }
 
     @Test

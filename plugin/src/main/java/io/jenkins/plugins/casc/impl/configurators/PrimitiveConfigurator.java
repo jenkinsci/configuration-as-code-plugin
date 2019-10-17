@@ -63,13 +63,14 @@ public class PrimitiveConfigurator implements Configurator {
             return new Scalar((Boolean) instance);
         }
         if (instance instanceof Secret) {
-            return new Scalar(((Secret) instance).getEncryptedValue());
+            // Secrets are sensitive, but they do not need masking since they are exported in the encrypted form
+            return new Scalar(((Secret) instance).getEncryptedValue()).encrypted(true);
         }
         if (target.isEnum()) {
             return new Scalar((Enum) instance);
         }
 
-        return new Scalar(String.valueOf(instance));
+        return new Scalar(SecretSourceResolver.encode(String.valueOf(instance)));
     }
 
     @NonNull

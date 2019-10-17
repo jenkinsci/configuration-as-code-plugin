@@ -7,5 +7,5 @@ jenkins:
           password: ${adminpw:-passw0rd}
   authorizationStrategy:
     globalMatrix:
-      grantedPermissions:
+      permissions:
         - "Overall/Administer:authenticated"

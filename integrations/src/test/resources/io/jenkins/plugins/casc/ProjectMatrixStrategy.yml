@@ -12,6 +12,6 @@ jenkins:
 
   authorizationStrategy:
     projectMatrix:
-      grantedPermissions:
+      permissions:
         - "Overall/Read:anonymous"
         - "Overall/Administer:authenticated"

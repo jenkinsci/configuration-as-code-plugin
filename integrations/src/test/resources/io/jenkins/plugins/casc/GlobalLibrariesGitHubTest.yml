@@ -1,0 +1,20 @@
+unclassified:
+  globalLibraries:
+    libraries:
+      - defaultVersion: "master"
+        name: "jenkins-pipeline-lib"
+        retriever:
+          modernSCM:
+            scm:
+              github:
+                id: "e43d6600-ba0e-46c5-8eae-3989bf654055"
+                repoOwner: "jenkins-infra"
+                repository: "pipeline-library"
+                traits:
+                  - gitHubBranchDiscovery:
+                      strategyId: 1
+                  - originPullRequestDiscoveryTrait:
+                      strategyId: 2
+                  - gitHubForkDiscovery:
+                      strategyId: 3
+                      trust: "trustPermission"

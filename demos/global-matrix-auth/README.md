@@ -1,12 +1,14 @@
 # matrix-auth-plugin
 
+Requires `matrix-auth` >= 2.4
+
 ## sample-configuration (global matrix)
 
 ```yaml
 jenkins:
   authorizationStrategy:
     globalMatrix:
-      grantedPermissions:
+      permissions:
         - "Overall/Read:anonymous"
         - "Overall/Administer:authenticated"
 ```
@@ -17,7 +19,7 @@ jenkins:
 jenkins:
   authorizationStrategy:
     projectMatrix:
-      grantedPermissions:
+      permissions:
         - "View/Delete:authenticated"
         - "View/Read:authenticated"
         - "View/Configure:authenticated"

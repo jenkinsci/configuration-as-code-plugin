@@ -8,7 +8,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 import org.hamcrest.core.StringContains;
-import org.jvnet.hudson.test.JenkinsRule;
 
 import static java.lang.reflect.Modifier.isPublic;
 import static java.lang.reflect.Modifier.isStatic;
@@ -16,7 +15,7 @@ import static java.lang.reflect.Modifier.isStatic;
 /**
  * @author lanwen (Kirill Merkushev)
  */
-public class JenkinsConfiguredWithCodeRule extends JenkinsRule {
+public class JenkinsConfiguredWithCodeRule extends JenkinsConfiguredRule {
 
     @Override
     public void before() throws Throwable {

@@ -5,6 +5,7 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.Functions;
+import hudson.PluginManager;
 import hudson.Util;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
@@ -17,10 +18,10 @@ import io.jenkins.plugins.casc.impl.DefaultConfiguratorRegistry;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import io.jenkins.plugins.casc.model.Scalar;
+import io.jenkins.plugins.casc.model.Scalar.Format;
 import io.jenkins.plugins.casc.model.Sequence;
 import io.jenkins.plugins.casc.model.Source;
 import io.jenkins.plugins.casc.snakeyaml.DumperOptions;
-import io.jenkins.plugins.casc.snakeyaml.Yaml;
 import io.jenkins.plugins.casc.snakeyaml.emitter.Emitter;
 import io.jenkins.plugins.casc.snakeyaml.error.YAMLException;
 import io.jenkins.plugins.casc.snakeyaml.nodes.MappingNode;
@@ -38,9 +39,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.Reader;
 import java.io.Writer;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
@@ -84,8 +85,10 @@ import org.kohsuke.stapler.interceptor.RequirePOST;
 import org.kohsuke.stapler.lang.Klass;
 import org.kohsuke.stapler.verb.POST;
 
+import static io.jenkins.plugins.casc.SchemaGeneration.writeJSONSchema;
 import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.FlowStyle.BLOCK;
 import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.DOUBLE_QUOTED;
+import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.LITERAL;
 import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.PLAIN;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
@@ -109,6 +112,10 @@ public class ConfigurationAsCode extends ManagementLink {
     @Inject
     private DefaultConfiguratorRegistry registry;
 
+    private long lastTimeLoaded;
+
+    private List<String> sources = Collections.emptyList();
+
     @CheckForNull
     @Override
     public String getIconFileName() {
@@ -131,10 +138,6 @@ public class ConfigurationAsCode extends ManagementLink {
     public String getDescription() {
         return "Reload your configuration or update configuration source";
     }
-
-    private long lastTimeLoaded;
-
-    private List<String> sources = Collections.emptyList();
 
     public Date getLastTimeLoaded() {
         return new Date(lastTimeLoaded);
@@ -176,7 +179,7 @@ public class ConfigurationAsCode extends ManagementLink {
                 }
                 LOGGER.log(Level.FINE, "Replace configuration with: " + normalizedSource);
             } else {
-                LOGGER.log(Level.INFO, "Provided sources could not be applied");
+                LOGGER.log(Level.WARNING, "Provided sources could not be applied");
                 // todo: show message in UI
             }
         } else {
@@ -266,6 +269,7 @@ public class ConfigurationAsCode extends ManagementLink {
      */
     @Initializer(after = InitMilestone.EXTENSIONS_AUGMENTED, before = InitMilestone.JOB_LOADED)
     public static void init() throws Exception {
+        detectVaultPluginMissing();
         get().configure();
     }
 
@@ -297,7 +301,8 @@ public class ConfigurationAsCode extends ManagementLink {
                 System.getenv(CASC_JENKINS_CONFIG_ENV)
         );
 
-        if (!StringUtils.isBlank(cascPath)) {
+        // We prefer to rely on environment variable over global config
+        if (StringUtils.isNotBlank(cascPath) && StringUtils.isBlank(configParameter)) {
             configParameter = cascPath;
         }
 
@@ -396,6 +401,21 @@ public class ConfigurationAsCode extends ManagementLink {
         export(res.getOutputStream());
     }
 
+    /**
+     * Export JSONSchema to URL
+     * @throws Exception
+     */
+    public void doSchema(StaplerRequest req, StaplerResponse res) throws Exception {
+
+        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+            res.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+
+        res.setContentType("application/json; charset=utf-8");
+        res.getWriter().print(writeJSONSchema());
+    }
+
     @RequirePOST
     public void doViewExport(StaplerRequest req, StaplerResponse res) throws Exception {
         if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
@@ -408,6 +428,15 @@ public class ConfigurationAsCode extends ManagementLink {
 
         req.setAttribute("export", out.toString(StandardCharsets.UTF_8.name()));
         req.getView(this, "viewExport.jelly").forward(req, res);
+    }
+
+    public void doReference(StaplerRequest req, StaplerResponse res) throws Exception {
+        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+            res.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+
+        req.getView(this, "reference.jelly").forward(req, res);
     }
 
     @Restricted(NoExternalUse.class)
@@ -490,7 +519,14 @@ public class ConfigurationAsCode extends ManagementLink {
                 final String value = scalar.getValue();
                 if (value == null || value.length() == 0) return null;
 
-                final DumperOptions.ScalarStyle style = scalar.isRaw() ? PLAIN : DOUBLE_QUOTED;
+                final DumperOptions.ScalarStyle style;
+                if (scalar.getFormat().equals(Format.MULTILINESTRING) && !scalar.isRaw()) {
+                    style = LITERAL;
+                } else if (scalar.isRaw()) {
+                    style = PLAIN;
+                } else {
+                    style = DOUBLE_QUOTED;
+                }
 
                 return new ScalarNode(getTag(scalar.getFormat()), value, null, null, style);
         }
@@ -500,9 +536,12 @@ public class ConfigurationAsCode extends ManagementLink {
         switch (format) {
             case NUMBER:
                 return Tag.INT;
+            case FLOATING:
+                return Tag.FLOAT;
             case BOOLEAN:
                 return Tag.BOOL;
             case STRING:
+            case MULTILINESTRING:
             default:
                 return Tag.STR;
         }
@@ -529,8 +568,13 @@ public class ConfigurationAsCode extends ManagementLink {
             return false;
         }
         final List<String> supportedProtocols = Arrays.asList("https","http","file");
-        URI uri = URI.create(configurationParameter);
-        if(uri == null || uri.getScheme() == null) {
+        URI uri;
+        try {
+            uri = new URI(configurationParameter);
+        } catch (URISyntaxException ex) {
+            return false;
+        }
+        if(uri.getScheme() == null) {
             return false;
         }
         return supportedProtocols.contains(uri.getScheme());
@@ -581,7 +625,7 @@ public class ConfigurationAsCode extends ManagementLink {
         final PathMatcher matcher = FileSystems.getDefault().getPathMatcher(YAML_FILES_PATTERN);
         try (Stream<Path> stream = Files.find(Paths.get(path), Integer.MAX_VALUE,
                 (next, attrs) -> !attrs.isDirectory() && !isHidden(next) && matcher.matches(next))) {
-            return stream.collect(toList());
+            return stream.sorted().collect(toList());
         } catch (IOException e) {
             throw new IllegalStateException("failed config scan for " + path, e);
         }
@@ -592,11 +636,6 @@ public class ConfigurationAsCode extends ManagementLink {
             .mapToObj(path::getName)
             .anyMatch(subPath -> subPath.toString().startsWith("."));
     }
-
-    private static Stream<? extends Map.Entry<String, Object>> entries(Reader config) {
-        return ((Map<String, Object>) new Yaml().loadAs(config, Map.class)).entrySet().stream();
-    }
-
 
     @FunctionalInterface
     private interface ConfiguratorOperation {
@@ -642,7 +681,20 @@ public class ConfigurationAsCode extends ManagementLink {
         }
     }
 
+    private static void detectVaultPluginMissing() {
+        PluginManager pluginManager = Jenkins.getInstance().getPluginManager();
+        Set<String> envKeys = System.getenv().keySet();
+        if (envKeys.stream().anyMatch(s -> s.startsWith("CASC_VAULT_"))
+            && pluginManager.getPlugin("hashicorp-vault-plugin") == null) {
+            LOGGER.log(Level.SEVERE,
+                "Vault secret resolver is not installed, consider installing hashicorp-vault-plugin v2.4.0 or higher\nor consider removing any 'CASC_VAULT_' variables");
+        }
+    }
+
     private void configureWith(Mapping entries) throws ConfiguratorException {
+        // Initialize secret sources
+        SecretSource.all().forEach(SecretSource::init);
+
         // Check input before actually applying changes,
         // so we don't let master in a weird state after some ConfiguratorException has been thrown
         final Mapping clone = entries.clone();
@@ -652,7 +704,6 @@ public class ConfigurationAsCode extends ManagementLink {
         monitor.reset();
         ConfigurationContext context = new ConfigurationContext(registry);
         context.addListener(monitor::record);
-        context.getSecretSources().forEach(SecretSource::init);
         try (ACLContext acl = ACL.as(ACL.SYSTEM)) {
             invokeWith(entries, (configurator, config) -> configurator.configure(config, context));
         }
@@ -749,7 +800,7 @@ public class ConfigurationAsCode extends ManagementLink {
     public static String printThrowable(@NonNull Throwable t) {
         String s = Functions.printThrowable(t)
             .split("at io.jenkins.plugins.casc.ConfigurationAsCode.export")[0]
-            .replaceAll("\n\t", "  ");
+            .replaceAll("\t", "  ");
         return s.substring(0, s.lastIndexOf(")") + 1);
     }
 

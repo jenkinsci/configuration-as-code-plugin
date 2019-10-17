@@ -1,4 +1,6 @@
-# configure statistics-gatherer plugin
+# Configure statistics-gatherer plugin
+
+Sample configuration for the [Statistics Gatherer plugin](https://plugins.jenkins.io/statistics-gatherer).
 
 ## sample configuration
 

@@ -14,7 +14,7 @@
     <checkstyle.skip>true</checkstyle.skip>
     <spotbugs.skip>true</spotbugs.skip>
     <maven.javadoc.skip>true</maven.javadoc.skip>
-    <snakeyaml.version>1.23</snakeyaml.version>
+    <snakeyaml.version>1.25</snakeyaml.version>
   </properties>
 
   <dependencies>
@@ -30,7 +30,7 @@
     <plugins>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>2.3</version>
+        <version>3.2.1</version>
         <executions>
           <execution>
             <id>shade</id>
