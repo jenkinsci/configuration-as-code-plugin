@@ -274,6 +274,18 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     /**
+     *  Reinit to load CASC config to temporary avoid issues
+     *  https://github.com/jenkinsci/configuration-as-code-plugin/issues/1026
+     *
+     * @throws Exception
+     */
+    @Initializer(after = InitMilestone.JOB_LOADED)
+    public static void reinit() throws Exception{
+        detectVaultPluginMissing();
+        get().configure();
+    }
+
+    /**
      * Main entry point to start configuration process.
      * @throws ConfiguratorException Configuration error
      */
