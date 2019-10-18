@@ -36,7 +36,7 @@ public class SSHCredentialsTest {
             .around(j);
 
     private static final String CREDENTIALS_PASSWORD = "password-of-userid";
-    private static final String PRIVATE_KEY = "sp0ds9d+skkfjf";
+    private static final String PRIVATE_KEY = "sp0ds9d+skkfjf\n";
 
     @Test
     @ConfiguredWithCode("SSHCredentialsTest.yml")
