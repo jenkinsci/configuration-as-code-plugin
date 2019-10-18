@@ -24,7 +24,7 @@ public class ProxyTest {
     public void configure_proxy() throws Exception {
         final ProxyConfiguration proxy = Jenkins.get().proxy;
         assertNotNull(proxy);
-        assertThat(proxy.getPassword(), is("password"));
+        assertThat(proxy.getSecretPassword().getPlainText(), is("password"));
         assertThat(proxy.getTestUrl(), is("http://google.com"));
         assertThat(proxy.getUserName(), is("login"));
         assertThat(proxy.name, is("proxyhost"));
