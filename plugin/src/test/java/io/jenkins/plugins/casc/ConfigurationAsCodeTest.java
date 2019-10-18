@@ -245,4 +245,13 @@ public class ConfigurationAsCodeTest {
             + "  This Jenkins is 100% configured and managed 'as code'.\n";
         assertThat(exported, is(expected));
     }
+
+    @Test
+    public void testHtmlDocStringRetrieval() throws Exception {
+        String expectedDocString = "<div>\n"
+            + "  If checked, this will allow users who are not authenticated to access Jenkins in a read-only mode.\n"
+            + "</div>\n";
+        String actualDocString = ConfigurationAsCode.get().getHtmlHelp(hudson.security.FullControlOnceLoggedInAuthorizationStrategy.class, "allowAnonymousRead");
+        assertEquals(expectedDocString, actualDocString);
+    }
 }

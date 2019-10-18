@@ -1,15 +1,19 @@
 package io.jenkins.plugins.casc;
 
 import io.jenkins.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class SchemaGeneration {
+
+    private static final Logger LOGGER = Logger.getLogger(SchemaGeneration.class.getName());
 
     final static JSONObject schemaTemplateObject = new JSONObject()
         .put("$schema", "http://json-schema.org/draft-07/schema#")
@@ -48,12 +52,12 @@ public class SchemaGeneration {
                     JSONObject attributeSchema = new JSONObject();
                     for (Attribute attribute : baseConfigAttributeList) {
                         if (attribute.multiple) {
-                            generateMultipleAttributeSchema(attributeSchema, attribute);
+                            generateMultipleAttributeSchema(attributeSchema, attribute, baseConfigurator);
                         } else {
                             if (attribute.type.isEnum()) {
-                                generateEnumAttributeSchema(attributeSchema, attribute);
+                                generateEnumAttributeSchema(attributeSchema, attribute, baseConfigurator);
                             } else {
-                                attributeSchema.put(attribute.getName(), generateNonEnumAttributeObject(attribute));
+                                attributeSchema.put(attribute.getName(), generateNonEnumAttributeObject(attribute, baseConfigurator));
                                 schemaConfiguratorObjects
                                     .put(((BaseConfigurator) configuratorObject).getTarget().getSimpleName().toLowerCase(),
                                         new JSONObject()
@@ -100,35 +104,43 @@ public class SchemaGeneration {
             return finalHeteroConfiguratorObject;
     }
 
-    private static JSONObject generateNonEnumAttributeObject(Attribute attribute) {
+    private static JSONObject generateNonEnumAttributeObject(Attribute attribute, BaseConfigurator baseConfigurator) {
         JSONObject attributeType = new JSONObject();
+        String description = retrieveDocStringFromAttribute(baseConfigurator.getTarget(), attribute.name);
         switch (attribute.type.getName()) {
             case "java.lang.String":
                 attributeType.put("type", "string");
+                attributeType.put("description", description);
                 break;
 
             case "int":
                 attributeType.put("type", "integer");
+                attributeType.put("description", description);
                 break;
 
             case "boolean":
                 attributeType.put("type", "boolean");
+                attributeType.put("description", description);
                 break;
 
             case "java.lang.Boolean":
                 attributeType.put("type", "boolean");
+                attributeType.put("description", description);
                 break;
 
             case "java.lang.Integer":
                 attributeType.put("type", "integer");
+                attributeType.put("description", description);
                 break;
 
             case "java.lang.Long":
                 attributeType.put("type", "integer");
+                attributeType.put("description", description);
                 break;
 
             default:
                 attributeType.put("type", "object");
+                attributeType.put("description", description);
                 attributeType.put("$id",
                     "#/definitions/" + attribute.type.getName());
                 break;
@@ -149,23 +161,26 @@ public class SchemaGeneration {
         return rootConfiguratorObject;
     }
 
-    private static void generateMultipleAttributeSchema(JSONObject attributeSchema, Attribute attribute) {
+    private static void generateMultipleAttributeSchema(JSONObject attributeSchema, Attribute attribute, BaseConfigurator baseConfigurator) {
         if (attribute.type.getName().equals("java.lang.String")) {
             attributeSchema.put(attribute.getName(),
                 new JSONObject()
+                    .put("description", retrieveDocStringFromAttribute(baseConfigurator.getTarget(), attribute.name))
                     .put("type", "string"));
         } else {
             attributeSchema.put(attribute.getName(),
                 new JSONObject()
+                    .put("description", retrieveDocStringFromAttribute(baseConfigurator.getTarget(), attribute.name))
                     .put("type", "object")
                     .put("$id", "#/definitions/" + attribute.type.getName()));
         }
     }
 
-    private static void generateEnumAttributeSchema(JSONObject attributeSchemaTemplate, Attribute attribute) {
+    private static void generateEnumAttributeSchema(JSONObject attributeSchemaTemplate, Attribute attribute, BaseConfigurator baseConfigurator) {
         if (attribute.type.getEnumConstants().length == 0) {
             attributeSchemaTemplate.put(attribute.getName(),
                 new JSONObject()
+                    .put("description", retrieveDocStringFromAttribute(baseConfigurator.getTarget(), attribute.name))
                     .put("type", "string"));
         } else {
             ArrayList<String> attributeList = new ArrayList<>();
@@ -174,9 +189,24 @@ public class SchemaGeneration {
             }
             attributeSchemaTemplate.put(attribute.getName(),
                 new JSONObject()
+                    .put("description", retrieveDocStringFromAttribute(baseConfigurator.getTarget(), attribute.name))
                     .put("type", "string")
                     .put("enum", new JSONArray(attributeList)));
         }
+    }
+
+    public static String retrieveDocStringFromAttribute(Class baseConfigClass, String attributeName) {
+        try {
+            String htmlDocString = ConfigurationAsCode.get().getHtmlHelp(baseConfigClass, attributeName);
+            return removeHtmlTags(htmlDocString);
+        } catch (IOException e) {
+            LOGGER.warning("Error getting help document for attribute : " + e);
+        }
+        return null;
+    }
+
+    public static String removeHtmlTags(String htmlDocString) {
+        return htmlDocString.replaceAll("\\<.*?\\>", "").trim();
     }
 }
 
