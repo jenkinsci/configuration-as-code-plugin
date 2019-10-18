@@ -46,7 +46,7 @@ public class ProxyConfiguratorTest {
         assertEquals(proxy.port, 80);
 
         assertEquals(proxy.getUserName(), "login");
-        assertEquals(Secret.decrypt(proxy.getEncryptedPassword()).getPlainText(), "password");
+        assertEquals(proxy.getSecretPassword().getPlainText(), "password");
         assertEquals(proxy.noProxyHost, "externalhost");
         assertEquals(proxy.getTestUrl(), "http://google.com");
 
@@ -94,7 +94,7 @@ public class ProxyConfiguratorTest {
         assertEquals(proxy.port, 80);
 
         assertEquals(proxy.getUserName(), "proxy_user");
-        assertEquals(Secret.decrypt(proxy.getEncryptedPassword()).getPlainText(), "proxy_password");
+        assertEquals(proxy.getSecretPassword().getPlainText(), "proxy_password");
         assertEquals(proxy.noProxyHost, "external.host");
         assertEquals(proxy.getTestUrl(), "http://google.com");
     }
@@ -107,10 +107,10 @@ public class ProxyConfiguratorTest {
     public void shouldNotWritePasswordToLog() {
         ProxyConfiguration proxy = j.jenkins.proxy;
         assertEquals(proxy.getUserName(), "proxy_user");
-        assertEquals(Secret.decrypt(proxy.getEncryptedPassword()).getPlainText(), "proxy_password");
+        assertEquals(proxy.getSecretPassword().getPlainText(), "proxy_password");
 
         // Check logs
-        Util.assertLogContains(logging, "password");
+        Util.assertLogContains(logging, "secretPassword");
         Util.assertNotInLog(logging, "proxy_password");
     }
 
@@ -121,14 +121,14 @@ public class ProxyConfiguratorTest {
         ConfigurationContext context = new ConfigurationContext(registry);
         final CNode configNode = getProxyNode(context);
 
-        Secret password = requireNonNull(Secret.decrypt(getProxyNode(context).getScalarValue("password")));
+        Secret password = requireNonNull(Secret.decrypt(getProxyNode(context).getScalarValue("secretPassword")));
 
         final String yamlConfig = toYamlString(configNode);
         assertEquals(String.join("\n",
                 "name: \"proxyhost\"",
                 "noProxyHost: \"externalhost\"",
-                "password: \"" + password.getEncryptedValue() + "\"",
                 "port: 80",
+                "secretPassword: \"" + password.getEncryptedValue() + "\"",
                 "testUrl: \"http://google.com\"",
                 "userName: \"login\"",
                 ""
