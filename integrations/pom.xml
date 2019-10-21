@@ -403,7 +403,7 @@
     <dependency>
       <groupId>com.vladsch.flexmark</groupId>
       <artifactId>flexmark-all</artifactId>
-      <version>0.50.40</version>
+      <version>0.50.42</version>
       <scope>test</scope>
     </dependency>
 
