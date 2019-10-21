@@ -211,8 +211,12 @@ public class ConfigurationAsCode extends ManagementLink {
         if (!file.exists() && !ConfigurationAsCode.isSupportedURI(normalizedSource)) {
             return FormValidation.error("Configuration cannot be applied. File or URL cannot be parsed or do not exist.");
         }
+
+        List<YamlSource> yamlSources = Collections.emptyList();
         try {
-            final Map<Source, String> issues = collectIssues(normalizedSource);
+            List<String> sources = Collections.singletonList(normalizedSource);
+            yamlSources = getConfigFromSources(sources);
+            final Map<Source, String> issues = checkWith(yamlSources);
             final JSONArray errors = collectProblems(issues, "error");
             if (!errors.isEmpty()) {
                 return FormValidation.error(errors.toString());
@@ -224,13 +228,9 @@ public class ConfigurationAsCode extends ManagementLink {
             return FormValidation.okWithMarkup("The configuration can be applied");
         } catch (ConfiguratorException | IllegalArgumentException e) {
             return FormValidation.error(e, e.getCause() == null ? e.getMessage() : e.getCause().getMessage());
+        } finally {
+            closeSources(yamlSources);
         }
-    }
-
-    private Map<Source, String> collectIssues(String configurationPath) throws ConfiguratorException {
-        List<String> sources = Collections.singletonList(configurationPath);
-        List<YamlSource> yamlSource = getConfigFromSources(sources);
-        return checkWith(yamlSource);
     }
 
     private JSONArray collectProblems(Map<Source, String> issues, String severity) {
@@ -590,6 +590,7 @@ public class ConfigurationAsCode extends ManagementLink {
     private void configureWith(List<YamlSource> sources) throws ConfiguratorException {
         lastTimeLoaded = System.currentTimeMillis();
         configureWith( YamlUtils.loadFrom(sources) );
+        closeSources(sources);
     }
 
     @Restricted(NoExternalUse.class)
@@ -600,10 +601,19 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     private Map<Source, String> checkWith(List<YamlSource> sources) throws ConfiguratorException {
-        if (sources.isEmpty()) return null;
+        if (sources.isEmpty()) return Collections.emptyMap();
         return checkWith( YamlUtils.loadFrom(sources) );
     }
 
+    private void closeSources(List<YamlSource> sources) {
+        for (YamlSource source : sources) {
+            try {
+                source.close();
+            } catch (IOException e) {
+                LOGGER.log(Level.WARNING, "Failed to close YAML Source", e);
+            }
+        }
+    }
 
     /**
      * Recursive search for all {@link #YAML_FILES_PATTERN} in provided base path
