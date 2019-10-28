@@ -464,7 +464,7 @@
       <dependency>
         <groupId>io.netty</groupId>
         <artifactId>netty-codec-http</artifactId>
-        <version>4.1.41.Final</version>
+        <version>4.1.43.Final</version>
       </dependency>
       <dependency>
         <groupId>com.jcraft</groupId>
