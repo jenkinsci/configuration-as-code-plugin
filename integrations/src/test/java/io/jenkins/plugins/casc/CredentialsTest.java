@@ -4,11 +4,15 @@ import com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.cloudbees.plugins.credentials.casc.CredentialsRootConfigurator;
+import com.cloudbees.plugins.credentials.common.StandardUsernameCredentials;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 import hudson.ExtensionList;
+import hudson.model.Describable;
+import hudson.model.Descriptor;
 import hudson.util.Secret;
 import io.jenkins.plugins.casc.impl.configurators.DataBoundConfigurator;
+import io.jenkins.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.model.CNode;
@@ -18,9 +22,13 @@ import java.util.List;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import jenkins.model.Jenkins;
+import org.checkerframework.checker.signedness.qual.UnknownSignedness;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
+import org.jvnet.hudson.test.TestExtension;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 
 import static java.util.Objects.requireNonNull;
 import static org.hamcrest.Matchers.is;
@@ -115,6 +123,17 @@ public class CredentialsTest {
                 new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL, "1", "2", "3", "4")));
     }
 
+    @Test
+    @Issue("JCasC #1188")
+    public void shouldNotFailOnCredentials() {
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        ConfigurationContext context = new ConfigurationContext(registry);
+        CredentialsRootConfigurator root = ExtensionList.lookupSingleton(CredentialsRootConfigurator.class);
+
+        HeteroDescribableConfigurator<JCasC_Issue1188_Repro> desc = new HeteroDescribableConfigurator<>(JCasC_Issue1188_Repro.class);
+        final List<Configurator<JCasC_Issue1188_Repro>> configurators = desc.getConfigurators(context);
+    }
+
     @Nonnull
     private <T> Attribute<T,?> getFromDatabound(Class<T> clazz, @Nonnull String attributeName) {
         DataBoundConfigurator<T> cfg = new DataBoundConfigurator<>(clazz);
@@ -125,6 +144,39 @@ public class CredentialsTest {
             }
         }
         throw new AssertionError("Cannot find databound attribute " + attributeName + " in " + clazz);
+    }
+
+    private static class JCasC_Issue1188_Repro implements Describable<JCasC_Issue1188_Repro> {
+        private List<JCasC_Issue1188_Repro_2> credentials;
+
+        @DataBoundConstructor
+        public JCasC_Issue1188_Repro() {
+            // noop
+        }
+
+        @DataBoundSetter
+        public void setCredentials(List<JCasC_Issue1188_Repro_2> credentials) {
+            this.credentials = credentials;
+        }
+
+        @Override
+        public Descriptor<JCasC_Issue1188_Repro> getDescriptor() {
+            return Jenkins.get().getDescriptor(JCasC_Issue1188_Repro.class);
+        }
+
+        @TestExtension("shouldNotFailOnCredentials")
+        public static class DescriptorImp extends Descriptor<JCasC_Issue1188_Repro> {
+
+        }
+    }
+
+    private static class JCasC_Issue1188_Repro_2 {
+        private StandardUsernameCredentials credentials;
+
+        @DataBoundConstructor
+        public JCasC_Issue1188_Repro_2(StandardUsernameCredentials credentials) {
+            this.credentials = credentials;
+        }
     }
 
 }
