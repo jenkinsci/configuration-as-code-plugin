@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import jenkins.model.Jenkins;
-import org.checkerframework.checker.signedness.qual.UnknownSignedness;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
