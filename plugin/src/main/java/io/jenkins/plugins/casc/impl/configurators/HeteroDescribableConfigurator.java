@@ -150,10 +150,17 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
             return Stream.ofAll(descriptorList);
         }
 
-        LOGGER.log(Level.FINEST, "getDescriptors(): Cannot find descriptors for {0}." +
+        LOGGER.log(Level.FINEST, "getDescriptors(): Cannot find descriptors for {0}. " +
                 "Will try parent classes to find proper extension points", target);
         DescriptorExtensionList parentDescriptorClassList = descriptorList;
-        Class<?> effectiveTarget = target.getSuperclass();
+
+        @CheckForNull Class<?> effectiveTarget = target.getSuperclass(); // getSuperclass(may return null)
+        if (effectiveTarget == null) {
+            LOGGER.log(Level.WARNING, "getDescriptors(): Effective target class {0} has no superclass. "
+                + "It is not possible to find a descriptor for it", target);
+            return Stream.empty();
+        }
+
         while (parentDescriptorClassList.isEmpty() && effectiveTarget != Object.class) {
             final Class<Describable> match;
             LOGGER.log(Level.FINEST, "getDescriptors() for {0}: Trying parent class {1}",
@@ -168,11 +175,17 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
                 }
                 break;
             }
-            parentDescriptorClassList = Jenkins.getInstance().getDescriptorList(match);
-            effectiveTarget = effectiveTarget.getSuperclass();
+
+            if (match != null) {
+                parentDescriptorClassList = Jenkins.getInstance().getDescriptorList(match);
+                effectiveTarget = effectiveTarget.getSuperclass();
+            } else {
+                parentDescriptorClassList = null;
+                break;
+            }
         }
 
-        if (parentDescriptorClassList.isEmpty()) {
+        if (parentDescriptorClassList != null || parentDescriptorClassList.isEmpty()) {
             return Stream.empty();
         }
 
