@@ -122,6 +122,16 @@ public class ConfigurationAsCodeTest {
         assertThat(j.jenkins.getSystemMessage(), equalTo("configuration as code - JenkinsConfigTest"));
     }
 
+    @Test
+    @ConfiguredWithCode(value = {"merge1.yml", "merge3.yml"}, expected = ConfiguratorException.class)
+    public void test_loads_multi_files() throws Exception {
+        ConfigurationAsCode casc = ConfigurationAsCode.get();
+
+        List<String> sources = casc.getSources();
+        assertNotNull(sources);
+        assertEquals(sources.size(), 2);
+    }
+
     @Test(expected = ConfiguratorException.class)
     public void shouldReportMissingFileOnNotFoundConfig() throws ConfiguratorException {
         ConfigurationAsCode casc = new ConfigurationAsCode();
