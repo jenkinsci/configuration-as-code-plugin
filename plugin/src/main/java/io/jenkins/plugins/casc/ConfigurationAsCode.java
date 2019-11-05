@@ -284,10 +284,11 @@ public class ConfigurationAsCode extends ManagementLink {
     private List<YamlSource> getStandardConfigSources() throws ConfiguratorException {
         List<YamlSource> configs = new ArrayList<>();
 
-        for (String p : getStandardConfig()) {
+        List<String> standardConfig = getStandardConfig();
+        for (String p : standardConfig) {
             appendSources(configs, p);
-            sources = Collections.singletonList(p);
         }
+        sources = Collections.unmodifiableList(standardConfig);
         return configs;
     }
 
@@ -557,8 +558,8 @@ public class ConfigurationAsCode extends ManagementLink {
 
         for (String p : configParameters) {
             appendSources(configs, p);
-            sources = Collections.singletonList(p);
         }
+        sources = Collections.unmodifiableList(configParameters.stream().collect(toList()));
         configureWith(configs);
         lastTimeLoaded = System.currentTimeMillis();
     }
