@@ -122,6 +122,16 @@ public class ConfigurationAsCodeTest {
         assertThat(j.jenkins.getSystemMessage(), equalTo("configuration as code - JenkinsConfigTest"));
     }
 
+    @Test
+    @ConfiguredWithCode(value = {"merge1.yml", "merge3.yml"}, expected = ConfiguratorException.class)
+    public void test_loads_multi_files() throws Exception {
+        ConfigurationAsCode casc = ConfigurationAsCode.get();
+
+        List<String> sources = casc.getSources();
+        assertNotNull(sources);
+        assertEquals(sources.size(), 2);
+    }
+
     @Test(expected = ConfiguratorException.class)
     public void shouldReportMissingFileOnNotFoundConfig() throws ConfiguratorException {
         ConfigurationAsCode casc = new ConfigurationAsCode();
@@ -244,5 +254,14 @@ public class ConfigurationAsCodeTest {
             + "  Welcome to our build server.\n\n"
             + "  This Jenkins is 100% configured and managed 'as code'.\n";
         assertThat(exported, is(expected));
+    }
+
+    @Test
+    public void testHtmlDocStringRetrieval() throws Exception {
+        String expectedDocString = "<div>\n"
+            + "  If checked, this will allow users who are not authenticated to access Jenkins in a read-only mode.\n"
+            + "</div>\n";
+        String actualDocString = ConfigurationAsCode.get().getHtmlHelp(hudson.security.FullControlOnceLoggedInAuthorizationStrategy.class, "allowAnonymousRead");
+        assertEquals(expectedDocString, actualDocString);
     }
 }

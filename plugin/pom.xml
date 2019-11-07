@@ -14,8 +14,6 @@
   <packaging>hpi</packaging>
 
   <name>Configuration as Code Plugin</name>
-  <description>Manage Jenkins master configuration as code</description>
-  <url>https://github.com/jenkinsci/configuration-as-code-plugin</url>
 
   <properties>
     <!-- Breaking changes log
@@ -96,7 +94,7 @@
     <dependency>
       <groupId>com.vladsch.flexmark</groupId>
       <artifactId>flexmark-all</artifactId>
-      <version>0.50.40</version>
+      <version>0.50.42</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

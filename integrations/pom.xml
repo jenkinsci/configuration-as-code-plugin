@@ -50,6 +50,13 @@
     </dependency>
 
     <dependency>
+      <groupId>com.coravy.hudson.plugins.github</groupId>
+      <artifactId>github</artifactId>
+      <version>1.29.5</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>vault</artifactId>
       <version>1.12.2</version>
@@ -312,7 +319,7 @@
     <dependency>
       <groupId>org.jvnet.hudson.plugins</groupId>
       <artifactId>warnings</artifactId>
-      <version>5.0.0</version>
+      <version>5.0.1</version>
       <scope>test</scope>
     </dependency>
 
@@ -376,7 +383,7 @@
     <dependency>
       <groupId>com.datapipe.jenkins.plugins</groupId>
       <artifactId>hashicorp-vault-plugin</artifactId>
-      <version>2.5.0</version>
+      <version>3.0.0</version>
     </dependency>
 
     <dependency>
@@ -389,15 +396,28 @@
     <dependency>
       <groupId>org.jsoup</groupId>
       <artifactId>jsoup</artifactId>
-      <version>1.11.3</version>
+      <version>1.12.1</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>com.vladsch.flexmark</groupId>
       <artifactId>flexmark-all</artifactId>
-      <version>0.50.40</version>
+      <version>0.50.42</version>
       <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>nodejs</artifactId>
+      <version>1.3.3</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.jenkins-ci.plugins</groupId>
+          <artifactId>config-file-provider</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 
@@ -544,12 +564,17 @@
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
-        <version>3.1.0</version>
+        <version>3.2.1</version>
       </dependency>
       <dependency>
         <groupId>org.jdom</groupId>
         <artifactId>jdom</artifactId>
         <version>2.0.2</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jenkins-ci.plugins</groupId>
+        <artifactId>aws-java-sdk</artifactId>
+        <version>1.11.457</version>
       </dependency>
       <dependency>
         <groupId>org.jenkins-ci.plugins</groupId>
@@ -569,8 +594,8 @@
       </dependency>
       <dependency>
         <groupId>org.jenkins-ci.plugins</groupId>
-        <artifactId>aws-java-sdk</artifactId>
-        <version>1.11.457</version>
+        <artifactId>github-api</artifactId>
+        <version>1.95</version>
       </dependency>
       <dependency>
         <groupId>org.json</groupId>
@@ -590,7 +615,7 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>1.7.25</version>
+        <version>1.7.28</version>
       </dependency>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>

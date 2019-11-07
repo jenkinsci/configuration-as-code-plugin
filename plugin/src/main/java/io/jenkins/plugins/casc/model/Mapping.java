@@ -47,7 +47,7 @@ public final class Mapping extends HashMap<String, CNode> implements CNode {
         if (node != null) super.put(key, node);
     }
 
-    public void putIfNotEmpry(String key, Sequence seq) {
+    public void putIfNotEmpty(String key, Sequence seq) {
         if (!seq.isEmpty()) super.put(key, seq);
     }
 
