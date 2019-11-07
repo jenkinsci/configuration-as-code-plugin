@@ -4,12 +4,13 @@ import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static io.jenkins.plugins.casc.SchemaGeneration.generateSchema;
 import static io.jenkins.plugins.casc.SchemaGeneration.removeHtmlTags;
 import static io.jenkins.plugins.casc.SchemaGeneration.retrieveDocStringFromAttribute;
-import static io.jenkins.plugins.casc.misc.Util.toStringFromYamlFile;
+import static io.jenkins.plugins.casc.misc.Util.convertYamlFileToJson;
+import static io.jenkins.plugins.casc.misc.Util.validateSchema;
+import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertFalse;
 
 public class SchemaGenerationTest {
 

@@ -20,7 +20,7 @@ public class SchemaGeneration {
         .put("description", "Jenkins Configuration as Code")
         .put("type", "object");
 
-    public static JSONObject generateSchema() throws Exception {
+    public static JSONObject generateSchema() {
 
         /**
          * The initial template for the JSON Schema
@@ -81,8 +81,7 @@ public class SchemaGeneration {
         return generateSchema().toString(4);
     }
 
-    private static JSONObject generateHeteroDescribableConfigObject(HeteroDescribableConfigurator heteroDescribableConfiguratorObject)
-    throws Exception{
+    private static JSONObject generateHeteroDescribableConfigObject(HeteroDescribableConfigurator heteroDescribableConfiguratorObject) {
         Map<String, Class> implementorsMap = heteroDescribableConfiguratorObject
             .getImplementors();
         JSONObject finalHeteroConfiguratorObject = new JSONObject();
