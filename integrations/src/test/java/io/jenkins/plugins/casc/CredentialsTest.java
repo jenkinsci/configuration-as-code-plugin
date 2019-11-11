@@ -117,7 +117,7 @@ public class CredentialsTest {
 
     @Nonnull
     private <T> Attribute<T,?> getFromDatabound(Class<T> clazz, @Nonnull String attributeName) {
-        DataBoundConfigurator<T> cfg = new DataBoundConfigurator<T>(clazz);
+        DataBoundConfigurator<T> cfg = new DataBoundConfigurator<>(clazz);
         Set<Attribute<T,?>> attributes = cfg.describe();
         for (Attribute<T,?> a : attributes) {
             if(attributeName.equals(a.getName())) {

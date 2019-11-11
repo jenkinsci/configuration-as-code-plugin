@@ -1,4 +1,6 @@
-# configure Keycloak plugin
+# Configure Keycloak plugin
+
+Basic configuration of the [Keycloak plugin](https://plugins.jenkins.io/keycloak)
 
 ## sample configuration
 

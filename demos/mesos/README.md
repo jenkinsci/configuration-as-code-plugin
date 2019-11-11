@@ -1,4 +1,6 @@
-# configure mesos plugin
+# Configure mesos plugin
+
+Basic configuration of the [Mesos plugin](https://plugins.jenkins.io/mesos)
 
 ## sample configuration
 
@@ -7,6 +9,7 @@ jenkins:
   clouds:
     - mesos:
         checkpoint: false
+        cloudID: "mesos-name"
         credentialsId: "MESOS_CREDENTIALS"
         declineOfferDuration: 600
         description: "My Mesos Cloud"
@@ -33,11 +36,12 @@ jenkins:
                 - containerPath: "/tmp/jenkins/workspace/"
                   hostPath: "/tmp/jenkins/workspace/"
                   readOnly: "false"
-            slaveCpus: 0.1
+            mode: "NORMAL"
+            slaveCpus: "0.1"
             slaveMem: 512
-            executorCpus: 0.1
+            executorCpus: "0.1"
             executorMem: 128
-            diskNeeded: 0.0
+            diskNeeded: "0.0"
             minExecutors: 1
             maxExecutors: 2
             remoteFSRoot: "jenkins"
