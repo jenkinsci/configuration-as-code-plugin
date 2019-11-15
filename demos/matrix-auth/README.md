@@ -1,8 +1,11 @@
+# Configure Matrix Authorization Strategy
+
+Basic configuration of the [Matrix Authorization Strategy plugin](https://plugins.jenkins.io/matrix-auth)
+
+## sample configuration
+
+```yaml
 jenkins:
-  systemMessage: "Welcome!"
-  numExecutors: 4
-  mode: NORMAL
-  scmCheckoutRetryCount: 4
   securityRealm:
     local:
       allowsSignup: false
@@ -15,3 +18,4 @@ jenkins:
       permissions:
         - "Overall/Read:anonymous"
         - "Overall/Administer:authenticated"
+```

@@ -1,6 +1,6 @@
-# github-oauth-plugin
+# Configure github-oauth-plugin
 
-[Link to the plugin site](https://plugins.jenkins.io/github-oauth)
+Basic configuration of the [GitHub Authentication plugin](https://plugins.jenkins.io/github-oauth)
 
 ## sample-configuration
 

@@ -5,8 +5,8 @@ import com.nirima.jenkins.plugins.docker.DockerTemplate;
 import com.nirima.jenkins.plugins.docker.strategy.DockerOnceRetentionStrategy;
 import hudson.model.Label;
 import io.jenkins.docker.connector.DockerComputerAttachConnector;
-import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
-import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
+import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -21,16 +21,17 @@ import static org.junit.Assert.assertTrue;
 public class DockerCloudTest {
 
     @Rule
-    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+    public JenkinsConfiguredWithReadmeRule j = new JenkinsConfiguredWithReadmeRule();
 
     @Test
-    @ConfiguredWithCode("DockerCloudTest.yml")
+    @ConfiguredWithReadme("docker/README.md")
     public void configure_docker_cloud() throws Exception {
         final DockerCloud docker = DockerCloud.getCloudByName("docker");
         assertNotNull(docker);
         assertNotNull(docker.getDockerApi());
         assertNotNull(docker.getDockerApi().getDockerHost());
         assertEquals("unix:///var/run/docker.sock", docker.getDockerApi().getDockerHost().getUri());
+
         final DockerTemplate template = docker.getTemplate("jenkins/slave");
         checkTemplate(template, "docker-agent", "jenkins", "/home/jenkins/agent", "10",
                 new String[] { "hello:/hello", "world:/world"}, "hello=world\nfoo=bar");
@@ -39,7 +40,7 @@ public class DockerCloudTest {
     }
 
     @Test
-    @ConfiguredWithCode("DockerCloudTest1.yml")
+    @ConfiguredWithReadme("docker/README.md")
     public void update_docker_cloud() throws Exception {
         DockerCloud docker = DockerCloud.getCloudByName("docker");
         assertNotNull(docker);
@@ -66,7 +67,6 @@ public class DockerCloudTest {
         template = docker.getTemplate(Label.get("generic"));
         checkTemplate(template, "generic", "jenkins", "/home/jenkins/agent2", "5",
                 new String[] { "hello:/hello", "world:/world"}, "hello=world\nfoo=bar");
-
     }
 
     private void checkTemplate(DockerTemplate template, String labelString, String user, String remoteFs,

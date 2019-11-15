@@ -13,7 +13,7 @@ jobs:
         os: [ubuntu-latest, windows-latest]
         include:
         - jenkins-version: '2.176.3'
-          flags: '-Djenkins.version=2.176.3'
+          flags: '--define jenkins.version=2.176.3'
         exclude:
         - java: '11'
           jenkins-version: '2.60.3'

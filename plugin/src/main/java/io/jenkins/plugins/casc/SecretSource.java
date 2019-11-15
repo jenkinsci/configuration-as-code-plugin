@@ -23,8 +23,7 @@ public abstract class SecretSource implements ExtensionPoint {
     public abstract Optional<String> reveal(String secret) throws IOException;
 
     public static List<SecretSource> all() {
-        List<SecretSource> all = new ArrayList<>();
-        all.addAll(Jenkins.getInstance().getExtensionList(SecretSource.class));
-        return all;
+        return new ArrayList<>(
+            Jenkins.getInstance().getExtensionList(SecretSource.class));
     }
 }

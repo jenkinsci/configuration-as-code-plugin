@@ -1,6 +1,6 @@
 # Configure External Workspace Manager
 
-Sample configuration of the [External Workspace Manager plugin] (https://wiki.jenkins.io/display/JENKINS/External+Workspace+Manager+Plugin)
+Sample configuration of the [External Workspace Manager plugin](https://plugins.jenkins.io/external-workspace-manager)
 
 ## sample configuration
 

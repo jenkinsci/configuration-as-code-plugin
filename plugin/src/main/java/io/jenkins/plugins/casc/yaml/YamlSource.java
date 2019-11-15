@@ -1,5 +1,6 @@
 package io.jenkins.plugins.casc.yaml;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -16,7 +17,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 
-public class YamlSource<T> {
+public class YamlSource<T> implements AutoCloseable {
 
     public static final YamlReader<String> READ_FROM_URL = config -> {
         final URL url = URI.create(config).toURL();
@@ -72,5 +73,14 @@ public class YamlSource<T> {
     @Override
     public String toString() {
         return "YamlSource: " + source;
+    }
+
+    @Override
+    public void close() throws IOException {
+        if (reader instanceof BufferedReader) {
+            ((BufferedReader) reader).close();
+        } else if (reader instanceof InputStreamReader) {
+            ((InputStreamReader) reader).close();
+        }
     }
 }

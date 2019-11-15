@@ -1,8 +1,8 @@
 package io.jenkins.plugins.casc;
 
 import hudson.security.SecurityRealm;
-import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
-import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
+import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.GithubSecurityRealm;
 import org.junit.Rule;
@@ -21,10 +21,12 @@ import static org.junit.Assert.assertThat;
 public class GithubOAuthTest {
 
     @Rule
-    public RuleChain rc = RuleChain.outerRule(new EnvironmentVariables().set("GITHUB_SECRET","j985j8fhfhh377"))
-            .around(new JenkinsConfiguredWithCodeRule());
+    public RuleChain chain = RuleChain.outerRule(new EnvironmentVariables()
+        .set("GITHUB_SECRET", "j985j8fhfhh377"))
+        .around(new JenkinsConfiguredWithReadmeRule());
+
     @Test
-    @ConfiguredWithCode("GithubOAuth.yml")
+    @ConfiguredWithReadme("github-oauth/README.md")
     public void testSampleVersionForOAuth() {
         SecurityRealm realm = Jenkins.get().getSecurityRealm();
         assertThat(realm, instanceOf(GithubSecurityRealm.class));
