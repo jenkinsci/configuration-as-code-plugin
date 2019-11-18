@@ -99,7 +99,6 @@ import static java.util.stream.Collectors.toList;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Extension
-@Restricted(NoExternalUse.class)
 public class ConfigurationAsCode extends ManagementLink {
 
     public static final String CASC_JENKINS_CONFIG_PROPERTY = "casc.jenkins.config";
@@ -440,7 +439,6 @@ public class ConfigurationAsCode extends ManagementLink {
         req.getView(this, "reference.jelly").forward(req, res);
     }
 
-    @Restricted(NoExternalUse.class)
     public void export(OutputStream out) throws Exception {
 
         final List<NodeTuple> tuples = new ArrayList<>();
