@@ -147,6 +147,7 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     @RequirePOST
+    @Restricted(NoExternalUse.class)
     public void doReload(StaplerRequest request, StaplerResponse response) throws Exception {
         if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
@@ -157,6 +158,7 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     @RequirePOST
+    @Restricted(NoExternalUse.class)
     public void doReplace(StaplerRequest request, StaplerResponse response) throws Exception {
         if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
@@ -200,6 +202,7 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     @POST
+    @Restricted(NoExternalUse.class)
     public FormValidation doCheckNewSource(@QueryParameter String newSource) {
         Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
         String normalizedSource = Util.fixEmptyAndTrim(newSource);
@@ -359,6 +362,7 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     @RequirePOST
+    @Restricted(NoExternalUse.class)
     public void doCheck(StaplerRequest req, StaplerResponse res) throws Exception {
 
         if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
@@ -375,6 +379,7 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     @RequirePOST
+    @Restricted(NoExternalUse.class)
     public void doApply(StaplerRequest req, StaplerResponse res) throws Exception {
 
         if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
@@ -389,6 +394,7 @@ public class ConfigurationAsCode extends ManagementLink {
      * @throws Exception
      */
     @RequirePOST
+    @Restricted(NoExternalUse.class)
     public void doExport(StaplerRequest req, StaplerResponse res) throws Exception {
 
         if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
@@ -405,6 +411,7 @@ public class ConfigurationAsCode extends ManagementLink {
      * Export JSONSchema to URL
      * @throws Exception
      */
+    @Restricted(NoExternalUse.class)
     public void doSchema(StaplerRequest req, StaplerResponse res) throws Exception {
 
         if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
@@ -417,6 +424,7 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     @RequirePOST
+    @Restricted(NoExternalUse.class)
     public void doViewExport(StaplerRequest req, StaplerResponse res) throws Exception {
         if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
@@ -430,6 +438,7 @@ public class ConfigurationAsCode extends ManagementLink {
         req.getView(this, "viewExport.jelly").forward(req, res);
     }
 
+    @Restricted(NoExternalUse.class)
     public void doReference(StaplerRequest req, StaplerResponse res) throws Exception {
         if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
