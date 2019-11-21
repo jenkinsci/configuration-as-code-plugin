@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>3.49</version>
+    <version>3.54-SNAPSHOT</version>
     <relativePath />
   </parent>
   <groupId>io.jenkins.configuration-as-code</groupId>
@@ -13,7 +13,6 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>snakeyaml</module>
     <module>plugin</module>
     <module>integrations</module>
   </modules>
