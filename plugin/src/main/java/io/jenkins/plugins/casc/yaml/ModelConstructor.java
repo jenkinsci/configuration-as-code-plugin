@@ -7,6 +7,7 @@ import io.jenkins.plugins.casc.model.Source;
 import io.jenkins.plugins.casc.snakeyaml.constructor.AbstractConstruct;
 import io.jenkins.plugins.casc.snakeyaml.constructor.Construct;
 import io.jenkins.plugins.casc.snakeyaml.constructor.Constructor;
+import io.jenkins.plugins.casc.snakeyaml.constructor.CustomClassLoaderConstructor;
 import io.jenkins.plugins.casc.snakeyaml.error.Mark;
 import io.jenkins.plugins.casc.snakeyaml.nodes.MappingNode;
 import io.jenkins.plugins.casc.snakeyaml.nodes.Node;
@@ -23,10 +24,10 @@ import org.apache.commons.lang.ObjectUtils;
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-class ModelConstructor extends Constructor {
+class ModelConstructor extends CustomClassLoaderConstructor {
 
     public ModelConstructor() {
-        super(Mapping.class);
+        super(Mapping.class, ModelConstructor.class.getClassLoader());
 
         this.yamlConstructors.put(Tag.BOOL, ConstructScalar);
         this.yamlConstructors.put(Tag.INT, ConstructScalar);

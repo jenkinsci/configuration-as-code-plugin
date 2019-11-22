@@ -1,6 +1,7 @@
 package io.jenkins.plugins.casc.misc;
 
 import com.fasterxml.jackson.dataformat.yaml.snakeyaml.Yaml;
+import com.fasterxml.jackson.dataformat.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 import hudson.ExtensionList;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfigurationContext;
@@ -198,7 +199,7 @@ public class Util {
      */
 
     public static String convertToJson(String yamlString) {
-        Yaml yaml= new Yaml();
+        Yaml yaml = new Yaml(new CustomClassLoaderConstructor(Util.class.getClassLoader()));
         Map<String,Object> map= (Map<String, Object>) yaml.load(yamlString);
         JSONObject jsonObject=new JSONObject(map);
         return jsonObject.toString();
