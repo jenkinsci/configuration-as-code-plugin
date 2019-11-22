@@ -223,7 +223,7 @@
       <version>2.3.0</version>
       <scope>test</scope>
     </dependency>
-  
+
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>mesos</artifactId>
@@ -384,6 +384,12 @@
       <groupId>com.datapipe.jenkins.plugins</groupId>
       <artifactId>hashicorp-vault-plugin</artifactId>
       <version>3.0.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>io.jenkins</groupId>
+          <artifactId>configuration-as-code</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
