@@ -165,7 +165,7 @@ Jenkins 2.199 introduced a check to prevent saving global configuration before l
 
 If you encounter the race condition Jenkins will fail to start with an exception message similar to the following:
 
-```
+```text
 SEVERE	jenkins.InitReactorRunner$1#onTaskFailed: Failed ConfigurationAsCode.init
 java.lang.IllegalStateException: An attempt to save the global configuration was made before it was loaded
 ```
