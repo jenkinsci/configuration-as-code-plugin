@@ -21,6 +21,7 @@ import io.jenkins.plugins.casc.model.Scalar;
 import io.jenkins.plugins.casc.model.Scalar.Format;
 import io.jenkins.plugins.casc.model.Sequence;
 import io.jenkins.plugins.casc.model.Source;
+import io.jenkins.plugins.casc.yaml.MergeStrategyFactory;
 import io.jenkins.plugins.casc.yaml.YamlSource;
 import io.jenkins.plugins.casc.yaml.YamlUtils;
 import java.io.ByteArrayOutputStream;
@@ -635,7 +636,7 @@ public class ConfigurationAsCode extends ManagementLink {
     private void configureWith(List<YamlSource> sources) throws ConfiguratorException {
         lastTimeLoaded = System.currentTimeMillis();
         ConfigurationContext context = new ConfigurationContext(registry);
-        configureWith(YamlUtils.loadFrom(sources, context), context);
+        configureWith( YamlUtils.loadFrom(sources, context, MergeStrategyFactory.getMergeStrategy()), context);
     }
 
     @Restricted(NoExternalUse.class)
@@ -648,7 +649,7 @@ public class ConfigurationAsCode extends ManagementLink {
     private Map<Source, String> checkWith(List<YamlSource> sources) throws ConfiguratorException {
         if (sources.isEmpty()) return Collections.emptyMap();
         ConfigurationContext context = new ConfigurationContext(registry);
-        return checkWith(YamlUtils.loadFrom(sources, context), context);
+        return checkWith( YamlUtils.loadFrom(sources, context, MergeStrategyFactory.getMergeStrategy()), context);
     }
 
     /**

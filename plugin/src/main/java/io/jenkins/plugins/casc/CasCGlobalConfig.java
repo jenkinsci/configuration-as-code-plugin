@@ -15,6 +15,7 @@ import org.kohsuke.stapler.StaplerRequest;
 public class CasCGlobalConfig extends GlobalConfiguration {
 
     private String configurationPath;
+    private String mergeStrategy;
 
     @DataBoundConstructor
     public CasCGlobalConfig(String configurationPath) {
@@ -38,6 +39,15 @@ public class CasCGlobalConfig extends GlobalConfiguration {
     @DataBoundSetter
     public void setConfigurationPath(String configurationPath) {
         this.configurationPath = configurationPath;
+    }
+
+    public String getMergeStrategy() {
+        return mergeStrategy;
+    }
+
+    @DataBoundSetter
+    public void setMergeStrategy(String mergeStrategy) {
+        this.mergeStrategy = mergeStrategy;
     }
 
     @Override
