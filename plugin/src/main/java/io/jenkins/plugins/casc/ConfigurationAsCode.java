@@ -99,7 +99,6 @@ import static java.util.stream.Collectors.toList;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Extension
-@Restricted(NoExternalUse.class)
 public class ConfigurationAsCode extends ManagementLink {
 
     public static final String CASC_JENKINS_CONFIG_PROPERTY = "casc.jenkins.config";
@@ -148,6 +147,7 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     @RequirePOST
+    @Restricted(NoExternalUse.class)
     public void doReload(StaplerRequest request, StaplerResponse response) throws Exception {
         if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
@@ -158,6 +158,7 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     @RequirePOST
+    @Restricted(NoExternalUse.class)
     public void doReplace(StaplerRequest request, StaplerResponse response) throws Exception {
         if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
@@ -201,6 +202,7 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     @POST
+    @Restricted(NoExternalUse.class)
     public FormValidation doCheckNewSource(@QueryParameter String newSource) {
         Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
         String normalizedSource = Util.fixEmptyAndTrim(newSource);
@@ -267,6 +269,7 @@ public class ConfigurationAsCode extends ManagementLink {
      *
      * @throws Exception when the file provided cannot be found or parsed
      */
+    @Restricted(NoExternalUse.class)
     @Initializer(after = InitMilestone.EXTENSIONS_AUGMENTED, before = InitMilestone.JOB_LOADED)
     public static void init() throws Exception {
         detectVaultPluginMissing();
@@ -325,6 +328,7 @@ public class ConfigurationAsCode extends ManagementLink {
         return configParameters;
     }
 
+    @Restricted(NoExternalUse.class)
     public List<String> getBundledCasCURIs() {
         final String cascFile = "/WEB-INF/" + DEFAULT_JENKINS_YAML_PATH;
         final String cascDirectory = "/WEB-INF/" + DEFAULT_JENKINS_YAML_PATH + ".d/";
@@ -360,6 +364,7 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     @RequirePOST
+    @Restricted(NoExternalUse.class)
     public void doCheck(StaplerRequest req, StaplerResponse res) throws Exception {
 
         if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
@@ -376,6 +381,7 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     @RequirePOST
+    @Restricted(NoExternalUse.class)
     public void doApply(StaplerRequest req, StaplerResponse res) throws Exception {
 
         if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
@@ -390,6 +396,7 @@ public class ConfigurationAsCode extends ManagementLink {
      * @throws Exception
      */
     @RequirePOST
+    @Restricted(NoExternalUse.class)
     public void doExport(StaplerRequest req, StaplerResponse res) throws Exception {
 
         if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
@@ -406,6 +413,7 @@ public class ConfigurationAsCode extends ManagementLink {
      * Export JSONSchema to URL
      * @throws Exception
      */
+    @Restricted(NoExternalUse.class)
     public void doSchema(StaplerRequest req, StaplerResponse res) throws Exception {
 
         if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
@@ -418,6 +426,7 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     @RequirePOST
+    @Restricted(NoExternalUse.class)
     public void doViewExport(StaplerRequest req, StaplerResponse res) throws Exception {
         if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
@@ -431,6 +440,7 @@ public class ConfigurationAsCode extends ManagementLink {
         req.getView(this, "viewExport.jelly").forward(req, res);
     }
 
+    @Restricted(NoExternalUse.class)
     public void doReference(StaplerRequest req, StaplerResponse res) throws Exception {
         if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
@@ -622,6 +632,7 @@ public class ConfigurationAsCode extends ManagementLink {
      * @param path base path to start (can be file or directory)
      * @return list of all paths matching pattern. Only base file itself if it is a file matching pattern
      */
+    @Restricted(NoExternalUse.class)
     public List<Path> configs(String path) throws ConfiguratorException {
         final Path root = Paths.get(path);
 
@@ -783,6 +794,7 @@ public class ConfigurationAsCode extends ManagementLink {
      * @return String that shows help. May be empty
      * @throws IOException if the resource cannot be read
      */
+    @Restricted(NoExternalUse.class)
     @NonNull
     public String getHtmlHelp(Class type, String attribute) throws IOException {
         final URL resource = Klass.java(type).getResource("help-" + attribute + ".html");
@@ -797,6 +809,7 @@ public class ConfigurationAsCode extends ManagementLink {
      *
      * @return String representation of the extension source, usually artifactId.
      */
+    @Restricted(NoExternalUse.class)
     @CheckForNull
     public String getExtensionSource(Configurator c) throws IOException {
         final Class e = c.getImplementedAPI();
