@@ -269,6 +269,7 @@ public class ConfigurationAsCode extends ManagementLink {
      *
      * @throws Exception when the file provided cannot be found or parsed
      */
+    @Restricted(NoExternalUse.class)
     @Initializer(after = InitMilestone.EXTENSIONS_AUGMENTED, before = InitMilestone.JOB_LOADED)
     public static void init() throws Exception {
         detectVaultPluginMissing();
@@ -327,6 +328,7 @@ public class ConfigurationAsCode extends ManagementLink {
         return configParameters;
     }
 
+    @Restricted(NoExternalUse.class)
     public List<String> getBundledCasCURIs() {
         final String cascFile = "/WEB-INF/" + DEFAULT_JENKINS_YAML_PATH;
         final String cascDirectory = "/WEB-INF/" + DEFAULT_JENKINS_YAML_PATH + ".d/";
@@ -448,6 +450,7 @@ public class ConfigurationAsCode extends ManagementLink {
         req.getView(this, "reference.jelly").forward(req, res);
     }
 
+    @Restricted(NoExternalUse.class)
     public void export(OutputStream out) throws Exception {
 
         final List<NodeTuple> tuples = new ArrayList<>();
@@ -629,6 +632,7 @@ public class ConfigurationAsCode extends ManagementLink {
      * @param path base path to start (can be file or directory)
      * @return list of all paths matching pattern. Only base file itself if it is a file matching pattern
      */
+    @Restricted(NoExternalUse.class)
     public List<Path> configs(String path) throws ConfiguratorException {
         final Path root = Paths.get(path);
 
@@ -790,6 +794,7 @@ public class ConfigurationAsCode extends ManagementLink {
      * @return String that shows help. May be empty
      * @throws IOException if the resource cannot be read
      */
+    @Restricted(NoExternalUse.class)
     @NonNull
     public String getHtmlHelp(Class type, String attribute) throws IOException {
         final URL resource = Klass.java(type).getResource("help-" + attribute + ".html");
@@ -804,6 +809,7 @@ public class ConfigurationAsCode extends ManagementLink {
      *
      * @return String representation of the extension source, usually artifactId.
      */
+    @Restricted(NoExternalUse.class)
     @CheckForNull
     public String getExtensionSource(Configurator c) throws IOException {
         final Class e = c.getImplementedAPI();
