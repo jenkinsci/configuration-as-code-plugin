@@ -274,7 +274,7 @@ public class ConfigurationAsCode extends ManagementLink {
             try {
                 Thread.sleep(duration);
             } catch (InterruptedException e) {
-                LOGGER.log(Level.WARNING, "interupted whilst delaying startup", e);
+                LOGGER.log(Level.WARNING, "Interrupted whilst delaying CasC startup", e);
             }
         }
         detectVaultPluginMissing();
