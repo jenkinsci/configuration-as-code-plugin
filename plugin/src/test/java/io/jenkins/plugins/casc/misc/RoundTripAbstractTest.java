@@ -105,6 +105,7 @@ public abstract class RoundTripAbstractTest {
             assertConfigViaWebUI(jenkinsConf);
 
             //Validate Schema before application
+            assertTrue(validateSchema(convertYamlFileToJson(this, "validJenkinsConfigurator.yml")));
 
             // Apply configuration via Web UI
             applyConfigViaWebUI(jenkinsConf);
