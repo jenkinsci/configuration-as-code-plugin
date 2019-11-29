@@ -312,7 +312,7 @@ public class ConfigurationAsCodeTest {
 }
 ```
 
-### JSON Schema Test
+### JSON Schema Test (Beta)
 We generate a JSON schema that users can use to validate their changes and provide IDE assistance, 
 you can test that your plugin's example yaml file validates correctly by implementing the below test:
 `SchemaGenerationTest` provides a abstraction layer to test out the plugins YAML file against the generated schema.
