@@ -148,7 +148,7 @@ public class SchemaGeneration {
         return attributeType;
     }
 
-    private static JSONObject generateRootConfiguratorObject()  {
+    private static JSONObject generateRootConfiguratorObject() {
         JSONObject rootConfiguratorObject = new JSONObject();
         LinkedHashSet linkedHashSet = new LinkedHashSet<>(
             ConfigurationAsCode.get().getRootConfigurators());
@@ -209,4 +209,3 @@ public class SchemaGeneration {
         return htmlDocString.replaceAll("\\<.*?\\>", "").trim();
     }
 }
-
