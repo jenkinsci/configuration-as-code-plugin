@@ -311,3 +311,32 @@ public class ConfigurationAsCodeTest {
     }
 }
 ```
+
+### JSON Schema Test (Beta)
+We generate a JSON schema that users can use to validate their changes and provide IDE assistance, 
+you can test that your plugin's example yaml file validates correctly by implementing the below test:
+`SchemaGenerationTest` provides a abstraction layer to test out the plugins YAML file against the generated schema.
+
+You can test if your YAML file validates against the schema.
+
+Step 1
+
+Create a YAML file for the configurators corresponding to the developed plugin.
+For eg: `validJenkinsConfigurator.yml`
+```yaml
+jenkins:
+    systemMessage: "Configured by Configuration as Code plugin"
+    numExecutors: "Hello"
+
+```
+
+Step 2
+
+Add a test for the YAML file
+
+```java
+    @Test
+    public void validSchemaShouldSucceed() throws Exception {
+        assertTrue(validateSchema(convertYamlFileToJson(this, "validJenkinsConfigurator.yml")));
+    }
+```

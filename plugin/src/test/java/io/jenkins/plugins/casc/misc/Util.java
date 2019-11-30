@@ -19,16 +19,25 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import jenkins.model.GlobalConfigurationCategory;
 import jenkins.tools.ToolConfigurationCategory;
+import org.everit.json.schema.Schema;
+import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.jvnet.hudson.test.LoggerRule;
 
 import static io.jenkins.plugins.casc.ConfigurationAsCode.serializeYamlNode;
+import static io.jenkins.plugins.casc.SchemaGeneration.generateSchema;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class Util {
+
+    private static final Logger LOGGER = Logger.getLogger(Util.class.getName());
+    private static final String failureMessage  = "The YAML file provided for this schema is invalid";
 
     /**
      * Gets the Jenkins configurator.
@@ -202,5 +211,53 @@ public class Util {
         Map<String,Object> map= (Map<String, Object>) yaml.load(yamlString);
         JSONObject jsonObject=new JSONObject(map);
         return jsonObject.toString();
+    }
+
+    /**
+     * Retrieves the JSON schema for the running jenkins instance.
+     * Example Usage:
+     *      * <pre>{@code
+     *      * Schema jsonSchema = returnSchema();}
+     *      * </pre>
+     * @return Schema the schema for the current jenkins instance
+     */
+    public static Schema returnSchema() throws Exception{
+        JSONObject schemaObject = generateSchema();
+        JSONObject jsonSchema = new JSONObject(
+            new JSONTokener(schemaObject.toString()));
+        return SchemaLoader.load(jsonSchema);
+    }
+
+    /**
+     * Validates a given jsonObject against the schema generated for the current live jenkins instance
+     *      * Example Usage:
+     *      *      * <pre>{@code
+     *      *      * assertTrue(validateSchema(jsonSubject));}
+     *      *      * </pre>
+     * @param  jsonSubject The json Object that needs to be validated
+     * @return true if it's valid else returns false
+     */
+    public static boolean validateSchema(JSONObject jsonSubject) {
+        try {
+            returnSchema().validate(jsonSubject);
+        } catch (Exception ie) {
+            LOGGER.log(Level.WARNING, failureMessage, ie);
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Converts a YAML file into a json object
+     * Example Usage:
+     *           * <pre>{@code
+     *           * JSONObject  jsonObject = convertYamlFileToJson("filename");}
+     *           * </pre>
+     * @param yamlFileName the name of the yaml file that needs to be converted
+     * @return JSONObject pertaining to that yaml file.
+     */
+     public static JSONObject convertYamlFileToJson(Object clazz, String yamlFileName) throws Exception {
+        String yamlStringContents = toStringFromYamlFile(clazz, yamlFileName);
+        return new JSONObject(new JSONTokener(convertToJson(yamlStringContents)));
     }
 }
