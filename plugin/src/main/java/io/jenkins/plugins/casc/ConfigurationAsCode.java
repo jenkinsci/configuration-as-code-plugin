@@ -781,16 +781,16 @@ public class ConfigurationAsCode extends ManagementLink {
      */
     private void listElements(Set<Object> elements, Set<Attribute<?,?>> attributes, ConfigurationContext context) {
         attributes.stream()
-            .map(Attribute::getType)
-            .map(context::lookup)
-            .filter(Objects::nonNull)
-            .map(c -> c.getConfigurators(context))
-            .flatMap(Collection::stream)
-            .forEach(configurator -> {
-                if (elements.add(configurator)) {
-                    listElements(elements, ((Configurator)configurator).describe(), context);   // some unexpected type erasure force to cast here
-                }
-            });
+                .map(Attribute::getType)
+                .map(context::lookup)
+                .filter(Objects::nonNull)
+                .map(c -> c.getConfigurators(context))
+                .flatMap(Collection::stream)
+                .forEach(configurator -> {
+                    if (elements.add(configurator)) {
+                        listElements(elements, ((Configurator)configurator).describe(), context);   // some unexpected type erasure force to cast here
+                    }
+                });
     }
 
     // --- UI helper methods

@@ -117,7 +117,6 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
                 }).getOrNull();
     }
 
-
     @SuppressWarnings("unused")
     public Map<String, Class<T>> getImplementors() {
         return getDescriptors()
