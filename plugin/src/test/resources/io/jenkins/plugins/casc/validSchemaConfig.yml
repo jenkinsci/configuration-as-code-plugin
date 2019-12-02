@@ -1,3 +1,3 @@
 security:
-   cli:
-      enabled: false
+  cli:
+    enabled: false
