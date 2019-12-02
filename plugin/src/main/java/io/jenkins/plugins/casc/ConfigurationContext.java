@@ -6,6 +6,8 @@ import io.jenkins.plugins.casc.model.CNode;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.Stapler;
 
 /**
@@ -30,7 +32,7 @@ public class ConfigurationContext implements ConfiguratorRegistry {
 
     private transient final ConfiguratorRegistry registry;
 
-    private String mode;
+    private transient String mode;
 
     public ConfigurationContext(ConfiguratorRegistry registry) {
         this.registry = registry;
@@ -64,7 +66,7 @@ public class ConfigurationContext implements ConfiguratorRegistry {
         this.unknown = unknown;
     }
 
-    public String getMode() {
+    String getMode() {
         return mode;
     }
 

@@ -1,12 +1,14 @@
 package io.jenkins.plugins.casc;
 
 import io.jenkins.plugins.casc.impl.DefaultConfiguratorRegistry;
+import io.jenkins.plugins.casc.impl.attributes.DescribableAttribute;
 import io.jenkins.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -18,6 +20,7 @@ public class SchemaGeneration {
         .put("description", "Jenkins Configuration as Code")
         .put("additionalProperties", false)
         .put("type", "object");
+
 
     public static JSONObject generateSchema() {
 
@@ -78,6 +81,16 @@ public class SchemaGeneration {
                         .put(
                             heteroDescribableConfigurator.getTarget().getSimpleName().toLowerCase(),
                             generateHeteroDescribableConfigObject(heteroDescribableConfigurator));
+                } else if (configuratorObject instanceof Attribute) {
+                    Attribute attribute = (Attribute) configuratorObject;
+                    JSONObject attributeSchema = new JSONObject();
+                    if (attribute.type.isEnum()) {
+                        generateEnumAttributeSchema(schemaConfiguratorObjects, attribute);
+                    } else {
+                        schemaConfiguratorObjects
+                            .put(attribute.getName(), generateNonEnumAttributeObject(attribute));
+                    }
+
                 }
             }
 
@@ -120,6 +133,35 @@ public class SchemaGeneration {
         }
         return finalHeteroConfiguratorObject;
     }
+
+    /**
+     * Recursive configurators tree walk (DFS) and non-describable able attributes. Collects all
+     * configurators starting from root ones in {@link ConfigurationAsCode#getConfigurators()}
+     *
+     * @param elements linked set (to save order) of visited elements
+     * @param attributes siblings to find associated configurators and dive to next tree levels
+     * @param context configuration context
+     */
+    private void listElements(Set<Object> elements, Set<Attribute<?,?>> attributes, ConfigurationContext context) {
+        // some unexpected type erasure force to cast here
+        attributes.stream()
+            .peek(attribute -> {
+                if (!(attribute instanceof DescribableAttribute)) {
+                    elements.add(attribute);
+                }
+            })
+            .map(attribute -> attribute.getType())
+            .map(type -> context.lookup(type))
+            .filter(obj -> Objects.nonNull(obj))
+            .map(c -> c.getConfigurators(context))
+            .flatMap(configurators -> configurators.stream())
+            .filter(e -> elements.add(e))
+            .forEach(
+                configurator -> listElements(elements, ((Configurator) configurator).describe(),
+                    context)
+            );
+    }
+
 
     private static JSONObject generateNonEnumAttributeObject(Attribute attribute) {
         JSONObject attributeType = new JSONObject();
