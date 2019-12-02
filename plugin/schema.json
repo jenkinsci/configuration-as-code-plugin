@@ -9,22 +9,15 @@
             "type": "object",
             "title": "Configuration base for the security classifier",
             "properties": {
-                "downloadSettings": {
-                    "type": "object",
-                    "$id": "#/definitions/jenkins.model.DownloadSettings"
-                },
                 "cli": {
                     "additionalProperties": false,
                     "type": "object",
                     "properties": {"enabled": {"type": "boolean"}}
                 },
-                "queueItemAuthenticator": {
+                "crumb": {
+                    "additionalProperties": false,
                     "type": "object",
-                    "$id": "#/definitions/jenkins.security.QueueItemAuthenticatorConfiguration"
-                },
-                "updateSiteWarningsConfiguration": {
-                    "type": "object",
-                    "$id": "#/definitions/jenkins.security.UpdateSiteWarningsConfiguration"
+                    "properties": {}
                 },
                 "queueitemauthenticator": {
                     "oneOf": [{
@@ -33,35 +26,16 @@
                     }],
                     "type": "object"
                 },
-                "masterKillSwitchConfiguration": {
-                    "type": "object",
-                    "$id": "#/definitions/jenkins.security.s2m.MasterKillSwitchConfiguration"
-                },
                 "masterkillswitchconfiguration": {
                     "additionalProperties": false,
                     "type": "object",
                     "properties": {}
-                },
-                "remotingCLI": {
-                    "type": "object",
-                    "$id": "#/definitions/jenkins.CLI"
-                },
-                "sSHD": {
-                    "type": "object",
-                    "$id": "#/definitions/org.jenkinsci.main.modules.sshd.SSHD"
                 },
                 "sshd": {
                     "additionalProperties": false,
                     "type": "object",
                     "properties": {"port": {"type": "integer"}}
                 },
-                "enabled": {"type": "boolean"},
-                "crumb": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "properties": {}
-                },
-                "port": {"type": "integer"},
                 "downloadsettings": {
                     "additionalProperties": false,
                     "type": "object",
@@ -71,8 +45,7 @@
                     "additionalProperties": false,
                     "type": "object",
                     "properties": {}
-                },
-                "useBrowser": {"type": "boolean"}
+                }
             }
         },
         "unclassified": {
@@ -80,6 +53,19 @@
             "type": "object",
             "title": "Configuration base for the unclassified classifier",
             "properties": {
+                "defaultview": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "properties": {}
+                },
+                "foobarglobalconfiguration": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "properties": {"fooBar": {
+                        "type": "object",
+                        "$id": "#/definitions/io.jenkins.plugins.casc.impl.configurators.DuplicateKeyDescribableConfiguratorTest$FooBar"
+                    }}
+                },
                 "jenkinslocationconfiguration": {
                     "additionalProperties": false,
                     "type": "object",
@@ -88,20 +74,16 @@
                         "url": {"type": "string"}
                     }
                 },
-                "foo": {"type": "string"},
-                "nodeProperties": {
-                    "type": "object",
-                    "$id": "#/definitions/jenkins.model.GlobalNodePropertiesConfiguration"
-                },
+                "artifactmanagerfactory": {},
                 "cloud": {
                     "additionalProperties": false,
                     "type": "object",
                     "properties": {}
                 },
-                "bar": {"type": "string"},
-                "quietPeriod": {
+                "myview": {
+                    "additionalProperties": false,
                     "type": "object",
-                    "$id": "#/definitions/jenkins.model.GlobalQuietPeriodConfiguration"
+                    "properties": {}
                 },
                 "foobar": {
                     "additionalProperties": false,
@@ -111,18 +93,15 @@
                         "foo": {"type": "string"}
                     }
                 },
-                "viewstabbar": {
+                "plugin": {
                     "additionalProperties": false,
                     "type": "object",
                     "properties": {}
                 },
-                "usageStatistics": {
+                "viewstabbar": {
+                    "additionalProperties": false,
                     "type": "object",
-                    "$id": "#/definitions/hudson.model.UsageStatistics"
-                },
-                "pollSCM": {
-                    "type": "object",
-                    "$id": "#/definitions/hudson.triggers.SCMTrigger$DescriptorImpl"
+                    "properties": {}
                 },
                 "scmretrycount": {
                     "additionalProperties": false,
@@ -134,6 +113,14 @@
                     "type": "object",
                     "properties": {}
                 },
+                "foobarone": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "properties": {
+                        "bar": {"type": "string"},
+                        "foo": {"type": "string"}
+                    }
+                },
                 "cascglobalconfig": {
                     "additionalProperties": false,
                     "type": "object",
@@ -144,103 +131,10 @@
                     "type": "object",
                     "properties": {}
                 },
-                "administrativeMonitorsConfiguration": {
-                    "type": "object",
-                    "$id": "#/definitions/jenkins.management.AdministrativeMonitorsConfiguration"
-                },
                 "administrativemonitorsconfiguration": {
                     "additionalProperties": false,
                     "type": "object",
                     "properties": {}
-                },
-                "masterBuild": {
-                    "type": "object",
-                    "$id": "#/definitions/jenkins.model.MasterBuildConfiguration"
-                },
-                "projectNamingStrategy": {
-                    "type": "object",
-                    "$id": "#/definitions/jenkins.model.GlobalProjectNamingStrategyConfiguration"
-                },
-                "descriptorimpl": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "properties": {"pollingThreadCount": {"type": "integer"}}
-                },
-                "defaultview": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "properties": {}
-                },
-                "myView": {
-                    "type": "object",
-                    "$id": "#/definitions/hudson.views.MyViewsTabBar$GlobalConfigurationImpl"
-                },
-                "fooBarGlobal": {
-                    "type": "object",
-                    "$id": "#/definitions/io.jenkins.plugins.casc.impl.configurators.DuplicateKeyDescribableConfiguratorTest$FooBarGlobalConfiguration"
-                },
-                "foobarglobalconfiguration": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "properties": {"fooBar": {
-                        "type": "object",
-                        "$id": "#/definitions/io.jenkins.plugins.casc.impl.configurators.DuplicateKeyDescribableConfiguratorTest$FooBar"
-                    }}
-                },
-                "scmRetryCount": {
-                    "type": "object",
-                    "$id": "#/definitions/jenkins.model.GlobalSCMRetryCountConfiguration"
-                },
-                "adminAddress": {"type": "string"},
-                "casCGlobalConfig": {
-                    "type": "object",
-                    "$id": "#/definitions/io.jenkins.plugins.casc.CasCGlobalConfig"
-                },
-                "pollingThreadCount": {"type": "integer"},
-                "artifactManager": {
-                    "type": "object",
-                    "$id": "#/definitions/jenkins.model.ArtifactManagerConfiguration"
-                },
-                "artifactmanagerfactory": {},
-                "url": {"type": "string"},
-                "fooBar": {
-                    "type": "object",
-                    "$id": "#/definitions/io.jenkins.plugins.casc.impl.configurators.DescriptorConfiguratorTest$FooBar"
-                },
-                "myview": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "properties": {}
-                },
-                "viewsTabBar": {
-                    "type": "object",
-                    "$id": "#/definitions/hudson.views.ViewsTabBar$GlobalConfigurationImpl"
-                },
-                "configurationPath": {"type": "string"},
-                "defaultView": {
-                    "type": "object",
-                    "$id": "#/definitions/hudson.views.GlobalDefaultViewConfiguration"
-                },
-                "plugin": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "properties": {}
-                },
-                "shell": {
-                    "type": "object",
-                    "$id": "#/definitions/hudson.tasks.Shell$DescriptorImpl"
-                },
-                "foobarone": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "properties": {
-                        "bar": {"type": "string"},
-                        "foo": {"type": "string"}
-                    }
-                },
-                "location": {
-                    "type": "object",
-                    "$id": "#/definitions/jenkins.model.JenkinsLocationConfiguration"
                 },
                 "nodeproperties": {
                     "additionalProperties": false,
@@ -251,6 +145,11 @@
                     "additionalProperties": false,
                     "type": "object",
                     "properties": {}
+                },
+                "descriptorimpl": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "properties": {"pollingThreadCount": {"type": "integer"}}
                 },
                 "masterbuild": {
                     "additionalProperties": false,
@@ -263,42 +162,18 @@
             "additionalProperties": false,
             "type": "object",
             "title": "Configuration base for the configuration-as-code classifier",
-            "properties": {
-                "mode": {"type": "string"},
-                "restricted": {
-                    "type": "string",
-                    "enum": [
-                        "reject",
-                        "beta",
-                        "warn"
-                    ]
-                },
-                "deprecated": {
-                    "type": "string",
-                    "enum": [
-                        "reject",
-                        "warn"
-                    ]
-                },
-                "version": {
-                    "type": "string",
-                    "enum": ["ONE"]
-                },
-                "unknown": {
-                    "type": "string",
-                    "enum": [
-                        "reject",
-                        "warn"
-                    ]
-                }
-            }
+            "properties": {}
         },
         "jenkins": {
             "additionalProperties": false,
             "type": "object",
             "title": "Configuration base for the jenkins classifier",
             "properties": {
-                "systemMessage": {"type": "string"},
+                "standard": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "properties": {}
+                },
                 "listview": {
                     "additionalProperties": false,
                     "type": "object",
@@ -320,7 +195,6 @@
                         }
                     }
                 },
-                "forceExistingJobs": {"type": "boolean"},
                 "computerlauncher": {
                     "oneOf": [
                         {
@@ -338,8 +212,37 @@
                     ],
                     "type": "object"
                 },
-                "upTimeMins": {"type": "integer"},
-                "quietPeriod": {"type": "integer"},
+                "cloud": {},
+                "view": {
+                    "oneOf": [
+                        {
+                            "additionalProperties": false,
+                            "properties": {"all": {"$id": "#/definitions/hudson.model.AllView"}}
+                        },
+                        {
+                            "additionalProperties": false,
+                            "properties": {"proxy": {"$id": "#/definitions/hudson.model.ProxyView"}}
+                        },
+                        {
+                            "additionalProperties": false,
+                            "properties": {"myView": {"$id": "#/definitions/hudson.model.MyView"}}
+                        },
+                        {
+                            "additionalProperties": false,
+                            "properties": {"list": {"$id": "#/definitions/hudson.model.ListView"}}
+                        }
+                    ],
+                    "type": "object"
+                },
+                "batchcommandinstaller": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "properties": {
+                        "label": {"type": "string"},
+                        "toolHome": {"type": "string"},
+                        "command": {"type": "string"}
+                    }
+                },
                 "markupformatter": {
                     "oneOf": [{
                         "additionalProperties": false,
@@ -347,12 +250,6 @@
                     }],
                     "type": "object"
                 },
-                "password": {"type": "string"},
-                "jDKs": {
-                    "type": "object",
-                    "$id": "#/definitions/hudson.model.JDK"
-                },
-                "proxiedViewName": {"type": "string"},
                 "retentionstrategy": {
                     "oneOf": [
                         {
@@ -380,8 +277,60 @@
                     "type": "object",
                     "properties": {"excludeClientIPFromCrumb": {"type": "boolean"}}
                 },
-                "id": {"type": "string"},
-                "scmCheckoutRetryCount": {"type": "integer"},
+                "listviewcolumn": {
+                    "oneOf": [
+                        {
+                            "additionalProperties": false,
+                            "properties": {"jobName": {"$id": "#/definitions/hudson.views.JobColumn"}}
+                        },
+                        {
+                            "additionalProperties": false,
+                            "properties": {"lastDuration": {"$id": "#/definitions/hudson.views.LastDurationColumn"}}
+                        },
+                        {
+                            "additionalProperties": false,
+                            "properties": {"buildButton": {"$id": "#/definitions/hudson.views.BuildButtonColumn"}}
+                        },
+                        {
+                            "additionalProperties": false,
+                            "properties": {"lastStable": {"$id": "#/definitions/hudson.views.LastStableColumn"}}
+                        },
+                        {
+                            "additionalProperties": false,
+                            "properties": {"weather": {"$id": "#/definitions/hudson.views.WeatherColumn"}}
+                        },
+                        {
+                            "additionalProperties": false,
+                            "properties": {"lastSuccess": {"$id": "#/definitions/hudson.views.LastSuccessColumn"}}
+                        },
+                        {
+                            "additionalProperties": false,
+                            "properties": {"lastFailure": {"$id": "#/definitions/hudson.views.LastFailureColumn"}}
+                        },
+                        {
+                            "additionalProperties": false,
+                            "properties": {"status": {"$id": "#/definitions/hudson.views.StatusColumn"}}
+                        }
+                    ],
+                    "type": "object"
+                },
+                "authorizationstrategy": {
+                    "oneOf": [
+                        {
+                            "additionalProperties": false,
+                            "properties": {"legacy": {"$id": "#/definitions/hudson.security.LegacyAuthorizationStrategy"}}
+                        },
+                        {
+                            "additionalProperties": false,
+                            "properties": {"loggedInUsersCanDoAnything": {"$id": "#/definitions/hudson.security.FullControlOnceLoggedInAuthorizationStrategy"}}
+                        },
+                        {
+                            "additionalProperties": false,
+                            "properties": {"unsecured": {"$id": "#/definitions/hudson.security.AuthorizationStrategy$Unsecured"}}
+                        }
+                    ],
+                    "type": "object"
+                },
                 "patternprojectnamingstrategy": {
                     "additionalProperties": false,
                     "type": "object",
@@ -391,12 +340,53 @@
                         "forceExistingJobs": {"type": "boolean"}
                     }
                 },
+                "jobname": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "properties": {}
+                },
+                "always": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "properties": {}
+                },
+                "proxyview": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "properties": {
+                        "proxiedViewName": {"type": "string"},
+                        "name": {"type": "string"},
+                        "properties": {
+                            "type": "object",
+                            "$id": "#/definitions/hudson.model.ViewProperty"
+                        }
+                    }
+                },
+                "zipextractioninstaller": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "properties": {
+                        "subdir": {"type": "string"},
+                        "label": {"type": "string"},
+                        "url": {"type": "string"}
+                    }
+                },
+                "test": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "properties": {}
+                },
+                "adminwhitelistrule": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "properties": {"enabled": {"type": "boolean"}}
+                },
                 "maveninstaller": {
                     "additionalProperties": false,
                     "type": "object",
                     "properties": {"id": {"type": "string"}}
                 },
-                "allowsSignup": {"type": "boolean"},
+                "captchasupport": {},
                 "nodeproperty": {
                     "oneOf": [
                         {
@@ -424,9 +414,24 @@
                         }
                     }
                 },
-                "proxy": {
+                "myview": {
+                    "additionalProperties": false,
                     "type": "object",
-                    "$id": "#/definitions/hudson.ProxyConfiguration"
+                    "properties": {
+                        "name": {"type": "string"},
+                        "properties": {
+                            "type": "object",
+                            "$id": "#/definitions/hudson.model.ViewProperty"
+                        }
+                    }
+                },
+                "entry": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "properties": {
+                        "value": {"type": "string"},
+                        "key": {"type": "string"}
+                    }
                 },
                 "node": {
                     "oneOf": [
@@ -449,8 +454,40 @@
                     ],
                     "type": "object"
                 },
-                "includeRegex": {"type": "string"},
-                "cmd": {"type": "string"},
+                "viewjobfilter": {},
+                "toolinstaller": {
+                    "oneOf": [
+                        {
+                            "additionalProperties": false,
+                            "properties": {"zip": {"$id": "#/definitions/hudson.tools.ZipExtractionInstaller"}}
+                        },
+                        {
+                            "additionalProperties": false,
+                            "properties": {"batchFile": {"$id": "#/definitions/hudson.tools.BatchCommandInstaller"}}
+                        },
+                        {
+                            "additionalProperties": false,
+                            "properties": {"jdkInstaller": {"$id": "#/definitions/hudson.tools.JDKInstaller"}}
+                        },
+                        {
+                            "additionalProperties": false,
+                            "properties": {"maven": {"$id": "#/definitions/hudson.tasks.Maven$MavenInstaller"}}
+                        },
+                        {
+                            "additionalProperties": false,
+                            "properties": {"command": {"$id": "#/definitions/hudson.tools.CommandInstaller"}}
+                        }
+                    ],
+                    "type": "object"
+                },
+                "jnlplauncher": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "properties": {
+                        "vmargs": {"type": "string"},
+                        "tunnel": {"type": "string"}
+                    }
+                },
                 "fullcontrolonceloggedinauthorizationstrategy": {
                     "additionalProperties": false,
                     "type": "object",
@@ -461,13 +498,25 @@
                     "type": "object",
                     "properties": {}
                 },
-                "nodeName": {"type": "string"},
+                "userwithpassword": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "properties": {
+                        "password": {"type": "string"},
+                        "id": {"type": "string"}
+                    }
+                },
                 "toolproperty": {
                     "oneOf": [{
                         "additionalProperties": false,
                         "properties": {"installSource": {"$id": "#/definitions/hudson.tools.InstallSourceProperty"}}
                     }],
                     "type": "object"
+                },
+                "legacy": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "properties": {}
                 },
                 "securityrealm": {
                     "oneOf": [
@@ -482,9 +531,27 @@
                     ],
                     "type": "object"
                 },
-                "agentProtocols": {"type": "string"},
-                "testUrl": {"type": "string"},
-                "enabled": {"type": "boolean"},
+                "simplescheduledretentionstrategy": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "properties": {
+                        "keepUpWhenActive": {"type": "boolean"},
+                        "startTimeSpec": {"type": "string"},
+                        "upTimeMins": {"type": "integer"}
+                    }
+                },
+                "proxyconfiguration": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "properties": {
+                        "password": {"type": "string"},
+                        "port": {"type": "integer"},
+                        "name": {"type": "string"},
+                        "testUrl": {"type": "string"},
+                        "userName": {"type": "string"},
+                        "noProxyHost": {"type": "string"}
+                    }
+                },
                 "crumbissuer": {
                     "oneOf": [
                         {
@@ -498,16 +565,17 @@
                     ],
                     "type": "object"
                 },
-                "inDemandDelay": {
-                    "type": "object",
-                    "$id": "#/definitions/long"
-                },
                 "viewstabbar": {
                     "oneOf": [{
                         "additionalProperties": false,
                         "properties": {"standard": {"$id": "#/definitions/hudson.views.DefaultViewsTabBar"}}
                     }],
                     "type": "object"
+                },
+                "simplecommandlauncher": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "properties": {"cmd": {"type": "string"}}
                 },
                 "jenkins": {
                     "additionalProperties": false,
@@ -604,16 +672,55 @@
                         "command": {"type": "string"}
                     }
                 },
-                "key": {"type": "string"},
-                "noProxyHost": {"type": "string"},
+                "buildbutton": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "properties": {}
+                },
+                "dumbslave": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "properties": {
+                        "mode": {
+                            "type": "string",
+                            "enum": [
+                                "NORMAL",
+                                "EXCLUSIVE"
+                            ]
+                        },
+                        "nodeName": {"type": "string"},
+                        "numExecutors": {"type": "integer"},
+                        "retentionStrategy": {
+                            "type": "object",
+                            "$id": "#/definitions/hudson.slaves.RetentionStrategy"
+                        },
+                        "labelString": {"type": "string"},
+                        "name": {"type": "string"},
+                        "nodeDescription": {"type": "string"},
+                        "remoteFS": {"type": "string"},
+                        "userId": {"type": "string"},
+                        "launcher": {
+                            "type": "object",
+                            "$id": "#/definitions/hudson.slaves.ComputerLauncher"
+                        },
+                        "nodeProperties": {
+                            "type": "object",
+                            "$id": "#/definitions/hudson.slaves.NodeProperty"
+                        }
+                    }
+                },
                 "laststable": {
                     "additionalProperties": false,
                     "type": "object",
                     "properties": {}
                 },
-                "idleDelay": {
+                "toollocation": {
+                    "additionalProperties": false,
                     "type": "object",
-                    "$id": "#/definitions/long"
+                    "properties": {
+                        "key": {"type": "string"},
+                        "home": {"type": "string"}
+                    }
                 },
                 "hudsonprivatesecurityrealm": {
                     "additionalProperties": false,
@@ -659,14 +766,11 @@
                     "type": "object",
                     "properties": {}
                 },
-                "startTimeSpec": {"type": "string"},
                 "unsecured": {
                     "additionalProperties": false,
                     "type": "object",
                     "properties": {}
                 },
-                "userId": {"type": "string"},
-                "url": {"type": "string"},
                 "jdk": {
                     "additionalProperties": false,
                     "type": "object",
@@ -690,345 +794,10 @@
                         }
                     }
                 },
-                "remotingSecurity": {
-                    "type": "object",
-                    "$id": "#/definitions/jenkins.security.s2m.AdminWhitelistRule"
-                },
-                "projectnamingstrategy": {
-                    "oneOf": [
-                        {
-                            "additionalProperties": false,
-                            "properties": {"standard": {"$id": "#/definitions/jenkins.model.ProjectNamingStrategy$DefaultProjectNamingStrategy"}}
-                        },
-                        {
-                            "additionalProperties": false,
-                            "properties": {"pattern": {"$id": "#/definitions/jenkins.model.ProjectNamingStrategy$PatternProjectNamingStrategy"}}
-                        }
-                    ],
-                    "type": "object"
-                },
-                "standard": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "properties": {}
-                },
-                "keepUpWhenActive": {"type": "boolean"},
-                "sites": {
-                    "type": "object",
-                    "$id": "#/definitions/hudson.model.UpdateSite"
-                },
-                "cloud": {},
-                "mode": {
-                    "type": "string",
-                    "enum": [
-                        "NORMAL",
-                        "EXCLUSIVE"
-                    ]
-                },
-                "numExecutors": {"type": "integer"},
-                "subdir": {"type": "string"},
-                "view": {
-                    "oneOf": [
-                        {
-                            "additionalProperties": false,
-                            "properties": {"all": {"$id": "#/definitions/hudson.model.AllView"}}
-                        },
-                        {
-                            "additionalProperties": false,
-                            "properties": {"proxy": {"$id": "#/definitions/hudson.model.ProxyView"}}
-                        },
-                        {
-                            "additionalProperties": false,
-                            "properties": {"myView": {"$id": "#/definitions/hudson.model.MyView"}}
-                        },
-                        {
-                            "additionalProperties": false,
-                            "properties": {"list": {"$id": "#/definitions/hudson.model.ListView"}}
-                        }
-                    ],
-                    "type": "object"
-                },
-                "batchcommandinstaller": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "properties": {
-                        "label": {"type": "string"},
-                        "toolHome": {"type": "string"},
-                        "command": {"type": "string"}
-                    }
-                },
-                "labelString": {"type": "string"},
-                "listviewcolumn": {
-                    "oneOf": [
-                        {
-                            "additionalProperties": false,
-                            "properties": {"jobName": {"$id": "#/definitions/hudson.views.JobColumn"}}
-                        },
-                        {
-                            "additionalProperties": false,
-                            "properties": {"lastDuration": {"$id": "#/definitions/hudson.views.LastDurationColumn"}}
-                        },
-                        {
-                            "additionalProperties": false,
-                            "properties": {"buildButton": {"$id": "#/definitions/hudson.views.BuildButtonColumn"}}
-                        },
-                        {
-                            "additionalProperties": false,
-                            "properties": {"lastStable": {"$id": "#/definitions/hudson.views.LastStableColumn"}}
-                        },
-                        {
-                            "additionalProperties": false,
-                            "properties": {"weather": {"$id": "#/definitions/hudson.views.WeatherColumn"}}
-                        },
-                        {
-                            "additionalProperties": false,
-                            "properties": {"lastSuccess": {"$id": "#/definitions/hudson.views.LastSuccessColumn"}}
-                        },
-                        {
-                            "additionalProperties": false,
-                            "properties": {"lastFailure": {"$id": "#/definitions/hudson.views.LastFailureColumn"}}
-                        },
-                        {
-                            "additionalProperties": false,
-                            "properties": {"status": {"$id": "#/definitions/hudson.views.StatusColumn"}}
-                        }
-                    ],
-                    "type": "object"
-                },
-                "authorizationstrategy": {
-                    "oneOf": [
-                        {
-                            "additionalProperties": false,
-                            "properties": {"legacy": {"$id": "#/definitions/hudson.security.LegacyAuthorizationStrategy"}}
-                        },
-                        {
-                            "additionalProperties": false,
-                            "properties": {"loggedInUsersCanDoAnything": {"$id": "#/definitions/hudson.security.FullControlOnceLoggedInAuthorizationStrategy"}}
-                        },
-                        {
-                            "additionalProperties": false,
-                            "properties": {"unsecured": {"$id": "#/definitions/hudson.security.AuthorizationStrategy$Unsecured"}}
-                        }
-                    ],
-                    "type": "object"
-                },
-                "vmargs": {"type": "string"},
-                "jobname": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "properties": {}
-                },
-                "always": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "properties": {}
-                },
-                "namePattern": {"type": "string"},
-                "proxyview": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "properties": {
-                        "proxiedViewName": {"type": "string"},
-                        "name": {"type": "string"},
-                        "properties": {
-                            "type": "object",
-                            "$id": "#/definitions/hudson.model.ViewProperty"
-                        }
-                    }
-                },
-                "zipextractioninstaller": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "properties": {
-                        "subdir": {"type": "string"},
-                        "label": {"type": "string"},
-                        "url": {"type": "string"}
-                    }
-                },
-                "test": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "properties": {}
-                },
-                "rawBuildsDir": {"type": "string"},
-                "adminwhitelistrule": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "properties": {"enabled": {"type": "boolean"}}
-                },
-                "slaveAgentPort": {"type": "integer"},
-                "captchasupport": {},
-                "updateCenter": {
-                    "type": "object",
-                    "$id": "#/definitions/hudson.model.UpdateCenter"
-                },
-                "users": {
-                    "type": "object",
-                    "$id": "#/definitions/io.jenkins.plugins.casc.core.HudsonPrivateSecurityRealmConfigurator$UserWithPassword"
-                },
-                "myview": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "properties": {
-                        "name": {"type": "string"},
-                        "properties": {
-                            "type": "object",
-                            "$id": "#/definitions/hudson.model.ViewProperty"
-                        }
-                    }
-                },
-                "entry": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "properties": {
-                        "value": {"type": "string"},
-                        "key": {"type": "string"}
-                    }
-                },
-                "viewjobfilter": {},
-                "port": {"type": "integer"},
-                "recurse": {"type": "boolean"},
-                "toolinstaller": {
-                    "oneOf": [
-                        {
-                            "additionalProperties": false,
-                            "properties": {"zip": {"$id": "#/definitions/hudson.tools.ZipExtractionInstaller"}}
-                        },
-                        {
-                            "additionalProperties": false,
-                            "properties": {"batchFile": {"$id": "#/definitions/hudson.tools.BatchCommandInstaller"}}
-                        },
-                        {
-                            "additionalProperties": false,
-                            "properties": {"jdkInstaller": {"$id": "#/definitions/hudson.tools.JDKInstaller"}}
-                        },
-                        {
-                            "additionalProperties": false,
-                            "properties": {"maven": {"$id": "#/definitions/hudson.tasks.Maven$MavenInstaller"}}
-                        },
-                        {
-                            "additionalProperties": false,
-                            "properties": {"command": {"$id": "#/definitions/hudson.tools.CommandInstaller"}}
-                        }
-                    ],
-                    "type": "object"
-                },
-                "jnlplauncher": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "properties": {
-                        "vmargs": {"type": "string"},
-                        "tunnel": {"type": "string"}
-                    }
-                },
-                "name": {"type": "string"},
-                "userwithpassword": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "properties": {
-                        "password": {"type": "string"},
-                        "id": {"type": "string"}
-                    }
-                },
-                "legacy": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "properties": {}
-                },
-                "simplescheduledretentionstrategy": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "properties": {
-                        "keepUpWhenActive": {"type": "boolean"},
-                        "startTimeSpec": {"type": "string"},
-                        "upTimeMins": {"type": "integer"}
-                    }
-                },
-                "description": {"type": "string"},
-                "nodeDescription": {"type": "string"},
-                "toolHome": {"type": "string"},
-                "proxyconfiguration": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "properties": {
-                        "password": {"type": "string"},
-                        "port": {"type": "integer"},
-                        "name": {"type": "string"},
-                        "testUrl": {"type": "string"},
-                        "userName": {"type": "string"},
-                        "noProxyHost": {"type": "string"}
-                    }
-                },
-                "simplecommandlauncher": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "properties": {"cmd": {"type": "string"}}
-                },
-                "value": {"type": "string"},
-                "buildbutton": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "properties": {}
-                },
-                "enableCaptcha": {"type": "boolean"},
-                "dumbslave": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "properties": {
-                        "mode": {
-                            "type": "string",
-                            "enum": [
-                                "NORMAL",
-                                "EXCLUSIVE"
-                            ]
-                        },
-                        "nodeName": {"type": "string"},
-                        "numExecutors": {"type": "integer"},
-                        "retentionStrategy": {
-                            "type": "object",
-                            "$id": "#/definitions/hudson.slaves.RetentionStrategy"
-                        },
-                        "labelString": {"type": "string"},
-                        "name": {"type": "string"},
-                        "nodeDescription": {"type": "string"},
-                        "remoteFS": {"type": "string"},
-                        "userId": {"type": "string"},
-                        "launcher": {
-                            "type": "object",
-                            "$id": "#/definitions/hudson.slaves.ComputerLauncher"
-                        },
-                        "nodeProperties": {
-                            "type": "object",
-                            "$id": "#/definitions/hudson.slaves.NodeProperty"
-                        }
-                    }
-                },
-                "disableRememberMe": {"type": "boolean"},
-                "toollocation": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "properties": {
-                        "key": {"type": "string"},
-                        "home": {"type": "string"}
-                    }
-                },
-                "label": {"type": "string"},
-                "allowAnonymousRead": {"type": "boolean"},
-                "env": {
-                    "type": "object",
-                    "$id": "#/definitions/hudson.slaves.EnvironmentVariablesNodeProperty$Entry"
-                },
-                "userName": {"type": "string"},
-                "command": {"type": "string"},
-                "home": {"type": "string"},
                 "lastduration": {
                     "additionalProperties": false,
                     "type": "object",
                     "properties": {}
-                },
-                "locations": {
-                    "type": "object",
-                    "$id": "#/definitions/hudson.tools.ToolLocationNodeProperty$ToolLocation"
                 },
                 "myviewstabbar": {
                     "oneOf": [{
@@ -1045,10 +814,19 @@
                         "url": {"type": "string"}
                     }
                 },
-                "acceptLicense": {"type": "boolean"},
-                "excludeClientIPFromCrumb": {"type": "boolean"},
-                "remoteFS": {"type": "string"},
-                "tunnel": {"type": "string"}
+                "projectnamingstrategy": {
+                    "oneOf": [
+                        {
+                            "additionalProperties": false,
+                            "properties": {"standard": {"$id": "#/definitions/jenkins.model.ProjectNamingStrategy$DefaultProjectNamingStrategy"}}
+                        },
+                        {
+                            "additionalProperties": false,
+                            "properties": {"pattern": {"$id": "#/definitions/jenkins.model.ProjectNamingStrategy$PatternProjectNamingStrategy"}}
+                        }
+                    ],
+                    "type": "object"
+                }
             }
         },
         "tool": {
@@ -1068,6 +846,23 @@
                     "type": "object",
                     "properties": {}
                 },
+                "zipextractioninstaller": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "properties": {
+                        "subdir": {"type": "string"},
+                        "label": {"type": "string"},
+                        "url": {"type": "string"}
+                    }
+                },
+                "jdkinstaller": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "properties": {
+                        "id": {"type": "string"},
+                        "acceptLicense": {"type": "boolean"}
+                    }
+                },
                 "globalsettingsprovider": {
                     "oneOf": [
                         {
@@ -1081,9 +876,10 @@
                     ],
                     "type": "object"
                 },
-                "installations": {
+                "maveninstaller": {
+                    "additionalProperties": false,
                     "type": "object",
-                    "$id": "#/definitions/hudson.model.JDK"
+                    "properties": {"id": {"type": "string"}}
                 },
                 "globalmavenconfig": {
                     "additionalProperties": false,
@@ -1108,9 +904,18 @@
                     "type": "object",
                     "properties": {"path": {"type": "string"}}
                 },
-                "toolHome": {"type": "string"},
-                "subdir": {"type": "string"},
-                "path": {"type": "string"},
+                "jdk": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "properties": {
+                        "name": {"type": "string"},
+                        "properties": {
+                            "type": "object",
+                            "$id": "#/definitions/hudson.tools.ToolProperty"
+                        },
+                        "home": {"type": "string"}
+                    }
+                },
                 "settingsprovider": {
                     "oneOf": [
                         {
@@ -1124,6 +929,11 @@
                     ],
                     "type": "object"
                 },
+                "filepathglobalsettingsprovider": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "properties": {"path": {"type": "string"}}
+                },
                 "batchcommandinstaller": {
                     "additionalProperties": false,
                     "type": "object",
@@ -1132,63 +942,6 @@
                         "toolHome": {"type": "string"},
                         "command": {"type": "string"}
                     }
-                },
-                "commandinstaller": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "properties": {
-                        "label": {"type": "string"},
-                        "toolHome": {"type": "string"},
-                        "command": {"type": "string"}
-                    }
-                },
-                "id": {"type": "string"},
-                "zipextractioninstaller": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "properties": {
-                        "subdir": {"type": "string"},
-                        "label": {"type": "string"},
-                        "url": {"type": "string"}
-                    }
-                },
-                "jdkinstaller": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "properties": {
-                        "id": {"type": "string"},
-                        "acceptLicense": {"type": "boolean"}
-                    }
-                },
-                "maven": {
-                    "type": "object",
-                    "$id": "#/definitions/jenkins.mvn.GlobalMavenConfig"
-                },
-                "maveninstaller": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "properties": {"id": {"type": "string"}}
-                },
-                "label": {"type": "string"},
-                "url": {"type": "string"},
-                "command": {"type": "string"},
-                "home": {"type": "string"},
-                "jdk": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "properties": {
-                        "name": {"type": "string"},
-                        "properties": {
-                            "type": "object",
-                            "$id": "#/definitions/hudson.tools.ToolProperty"
-                        },
-                        "home": {"type": "string"}
-                    }
-                },
-                "filepathglobalsettingsprovider": {
-                    "additionalProperties": false,
-                    "type": "object",
-                    "properties": {"path": {"type": "string"}}
                 },
                 "maveninstallation": {
                     "additionalProperties": false,
@@ -1227,8 +980,15 @@
                     ],
                     "type": "object"
                 },
-                "name": {"type": "string"},
-                "acceptLicense": {"type": "boolean"}
+                "commandinstaller": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "properties": {
+                        "label": {"type": "string"},
+                        "toolHome": {"type": "string"},
+                        "command": {"type": "string"}
+                    }
+                }
             }
         }
     }
