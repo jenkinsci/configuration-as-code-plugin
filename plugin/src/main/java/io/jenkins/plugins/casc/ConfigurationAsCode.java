@@ -779,7 +779,7 @@ public class ConfigurationAsCode extends ManagementLink {
      * @param attributes siblings to find associated configurators and dive to next tree levels
      * @param context
      */
-    public void listElements(Set<Object> elements, Set<Attribute<?,?>> attributes, ConfigurationContext context) {
+    private void listElements(Set<Object> elements, Set<Attribute<?,?>> attributes, ConfigurationContext context) {
         attributes.stream()
             .map(Attribute::getType)
             .map(context::lookup)

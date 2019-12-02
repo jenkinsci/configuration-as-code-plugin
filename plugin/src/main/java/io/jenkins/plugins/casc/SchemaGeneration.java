@@ -39,7 +39,7 @@ public class SchemaGeneration {
         for(RootElementConfigurator rootElementConfigurator : RootElementConfigurator.all()) {
             JSONObject schemaConfiguratorObjects = new JSONObject();
             Set<Object> elements = new LinkedHashSet<>();
-            ConfigurationAsCode.get().listElements(elements, rootElementConfigurator.describe(), context);
+            listElements(elements, rootElementConfigurator.describe(), context);
             for (Object configuratorObject : elements) {
                 if (configuratorObject instanceof BaseConfigurator) {
                     BaseConfigurator baseConfigurator = (BaseConfigurator) configuratorObject;
@@ -142,7 +142,7 @@ public class SchemaGeneration {
      * @param attributes siblings to find associated configurators and dive to next tree levels
      * @param context configuration context
      */
-    private void listElements(Set<Object> elements, Set<Attribute<?,?>> attributes, ConfigurationContext context) {
+    private static void listElements(Set<Object> elements, Set<Attribute<?,?>> attributes, ConfigurationContext context) {
         // some unexpected type erasure force to cast here
         attributes.stream()
             .peek(attribute -> {

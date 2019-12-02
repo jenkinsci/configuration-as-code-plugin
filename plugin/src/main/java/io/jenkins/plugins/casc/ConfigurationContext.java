@@ -136,6 +136,11 @@ public class ConfigurationContext implements ConfiguratorRegistry {
         public boolean isAtLeast(Version version) {
             return this.ordinal() >= version.ordinal();
         }
+
+        @Override
+        public String toString() {
+            return value;
+        }
     }
 
     static {

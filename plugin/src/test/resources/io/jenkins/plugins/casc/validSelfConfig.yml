@@ -1,5 +1,5 @@
 configuration-as-code:
-  version: 1
+  version: "1"
   deprecated: warn
   restricted: warn
   unknown: warn
