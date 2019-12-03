@@ -17,7 +17,6 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -187,7 +186,7 @@ public class Util {
      */
     public static void assertNotInLog(LoggerRule logging, String unexpectedText) {
         assertFalse("The log should not contain '" + unexpectedText + "'",
-                logging.getMessages().stream().anyMatch(m -> m.contains(unexpectedText)));
+            logging.getMessages().stream().anyMatch(m -> m.contains(unexpectedText)));
     }
 
     /**
@@ -198,17 +197,17 @@ public class Util {
      */
     public static void assertLogContains(LoggerRule logging, String expectedText) {
         assertTrue("The log should contain '" + expectedText + "'",
-                logging.getMessages().stream().anyMatch(m -> m.contains(expectedText)));
+            logging.getMessages().stream().anyMatch(m -> m.contains(expectedText)));
     }
 
     /**
-     * Converts a given yamlString into a JsonString.
-     * Example Usage:
+     * <p>Converts a given yamlString into a JsonString.</p>
+     * <p>Example Usage:</p>
      * <pre>{@code
      * String jsonString = convertToJson(yourYamlString);}
      * </pre>
-     * @param yamlString
-     * @return JsonString
+     * @param yamlString the yaml to convert
+     * @return the json conversion of the yaml string.
      */
 
     public static String convertToJson(String yamlString) {
@@ -220,11 +219,12 @@ public class Util {
 
     /**
      * Retrieves the JSON schema for the running jenkins instance.
-     * Example Usage:
-     *      * <pre>{@code
-     *      * Schema jsonSchema = returnSchema();}
-     *      * </pre>
-     * @return Schema the schema for the current jenkins instance
+     * <p>Example Usage:</p>
+     * <pre>{@code
+     *      Schema jsonSchema = returnSchema();}
+     *      </pre>
+     *
+     * @return the schema for the current jenkins instance
      */
     public static Schema returnSchema() throws Exception{
         JSONObject schemaObject = generateSchema();
@@ -234,13 +234,22 @@ public class Util {
     }
 
     /**
-     * Validates a given jsonObject against the schema generated for the current live jenkins instance
-     *      * Example Usage:
-     *      *      * <pre>{@code
-     *      *      * assertTrue(validateSchema(jsonSubject));}
-     *      *      * </pre>
-     * @param  jsonSubject The json Object that needs to be validated
-     * @return true if it's valid else returns false
+     * Validates a given jsonObject against the schema generated for the current live jenkins
+     * instance.
+     *
+     * <p>Example Usage:</p>
+     *  <pre>{@code
+     *   assertThat(validateSchema(convertYamlFileToJson(this, "invalidSchemaConfig.yml")),
+     *             contains("#/jenkins/numExecutors: expected type: Number, found: String"));
+     *  }</pre
+     *
+     *  <pre>{@code
+     *   assertThat(validateSchema(convertYamlFileToJson(this, "validConfig.yml")),
+     *             empty());
+     *  }</pre>
+     *
+     * @param jsonSubject the json object that needs to be validated
+     * @return a list of validation errors, empty list if no errors
      */
     public static List<String> validateSchema(JSONObject jsonSubject) {
         try {
@@ -256,14 +265,16 @@ public class Util {
 
     /**
      * Converts a YAML file into a json object
-     * Example Usage:
-     *           * <pre>{@code
-     *           * JSONObject  jsonObject = convertYamlFileToJson("filename");}
-     *           * </pre>
+     * <p>Example Usage:</p>
+     * <pre>{@code
+     *  JSONObject jsonObject = convertYamlFileToJson(this, "filename");}
+     * </pre>
+     *
+     * @param clazz the class used for loading resources, normally you want to pass 'this'
      * @param yamlFileName the name of the yaml file that needs to be converted
      * @return JSONObject pertaining to that yaml file.
      */
-     public static JSONObject convertYamlFileToJson(Object clazz, String yamlFileName) throws Exception {
+    public static JSONObject convertYamlFileToJson(Object clazz, String yamlFileName) throws Exception {
         String yamlStringContents = toStringFromYamlFile(clazz, yamlFileName);
         return new JSONObject(new JSONTokener(convertToJson(yamlStringContents)));
     }
