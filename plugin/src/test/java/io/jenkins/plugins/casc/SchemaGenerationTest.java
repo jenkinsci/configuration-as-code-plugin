@@ -8,6 +8,7 @@ import static io.jenkins.plugins.casc.SchemaGeneration.removeHtmlTags;
 import static io.jenkins.plugins.casc.SchemaGeneration.retrieveDocStringFromAttribute;
 import static io.jenkins.plugins.casc.misc.Util.convertYamlFileToJson;
 import static io.jenkins.plugins.casc.misc.Util.validateSchema;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -25,7 +26,7 @@ public class SchemaGenerationTest {
     @Test
     public void invalidSchemaShouldNotSucceed() throws Exception {
         assertThat(validateSchema(convertYamlFileToJson(this, "invalidSchemaConfig.yml")),
-            empty());
+            contains("#/jenkins/numExecutors: expected type: Number, found: String"));
     }
 
     @Test
