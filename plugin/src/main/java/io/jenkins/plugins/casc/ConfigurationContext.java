@@ -6,8 +6,6 @@ import io.jenkins.plugins.casc.model.CNode;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.Stapler;
 
 /**
