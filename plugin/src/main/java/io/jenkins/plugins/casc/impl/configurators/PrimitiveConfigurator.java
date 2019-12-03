@@ -67,7 +67,6 @@ public class PrimitiveConfigurator implements Configurator {
             return new Scalar(((Secret) instance).getEncryptedValue()).encrypted(true);
         }
         if (target.isEnum()) {
-            System.out.println(instance.getClass().getSimpleName());
             return new Scalar((Enum) instance);
         }
 
