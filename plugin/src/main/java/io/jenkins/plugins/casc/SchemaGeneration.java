@@ -83,7 +83,6 @@ public class SchemaGeneration {
                             generateHeteroDescribableConfigObject(heteroDescribableConfigurator));
                 } else if (configuratorObject instanceof Attribute) {
                     Attribute attribute = (Attribute) configuratorObject;
-                    JSONObject attributeSchema = new JSONObject();
                     if (attribute.type.isEnum()) {
                         generateEnumAttributeSchema(schemaConfiguratorObjects, attribute);
                     } else {
