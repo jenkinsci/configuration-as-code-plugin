@@ -52,7 +52,7 @@ public class SchemaGenerationTest {
     public void attributesNotFlattenedToTopLevel() throws Exception {
         assertThat(
             validateSchema(convertYamlFileToJson(this, "attributesNotFlattenedToTop.yml")),
-            contains("#: extraneous key [acceptLicense] is not permitted"));
+            contains("#/tool: extraneous key [acceptLicense] is not permitted"));
     }
 
     //    For testing purposes.To be removed

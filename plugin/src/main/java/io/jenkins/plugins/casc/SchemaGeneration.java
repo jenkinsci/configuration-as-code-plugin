@@ -36,10 +36,10 @@ public class SchemaGeneration {
         final ConfigurationContext context = new ConfigurationContext(registry);
 
         JSONObject rootConfiguratorProperties = new JSONObject();
-        for(RootElementConfigurator rootElementConfigurator : RootElementConfigurator.all()) {
+        for (RootElementConfigurator rootElementConfigurator : RootElementConfigurator.all()) {
             JSONObject schemaConfiguratorObjects = new JSONObject();
             Set<Object> elements = new LinkedHashSet<>();
-            listElements(elements, rootElementConfigurator.describe(), context);
+            listElements(elements, rootElementConfigurator.describe(), context, true);
             for (Object configuratorObject : elements) {
                 if (configuratorObject instanceof BaseConfigurator) {
                     BaseConfigurator baseConfigurator = (BaseConfigurator) configuratorObject;
@@ -94,19 +94,19 @@ public class SchemaGeneration {
                 }
             }
 
-           rootConfiguratorProperties.put(rootElementConfigurator.getName(),
-                                        new JSONObject().put("type", "object")
-                                                        .put("additionalProperties", false)
-                                                        .put("properties", schemaConfiguratorObjects)
-                                                        .put("title", "Configuration base for the " + rootElementConfigurator.getName()
-                                                            + " classifier"));
+            rootConfiguratorProperties.put(rootElementConfigurator.getName(),
+                new JSONObject().put("type", "object")
+                    .put("additionalProperties", false)
+                    .put("properties", schemaConfiguratorObjects)
+                    .put("title", "Configuration base for the " + rootElementConfigurator.getName()
+                        + " classifier"));
         }
         schemaObject.put("properties", rootConfiguratorProperties);
         return schemaObject;
     }
 
     public static String writeJSONSchema() {
-         return generateSchema().toString(4);
+        return generateSchema().toString(4);
     }
 
     private static JSONObject generateHeteroDescribableConfigObject(
@@ -141,12 +141,15 @@ public class SchemaGeneration {
      * @param elements linked set (to save order) of visited elements
      * @param attributes siblings to find associated configurators and dive to next tree levels
      * @param context configuration context
+     * @param root is this the first iteration of root attributes
      */
-    private static void listElements(Set<Object> elements, Set<Attribute<?,?>> attributes, ConfigurationContext context) {
+    private static void listElements(Set<Object> elements, Set<Attribute<?, ?>> attributes,
+        ConfigurationContext context, boolean root) {
         // some unexpected type erasure force to cast here
         attributes.stream()
             .peek(attribute -> {
-                if (!(attribute instanceof DescribableAttribute)) {
+                // root primitive attributes are skipped without this
+                if (root && !(attribute instanceof DescribableAttribute)) {
                     elements.add(attribute);
                 }
             })
@@ -158,7 +161,7 @@ public class SchemaGeneration {
             .filter(e -> elements.add(e))
             .forEach(
                 configurator -> listElements(elements, ((Configurator) configurator).describe(),
-                    context)
+                    context, false)
             );
     }
 
@@ -167,31 +170,19 @@ public class SchemaGeneration {
         JSONObject attributeType = new JSONObject();
         switch (attribute.type.getName()) {
             case "java.lang.String":
-                attributeType.put("type", "string");
-                break;
-
-            case "int":
-                attributeType.put("type", "integer");
-                break;
-
-            case "boolean":
-                attributeType.put("type", "boolean");
-                break;
-
-            case "java.lang.Boolean":
-                attributeType.put("type", "boolean");
-                break;
-
-            case "java.lang.Integer":
-                attributeType.put("type", "integer");
-                break;
-
             case "hudson.Secret":
                 attributeType.put("type", "string");
                 break;
 
+            case "int":
+            case "java.lang.Integer":
             case "java.lang.Long":
                 attributeType.put("type", "integer");
+                break;
+
+            case "boolean":
+            case "java.lang.Boolean":
+                attributeType.put("type", "boolean");
                 break;
 
             default:
@@ -235,36 +226,4 @@ public class SchemaGeneration {
                     .put("enum", new JSONArray(attributeList)));
         }
     }
-
-    public static void storeConfiguratorNames() {
-        ConfigurationAsCode configurationAsCodeObject = ConfigurationAsCode.get();
-        for (Object configuratorObject : configurationAsCodeObject.getConfigurators()) {
-            if (configuratorObject instanceof BaseConfigurator) {
-                BaseConfigurator baseConfigurator = (BaseConfigurator) configuratorObject;
-                List<Attribute> baseConfigAttributeList = baseConfigurator.getAttributes();
-
-                for (Attribute attribute : baseConfigAttributeList) {
-                    if (attribute.multiple) {
-                        System.out.println(
-                            "This is a multiple attribute " + attribute.getType() + " " + attribute
-                                .getName());
-                    } else {
-                        if (attribute.type.isEnum()) {
-                            System.out.println("This is an enumeration attribute: ");
-                            if (attribute.type.getEnumConstants().length != 0) {
-                                System.out.println(
-                                    "Printing Enumeration constants for: " + attribute.getName());
-                                for (Object obj : attribute.type.getEnumConstants()) {
-                                    System.out.println("EConstant : " + obj.toString());
-                                }
-                            }
-                        }
-                    }
-                }
-            } else if (configuratorObject instanceof HeteroDescribableConfigurator) {
-                System.out.println("Instance of HeteroDescribable Configurator");
-            }
-        }
-    }
-
 }
