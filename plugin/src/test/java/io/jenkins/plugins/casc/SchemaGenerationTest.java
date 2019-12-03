@@ -48,6 +48,13 @@ public class SchemaGenerationTest {
             empty());
     }
 
+    @Test
+    public void attributesNotFlattenedToTopLevel() throws Exception {
+        assertThat(
+            validateSchema(convertYamlFileToJson(this, "attributesNotFlattenedToTop.yml")),
+            contains("#: extraneous key [acceptLicense] is not permitted"));
+    }
+
     //    For testing purposes.To be removed
     @Test
     public void writeSchema() throws Exception {
