@@ -54,8 +54,7 @@ public class DefaultMergeStrategy implements MergeStrategy {
                 map.getValue().addAll(map2.getValue());
                 return;
             default:
-                throw new ConfiguratorException(
-                        String.format("Found conflicting configuration at %s %s", source, node.getStartMark()));
+                new OverrideMergeStrategy().merge(root, node, source);
         }
     }
 

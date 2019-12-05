@@ -1,8 +1,10 @@
 package io.jenkins.plugins.casc.yaml;
 
 import hudson.ExtensionList;
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
@@ -22,7 +24,7 @@ public class MergeStrategyFactory {
         LOGGER.info("Get merge strategy: " + strategyName);
     }
 
-    public static MergeStrategy getMergeStrategy(@Nonnull String name) {
+    private static MergeStrategy getMergeStrategy(@Nonnull String name) {
         ExtensionList<MergeStrategy> mergeStrategyList = Jenkins.getInstance()
             .getExtensionList(MergeStrategy.class);
         Optional<MergeStrategy> opt = mergeStrategyList.stream().

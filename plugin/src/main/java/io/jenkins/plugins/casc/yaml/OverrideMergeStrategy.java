@@ -8,8 +8,10 @@ import org.yaml.snakeyaml.nodes.NodeId;
 import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.ScalarNode;
 import org.yaml.snakeyaml.nodes.SequenceNode;
-import java.util.Iterator;
 
+/**
+ * Override the configuration by loading order
+ */
 @Extension
 public class OverrideMergeStrategy implements MergeStrategy {
 
@@ -31,9 +33,8 @@ public class OverrideMergeStrategy implements MergeStrategy {
                 MappingNode map = (MappingNode) root;
                 MappingNode map2 = (MappingNode) node;
                 // merge common entries
-                final Iterator<NodeTuple> it = map2.getValue().iterator();
-                while (it.hasNext()) {
-                    NodeTuple t2 = it.next();
+                for (int i = 0; i < map2.getValue().size();) {
+                    NodeTuple t2 = map2.getValue().get(i);
                     for (NodeTuple tuple : map.getValue()) {
 
                         final Node key = tuple.getKeyNode();
@@ -42,7 +43,14 @@ public class OverrideMergeStrategy implements MergeStrategy {
                             // We dont support merge for more complex cases (yet)
                             if (((ScalarNode) key).getValue()
                                 .equals(((ScalarNode) key2).getValue())) {
-                                merge(tuple.getValueNode(), t2.getValueNode(), source);
+                                try {
+                                    merge(tuple.getValueNode(), t2.getValueNode(), source);
+                                } catch (ConfiguratorException e) {
+                                    map.getValue().set(i, tuple);
+                                }
+                                map2.getValue().remove(i);
+                            } else {
+                                i++;
                             }
                         } else {
                             throw new ConfiguratorException(
@@ -53,8 +61,11 @@ public class OverrideMergeStrategy implements MergeStrategy {
                 }
                 // .. and add others
                 map.getValue().addAll(map2.getValue());
+                return;
             default:
-                // ignore
+                throw new ConfiguratorException(
+                    String.format("Found conflicting configuration at %s %s", source,
+                        node.getStartMark()));
         }
     }
 
