@@ -1,10 +1,8 @@
 package io.jenkins.plugins.casc.yaml;
 
 import hudson.ExtensionList;
-import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
