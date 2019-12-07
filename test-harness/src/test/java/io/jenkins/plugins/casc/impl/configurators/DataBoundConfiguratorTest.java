@@ -135,7 +135,7 @@ public class DataBoundConfiguratorTest {
         final NonnullParameterConstructor configured = (NonnullParameterConstructor) registry
                                                         .lookupOrFail(NonnullParameterConstructor.class)
                                                         .configure(config, new ConfigurationContext(registry));
-        Assert.assertEquals(0, configured.getStrings().size());
+        assertEquals(0, configured.getStrings().size());
     }
 
     @Test
