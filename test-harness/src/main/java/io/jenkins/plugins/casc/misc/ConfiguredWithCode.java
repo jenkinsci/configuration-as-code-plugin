@@ -16,7 +16,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface ConfiguredWithCode {
 
     /**
-     * resource path in classpath
+     * Resource path in classpath
+     * @return resources to configure the test case with.
      */
     String[] value();
 

@@ -16,7 +16,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface ConfiguredWithReadme {
 
     /**
-     * resource path in the project
+     * Resource path in classpath
+     * @return resources to configure the test case with
      */
     String[] value();
 
