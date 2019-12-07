@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.PostConstruct;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -134,7 +135,7 @@ public class DataBoundConfiguratorTest {
         final NonnullParameterConstructor configured = (NonnullParameterConstructor) registry
                                                         .lookupOrFail(NonnullParameterConstructor.class)
                                                         .configure(config, new ConfigurationContext(registry));
-        assertEquals(0, configured.getStrings().size());
+        Assert.assertEquals(0, configured.getStrings().size());
     }
 
     @Test

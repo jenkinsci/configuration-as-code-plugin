@@ -1,6 +1,8 @@
 package io.jenkins.plugins.casc.misc;
 
-import com.fasterxml.jackson.dataformat.yaml.snakeyaml.Yaml;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import hudson.ExtensionList;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfigurationContext;
@@ -12,13 +14,13 @@ import io.jenkins.plugins.casc.snakeyaml.nodes.Node;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.io.UncheckedIOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -209,12 +211,16 @@ public class Util {
      * @param yamlString the yaml to convert
      * @return the json conversion of the yaml string.
      */
-
     public static String convertToJson(String yamlString) {
-        Yaml yaml= new Yaml();
-        Map<String,Object> map= (Map<String, Object>) yaml.load(yamlString);
-        JSONObject jsonObject=new JSONObject(map);
-        return jsonObject.toString();
+        try {
+            ObjectMapper yamlReader = new ObjectMapper(new YAMLFactory());
+            Object obj = yamlReader.readValue(yamlString, Object.class);
+
+            ObjectMapper jsonWriter = new ObjectMapper();
+            return jsonWriter.writeValueAsString(obj);
+        } catch (JsonProcessingException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     /**
