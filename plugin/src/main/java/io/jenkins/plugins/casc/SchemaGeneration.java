@@ -1,8 +1,11 @@
 package io.jenkins.plugins.casc;
 
+import hudson.model.Descriptor;
 import io.jenkins.plugins.casc.impl.DefaultConfiguratorRegistry;
 import io.jenkins.plugins.casc.impl.attributes.DescribableAttribute;
+import io.jenkins.plugins.casc.impl.configurators.DescriptorConfigurator;
 import io.jenkins.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
+import io.vavr.collection.Stream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -64,9 +67,16 @@ public class SchemaGeneration {
                                 } else {
                                     attributeSchema.put(attribute.getName(),
                                         generateNonEnumAttributeObject(attribute));
+                                    String key;
+                                    if (baseConfigurator instanceof DescriptorConfigurator) {
+                                        key = ((DescriptorConfigurator) configuratorObject)
+                                            .getName();
+                                    } else {
+                                        key = ((BaseConfigurator) configuratorObject).getTarget()
+                                            .getSimpleName().toLowerCase();
+                                    }
                                     schemaConfiguratorObjects
-                                        .put(((BaseConfigurator) configuratorObject).getTarget()
-                                                .getSimpleName().toLowerCase(),
+                                        .put(key,
                                             new JSONObject()
                                                 .put("additionalProperties", false)
                                                 .put("type", "object")
@@ -77,9 +87,20 @@ public class SchemaGeneration {
                     }
                 } else if (configuratorObject instanceof HeteroDescribableConfigurator) {
                     HeteroDescribableConfigurator heteroDescribableConfigurator = (HeteroDescribableConfigurator) configuratorObject;
+                    Stream descriptors = heteroDescribableConfigurator.getDescriptors();
+                    String key;
+                    if (!descriptors.isEmpty()) {
+                        key = DescribableAttribute.getPreferredSymbol(
+                            (Descriptor) descriptors.get(0),
+                            heteroDescribableConfigurator.getTarget(),
+                            heteroDescribableConfigurator.getTarget());
+                    } else {
+                        key = heteroDescribableConfigurator.getTarget().getSimpleName()
+                            .toLowerCase();
+                    }
                     schemaConfiguratorObjects
                         .put(
-                            heteroDescribableConfigurator.getTarget().getSimpleName().toLowerCase(),
+                            key,
                             generateHeteroDescribableConfigObject(heteroDescribableConfigurator));
                 } else if (configuratorObject instanceof Attribute) {
                     Attribute attribute = (Attribute) configuratorObject;

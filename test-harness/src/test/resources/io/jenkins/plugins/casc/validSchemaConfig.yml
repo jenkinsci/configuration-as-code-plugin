@@ -1,3 +1,2 @@
-security:
-  cli:
-    enabled: false
+jenkins:
+  systemMessage: "Configured by JCasC"

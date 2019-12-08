@@ -20,11 +20,4 @@ public class AzureKeyVaultTest {
             validateSchema(convertYamlFileToJson(this, "azureKeyVault.yml")),
             empty());
     }
-
-//    @Test
-//    public void writeSchema() throws Exception {
-//        BufferedWriter writer = new BufferedWriter(new FileWriter("schema.json"));
-//        writer.write(writeJSONSchema());
-//        writer.close();
-//    }
 }

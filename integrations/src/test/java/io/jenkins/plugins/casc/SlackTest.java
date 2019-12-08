@@ -40,12 +40,4 @@ public class SlackTest {
             validateSchema(convertYamlFileToJson(this, "slackSchema.yml")),
             empty());
     }
-
-//    @Test
-//    public void writeSchema() throws Exception {
-//        BufferedWriter writer = new BufferedWriter(new FileWriter("schema.json"));
-//        writer.write(writeJSONSchema());
-//        writer.close();
-//    }
-
 }
