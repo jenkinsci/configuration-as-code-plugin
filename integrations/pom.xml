@@ -381,6 +381,12 @@
 
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>azure-keyvault</artifactId>
+      <version>1.4</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>display-url-api</artifactId>
       <version>2.3.1</version>
       <scope>test</scope>

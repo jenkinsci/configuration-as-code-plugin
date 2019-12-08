@@ -186,6 +186,7 @@ public class SchemaGeneration {
 
             default:
                 attributeType.put("type", "object");
+                attributeType.put("additionalProperties", false);
                 attributeType.put("$id",
                     "#/definitions/" + attribute.type.getName());
                 break;

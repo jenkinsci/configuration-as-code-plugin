@@ -3,13 +3,20 @@ package io.jenkins.plugins.casc;
 import hudson.ExtensionList;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import jenkins.plugins.slack.SlackNotifier;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.rules.RuleChain;
 
-import static junit.framework.TestCase.assertNotNull;
+import static io.jenkins.plugins.casc.SchemaGeneration.writeJSONSchema;
+import static io.jenkins.plugins.casc.misc.Util.convertYamlFileToJson;
+import static io.jenkins.plugins.casc.misc.Util.validateSchema;
+import static org.hamcrest.Matchers.empty;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author v1v (Victor Martinez)
@@ -29,4 +36,19 @@ public class SlackTest {
         SlackNotifier.DescriptorImpl slackNotifier = ExtensionList.lookupSingleton(SlackNotifier.DescriptorImpl.class);
         assertNotNull(slackNotifier);
     }
+
+    @Test
+    public void validJsonSchema() throws Exception {
+        assertThat(
+            validateSchema(convertYamlFileToJson(this, "slackSchema.yml")),
+            empty());
+    }
+
+    @Test
+    public void writeSchema() throws Exception {
+        BufferedWriter writer = new BufferedWriter(new FileWriter("schema.json"));
+        writer.write(writeJSONSchema());
+        writer.close();
+    }
+
 }
