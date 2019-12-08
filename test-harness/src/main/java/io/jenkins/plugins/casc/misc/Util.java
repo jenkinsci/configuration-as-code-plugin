@@ -1,6 +1,8 @@
 package io.jenkins.plugins.casc.misc;
 
-import com.fasterxml.jackson.dataformat.yaml.snakeyaml.Yaml;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import hudson.ExtensionList;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfigurationContext;
@@ -12,13 +14,13 @@ import io.jenkins.plugins.casc.snakeyaml.nodes.Node;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.io.UncheckedIOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -165,17 +167,21 @@ public class Util {
      * @param clazz pass in {@code this}
      * @param resourcePath the file name to read, should be in the same package as your test class in resources
      * @return the string content of the file
-     * @throws URISyntaxException invalid path
-     * @throws IOException invalid path or file not found in general
+     * @throws URISyntaxException if an invalid URI is passed.
      */
-    public static String toStringFromYamlFile(Object clazz, String resourcePath) throws URISyntaxException, IOException {
-        URL resource = clazz.getClass().getResource(resourcePath);
-        if (resource == null) {
-            throw new FileNotFoundException("Couldn't find file: " + resourcePath);
-        }
+    public static String toStringFromYamlFile(Object clazz, String resourcePath)
+        throws URISyntaxException {
+        try {
+            URL resource = clazz.getClass().getResource(resourcePath);
+            if (resource == null) {
+                throw new FileNotFoundException("Couldn't find file: " + resourcePath);
+            }
 
-        byte[] bytes = Files.readAllBytes(Paths.get(resource.toURI()));
-        return new String(bytes, StandardCharsets.UTF_8).replaceAll("\r\n?", "\n");
+            byte[] bytes = Files.readAllBytes(Paths.get(resource.toURI()));
+            return new String(bytes, StandardCharsets.UTF_8).replaceAll("\r\n?", "\n");
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     /**
@@ -209,12 +215,16 @@ public class Util {
      * @param yamlString the yaml to convert
      * @return the json conversion of the yaml string.
      */
-
     public static String convertToJson(String yamlString) {
-        Yaml yaml= new Yaml();
-        Map<String,Object> map= (Map<String, Object>) yaml.load(yamlString);
-        JSONObject jsonObject=new JSONObject(map);
-        return jsonObject.toString();
+        try {
+            ObjectMapper yamlReader = new ObjectMapper(new YAMLFactory());
+            Object obj = yamlReader.readValue(yamlString, Object.class);
+
+            ObjectMapper jsonWriter = new ObjectMapper();
+            return jsonWriter.writeValueAsString(obj);
+        } catch (JsonProcessingException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     /**
@@ -226,7 +236,7 @@ public class Util {
      *
      * @return the schema for the current jenkins instance
      */
-    public static Schema returnSchema() throws Exception{
+    public static Schema returnSchema() {
         JSONObject schemaObject = generateSchema();
         JSONObject jsonSchema = new JSONObject(
             new JSONTokener(schemaObject.toString()));
@@ -241,7 +251,7 @@ public class Util {
      *  <pre>{@code
      *   assertThat(validateSchema(convertYamlFileToJson(this, "invalidSchemaConfig.yml")),
      *             contains("#/jenkins/numExecutors: expected type: Number, found: String"));
-     *  }</pre
+     *  }</pre>
      *
      *  <pre>{@code
      *   assertThat(validateSchema(convertYamlFileToJson(this, "validConfig.yml")),
@@ -273,8 +283,10 @@ public class Util {
      * @param clazz the class used for loading resources, normally you want to pass 'this'
      * @param yamlFileName the name of the yaml file that needs to be converted
      * @return JSONObject pertaining to that yaml file.
+     * @throws URISyntaxException if an invalid URI is passed.
      */
-    public static JSONObject convertYamlFileToJson(Object clazz, String yamlFileName) throws Exception {
+    public static JSONObject convertYamlFileToJson(Object clazz, String yamlFileName)
+        throws URISyntaxException {
         String yamlStringContents = toStringFromYamlFile(clazz, yamlFileName);
         return new JSONObject(new JSONTokener(convertToJson(yamlStringContents)));
     }

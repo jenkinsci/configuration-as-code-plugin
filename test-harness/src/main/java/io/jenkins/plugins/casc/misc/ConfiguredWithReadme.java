@@ -9,14 +9,15 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * To load specified config with plugin
+ * To load specified config with plugin from a README file
  */
 @Target({METHOD,FIELD})
 @Retention(RUNTIME)
-public @interface ConfiguredWithCode {
+public @interface ConfiguredWithReadme {
 
     /**
-     * resource path in classpath
+     * Resource path in classpath
+     * @return resources to configure the test case with
      */
     String[] value();
 
