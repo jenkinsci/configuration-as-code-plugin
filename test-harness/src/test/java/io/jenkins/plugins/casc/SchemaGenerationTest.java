@@ -1,12 +1,9 @@
 package io.jenkins.plugins.casc;
 
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static io.jenkins.plugins.casc.SchemaGeneration.writeJSONSchema;
 import static io.jenkins.plugins.casc.misc.Util.convertYamlFileToJson;
 import static io.jenkins.plugins.casc.misc.Util.validateSchema;
 import static org.hamcrest.Matchers.contains;
@@ -56,10 +53,10 @@ public class SchemaGenerationTest {
     }
 
     //    For testing purposes.To be removed
-    @Test
-    public void writeSchema() throws Exception {
-        BufferedWriter writer = new BufferedWriter(new FileWriter("schema.json"));
-        writer.write(writeJSONSchema());
-        writer.close();
-    }
+//    @Test
+//    public void writeSchema() throws Exception {
+//        BufferedWriter writer = new BufferedWriter(new FileWriter("schema.json"));
+//        writer.write(writeJSONSchema());
+//        writer.close();
+//    }
 }
