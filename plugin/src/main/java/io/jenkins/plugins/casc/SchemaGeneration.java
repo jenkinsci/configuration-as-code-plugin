@@ -170,6 +170,7 @@ public class SchemaGeneration {
 
             case "int":
             case "java.lang.Integer":
+            case "long":
             case "java.lang.Long":
                 attributeType.put("type", "integer");
                 break;
