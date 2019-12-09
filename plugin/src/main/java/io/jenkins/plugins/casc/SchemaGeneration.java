@@ -50,7 +50,7 @@ public class SchemaGeneration {
                         JSONObject attributeSchema = new JSONObject();
                         for (Attribute attribute : baseConfigAttributeList) {
                             if (attribute.multiple) {
-                                generateMultipleAttributeSchema(attributeSchema, attribute);
+                                generateMultipleAttributeSchema(attributeSchema, attribute, context);
                             } else {
                                 if (attribute.type.isEnum()) {
                                     generateEnumAttributeSchema(attributeSchema, attribute);
@@ -190,17 +190,38 @@ public class SchemaGeneration {
         return attributeType;
     }
 
-    private static void generateMultipleAttributeSchema(JSONObject attributeSchema,
-        Attribute attribute) {
+    private static void generateMultipleAttributeSchema(
+        JSONObject attributeSchema,
+        Attribute attribute,
+        ConfigurationContext context
+    ) {
         if (attribute.type.getName().equals("java.lang.String")) {
             attributeSchema.put(attribute.getName(),
                 new JSONObject()
                     .put("type", "string"));
         } else {
+            JSONObject properties = new JSONObject();
+            Configurator<Object> lookup = context.lookup(attribute.getType());
+            if (lookup != null) {
+                lookup
+                    .getAttributes()
+                    .forEach(attr -> {
+                        properties
+                            .put(attr.getName(), generateNonEnumAttributeObject(attr));
+                    });
+            }
+
             attributeSchema.put(attribute.getName(),
                 new JSONObject()
-                    .put("type", "object")
-                    .put("$id", "#/definitions/" + attribute.type.getName()));
+                    .put("type", "array")
+                    .put("items", new JSONArray()
+                        .put(new JSONObject()
+                            .put("type", "object")
+                            .put("properties", properties)
+                            .put("additionalProperties", false)
+                        )
+                    )
+            );
         }
     }
 

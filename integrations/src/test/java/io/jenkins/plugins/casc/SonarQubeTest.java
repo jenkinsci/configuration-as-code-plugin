@@ -5,11 +5,19 @@ import hudson.plugins.sonar.SonarInstallation;
 import hudson.plugins.sonar.model.TriggersConfig;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import jenkins.model.GlobalConfiguration;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
+import static io.jenkins.plugins.casc.SchemaGeneration.writeJSONSchema;
+import static io.jenkins.plugins.casc.misc.Util.convertYamlFileToJson;
+import static io.jenkins.plugins.casc.misc.Util.validateSchema;
+import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -38,4 +46,18 @@ public class SonarQubeTest {
         assertEquals("envVar", triggers.getEnvVar());
     }
 
+    @Test
+    public void validJsonSchema() throws Exception {
+        assertThat(
+            validateSchema(convertYamlFileToJson(this, "sonarSchema.yml")),
+            empty());
+    }
+
+    @Test
+    @Ignore
+    public void validFullJsonSchema() throws Exception {
+        assertThat(
+            validateSchema(convertYamlFileToJson(this, "sonarSchemaFull.yml")),
+            empty());
+    }
 }
