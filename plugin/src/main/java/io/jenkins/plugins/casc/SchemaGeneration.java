@@ -1,12 +1,8 @@
 package io.jenkins.plugins.casc;
 
-import hudson.model.Descriptor;
 import io.jenkins.plugins.casc.impl.DefaultConfiguratorRegistry;
 import io.jenkins.plugins.casc.impl.attributes.DescribableAttribute;
-import io.jenkins.plugins.casc.impl.configurators.DataBoundConfigurator;
-import io.jenkins.plugins.casc.impl.configurators.DescriptorConfigurator;
 import io.jenkins.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
-import io.vavr.collection.Stream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
