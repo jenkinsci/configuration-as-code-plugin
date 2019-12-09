@@ -39,6 +39,12 @@ public class SchemaGenerationTest {
     }
 
     @Test
+    public void symbolResolutionForJenkinsBaseConfigurator() throws Exception {
+        assertThat(validateSchema(convertYamlFileToJson(this, "validJenkinsBaseConfigWithSymbol.yml")),
+            empty());
+    }
+
+    @Test
     public void validSelfConfigurator() throws Exception {
         assertThat(
             validateSchema(convertYamlFileToJson(this, "validSelfConfig.yml")),
@@ -52,7 +58,7 @@ public class SchemaGenerationTest {
             contains("#/tool: extraneous key [acceptLicense] is not permitted"));
     }
 
-    //    For testing purposes.To be removed
+//    For testing manually
 //    @Test
 //    public void writeSchema() throws Exception {
 //        BufferedWriter writer = new BufferedWriter(new FileWriter("schema.json"));

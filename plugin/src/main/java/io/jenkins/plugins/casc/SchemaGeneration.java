@@ -3,6 +3,7 @@ package io.jenkins.plugins.casc;
 import hudson.model.Descriptor;
 import io.jenkins.plugins.casc.impl.DefaultConfiguratorRegistry;
 import io.jenkins.plugins.casc.impl.attributes.DescribableAttribute;
+import io.jenkins.plugins.casc.impl.configurators.DataBoundConfigurator;
 import io.jenkins.plugins.casc.impl.configurators.DescriptorConfigurator;
 import io.jenkins.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
 import io.vavr.collection.Stream;
@@ -26,15 +27,7 @@ public class SchemaGeneration {
 
 
     public static JSONObject generateSchema() {
-
-        /**
-         * The initial template for the JSON Schema
-         */
         JSONObject schemaObject = new JSONObject(schemaTemplateObject.toString());
-        /**
-         * This generates the schema for the base configurators
-         * Iterates over the base configurators and adds them to the schema.
-         */
         DefaultConfiguratorRegistry registry = new DefaultConfiguratorRegistry();
         final ConfigurationContext context = new ConfigurationContext(registry);
 
@@ -49,8 +42,9 @@ public class SchemaGeneration {
                     List<Attribute> baseConfigAttributeList = baseConfigurator.getAttributes();
 
                     if (baseConfigAttributeList.size() == 0) {
+                        String key = baseConfigurator.getName();
                         schemaConfiguratorObjects
-                            .put(baseConfigurator.getName().toLowerCase(),
+                            .put(key,
                                 new JSONObject()
                                     .put("additionalProperties", false)
                                     .put("type", "object")
@@ -67,14 +61,8 @@ public class SchemaGeneration {
                                 } else {
                                     attributeSchema.put(attribute.getName(),
                                         generateNonEnumAttributeObject(attribute));
-                                    String key;
-                                    if (baseConfigurator instanceof DescriptorConfigurator) {
-                                        key = ((DescriptorConfigurator) configuratorObject)
-                                            .getName();
-                                    } else {
-                                        key = ((BaseConfigurator) configuratorObject).getTarget()
-                                            .getSimpleName().toLowerCase();
-                                    }
+                                    String key = baseConfigurator.getName();
+
                                     schemaConfiguratorObjects
                                         .put(key,
                                             new JSONObject()
@@ -87,17 +75,7 @@ public class SchemaGeneration {
                     }
                 } else if (configuratorObject instanceof HeteroDescribableConfigurator) {
                     HeteroDescribableConfigurator heteroDescribableConfigurator = (HeteroDescribableConfigurator) configuratorObject;
-                    Stream descriptors = heteroDescribableConfigurator.getDescriptors();
-                    String key;
-                    if (!descriptors.isEmpty()) {
-                        key = DescribableAttribute.getPreferredSymbol(
-                            (Descriptor) descriptors.get(0),
-                            heteroDescribableConfigurator.getTarget(),
-                            heteroDescribableConfigurator.getTarget());
-                    } else {
-                        key = heteroDescribableConfigurator.getTarget().getSimpleName()
-                            .toLowerCase();
-                    }
+                    String key = heteroDescribableConfigurator.getName();
                     schemaConfiguratorObjects
                         .put(
                             key,
