@@ -10,13 +10,6 @@ import org.apache.commons.lang.StringUtils;
 public class MergeStrategyFactory {
     private static final Logger LOGGER = Logger.getLogger(MergeStrategyFactory.class.getName());
 
-    private static final String strategyName;
-
-    static {
-        strategyName = getDefaultStrategy();
-        LOGGER.info("Get merge strategy: " + strategyName);
-    }
-
     private static MergeStrategy getMergeStrategy(@Nonnull String name) {
         ExtensionList<MergeStrategy> mergeStrategyList = Jenkins.getInstance()
             .getExtensionList(MergeStrategy.class);
@@ -30,6 +23,8 @@ public class MergeStrategyFactory {
      * @return MergeStrategy
      */
     public static MergeStrategy getMergeStrategy() {
+        String strategyName = getDefaultStrategy();
+
         return MergeStrategyFactory.getMergeStrategy(
             StringUtils.isEmpty(strategyName) ? "default" : strategyName);
     }
