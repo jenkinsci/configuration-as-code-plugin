@@ -159,6 +159,25 @@ Kubernetes users:\
 
 Most plugins should be supported out-of-the-box, or maybe require some minimal changes. See this [dashboard](https://issues.jenkins.io/secure/Dashboard.jspa?selectPageId=18341) for known compatibility issues.
 
+## Compatibility with Jenkins > 2.199
+
+Jenkins 2.199 introduced [a check to prevent saving global configuration before loading the configuration has occurred](https://github.com/jenkinsci/jenkins/pull/4171). Configurations As Code needs to apply global configuration before Jenkins loads jobs (so they can load and correctly reference any global state) and as such until [JENKINS-51856](https://issues.jenkins-ci.org/browse/JENKINS-51856) is implemented there exists a race condition where by Jenkins may fail to start when used with this plugin.
+
+If you encounter the race condition Jenkins will fail to start with an exception message similar to the following:
+
+```text
+SEVERE	jenkins.InitReactorRunner$1#onTaskFailed: Failed ConfigurationAsCode.init
+java.lang.IllegalStateException: An attempt to save the global configuration was made before it was loaded
+```
+
+If you encounter this you can tell the plugin to delay configuration for an amount of time to give Jenkins time to load the global configuration before the configuration is applied by the plugin.
+
+To enable this set the `io.jenkins.plugins.casc.ConfigurationAsCode.initialDelay` system property to a number of milliseconds to delay the initialisation by.
+The required value will be dependant on aspects of your system (cpu/disk) and configuration, and how it can be found is mostly a trial and error.
+A suggestion would be to start with 5000 (5 Seconds) and then increment by 2000 (2 seconds) until you no longer exhibit the issue and finally add 1000 (1 second) for some extra safety.
+For example, to delay the configuration by 9 seconds you would use something like the following command `java -Dio.jenkins.plugins.casc.ConfigurationAsCode.initialDelay=9000 -jar jenkins.war`.
+Exactly how and where you specify this option depends on the installation method used to install Jenkins.
+
 
 ## Configuration-as-Code extension plugins
 

@@ -209,4 +209,3 @@ public class SchemaGeneration {
         return htmlDocString.replaceAll("\\<.*?\\>", "").trim();
     }
 }
-

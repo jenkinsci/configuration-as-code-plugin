@@ -16,10 +16,11 @@
     <module>snakeyaml</module>
     <module>plugin</module>
     <module>integrations</module>
+    <module>test-harness</module>
   </modules>
 
   <properties>
-    <revision>1.33</revision>
+    <revision>1.35</revision>
     <changelist>-SNAPSHOT</changelist>
     <jenkins.version>2.60.3</jenkins.version>
     <java.level>8</java.level>
@@ -68,7 +69,7 @@
             <dependency>
               <groupId>com.puppycrawl.tools</groupId>
               <artifactId>checkstyle</artifactId>
-              <version>8.25</version>
+              <version>8.26</version>
             </dependency>
           </dependencies>
         </plugin>
