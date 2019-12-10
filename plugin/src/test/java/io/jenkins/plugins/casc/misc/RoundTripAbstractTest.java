@@ -20,6 +20,7 @@ import org.jvnet.hudson.test.LoggerRule;
 import org.jvnet.hudson.test.RestartableJenkinsRule;
 
 import static com.gargoylesoftware.htmlunit.HttpMethod.POST;
+import static io.jenkins.plugins.casc.misc.Util.convertToJson;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
@@ -105,7 +106,7 @@ public abstract class RoundTripAbstractTest {
             assertConfigViaWebUI(jenkinsConf);
 
             //Validate Schema before application
-            assertTrue(validateSchema(convertYamlFileToJson(this, "validJenkinsConfigurator.yml")));
+            assertThat(validateSchema(convertToJson(resourceContent)), empty());
 
             // Apply configuration via Web UI
             applyConfigViaWebUI(jenkinsConf);
