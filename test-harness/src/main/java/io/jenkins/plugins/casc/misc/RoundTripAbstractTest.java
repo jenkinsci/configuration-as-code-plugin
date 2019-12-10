@@ -57,6 +57,8 @@ public abstract class RoundTripAbstractTest {
     /**
      * A method to assert if the configuration was correctly loaded. The Jenkins rule and the content of the config
      * supposedly loaded are passed.
+     * @param j a RestartableJenkinsRule instance.
+     * @param configContent expected configuration.
      */
     protected abstract void assertConfiguredAsExpected(RestartableJenkinsRule j, String configContent);
 

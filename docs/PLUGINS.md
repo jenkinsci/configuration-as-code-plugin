@@ -212,10 +212,9 @@ Add the Configuration as Code plugin as a test dependency in your pom.xml:
     <scope>test</scope>
 </dependency>
 <dependency>
-    <groupId>io.jenkins</groupId>
-    <artifactId>configuration-as-code</artifactId>
+    <groupId>io.jenkins.configuration-as-code</groupId>
+    <artifactId>test-harness</artifactId>
     <version>${configuration-as-code.version}</version>
-    <classifier>tests</classifier>
     <scope>test</scope>
 </dependency>
 ```
@@ -337,6 +336,6 @@ Add a test for the YAML file
 ```java
     @Test
     public void validSchemaShouldSucceed() throws Exception {
-        assertTrue(validateSchema(convertYamlFileToJson(this, "validJenkinsConfigurator.yml")));
+        assertThat(validateSchema(convertYamlFileToJson(this, "validSchemaConfig.yml")), empty());
     }
 ```

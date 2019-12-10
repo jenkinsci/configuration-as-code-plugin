@@ -14,6 +14,7 @@
   <properties>
     <jenkins.version>2.176.3</jenkins.version> <!-- Remove when parent base is updated. -->
     <maven.deploy.skip>true</maven.deploy.skip> <!-- no need to be deployed during release, this is a test-only module -->
+    <jackson.version>2.10.1</jackson.version>
   </properties>
 
   <dependencies>
@@ -28,18 +29,10 @@
         </exclusion>
       </exclusions>
     </dependency>
-
     <dependency>
-      <groupId>io.jenkins</groupId>
-      <artifactId>configuration-as-code</artifactId>
+      <groupId>io.jenkins.configuration-as-code</groupId>
+      <artifactId>test-harness</artifactId>
       <version>${project.version}</version>
-      <type>test-jar</type>
-      <exclusions>
-        <exclusion>
-          <groupId>org.json</groupId>
-          <artifactId>json</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
@@ -223,7 +216,7 @@
       <version>2.3.0</version>
       <scope>test</scope>
     </dependency>
-  
+
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>mesos</artifactId>
@@ -334,7 +327,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>jackson2-api</artifactId>
-      <version>2.9.10</version>
+      <version>${jackson.version}</version>
     </dependency>
 
     <dependency>
@@ -484,27 +477,27 @@
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-core</artifactId>
-        <version>2.9.10</version>
+        <version>${jackson.version}</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
-        <version>2.9.10</version>
+        <version>${jackson.version}</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.jaxrs</groupId>
         <artifactId>jackson-jaxrs-json-provider</artifactId>
-        <version>2.9.7</version>
+        <version>${jackson.version}</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.jaxrs</groupId>
         <artifactId>jaxrs-json-provider</artifactId>
-        <version>2.9.7</version>
+        <version>${jackson.version}</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.module</groupId>
         <artifactId>jackson-module-jaxb-annotations</artifactId>
-        <version>2.9.9</version>
+        <version>${jackson.version}</version>
       </dependency>
       <dependency>
         <groupId>com.google.errorprone</groupId>
