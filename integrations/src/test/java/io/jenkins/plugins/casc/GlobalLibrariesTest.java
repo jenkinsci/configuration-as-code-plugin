@@ -1,7 +1,9 @@
 package io.jenkins.plugins.casc;
 
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
+import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import jenkins.plugins.git.GitSCMSource;
 import org.jenkinsci.plugins.github_branch_source.BranchDiscoveryTrait;
 import org.jenkinsci.plugins.github_branch_source.ForkPullRequestDiscoveryTrait;
@@ -28,7 +30,7 @@ public class GlobalLibrariesTest {
     public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 
     @Test
-    @ConfiguredWithCode("GlobalLibrariesTest.yml")
+    @ConfiguredWithReadme("workflow-cps-global-lib/README.md")
     public void configure_global_library() throws Exception {
         assertEquals(1, GlobalLibraries.get().getLibraries().size());
         final LibraryConfiguration library = GlobalLibraries.get().getLibraries().get(0);
@@ -36,7 +38,6 @@ public class GlobalLibrariesTest {
         final SCMSourceRetriever retriever = (SCMSourceRetriever) library.getRetriever();
         final GitSCMSource scm = (GitSCMSource) retriever.getScm();
         assertEquals("https://github.com/jenkins-infra/pipeline-library.git", scm.getRemote());
-
     }
 
     @Issue("JENKINS-57557")
