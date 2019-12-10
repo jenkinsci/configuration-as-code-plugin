@@ -18,10 +18,9 @@ public class OrderedMergeStrategyTest {
         .around(new JenkinsConfiguredWithCodeRule());
 
     @Test
-    @ConfiguredWithCode(value = {"merge2.yml", "merge3.yml"})
+    @ConfiguredWithCode(value = {"merge1.yml", "merge2.yml"})
     public void orderMergeStrategy() {
-        String message = Jenkins.getInstance().getSystemMessage();
-        assertEquals("only use the last config file",
-            "Configured by Configuration as Code plugin", message);
+        int executorNum = Jenkins.getInstance().getNumExecutors();
+        assertEquals("only use the last config file", 20, executorNum);
     }
 }
