@@ -13,12 +13,7 @@ public class MergeStrategyFactory {
     private static final String strategyName;
 
     static {
-        String strategyEnv = System.getenv("CASC_MERGE_STRATEGY");
-        if (StringUtils.isEmpty(strategyEnv)) {
-            strategyEnv = System.getProperty("casc.merge.strategy", "default");
-        }
-        strategyName = strategyEnv;
-
+        strategyName = getDefaultStrategy();
         LOGGER.info("Get merge strategy: " + strategyName);
     }
 
@@ -37,5 +32,13 @@ public class MergeStrategyFactory {
     public static MergeStrategy getMergeStrategy() {
         return MergeStrategyFactory.getMergeStrategy(
             StringUtils.isEmpty(strategyName) ? "default" : strategyName);
+    }
+
+    public static String getDefaultStrategy() {
+        String strategyEnv = System.getenv("CASC_MERGE_STRATEGY");
+        if (StringUtils.isEmpty(strategyEnv)) {
+            strategyEnv = System.getProperty("casc.merge.strategy", "default");
+        }
+        return strategyEnv;
     }
 }
