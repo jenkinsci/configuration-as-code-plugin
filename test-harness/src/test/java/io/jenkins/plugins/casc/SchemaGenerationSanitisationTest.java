@@ -3,9 +3,9 @@ package io.jenkins.plugins.casc;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import org.junit.Rule;
 import org.junit.Test;
+
 import static io.jenkins.plugins.casc.SchemaGeneration.removeHtmlTags;
 import static io.jenkins.plugins.casc.SchemaGeneration.retrieveDocStringFromAttribute;
-
 import static org.junit.Assert.assertEquals;
 
 public class SchemaGenerationSanitisationTest {
