@@ -12,6 +12,8 @@ import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.logging.Level;
 import org.apache.commons.io.IOUtils;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -21,8 +23,10 @@ import org.jvnet.hudson.test.RestartableJenkinsRule;
 
 import static com.gargoylesoftware.htmlunit.HttpMethod.POST;
 import static io.jenkins.plugins.casc.misc.Util.convertToJson;
+import static io.jenkins.plugins.casc.misc.Util.validateSchema;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -108,7 +112,7 @@ public abstract class RoundTripAbstractTest {
             assertConfigViaWebUI(jenkinsConf);
 
             //Validate Schema before application
-            assertThat(validateSchema(convertToJson(resourceContent)), empty());
+            assertThat(validateSchema(new JSONObject(new JSONTokener(convertToJson(resourceContent)))), empty());
 
             // Apply configuration via Web UI
             applyConfigViaWebUI(jenkinsConf);
