@@ -1,12 +1,14 @@
-# configure Metrics Graphite plugin
+# Configure Metrics Graphite plugin
 
-## sample configuration
+Basic configuration of the [Metrics Graphite plugin](https://plugins.jenkins.io/metrics-graphite)
+
+## Sample configuration
 
 ```yaml
 unclassified:
-  graphiteserver:
+  graphiteServer:
     servers:
-      - hostname: "1.2.3.4"
-        port: 2003
-        prefix: jenkins.master.
+    - hostname: "1.2.3.4"
+      port: 2003
+      prefix: "jenkins.master."
 ```
