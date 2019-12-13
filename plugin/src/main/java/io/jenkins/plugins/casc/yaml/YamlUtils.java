@@ -4,12 +4,6 @@ import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.model.Mapping;
-import org.yaml.snakeyaml.LoaderOptions;
-import org.yaml.snakeyaml.composer.Composer;
-import org.yaml.snakeyaml.error.YAMLException;
-import org.yaml.snakeyaml.nodes.Node;
-import org.yaml.snakeyaml.parser.ParserImpl;
-import org.yaml.snakeyaml.resolver.Resolver;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -22,7 +16,11 @@ import java.util.List;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import org.yaml.snakeyaml.LoaderOptions;
+import org.yaml.snakeyaml.composer.Composer;
 import org.yaml.snakeyaml.error.YAMLException;
+import org.yaml.snakeyaml.nodes.Node;
+import org.yaml.snakeyaml.parser.ParserImpl;
+import org.yaml.snakeyaml.resolver.Resolver;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -33,11 +31,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public final class YamlUtils {
 
     public static final Logger LOGGER = Logger.getLogger(ConfigurationAsCode.class.getName());
-
-    public static Node merge(List<YamlSource> sources,
-        ConfigurationContext context) throws ConfiguratorException {
-        return merge(sources, context, null);
-    }
 
     public static Node merge(List<YamlSource> sources, ConfigurationContext context,
         MergeStrategy mergeStrategy) throws ConfiguratorException {

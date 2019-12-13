@@ -2,14 +2,11 @@ package io.jenkins.plugins.casc.yaml;
 
 import hudson.ExtensionList;
 import java.util.Optional;
-import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 
 public class MergeStrategyFactory {
-    private static final Logger LOGGER = Logger.getLogger(MergeStrategyFactory.class.getName());
-
     private static MergeStrategy getMergeStrategy(@Nonnull String name) {
         ExtensionList<MergeStrategy> mergeStrategyList = Jenkins.getInstance()
             .getExtensionList(MergeStrategy.class);
@@ -26,13 +23,13 @@ public class MergeStrategyFactory {
         String strategyName = getDefaultStrategy();
 
         return MergeStrategyFactory.getMergeStrategy(
-            StringUtils.isEmpty(strategyName) ? "default" : strategyName);
+            StringUtils.isEmpty(strategyName) ? MergeStrategy.DEFAULT_STRATEGY : strategyName);
     }
 
-    public static String getDefaultStrategy() {
+    private static String getDefaultStrategy() {
         String strategyEnv = System.getenv("CASC_MERGE_STRATEGY");
         if (StringUtils.isEmpty(strategyEnv)) {
-            strategyEnv = System.getProperty("casc.merge.strategy", "default");
+            strategyEnv = System.getProperty("casc.merge.strategy", MergeStrategy.DEFAULT_STRATEGY);
         }
         return strategyEnv;
     }

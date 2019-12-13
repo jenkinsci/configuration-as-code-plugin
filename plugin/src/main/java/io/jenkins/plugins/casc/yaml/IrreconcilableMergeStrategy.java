@@ -2,23 +2,24 @@ package io.jenkins.plugins.casc.yaml;
 
 import hudson.Extension;
 import io.jenkins.plugins.casc.ConfiguratorException;
+import java.util.Iterator;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.NodeId;
 import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.ScalarNode;
 import org.yaml.snakeyaml.nodes.SequenceNode;
-import java.util.Iterator;
 
 @Extension
-public class DefaultMergeStrategy implements MergeStrategy {
+public class IrreconcilableMergeStrategy implements MergeStrategy {
 
     @Override
     public void merge(Node root, Node node, String source) throws ConfiguratorException {
         if (root.getNodeId() != node.getNodeId()) {
             // means one of those yaml file doesn't conform to JCasC schema
             throw new ConfiguratorException(
-                String.format("Found incompatible configuration elements %s %s", source, node.getStartMark()));
+                String.format("Found incompatible configuration elements %s %s", source,
+                    node.getStartMark()));
         }
 
         switch (root.getNodeId()) {
@@ -40,13 +41,15 @@ public class DefaultMergeStrategy implements MergeStrategy {
                         final Node key2 = t2.getKeyNode();
                         if (key.getNodeId() == NodeId.scalar) {
                             // We dont support merge for more complex cases (yet)
-                            if (((ScalarNode) key).getValue().equals(((ScalarNode) key2).getValue())) {
+                            if (((ScalarNode) key).getValue()
+                                .equals(((ScalarNode) key2).getValue())) {
                                 merge(tuple.getValueNode(), t2.getValueNode(), source);
                                 it.remove();
                             }
                         } else {
                             throw new ConfiguratorException(
-                                String.format("Found unmergeable configuration keys %s %s)", source, node.getEndMark()));
+                                String.format("Found unmergeable configuration keys %s %s)", source,
+                                    node.getEndMark()));
                         }
                     }
                 }
@@ -60,6 +63,6 @@ public class DefaultMergeStrategy implements MergeStrategy {
 
     @Override
     public String getName() {
-        return "default";
+        return DEFAULT_STRATEGY;
     }
 }

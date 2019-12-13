@@ -7,6 +7,7 @@ import org.yaml.snakeyaml.nodes.Node;
  * YAML merge strategy between multiple files
  */
 public interface MergeStrategy {
+    String DEFAULT_STRATEGY = "irreconcilable";
 
     /**
      * Merge two nodes which come from two YAML files

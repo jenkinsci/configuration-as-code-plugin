@@ -4,7 +4,6 @@ import hudson.ExtensionList;
 import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.contrib.java.lang.system.RestoreSystemProperties;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import static org.junit.Assert.assertEquals;
@@ -12,8 +11,6 @@ import static org.junit.Assert.assertTrue;
 
 public class MergeStrategyTest {
 
-    @Rule
-    public RestoreSystemProperties properties = new RestoreSystemProperties();
     @Rule
     public JenkinsRule j = new JenkinsRule();
 
@@ -25,6 +22,6 @@ public class MergeStrategyTest {
         assertTrue("should have at least one strategy",
             strategyExtensionList.size() > 0);
         assertEquals("default merge strategy's name should be default",
-            "default", MergeStrategyFactory.getMergeStrategy().getName());
+            MergeStrategy.DEFAULT_STRATEGY, MergeStrategyFactory.getMergeStrategy().getName());
     }
 }
