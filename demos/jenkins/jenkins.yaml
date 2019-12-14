@@ -42,16 +42,19 @@ tool:
       - name: git
         home: /usr/local/bin/git
 
-security:
-  remotingCLI:
-    enabled: false
+##  If Jenkins <2.165 then you can comment out the below section:
+##
+##  https://github.com/jenkinsci/configuration-as-code-plugin/issues/754
+##
+##security:
+##  remotingCLI:
+##    enabled: false
 
 unclassified:
   artifactorybuilder:
     useCredentialsPlugin: true
     artifactoryServers:
-      - name: foo
-        serverId: artifactory
+      - serverId: artifactory
         artifactoryUrl: http://acme.com/artifactory
         resolverCredentialsConfig:
           username: artifactory_user
@@ -69,14 +72,6 @@ unclassified:
   location:
     adminAddress: you@example.com
     url: https://ci.example.com/
-
-  teampluginglobalconfig:
-    collectionConfigurations:
-      - collectionUrl: http://test.com
-        credentialsId: tfsCredentials
-    enableTeamPushTriggerForAllJobs: true
-    enableTeamStatusForAllJobs: true
-    configFolderPerNode: true
 
   mailer:
     replyToAddress: do-not-reply@acme.org

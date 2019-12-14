@@ -19,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -52,10 +53,12 @@ public class JenkinsConfiguredWithReadmeRule extends JenkinsConfiguredRule {
             final List<String> configs = Arrays.stream(resource)
                 .map(s -> {
                     try {
+                        String currentResource = s.replaceAll("#.*", "");
+                        int position = getFencedCodeBlockIndex(s);
                         File codeBlockFile = File.createTempFile("integrations", "markdown");
-                        InputStream inputStream = clazz.getClassLoader().getResourceAsStream(s);
+                        InputStream inputStream = clazz.getClassLoader().getResourceAsStream(currentResource);
                         List<String> lines = Collections.singletonList(
-                            transformFencedCodeBlockFromMarkdownToString(inputStream));
+                            transformFencedCodeBlockFromMarkdownToString(inputStream).get(position));
                         Path file = Paths.get(codeBlockFile.getCanonicalPath());
                         Files.write(file, lines, StandardCharsets.UTF_8);
                         return  codeBlockFile.toURI().toString();
@@ -111,12 +114,27 @@ public class JenkinsConfiguredWithReadmeRule extends JenkinsConfiguredRule {
         return null;
     }
 
-    private String transformFencedCodeBlockFromMarkdownToString(InputStream markdownContent) throws IOException {
+    private List<String> transformFencedCodeBlockFromMarkdownToString(InputStream markdownContent) throws IOException {
+        ArrayList<String> results = new ArrayList<String>();
         final MutableDataSet FORMAT_OPTIONS = new MutableDataSet();
         FORMAT_OPTIONS.set(Parser.EXTENSIONS, OPTIONS.get(Parser.EXTENSIONS));
         Reader targetReader = new InputStreamReader(markdownContent);
         Node document = PARSER.parseReader(targetReader);
         TextCollectingVisitor textCollectingVisitor = new TextCollectingVisitor();
-        return textCollectingVisitor.collectAndGetText(document.getChildOfType(FencedCodeBlock.class));
+        Node fencedCodeBlock = document.getChildOfType(FencedCodeBlock.class);
+        while(fencedCodeBlock!=null) {
+            results.add(textCollectingVisitor.collectAndGetText(fencedCodeBlock));
+            fencedCodeBlock = fencedCodeBlock.getNextAny(FencedCodeBlock.class);
+        }
+        return results;
     }
+
+    private int getFencedCodeBlockIndex(String resource) {
+        int position = 0;
+        if (resource.matches(".*#\\d+$")) {
+            position = Integer.parseInt(resource.replaceAll(".*#", ""));
+        }
+        return position;
+    }
+
 }
