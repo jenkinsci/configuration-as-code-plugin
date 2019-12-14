@@ -257,7 +257,7 @@ public class Attribute<Owner, Type> {
                         seq.add(_describe(c, context, value, shouldBeMasked));
                     }
                 } else {
-                    LOGGER.log(Level.FINE, o.getClass().toString() + "is not iterable");
+                    LOGGER.log(Level.FINE, o.getClass().toString() + " is not iterable");
                 }
                 return seq;
             }
