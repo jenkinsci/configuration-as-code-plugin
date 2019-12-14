@@ -256,6 +256,8 @@ public class Attribute<Owner, Type> {
                     for (Object value : (Iterable) o) {
                         seq.add(_describe(c, context, value, shouldBeMasked));
                     }
+                } else {
+                    LOGGER.log(Level.FINE, o.getClass().toString() + "is not iterable");
                 }
                 return seq;
             }
@@ -271,9 +273,9 @@ public class Attribute<Owner, Type> {
 
     /**
      * This function is for the JSONSchemaGeneration
-     * @param instance
-     * @param context
-     * @return
+     * @param instance Owner Instance
+     * @param context Context to be passed
+     * @return CNode object describing the structure of the node
      */
     public CNode describeStructure(Owner instance, ConfigurationContext context) {
 
@@ -304,7 +306,7 @@ public class Attribute<Owner, Type> {
                 return seq;
             }
             return _describe(c, context, o, shouldBeMasked);
-        } catch (Exception | /* Jenkins.getDescriptorOrDie */AssertionError e) {
+        } catch (Exception e) {
             // Don't fail the whole export, prefer logging this error
             LOGGER.log(Level.WARNING, "Failed to export", e);
             return new Scalar("FAILED TO EXPORT\n" + instance.getClass().getName() + "#" + name + ": "
