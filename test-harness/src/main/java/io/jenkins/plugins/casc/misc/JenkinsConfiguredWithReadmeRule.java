@@ -122,7 +122,7 @@ public class JenkinsConfiguredWithReadmeRule extends JenkinsConfiguredRule {
         Node document = PARSER.parseReader(targetReader);
         TextCollectingVisitor textCollectingVisitor = new TextCollectingVisitor();
         Node fencedCodeBlock = document.getChildOfType(FencedCodeBlock.class);
-        while(fencedCodeBlock!=null) {
+        while (fencedCodeBlock != null) {
             results.add(textCollectingVisitor.collectAndGetText(fencedCodeBlock));
             fencedCodeBlock = fencedCodeBlock.getNextAny(FencedCodeBlock.class);
         }
