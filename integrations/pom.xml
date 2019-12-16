@@ -52,7 +52,7 @@
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>vault</artifactId>
-      <version>1.12.2</version>
+      <version>1.12.4</version>
       <scope>test</scope>
     </dependency>
 
