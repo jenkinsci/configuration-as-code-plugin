@@ -50,7 +50,7 @@ public class JenkinsConfiguredWithCodeRule extends JenkinsConfiguredRule {
                     throw new AssertionError("Unexpected exception ", t);
                 } else {
                     if (!StringUtils.isBlank(configuredWithCode.message())) {
-                        boolean match = new StringContains(configuredWithCode.message())
+                        boolean match = new StringContains(false, configuredWithCode.message())
                             .matches(t.getMessage());
                         if (!match) {
                             throw new AssertionError(
