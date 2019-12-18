@@ -75,7 +75,7 @@ public class JenkinsConfiguredWithReadmeRule extends JenkinsConfiguredRule {
                     throw new AssertionError("Unexpected exception ", t);
                 } else {
                     if (!StringUtils.isBlank(configuredWithReadme.message())) {
-                        boolean match = new StringContains(configuredWithReadme.message())
+                        boolean match = new StringContains(false, configuredWithReadme.message())
                             .matches(t.getMessage());
                         if (!match) {
                             throw new AssertionError(

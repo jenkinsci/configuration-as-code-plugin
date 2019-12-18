@@ -20,6 +20,12 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.hamcrest</groupId>
+          <artifactId>hamcrest-core</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>io.jenkins</groupId>
