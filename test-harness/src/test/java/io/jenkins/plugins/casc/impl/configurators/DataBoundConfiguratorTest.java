@@ -264,6 +264,22 @@ public class DataBoundConfiguratorTest {
         assertNotInLog(logging, "mySecretValue");
     }
 
+    @Test
+    public void shouldExportArray() throws Exception {
+        ArrayConstructor obj = new ArrayConstructor(new Foo[]{new Foo("", false, 0)});
+
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+
+        final Configurator c = registry.lookupOrFail(ArrayConstructor.class);
+        final ConfigurationContext context = new ConfigurationContext(registry);
+        CNode node = c.describe(obj, context);
+
+        assertNotNull(node);
+        assertTrue(node instanceof Mapping);
+        Mapping map = (Mapping) node;
+        assertEquals(map.get("anArray").toString(), "[{qix=0, bar=false, foo=}]");
+    }
+
     public static class Foo {
 
         final String foo;
@@ -360,6 +376,15 @@ public class DataBoundConfiguratorTest {
         @DataBoundConstructor
         public SecretHolderWithString(String secret) {
             this.secret = Secret.fromString(secret);
+        }
+    }
+
+    public static class ArrayConstructor {
+        private final Foo[] anArray;
+
+        @DataBoundConstructor
+        public ArrayConstructor(Foo[] anArray) {
+            this.anArray = anArray;
         }
     }
 }
