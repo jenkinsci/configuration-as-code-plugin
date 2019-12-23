@@ -109,7 +109,10 @@ public class PatchConfig {
     }
 
     private static void copy(URL src, URL target) throws IOException {
-        IOUtils.copy(src.openStream(), new FileOutputStream(target.getFile()));
+        try (InputStream input = src.openStream();
+            OutputStream output = new FileOutputStream(target.getFile())) {
+            IOUtils.copy(input, output);
+        }
     }
 
     private static String jsonToYaml(InputStream input) throws IOException {
