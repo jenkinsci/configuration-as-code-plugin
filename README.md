@@ -136,6 +136,7 @@ You can find more documentation about JCasC here:
 - [Exporting configurations](./docs/features/configExport.md)
 - [Validating configurations](./docs/features/jsonSchema.md)
 - [Triggering Configuration Reload](./docs/features/configurationReload.md)
+- [Auto backup](./docs/features/auto-backup.md)
 
 The configuration file format depends on the version of jenkins-core and installed plugins.
 Documentation is generated from a live instance, as well as a JSON schema you can use to validate configuration file
