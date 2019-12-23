@@ -29,7 +29,7 @@
 
   <name>Configuration as Code Parent</name>
   <description>The Configuration as Code plugin has been designed as an opinionated way to configure Jenkins based on human-readable declarative configuration files</description>
-  <url>https://github.com/jenkinsci/configuration-as-code-plugin</url>
+  <url>https://github.com/alauda/configuration-as-code-plugin</url>
 
   <licenses>
     <license>
@@ -37,6 +37,17 @@
       <url>http://opensource.org/licenses/MIT</url>
     </license>
   </licenses>
+
+  <distributionManagement>
+    <repository>
+      <id>${releases.id}</id>
+      <url>${releases.url}</url>
+    </repository>
+    <snapshotRepository>
+      <id>${snapshots.id}</id>
+      <url>${snapshots.url}</url>
+    </snapshotRepository>
+  </distributionManagement>
 
   <scm>
     <connection>scm:git:git://github.com/jenkinsci/configuration-as-code-plugin.git</connection>
@@ -49,6 +60,20 @@
     <repository>
       <id>repo.jenkins-ci.org</id>
       <url>https://repo.jenkins-ci.org/public/</url>
+    </repository>
+    <repository>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>nexus-oss-snapshots</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+    </repository>
+    <repository>
+      <id>release</id>
+      <url>https://oss.sonatype.org/content/repositories/releases</url>
     </repository>
   </repositories>
   <pluginRepositories>
@@ -98,5 +123,33 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>incrementals</id>
+      <properties>
+        <snapshots.url>https://nexus.acp.alauda.cn/repository/maven-snapshots/</snapshots.url>
+        <releases.id>nexus.acp.alauda.cn</releases.id>
+        <snapshots.id>nexus.acp.alauda.cn</snapshots.id>
+        <snapshots.name>nexus.acp.alauda.cn</snapshots.name>
+        <releases.url>https://nexus.acp.alauda.cn/repository/maven-incrementals/</releases.url>
+        <releases.name>nexus.acp.alauda.cn</releases.name>
+      </properties>
+    </profile>
+    <profile>
+      <id>release</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <snapshots.url>https://nexus.acp.alauda.cn/repository/maven-snapshots/</snapshots.url>
+        <releases.id>nexus.acp.alauda.cn</releases.id>
+        <snapshots.id>nexus.acp.alauda.cn</snapshots.id>
+        <snapshots.name>nexus.acp.alauda.cn</snapshots.name>
+        <releases.url>https://nexus.acp.alauda.cn/repository/maven-releases/</releases.url>
+        <releases.name>nexus.acp.alauda.cn</releases.name>
+      </properties>
+    </profile>
+  </profiles>
 
 </project>
