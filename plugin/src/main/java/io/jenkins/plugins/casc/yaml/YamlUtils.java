@@ -103,11 +103,11 @@ public final class YamlUtils {
      * Load configuration-as-code model from a set of Yaml sources, merging documents
      */
     public static Mapping loadFrom(List<YamlSource> sources) throws ConfiguratorException {
-        if (sources.isEmpty()) return Mapping.EMPTY;
+        if (sources.isEmpty()) return Mapping.getEmpty();
         final Node merged = merge(sources);
         if (merged == null) {
             LOGGER.warning("configuration-as-code yaml source returned an empty document.");
-            return Mapping.EMPTY;
+            return Mapping.getEmpty();
         }
         return loadFrom(merged);
     }

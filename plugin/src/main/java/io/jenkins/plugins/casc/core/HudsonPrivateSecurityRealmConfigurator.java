@@ -29,7 +29,7 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
     private static final Logger logger = Logger.getLogger(HudsonPrivateSecurityRealmConfigurator.class.getName());
     private static final VersionNumber MIN_VERSION_FOR_HASHED_PASSWORDS = new VersionNumber("2.161");
     /// matches HudsonPrivateSecurityRealm.JBCRYPT_HEADER
-    private static final String HASHED_PASSWORD_PREFIX = "#jbcrypt:";
+    private static final String HASHED_PASSWORD_PREFIX = "#jbcrypt:"; // Noncompliant
 
     public HudsonPrivateSecurityRealmConfigurator() {
         super(HudsonPrivateSecurityRealm.class);
