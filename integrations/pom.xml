@@ -635,9 +635,15 @@
 
   <build>
     <resources>
-       <resource>
-         <directory>../demos</directory>
-       </resource>
+      <resource>
+        <directory>../demos</directory>
+      </resource>
+      <resource>
+        <directory>../.</directory>
+        <includes>
+          <include>README.md</include>
+        </includes>
+      </resource>
     </resources>
   </build>
 </project>
