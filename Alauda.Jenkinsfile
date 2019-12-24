@@ -92,7 +92,12 @@ pipeline {
 			steps{
 				container("tools"){
 					script{
-						deploy.scan().startACPSonar(null, "-D sonar.projectVersion=${RELEASE_VERSION}")
+					  if(env.BRANCH_NAME == "alauda"){
+					    env.BRANCH_NAME = "master"
+						  deploy.scan().startACPSonar(null, "-D sonar.projectVersion=${RELEASE_VERSION}")
+					  } else {
+					    env.BRANCH_NAME = "alauda"
+					  }
 					}
 				}
 			}
