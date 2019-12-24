@@ -15,7 +15,7 @@ credentials:
           id: checkmarx_credential
           description: "login/pwd for checkmarx"
           username: jenkins_checkmarx
-          password: "StrongPassword"
+          password: "${CHECKMARX_PASSWORD}"
 
 unclassified:
   cxscanbuilder:
