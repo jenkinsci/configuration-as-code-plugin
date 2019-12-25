@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletContext;
@@ -77,11 +78,11 @@ public class PatchConfig {
                 ObjectMapper jsonReader = new ObjectMapper();
                 JsonNode target = JsonPatch.apply(patch, jsonReader.readTree(yamlToJson(newSystemInput)));
 
-                String userYaml = jsonToYaml(new ByteArrayInputStream(target.toString().getBytes()));
+                String userYaml = jsonToYaml(new ByteArrayInputStream(target.toString().getBytes(StandardCharsets.UTF_8)));
 
-                userFileOutput.write(userYaml.getBytes());
-                patchFileOutput.write(patch.toString().getBytes());
-            } catch (Exception e) {
+                userFileOutput.write(userYaml.getBytes(StandardCharsets.UTF_8));
+                patchFileOutput.write(patch.toString().getBytes(StandardCharsets.UTF_8));
+            } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, "error happen when copy the new system config", e);
             }
         } else {
