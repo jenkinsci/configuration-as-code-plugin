@@ -124,32 +124,4 @@
     </plugins>
   </build>
 
-  <profiles>
-    <profile>
-      <id>incrementals</id>
-      <properties>
-        <snapshots.url>https://nexus.acp.alauda.cn/repository/maven-snapshots/</snapshots.url>
-        <releases.id>nexus.acp.alauda.cn</releases.id>
-        <snapshots.id>nexus.acp.alauda.cn</snapshots.id>
-        <snapshots.name>nexus.acp.alauda.cn</snapshots.name>
-        <releases.url>https://nexus.acp.alauda.cn/repository/maven-incrementals/</releases.url>
-        <releases.name>nexus.acp.alauda.cn</releases.name>
-      </properties>
-    </profile>
-    <profile>
-      <id>release</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <properties>
-        <snapshots.url>https://nexus.acp.alauda.cn/repository/maven-snapshots/</snapshots.url>
-        <releases.id>nexus.acp.alauda.cn</releases.id>
-        <snapshots.id>nexus.acp.alauda.cn</snapshots.id>
-        <snapshots.name>nexus.acp.alauda.cn</snapshots.name>
-        <releases.url>https://nexus.acp.alauda.cn/repository/maven-releases/</releases.url>
-        <releases.name>nexus.acp.alauda.cn</releases.name>
-      </properties>
-    </profile>
-  </profiles>
-
 </project>
