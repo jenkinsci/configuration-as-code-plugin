@@ -10,6 +10,7 @@ import java.util.HashMap;
 public final class Mapping extends HashMap<String, CNode> implements CNode {
 
     // Deprecated by PR #1240
+    @Deprecated
     public static final Mapping EMPTY = new Mapping();
     private Source source;
 
