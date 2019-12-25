@@ -94,23 +94,25 @@ public final class Scalar implements CNode, CharSequence {
     /**
      * Sets the sensitive flag.
      * It indicates that the scalar represents a sensitive argument (secret or other restricted data).
+     * Sensitive flag cannot be reset to {@code false}.
      * @param sensitive value to set
      * @return Object instance
      * @since 1.25
      */
     public Scalar sensitive(boolean sensitive) {
-        this.sensitive = sensitive;
+        this.sensitive = this.sensitive || sensitive;
         return this;
     }
 
     /**
      * Indicates that the data is encrypted and hence safe to be exported.
+     * Encrypted flag cannot be reset to {@code false}.
      * @param encrypted Value to set
      * @return Object instance
      * @since 1.25
      */
     public Scalar encrypted(boolean encrypted) {
-        this.encrypted = encrypted;
+        this.encrypted = this.encrypted || encrypted;
         return this;
     }
 

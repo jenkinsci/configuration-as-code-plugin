@@ -58,7 +58,7 @@ public class ProxyConfigurator extends BaseConfigurator<ProxyConfiguration> {
                         .getter(ProxyConfiguration::getUserName)
                         .setter(noop()),
                 new Attribute<ProxyConfiguration, String>("password", String.class)
-                        .getter(ProxyConfiguration::getEncryptedPassword)
+                        .getter(ProxyPasswordGetter.INSTANCE)
                         .setter(noop()),
                 new Attribute<ProxyConfiguration, String>("noProxyHost", String.class)
                         .getter(config -> config.noProxyHost)
@@ -126,6 +126,21 @@ public class ProxyConfigurator extends BaseConfigurator<ProxyConfiguration> {
         @DataBoundSetter
         public void setTestUrl(String testUrl) {
             this.testUrl = testUrl;
+        }
+    }
+
+    static class ProxyPasswordGetter implements Attribute.Getter<ProxyConfiguration, String> {
+
+        private static final ProxyPasswordGetter INSTANCE = new ProxyPasswordGetter();
+
+        @Override
+        public String getValue(ProxyConfiguration target) throws Exception {
+            return target.getEncryptedPassword();
+        }
+
+        @Override
+        public boolean encrypted() {
+            return true;
         }
     }
 }

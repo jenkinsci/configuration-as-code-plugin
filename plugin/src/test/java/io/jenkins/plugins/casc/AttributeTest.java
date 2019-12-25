@@ -41,6 +41,7 @@ public class AttributeTest {
         assertFieldIsSecret(SecretFromPublicField.class, "secretField");
         assertFieldIsSecret(SecretFromPrivateField.class, "secretField");
 
+        assertFieldIsSecret(SecretFromImpliedAttributeName.class, "password");
         assertFieldIsSecret(SecretRenamedFieldFithSecretConstructor.class, "mySecretValueField");
     }
 
@@ -61,12 +62,33 @@ public class AttributeTest {
         assertFieldIsSecret(SecretFromPublicField2.class, "secretField");
         assertFieldIsSecret(SecretFromPrivateField2.class, "secretField");
         assertFieldIsSecret(SecretFromPrivateField3.class, "secretField");
+
+        assertFieldIsSecret(SecretFromImpliedAttributeName2.class, "password");
     }
 
     @Test
     @Issue("SECURITY-1279")
     public void checkNonSecretPatterns() {
         assertFieldIsNotSecret(NonSecretField.class, "passwordPath");
+    }
+
+    @Test
+    public void shouldConsiderSuffixes() {
+        assertFieldIsSecret(null, "secretKey");
+        assertFieldIsSecret(null, "mySecretKey");
+        assertFieldIsSecret(null, "myPwd");
+        assertFieldIsSecret(null, "superSecretPassword");
+
+        // Examples of false positives
+        assertFieldIsSecret(null, "pathToSecretKey");
+        assertFieldIsSecret(null, "foretoken"); // https://en.wiktionary.org/wiki/foretoken
+    }
+
+    @Test
+    public void shouldNotConsiderSuffixesInTheMiddle() {
+        assertFieldIsNotSecret(null, "passwordPath");
+        assertFieldIsNotSecret(null, "passwordFile");
+        assertFieldIsNotSecret(null, "tokenSource");
     }
 
     public static void assertFieldIsSecret(Class<?> clazz, String fieldName) {
@@ -156,6 +178,24 @@ public class AttributeTest {
     public static class SecretFromPrivateField3 extends SecretFromPrivateField2 {
         public SecretFromPrivateField3(String secret) {
             super(secret);
+        }
+    }
+
+    public static class SecretFromImpliedAttributeName {
+
+        public String password;
+
+        @DataBoundConstructor
+        public SecretFromImpliedAttributeName(String password) {
+            this.password = password;
+        }
+    }
+
+    public static class SecretFromImpliedAttributeName2 extends SecretFromImpliedAttributeName {
+
+        @DataBoundConstructor
+        public SecretFromImpliedAttributeName2(String password) {
+            super(password);
         }
     }
 
