@@ -263,7 +263,7 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
     @NonNull
     @Override
     public T configure(CNode c, ConfigurationContext context) throws ConfiguratorException {
-        final Mapping mapping = (c != null ? c.asMapping() : Mapping.getEmpty());
+        final Mapping mapping = (c != null ? c.asMapping() : Mapping.empty());
         final T instance = instance(mapping, context);
         if (instance instanceof Saveable) {
             try (BulkChange bc = new BulkChange((Saveable) instance) ){
@@ -282,7 +282,7 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
 
     @Override
     public T check(CNode c, ConfigurationContext context) throws ConfiguratorException {
-        final Mapping mapping = (c != null ? c.asMapping() : Mapping.getEmpty());
+        final Mapping mapping = (c != null ? c.asMapping() : Mapping.empty());
         final T instance = instance(mapping, context);
         configure(mapping, instance, true, context);
         return instance;

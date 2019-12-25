@@ -9,6 +9,8 @@ import java.util.HashMap;
 
 public final class Mapping extends HashMap<String, CNode> implements CNode {
 
+    // Deprecated by PR #1240
+    public static final Mapping EMPTY = new Mapping();
     private Source source;
 
     public Mapping() {
@@ -74,7 +76,7 @@ public final class Mapping extends HashMap<String, CNode> implements CNode {
         return clone;
     }
 
-    public static Mapping getEmpty() {
+    public static Mapping empty() {
         return new Mapping();
     }
 }
