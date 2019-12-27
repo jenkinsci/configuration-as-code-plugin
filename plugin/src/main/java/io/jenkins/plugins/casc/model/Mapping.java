@@ -12,7 +12,6 @@ public final class Mapping extends HashMap<String, CNode> implements CNode {
     /**
      * @deprecated replaced by {@link #empty()}
      */
-    @Deprecated
     public static final Mapping EMPTY = new Mapping();
     private Source source;
 
