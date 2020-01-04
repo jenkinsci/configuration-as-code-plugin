@@ -29,6 +29,7 @@ import static com.gargoylesoftware.htmlunit.HttpMethod.POST;
 import static io.jenkins.plugins.casc.ConfigurationAsCode.CASC_JENKINS_CONFIG_PROPERTY;
 import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
 import static io.jenkins.plugins.casc.misc.Util.toYamlString;
+import java.util.Arrays;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
@@ -86,7 +87,7 @@ public class ConfigurationAsCodeTest {
 
         assertThat(casc.configs(exactFile.getAbsolutePath()), hasSize(1));
         final List<Path> foo = casc.configs(tempFolder.getRoot().getAbsolutePath());
-        assertThat(foo, hasSize(6));
+        assertThat("failed to find 6 configs in " + Arrays.toString(tempFolder.getRoot().list()), foo, hasSize(6));
     }
 
     @Test
@@ -99,7 +100,7 @@ public class ConfigurationAsCodeTest {
         tempFolder.newFile("z.yaml");
 
         final List<Path> foo = casc.configs(tempFolder.getRoot().getAbsolutePath());
-        assertThat(foo, hasSize(4));
+        assertThat("failed to find 4 configs in " + Arrays.toString(tempFolder.getRoot().list()), foo, hasSize(4));
         assertTrue(foo.get(0).endsWith("0.yaml"));
         assertTrue(foo.get(1).endsWith("1.yaml"));
         assertTrue(foo.get(2).endsWith("a.yaml"));
