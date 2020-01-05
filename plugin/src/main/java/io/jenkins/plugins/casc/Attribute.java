@@ -310,7 +310,7 @@ public class Attribute<Owner, Type> {
                 + printThrowable(e));
         }
     }
-    
+
     /**
      * Describes a node.
      * @param c Configurator
