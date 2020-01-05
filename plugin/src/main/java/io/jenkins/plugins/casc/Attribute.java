@@ -235,16 +235,9 @@ public class Attribute<Owner, Type> {
         }
         try {
             Object o;
-            if(isJsonSchema) {
-                 o = getType();
-                if (o == null) {
-                    return null;
-                }
-            } else {
-                 o = getValue(instance);
-                if (o == null) {
-                    return null;
-                }
+            o = getValue(instance);
+            if (o == null) {
+                return null;
             }
 
             // In Export we sensitive only those values which do not get rendered as secrets
@@ -270,14 +263,13 @@ public class Attribute<Owner, Type> {
         }
     }
 
-
     /**
      * This function is for the JSONSchemaGeneration
      * @param instance Owner Instance
      * @param context Context to be passed
      * @return CNode object describing the structure of the node
      */
-    public CNode describeStructure(Owner instance, ConfigurationContext context) {
+    public CNode describeForSchema(Owner instance, ConfigurationContext context) {
 
         final Configurator c = context.lookup(type);
         if (c == null) {
@@ -288,6 +280,11 @@ public class Attribute<Owner, Type> {
             Object o = new Object();
             if(isJsonSchema) {
                 o = getType();
+                if (o == null) {
+                    return null;
+                }
+            } else {
+                o = getValue(instance);
                 if (o == null) {
                     return null;
                 }
@@ -313,8 +310,7 @@ public class Attribute<Owner, Type> {
                 + printThrowable(e));
         }
     }
-
-
+    
     /**
      * Describes a node.
      * @param c Configurator

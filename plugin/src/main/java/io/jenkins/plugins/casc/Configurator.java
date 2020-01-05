@@ -176,7 +176,7 @@ public interface Configurator<T> {
             if(context.getMode().equals("JSONSchema")) {
                 attribute.setJsonSchema(true);
             }
-            CNode value = attribute.describeStructure(instance, context);
+            CNode value = attribute.describeForSchema(instance, context);
             if (value != null) {
                 mapping.put(attribute.getName(), attribute.getType().getSimpleName());
             }
