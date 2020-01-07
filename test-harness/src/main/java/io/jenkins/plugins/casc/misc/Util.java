@@ -290,4 +290,18 @@ public class Util {
         String yamlStringContents = toStringFromYamlFile(clazz, yamlFileName);
         return new JSONObject(new JSONTokener(convertToJson(yamlStringContents)));
     }
+
+    /**
+     * Converts a YAML string into a json object
+     * <p>Example Usage:</p>
+     * <pre>{@code
+     *  JSONObject jsonObject = convertYamlStringToJsonObject(yamlString);}
+     * </pre>
+     *
+     * @param yamlString the yaml string that needs to be converted
+     * @return JSONObject pertaining to that yaml string.
+     */
+    public static JSONObject convertYamlStringToJsonObject(String yamlString) {
+        return new JSONObject(new JSONTokener(convertToJson(yamlString)));
+    }
 }

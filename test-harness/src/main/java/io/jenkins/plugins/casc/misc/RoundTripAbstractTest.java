@@ -23,6 +23,7 @@ import org.jvnet.hudson.test.RestartableJenkinsRule;
 
 import static com.gargoylesoftware.htmlunit.HttpMethod.POST;
 import static io.jenkins.plugins.casc.misc.Util.convertToJson;
+import static io.jenkins.plugins.casc.misc.Util.convertYamlStringToJsonObject;
 import static io.jenkins.plugins.casc.misc.Util.validateSchema;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -112,7 +113,7 @@ public abstract class RoundTripAbstractTest {
             assertConfigViaWebUI(jenkinsConf);
 
             //Validate Schema before application
-            assertThat(validateSchema(new JSONObject(new JSONTokener(convertToJson(resourceContent)))), empty());
+            assertThat(validateSchema(convertYamlStringToJsonObject(resourceContent)), empty());
 
             // Apply configuration via Web UI
             applyConfigViaWebUI(jenkinsConf);
