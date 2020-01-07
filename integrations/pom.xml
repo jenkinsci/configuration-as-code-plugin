@@ -251,6 +251,19 @@
     </dependency>
 
     <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>terraform</artifactId>
+      <version>1.0.9</version>
+      <scope>test</scope>
+      <exclusions> <!-- Exclude Banned Dependency -->
+        <exclusion>
+          <groupId>javax.servlet</groupId>
+          <artifactId>servlet-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-cps-global-lib</artifactId>
       <scope>test</scope>
@@ -622,9 +635,15 @@
 
   <build>
     <resources>
-       <resource>
-         <directory>../demos</directory>
-       </resource>
+      <resource>
+        <directory>../demos</directory>
+      </resource>
+      <resource>
+        <directory>../.</directory>
+        <includes>
+          <include>README.md</include>
+        </includes>
+      </resource>
     </resources>
   </build>
 </project>

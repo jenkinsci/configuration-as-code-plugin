@@ -7,9 +7,10 @@ metadata:
   name: jenkins-configuration-as-code
 data:
   configuration-as-code.yaml: |
-    jenkins:
+    unclassified:
       location:
         url: http://jenkins/
+    jenkins:
       clouds:
         - kubernetes:
             name: "advanced-k8s-config"
