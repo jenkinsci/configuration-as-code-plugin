@@ -269,7 +269,7 @@ public class Attribute<Owner, Type> {
      * @param context Context to be passed
      * @return CNode object describing the structure of the node
      */
-    public CNode describeForSchema(Owner instance, ConfigurationContext context) {
+    public CNode describeForSchema (Owner instance, ConfigurationContext context) {
 
         final Configurator c = context.lookup(type);
         if (c == null) {
@@ -287,7 +287,7 @@ public class Attribute<Owner, Type> {
             boolean shouldBeMasked = isSecret(instance);
             if (multiple) {
                 Sequence seq = new Sequence();
-                if (o.getClass().isArray()) o = Arrays.asList((Object[]) o);
+                if (o.getClass().isArray()) o = Arrays.asList(o);
                 if(o instanceof Iterable) {
                     for (Object value : (Iterable) o) {
                         seq.add(_describe(c, context, value, shouldBeMasked));
