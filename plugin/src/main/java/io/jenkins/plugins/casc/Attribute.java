@@ -277,17 +277,10 @@ public class Attribute<Owner, Type> {
                 ": No configurator found for type " + type);
         }
         try {
-            Object o = new Object();
-            if(isJsonSchema) {
-                o = getType();
-                if (o == null) {
-                    return null;
-                }
-            } else {
-                o = getValue(instance);
-                if (o == null) {
-                    return null;
-                }
+            Object o;
+            o = getType();
+            if (o == null) {
+                return null;
             }
 
             // In Export we sensitive only those values which do not get rendered as secrets
