@@ -12,8 +12,6 @@ import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.logging.Level;
 import org.apache.commons.io.IOUtils;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -22,7 +20,6 @@ import org.jvnet.hudson.test.LoggerRule;
 import org.jvnet.hudson.test.RestartableJenkinsRule;
 
 import static com.gargoylesoftware.htmlunit.HttpMethod.POST;
-import static io.jenkins.plugins.casc.misc.Util.convertToJson;
 import static io.jenkins.plugins.casc.misc.Util.convertYamlStringToJsonObject;
 import static io.jenkins.plugins.casc.misc.Util.validateSchema;
 import static org.hamcrest.MatcherAssert.assertThat;
