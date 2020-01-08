@@ -234,8 +234,7 @@ public class Attribute<Owner, Type> {
                     ": No configurator found for type " + type);
         }
         try {
-            Object o;
-            o = getValue(instance);
+            Object o = getValue(instance);
             if (o == null) {
                 return null;
             }
@@ -270,15 +269,13 @@ public class Attribute<Owner, Type> {
      * @return CNode object describing the structure of the node
      */
     public CNode describeForSchema (Owner instance, ConfigurationContext context) {
-
         final Configurator c = context.lookup(type);
         if (c == null) {
             return new Scalar("FAILED TO EXPORT\n" + instance.getClass().getName()+"#"+name +
                 ": No configurator found for type " + type);
         }
         try {
-            Object o;
-            o = getType();
+            Object o = getType();
             if (o == null) {
                 return null;
             }
