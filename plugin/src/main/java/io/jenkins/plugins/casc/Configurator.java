@@ -168,6 +168,12 @@ public interface Configurator<T> {
         return mapping;
     }
 
+    /**
+     * Describe Structure of the attributes, as required by the schema.
+     * @param instance
+     * @param context
+     * @return CNode describing the attributes.
+     */
     @CheckForNull
     default CNode describeStructure(T instance, ConfigurationContext context)
         throws Exception {
