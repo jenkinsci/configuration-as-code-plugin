@@ -25,11 +25,14 @@ jobs:
           jenkins-version: '2.60.3'
 
     steps:
+
     - uses: actions/checkout@v1
+
     - name: Set up JDK ${{ matrix.java }}
       uses: actions/setup-java@v1
       with:
         java-version: ${{ matrix.java }}
+
     - name: Cache dependencies
       uses: actions/cache@v1
       with:
@@ -37,6 +40,7 @@ jobs:
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
           ${{ runner.os }}-maven
+
     - name: Build with Maven
       env:
         CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
