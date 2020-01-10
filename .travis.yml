@@ -10,35 +10,19 @@ if: |
 services:
   - docker
 
-before_cache:
-  - rm -rf $HOME/.m2/repository/io/jenkins/configuration-as-code*
-
 cache:
   directories:
     - $HOME/.m2
 
-env:
-  global:
-    - JAVA_LEVEL=8
+jdk: openjdk11
 
-matrix:
-  include:
-    - jdk: openjdk11
-      env:
-        - MVN_FLAG='-Djenkins.version=2.176.3 -Daccess-modifier-checker.failOnError=true'
-    - jdk: openjdk8
-      env:
-        - MVN_FLAG='-Djenkins.version=2.176.3 -Daccess-modifier-checker.failOnError=true'
-    - jdk: openjdk8
-
-install:
-  - mvn clean install -DskipTests=true -Dmaven.javadoc.skip=true -B -V $MVN_FLAG -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+install: skip
 
 script:
   - |
-    mvn -Penable-jacoco clean install jacoco:report -B \
-      -Djava.level=$JAVA_LEVEL \
-      $MVN_FLAG -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+    mvn -Penable-jacoco clean package jacoco:report -B -V \
+      -Djenkins.version=2.176.3 -Daccess-modifier-checker.failOnError=true \
+      --no-transfer-progress
 
 after_success:
   - bash <(curl -s https://codecov.io/bash) -f "*jacoco.xml"
