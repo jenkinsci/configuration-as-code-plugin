@@ -180,7 +180,7 @@ public interface Configurator<T> {
         throws Exception {
         Mapping mapping = new Mapping();
         for (Attribute attribute : getAttributes()) {
-            if(context.getMode().equals("JSONSchema")) {
+            if (context.getMode().equals("JSONSchema")) {
                 attribute.setJsonSchema(true);
             }
             CNode value = attribute.describeForSchema(instance, context);
