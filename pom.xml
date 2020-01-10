@@ -17,6 +17,7 @@
     <module>plugin</module>
     <module>integrations</module>
     <module>test-harness</module>
+    <module>report</module>
   </modules>
 
   <properties>
