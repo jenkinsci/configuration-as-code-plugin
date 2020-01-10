@@ -285,7 +285,7 @@ public class Attribute<Owner, Type> {
             if (multiple) {
                 Sequence seq = new Sequence();
                 if (o.getClass().isArray()) o = Arrays.asList(o);
-                if(o instanceof Iterable) {
+                if (o instanceof Iterable) {
                     for (Object value : (Iterable) o) {
                         seq.add(_describe(c, context, value, shouldBeMasked));
                     }
