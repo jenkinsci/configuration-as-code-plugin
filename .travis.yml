@@ -1,6 +1,6 @@
 language: java
 
-dist: xenial
+dist: bionic
 
 if: |
   repo != jenkinsci/configuration-as-code-plugin OR \
@@ -41,10 +41,7 @@ script:
       $MVN_FLAG -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
 
 after_success:
-  - export LATEST_VERSION="$(curl -Ls https://api.bintray.com/packages/codacy/Binaries/codacy-coverage-reporter/versions/_latest | jq -r .name)"
-  - curl -Ls -o codacy-coverage-reporter "https://dl.bintray.com/codacy/Binaries/$LATEST_VERSION/codacy-coverage-reporter-linux"
-  - chmod +x codacy-coverage-reporter
-  - ./codacy-coverage-reporter report -l Java -r report/target/site/jacoco-aggregate/jacoco.xml
+  - bash <(curl -s https://codecov.io/bash) -f "*jacoco.xml"
 
 notifications:
   email: false
