@@ -43,6 +43,6 @@ jobs:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       shell: bash
       run: |
-        mvn -P enable-jacoco clean install jacoco:report -B -V --no-transfer-progress ${{ matrix.flags }}
+        mvn -P enable-jacoco clean package jacoco:report -B -V --no-transfer-progress ${{ matrix.flags }}
         bash <(curl -Ls https://coverage.codacy.com/get.sh) report -l Java -r report/target/site/jacoco-aggregate/jacoco.xml
         bash <(curl -s https://codecov.io/bash) -f report/target/site/jacoco-aggregate/jacoco.xml
