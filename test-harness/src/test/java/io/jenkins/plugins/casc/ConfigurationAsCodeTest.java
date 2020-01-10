@@ -17,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.Assume;
 import org.junit.Rule;
@@ -86,7 +87,7 @@ public class ConfigurationAsCodeTest {
 
         assertThat(casc.configs(exactFile.getAbsolutePath()), hasSize(1));
         final List<Path> foo = casc.configs(tempFolder.getRoot().getAbsolutePath());
-        assertThat(foo, hasSize(6));
+        assertThat("failed to find 6 configs in " + Arrays.toString(tempFolder.getRoot().list()), foo, hasSize(6));
     }
 
     @Test
@@ -99,7 +100,7 @@ public class ConfigurationAsCodeTest {
         tempFolder.newFile("z.yaml");
 
         final List<Path> foo = casc.configs(tempFolder.getRoot().getAbsolutePath());
-        assertThat(foo, hasSize(4));
+        assertThat("failed to find 4 configs in " + Arrays.toString(tempFolder.getRoot().list()), foo, hasSize(4));
         assertTrue(foo.get(0).endsWith("0.yaml"));
         assertTrue(foo.get(1).endsWith("1.yaml"));
         assertTrue(foo.get(2).endsWith("a.yaml"));
