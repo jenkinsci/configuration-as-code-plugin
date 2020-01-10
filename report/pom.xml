@@ -10,7 +10,7 @@
     <version>${revision}${changelist}</version>
   </parent>
 
-  <artifactId>report</artifactId>
+  <artifactId>report-aggregator</artifactId>
   <name>Aggregate Report</name>
 
   <properties>
