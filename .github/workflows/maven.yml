@@ -41,6 +41,7 @@ jobs:
       env:
         CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      shell: bash
       run: |
         mvn -P enable-jacoco clean install jacoco:report -B -V --no-transfer-progress ${{ matrix.flags }}
         bash <(curl -Ls https://coverage.codacy.com/get.sh) report -l Java -r report/target/site/jacoco-aggregate/jacoco.xml
