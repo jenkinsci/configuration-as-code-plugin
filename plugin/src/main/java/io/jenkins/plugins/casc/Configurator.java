@@ -172,6 +172,7 @@ public interface Configurator<T> {
      * Describe Structure of the attributes, as required by the schema.
      * @param instance
      * @param context
+     * @since 1.35
      * @return CNode describing the attributes.
      */
     @CheckForNull
