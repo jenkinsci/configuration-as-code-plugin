@@ -144,7 +144,7 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
      * Then we go through all the descriptors and find ones compliant with the target.
      * @return Stream of descriptors which match the target
      */
-    private Stream<Descriptor<T>> getDescriptors() {
+     private Stream<Descriptor<T>> getDescriptors() {
         DescriptorExtensionList<T, Descriptor<T>> descriptorList = Jenkins.getInstance().getDescriptorList(target);
         if (!descriptorList.isEmpty()) { // fast fetch for root objects
             return Stream.ofAll(descriptorList);
