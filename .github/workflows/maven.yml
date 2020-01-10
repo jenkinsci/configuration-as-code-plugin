@@ -42,11 +42,14 @@ jobs:
           ${{ runner.os }}-maven
 
     - name: Build with Maven
-      env:
-        CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      run: mvn -P enable-jacoco clean package jacoco:report -B -V --no-transfer-progress ${{ matrix.flags }}
+
+    - name: Report coverage
       shell: bash
       run: |
-        mvn -P enable-jacoco clean package jacoco:report -B -V --no-transfer-progress ${{ matrix.flags }}
-        bash <(curl -Ls https://coverage.codacy.com/get.sh) report -l Java -r report/target/site/jacoco-aggregate/jacoco.xml
-        bash <(curl -s https://codecov.io/bash) -f report/target/site/jacoco-aggregate/jacoco.xml
+        if [ "${{ secrets.CODACY_PROJECT_TOKEN }}" != "" ] && [ "${{ secrets.CODECOV_TOKEN }}" != "" ]; then
+          bash <(curl -Ls https://coverage.codacy.com/get.sh) report -l Java -r report/target/site/jacoco-aggregate/jacoco.xml -t ${{ secrets.CODACY_PROJECT_TOKEN }}
+          bash <(curl -s https://codecov.io/bash) -f report/target/site/jacoco-aggregate/jacoco.xml -t ${{ secrets.CODECOV_TOKEN }}
+        else
+          echo "No secrets provided for coverage report"
+        fi
