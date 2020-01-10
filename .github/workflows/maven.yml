@@ -54,6 +54,7 @@ jobs:
           bash <(curl -s https://codecov.io/bash) -f "*jacoco.xml"
           bash <(curl -Ls https://coverage.codacy.com/get.sh) report -l Java -r plugin/target/site/jacoco/jacoco.xml --partial
           bash <(curl -Ls https://coverage.codacy.com/get.sh) report -l Java -r test-harness/target/site/jacoco/jacoco.xml --partial
+          bash <(curl -Ls https://coverage.codacy.com/get.sh) report -l Java -r report/target/site/jacoco-aggregate/jacoco.xml --partial
           bash <(curl -Ls https://coverage.codacy.com/get.sh) final
         else
           echo "No secrets provided for coverage report"
