@@ -314,7 +314,7 @@ public class Attribute<Owner, Type> {
     private CNode _describe(Configurator c, ConfigurationContext context, Object value, boolean shouldBeMasked)
             throws Exception {
         CNode node;
-        if(isJsonSchema) {
+        if (isJsonSchema) {
             node = c.describeStructure(value, context);
         } else {
             node = c.describe(value, context);
