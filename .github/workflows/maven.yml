@@ -48,8 +48,13 @@ jobs:
       shell: bash
       run: |
         if [ "${{ secrets.CODACY_PROJECT_TOKEN }}" != "" ] && [ "${{ secrets.CODECOV_TOKEN }}" != "" ]; then
-          bash <(curl -Ls https://coverage.codacy.com/get.sh) report -l Java -r report/target/site/jacoco-aggregate/jacoco.xml -t ${{ secrets.CODACY_PROJECT_TOKEN }}
-          bash <(curl -s https://codecov.io/bash) -f report/target/site/jacoco-aggregate/jacoco.xml -t ${{ secrets.CODECOV_TOKEN }}
+          report=$(find . -type f -wholename '.*/jacoco-aggregate/jacoco.xml')
+          if [ ! -f "$report" ]; then
+            echo "Coverage report not found"
+            exit 1
+          fi
+          bash <(curl -Ls https://coverage.codacy.com/get.sh) report -l Java -r $report -t ${{ secrets.CODACY_PROJECT_TOKEN }}
+          bash <(curl -s https://codecov.io/bash) -f $report -t ${{ secrets.CODECOV_TOKEN }}
         else
           echo "No secrets provided for coverage report"
         fi
