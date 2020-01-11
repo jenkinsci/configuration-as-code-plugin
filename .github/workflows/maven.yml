@@ -1,6 +1,12 @@
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
   build:
@@ -8,7 +14,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        java: [1.8, 11]
+        java: [8, 11]
         jenkins-version: [2.60.3, 2.176.3]
         os: [ubuntu-latest, windows-latest]
         include:
@@ -19,11 +25,34 @@ jobs:
           jenkins-version: '2.60.3'
 
     steps:
+
     - uses: actions/checkout@v1
+
     - name: Set up JDK ${{ matrix.java }}
       uses: actions/setup-java@v1
       with:
         java-version: ${{ matrix.java }}
+
+    - name: Cache dependencies
+      uses: actions/cache@v1
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven
+
     - name: Build with Maven
+      run: mvn -Pjacoco clean verify -B -V --no-transfer-progress ${{ matrix.flags }}
+
+    - name: Report coverage
+      shell: bash
+      env:
+        CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       run: |
-        mvn install -B -V --no-transfer-progress ${{ matrix.flags }}
+        if [ "$CODACY_PROJECT_TOKEN" != "" ] && [ "$CODECOV_TOKEN" != "" ]; then
+          bash <(curl -s https://codecov.io/bash) -f "*jacoco.xml"
+          bash <(curl -Ls https://coverage.codacy.com/get.sh) report -l Java -r integrations/target/site/jacoco-aggregate/jacoco.xml
+        else
+          echo "No secrets provided for coverage report"
+        fi

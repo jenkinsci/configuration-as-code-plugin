@@ -1,6 +1,6 @@
 language: java
 
-dist: xenial
+dist: bionic
 
 if: |
   repo != jenkinsci/configuration-as-code-plugin OR \
@@ -10,41 +10,22 @@ if: |
 services:
   - docker
 
-before_cache:
-  - rm -rf $HOME/.m2/repository/io/jenkins/configuration-as-code*
-
 cache:
   directories:
     - $HOME/.m2
 
-env:
-  global:
-    - JAVA_LEVEL=8
+jdk: openjdk11
 
-matrix:
-  include:
-    - jdk: openjdk11
-      env:
-        - MVN_FLAG='-Djenkins.version=2.176.3 -Daccess-modifier-checker.failOnError=true'
-    - jdk: openjdk8
-      env:
-        - MVN_FLAG='-Djenkins.version=2.176.3 -Daccess-modifier-checker.failOnError=true'
-    - jdk: openjdk8
-
-install:
-  - mvn clean install -DskipTests=true -Dmaven.javadoc.skip=true -B -V $MVN_FLAG -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+install: skip
 
 script:
   - |
-    mvn -Penable-jacoco clean install jacoco:report -B \
-      -Djava.level=$JAVA_LEVEL \
-      $MVN_FLAG -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+    mvn -Pjacoco clean verify -B -V \
+      -Djenkins.version=2.176.3 -Daccess-modifier-checker.failOnError=true \
+      --no-transfer-progress
 
 after_success:
-  - export LATEST_VERSION="$(curl -Ls https://api.bintray.com/packages/codacy/Binaries/codacy-coverage-reporter/versions/_latest | jq -r .name)"
-  - curl -Ls -o codacy-coverage-reporter "https://dl.bintray.com/codacy/Binaries/$LATEST_VERSION/codacy-coverage-reporter-linux"
-  - chmod +x codacy-coverage-reporter
-  - ./codacy-coverage-reporter report -l Java -r plugin/target/site/jacoco/jacoco.xml
+  - bash <(curl -s https://codecov.io/bash) -f "*jacoco.xml"
 
 notifications:
   email: false

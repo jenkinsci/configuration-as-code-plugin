@@ -15,8 +15,8 @@
   <modules>
     <module>snakeyaml</module>
     <module>plugin</module>
-    <module>integrations</module>
     <module>test-harness</module>
+    <module>integrations</module>
   </modules>
 
   <properties>
@@ -98,5 +98,31 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>jacoco</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>prepare-agent</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <excludes>
+                <exclude>**/Messages.class</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>
