@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 
+
 /**
  * Define a {@link Configurator} which handles a configuration element, identified by name.
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -162,6 +163,29 @@ public interface Configurator<T> {
             CNode value = attribute.describe(instance, context);
             if (value != null) {
                 mapping.put(attribute.getName(), value);
+            }
+        }
+        return mapping;
+    }
+
+    /**
+     * Describe Structure of the attributes, as required by the schema.
+     * @param instance
+     * @param context
+     * @since 1.35
+     * @return CNode describing the attributes.
+     */
+    @CheckForNull
+    default CNode describeStructure(T instance, ConfigurationContext context)
+        throws Exception {
+        Mapping mapping = new Mapping();
+        for (Attribute attribute : getAttributes()) {
+            if (context.getMode().equals("JSONSchema")) {
+                attribute.setJsonSchema(true);
+            }
+            CNode value = attribute.describeForSchema(instance, context);
+            if (value != null) {
+                mapping.put(attribute.getName(), attribute.getType().getSimpleName());
             }
         }
         return mapping;

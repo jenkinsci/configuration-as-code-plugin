@@ -1,0 +1,8 @@
+unclassified:
+  sonarGlobalConfiguration:
+    buildWrapperEnabled: false
+    installations:
+      - additionalAnalysisProperties: sonar.organization=jenkinsci
+        name: SonarQube
+        serverAuthenticationToken: 'sonarcloud-api-token'
+        serverUrl: 'https://sonarcloud.io'
