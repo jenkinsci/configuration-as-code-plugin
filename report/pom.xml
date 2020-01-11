@@ -13,8 +13,6 @@
   <artifactId>report-aggregator</artifactId>
   <name>Aggregate Report</name>
 
-  <packaging>pom</packaging>
-
   <properties>
     <enforcer.skip>true</enforcer.skip>
     <maven.deploy.skip>true</maven.deploy.skip> <!-- no need to be deployed during release, this is a test-only module -->
