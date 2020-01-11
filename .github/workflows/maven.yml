@@ -52,10 +52,7 @@ jobs:
       run: |
         if [ "$CODACY_PROJECT_TOKEN" != "" ] && [ "$CODECOV_TOKEN" != "" ]; then
           bash <(curl -s https://codecov.io/bash) -f "*jacoco.xml"
-          bash <(curl -Ls https://coverage.codacy.com/get.sh) report -l Java -r plugin/target/site/jacoco/jacoco.xml --partial
-          bash <(curl -Ls https://coverage.codacy.com/get.sh) report -l Java -r test-harness/target/site/jacoco/jacoco.xml --partial
-          bash <(curl -Ls https://coverage.codacy.com/get.sh) report -l Java -r integrations/target/site/jacoco-aggregate/jacoco.xml --partial
-          bash <(curl -Ls https://coverage.codacy.com/get.sh) final
+          bash <(curl -Ls https://coverage.codacy.com/get.sh) report -l Java -r integrations/target/site/jacoco-aggregate/jacoco.xml
         else
           echo "No secrets provided for coverage report"
         fi
