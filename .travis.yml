@@ -20,7 +20,7 @@ install: skip
 
 script:
   - |
-    mvn -Penable-jacoco clean package -B -V \
+    mvn -Penable-jacoco clean verify -B -V \
       -Djenkins.version=2.176.3 -Daccess-modifier-checker.failOnError=true \
       --no-transfer-progress
 

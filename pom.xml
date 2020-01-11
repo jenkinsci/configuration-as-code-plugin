@@ -15,9 +15,8 @@
   <modules>
     <module>snakeyaml</module>
     <module>plugin</module>
-    <module>integrations</module>
     <module>test-harness</module>
-    <module>report</module>
+    <module>integrations</module>
   </modules>
 
   <properties>
