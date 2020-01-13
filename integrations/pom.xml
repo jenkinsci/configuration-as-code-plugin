@@ -14,7 +14,7 @@
   <properties>
     <jenkins.version>2.176.3</jenkins.version> <!-- Remove when parent base is updated. -->
     <maven.deploy.skip>true</maven.deploy.skip> <!-- no need to be deployed during release, this is a test-only module -->
-    <jackson.version>2.10.1</jackson.version>
+    <jackson.version>2.10.2</jackson.version>
   </properties>
 
   <dependencies>
