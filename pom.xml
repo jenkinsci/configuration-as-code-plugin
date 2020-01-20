@@ -15,12 +15,12 @@
   <modules>
     <module>snakeyaml</module>
     <module>plugin</module>
-    <module>integrations</module>
     <module>test-harness</module>
+    <module>integrations</module>
   </modules>
 
   <properties>
-    <revision>1.35</revision>
+    <revision>1.36</revision>
     <changelist>-SNAPSHOT</changelist>
     <jenkins.version>2.60.3</jenkins.version>
     <java.level>8</java.level>
@@ -80,6 +80,7 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <configLocation>${maven.multiModuleProjectDirectory}/.mvn/checkstyle.xml</configLocation>
+          <suppressionsLocation>${maven.multiModuleProjectDirectory}/.mvn/checkstyle-suppressions.xml</suppressionsLocation>
           <includeTestSourceDirectory>true</includeTestSourceDirectory>
           <sourceDirectories>
             <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
@@ -98,5 +99,31 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>jacoco</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>prepare-agent</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <excludes>
+                <exclude>**/Messages.class</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>

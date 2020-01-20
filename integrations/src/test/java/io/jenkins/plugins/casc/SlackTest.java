@@ -9,7 +9,11 @@ import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.rules.RuleChain;
 
-import static junit.framework.TestCase.assertNotNull;
+import static io.jenkins.plugins.casc.misc.Util.convertYamlFileToJson;
+import static io.jenkins.plugins.casc.misc.Util.validateSchema;
+import static org.hamcrest.Matchers.empty;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author v1v (Victor Martinez)
@@ -28,5 +32,12 @@ public class SlackTest {
         // https://github.com/jenkinsci/slack-plugin/pull/582
         SlackNotifier.DescriptorImpl slackNotifier = ExtensionList.lookupSingleton(SlackNotifier.DescriptorImpl.class);
         assertNotNull(slackNotifier);
+    }
+
+    @Test
+    public void validJsonSchema() throws Exception {
+        assertThat(
+            validateSchema(convertYamlFileToJson(this, "slackSchema.yml")),
+            empty());
     }
 }
