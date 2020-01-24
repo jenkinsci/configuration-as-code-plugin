@@ -8,8 +8,8 @@ The latest stable helm chart can be found [here](https://github.com/helm/charts/
 Now grab a copy of the helm chart [values file](https://github.com/helm/charts/blob/master/stable/jenkins/values.yaml) and adjust the Master part a little bit:
 
 ```yaml
-Master:
-  Name: jenkins-master
+master:
+  componentName: jenkins-master
   Image: "jenkins/jenkins"
   ImageTag: "2.134-alpine"
   ImagePullPolicy: "IfNotPresent"
