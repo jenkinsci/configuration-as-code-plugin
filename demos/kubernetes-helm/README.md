@@ -10,15 +10,19 @@ Now grab a copy of the helm chart [values file](https://github.com/helm/charts/b
 ```yaml
 master:
   componentName: jenkins-master
-  Image: 'jenkins/jenkins'
-  ImageTag: '2.134-alpine'
-  ImagePullPolicy: 'IfNotPresent'
-  Component: 'jenkins-master'
-  UseSecurity: true
-  AdminUser: admin
-  AdminPassword: 'formetoknowforyoutofindout'
-  Cpu: '200m'
-  Memory: '1024Mi'
+  image: 'jenkins/jenkins'
+  tag: 'lts'
+  imagePullPolicy: 'Always'
+  useSecurity: true
+  adminUser: admin
+  adminPassword: 'formetoknowforyoutofindout'
+  resources:
+    requests:
+      cpu: '50m'
+      memory: '256Mi'
+    limits:
+      cpu: '2000m'
+      memory: '4096Mi'
 
   # Below is the implementation of Jenkins Configuration as Code.  Add a key under ConfigScripts for each configuration area,
   # where each corresponds to a plugin or section of the UI.  Each key (prior to | character) is just a label, and can be any value.
@@ -29,14 +33,14 @@ master:
   # etc.  Best reference is https://<jenkins_url>/configuration-as-code/reference.  The example below creates a welcome message:
   JCasC:
     enabled: true
-    PluginVersion: 1.5
+    pluginVersion: 1.5
     SupportPluginVersion: 1.5
-    ConfigScripts:
+    configScripts:
       welcome-message: |
         jenkins:
           systemMessage: Welcome to our CI\CD server.  This Jenkins is configured and managed 'as code'.
 
-  Sidecars:
+  sidecars:
     configAutoReload:
       # If enabled: true, Jenkins Configuration as Code will be reloaded on-the-fly without a reboot.  If false or not-specified,
       # JCasC changes will cause a reboot and will only be applied at the subsequent start-up.  Auto-reload uses the Jenkins CLI
@@ -67,9 +71,9 @@ master:
       # It's also possible to specify ALL to search in all namespaces:
       # searchNamespace:
 
-  InitContainerEnv:
+  initContainerEnv:
 
-  ContainerEnv:
+  containerEnv:
     # Tell the plugin where to find its config.
     - name: CASC_JENKINS_CONFIG
       value: /var/jenkins_home/casc_configs/jenkins.yaml
@@ -81,7 +85,7 @@ master:
 
   # List of plugins to be install during Jenkins master start
   # mind the last plugin in the list now ;)
-  InstallPlugins:
+  installPlugins:
     - kubernetes:latest
     - kubernetes-credentials:latest
     - workflow-aggregator:latest
