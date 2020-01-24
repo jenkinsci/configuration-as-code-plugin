@@ -34,7 +34,6 @@ master:
   JCasC:
     enabled: true
     pluginVersion: 1.35
-    SupportPluginVersion: 1.5
     configScripts:
       welcome-message: |
         jenkins:
