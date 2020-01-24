@@ -10,15 +10,15 @@ Now grab a copy of the helm chart [values file](https://github.com/helm/charts/b
 ```yaml
 master:
   componentName: jenkins-master
-  Image: "jenkins/jenkins"
-  ImageTag: "2.134-alpine"
-  ImagePullPolicy: "IfNotPresent"
-  Component: "jenkins-master"
+  Image: 'jenkins/jenkins'
+  ImageTag: '2.134-alpine'
+  ImagePullPolicy: 'IfNotPresent'
+  Component: 'jenkins-master'
   UseSecurity: true
   AdminUser: admin
-  AdminPassword: "formetoknowforyoutofindout"
-  Cpu: "200m"
-  Memory: "1024Mi"
+  AdminPassword: 'formetoknowforyoutofindout'
+  Cpu: '200m'
+  Memory: '1024Mi'
 
   # Below is the implementation of Jenkins Configuration as Code.  Add a key under ConfigScripts for each configuration area,
   # where each corresponds to a plugin or section of the UI.  Each key (prior to | character) is just a label, and can be any value.
@@ -93,7 +93,7 @@ master:
 Now, deploy the Helm chart with those customized values:
 
 ```bash
-helm install --name jenkins stable/jenkins -f values.yaml
+helm install jenkins stable/jenkins -f values.yaml
 ```
 
 Once Helm finishes deploying the chart, connect to your Jenkins server in your browser. You should see the welcome system message displayed at the top. Congratulations, you've installed the plugin and made your first Jenkins configuration change successfully! :)
