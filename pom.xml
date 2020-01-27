@@ -22,9 +22,11 @@
   <properties>
     <revision>1.36</revision>
     <changelist>-SNAPSHOT</changelist>
-    <jenkins.version>2.60.3</jenkins.version>
+    <jenkins.version>2.218-rc29200.f79828ffaafc</jenkins.version>
     <java.level>8</java.level>
     <tagNameFormat>configuration-as-code-@{project.version}</tagNameFormat>
+    <!-- Because of the new base line -->
+    <slf4jVersion>1.7.26</slf4jVersion>
   </properties>
 
   <name>Configuration as Code Parent</name>
