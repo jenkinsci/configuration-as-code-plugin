@@ -12,7 +12,6 @@
   <name>Configuration as Code Integration tests</name>
 
   <properties>
-    <jenkins.version>2.176.3</jenkins.version> <!-- Remove when parent base is updated. -->
     <maven.deploy.skip>true</maven.deploy.skip> <!-- no need to be deployed during release, this is a test-only module -->
     <jackson.version>2.10.2</jackson.version>
   </properties>
@@ -481,7 +480,7 @@
       <dependency>
         <groupId>commons-codec</groupId>
         <artifactId>commons-codec</artifactId>
-        <version>1.11</version>
+        <version>1.12</version>
       </dependency>
       <dependency>
         <groupId>commons-lang</groupId>
