@@ -501,6 +501,11 @@
         <version>2.6</version>
       </dependency>
       <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-text</artifactId>
+        <version>1.7</version>
+      </dependency>
+      <dependency>
         <groupId>io.netty</groupId>
         <artifactId>netty-handler</artifactId>
         <version>4.1.39.Final</version>
