@@ -1,6 +1,5 @@
 package io.jenkins.plugins.casc;
 
-import com.google.common.io.Files;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
@@ -10,7 +9,6 @@ import java.io.IOException;
 import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
-import org.jvnet.hudson.test.HudsonHomeLoader;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.TestExtension;
 
@@ -33,13 +31,12 @@ public class InitTest {
     @TestExtension("testInitializer")
     public static class JobsDependantOnConfig {
 
-        @Initializer(after = InitMilestone.EXTENSIONS_AUGMENTED, before = InitMilestone.JOB_LOADED)
+        @Initializer(after = InitMilestone.SYSTEM_CONFIG_ADAPTED, before = InitMilestone.JOB_LOADED)
         public void happensWhenJobLoading() throws IOException, InterruptedException {
             Jenkins jenkins = Jenkins.get();
             File gitTools = new File(jenkins.getRootDir(), "hudson.plugins.git.GitTool.xml");
             int tries = 0;
             while (!gitTools.exists() && tries++ < 10) {
-                System.out.println("Vamos a por el "+tries);
                 File flag = new File(jenkins.getRootDir(), "gitTool-flag.txt");
                 if (!flag.exists()) {
                     flag.createNewFile();
