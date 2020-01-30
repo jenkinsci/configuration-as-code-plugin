@@ -75,9 +75,9 @@ public class ProxyConfiguratorTest {
         final CNode node = c.describe(proxy, context);
         assertNotNull(node);
         Mapping mapping = node.asMapping();
-        assertEquals(3, node.asMapping().size());
+        assertEquals(2, node.asMapping().size());
         assertEquals("proxyhost", mapping.getScalarValue("name"));
-        assertEquals("", Secret.decrypt(mapping.getScalarValue("password")).getPlainText());
+        assertEquals("80", mapping.getScalarValue("port"));
     }
 
     @Test
@@ -142,12 +142,9 @@ public class ProxyConfiguratorTest {
         ConfigurationContext context = new ConfigurationContext(registry);
         final CNode configNode = getProxyNode(context);
 
-        Secret password = requireNonNull(Secret.decrypt(getProxyNode(context).getScalarValue("password")));
-
         final String yamlConfig = Util.toYamlString(configNode);
         assertEquals(String.join("\n",
                 "name: \"proxyhost\"",
-                "password: \"" + password.getEncryptedValue() + "\"", // It's an empty string here
                 "port: 80",
                 ""
         ), yamlConfig);
