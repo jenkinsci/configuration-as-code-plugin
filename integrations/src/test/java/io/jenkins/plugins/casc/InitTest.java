@@ -20,7 +20,7 @@ public class InitTest {
     public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 
     @Test
-    @Issue("Issue #280 - https://github.com/jenkinsci/configuration-as-code-plugin/issues/280")
+    @Issue("#280")
     @ConfiguredWithCode("init.yml")
     public void testInitializer() {
         File flag = new File(j.jenkins.getRootDir(), "gitTool-flag.txt");
