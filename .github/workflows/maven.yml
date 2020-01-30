@@ -10,19 +10,12 @@ on:
 
 jobs:
   build:
-    name: Build on Jenkins ${{ matrix.jenkins-version }}, JDK ${{ matrix.java }} and ${{ matrix.os }}
+    name: Build on JDK ${{ matrix.java }} and ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         java: [8, 11]
-        jenkins-version: [2.60.3, 2.176.3]
         os: [ubuntu-latest, windows-latest]
-        include:
-        - jenkins-version: '2.176.3'
-          flags: '--define jenkins.version=2.176.3'
-        exclude:
-        - java: '11'
-          jenkins-version: '2.60.3'
 
     steps:
 
