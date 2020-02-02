@@ -95,7 +95,7 @@
   </scm>
   
   <issueManagement>
-    <system>GitHub</system>
+    <system>GitHub Issues</system>
     <url>https://github.com/jenkinsci/configuration-as-code-plugin/issues</url>
   </issueManagement>
 </project>
