@@ -93,4 +93,9 @@
     <url>https://github.com/jenkinsci/configuration-as-code-plugin</url>
     <tag>${scmTag}</tag>
   </scm>
+  
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/jenkinsci/configuration-as-code-plugin/issues</url>
+  </issueManagement>
 </project>
