@@ -170,7 +170,7 @@ Kubernetes users:\
 
 Most plugins should be supported out-of-the-box, or maybe require some minimal changes. See this [dashboard](https://issues.jenkins.io/secure/Dashboard.jspa?selectPageId=18341) for known compatibility issues.
 
-## Compatibility with Jenkins > 2.199
+## Compatibility with Jenkins >= 2.199
 
 Jenkins 2.199 introduced [a check to prevent saving global configuration before loading the configuration has occurred](https://github.com/jenkinsci/jenkins/pull/4171). Configurations As Code needs to apply global configuration before Jenkins loads jobs (so they can load and correctly reference any global state) and as such until [JENKINS-51856](https://issues.jenkins-ci.org/browse/JENKINS-51856) is implemented there exists a race condition where by Jenkins may fail to start when used with this plugin.
 
