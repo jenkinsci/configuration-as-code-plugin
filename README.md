@@ -189,7 +189,7 @@ A suggestion would be to start with 5000 (5 Seconds) and then increment by 2000 
 For example, to delay the configuration by 9 seconds you would use something like the following command `java -Dio.jenkins.plugins.casc.ConfigurationAsCode.initialDelay=9000 -jar jenkins.war`.
 Exactly how and where you specify this option depends on the installation method used to install Jenkins.
 
-Jenkins _TODO_ includes [JENKINS-51856](https://issues.jenkins-ci.org/browse/JENKINS-51856) so the instance will not face the race condition. Starting with JCasC _TODO_, this system properties is not needed anymore and it is not present.
+Jenkins 2.220 includes [JENKINS-51856](https://issues.jenkins-ci.org/browse/JENKINS-51856) so the instance will not face the race condition. Starting with JCasC 1.36, the system property is not needed anymore.
 
 ## Configuration-as-Code extension plugins
 
