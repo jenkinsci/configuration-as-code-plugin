@@ -1,5 +1,5 @@
 // https://jenkins.io/doc/book/pipeline/syntax/
-@Library('alauda-cicd-debug') _
+@Library('alauda-cicd') _
 
 // global variables for pipeline
 def GIT_BRANCH
