@@ -377,7 +377,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>gitlab-plugin</artifactId>
-      <version>1.5.9</version>
+      <version>1.5.13</version>
     </dependency>
 
     <dependency>
