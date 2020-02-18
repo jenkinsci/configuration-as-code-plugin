@@ -26,7 +26,7 @@
       In v1.28 we removed vault secret resolver and moved it to the hashicorp-vault-plugin. https://github.com/jenkinsci/hashicorp-vault-plugin
     -->
     <hpi.compatibleSinceVersion>1.28</hpi.compatibleSinceVersion>
-    <hpi.pluginChagelogUrl>https://github.com/jenkinsci/configuration-as-code-plugin/releases</hpi.pluginChagelogUrl>
+    <hpi.pluginChangelogUrl>https://github.com/jenkinsci/configuration-as-code-plugin/releases</hpi.pluginChangelogUrl>
     <hpi.pluginLogoUrl>https://raw.githubusercontent.com/jenkinsci/configuration-as-code-plugin/master/plugin/src/main/webapp/img/logo-head.svg</hpi.pluginLogoUrl>
   </properties>
 

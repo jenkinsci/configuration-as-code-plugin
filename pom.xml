@@ -15,12 +15,12 @@
   <modules>
     <module>snakeyaml</module>
     <module>plugin</module>
-    <module>integrations</module>
     <module>test-harness</module>
+    <module>integrations</module>
   </modules>
 
   <properties>
-    <revision>1.35</revision>
+    <revision>1.36</revision>
     <changelist>-SNAPSHOT</changelist>
     <jenkins.version>2.60.3</jenkins.version>
     <java.level>8</java.level>
@@ -94,7 +94,7 @@
             <dependency>
               <groupId>com.puppycrawl.tools</groupId>
               <artifactId>checkstyle</artifactId>
-              <version>8.26</version>
+              <version>8.29</version>
             </dependency>
           </dependencies>
         </plugin>
@@ -105,6 +105,7 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <configLocation>${maven.multiModuleProjectDirectory}/.mvn/checkstyle.xml</configLocation>
+          <suppressionsLocation>${maven.multiModuleProjectDirectory}/.mvn/checkstyle-suppressions.xml</suppressionsLocation>
           <includeTestSourceDirectory>true</includeTestSourceDirectory>
           <sourceDirectories>
             <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
@@ -123,4 +124,5 @@
       </plugin>
     </plugins>
   </build>
+
 </project>

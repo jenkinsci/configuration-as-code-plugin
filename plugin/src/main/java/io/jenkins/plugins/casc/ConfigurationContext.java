@@ -31,6 +31,8 @@ public class ConfigurationContext implements ConfiguratorRegistry {
 
     private transient final ConfiguratorRegistry registry;
 
+    private transient String mode;
+
     public ConfigurationContext(ConfiguratorRegistry registry) {
         this.registry = registry;
     }
@@ -130,6 +132,11 @@ public class ConfigurationContext implements ConfiguratorRegistry {
 
         public boolean isAtLeast(Version version) {
             return this.ordinal() >= version.ordinal();
+        }
+
+        @Override
+        public String toString() {
+            return value;
         }
     }
 
