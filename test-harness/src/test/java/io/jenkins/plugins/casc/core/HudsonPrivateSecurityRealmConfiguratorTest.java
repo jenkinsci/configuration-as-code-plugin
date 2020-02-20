@@ -41,13 +41,6 @@ public class HudsonPrivateSecurityRealmConfiguratorTest {
 
         final FullControlOnceLoggedInAuthorizationStrategy authorizationStrategy = (FullControlOnceLoggedInAuthorizationStrategy) jenkins.getAuthorizationStrategy();
         assertTrue(authorizationStrategy.isAllowAnonymousRead());
-
-        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
-        ConfigurationContext context = new ConfigurationContext(registry);
-        final Configurator c = context.lookupOrFail(HudsonPrivateSecurityRealm.class);
-        final CNode node = c.describe(securityRealm, context);
-        final Mapping user = node.asMapping().get("users").asSequence().get(0).asMapping();
-        assertEquals("admin", user.getScalarValue("id"));
     }
 
     @Test
