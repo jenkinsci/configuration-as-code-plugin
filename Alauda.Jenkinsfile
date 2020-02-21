@@ -123,7 +123,7 @@ pipeline {
 			steps {
 				script {
 					// adding tag to the current commit
-					withCredentials([usernamePassword(credentialsId: TAG_CREDENTIALS, passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+					withCredentials([usernamePassword(credentialsId: deploy.getAlaudaCredentialID(TAG_CREDENTIALS), passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
 						sh "git tag -l | xargs git tag -d" // clean local tags
 						sh """
 							git config --global user.email "alaudabot@alauda.io"
