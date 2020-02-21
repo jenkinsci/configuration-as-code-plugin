@@ -6,6 +6,7 @@ import io.jenkins.plugins.casc.model.CNode;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import org.kohsuke.accmod.Restricted;
 import org.kohsuke.stapler.Stapler;
 
 /**
@@ -17,6 +18,7 @@ public class ConfigurationContext implements ConfiguratorRegistry {
     private Deprecation deprecation = Deprecation.reject;
     private Restriction restriction = Restriction.reject;
     private Unknown unknown = Unknown.reject;
+    private boolean enableBackup = false;
 
     /**
      * the model-introspection model to be applied by configuration-as-code.
@@ -29,6 +31,8 @@ public class ConfigurationContext implements ConfiguratorRegistry {
     private transient List<Listener> listeners = new ArrayList<>();
 
     private transient final ConfiguratorRegistry registry;
+
+    private transient String mode;
 
     public ConfigurationContext(ConfiguratorRegistry registry) {
         this.registry = registry;
@@ -50,6 +54,10 @@ public class ConfigurationContext implements ConfiguratorRegistry {
 
     public Unknown getUnknown() { return unknown; }
 
+    public boolean isEnableBackup() {
+        return enableBackup;
+    }
+
     public void setDeprecated(Deprecation deprecation) {
         this.deprecation = deprecation;
     }
@@ -62,8 +70,11 @@ public class ConfigurationContext implements ConfiguratorRegistry {
         this.unknown = unknown;
     }
 
+    public void setEnableBackup(boolean enableBackup) {
+        this.enableBackup = enableBackup;
+    }
 
-    // --- delegate methods for ConfigurationContext
+// --- delegate methods for ConfigurationContext
 
 
     @Override
@@ -99,6 +110,14 @@ public class ConfigurationContext implements ConfiguratorRegistry {
         return SecretSource.all();
     }
 
+    String getMode() {
+        return mode;
+    }
+
+    public void setMode(String mode) {
+        this.mode = mode;
+    }
+
     // Once we introduce some breaking change on the model inference mechanism, we will introduce `TWO` and so on
     // And this new mechanism will only get enabled when configuration file uses this version or later
     enum Version { ONE("1");
@@ -123,6 +142,11 @@ public class ConfigurationContext implements ConfiguratorRegistry {
         public boolean isAtLeast(Version version) {
             return this.ordinal() >= version.ordinal();
         }
+
+        @Override
+        public String toString() {
+            return value;
+        }
     }
 
     static {
@@ -135,7 +159,7 @@ public class ConfigurationContext implements ConfiguratorRegistry {
     enum Unknown { reject, warn }
 
     /**
-     * Policy regarding {@link org.kohsuke.accmod.Restricted} attributes.
+     * Policy regarding {@link Restricted} attributes.
      */
     enum Restriction { reject, beta, warn }
 

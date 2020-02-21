@@ -9,7 +9,6 @@ import java.util.HashMap;
 
 public final class Mapping extends HashMap<String, CNode> implements CNode {
 
-    public static final Mapping EMPTY = new Mapping();
     private Source source;
 
     public Mapping() {
@@ -73,5 +72,9 @@ public final class Mapping extends HashMap<String, CNode> implements CNode {
             }
         });
         return clone;
+    }
+
+    public static Mapping getEmpty() {
+        return new Mapping();
     }
 }

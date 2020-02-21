@@ -32,6 +32,7 @@ import io.jenkins.plugins.casc.snakeyaml.nodes.SequenceNode;
 import io.jenkins.plugins.casc.snakeyaml.nodes.Tag;
 import io.jenkins.plugins.casc.snakeyaml.resolver.Resolver;
 import io.jenkins.plugins.casc.snakeyaml.serializer.Serializer;
+import io.jenkins.plugins.casc.yaml.MergeStrategyFactory;
 import io.jenkins.plugins.casc.yaml.YamlSource;
 import io.jenkins.plugins.casc.yaml.YamlUtils;
 import java.io.ByteArrayOutputStream;
@@ -608,7 +609,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
     private void configureWith(List<YamlSource> sources) throws ConfiguratorException {
         lastTimeLoaded = System.currentTimeMillis();
-        configureWith( YamlUtils.loadFrom(sources) );
+        configureWith( YamlUtils.loadFrom(sources, MergeStrategyFactory.getMergeStrategy()) );
         closeSources(sources);
     }
 
@@ -621,7 +622,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
     private Map<Source, String> checkWith(List<YamlSource> sources) throws ConfiguratorException {
         if (sources.isEmpty()) return Collections.emptyMap();
-        return checkWith( YamlUtils.loadFrom(sources) );
+        return checkWith( YamlUtils.loadFrom(sources, MergeStrategyFactory.getMergeStrategy()) );
     }
 
     private void closeSources(List<YamlSource> sources) {

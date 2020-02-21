@@ -26,8 +26,9 @@
       In v1.28 we removed vault secret resolver and moved it to the hashicorp-vault-plugin. https://github.com/jenkinsci/hashicorp-vault-plugin
     -->
     <hpi.compatibleSinceVersion>1.28</hpi.compatibleSinceVersion>
-    <hpi.pluginChagelogUrl>https://github.com/jenkinsci/configuration-as-code-plugin/releases</hpi.pluginChagelogUrl>
+    <hpi.pluginChangelogUrl>https://github.com/jenkinsci/configuration-as-code-plugin/releases</hpi.pluginChangelogUrl>
     <hpi.pluginLogoUrl>https://raw.githubusercontent.com/jenkinsci/configuration-as-code-plugin/master/plugin/src/main/webapp/img/logo-head.svg</hpi.pluginLogoUrl>
+    <jackson.version>2.10.2</jackson.version>
   </properties>
 
   <developers>
@@ -67,6 +68,23 @@
       <groupId>io.vavr</groupId>
       <artifactId>vavr</artifactId>
       <version>0.10.2</version>
+    </dependency>
+
+
+    <dependency>
+      <groupId>com.flipkart.zjsonpatch</groupId>
+      <artifactId>zjsonpatch</artifactId>
+      <version>0.4.9</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.dataformat</groupId>
+      <artifactId>jackson-dataformat-yaml</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>${jackson.version}</version>
     </dependency>
 
     <dependency>

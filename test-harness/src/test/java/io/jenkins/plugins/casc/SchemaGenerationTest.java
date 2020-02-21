@@ -4,13 +4,10 @@ import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static io.jenkins.plugins.casc.SchemaGeneration.removeHtmlTags;
-import static io.jenkins.plugins.casc.SchemaGeneration.retrieveDocStringFromAttribute;
 import static io.jenkins.plugins.casc.misc.Util.convertYamlFileToJson;
 import static io.jenkins.plugins.casc.misc.Util.validateSchema;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 public class SchemaGenerationTest {
@@ -30,18 +27,42 @@ public class SchemaGenerationTest {
     }
 
     @Test
-    public void testRetrieveDocStringFromAttribute() {
-        String expectedDocString = "If checked, this will allow users who are not authenticated to access Jenkins in a read-only mode.";
-        String actualDocString = retrieveDocStringFromAttribute(hudson.security.FullControlOnceLoggedInAuthorizationStrategy.class, "allowAnonymousRead");
-        assertEquals(expectedDocString,actualDocString);
+    public void rejectsInvalidBaseConfigurator() throws Exception {
+        assertThat(validateSchema(convertYamlFileToJson(this, "invalidBaseConfig.yml")),
+            contains("#: extraneous key [invalidBaseConfigurator] is not permitted"));
     }
 
     @Test
-    public void testRemoveHtmlTagRegex() {
-        String htmlTagString = "<div> If checked, this will allow users who are not authenticated to access Jenkins in a read-only mode.</div>";
-        String expectedString = "If checked, this will allow users who are not authenticated to access Jenkins in a read-only mode.";
-        String actualString = removeHtmlTags(htmlTagString);
-        assertEquals(expectedString, actualString);
+    public void validJenkinsBaseConfigurator() throws Exception {
+        assertThat(validateSchema(convertYamlFileToJson(this, "validJenkinsBaseConfig.yml")),
+            empty());
     }
 
+    @Test
+    public void symbolResolutionForJenkinsBaseConfigurator() throws Exception {
+        assertThat(validateSchema(convertYamlFileToJson(this, "validJenkinsBaseConfigWithSymbol.yml")),
+            empty());
+    }
+
+    @Test
+    public void validSelfConfigurator() throws Exception {
+        assertThat(
+            validateSchema(convertYamlFileToJson(this, "validSelfConfig.yml")),
+            empty());
+    }
+
+    @Test
+    public void attributesNotFlattenedToTopLevel() throws Exception {
+        assertThat(
+            validateSchema(convertYamlFileToJson(this, "attributesNotFlattenedToTop.yml")),
+            contains("#/tool: extraneous key [acceptLicense] is not permitted"));
+    }
+
+//    For testing manually
+//    @Test
+//    public void writeSchema() throws Exception {
+//        BufferedWriter writer = new BufferedWriter(new FileWriter("schema.json"));
+//        writer.write(writeJSONSchema());
+//        writer.close();
+//    }
 }

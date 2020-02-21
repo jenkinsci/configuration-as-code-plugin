@@ -1,0 +1,5 @@
+tool:
+  git:
+    installations:
+      - name: git
+        home: 000

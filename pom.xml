@@ -15,21 +15,22 @@
   <modules>
     <module>snakeyaml</module>
     <module>plugin</module>
-    <module>integrations</module>
     <module>test-harness</module>
+    <module>integrations</module>
   </modules>
 
   <properties>
-    <revision>1.35</revision>
+    <revision>2.8</revision>
     <changelist>-SNAPSHOT</changelist>
     <jenkins.version>2.60.3</jenkins.version>
     <java.level>8</java.level>
+    <sha1/>
     <tagNameFormat>configuration-as-code-@{project.version}</tagNameFormat>
   </properties>
 
   <name>Configuration as Code Parent</name>
   <description>The Configuration as Code plugin has been designed as an opinionated way to configure Jenkins based on human-readable declarative configuration files</description>
-  <url>https://github.com/jenkinsci/configuration-as-code-plugin</url>
+  <url>https://github.com/alauda/configuration-as-code-plugin</url>
 
   <licenses>
     <license>
@@ -37,6 +38,17 @@
       <url>http://opensource.org/licenses/MIT</url>
     </license>
   </licenses>
+
+  <distributionManagement>
+    <repository>
+      <id>${releases.id}</id>
+      <url>${releases.url}</url>
+    </repository>
+    <snapshotRepository>
+      <id>${snapshots.id}</id>
+      <url>${snapshots.url}</url>
+    </snapshotRepository>
+  </distributionManagement>
 
   <scm>
     <connection>scm:git:git://github.com/jenkinsci/configuration-as-code-plugin.git</connection>
@@ -49,6 +61,20 @@
     <repository>
       <id>repo.jenkins-ci.org</id>
       <url>https://repo.jenkins-ci.org/public/</url>
+    </repository>
+    <repository>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>nexus-oss-snapshots</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+    </repository>
+    <repository>
+      <id>release</id>
+      <url>https://oss.sonatype.org/content/repositories/releases</url>
     </repository>
   </repositories>
   <pluginRepositories>
@@ -69,7 +95,7 @@
             <dependency>
               <groupId>com.puppycrawl.tools</groupId>
               <artifactId>checkstyle</artifactId>
-              <version>8.26</version>
+              <version>8.29</version>
             </dependency>
           </dependencies>
         </plugin>
@@ -80,6 +106,7 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <configLocation>${maven.multiModuleProjectDirectory}/.mvn/checkstyle.xml</configLocation>
+          <suppressionsLocation>${maven.multiModuleProjectDirectory}/.mvn/checkstyle-suppressions.xml</suppressionsLocation>
           <includeTestSourceDirectory>true</includeTestSourceDirectory>
           <sourceDirectories>
             <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
