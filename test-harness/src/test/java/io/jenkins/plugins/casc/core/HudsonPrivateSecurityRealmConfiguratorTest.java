@@ -3,19 +3,13 @@ package io.jenkins.plugins.casc.core;
 import hudson.model.User;
 import hudson.security.FullControlOnceLoggedInAuthorizationStrategy;
 import hudson.security.HudsonPrivateSecurityRealm;
-import io.jenkins.plugins.casc.ConfigurationContext;
-import io.jenkins.plugins.casc.Configurator;
-import io.jenkins.plugins.casc.ConfiguratorRegistry;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
-import io.jenkins.plugins.casc.model.CNode;
-import io.jenkins.plugins.casc.model.Mapping;
 import jenkins.model.Jenkins;
 import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -41,13 +35,6 @@ public class HudsonPrivateSecurityRealmConfiguratorTest {
 
         final FullControlOnceLoggedInAuthorizationStrategy authorizationStrategy = (FullControlOnceLoggedInAuthorizationStrategy) jenkins.getAuthorizationStrategy();
         assertTrue(authorizationStrategy.isAllowAnonymousRead());
-
-        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
-        ConfigurationContext context = new ConfigurationContext(registry);
-        final Configurator c = context.lookupOrFail(HudsonPrivateSecurityRealm.class);
-        final CNode node = c.describe(securityRealm, context);
-        final Mapping user = node.asMapping().get("users").asSequence().get(0).asMapping();
-        assertEquals("admin", user.getScalarValue("id"));
     }
 
     @Test
