@@ -16,14 +16,14 @@ jenkins:
           site: "site"
           bindName: "admin"
           bindPassword: "${BIND_PASSWORD}"
+          tlsConfiguration: JDK_TRUSTSTORE
       groupLookupStrategy: "RECURSIVE"
       removeIrrelevantGroups: true
       customDomain: true
       cache:
-        size: 4096
-        ttl: 30
+        size: 500
+        ttl: 600
       startTls: true
-      tlsConfiguration: JDK_TRUSTSTORE
       internalUsersDatabase:
         jenkinsInternalUser: "jenkins"
 ```
