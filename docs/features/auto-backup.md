@@ -32,7 +32,11 @@ We deal with three config files:
 |---|---|
 |`${JENKINS_HOME}/war/jenkins.yaml`|Initial config file, put the new config files in here|
 |`${JENKINS_HOME}/war/WEB-INF/jenkins.yaml`|Should be the last version of config file|
-|`${JENKINS_HOME}/war/WEB-INF/jenkins.yaml.d/user.yaml`|All current config file, auto generate it when a user change the config|
+|`${JENKINS_HOME}/war/WEB-INF/jenkins.yaml.bak/user.yaml`|All current config file, auto generate it when a user change the config|
+
+By default, the backup function is not enabled. If you want to enable it, please add the following environment:
+
+`CASC_AUTO_BACKUP=true`
 
 ## TODO
 
