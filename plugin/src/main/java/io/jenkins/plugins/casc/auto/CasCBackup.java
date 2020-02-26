@@ -6,8 +6,6 @@ import hudson.init.InitMilestone;
 import hudson.model.Saveable;
 import hudson.model.listeners.SaveableListener;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
-import io.jenkins.plugins.casc.ConfigurationContext;
-import io.jenkins.plugins.casc.impl.DefaultConfiguratorRegistry;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -17,7 +15,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
@@ -29,19 +26,24 @@ public class CasCBackup extends SaveableListener {
     private static final String DEFAULT_JENKINS_YAML_PATH = "jenkins.yaml";
     private static final String cascDirectory = "/WEB-INF/" + DEFAULT_JENKINS_YAML_PATH + ".bak/";
 
-    @Inject
-    private DefaultConfiguratorRegistry registry;
+    private static final boolean enableBackup;
+
+    static {
+        enableBackup = "true".equals(System.getenv("CASC_AUTO_BACKUP"));
+
+        LOGGER.warning("CasCBackup is " + (enableBackup ? "enabled" : "disabled"));
+    }
 
     @Override
     public void onChange(Saveable o, XmlFile file) {
+        if (!enableBackup) {
+            return;
+        }
+
         InitMilestone initLevel = Jenkins.getInstance().getInitLevel();
         if (initLevel != InitMilestone.COMPLETED) {
             return;
         }
-
-        ConfigurationContext context = new ConfigurationContext(registry);
-
-        LOGGER.warning("context.isEnableBackup()" + context.isEnableBackup());
 
         // only take care of the configuration which controlled by casc
         if (!(o instanceof GlobalConfiguration)) {
