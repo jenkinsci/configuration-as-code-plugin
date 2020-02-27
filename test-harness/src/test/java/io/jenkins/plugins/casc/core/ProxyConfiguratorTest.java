@@ -22,10 +22,13 @@ import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.LoggerRule;
 
 import static java.util.Objects.requireNonNull;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.jvnet.hudson.test.JenkinsMatchers.hasPlainText;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class ProxyConfiguratorTest {
 
     final JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
@@ -45,7 +48,7 @@ public class ProxyConfiguratorTest {
         assertEquals(proxy.port, 80);
 
         assertEquals(proxy.getUserName(), "login");
-        assertEquals(Secret.decrypt(proxy.getEncryptedPassword()).getPlainText(), "password");
+        assertThat(proxy.getSecretPassword(), hasPlainText("password"));
         assertEquals(proxy.noProxyHost, "externalhost");
         assertEquals(proxy.getTestUrl(), "http://google.com");
 
@@ -75,9 +78,9 @@ public class ProxyConfiguratorTest {
         final CNode node = c.describe(proxy, context);
         assertNotNull(node);
         Mapping mapping = node.asMapping();
-        assertEquals(3, node.asMapping().size());
+        assertEquals(2, node.asMapping().size());
         assertEquals("proxyhost", mapping.getScalarValue("name"));
-        assertEquals("", Secret.decrypt(mapping.getScalarValue("password")).getPlainText());
+        assertEquals("80", mapping.getScalarValue("port"));
     }
 
     @Test
@@ -94,7 +97,7 @@ public class ProxyConfiguratorTest {
         assertEquals(proxy.port, 80);
 
         assertEquals(proxy.getUserName(), "proxy_user");
-        assertEquals(Secret.decrypt(proxy.getEncryptedPassword()).getPlainText(), "proxy_password");
+        assertThat(proxy.getSecretPassword(), hasPlainText("proxy_password"));
         assertEquals(proxy.noProxyHost, "external.host");
         assertEquals(proxy.getTestUrl(), "http://google.com");
     }
@@ -107,7 +110,7 @@ public class ProxyConfiguratorTest {
     public void shouldNotWritePasswordToLog() {
         ProxyConfiguration proxy = j.jenkins.proxy;
         assertEquals(proxy.getUserName(), "proxy_user");
-        assertEquals(Secret.decrypt(proxy.getEncryptedPassword()).getPlainText(), "proxy_password");
+        assertThat(proxy.getSecretPassword(), hasPlainText("proxy_password"));
 
         // Check logs
         Util.assertLogContains(logging, "password");
@@ -142,12 +145,9 @@ public class ProxyConfiguratorTest {
         ConfigurationContext context = new ConfigurationContext(registry);
         final CNode configNode = getProxyNode(context);
 
-        Secret password = requireNonNull(Secret.decrypt(getProxyNode(context).getScalarValue("password")));
-
         final String yamlConfig = Util.toYamlString(configNode);
         assertEquals(String.join("\n",
                 "name: \"proxyhost\"",
-                "password: \"" + password.getEncryptedValue() + "\"", // It's an empty string here
                 "port: 80",
                 ""
         ), yamlConfig);
