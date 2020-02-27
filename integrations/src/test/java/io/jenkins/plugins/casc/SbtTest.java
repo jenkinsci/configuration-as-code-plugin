@@ -14,9 +14,10 @@ import org.jvnet.hudson.plugins.SbtPluginBuilder.SbtInstaller;
 import static io.jenkins.plugins.casc.misc.Util.getToolRoot;
 import static io.jenkins.plugins.casc.misc.Util.toStringFromYamlFile;
 import static io.jenkins.plugins.casc.misc.Util.toYamlString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+
 
 /**
  * @author v1v (Victor Martinez)
