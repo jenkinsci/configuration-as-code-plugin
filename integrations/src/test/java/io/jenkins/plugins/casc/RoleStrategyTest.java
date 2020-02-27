@@ -64,7 +64,7 @@ public class RoleStrategyTest {
         // Admin has configuration access
         assertHasPermission(admin, j.jenkins, Jenkins.ADMINISTER, Jenkins.READ);
         assertHasPermission(user1, j.jenkins, Jenkins.READ);
-        assertHasNoPermission(user1, j.jenkins, Jenkins.ADMINISTER, Jenkins.RUN_SCRIPTS);
+        assertHasNoPermission(user1, j.jenkins, Jenkins.ADMINISTER);
 
         // Folder A is restricted to admin
         assertHasPermission(admin, folderA, Item.CONFIGURE);

@@ -807,7 +807,7 @@ public class ConfigurationAsCode extends ManagementLink {
     public String getHtmlHelp(Class type, String attribute) throws IOException {
         final URL resource = Klass.java(type).getResource("help-" + attribute + ".html");
         if (resource != null) {
-            return IOUtils.toString(resource.openStream());
+            return IOUtils.toString(resource.openStream(), StandardCharsets.UTF_8);
         }
         return "";
     }

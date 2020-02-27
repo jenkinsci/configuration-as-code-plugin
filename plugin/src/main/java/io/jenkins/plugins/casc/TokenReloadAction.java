@@ -45,7 +45,7 @@ public class TokenReloadAction implements UnprotectedRootAction {
         String token = getReloadTokenProperty();
 
         if (Strings.isNullOrEmpty(token)) {
-            response.sendError(HttpStatus.SC_NOT_FOUND);
+            response.sendError(404);
             LOGGER.warning("Configuration reload via token is not enabled");
         } else {
             String requestToken = getRequestToken(request);
@@ -57,7 +57,7 @@ public class TokenReloadAction implements UnprotectedRootAction {
                     ConfigurationAsCode.get().configure();
                 }
             } else {
-                response.sendError(HttpStatus.SC_UNAUTHORIZED);
+                response.sendError(401);
                 LOGGER.warning("Invalid token received, not reloading configuration");
 
             }
