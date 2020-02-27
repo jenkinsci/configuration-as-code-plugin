@@ -279,21 +279,24 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
         for (int i = 0; i < parameters.length; i++) {
             final Parameter p = parameters[i];
             final Attribute a = createAttribute(names[i], TypePair.of(p));
-            Object value = a.getValue(instance);
-            if (value != null) {
-                Object converted = Stapler.CONVERT_UTILS.convert(value, a.getType());
-                if (converted instanceof Collection || p.getType().isArray() || !a.isMultiple()) {
-                    args[i] = converted;
-                } else if (Set.class.isAssignableFrom(p.getType())) {
-                    args[i] = Collections.singleton(converted);
-                } else {
-                    args[i] = Collections.singletonList(converted);
+            if (a != null) {
+                Object value = a.getValue(instance);
+                if (value != null) {
+                    Object converted = Stapler.CONVERT_UTILS.convert(value, a.getType());
+                    if (converted instanceof Collection ||
+                        p.getType().isArray() || !a.isMultiple()) {
+                        args[i] = converted;
+                    } else if (Set.class.isAssignableFrom(p.getType())) {
+                        args[i] = Collections.singleton(converted);
+                    } else {
+                        args[i] = Collections.singletonList(converted);
+                    }
                 }
+                if (args[i] == null && p.getType().isPrimitive()) {
+                    args[i] = defaultValue(p.getType());
+                }
+                attributes[i] = a;
             }
-            if (args[i] == null && p.getType().isPrimitive()) {
-                args[i] = defaultValue(p.getType());
-            }
-            attributes[i] = a;
         }
 
         T ref = (T) constructor.newInstance(args);
