@@ -33,7 +33,7 @@ public class JenkinsConfigTest {
 
     @Test
     public void loadFromCASC_JENKINS_CONFIG() {
-        Jenkins j = Jenkins.getInstance();
+        Jenkins j = Jenkins.get();
         assertEquals("configuration as code - JenkinsConfigTest", j.getSystemMessage());
         assertEquals(10, j.getQuietPeriod());
     }
@@ -41,7 +41,7 @@ public class JenkinsConfigTest {
 
     @Test
     public void shouldExportEvenOnError() throws Exception {
-        Jenkins j = Jenkins.getInstance();
+        Jenkins j = Jenkins.get();
         j.setCrumbIssuer(new BrokenCrumbIssuer("bar"));
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         ConfigurationAsCode.get().export(out);

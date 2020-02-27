@@ -40,6 +40,6 @@ public interface ConfiguratorRegistry {
      * Retrieve default implementation from Jenkins
      */
     static ConfiguratorRegistry get() {
-        return Jenkins.getInstance().getExtensionList(ConfiguratorRegistry.class).get(0);
+        return Jenkins.get().getExtensionList(ConfiguratorRegistry.class).get(0);
     }
 }

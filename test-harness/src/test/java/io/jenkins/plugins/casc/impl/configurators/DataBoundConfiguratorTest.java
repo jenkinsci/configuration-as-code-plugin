@@ -200,7 +200,6 @@ public class DataBoundConfiguratorTest {
     }
 
 
-    @SuppressWarnings("unchecked")
     @Test
     @Issue("PR #838, Issue #222")
     public void export_mapping_should_not_be_null() throws Exception {

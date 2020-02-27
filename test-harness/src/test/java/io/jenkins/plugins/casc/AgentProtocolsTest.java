@@ -22,7 +22,7 @@ public class AgentProtocolsTest {
     @Test
     @ConfiguredWithCode(value = "AgentProtocolsTest.yml")
     public void configure_agent_protocols() throws Exception {
-        final Jenkins jenkins = Jenkins.getInstance();
+        final Jenkins jenkins = Jenkins.get();
         final Set<String> agentProtocols =
                 Arrays.stream(new String[]{"JNLP4-connect", "Ping"}).collect(Collectors.toSet());
         assertEquals(agentProtocols, jenkins.getAgentProtocols());
