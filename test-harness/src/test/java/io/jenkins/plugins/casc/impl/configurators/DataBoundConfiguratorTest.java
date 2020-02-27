@@ -24,7 +24,6 @@ import javax.annotation.PostConstruct;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.LoggerRule;
@@ -41,6 +40,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -54,9 +54,6 @@ public class DataBoundConfiguratorTest {
 
     @Rule
     public LoggerRule logging = new LoggerRule();
-
-    @Rule
-    public ExpectedException exceptionRule = ExpectedException.none();
 
     @Before
     public void tearUp() {
@@ -149,16 +146,17 @@ public class DataBoundConfiguratorTest {
     }
 
     @Test
-    public void packageParametersAreNonnullByDefault() throws Exception {
+    public void packageParametersAreNonnullByDefault() {
         Mapping config = new Mapping();
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
 
-        exceptionRule.expect(ConfiguratorException.class);
-        exceptionRule.expectMessage("string is required to configure class io.jenkins.plugins.casc.impl.configurators.nonnull.nonnullparampackage.PackageParametersAreNonnullByDefault");
+        String expectedMessage = "string is required to configure class io.jenkins.plugins.casc.impl.configurators.nonnull.nonnullparampackage.PackageParametersAreNonnullByDefault";
 
-        registry
+        ConfiguratorException exception = assertThrows(ConfiguratorException.class, () -> registry
             .lookupOrFail(PackageParametersAreNonnullByDefault.class)
-            .configure(config, new ConfigurationContext(registry));
+            .configure(config, new ConfigurationContext(registry)));
+
+       assertThat(exception.getMessage(), is(expectedMessage));
     }
 
     @Test
