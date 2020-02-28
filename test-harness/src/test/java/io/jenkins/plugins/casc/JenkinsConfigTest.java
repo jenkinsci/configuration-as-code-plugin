@@ -16,6 +16,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 
 
@@ -46,7 +47,7 @@ public class JenkinsConfigTest {
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         ConfigurationAsCode.get().export(out);
         final String s = out.toString();
-        assertThat(s, is(emptyOrNullString()));
+        assertThat(s, is(not(emptyOrNullString())));
     }
 
 

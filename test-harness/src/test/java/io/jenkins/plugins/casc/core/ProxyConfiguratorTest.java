@@ -21,6 +21,8 @@ import org.junit.rules.RuleChain;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.LoggerRule;
 
+import static io.jenkins.plugins.casc.misc.Util.assertLogContains;
+import static io.jenkins.plugins.casc.misc.Util.assertNotInLog;
 import static java.util.Objects.requireNonNull;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -113,8 +115,8 @@ public class ProxyConfiguratorTest {
         assertThat(proxy.getSecretPassword(), hasPlainText("proxy_password"));
 
         // Check logs
-        Util.assertLogContains(logging, "password");
-        Util.assertNotInLog(logging, "proxy_password");
+        assertLogContains(logging, "secretPassword");
+        assertNotInLog(logging, "proxy_password");
     }
 
     @Test
@@ -124,14 +126,14 @@ public class ProxyConfiguratorTest {
         ConfigurationContext context = new ConfigurationContext(registry);
         final CNode configNode = getProxyNode(context);
 
-        Secret password = requireNonNull(Secret.decrypt(getProxyNode(context).getScalarValue("password")));
+        Secret password = requireNonNull(Secret.decrypt(getProxyNode(context).getScalarValue("secretPassword")));
 
         final String yamlConfig = Util.toYamlString(configNode);
         assertEquals(String.join("\n",
                 "name: \"proxyhost\"",
                 "noProxyHost: \"externalhost\"",
-                "password: \"" + password.getEncryptedValue() + "\"",
                 "port: 80",
+                "secretPassword: \"" + password.getEncryptedValue() + "\"",
                 "testUrl: \"http://google.com\"",
                 "userName: \"login\"",
                 ""
