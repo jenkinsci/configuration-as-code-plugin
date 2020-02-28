@@ -1,8 +1,6 @@
 package io.jenkins.plugins.casc;
 
 import hudson.plugins.jira.JiraGlobalConfiguration;
-import hudson.plugins.jira.JiraProjectProperty;
-import hudson.plugins.jira.JiraProjectProperty.DescriptorImpl;
 import hudson.plugins.jira.JiraSite;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;

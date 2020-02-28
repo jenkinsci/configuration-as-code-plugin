@@ -50,7 +50,6 @@ import static io.jenkins.plugins.casc.vault.VaultTestUtil.runCommand;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 

@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.logging.Logger;
 import javax.annotation.CheckForNull;
 import javax.servlet.http.HttpServletRequest;
-import org.apache.commons.httpclient.HttpStatus;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.interceptor.RequirePOST;

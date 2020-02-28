@@ -2,7 +2,6 @@ package io.jenkins.plugins.casc.yaml;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.StringBufferInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;

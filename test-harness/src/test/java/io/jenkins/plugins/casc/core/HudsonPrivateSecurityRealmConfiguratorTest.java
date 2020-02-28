@@ -6,7 +6,6 @@ import hudson.security.HudsonPrivateSecurityRealm;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import jenkins.model.Jenkins;
-import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -40,8 +39,6 @@ public class HudsonPrivateSecurityRealmConfiguratorTest {
     @Test
     @ConfiguredWithCode("HudsonPrivateSecurityRealmConfiguratorTest.yml")
     public void config_local_security_and_hashed_admin_user() {
-        Assume.assumeTrue(HudsonPrivateSecurityRealmConfigurator.jenkinsSupportsHashedPasswords());
-
         final User admin = User.getById("hashedadmin", false);
         assertNotNull(admin);
         final HudsonPrivateSecurityRealm.Details details = admin.getProperty(HudsonPrivateSecurityRealm.Details.class);
