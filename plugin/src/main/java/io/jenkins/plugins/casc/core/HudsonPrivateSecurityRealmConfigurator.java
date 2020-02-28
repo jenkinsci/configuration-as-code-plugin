@@ -1,5 +1,6 @@
 package io.jenkins.plugins.casc.core;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.security.HudsonPrivateSecurityRealm;
 import io.jenkins.plugins.casc.Attribute;
@@ -14,7 +15,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
@@ -34,7 +34,7 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
         super(HudsonPrivateSecurityRealm.class);
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public Set<Attribute<HudsonPrivateSecurityRealm, ?>> describe() {
         final Set<Attribute<HudsonPrivateSecurityRealm, ?>> describe = super.describe();
