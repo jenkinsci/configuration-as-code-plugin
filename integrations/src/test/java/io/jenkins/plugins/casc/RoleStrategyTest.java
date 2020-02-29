@@ -25,8 +25,9 @@ import static io.jenkins.plugins.casc.misc.Util.toStringFromYamlFile;
 import static io.jenkins.plugins.casc.misc.Util.toYamlString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+
 
 /**
  * @author Oleg Nenashev
@@ -63,7 +64,7 @@ public class RoleStrategyTest {
         // Admin has configuration access
         assertHasPermission(admin, j.jenkins, Jenkins.ADMINISTER, Jenkins.READ);
         assertHasPermission(user1, j.jenkins, Jenkins.READ);
-        assertHasNoPermission(user1, j.jenkins, Jenkins.ADMINISTER, Jenkins.RUN_SCRIPTS);
+        assertHasNoPermission(user1, j.jenkins, Jenkins.ADMINISTER);
 
         // Folder A is restricted to admin
         assertHasPermission(admin, folderA, Item.CONFIGURE);

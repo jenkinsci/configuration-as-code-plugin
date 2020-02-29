@@ -208,7 +208,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
     }
 
     private Descriptor getDescriptor() {
-        return Jenkins.getInstance().getDescriptor(getTarget());
+        return Jenkins.get().getDescriptor(getTarget());
     }
 
     @NonNull

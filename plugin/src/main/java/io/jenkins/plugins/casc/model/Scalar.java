@@ -115,6 +115,7 @@ public final class Scalar implements CNode, CharSequence {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public boolean isSensitiveData() {
         return sensitive;
     }

@@ -21,7 +21,7 @@ install: skip
 script:
   - |
     mvn -Pjacoco clean verify -B -V \
-      -Djenkins.version=2.176.3 -Daccess-modifier-checker.failOnError=true \
+      -Daccess-modifier-checker.failOnError=true \
       --no-transfer-progress
 
 after_success:

@@ -29,14 +29,14 @@ public class JenkinsConfiguratorTest {
     @Test
     @ConfiguredWithCode("Primitives.yml")
     public void jenkins_primitive_attributes() throws Exception {
-        final Jenkins jenkins = Jenkins.getInstance();
+        final Jenkins jenkins = Jenkins.get();
         assertEquals(6666, jenkins.getSlaveAgentPort());
     }
 
     @Test
     @ConfiguredWithCode("HeteroDescribable.yml")
     public void jenkins_abstract_describable_attributes() throws Exception {
-        final Jenkins jenkins = Jenkins.getInstance();
+        final Jenkins jenkins = Jenkins.get();
         assertTrue(jenkins.getSecurityRealm() instanceof HudsonPrivateSecurityRealm);
         assertTrue(jenkins.getAuthorizationStrategy() instanceof FullControlOnceLoggedInAuthorizationStrategy);
         assertFalse(((FullControlOnceLoggedInAuthorizationStrategy) jenkins.getAuthorizationStrategy()).isAllowAnonymousRead());
@@ -46,7 +46,7 @@ public class JenkinsConfiguratorTest {
     @Issue("Issue #173")
     @ConfiguredWithCode("SetEnvironmentVariable.yml")
     public void shouldSetEnvironmentVariable() throws Exception {
-        final DescribableList<NodeProperty<?>, NodePropertyDescriptor> properties = Jenkins.getInstance().getNodeProperties();
+        final DescribableList<NodeProperty<?>, NodePropertyDescriptor> properties = Jenkins.get().getNodeProperties();
         EnvVars env = new EnvVars();
         for (NodeProperty<?> property : properties) {
             property.buildEnvVars(env, TaskListener.NULL);
