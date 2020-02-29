@@ -10,8 +10,9 @@ import org.jvnet.hudson.test.Issue;
 import static io.jenkins.plugins.casc.misc.Util.getToolRoot;
 import static io.jenkins.plugins.casc.misc.Util.toStringFromYamlFile;
 import static io.jenkins.plugins.casc.misc.Util.toYamlString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+
 
 public class ToolDefaultPropertiesExportBlacklistTest {
 

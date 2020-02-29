@@ -149,7 +149,7 @@ public class ConfigurationAsCode extends ManagementLink {
     @RequirePOST
     @Restricted(NoExternalUse.class)
     public void doReload(StaplerRequest request, StaplerResponse response) throws Exception {
-        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+        if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -160,7 +160,7 @@ public class ConfigurationAsCode extends ManagementLink {
     @RequirePOST
     @Restricted(NoExternalUse.class)
     public void doReplace(StaplerRequest request, StaplerResponse response) throws Exception {
-        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+        if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -204,7 +204,7 @@ public class ConfigurationAsCode extends ManagementLink {
     @POST
     @Restricted(NoExternalUse.class)
     public FormValidation doCheckNewSource(@QueryParameter String newSource) {
-        Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
+        Jenkins.get().checkPermission(Jenkins.ADMINISTER);
         String normalizedSource = Util.fixEmptyAndTrim(newSource);
         File file = new File(Util.fixNull(normalizedSource));
         if (normalizedSource == null) {
@@ -311,7 +311,7 @@ public class ConfigurationAsCode extends ManagementLink {
         }
 
         if (configParameter == null) {
-            String fullPath = Jenkins.getInstance().getRootDir() + File.separator + DEFAULT_JENKINS_YAML_PATH;
+            String fullPath = Jenkins.get().getRootDir() + File.separator + DEFAULT_JENKINS_YAML_PATH;
             if (Files.exists(Paths.get(fullPath))) {
                 configParameter = fullPath;
             }
@@ -334,7 +334,7 @@ public class ConfigurationAsCode extends ManagementLink {
         final String cascDirectory = "/WEB-INF/" + DEFAULT_JENKINS_YAML_PATH + ".d/";
         List<String> res = new ArrayList<>();
 
-        final ServletContext servletContext = Jenkins.getInstance().servletContext;
+        final ServletContext servletContext = Jenkins.get().servletContext;
         try {
             URL bundled = servletContext.getResource(cascFile);
             if (bundled != null) {
@@ -367,7 +367,7 @@ public class ConfigurationAsCode extends ManagementLink {
     @Restricted(NoExternalUse.class)
     public void doCheck(StaplerRequest req, StaplerResponse res) throws Exception {
 
-        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+        if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -384,7 +384,7 @@ public class ConfigurationAsCode extends ManagementLink {
     @Restricted(NoExternalUse.class)
     public void doApply(StaplerRequest req, StaplerResponse res) throws Exception {
 
-        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+        if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -399,7 +399,7 @@ public class ConfigurationAsCode extends ManagementLink {
     @Restricted(NoExternalUse.class)
     public void doExport(StaplerRequest req, StaplerResponse res) throws Exception {
 
-        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+        if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -416,7 +416,7 @@ public class ConfigurationAsCode extends ManagementLink {
     @Restricted(NoExternalUse.class)
     public void doSchema(StaplerRequest req, StaplerResponse res) throws Exception {
 
-        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+        if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -428,7 +428,7 @@ public class ConfigurationAsCode extends ManagementLink {
     @RequirePOST
     @Restricted(NoExternalUse.class)
     public void doViewExport(StaplerRequest req, StaplerResponse res) throws Exception {
-        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+        if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -442,7 +442,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
     @Restricted(NoExternalUse.class)
     public void doReference(StaplerRequest req, StaplerResponse res) throws Exception {
-        if (!Jenkins.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+        if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -704,7 +704,7 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     private static void detectVaultPluginMissing() {
-        PluginManager pluginManager = Jenkins.getInstance().getPluginManager();
+        PluginManager pluginManager = Jenkins.get().getPluginManager();
         Set<String> envKeys = System.getenv().keySet();
         if (envKeys.stream().anyMatch(s -> s.startsWith("CASC_VAULT_"))
             && pluginManager.getPlugin("hashicorp-vault-plugin") == null) {
@@ -741,7 +741,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
 
     public static ConfigurationAsCode get() {
-        return Jenkins.getInstance().getExtensionList(ConfigurationAsCode.class).get(0);
+        return Jenkins.get().getExtensionList(ConfigurationAsCode.class).get(0);
     }
 
     /**
@@ -799,7 +799,7 @@ public class ConfigurationAsCode extends ManagementLink {
     public String getHtmlHelp(Class type, String attribute) throws IOException {
         final URL resource = Klass.java(type).getResource("help-" + attribute + ".html");
         if (resource != null) {
-            return IOUtils.toString(resource.openStream());
+            return IOUtils.toString(resource.openStream(), StandardCharsets.UTF_8);
         }
         return "";
     }

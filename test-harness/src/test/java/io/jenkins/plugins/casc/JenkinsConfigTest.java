@@ -13,11 +13,12 @@ import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.rules.RuleChain;
 import org.kohsuke.stapler.DataBoundConstructor;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -33,7 +34,7 @@ public class JenkinsConfigTest {
 
     @Test
     public void loadFromCASC_JENKINS_CONFIG() {
-        Jenkins j = Jenkins.getInstance();
+        Jenkins j = Jenkins.get();
         assertEquals("configuration as code - JenkinsConfigTest", j.getSystemMessage());
         assertEquals(10, j.getQuietPeriod());
     }
@@ -41,12 +42,12 @@ public class JenkinsConfigTest {
 
     @Test
     public void shouldExportEvenOnError() throws Exception {
-        Jenkins j = Jenkins.getInstance();
+        Jenkins j = Jenkins.get();
         j.setCrumbIssuer(new BrokenCrumbIssuer("bar"));
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         ConfigurationAsCode.get().export(out);
         final String s = out.toString();
-        assertThat(s, is(not(isEmptyOrNullString())));
+        assertThat(s, is(not(emptyOrNullString())));
     }
 
 

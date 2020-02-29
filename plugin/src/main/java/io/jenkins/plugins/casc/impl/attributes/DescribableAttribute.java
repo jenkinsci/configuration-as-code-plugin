@@ -25,7 +25,7 @@ public class DescribableAttribute<Owner, Type> extends Attribute<Owner, Type> {
 
     @Override
     public List<String> possibleValues() {
-        final List<Descriptor> descriptors = Jenkins.getInstance().getDescriptorList(type);
+        final List<Descriptor> descriptors = Jenkins.get().getDescriptorList(type);
         return descriptors.stream()
                 .map(d -> getPreferredSymbol(d, type, d.getKlass().toJavaClass()))
                 .collect(Collectors.toList());

@@ -14,18 +14,18 @@ import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.model.CNode;
 import java.io.IOException;
-import java.util.ArrayList;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.PretendSlave;
 
 import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
 import static io.jenkins.plugins.casc.misc.Util.toYamlString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+
 
 public class JenkinsConfiguratorCloudSupportTest {
 
@@ -139,7 +139,7 @@ public class JenkinsConfiguratorCloudSupportTest {
     private static class Cloud3PretendSlave extends AbstractCloudSlave {
 
         public Cloud3PretendSlave() throws IOException, Descriptor.FormException {
-            super("testCloud", "Node desc", "remoteFS", 3, Mode.NORMAL, "labelString", null, null, new ArrayList<>());
+            super("testCloud", "remoteFS", null);
         }
 
         @Override

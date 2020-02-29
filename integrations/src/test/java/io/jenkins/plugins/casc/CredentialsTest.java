@@ -23,11 +23,11 @@ import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
 
 import static java.util.Objects.requireNonNull;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class CredentialsTest {
@@ -65,6 +65,31 @@ public class CredentialsTest {
         assertEquals("user1", creds.get(0).getId());
         assertEquals("Administrator", creds.get(0).getUsername());
         assertEquals("secret", creds.get(0).getPassword().getPlainText());
+    }
+
+    @Test
+    @ConfiguredWithCode("GlobalCredentials.yml")
+    public void testExportFileCredentials() throws Exception {
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        ConfigurationContext context = new ConfigurationContext(registry);
+        CredentialsRootConfigurator root = ExtensionList.lookupSingleton(CredentialsRootConfigurator.class);
+
+        CNode node = root.describe(root.getTargetComponent(context), context);
+        assertNotNull(node);
+        final Mapping mapping = node.asMapping();
+
+        Mapping fileCredential = mapping.get("system")
+            .asMapping()
+            .get("domainCredentials")
+            .asSequence().get(0)
+            .asMapping().get("credentials")
+            .asSequence().get(2)
+            .asMapping().get("file").asMapping();
+
+        assertThat(fileCredential.getScalarValue("scope"), is("GLOBAL"));
+        assertThat(fileCredential.getScalarValue("id"), is("secret-file"));
+        assertThat(fileCredential.getScalarValue("fileName"), is("mysecretfile.txt"));
+        assertThat(fileCredential.getScalarValue("secretBytes"), not("WJjZAo="));
     }
 
     @ConfiguredWithCode("GlobalCredentials.yml")

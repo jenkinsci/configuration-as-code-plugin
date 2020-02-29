@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import org.apache.commons.httpclient.HttpStatus;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Response;
 import org.junit.Before;
@@ -40,7 +39,7 @@ public class TokenReloadActionTest {
     private ServletResponseSpy response;
 
     private class ServletResponseSpy extends Response {
-        private int error = HttpStatus.SC_OK;
+        private int error = 200;
 
         public ServletResponseSpy() {
             super(null, null);
@@ -98,7 +97,7 @@ public class TokenReloadActionTest {
         RequestImpl request = newRequest(null);
         tokenReloadAction.doIndex(request, new ResponseImpl(null, response));
 
-        assertEquals(HttpStatus.SC_NOT_FOUND, response.getStatus());
+        assertEquals(404, response.getStatus());
 
         List<LogRecord> messages = loggerRule.getRecords();
         assertEquals(1, messages.size());
@@ -114,7 +113,7 @@ public class TokenReloadActionTest {
         RequestImpl request = newRequest(null);
         tokenReloadAction.doIndex(request, new ResponseImpl(null, response));
 
-        assertEquals(HttpStatus.SC_UNAUTHORIZED, response.getStatus());
+        assertEquals(401, response.getStatus());
 
         assertFalse(configWasReloaded());
 
@@ -130,7 +129,7 @@ public class TokenReloadActionTest {
 
         tokenReloadAction.doIndex(newRequest("someSecretValue"), new ResponseImpl(null, response));
 
-        assertEquals(HttpStatus.SC_OK, response.getStatus());
+        assertEquals(200, response.getStatus());
 
         assertTrue(configWasReloaded());
 

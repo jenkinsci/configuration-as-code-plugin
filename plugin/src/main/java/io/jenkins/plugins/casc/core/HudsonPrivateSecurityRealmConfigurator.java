@@ -4,21 +4,17 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.security.HudsonPrivateSecurityRealm;
-import hudson.util.VersionNumber;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.impl.attributes.MultivaluedAttribute;
 import io.jenkins.plugins.casc.impl.configurators.DataBoundConfigurator;
 import io.jenkins.plugins.casc.model.CNode;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
@@ -31,7 +27,6 @@ import org.kohsuke.stapler.DataBoundConstructor;
 @Restricted(NoExternalUse.class)
 public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurator<HudsonPrivateSecurityRealm> {
     private static final Logger logger = Logger.getLogger(HudsonPrivateSecurityRealmConfigurator.class.getName());
-    private static final VersionNumber MIN_VERSION_FOR_HASHED_PASSWORDS = new VersionNumber("2.161");
     /// matches HudsonPrivateSecurityRealm.JBCRYPT_HEADER
     private static final String HASHED_PASSWORD_PREFIX = "#jbcrypt:";
 
@@ -64,9 +59,9 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
 
     private static void setter(HudsonPrivateSecurityRealm target, Collection<UserWithPassword> value) throws IOException {
         for (UserWithPassword user : value) {
-            if (StringUtils.startsWith(user.password, HASHED_PASSWORD_PREFIX) && jenkinsSupportsHashedPasswords()) {
+            if (StringUtils.startsWith(user.password, HASHED_PASSWORD_PREFIX)) {
                 try {
-                    createAccount(target, user);
+                    target.createAccountWithHashedPassword(user.id, user.password);
                 } catch (IllegalArgumentException e) {
                     logger.log(Level.WARNING, "Failed to create user with presumed hashed password", e);
                     // fallback, just create the account as is
@@ -76,37 +71,6 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
                 target.createAccount(user.id, user.password);
             }
         }
-    }
-
-    /**
-     * Call createAccountWithHashedPassword reflectively, as it only exists in Jenkins 2.161+, and we
-     * cannot depend on that newer Jenkins version in this plugin yet.
-     * @param target
-     *        The target to invoke
-     * @param user
-     *        The user to construct
-     */
-    private static void createAccount(HudsonPrivateSecurityRealm target, UserWithPassword user) {
-        // TODO remove reflection once we target 2.161+
-        try {
-            @SuppressWarnings("JavaReflectionMemberAccess") // available from 2.161+
-            Method createAccountWithHashedPassword = HudsonPrivateSecurityRealm.class.getDeclaredMethod(
-                    "createAccountWithHashedPassword", String.class, String.class);
-            createAccountWithHashedPassword.invoke(target, user.id, user.password);
-        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-            logger.log(Level.WARNING, "Failed to invoke createAccountWithHashedPassword method", e);
-            throw new IllegalArgumentException(e);
-        }
-    }
-
-    static boolean jenkinsSupportsHashedPasswords() {
-        VersionNumber currentVersion = Jenkins.getVersion();
-        if (currentVersion == null) {
-            logger.log(Level.WARNING,
-                    "Could not retrieve current version for Jenkins server. Is everything configured correctly?");
-            return false;
-        }
-        return !currentVersion.isOlderThan(MIN_VERSION_FOR_HASHED_PASSWORDS);
     }
 
     public static class UserWithPassword {
