@@ -3,17 +3,16 @@
 # Declare name/value pairs to be passed into your templates.
 # name: value
 
-Master:
-  Name: jenkins-master
-  Image: "jenkins/jenkins"
-  ImageTag: "lts"
-  ImagePullPolicy: "Always"
-  # ImagePullSecret: jenkins
-  Component: "jenkins-master"
-  UseSecurity: true
-  AdminUser: admin
-  #  AdminPassword: "<defaults to random>"
-  OwnSshKey: false
+master:
+  componentName: jenkins-master
+  image: "jenkins/jenkins"
+  tag: "lts"
+  imagePullPolicy: "Always"
+  # imagePullSecret: jenkins
+  useSecurity: true
+  adminUser: admin
+  #  adminPassword: "<defaults to random>"
+  ownSshKey: false
   # If CasC auto-reload is enabled, an SSH (RSA) keypair is needed.  Can either provide your own, or leave unconfigured\false to allow a random key to be auto-generated.
   # If you choose to use your own, you must upload your decrypted RSA private key (not the public key above) to a Kubernetes secret using the following command:
   # kubectl -n <namespace> create secret generic <helm_release_name> --dry-run --from-file=jenkins-admin-private-key=~/.ssh/id_rsa -o YAML |kubectl -n <namespace> apply -f -
@@ -35,14 +34,13 @@ Master:
   # etc.  Best reference is https://<jenkins_url>/configuration-as-code/reference.  The example below creates a welcome message:
   JCasC:
     enabled: true
-    PluginVersion: 1.5
-    SupportPluginVersion: 1.5
-    ConfigScripts:
+    pluginVersion: 1.35
+    configScripts:
       welcome-message: |
         jenkins:
           systemMessage: Welcome to our CI\CD server.  This Jenkins is configured and managed 'as code'.
 
-  Sidecars:
+  sidecars:
     configAutoReload:
       # If enabled: true, Jenkins Configuration as Code will be reloaded on-the-fly without a reboot.  If false or not-specified,
       # JCasC changes will cause a reboot and will only be applied at the subsequent start-up.  Auto-reload uses the Jenkins CLI
@@ -73,8 +71,8 @@ Master:
       # It's also possible to specify ALL to search in all namespaces:
       # searchNamespace:
 
-  ContainerEnv:
-  InitContainerEnv:
+  containerEnv:
+  initContainerEnv:
 
   # Set min/max heap here if needed with:
   # JavaOpts: "-Xms512m -Xmx512m"
@@ -86,7 +84,7 @@ Master:
   #   -Dcom.sun.management.jmxremote.ssl=false
   # JMXPort: 4000
   # List of plugins to be install during Jenkins master start
-  InstallPlugins:
+  installPlugins:
     - kubernetes:latest
     - kubernetes-credentials:latest
     - workflow-aggregator:latest
@@ -101,33 +99,32 @@ Master:
   #   - "method groovy.json.JsonSlurperClassic parseText java.lang.String"
   #   - "new groovy.json.JsonSlurperClassic"
   # List of groovy init scripts to be executed during Jenkins master start
-  InitScripts:
+  initScripts:
   #  - |
   #    print 'adding global pipeline libraries, register properties, bootstrap jobs...'
-  CustomConfigMap: false
+  customConfigMap: false
 
-  ServicePort: 8080
+  servicePort: 8080
   # For minikube, set this to NodePort, elsewhere use LoadBalancer
   # Use ClusterIP if your setup includes ingress controller
-  ServiceType: ClusterIP
-  ServiceAnnotations: {}
-  ContainerPort: 8080
-  SlaveListenerPort: 50000
-  LoadBalancerSourceRanges:
+  serviceType: ClusterIP
+  serviceAnnotations: {}
+  slaveListenerPort: 50000
+  loadBalancerSourceRanges:
     - 0.0.0.0/0
   # HostName: jenkins.cicd.your.cloud
-  Ingress:
-    Enabled: false
-    # Annotations:
+  ingress:
+    enabled: false
+    # annotations:
     #   kubernetes.io/ingress.class: nginx
     #   kubernetes.io/tls-acme: "false"
-    # TLS:
+    # tls:
     #  - secretName: jenkins.cicd.your.cloud
     #    hosts:
     #      - jenkins.cicd.your.cloud
 
-Persistence:
-  Enabled: false
+persistence:
+  enabled: false
   ## A manually managed Persistent Volume and Claim
   ## Requires Persistence.Enabled: true
   ## If defined, PVC must be created manually before volume will be bound
@@ -147,9 +144,9 @@ Persistence:
   #  name: nothing
   #  readOnly: true
 
-NetworkPolicy:
+networkPolicy:
   # Enable creation of NetworkPolicy resources.
-  Enabled: true
+  enabled: true
   # For Kubernetes v1.4, v1.5 and v1.6, use 'extensions/v1beta1'
   # For Kubernetes v1.7, use 'networking.k8s.io/v1'
-  ApiVersion: extensions/v1beta1
+  apiVersion: extensions/v1beta1

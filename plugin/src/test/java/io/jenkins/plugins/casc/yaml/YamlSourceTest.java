@@ -1,9 +1,10 @@
 package io.jenkins.plugins.casc.yaml;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.StringBufferInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -23,7 +24,7 @@ public class YamlSourceTest {
     @Test
     public void shouldUseToStringOfSourceInToStringForInputStream() {
         //given
-        StringBufferInputStream testInputStream = new StringBufferInputStream("IS content");
+        InputStream testInputStream = new ByteArrayInputStream("IS content".getBytes(StandardCharsets.UTF_8));
         String testInputStreamToString = testInputStream.toString();
         //and
         YamlSource<InputStream> yamlSource = YamlSource.of(testInputStream);

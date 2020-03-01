@@ -18,7 +18,7 @@ import jenkins.model.Jenkins;
 public interface RootElementConfigurator<T> extends Configurator<T> {
 
     static List<RootElementConfigurator> all() {
-        final Jenkins jenkins = Jenkins.getInstance();
+        final Jenkins jenkins = Jenkins.get();
         List<RootElementConfigurator> configurators = new ArrayList<>(
             jenkins.getExtensionList(RootElementConfigurator.class));
 
@@ -28,7 +28,7 @@ public interface RootElementConfigurator<T> extends Configurator<T> {
 
         for (ManagementLink link : ManagementLink.all()) {
             final String name = link.getUrlName();
-            final Descriptor descriptor = Jenkins.getInstance().getDescriptor(name);
+            final Descriptor descriptor = Jenkins.get().getDescriptor(name);
             if (descriptor != null)
                 configurators.add(new DescriptorConfigurator(descriptor));
         }

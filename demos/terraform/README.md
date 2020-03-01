@@ -1,38 +1,25 @@
-# example of how to configure terraform plugin
+# Configure terraform plugin
 
-## Prerequisites
+Sample configuration for the [Terraform plugin](https://plugins.jenkins.io/terraform).
 
-to test it from root of the current repository:
+## Sample configuration
 
-```bash
-export CASC_JENKINS_CONFIG=$(PWD)/demos/terraform/jenkins.yaml
-mvn hpi:run
-```
-
-You need to install the following plugins to make it work (you can do it before using the export):
-
-- Configuration As Code
-- Configuration As Code Support
-- Job DSL
-- SSH Credentials
-
-## Sample
-
-```yml
-jenkins:
-  systemMessage: "Jenkins configured automatically by Jenkins Configuration as Code plugin\n\n"
-
+```yaml
 tool:
-  terraforminstallation:
+  terraformInstallation:
     installations:
-      - name: terraform
-        home: ""
+      - name: "terraform"
+        home: "/terraform-0.11"
         properties:
           - installSource:
               installers:
                 - terraformInstaller:
                     id: "0.11.9-linux-amd64"
+```
 
+An example of the job definition, with the JobDSL, that uses the terraform wrapper.
+
+```yaml
 jobs:
   - script: >
       job("terraform-job") {
@@ -42,7 +29,7 @@ jobs:
         concurrentBuild(false)
         wrappers {
            terraformBuildWrapper {
-              variables("") 
+              variables("")
               terraformInstallation("terraform")
               doGetUpdate(true)
               doNotApply(false)

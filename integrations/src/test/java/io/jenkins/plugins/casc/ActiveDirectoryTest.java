@@ -11,6 +11,7 @@ import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.rules.RuleChain;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -38,5 +39,9 @@ public class ActiveDirectoryTest {
 
         assertTrue(realm.removeIrrelevantGroups);
         assertTrue(realm.startTls);
+        assertNotNull(realm.getCache());
+        assertEquals(500, realm.getCache().getSize());
+        assertEquals(600, realm.getCache().getTtl());
+
     }
 }

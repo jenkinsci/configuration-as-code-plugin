@@ -5,6 +5,7 @@ import hudson.Extension;
 import io.jenkins.plugins.casc.SecretSource;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
@@ -32,7 +33,7 @@ public class DockerSecretSource extends SecretSource {
         if (StringUtils.isBlank(secret)) return Optional.empty();
         final File file = new File(secrets, secret);
         if (file.exists()) {
-            return Optional.of(FileUtils.readFileToString(file).trim());
+            return Optional.of(FileUtils.readFileToString(file, StandardCharsets.UTF_8).trim());
         }
         return Optional.empty();
     }

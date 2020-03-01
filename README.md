@@ -28,6 +28,7 @@ Below configuration file includes root entries for various components of your pr
 
 ```yaml
 jenkins:
+  systemMessage: "Jenkins configured automatically by Jenkins Configuration as Code plugin\n\n"
   securityRealm:
     ldap:
       configurations:
@@ -44,25 +45,35 @@ jenkins:
         remoteFS: "/home/jenkins"
         launcher:
           jnlp:
+            workDirSettings:
+              disabled: true
+              failIfWorkDirIsMissing: false
+              internalDir: "remoting"
+              workDirPath: "/tmp"
 
   slaveAgentPort: 50000
   agentProtocols:
     - "jnlp2"
+
 tool:
   git:
     installations:
       - name: git
         home: /usr/local/bin/git
+
 credentials:
   system:
     domainCredentials:
-      credentials:
-        - certificate:
-            scope: SYSTEM
-            id: ssh_private_key
-            keyStoreSource:
-              fileOnMaster:
-                keyStoreFile: /docker/secret/id_rsa
+      - credentials:
+          - basicSSHUserPrivateKey:
+              scope: SYSTEM
+              id: ssh_with_passphrase_provided
+              username: ssh_root
+              passphrase: ${SSH_KEY_PASSWORD}
+              description: "SSH passphrase with private key file. Private key provided"
+              privateKeySource:
+                directEntry:
+                  privateKey: ${SSH_PRIVATE_KEY}
 ```
 
 In addition, we want to have a well documented syntax file, and tooling to assist in writing and testing,
@@ -159,7 +170,7 @@ Kubernetes users:\
 
 Most plugins should be supported out-of-the-box, or maybe require some minimal changes. See this [dashboard](https://issues.jenkins.io/secure/Dashboard.jspa?selectPageId=18341) for known compatibility issues.
 
-## Compatibility with Jenkins > 2.199
+## Compatibility with Jenkins >= 2.199
 
 Jenkins 2.199 introduced [a check to prevent saving global configuration before loading the configuration has occurred](https://github.com/jenkinsci/jenkins/pull/4171). Configurations As Code needs to apply global configuration before Jenkins loads jobs (so they can load and correctly reference any global state) and as such until [JENKINS-51856](https://issues.jenkins-ci.org/browse/JENKINS-51856) is implemented there exists a race condition where by Jenkins may fail to start when used with this plugin.
 

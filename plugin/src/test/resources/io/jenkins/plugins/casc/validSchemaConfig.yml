@@ -1,3 +1,0 @@
-jenkins:
-   systemMessage: "Configured by Configuration as Code plugin"
-   numExecutors: 3

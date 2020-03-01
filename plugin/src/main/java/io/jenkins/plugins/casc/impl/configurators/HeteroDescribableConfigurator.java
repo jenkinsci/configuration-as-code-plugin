@@ -126,7 +126,6 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
                 .toJavaMap();
     }
 
-    @SuppressWarnings("unchecked")
     private Option<Configurator<T>> lookupConfigurator(ConfigurationContext context, Class<?> descriptor) {
         return Option.of(context.lookup(descriptor));
     }
@@ -144,8 +143,8 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
      * Then we go through all the descriptors and find ones compliant with the target.
      * @return Stream of descriptors which match the target
      */
-    private Stream<Descriptor<T>> getDescriptors() {
-        DescriptorExtensionList<T, Descriptor<T>> descriptorList = Jenkins.getInstance().getDescriptorList(target);
+     private Stream<Descriptor<T>> getDescriptors() {
+        DescriptorExtensionList<T, Descriptor<T>> descriptorList = Jenkins.get().getDescriptorList(target);
         if (!descriptorList.isEmpty()) { // fast fetch for root objects
             return Stream.ofAll(descriptorList);
         }
@@ -168,7 +167,7 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
                 }
                 break;
             }
-            parentDescriptorClassList = Jenkins.getInstance().getDescriptorList(match);
+            parentDescriptorClassList = Jenkins.get().getDescriptorList(match);
             effectiveTarget = effectiveTarget.getSuperclass();
         }
 

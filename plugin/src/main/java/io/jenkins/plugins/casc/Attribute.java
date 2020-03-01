@@ -61,6 +61,7 @@ public class Attribute<Owner, Type> {
     private Setter<Owner, Type> setter;
     private Getter<Owner, Type> getter;
     private boolean secret;
+    private boolean isJsonSchema;
 
     private boolean deprecated;
 
@@ -109,6 +110,14 @@ public class Attribute<Owner, Type> {
 
     public Class<? extends AccessRestriction>[] getRestrictions() {
         return restrictions != null ? restrictions : EMPTY;
+    }
+
+    /**
+     * Set jsonSchema is used to tell the describe function to call the describe structure
+     * so that it supports and returns a nested structure
+     */
+    public void setJsonSchema(boolean jsonSchema) {
+        isJsonSchema = jsonSchema;
     }
 
     public boolean isRestricted() {
@@ -235,13 +244,56 @@ public class Attribute<Owner, Type> {
             if (multiple) {
                 Sequence seq = new Sequence();
                 if (o.getClass().isArray()) o = Arrays.asList((Object[]) o);
-                for (Object value : (Iterable) o) {
-                    seq.add(_describe(c, context, value, shouldBeMasked));
+                if (o instanceof Iterable) {
+                    for (Object value : (Iterable) o) {
+                        seq.add(_describe(c, context, value, shouldBeMasked));
+                    }
+                } else {
+                    LOGGER.log(Level.FINE, o.getClass().toString() + " is not iterable");
                 }
                 return seq;
             }
             return _describe(c, context, o, shouldBeMasked);
         } catch (Exception | /* Jenkins.getDescriptorOrDie */AssertionError e) {
+            // Don't fail the whole export, prefer logging this error
+            LOGGER.log(Level.WARNING, "Failed to export", e);
+            return new Scalar("FAILED TO EXPORT\n" + instance.getClass().getName() + "#" + name + ": "
+                + printThrowable(e));
+        }
+    }
+
+    /**
+     * This function is for the JSONSchemaGeneration
+     * @param instance Owner Instance
+     * @param context Context to be passed
+     * @return CNode object describing the structure of the node
+     */
+    public CNode describeForSchema (Owner instance, ConfigurationContext context) {
+        final Configurator c = context.lookup(type);
+        if (c == null) {
+            return new Scalar("FAILED TO EXPORT\n" + instance.getClass().getName()+"#"+name +
+                ": No configurator found for type " + type);
+        }
+        try {
+            Object o = getType();
+            if (o == null) {
+                return null;
+            }
+
+            // In Export we sensitive only those values which do not get rendered as secrets
+            boolean shouldBeMasked = isSecret(instance);
+            if (multiple) {
+                Sequence seq = new Sequence();
+                if (o.getClass().isArray()) o = Arrays.asList(o);
+                if (o instanceof Iterable) {
+                    for (Object value : (Iterable) o) {
+                        seq.add(_describe(c, context, value, shouldBeMasked));
+                    }
+                }
+                return seq;
+            }
+            return _describe(c, context, o, shouldBeMasked);
+        } catch (Exception e) {
             // Don't fail the whole export, prefer logging this error
             LOGGER.log(Level.WARNING, "Failed to export", e);
             return new Scalar("FAILED TO EXPORT\n" + instance.getClass().getName() + "#" + name + ": "
@@ -261,7 +313,12 @@ public class Attribute<Owner, Type> {
      */
     private CNode _describe(Configurator c, ConfigurationContext context, Object value, boolean shouldBeMasked)
             throws Exception {
-        CNode node = c.describe(value, context);
+        CNode node;
+        if (isJsonSchema) {
+            node = c.describeStructure(value, context);
+        } else {
+            node = c.describe(value, context);
+        }
         if (shouldBeMasked && node instanceof Scalar) {
             ((Scalar)node).sensitive(true);
         }
