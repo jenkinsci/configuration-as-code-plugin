@@ -13,6 +13,7 @@ import hudson.model.ManagementLink;
 import hudson.remoting.Which;
 import hudson.security.ACL;
 import hudson.security.ACLContext;
+import hudson.security.Permission;
 import hudson.util.FormValidation;
 import io.jenkins.plugins.casc.impl.DefaultConfiguratorRegistry;
 import io.jenkins.plugins.casc.model.CNode;
@@ -136,6 +137,12 @@ public class ConfigurationAsCode extends ManagementLink {
     @Override
     public String getDescription() {
         return "Reload your configuration or update configuration source";
+    }
+
+    @NonNull
+    @Override
+    public Permission getRequiredPermission() {
+        return Jenkins.SYSTEM_READ;
     }
 
     public Date getLastTimeLoaded() {
@@ -406,8 +413,7 @@ public class ConfigurationAsCode extends ManagementLink {
     @RequirePOST
     @Restricted(NoExternalUse.class)
     public void doExport(StaplerRequest req, StaplerResponse res) throws Exception {
-
-        if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
+        if (!Jenkins.get().hasPermission(Jenkins.SYSTEM_READ)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -423,8 +429,7 @@ public class ConfigurationAsCode extends ManagementLink {
      */
     @Restricted(NoExternalUse.class)
     public void doSchema(StaplerRequest req, StaplerResponse res) throws Exception {
-
-        if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
+        if (!Jenkins.get().hasPermission(Jenkins.SYSTEM_READ)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -436,7 +441,7 @@ public class ConfigurationAsCode extends ManagementLink {
     @RequirePOST
     @Restricted(NoExternalUse.class)
     public void doViewExport(StaplerRequest req, StaplerResponse res) throws Exception {
-        if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
+        if (!Jenkins.get().hasPermission(Jenkins.SYSTEM_READ)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -450,7 +455,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
     @Restricted(NoExternalUse.class)
     public void doReference(StaplerRequest req, StaplerResponse res) throws Exception {
-        if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
+        if (!Jenkins.get().hasPermission(Jenkins.SYSTEM_READ)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
