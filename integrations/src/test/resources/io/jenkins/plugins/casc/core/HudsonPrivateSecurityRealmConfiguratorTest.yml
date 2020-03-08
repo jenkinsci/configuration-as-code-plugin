@@ -5,6 +5,9 @@ jenkins:
       users:
         - id: "admin"
           password: "1234"
+          properties:
+            - slack:
+                userId: "1234"
         - id: "hashedadmin"
           # password is 'password'
           password: "#jbcrypt:$2a$10$LP4bMhwyCPnsDm.XRcTZSuBqWYKGAiDAsQXrSrJGYcEd9padaPgsC"

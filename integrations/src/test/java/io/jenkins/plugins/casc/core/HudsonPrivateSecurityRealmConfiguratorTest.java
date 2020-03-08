@@ -6,9 +6,12 @@ import hudson.security.HudsonPrivateSecurityRealm;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import jenkins.model.Jenkins;
+import jenkins.plugins.slack.user.SlackUserProperty;
 import org.junit.Rule;
 import org.junit.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -31,6 +34,11 @@ public class HudsonPrivateSecurityRealmConfiguratorTest {
         assertNotNull(admin);
         final HudsonPrivateSecurityRealm.Details details = admin.getProperty(HudsonPrivateSecurityRealm.Details.class);
         assertTrue(details.isPasswordCorrect("1234"));
+
+        SlackUserProperty property = admin
+            .getProperty(SlackUserProperty.class);
+
+        assertThat(property.getUserId(), is("1234"));
 
         final FullControlOnceLoggedInAuthorizationStrategy authorizationStrategy = (FullControlOnceLoggedInAuthorizationStrategy) jenkins.getAuthorizationStrategy();
         assertTrue(authorizationStrategy.isAllowAnonymousRead());
