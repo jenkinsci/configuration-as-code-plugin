@@ -53,8 +53,8 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
     @Override
     public CNode describe(HudsonPrivateSecurityRealm instance, ConfigurationContext context)
         throws Exception {
-        // by default don't export all users
-        if (System.getProperty("io.jenkins.plugins.casc.core.HudsonPrivateSecurityRealmConfigurator.exportUsers", "false").equals("true")) {
+        // allow disabling exporting users if an instance has too many
+        if (System.getProperty("io.jenkins.plugins.casc.core.HudsonPrivateSecurityRealmConfigurator.exportUsers", "true").equals("true")) {
             return super.describe(instance, context);
         }
         return null;
@@ -79,7 +79,7 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
 
     private static void setter(HudsonPrivateSecurityRealm target, Collection<UserWithPassword> value) throws IOException {
         for (UserWithPassword user : value) {
-            User updatedUser = createAccountOrLookupById(target, user);
+            User updatedUser = createAccount(target, user);
             updatedUser.setFullName(user.name);
             updatedUser.setDescription(user.description);
             if (user.getProperties() != null) {
@@ -90,7 +90,7 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
         }
     }
 
-    private static User createAccountOrLookupById(HudsonPrivateSecurityRealm target, UserWithPassword user)
+    private static User createAccount(HudsonPrivateSecurityRealm target, UserWithPassword user)
         throws IOException {
         User updatedUser;
         if (StringUtils.isNotBlank(user.password)) {
@@ -108,10 +108,7 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
                 updatedUser = target.createAccount(user.id, user.password);
             }
         } else {
-            updatedUser = User.getById(user.id, false);
-            if (updatedUser == null) {
-                throw new IllegalArgumentException("No password supplied for user: " + user.id + " and couldn't find the user in the existing jenkins user database");
-            }
+            updatedUser = User.getById(user.id, true);
         }
         return updatedUser;
     }
