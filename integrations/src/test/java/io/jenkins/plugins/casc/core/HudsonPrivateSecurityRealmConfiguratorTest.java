@@ -1,9 +1,9 @@
 package io.jenkins.plugins.casc.core;
 
 import hudson.model.User;
-import hudson.model.UserProperty;
 import hudson.security.FullControlOnceLoggedInAuthorizationStrategy;
 import hudson.security.HudsonPrivateSecurityRealm;
+import hudson.tasks.Mailer.UserProperty;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import jenkins.model.Jenkins;
