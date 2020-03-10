@@ -19,7 +19,6 @@ jenkins:
 
 ### Additional attributes
 
-
 ```yaml
 jenkins:
   securityRealm:
