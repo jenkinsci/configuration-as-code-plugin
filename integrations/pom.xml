@@ -14,6 +14,7 @@
   <properties>
     <maven.deploy.skip>true</maven.deploy.skip> <!-- no need to be deployed during release, this is a test-only module -->
     <jackson.version>2.10.2</jackson.version>
+    <netty.version>4.1.47.Final</netty.version>
   </properties>
 
   <dependencies>
@@ -526,12 +527,12 @@
       <dependency>
         <groupId>io.netty</groupId>
         <artifactId>netty-handler</artifactId>
-        <version>4.1.45.Final</version>
+        <version>${netty.version}</version>
       </dependency>
       <dependency>
         <groupId>io.netty</groupId>
         <artifactId>netty-codec-http</artifactId>
-        <version>4.1.41.Final</version>
+        <version>${netty.version}</version>
       </dependency>
       <dependency>
         <groupId>com.jcraft</groupId>
