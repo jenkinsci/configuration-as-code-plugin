@@ -207,6 +207,13 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
         return DescribableAttribute.getPreferredSymbol(d, getImplementedAPI(), getTarget());
     }
 
+    @NonNull
+    @Override
+    public List<String> getNames() {
+        final Descriptor d = getDescriptor();
+        return DescribableAttribute.getSymbols(d, getImplementedAPI(), getTarget());
+    }
+
     private Descriptor getDescriptor() {
         return Jenkins.get().getDescriptor(getTarget());
     }
