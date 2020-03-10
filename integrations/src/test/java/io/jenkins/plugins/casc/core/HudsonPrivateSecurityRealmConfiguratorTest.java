@@ -7,7 +7,6 @@ import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import jenkins.model.Jenkins;
 import jenkins.plugins.slack.user.SlackUserProperty;
-import org.jenkinsci.main.modules.cli.auth.ssh.UserPropertyImpl;
 import org.junit.Rule;
 import org.junit.Test;
 
