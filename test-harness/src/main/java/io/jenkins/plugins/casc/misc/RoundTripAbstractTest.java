@@ -32,7 +32,7 @@ import static org.junit.Assert.assertTrue;
  * 2. Check it was configured correctly.
  * 3. Check the configuration is valid via Web UI.
  * 4. Apply the configuration via Web UI.
- * 5. Write the configuration to $JENKINS_ROOT/jenkins.yaml.
+ * 5. Write the configuration to $JENKINS_HOME/jenkins.yaml.
  * 6. Restart Jenkins.
  * 7. Check the {@link #stringInLogExpected()} is set during the restart.
  *
@@ -83,7 +83,7 @@ public abstract class RoundTripAbstractTest {
      * 2. Check it was configured correctly.
      * 3. Check the configuration is valid via Web UI.
      * 4. Apply the configuration via Web UI.
-     * 5. Write the configuration to $JENKINS_ROOT/jenkins.yaml.
+     * 5. Write the configuration to $JENKINS_HOME/jenkins.yaml.
      * 6. Restart Jenkins.
      * 7. Check the {@link #stringInLogExpected()} is set during the restart.
      *
