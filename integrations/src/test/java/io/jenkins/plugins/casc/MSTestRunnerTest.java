@@ -17,8 +17,8 @@ public class MSTestRunnerTest {
     public JenkinsConfiguredWithReadmeRule j = new JenkinsConfiguredWithReadmeRule();
 
     @Test
-    @ConfiguredWithReadme("mstestruner/README.md")
-    public void configure_msbuild() {
+    @ConfiguredWithReadme("mstestrunner/README.md")
+    public void configure_mstestrunner() {
         final DescriptorImpl msTestRunnerDescriptor = ExtensionList.lookupSingleton(DescriptorImpl.class);
         assertNotNull(msTestRunnerDescriptor);
         assertEquals(1, msTestRunnerDescriptor.getInstallations().length);
