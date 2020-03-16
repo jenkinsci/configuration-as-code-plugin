@@ -25,7 +25,7 @@ public class MSTestRunnerTest {
 
         final MsTestInstallation msTestRunnerInstallation = msTestRunnerDescriptor.getInstallations()[0];
         assertEquals("MSTest test", msTestRunnerInstallation.getName());
-        assertEquals("C:\\\\Program Files (x86)\\\\Microsoft Visual Studio 10.0\\\\Common7\\\\IDE\\\\MSTest.exe", msTestRunnerInstallation.getHome());
+        assertEquals("C:\\Program Files (x86)\\Microsoft Visual Studio 10.0\\Common7\\IDE\\MSTest.exe", msTestRunnerInstallation.getHome());
         assertEquals("/category:SmokeTests", msTestRunnerInstallation.getDefaultArgs());
         assertTrue(msTestRunnerInstallation.getOmitNoIsolation());
     }
