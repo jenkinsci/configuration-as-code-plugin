@@ -22,17 +22,6 @@ import io.jenkins.plugins.casc.model.Scalar;
 import io.jenkins.plugins.casc.model.Scalar.Format;
 import io.jenkins.plugins.casc.model.Sequence;
 import io.jenkins.plugins.casc.model.Source;
-import io.jenkins.plugins.casc.snakeyaml.DumperOptions;
-import io.jenkins.plugins.casc.snakeyaml.emitter.Emitter;
-import io.jenkins.plugins.casc.snakeyaml.error.YAMLException;
-import io.jenkins.plugins.casc.snakeyaml.nodes.MappingNode;
-import io.jenkins.plugins.casc.snakeyaml.nodes.Node;
-import io.jenkins.plugins.casc.snakeyaml.nodes.NodeTuple;
-import io.jenkins.plugins.casc.snakeyaml.nodes.ScalarNode;
-import io.jenkins.plugins.casc.snakeyaml.nodes.SequenceNode;
-import io.jenkins.plugins.casc.snakeyaml.nodes.Tag;
-import io.jenkins.plugins.casc.snakeyaml.resolver.Resolver;
-import io.jenkins.plugins.casc.snakeyaml.serializer.Serializer;
 import io.jenkins.plugins.casc.yaml.YamlSource;
 import io.jenkins.plugins.casc.yaml.YamlUtils;
 import java.io.ByteArrayOutputStream;
@@ -85,14 +74,25 @@ import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.interceptor.RequirePOST;
 import org.kohsuke.stapler.lang.Klass;
 import org.kohsuke.stapler.verb.POST;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.emitter.Emitter;
+import org.yaml.snakeyaml.error.YAMLException;
+import org.yaml.snakeyaml.nodes.MappingNode;
+import org.yaml.snakeyaml.nodes.Node;
+import org.yaml.snakeyaml.nodes.NodeTuple;
+import org.yaml.snakeyaml.nodes.ScalarNode;
+import org.yaml.snakeyaml.nodes.SequenceNode;
+import org.yaml.snakeyaml.nodes.Tag;
+import org.yaml.snakeyaml.resolver.Resolver;
+import org.yaml.snakeyaml.serializer.Serializer;
 
 import static io.jenkins.plugins.casc.SchemaGeneration.writeJSONSchema;
-import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.FlowStyle.BLOCK;
-import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.DOUBLE_QUOTED;
-import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.LITERAL;
-import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.PLAIN;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static org.yaml.snakeyaml.DumperOptions.FlowStyle.BLOCK;
+import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.DOUBLE_QUOTED;
+import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.LITERAL;
+import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.PLAIN;
 
 /**
  * {@linkplain #configure() Main entry point of the logic}.
