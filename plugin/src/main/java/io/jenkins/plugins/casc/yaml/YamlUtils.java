@@ -3,20 +3,20 @@ package io.jenkins.plugins.casc.yaml;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.model.Mapping;
-import io.jenkins.plugins.casc.snakeyaml.composer.Composer;
-import io.jenkins.plugins.casc.snakeyaml.nodes.MappingNode;
-import io.jenkins.plugins.casc.snakeyaml.nodes.Node;
-import io.jenkins.plugins.casc.snakeyaml.nodes.NodeId;
-import io.jenkins.plugins.casc.snakeyaml.nodes.NodeTuple;
-import io.jenkins.plugins.casc.snakeyaml.nodes.ScalarNode;
-import io.jenkins.plugins.casc.snakeyaml.nodes.SequenceNode;
-import io.jenkins.plugins.casc.snakeyaml.parser.ParserImpl;
-import io.jenkins.plugins.casc.snakeyaml.resolver.Resolver;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
+import org.yaml.snakeyaml.composer.Composer;
+import org.yaml.snakeyaml.nodes.MappingNode;
+import org.yaml.snakeyaml.nodes.Node;
+import org.yaml.snakeyaml.nodes.NodeId;
+import org.yaml.snakeyaml.nodes.NodeTuple;
+import org.yaml.snakeyaml.nodes.ScalarNode;
+import org.yaml.snakeyaml.nodes.SequenceNode;
+import org.yaml.snakeyaml.parser.ParserImpl;
+import org.yaml.snakeyaml.resolver.Resolver;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>

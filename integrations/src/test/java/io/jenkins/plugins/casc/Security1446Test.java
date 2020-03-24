@@ -8,8 +8,6 @@ import io.jenkins.plugins.casc.impl.configurators.DataBoundConfigurator;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.model.CNode;
-import io.jenkins.plugins.casc.snakeyaml.error.YAMLException;
-import io.jenkins.plugins.casc.snakeyaml.nodes.Node;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Collections;
@@ -19,6 +17,8 @@ import org.jenkinsci.plugins.plaincredentials.StringCredentials;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
+import org.yaml.snakeyaml.error.YAMLException;
+import org.yaml.snakeyaml.nodes.Node;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;

@@ -1,8 +1,8 @@
 package io.jenkins.plugins.casc.yaml;
 
-import io.jenkins.plugins.casc.snakeyaml.reader.StreamReader;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import org.yaml.snakeyaml.reader.StreamReader;
 
 /**
  * Hack StreamReader to track the source file/url configuration node have been parsed from
