@@ -277,16 +277,8 @@ public class ConfigurationAsCode extends ManagementLink {
      * @throws Exception when the file provided cannot be found or parsed
      */
     @Restricted(NoExternalUse.class)
-    @Initializer(after = InitMilestone.EXTENSIONS_AUGMENTED, before = InitMilestone.JOB_LOADED)
+    @Initializer(after = InitMilestone.SYSTEM_CONFIG_LOADED, before = InitMilestone.SYSTEM_CONFIG_ADAPTED)
     public static void init() throws Exception {
-        Long duration = Long.getLong(ConfigurationAsCode.class.getName() + ".initialDelay");
-        if (duration != null) {
-            try {
-                Thread.sleep(duration);
-            } catch (InterruptedException e) {
-                LOGGER.log(Level.WARNING, "Interrupted whilst delaying CasC startup", e);
-            }
-        }
         detectVaultPluginMissing();
         get().configure();
     }
