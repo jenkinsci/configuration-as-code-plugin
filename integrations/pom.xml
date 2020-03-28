@@ -50,13 +50,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>vault</artifactId>
-      <version>1.12.2</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>metrics</artifactId>
       <version>4.0.2.6</version>
