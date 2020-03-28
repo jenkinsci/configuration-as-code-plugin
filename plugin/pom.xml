@@ -52,15 +52,9 @@
       <version>20190722</version>
     </dependency>
     <dependency>
-      <groupId>io.jenkins.configuration-as-code</groupId>
-      <artifactId>snakeyaml</artifactId>
-      <version>${project.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.yaml</groupId>
-          <artifactId>snakeyaml</artifactId>
-        </exclusion>
-      </exclusions>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>snakeyaml-api</artifactId>
+      <version>1.26.1</version>
     </dependency>
 
     <dependency>

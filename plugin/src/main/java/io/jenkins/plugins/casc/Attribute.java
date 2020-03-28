@@ -79,6 +79,15 @@ public class Attribute<Owner, Type> {
         this.secret = type == Secret.class || calculateIfSecret(null, this.name);
     }
 
+    public Attribute(List<String> name, Class type) {
+        this.name = name.get(0);
+        this.type = type;
+        this.getter = this::_getValue;
+        this.setter = this::_setValue;
+        this.aliases = name;
+        this.secret = type == Secret.class || calculateIfSecret(null, this.name);
+    }
+
     @SuppressWarnings("unchecked")
     public static <O,T> Optional<Attribute<O,T>> get(Set<Attribute<O,?>> attributes, String name) {
         return attributes.stream()

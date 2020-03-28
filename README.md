@@ -96,7 +96,7 @@ Second, the plugin looks for the `CASC_JENKINS_CONFIG` environment variable. The
 If `CASC_JENKINS_CONFIG` points to a folder, the plugin will recursively traverse the folder to find file (suffix with .yml,.yaml,.YAML,.YML), but doesn't contain hidden files or hidden subdirectories. It doesn't follow symbolic links.
 
 If you do not set the `CASC_JENKINS_CONFIG` environment variable, the plugin will
-default to looking for a single config file in `$JENKINS_ROOT/jenkins.yaml`.
+default to looking for a single config file in `$JENKINS_HOME/jenkins.yaml`.
 
 If everything was setup correctly, you should now be able to browse the Configuration as Code page with `Manage Jenkins` -> `Configuration as Code`.
 
@@ -170,9 +170,9 @@ Kubernetes users:\
 
 Most plugins should be supported out-of-the-box, or maybe require some minimal changes. See this [dashboard](https://issues.jenkins.io/secure/Dashboard.jspa?selectPageId=18341) for known compatibility issues.
 
-## Compatibility with Jenkins >= 2.199
+## Compatibility with Jenkins >= 2.199 for JCasC < 1.36
 
-Jenkins 2.199 introduced [a check to prevent saving global configuration before loading the configuration has occurred](https://github.com/jenkinsci/jenkins/pull/4171). Configurations As Code needs to apply global configuration before Jenkins loads jobs (so they can load and correctly reference any global state) and as such until [JENKINS-51856](https://issues.jenkins-ci.org/browse/JENKINS-51856) is implemented there exists a race condition where by Jenkins may fail to start when used with this plugin.
+Jenkins 2.199 introduced [a check to prevent saving global configuration before loading the configuration has occurred](https://github.com/jenkinsci/jenkins/pull/4171). Configurations As Code needs to apply global configuration before Jenkins loads jobs (so they can load and correctly reference any global state) and as such there exists a race condition where by Jenkins may fail to start when used with this plugin.
 
 If you encounter the race condition Jenkins will fail to start with an exception message similar to the following:
 
@@ -189,6 +189,7 @@ A suggestion would be to start with 5000 (5 Seconds) and then increment by 2000 
 For example, to delay the configuration by 9 seconds you would use something like the following command `java -Dio.jenkins.plugins.casc.ConfigurationAsCode.initialDelay=9000 -jar jenkins.war`.
 Exactly how and where you specify this option depends on the installation method used to install Jenkins.
 
+Jenkins 2.220 includes [JENKINS-51856](https://issues.jenkins-ci.org/browse/JENKINS-51856) so the instance will not face the race condition. Starting with JCasC 1.36, the system property is not needed anymore.
 
 ## Configuration-as-Code extension plugins
 

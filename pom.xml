@@ -13,7 +13,6 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>snakeyaml</module>
     <module>plugin</module>
     <module>test-harness</module>
     <module>integrations</module>

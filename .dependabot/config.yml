@@ -6,16 +6,3 @@ update_configs:
   ignored_updates:
     - match:
         dependency_name: "org.jenkins-ci.main:jenkins-core"
-    - match:
-        dependency_name: "org.jenkins-ci.plugins*"
-    - match:
-        dependency_name: "org.jenkinsci.plugins*"
-    - match:
-        dependency_name: "io.jenkins.plugins*"
-    - match:
-        dependency_name: "io.jenkins.docker:docker-plugin"
-    - match:
-        dependency_name: "com.cloudbees.jenkins.plugins*"
-    - match:
-        dependency_name: "org.csanchez.jenkins.plugins*"
-  
