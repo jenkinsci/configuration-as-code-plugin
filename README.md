@@ -96,7 +96,7 @@ Second, the plugin looks for the `CASC_JENKINS_CONFIG` environment variable. The
 If `CASC_JENKINS_CONFIG` points to a folder, the plugin will recursively traverse the folder to find file (suffix with .yml,.yaml,.YAML,.YML), but doesn't contain hidden files or hidden subdirectories. It doesn't follow symbolic links.
 
 If you do not set the `CASC_JENKINS_CONFIG` environment variable, the plugin will
-default to looking for a single config file in `$JENKINS_ROOT/jenkins.yaml`.
+default to looking for a single config file in `$JENKINS_HOME/jenkins.yaml`.
 
 If everything was setup correctly, you should now be able to browse the Configuration as Code page with `Manage Jenkins` -> `Configuration as Code`.
 

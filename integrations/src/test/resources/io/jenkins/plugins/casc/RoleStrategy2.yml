@@ -25,7 +25,6 @@ jenkins:
         - id: "admin"
           password: "1234"
         - id: "user1"
-          password: ""
 
   nodes:
     - dumb:

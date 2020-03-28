@@ -13,6 +13,7 @@ import hudson.model.ManagementLink;
 import hudson.remoting.Which;
 import hudson.security.ACL;
 import hudson.security.ACLContext;
+import hudson.security.Permission;
 import hudson.util.FormValidation;
 import io.jenkins.plugins.casc.impl.DefaultConfiguratorRegistry;
 import io.jenkins.plugins.casc.model.CNode;
@@ -21,17 +22,6 @@ import io.jenkins.plugins.casc.model.Scalar;
 import io.jenkins.plugins.casc.model.Scalar.Format;
 import io.jenkins.plugins.casc.model.Sequence;
 import io.jenkins.plugins.casc.model.Source;
-import io.jenkins.plugins.casc.snakeyaml.DumperOptions;
-import io.jenkins.plugins.casc.snakeyaml.emitter.Emitter;
-import io.jenkins.plugins.casc.snakeyaml.error.YAMLException;
-import io.jenkins.plugins.casc.snakeyaml.nodes.MappingNode;
-import io.jenkins.plugins.casc.snakeyaml.nodes.Node;
-import io.jenkins.plugins.casc.snakeyaml.nodes.NodeTuple;
-import io.jenkins.plugins.casc.snakeyaml.nodes.ScalarNode;
-import io.jenkins.plugins.casc.snakeyaml.nodes.SequenceNode;
-import io.jenkins.plugins.casc.snakeyaml.nodes.Tag;
-import io.jenkins.plugins.casc.snakeyaml.resolver.Resolver;
-import io.jenkins.plugins.casc.snakeyaml.serializer.Serializer;
 import io.jenkins.plugins.casc.yaml.YamlSource;
 import io.jenkins.plugins.casc.yaml.YamlUtils;
 import java.io.ByteArrayOutputStream;
@@ -84,14 +74,25 @@ import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.interceptor.RequirePOST;
 import org.kohsuke.stapler.lang.Klass;
 import org.kohsuke.stapler.verb.POST;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.emitter.Emitter;
+import org.yaml.snakeyaml.error.YAMLException;
+import org.yaml.snakeyaml.nodes.MappingNode;
+import org.yaml.snakeyaml.nodes.Node;
+import org.yaml.snakeyaml.nodes.NodeTuple;
+import org.yaml.snakeyaml.nodes.ScalarNode;
+import org.yaml.snakeyaml.nodes.SequenceNode;
+import org.yaml.snakeyaml.nodes.Tag;
+import org.yaml.snakeyaml.resolver.Resolver;
+import org.yaml.snakeyaml.serializer.Serializer;
 
 import static io.jenkins.plugins.casc.SchemaGeneration.writeJSONSchema;
-import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.FlowStyle.BLOCK;
-import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.DOUBLE_QUOTED;
-import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.LITERAL;
-import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.PLAIN;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static org.yaml.snakeyaml.DumperOptions.FlowStyle.BLOCK;
+import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.DOUBLE_QUOTED;
+import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.LITERAL;
+import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.PLAIN;
 
 /**
  * {@linkplain #configure() Main entry point of the logic}.
@@ -136,6 +137,12 @@ public class ConfigurationAsCode extends ManagementLink {
     @Override
     public String getDescription() {
         return "Reload your configuration or update configuration source";
+    }
+
+    @NonNull
+    @Override
+    public Permission getRequiredPermission() {
+        return Jenkins.SYSTEM_READ;
     }
 
     public Date getLastTimeLoaded() {
@@ -398,8 +405,7 @@ public class ConfigurationAsCode extends ManagementLink {
     @RequirePOST
     @Restricted(NoExternalUse.class)
     public void doExport(StaplerRequest req, StaplerResponse res) throws Exception {
-
-        if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
+        if (!Jenkins.get().hasPermission(Jenkins.SYSTEM_READ)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -415,8 +421,7 @@ public class ConfigurationAsCode extends ManagementLink {
      */
     @Restricted(NoExternalUse.class)
     public void doSchema(StaplerRequest req, StaplerResponse res) throws Exception {
-
-        if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
+        if (!Jenkins.get().hasPermission(Jenkins.SYSTEM_READ)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -428,7 +433,7 @@ public class ConfigurationAsCode extends ManagementLink {
     @RequirePOST
     @Restricted(NoExternalUse.class)
     public void doViewExport(StaplerRequest req, StaplerResponse res) throws Exception {
-        if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
+        if (!Jenkins.get().hasPermission(Jenkins.SYSTEM_READ)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -442,7 +447,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
     @Restricted(NoExternalUse.class)
     public void doReference(StaplerRequest req, StaplerResponse res) throws Exception {
-        if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
+        if (!Jenkins.get().hasPermission(Jenkins.SYSTEM_READ)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }

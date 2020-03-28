@@ -26,20 +26,24 @@
       </j:otherwise>
     </j:choose>
 
-    <f:form method="post" action="replace" name="replace">
-        <h2>${%Replace configuration source with:}</h2>
-        <f:entry title="${%Path or URL}" field="newSource" >
-            <f:textbox checkUrl="'checkNewSource?newSource='+this.value" checkMethod="post" />
-        </f:entry>
-        <f:bottomButtonBar>
-            <f:submit name="replace" value="${%Apply new configuration}"/>
-        </f:bottomButtonBar>
-    </f:form>
+    <l:isAdmin>
+      <f:form method="post" action="replace" name="replace">
+          <h2>${%Replace configuration source with:}</h2>
+          <f:entry title="${%Path or URL}" field="newSource" >
+              <f:textbox checkUrl="'checkNewSource?newSource='+this.value" checkMethod="post" />
+          </f:entry>
+          <f:bottomButtonBar>
+              <f:submit name="replace" value="${%Apply new configuration}"/>
+          </f:bottomButtonBar>
+      </f:form>
+    </l:isAdmin>
     <h2>${%Actions}</h2>
-    
-    <f:form method="post" action="reload" name="reload">
-      <f:submit name="reload" value="${%Reload existing configuration}"/>
-    </f:form>
+
+    <l:isAdmin>
+      <f:form method="post" action="reload" name="reload">
+        <f:submit name="reload" value="${%Reload existing configuration}"/>
+      </f:form>
+    </l:isAdmin>
     <f:form method="post" action="export" name="export">
       <f:submit name="export" value="${%Download Configuration}"/>
     </f:form>
