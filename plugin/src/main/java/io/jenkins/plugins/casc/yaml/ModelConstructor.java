@@ -11,7 +11,7 @@ import org.apache.commons.collections.map.AbstractMapDecorator;
 import org.apache.commons.lang.ObjectUtils;
 import org.yaml.snakeyaml.constructor.AbstractConstruct;
 import org.yaml.snakeyaml.constructor.Construct;
-import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 import org.yaml.snakeyaml.error.Mark;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
@@ -22,10 +22,10 @@ import org.yaml.snakeyaml.nodes.Tag;
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-class ModelConstructor extends Constructor {
+class ModelConstructor extends CustomClassLoaderConstructor {
 
     public ModelConstructor() {
-        super(Mapping.class);
+        super(Mapping.class, ModelConstructor.class.getClassLoader());
 
         this.yamlConstructors.put(Tag.BOOL, ConstructScalar);
         this.yamlConstructors.put(Tag.INT, ConstructScalar);
