@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: "❓ Gitter chat"
+    url: https://gitter.im/jenkinsci/configuration-as-code-plugin
+    about: Please ask and answer questions here.
+  - name: "🔒 Report a vulnerability"
+    url: https://jenkins.io/security/#reporting-vulnerabilities
+    about: "Do not report security issues in public, we have a process for it!"
