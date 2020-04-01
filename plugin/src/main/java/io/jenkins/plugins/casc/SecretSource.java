@@ -29,13 +29,14 @@ public abstract class SecretSource implements ExtensionPoint {
      * <p>Recoverable errors include:</p>
      * <ul>
      * <li>the secret was not found in the backing store</li>
-     * <li>the secret's value was not convertible to a String</li>
      * </ul>
      *
      * @throws IOException if an unrecoverable error occurred. (The exception will stop CasC processing the resolver chain.)
-     * <p>Unrecovarable errors include:</p>
+     * <p>Unrecoverable errors include:</p>
      * <ul>
      * <li>all attempts to contact the backing store have failed (including any applicable retry strategies)</li>
+     * <li>authentication or authorization with the backing store failed</li>
+     * <li>the secret's value was not convertible to a String</li>
      * </ul>
      */
     public abstract Optional<String> reveal(String secret) throws IOException;
