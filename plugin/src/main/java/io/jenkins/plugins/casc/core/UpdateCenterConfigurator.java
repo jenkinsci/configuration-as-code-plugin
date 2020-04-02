@@ -38,7 +38,7 @@ public class UpdateCenterConfigurator extends BaseConfigurator<UpdateCenter> {
 
     @Override
     protected UpdateCenter instance(Mapping mapping, ConfigurationContext context) throws ConfiguratorException {
-        return Jenkins.getInstance().getUpdateCenter();
+        return Jenkins.get().getUpdateCenter();
     }
 
     @Override

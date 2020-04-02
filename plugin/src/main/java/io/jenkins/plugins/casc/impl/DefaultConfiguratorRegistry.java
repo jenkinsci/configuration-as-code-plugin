@@ -101,7 +101,7 @@ public class DefaultConfiguratorRegistry implements ConfiguratorRegistry {
     private Configurator internalLookup(Type type) {
         Class clazz = Types.erasure(type);
 
-        final Jenkins jenkins = Jenkins.getInstance();
+        final Jenkins jenkins = Jenkins.get();
         final ExtensionList<Configurator> l = jenkins.getExtensionList(Configurator.class);
         for (Configurator c : l) {
             if (c.canConfigure(clazz)) {

@@ -1,10 +1,12 @@
-# warnings-plugin
+# Configure Warnings Next Generation Plugin
 
-Supported in plugin **version >= 5.00**
+The available parsers of the [Warnings Next Generation Plugin](https://plugins.jenkins.io/warnings-ng)
+can be specified using the following sample configuration. Afterwards,
+these parsers are shown in the `Groovy Based Warnings Parsers` section of the system configuration.
 
-Now present in the new `Groovy Based Warnings Parsers` section.
+## Sample configuration (parsers)
 
-## sample-configuration (Example parser from help)
+Required plugin version: 5.0.0 or newer.
 
 ```yaml
 unclassified:
@@ -23,3 +25,22 @@ unclassified:
           return builder.buildOptional();
         example: "somefile.txt:2:SeriousWarnings:SomethingWentWrong"
 ```
+
+This `Example Parser` parser will parse the following warning from the console log:
+```text
+somefile.txt:2:SeriousWarnings:SomethingWentWrong
+```
+
+It will produce a warning with the following properties:
+
+| property    | value              |
+|-------------|--------------------|
+| file name   | somefile.txt       |
+| line number | 2                  |
+| severity    | NORMAL             |
+| category    | SeriousWarnings    |
+| type        | -                  |
+| message     | SomethingWentWrong |
+
+See [documentation](https://github.com/jenkinsci/warnings-ng-plugin/blob/master/doc/Documentation.md) of the
+Warnings Next Generation Plugin for more details about the parsers.

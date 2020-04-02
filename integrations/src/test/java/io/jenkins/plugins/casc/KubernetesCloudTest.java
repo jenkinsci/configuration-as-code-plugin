@@ -1,7 +1,8 @@
 package io.jenkins.plugins.casc;
 
-import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
-import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import hudson.model.Node.Mode;
+import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
+import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import java.util.List;
 import org.csanchez.jenkins.plugins.kubernetes.KubernetesCloud;
 import org.csanchez.jenkins.plugins.kubernetes.PodTemplate;
@@ -22,27 +23,29 @@ import static org.junit.Assert.assertTrue;
 public class KubernetesCloudTest {
 
     @Rule
-    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+    public JenkinsConfiguredWithReadmeRule j = new JenkinsConfiguredWithReadmeRule();
 
     @Test
-    @ConfiguredWithCode("KubernetesCloudTest.yml")
+    @ConfiguredWithReadme("kubernetes/README.md")
     public void configure_kubernetes_cloud() throws Exception {
         final KubernetesCloud cloud = j.jenkins.clouds.get(KubernetesCloud.class);
         assertNotNull(cloud);
-        assertEquals("kubernetes", cloud.name);
-        assertEquals("serverUrl", cloud.getServerUrl());
+        assertEquals("advanced-k8s-config", cloud.name);
+        assertEquals("https://avanced-k8s-config:443", cloud.getServerUrl());
         assertEquals("serverCertificate", cloud.getServerCertificate());
         assertTrue(cloud.isSkipTlsVerify());
-        assertEquals("namespace", cloud.getNamespace());
-        assertEquals("jenkinsUrl", cloud.getJenkinsUrl());
+        assertEquals("default", cloud.getNamespace());
+        assertEquals("http://jenkins/", cloud.getJenkinsUrl());
+        assertEquals("advanced-k8s-credentials", cloud.getCredentialsId());
         assertEquals("jenkinsTunnel", cloud.getJenkinsTunnel());
         assertEquals(42, cloud.getContainerCap());
         assertEquals(5, cloud.getRetentionTimeout());
         assertEquals(10, cloud.getConnectTimeout());
         assertEquals(20, cloud.getReadTimeout());
+        assertEquals("64", cloud.getMaxRequestsPerHostStr());
 
         final List<PodTemplate> templates = cloud.getTemplates();
-        assertEquals(1, templates.size());
+        assertEquals(2, templates.size());
         final PodTemplate template = templates.get(0);
         assertEquals("test", template.getName());
         assertEquals("serviceAccount", template.getServiceAccount());
@@ -61,6 +64,11 @@ public class KubernetesCloudTest {
         final KeyValueEnvVar envVar = (KeyValueEnvVar) envVars.get(0);
         assertEquals("FOO", envVar.getKey());
         assertEquals("BAR", envVar.getValue());
+
+        final PodTemplate template1 = templates.get(1);
+        assertEquals("k8s-slave", template1.getName());
+        assertEquals("default", template1.getNamespace());
+        assertEquals(Mode.EXCLUSIVE, template1.getNodeUsageMode());
     }
 }
 

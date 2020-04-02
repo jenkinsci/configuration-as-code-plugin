@@ -27,8 +27,9 @@ import hudson.security.ACLContext;
 import hudson.security.AccessControlled;
 import hudson.security.Permission;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
+
 
 /**
  * Provides asserts for {@link hudson.security.Permission} checks.

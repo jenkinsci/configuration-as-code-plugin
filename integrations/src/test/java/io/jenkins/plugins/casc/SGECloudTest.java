@@ -2,6 +2,7 @@ package io.jenkins.plugins.casc;
 
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.output.WriterOutputStream;
 import org.jenkinsci.plugins.sge.BatchCloud;
 import org.junit.Rule;
@@ -29,7 +30,7 @@ public class SGECloudTest {
         j.jenkins.clouds.add(cloud);
 
         StringWriter writer = new StringWriter();
-        casc.export(new WriterOutputStream(writer));
+        casc.export(new WriterOutputStream(writer, StandardCharsets.UTF_8));
         String exported = writer.toString();
         assertThat("Password should not have been exported",
                 exported, not(containsString(passwordText)));

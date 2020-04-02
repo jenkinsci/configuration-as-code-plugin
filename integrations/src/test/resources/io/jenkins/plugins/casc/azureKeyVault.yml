@@ -1,0 +1,4 @@
+unclassified:
+  azureKeyVault:
+    keyVaultURL: https://not-a-real-vault.vault.azure.net
+    credentialID: service-principal
