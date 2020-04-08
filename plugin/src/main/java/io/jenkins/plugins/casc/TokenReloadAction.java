@@ -3,11 +3,12 @@ package io.jenkins.plugins.casc;
 import com.google.common.base.Strings;
 import hudson.Extension;
 import hudson.model.UnprotectedRootAction;
+import hudson.security.ACL;
+import hudson.security.ACLContext;
 import java.io.IOException;
 import java.util.logging.Logger;
 import javax.annotation.CheckForNull;
 import javax.servlet.http.HttpServletRequest;
-import org.apache.commons.httpclient.HttpStatus;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.interceptor.RequirePOST;
@@ -43,16 +44,19 @@ public class TokenReloadAction implements UnprotectedRootAction {
         String token = getReloadTokenProperty();
 
         if (Strings.isNullOrEmpty(token)) {
-            response.sendError(HttpStatus.SC_NOT_FOUND);
+            response.sendError(404);
             LOGGER.warning("Configuration reload via token is not enabled");
         } else {
             String requestToken = getRequestToken(request);
 
             if (token.equals(requestToken)) {
                 LOGGER.info("Configuration reload triggered via token");
-                ConfigurationAsCode.get().configure();
+
+                try (ACLContext ignored = ACL.as(ACL.SYSTEM)) {
+                    ConfigurationAsCode.get().configure();
+                }
             } else {
-                response.sendError(HttpStatus.SC_UNAUTHORIZED);
+                response.sendError(401);
                 LOGGER.warning("Invalid token received, not reloading configuration");
 
             }

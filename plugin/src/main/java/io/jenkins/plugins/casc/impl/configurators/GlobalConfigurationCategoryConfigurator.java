@@ -11,6 +11,7 @@ import io.jenkins.plugins.casc.RootElementConfigurator;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import io.jenkins.plugins.casc.model.Scalar;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -23,6 +24,8 @@ import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import static io.jenkins.plugins.casc.Attribute.Setter.NOP;
 import static io.jenkins.plugins.casc.ConfigurationAsCode.printThrowable;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -42,15 +45,21 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
     @NonNull
     @Override
     public String getName() {
+        return getNames().get(0);
+    }
+
+    @NonNull
+    @Override
+    public List<String> getNames() {
         final Class c = category.getClass();
         final Symbol symbol = (Symbol) c.getAnnotation(Symbol.class);
-        if (symbol != null) return symbol.value()[0];
+        if (symbol != null) return asList(symbol.value());
 
         String name = c.getSimpleName();
         name = StringUtils.remove(name, "Global");
         name = StringUtils.remove(name, "Configuration");
         name = StringUtils.remove(name, "Category");
-        return name.toLowerCase();
+        return singletonList(name.toLowerCase());
     }
 
     @Override
@@ -72,12 +81,12 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
     @NonNull
     @Override
     public Set describe() {
-        return (Set) Jenkins.getInstance().getExtensionList(Descriptor.class).stream()
+        return (Set) Jenkins.get().getExtensionList(Descriptor.class).stream()
                 .filter(d -> d.getCategory() == category)
                 .filter(d -> d.getGlobalConfigPage() != null)
                 .map(DescriptorConfigurator::new)
                 .filter(GlobalConfigurationCategoryConfigurator::reportDescriptorWithoutSetters)
-                .map(c -> new Attribute<GlobalConfigurationCategory, Object>(c.getName(), c.getTarget()).setter(NOP))
+                .map(c -> new Attribute<GlobalConfigurationCategory, Object>(c.getNames(), c.getTarget()).setter(NOP))
                 .collect(Collectors.toSet());
     }
 
@@ -94,7 +103,7 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
     public CNode describe(GlobalConfigurationCategory instance, ConfigurationContext context) {
 
         final Mapping mapping = new Mapping();
-        Jenkins.getInstance().getExtensionList(Descriptor.class).stream()
+        Jenkins.get().getExtensionList(Descriptor.class).stream()
             .filter(this::filterDescriptors)
             .forEach(d -> describe(d, mapping, context));
         return mapping;

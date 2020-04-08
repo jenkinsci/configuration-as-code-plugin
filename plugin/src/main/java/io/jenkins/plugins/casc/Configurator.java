@@ -26,6 +26,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.ExtensionPoint;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -33,6 +34,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
+
 
 /**
  * Define a {@link Configurator} which handles a configuration element, identified by name.
@@ -56,13 +58,30 @@ public interface Configurator<T> {
 
     /**
      * Get a configurator name.
+     *
+     * This should return the default name for the configurator,
+     * used for exporting yaml
+     * see {@link #getNames()} for all possible names which will be considered when configuring.
+     *
      * @return short name for this component when used in a configuration.yaml file
      */
     @NonNull
     default String getName() {
+        return getNames().get(0);
+    }
+
+    /**
+     * Get all possible configurator names
+     *
+     * @return a list of all possible short names for this component when used in a configuration.yaml file
+     */
+    @NonNull
+    default List<String> getNames() {
         final Symbol annotation = getTarget().getAnnotation(Symbol.class);
-        if (annotation != null) return annotation.value()[0];
-        return normalize(getTarget().getSimpleName());
+        if (annotation != null) {
+            return Arrays.asList(annotation.value());
+        }
+        return Collections.singletonList(normalize(getTarget().getSimpleName()));
     }
 
     /**
@@ -162,6 +181,29 @@ public interface Configurator<T> {
             CNode value = attribute.describe(instance, context);
             if (value != null) {
                 mapping.put(attribute.getName(), value);
+            }
+        }
+        return mapping;
+    }
+
+    /**
+     * Describe Structure of the attributes, as required by the schema.
+     * @param instance
+     * @param context
+     * @since 1.35
+     * @return CNode describing the attributes.
+     */
+    @CheckForNull
+    default CNode describeStructure(T instance, ConfigurationContext context)
+        throws Exception {
+        Mapping mapping = new Mapping();
+        for (Attribute attribute : getAttributes()) {
+            if (context.getMode().equals("JSONSchema")) {
+                attribute.setJsonSchema(true);
+            }
+            CNode value = attribute.describeForSchema(instance, context);
+            if (value != null) {
+                mapping.put(attribute.getName(), attribute.getType().getSimpleName());
             }
         }
         return mapping;

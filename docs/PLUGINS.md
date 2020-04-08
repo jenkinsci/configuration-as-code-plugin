@@ -15,7 +15,7 @@ compliant with JCasC, you'll need to expose your configuration attributes as `@D
 
 Before you start, make sure the following pre-conditions are met:
 
-- The parent pom version of your plugin is aligned with the Configuration as Code [parent pom version](/pom.xml).
+- You are using a recent version of plugin [parent pom](https://github.com/jenkinsci/plugin-pom/releases).
 
 ```xml
 <parent>
@@ -212,10 +212,9 @@ Add the Configuration as Code plugin as a test dependency in your pom.xml:
     <scope>test</scope>
 </dependency>
 <dependency>
-    <groupId>io.jenkins</groupId>
-    <artifactId>configuration-as-code</artifactId>
+    <groupId>io.jenkins.configuration-as-code</groupId>
+    <artifactId>test-harness</artifactId>
     <version>${configuration-as-code.version}</version>
-    <classifier>tests</classifier>
     <scope>test</scope>
 </dependency>
 ```
@@ -310,4 +309,33 @@ public class ConfigurationAsCodeTest {
      ...
     }
 }
+```
+
+### JSON Schema Test (Beta)
+We generate a JSON schema that users can use to validate their changes and provide IDE assistance, 
+you can test that your plugin's example yaml file validates correctly by implementing the below test:
+`SchemaGenerationTest` provides a abstraction layer to test out the plugins YAML file against the generated schema.
+
+You can test if your YAML file validates against the schema.
+
+Step 1
+
+Create a YAML file for the configurators corresponding to the developed plugin.
+For eg: `validJenkinsConfigurator.yml`
+```yaml
+jenkins:
+    systemMessage: "Configured by Configuration as Code plugin"
+    numExecutors: "Hello"
+
+```
+
+Step 2
+
+Add a test for the YAML file
+
+```java
+    @Test
+    public void validSchemaShouldSucceed() throws Exception {
+        assertThat(validateSchema(convertYamlFileToJson(this, "validSchemaConfig.yml")), empty());
+    }
 ```

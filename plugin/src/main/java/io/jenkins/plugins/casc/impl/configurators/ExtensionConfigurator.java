@@ -32,7 +32,7 @@ public class ExtensionConfigurator<T> extends BaseConfigurator<T> {
 
     @Override
     protected T instance(Mapping mapping, ConfigurationContext context) throws ConfiguratorException {
-        final ExtensionList<T> list = Jenkins.getInstance().getExtensionList(target);
+        final ExtensionList<T> list = Jenkins.get().getExtensionList(target);
         if (list.size() != 1) {
             throw new ConfiguratorException("Expected a unique instance of extension "+target);
         }

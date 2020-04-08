@@ -25,8 +25,9 @@ import static io.jenkins.plugins.casc.misc.Util.toStringFromYamlFile;
 import static io.jenkins.plugins.casc.misc.Util.toYamlString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+
 
 /**
  * @author Oleg Nenashev
@@ -42,8 +43,8 @@ public class RoleStrategyTest {
     @ConfiguredWithCode("RoleStrategy1.yml")
     public void shouldReadRolesCorrectly() throws Exception {
         j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
-        User admin = User.getById("admin", true);
-        User user1 = User.getById("user1", true);
+        User admin = User.getById("admin", false);
+        User user1 = User.getById("user1", false);
         User user2 = User.getById("user2", true);
         Computer agent1 = j.jenkins.getComputer("agent1");
         Computer agent2 = j.jenkins.getComputer("agent2");
@@ -63,7 +64,7 @@ public class RoleStrategyTest {
         // Admin has configuration access
         assertHasPermission(admin, j.jenkins, Jenkins.ADMINISTER, Jenkins.READ);
         assertHasPermission(user1, j.jenkins, Jenkins.READ);
-        assertHasNoPermission(user1, j.jenkins, Jenkins.ADMINISTER, Jenkins.RUN_SCRIPTS);
+        assertHasNoPermission(user1, j.jenkins, Jenkins.ADMINISTER);
 
         // Folder A is restricted to admin
         assertHasPermission(admin, folderA, Item.CONFIGURE);

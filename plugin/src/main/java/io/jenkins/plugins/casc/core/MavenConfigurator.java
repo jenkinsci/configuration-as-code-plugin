@@ -48,7 +48,7 @@ public class MavenConfigurator extends BaseConfigurator<GlobalMavenConfig> {
     @Override
     public Set<Attribute<GlobalMavenConfig,?>> describe() {
         final Set<Attribute<GlobalMavenConfig,?>> attributes = super.describe();
-        final Descriptor descriptor = Jenkins.getInstance().getDescriptorOrDie(Maven.class);
+        final Descriptor descriptor = Jenkins.get().getDescriptorOrDie(Maven.class);
         final Configurator<Descriptor> task = new DescriptorConfigurator(descriptor);
 
         for (Attribute attribute : task.describe()) {

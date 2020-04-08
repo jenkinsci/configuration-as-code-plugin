@@ -1,0 +1,8 @@
+installations:
+- home: "/terraform-0.11"
+  name: "terraform"
+  properties:
+  - installSource:
+      installers:
+      - terraformInstaller:
+          id: "0.11.9-linux-amd64"

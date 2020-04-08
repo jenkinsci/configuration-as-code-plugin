@@ -9,11 +9,17 @@ jenkins:
       configurations:
         - server: ldap.acme.com
           rootDN: dc=acme,dc=fr
+          managerDN: "manager"
           managerPasswordSecret: ${LDAP_PASSWORD}
+          userSearch: "(&(objectCategory=User)(sAMAccountName={0}))"
+          groupSearchFilter: "(&(cn={0})(objectclass=group))"
+          groupMembershipStrategy:
+            fromGroupSearch:
+              filter: "(&(objectClass=group)(|(cn=GROUP_1)(cn=GROUP_2)))"
       cache:
         size: 100
         ttl: 10
-      userIdStrategy: CaseSensitive
+      userIdStrategy: CaseInsensitive
       groupIdStrategy: CaseSensitive
 ```
 
@@ -23,21 +29,3 @@ jenkins:
 adapter code.
 It is identified as `ldap` as it implements the `SecurityRealm` extension point, so we can define a "natural" symbol name
 for it.
-
-## sample configuration with search filters
-
-```yaml
-jenkins:
-  securityRealm:
-    ldap:
-      configurations:
-        - server: "ldap.acme.com"
-          rootDN: "dc=acme,dc=fr"
-          managerDN: "manager"
-          managerPasswordSecret: ${LDAP_PASSWORD}
-          userSearch: "(&(objectCategory=User)(sAMAccountName={0}))"
-          groupSearchFilter: "(&(cn={0})(objectclass=group))"
-          groupMembershipStrategy:
-            fromGroupSearch:
-              filter: "(&(objectClass=group)(|(cn=GROUP_1)(cn=GROUP_2)))"
-```
