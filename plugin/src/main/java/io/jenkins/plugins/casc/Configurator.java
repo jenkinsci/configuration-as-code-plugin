@@ -115,7 +115,7 @@ public interface Configurator<T> {
 
 
     /**
-     * @return list of {@link Configurator<T>}s to be considered so one can fully configure this component.
+     * @return list of {@link Configurator}s to be considered so one can fully configure this component.
      * Typically, configurator for an abstract extension point will return Configurators for available implementations.
      */
     @NonNull
