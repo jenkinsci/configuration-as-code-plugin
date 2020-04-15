@@ -139,6 +139,14 @@ public class ConfigurationAsCode extends ManagementLink {
         return "Reload your configuration or update configuration source";
     }
 
+    /**
+     * Name of the category for this management link.
+     * TODO: Use getCategory when core requirement is greater or equal to 2.226
+     */
+    public @NonNull String getCategoryName() {
+        return "CONFIGURATION";
+    }
+
     @NonNull
     @Override
     public Permission getRequiredPermission() {
