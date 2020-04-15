@@ -1,5 +1,6 @@
 package io.jenkins.plugins.casc.impl.configurators;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Descriptor;
 import hudson.util.Secret;
@@ -11,6 +12,7 @@ import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.impl.attributes.DescribableAttribute;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -18,6 +20,7 @@ import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -25,9 +28,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.PostConstruct;
 import jenkins.model.Jenkins;
 import org.kohsuke.stapler.ClassDescriptor;
@@ -101,6 +101,10 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
         return super.configure(config, context);
     }
 
+    private boolean isAnnotationPresent(List<Annotation> annotations, String className) {
+        return annotations.stream().anyMatch(x -> className.equals(x.annotationType().getSimpleName()));
+    }
+
     private T tryConstructor(Constructor<T> constructor, Mapping config, ConfigurationContext context) throws ConfiguratorException {
         final Parameter[] parameters = constructor.getParameters();
         final String[] names = ClassDescriptor.loadParameterNames(constructor);
@@ -115,12 +119,15 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                 final Class t = parameters[i].getType();
 
                 Class<?> clazz = constructor.getDeclaringClass();
-                if (value == null && (parameters[i].isAnnotationPresent(Nonnull.class)   ||
-                    constructor.isAnnotationPresent(ParametersAreNonnullByDefault.class) ||
-                    clazz.isAnnotationPresent(ParametersAreNonnullByDefault.class)       ||
-                    clazz.getPackage().isAnnotationPresent(ParametersAreNonnullByDefault.class) &&
-                        !parameters[i].isAnnotationPresent(CheckForNull.class))) {
-
+                List<Annotation> parametersAnnotations = Arrays.asList(parameters[i].getAnnotations());
+                List<Annotation> constructorAnnotations = Arrays.asList(constructor.getAnnotations());
+                List<Annotation> clazzAnnotations = Arrays.asList(clazz.getAnnotations());
+                List<Annotation> packageAnnotations = Arrays.asList(clazz.getPackage().getAnnotations());
+                if (value == null && (isAnnotationPresent(parametersAnnotations, "Nonnull")   ||
+                    isAnnotationPresent(constructorAnnotations, "ParametersAreNonnullByDefault") ||
+                    isAnnotationPresent(clazzAnnotations, "ParametersAreNonnullByDefault")       ||
+                    isAnnotationPresent(packageAnnotations, "ParametersAreNonnullByDefault") &&
+                        !isAnnotationPresent(parametersAnnotations, "CheckForNull"))) {
                     if (Set.class.isAssignableFrom(t)) {
                         LOGGER.log(Level.FINER, "The parameter to be set is @Nonnull but is not present; " +
                                                            "setting equal to empty set.");
