@@ -265,4 +265,10 @@ public class ConfigurationAsCodeTest {
         String actualDocString = ConfigurationAsCode.get().getHtmlHelp(hudson.security.FullControlOnceLoggedInAuthorizationStrategy.class, "allowAnonymousRead");
         assertEquals(expectedDocString, actualDocString);
     }
+
+    @Test
+    public void configurationCategory() {
+        ConfigurationAsCode configurationAsCode = ConfigurationAsCode.get();
+        assertThat(configurationAsCode.getCategoryName(), is("CONFIGURATION"));
+    }
 }
