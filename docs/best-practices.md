@@ -18,3 +18,23 @@ This may also be found at: /var/jenkins_home/secrets/initialAdminPassword
 ```
 
 First, we need to install the  plugin itself, of course - we can find it in the available plugins list.After the installation, we can see `Configuration-as-Code` available in the `/manage` page.Clicking the link gives us the JCasC configuration screen, where we can provide a path or URL to our configuration path or export the existing configuration.
+
+
+# Managing Plugins
+
+Here, you have two steps:
+
+* URL or Path.
+* Export the Existing configuration.
+
+## URL or Path
+
+We have two options for storing Jenkins.yaml file:
+
+*  Any directory Jenkins is running
+*  Version Control (such as Git)
+
+![JCasC is coming](../images/jcascConfig.png)
+
+* If we go with option one, then we need to place Jenkins.yaml file in JENKINS_HOME directory, place that directory path and click on “Apply new configuration.” 
+* If we go with the second option like addition of yaml file using URL path that would mean we would have to open the file in a raw format and then paste the URL in the given box and proceed.
