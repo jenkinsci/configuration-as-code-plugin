@@ -1,7 +1,7 @@
 package io.jenkins.plugins.casc.impl.configurators.nonnull;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.List;
-import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -14,7 +14,7 @@ public class ClassParametersAreNonnullByDefault {
     private List<String> strings;
 
     @DataBoundConstructor
-    public ClassParametersAreNonnullByDefault(@Nonnull List<String> strings) {
+    public ClassParametersAreNonnullByDefault(@NonNull List<String> strings) {
         this.strings = strings;
     }
 

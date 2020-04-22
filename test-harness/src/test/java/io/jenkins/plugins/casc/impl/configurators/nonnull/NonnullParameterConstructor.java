@@ -1,7 +1,7 @@
 package io.jenkins.plugins.casc.impl.configurators.nonnull;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
@@ -12,7 +12,7 @@ public class NonnullParameterConstructor {
     private Set<String> strings;
 
     @DataBoundConstructor
-    public NonnullParameterConstructor(@Nonnull Set<String> strings) {
+    public NonnullParameterConstructor(@NonNull Set<String> strings) {
         this.strings = strings;
     }
 

@@ -1,7 +1,7 @@
 package io.jenkins.plugins.casc.impl.configurators.nonnull.nonnullparampackage;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import hudson.util.Secret;
-import javax.annotation.CheckForNull;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
