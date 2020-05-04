@@ -7,13 +7,20 @@ import hudson.security.HudsonPrivateSecurityRealm;
 import hudson.slaves.NodeProperty;
 import hudson.slaves.NodePropertyDescriptor;
 import hudson.util.DescribableList;
+import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import java.io.ByteArrayOutputStream;
 import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -52,6 +59,17 @@ public class JenkinsConfiguratorTest {
             property.buildEnvVars(env, TaskListener.NULL);
         }
         assertEquals("BAR", env.get("FOO"));
+    }
+
+    @Test
+    @ConfiguredWithCode("ConfigureNode.yml")
+    public void shouldExportLabelAtoms() throws Exception {
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ConfigurationAsCode.get().export(out);
+        final String s = out.toString();
+
+        assertThat(s, is(not(emptyOrNullString())));
+        assertThat(s, not(containsString("FAILED TO EXPORT")));
     }
 
 }
