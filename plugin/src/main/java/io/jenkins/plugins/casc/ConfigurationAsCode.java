@@ -35,6 +35,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
+import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
@@ -659,7 +660,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
         final PathMatcher matcher = FileSystems.getDefault().getPathMatcher(YAML_FILES_PATTERN);
         try (Stream<Path> stream = Files.find(Paths.get(path), Integer.MAX_VALUE,
-                (next, attrs) -> !attrs.isDirectory() && !isHidden(next) && matcher.matches(next))) {
+                (next, attrs) -> !attrs.isDirectory() && !isHidden(next) && matcher.matches(next), FileVisitOption.FOLLOW_LINKS)) {
             return stream.sorted().collect(toList());
         } catch (IOException e) {
             throw new IllegalStateException("failed config scan for " + path, e);
