@@ -64,6 +64,8 @@ public class JenkinsConfiguratorTest {
     @Test
     @ConfiguredWithCode("ConfigureNode.yml")
     public void shouldExportLabelAtoms() throws Exception {
+        Jenkins.get().getLabelAtom("label1").getProperties().add(new TestProperty(2));
+
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         ConfigurationAsCode.get().export(out);
         final String s = out.toString();

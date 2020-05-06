@@ -10,6 +10,7 @@ import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.impl.attributes.DescribableListAttribute;
+import io.jenkins.plugins.casc.impl.attributes.MultivaluedAttribute;
 import io.jenkins.plugins.casc.model.Mapping;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -40,7 +41,7 @@ public class LabelAtomConfigurator extends BaseConfigurator<LabelAtom> {
             new Attribute<LabelAtom, String>("name", String.class)
                 .getter(Label::getName)
                 .setter( noop() ),
-            new DescribableListAttribute<LabelAtom, LabelAtomProperty>("properties", LabelAtomProperty.class)
+            new MultivaluedAttribute<LabelAtom, LabelAtomProperty>("properties", LabelAtomProperty.class)
             .getter(labelAtom -> labelAtom.getProperties())
         ));
     }
