@@ -5,12 +5,14 @@ import hudson.Extension;
 import hudson.ProxyConfiguration;
 import hudson.model.Node;
 import hudson.model.UpdateCenter;
+import hudson.model.labels.LabelAtom;
 import hudson.slaves.AbstractCloudSlave;
 import hudson.slaves.EphemeralNode;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.RootElementConfigurator;
+import io.jenkins.plugins.casc.impl.attributes.MultivaluedAttribute;
 import io.jenkins.plugins.casc.model.Mapping;
 import io.vavr.control.Try;
 import java.util.Collections;
@@ -79,6 +81,21 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
         attributes.add(new Attribute<Jenkins, UpdateCenter>("updateCenter", UpdateCenter.class)
                 .getter(Jenkins::getUpdateCenter)
                 .setter( noop() ));
+
+        attributes.add(new MultivaluedAttribute<Jenkins, LabelAtom>("labelAtoms", LabelAtom.class)
+                .getter(jenkins -> jenkins.getLabelAtoms())
+                .setter((jenkins, labelAtoms) -> {
+                    for (LabelAtom labelAtom : labelAtoms) {
+                        // Get or create a LabelAtom instance
+                        LabelAtom atom = jenkins.getLabelAtom(labelAtom.getName());
+
+                        if (atom != null) {
+                            atom.getProperties().clear();
+                            atom.getProperties().addAll(labelAtom.getProperties());
+                        }
+                    }
+                })
+        );
 
         attributes.add(new Attribute<Jenkins, ProxyConfiguration>("proxy", ProxyConfiguration.class)
                 .getter( j -> j.proxy)
