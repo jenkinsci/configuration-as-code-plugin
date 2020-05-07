@@ -93,8 +93,6 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
                             atom.getProperties().clear();
                             atom.getProperties().addAll(labelAtom.getProperties());
                         }
-
-                        atom.save();
                     }
                 })
         );
