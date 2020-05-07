@@ -84,7 +84,20 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
 
         attributes.add(new MultivaluedAttribute<Jenkins, LabelAtom>("labelAtoms", LabelAtom.class)
                 .getter(jenkins -> jenkins.getLabelAtoms())
-                .setter( noop() ));
+                .setter((jenkins, labelAtoms) -> {
+                    for (LabelAtom labelAtom : labelAtoms) {
+                        // Get or create a LabelAtom instance
+                        LabelAtom atom = jenkins.getLabelAtom(labelAtom.getName());
+
+                        if (atom != null) {
+                            atom.getProperties().clear();
+                            atom.getProperties().addAll(labelAtom.getProperties());
+                        }
+
+                        atom.save();
+                    }
+                })
+        );
 
         attributes.add(new Attribute<Jenkins, ProxyConfiguration>("proxy", ProxyConfiguration.class)
                 .getter( j -> j.proxy)
