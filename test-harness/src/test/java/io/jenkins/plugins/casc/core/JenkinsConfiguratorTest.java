@@ -1,8 +1,6 @@
 package io.jenkins.plugins.casc.core;
 
 import hudson.EnvVars;
-import hudson.Extension;
-import hudson.model.Describable;
 import hudson.model.TaskListener;
 import hudson.model.labels.LabelAtom;
 import hudson.model.labels.LabelAtomProperty;
@@ -28,10 +26,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
