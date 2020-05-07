@@ -1,0 +1,25 @@
+jenkins:
+  nodes:
+    - permanent:
+        labelString: "label1 label2"
+        launcher:
+          jnlp:
+            workDirSettings:
+              disabled: false
+              failIfWorkDirIsMissing: false
+              internalDir: "remoting"
+        name: "myNode"
+        numExecutors: 1
+        remoteFS: "/"
+        retentionStrategy: "always"
+  labelAtoms:
+    - name: "label1"
+      properties:
+        - myProperty:
+            value: 2
+        - anotherTestProperty:
+            otherProperty: 4
+    - name: "label2"
+      properties:
+        - myProperty:
+            value: 3
