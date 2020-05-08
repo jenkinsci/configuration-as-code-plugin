@@ -8,6 +8,7 @@ import java.io.Reader;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.composer.Composer;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
@@ -49,7 +50,12 @@ public final class YamlUtils {
     }
 
     public static Node read(YamlSource source) throws IOException {
-        Composer composer = new Composer(new ParserImpl(new StreamReaderWithSource(source)), new Resolver());
+        LoaderOptions loaderOptions = new LoaderOptions();
+        loaderOptions.setMaxAliasesForCollections(100);
+        Composer composer = new Composer(
+            new ParserImpl(new StreamReaderWithSource(source)),
+            new Resolver(),
+            loaderOptions);
         return composer.getSingleNode();
     }
 
