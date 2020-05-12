@@ -1,8 +1,6 @@
 package io.jenkins.plugins.casc;
 
-import java.util.ArrayList;
 import java.util.Set;
-import jenkins.AgentProtocol;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
