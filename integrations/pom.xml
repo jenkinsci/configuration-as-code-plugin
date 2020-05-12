@@ -99,7 +99,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>config-file-provider</artifactId>
-      <version>3.6.3</version>
+      <version>3.4.1</version>
       <scope>test</scope>
     </dependency>
 
@@ -267,7 +267,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>terraform</artifactId>
-      <version>1.0.10</version>
+      <version>1.0.9</version>
       <scope>test</scope>
       <exclusions> <!-- Exclude Banned Dependency -->
         <exclusion>
