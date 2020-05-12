@@ -1,6 +1,7 @@
 package io.jenkins.plugins.casc.yaml;
 
 import io.jenkins.plugins.casc.ConfigurationAsCode;
+import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.model.Mapping;
 import java.io.IOException;
@@ -27,12 +28,13 @@ public final class YamlUtils {
 
     public static final Logger LOGGER = Logger.getLogger(ConfigurationAsCode.class.getName());
 
-    public static Node merge(List<YamlSource> configs) throws ConfiguratorException {
+    public static Node merge(List<YamlSource> configs,
+        ConfigurationContext context) throws ConfiguratorException {
         Node root = null;
         for (YamlSource source : configs) {
             try (Reader r = source.read()) {
 
-                final Node node = read(source);
+                final Node node = read(source, context);
 
                 if (root == null) {
                     root = node;
@@ -49,9 +51,9 @@ public final class YamlUtils {
         return root;
     }
 
-    public static Node read(YamlSource source) throws IOException {
+    public static Node read(YamlSource source, ConfigurationContext context) throws IOException {
         LoaderOptions loaderOptions = new LoaderOptions();
-        loaderOptions.setMaxAliasesForCollections(100);
+        loaderOptions.setMaxAliasesForCollections(context.getYamlMaxAliasesForCollections());
         Composer composer = new Composer(
             new ParserImpl(new StreamReaderWithSource(source)),
             new Resolver(),
@@ -108,9 +110,10 @@ public final class YamlUtils {
     /**
      * Load configuration-as-code model from a set of Yaml sources, merging documents
      */
-    public static Mapping loadFrom(List<YamlSource> sources) throws ConfiguratorException {
+    public static Mapping loadFrom(List<YamlSource> sources,
+        ConfigurationContext context) throws ConfiguratorException {
         if (sources.isEmpty()) return Mapping.EMPTY;
-        final Node merged = merge(sources);
+        final Node merged = merge(sources, context);
         if (merged == null) {
             LOGGER.warning("configuration-as-code yaml source returned an empty document.");
             return Mapping.EMPTY;
