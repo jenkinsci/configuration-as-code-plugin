@@ -35,7 +35,7 @@ public class UnknownRootElementTest {
     }
 
     @Test
-    public void ignoreUnknownAlias() throws Exception {
+    public void ignoreKnownAlias() throws Exception {
         ConfigurationAsCode.get().configure(getClass().getResource("known.yml").toExternalForm());
         assertThat(j.jenkins.getSystemMessage(), is("Configured by Configuration as Code plugin"));
         Set<String> agentProtocols = j.jenkins.getAgentProtocols();

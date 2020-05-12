@@ -715,7 +715,7 @@ public class ConfigurationAsCode extends ManagementLink {
             List<String> unknownKeys = new ArrayList<>();
             entries.entrySet().iterator().forEachRemaining(next -> {
                 String key = next.getKey();
-                if (ignoreAliasEntry(key)) {
+                if (isNotAliasEntry(key)) {
                     unknownKeys.add(key);
                 }
             });
@@ -726,7 +726,7 @@ public class ConfigurationAsCode extends ManagementLink {
         }
     }
 
-    static boolean ignoreAliasEntry(String key) {
+    static boolean isNotAliasEntry(String key) {
         return key != null && !key.startsWith("x-");
     }
 

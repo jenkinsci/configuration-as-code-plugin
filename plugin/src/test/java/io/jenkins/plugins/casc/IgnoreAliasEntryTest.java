@@ -8,17 +8,17 @@ import static org.hamcrest.core.Is.is;
 public class IgnoreAliasEntryTest {
 
     @Test
-    public void aliasNull() {
-        assertThat(ConfigurationAsCode.ignoreAliasEntry(null), is(false));
+    public void aliasKeyIsNull() {
+        assertThat(ConfigurationAsCode.isNotAliasEntry(null), is(false));
     }
 
     @Test
-    public void aliasIgnoreXAlias() {
-        assertThat(ConfigurationAsCode.ignoreAliasEntry("x-hello"), is(false));
+    public void aliasKeyStartsWithX() {
+        assertThat(ConfigurationAsCode.isNotAliasEntry("x-hello"), is(false));
     }
 
     @Test
-    public void warnOnUnknownKey() {
-        assertThat(ConfigurationAsCode.ignoreAliasEntry("bob"), is(true));
+    public void UnknownRootElementShouldReturnTrue() {
+        assertThat(ConfigurationAsCode.isNotAliasEntry("bob"), is(true));
     }
 }
