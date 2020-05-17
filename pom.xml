@@ -69,7 +69,7 @@
             <dependency>
               <groupId>com.puppycrawl.tools</groupId>
               <artifactId>checkstyle</artifactId>
-              <version>8.31</version>
+              <version>8.32</version>
             </dependency>
           </dependencies>
         </plugin>
