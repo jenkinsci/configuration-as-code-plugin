@@ -1,12 +1,14 @@
 # Configure terraform plugin
 
+Requires `terrorform-plugin` >= 1.0.10
+
 Sample configuration for the [Terraform plugin](https://plugins.jenkins.io/terraform).
 
 ## Sample configuration
 
 ```yaml
 tool:
-  terraformInstallation:
+  terraform:
     installations:
       - name: "terraform"
         home: "/terraform-0.11"
