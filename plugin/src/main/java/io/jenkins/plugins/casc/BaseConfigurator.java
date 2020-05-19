@@ -410,8 +410,9 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
     private List<Attribute<T, ?>> sortAttributes(Set<Attribute<T, ?>> attributes) {
         Comparator<Attribute<T,?>> attributeComparator = Comparator.comparingDouble(a -> {
             Annotation annotation = a.type.getAnnotation(Extension.class);
-            if (annotation == null)
+            if (annotation == null) {
                 return Double.MIN_VALUE;
+            }
             Extension extension = (Extension) annotation;
             return extension.ordinal();
         });
