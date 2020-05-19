@@ -2,6 +2,7 @@ package io.jenkins.plugins.casc;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.BulkChange;
+import hudson.Extension;
 import hudson.model.Describable;
 import hudson.model.Saveable;
 import hudson.util.DescribableList;
@@ -12,6 +13,7 @@ import io.jenkins.plugins.casc.impl.attributes.PersistedListAttribute;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
@@ -25,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -298,7 +301,8 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
      */
     protected void configure(Mapping config, T instance, boolean dryrun, ConfigurationContext context) throws ConfiguratorException {
         final Set<Attribute<T,?>> attributes = describe();
-        for (Attribute<T,?> attribute : attributes) {
+        List<Attribute<T, ?>> sortedAttributes = sortAttributes(attributes);
+        for (Attribute<T,?> attribute : sortedAttributes) {
 
             final String name = attribute.getName();
             CNode sub = removeIgnoreCase(config, name);
@@ -403,6 +407,16 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
         return null;
     }
 
+    private List<Attribute<T, ?>> sortAttributes(Set<Attribute<T, ?>> attributes) {
+        Comparator<Attribute<T,?>> attributeComparator = Comparator.comparingDouble(a -> {
+            Annotation annotation = a.type.getAnnotation(Extension.class);
+            if (annotation == null)
+                return Double.MIN_VALUE;
+            Extension extension = (Extension) annotation;
+            return extension.ordinal();
+        });
+        return attributes.stream().sorted(attributeComparator.reversed()).collect(Collectors.toList());
+    }
 
     public static final class TypePair {
 
