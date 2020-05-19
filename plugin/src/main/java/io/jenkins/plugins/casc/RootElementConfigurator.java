@@ -1,10 +1,12 @@
 package io.jenkins.plugins.casc;
 
+import hudson.Extension;
 import hudson.model.Descriptor;
 import hudson.model.ManagementLink;
 import io.jenkins.plugins.casc.impl.configurators.DescriptorConfigurator;
 import io.jenkins.plugins.casc.impl.configurators.GlobalConfigurationCategoryConfigurator;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import jenkins.model.GlobalConfigurationCategory;
 import jenkins.model.Jenkins;
@@ -32,6 +34,14 @@ public interface RootElementConfigurator<T> extends Configurator<T> {
             if (descriptor != null)
                 configurators.add(new DescriptorConfigurator(descriptor));
         }
+
+        configurators.sort(Comparator.comparingDouble(c -> {
+            Extension extension = c.getClass().getAnnotation(Extension.class);
+            if (extension == null) {
+                return Double.MIN_VALUE;
+            }
+            return extension.ordinal();
+        }).reversed());
 
         return configurators;
     }
