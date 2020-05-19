@@ -298,7 +298,8 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
      */
     protected void configure(Mapping config, T instance, boolean dryrun, ConfigurationContext context) throws ConfiguratorException {
         final Set<Attribute<T,?>> attributes = describe();
-        for (Attribute<T,?> attribute : attributes) {
+        List<Attribute<T, ?>> sortedAttributes = attributes.stream().sorted(Configurator.extensionOrdinalSort()).collect(Collectors.toList());
+        for (Attribute<T,?> attribute : sortedAttributes) {
 
             final String name = attribute.getName();
             CNode sub = removeIgnoreCase(config, name);
@@ -402,7 +403,6 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
         }
         return null;
     }
-
 
     public static final class TypePair {
 
