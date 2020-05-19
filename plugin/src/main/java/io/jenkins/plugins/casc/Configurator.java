@@ -225,7 +225,7 @@ public interface Configurator<T> {
     static double extractExtensionOrdinal(Class clazz) {
         Extension extension = (Extension) clazz.getAnnotation(Extension.class);
         if (extension == null) {
-            return Double.MIN_VALUE;
+            return 0.0;
         }
         return extension.ordinal();
     }
