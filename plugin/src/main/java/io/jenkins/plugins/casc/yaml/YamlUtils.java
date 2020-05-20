@@ -26,10 +26,10 @@ public final class YamlUtils {
 
     public static final Logger LOGGER = Logger.getLogger(ConfigurationAsCode.class.getName());
 
-    public static Node merge(List<YamlSource> configs) throws ConfiguratorException {
+    public static Node merge(List<YamlSource> sources) throws ConfiguratorException {
         Node root = null;
-        for (YamlSource source : configs) {
-            try (Reader r = source.read()) {
+        for (YamlSource src : sources) {
+            try (YamlSource source = src; Reader r = source.read()) {
 
                 final Node node = read(source);
 
@@ -41,7 +41,7 @@ public final class YamlUtils {
                     }
                 }
             } catch (IOException io) {
-                throw new ConfiguratorException("Failed to read " + source, io);
+                throw new ConfiguratorException("Failed to read " + src, io);
             }
         }
 

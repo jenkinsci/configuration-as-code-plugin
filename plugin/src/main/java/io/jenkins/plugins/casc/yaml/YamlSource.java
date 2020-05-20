@@ -1,6 +1,5 @@
 package io.jenkins.plugins.casc.yaml;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -77,10 +76,8 @@ public class YamlSource<T> implements AutoCloseable {
 
     @Override
     public void close() throws IOException {
-        if (reader instanceof BufferedReader) {
-            ((BufferedReader) reader).close();
-        } else if (reader instanceof InputStreamReader) {
-            ((InputStreamReader) reader).close();
+        if (reader instanceof Reader) {
+            ((Reader) reader).close();
         }
     }
 }

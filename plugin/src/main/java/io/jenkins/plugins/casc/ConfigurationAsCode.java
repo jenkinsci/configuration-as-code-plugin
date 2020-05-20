@@ -246,8 +246,6 @@ public class ConfigurationAsCode extends ManagementLink {
             return FormValidation.okWithMarkup("The configuration can be applied");
         } catch (ConfiguratorException | IllegalArgumentException e) {
             return FormValidation.error(e, e.getCause() == null ? e.getMessage() : e.getCause().getMessage());
-        } finally {
-            closeSources(yamlSources);
         }
     }
 
@@ -615,7 +613,6 @@ public class ConfigurationAsCode extends ManagementLink {
     private void configureWith(List<YamlSource> sources) throws ConfiguratorException {
         lastTimeLoaded = System.currentTimeMillis();
         configureWith( YamlUtils.loadFrom(sources) );
-        closeSources(sources);
     }
 
     @Restricted(NoExternalUse.class)
@@ -628,16 +625,6 @@ public class ConfigurationAsCode extends ManagementLink {
     private Map<Source, String> checkWith(List<YamlSource> sources) throws ConfiguratorException {
         if (sources.isEmpty()) return Collections.emptyMap();
         return checkWith( YamlUtils.loadFrom(sources) );
-    }
-
-    private void closeSources(List<YamlSource> sources) {
-        for (YamlSource source : sources) {
-            try {
-                source.close();
-            } catch (IOException e) {
-                LOGGER.log(Level.WARNING, "Failed to close YAML Source", e);
-            }
-        }
     }
 
     /**
