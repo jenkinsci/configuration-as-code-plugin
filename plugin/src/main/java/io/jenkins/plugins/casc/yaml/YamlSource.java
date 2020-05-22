@@ -1,6 +1,5 @@
 package io.jenkins.plugins.casc.yaml;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import javax.servlet.http.HttpServletRequest;
