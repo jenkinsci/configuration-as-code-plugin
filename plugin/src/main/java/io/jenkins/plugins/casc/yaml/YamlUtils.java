@@ -4,10 +4,17 @@ import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.model.Mapping;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.URI;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
+import javax.servlet.http.HttpServletRequest;
 import org.yaml.snakeyaml.composer.Composer;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
@@ -18,6 +25,8 @@ import org.yaml.snakeyaml.nodes.SequenceNode;
 import org.yaml.snakeyaml.parser.ParserImpl;
 import org.yaml.snakeyaml.resolver.Resolver;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
@@ -26,12 +35,26 @@ public final class YamlUtils {
 
     public static final Logger LOGGER = Logger.getLogger(ConfigurationAsCode.class.getName());
 
+    public static Reader reader(YamlSource<?> source) throws IOException {
+        Object src = source.source;
+        if (src instanceof String) {
+            final URL url = URI.create((String) src).toURL();
+            return new InputStreamReader(url.openStream(), UTF_8);
+        } else if (src instanceof InputStream) {
+            return new InputStreamReader((InputStream) src, UTF_8);
+        } else if (src instanceof HttpServletRequest) {
+            return new InputStreamReader(((HttpServletRequest) src).getInputStream(), UTF_8);
+        } else if (src instanceof Path) {
+            return Files.newBufferedReader((Path) src);
+        }
+        throw new IOException(String.format("Unknown %s", source));
+    }
+
     public static Node merge(List<YamlSource> sources) throws ConfiguratorException {
         Node root = null;
-        for (YamlSource src : sources) {
-            try (YamlSource source = src; Reader r = source.read()) {
-
-                final Node node = read(source);
+        for (YamlSource<?> source : sources) {
+            try (Reader reader = reader(source)) {
+                final Node node = read(source, reader);
 
                 if (root == null) {
                     root = node;
@@ -41,15 +64,15 @@ public final class YamlUtils {
                     }
                 }
             } catch (IOException io) {
-                throw new ConfiguratorException("Failed to read " + src, io);
+                throw new ConfiguratorException("Failed to read " + source, io);
             }
         }
 
         return root;
     }
 
-    public static Node read(YamlSource source) throws IOException {
-        Composer composer = new Composer(new ParserImpl(new StreamReaderWithSource(source)), new Resolver());
+    public static Node read(YamlSource source, Reader reader) throws IOException {
+        Composer composer = new Composer(new ParserImpl(new StreamReaderWithSource(source, reader)), new Resolver());
         return composer.getSingleNode();
     }
 
