@@ -43,7 +43,12 @@ jobs:
         file: '*jacoco.xml'
 
     - name: Codacy coverage
-      uses: codacy/codacy-coverage-reporter-action@master
-      with:
-        project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-        coverage-reports: integrations/target/site/jacoco-aggregate/jacoco.xml
+      shell: bash
+      env:
+        CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+      run: |
+        if [ "$CODACY_PROJECT_TOKEN" != "" ]; then
+          bash <(curl -Ls https://coverage.codacy.com/get.sh) report -l Java -r integrations/target/site/jacoco-aggregate/jacoco.xml
+        else
+          echo "No secrets provided for codacy coverage report"
+        fi
