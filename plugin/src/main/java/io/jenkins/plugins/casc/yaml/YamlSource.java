@@ -76,8 +76,6 @@ public class YamlSource<T> implements AutoCloseable {
 
     @Override
     public void close() throws IOException {
-        if (reader instanceof Reader) {
-            ((Reader) reader).close();
-        }
+        read().close();
     }
 }
