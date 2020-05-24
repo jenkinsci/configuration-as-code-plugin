@@ -3,6 +3,9 @@ package io.jenkins.plugins.casc;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.WebRequest;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.yaml.YamlSource;
+import io.jenkins.plugins.casc.yaml.YamlUtils;
+import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
@@ -20,6 +23,11 @@ public class YamlReaderTest {
 
     @Rule
     public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+
+    @Test(expected = IOException.class)
+    public void unknownReader() throws IOException {
+        YamlUtils.reader(new YamlSource<>(new StringBuilder()));
+    }
 
     @Test
     public void folder() throws Exception {
