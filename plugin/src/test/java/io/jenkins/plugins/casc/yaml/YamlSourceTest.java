@@ -45,8 +45,13 @@ public class YamlSourceTest {
 
     @Test
     public void shouldHaveInformativeToStringForRequestSource() {
-        Request request = new Request(null, null);
+        Request request = new Request(null, null) {
+            @Override
+            public String getPathInfo() {
+                return "/configuration-as-code/check";
+            }
+        };
         YamlSource<HttpServletRequest> yamlSource = YamlSource.of(request);
-        assertEquals("YamlSource: a", yamlSource.toString());
+        assertEquals("YamlSource: /configuration-as-code/check", yamlSource.toString());
     }
 }

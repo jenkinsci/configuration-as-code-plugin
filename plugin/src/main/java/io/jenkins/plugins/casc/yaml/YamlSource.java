@@ -33,11 +33,14 @@ public class YamlSource<T> {
     }
 
     public String source() {
+        if (source instanceof HttpServletRequest) {
+            return ((HttpServletRequest) source).getPathInfo();
+        }
         return source.toString();
     }
 
     @Override
     public String toString() {
-        return "YamlSource: " + source;
+        return "YamlSource: " + source();
     }
 }
