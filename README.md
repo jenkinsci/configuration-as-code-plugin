@@ -123,6 +123,8 @@ element.
 
 ## Examples
 
+See [demos](demos) folder with various samples.
+
 ### LDAP
 
 Replacing user interface based configuration for LDAP with the text based configuration.
@@ -142,7 +144,58 @@ jenkins:
           server: "ldaps://ldap.acme.org:1636"
 ```
 
-Also see [demos](demos) folder with various samples.
+### Yaml Aliases and Anchors
+
+Replace repeated elements with yaml anchors.
+Due note anchor keys must be prefixed with `x-` due to JCasC handling of unknown root elements.
+
+```yaml
+x-jenkins-linux-node: &jenkins_linux_node_anchor
+  remoteFS: "/home/jenkins"
+  launcher:
+    jnlp:
+      workDirSettings:
+        disabled: true
+        failIfWorkDirIsMissing: false
+        internalDir: "remoting"
+        workDirPath: "/tmp"
+
+jenkins:
+  nodes:
+    - permanent:
+        name: "static-agent1"
+        <<: *jenkins_linux_node_anchor
+    - permanent:
+        name: "static-agent2"
+        <<: *jenkins_linux_node_anchor
+```
+
+Which produces two permanent agent nodes which can also be written like this.
+
+```yaml
+jenkins:
+  nodes:
+    - permanent:
+        name: "static-agent1"
+        remoteFS: "/home/jenkins"
+        launcher:
+          jnlp:
+            workDirSettings:
+              disabled: true
+              failIfWorkDirIsMissing: false
+              internalDir: "remoting"
+              workDirPath: "/tmp"
+    - permanent:
+        name: "static-agent2"
+        remoteFS: "/home/jenkins"
+        launcher:
+          jnlp:
+            workDirSettings:
+              disabled: true
+              failIfWorkDirIsMissing: false
+              internalDir: "remoting"
+              workDirPath: "/tmp"
+```
 
 ## Documentation
 
