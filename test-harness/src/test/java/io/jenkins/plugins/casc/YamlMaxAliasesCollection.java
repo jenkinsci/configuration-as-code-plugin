@@ -7,7 +7,6 @@ import org.junit.Test;
 import org.junit.contrib.java.lang.system.RestoreSystemProperties;
 import org.junit.rules.RuleChain;
 import org.jvnet.hudson.test.JenkinsRule;
-import org.yaml.snakeyaml.error.YAMLException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
