@@ -35,21 +35,6 @@ public final class YamlUtils {
 
     public static final Logger LOGGER = Logger.getLogger(ConfigurationAsCode.class.getName());
 
-    public static Reader reader(YamlSource<?> source) throws IOException {
-        Object src = source.source;
-        if (src instanceof String) {
-            final URL url = URI.create((String) src).toURL();
-            return new InputStreamReader(url.openStream(), UTF_8);
-        } else if (src instanceof InputStream) {
-            return new InputStreamReader((InputStream) src, UTF_8);
-        } else if (src instanceof HttpServletRequest) {
-            return new InputStreamReader(((HttpServletRequest) src).getInputStream(), UTF_8);
-        } else if (src instanceof Path) {
-            return Files.newBufferedReader((Path) src);
-        }
-        throw new IOException(String.format("Unknown %s", source));
-    }
-
     public static Node merge(List<YamlSource> sources) throws ConfiguratorException {
         Node root = null;
         for (YamlSource<?> source : sources) {
@@ -74,6 +59,21 @@ public final class YamlUtils {
     public static Node read(YamlSource source, Reader reader) throws IOException {
         Composer composer = new Composer(new ParserImpl(new StreamReaderWithSource(source, reader)), new Resolver());
         return composer.getSingleNode();
+    }
+
+    public static Reader reader(YamlSource<?> source) throws IOException {
+        Object src = source.source;
+        if (src instanceof String) {
+            final URL url = URI.create((String) src).toURL();
+            return new InputStreamReader(url.openStream(), UTF_8);
+        } else if (src instanceof InputStream) {
+            return new InputStreamReader((InputStream) src, UTF_8);
+        } else if (src instanceof HttpServletRequest) {
+            return new InputStreamReader(((HttpServletRequest) src).getInputStream(), UTF_8);
+        } else if (src instanceof Path) {
+            return Files.newBufferedReader((Path) src);
+        }
+        throw new IOException(String.format("Unknown %s", source));
     }
 
     private static void merge(Node root, Node node, String source) throws ConfiguratorException {
