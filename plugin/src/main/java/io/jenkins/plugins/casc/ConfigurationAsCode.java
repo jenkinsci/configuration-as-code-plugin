@@ -614,7 +614,8 @@ public class ConfigurationAsCode extends ManagementLink {
 
     private void configureWith(List<YamlSource> sources) throws ConfiguratorException {
         lastTimeLoaded = System.currentTimeMillis();
-        configureWith( YamlUtils.loadFrom(sources) );
+        ConfigurationContext context = new ConfigurationContext(registry);
+        configureWith(YamlUtils.loadFrom(sources, context), context);
         closeSources(sources);
     }
 
@@ -627,7 +628,8 @@ public class ConfigurationAsCode extends ManagementLink {
 
     private Map<Source, String> checkWith(List<YamlSource> sources) throws ConfiguratorException {
         if (sources.isEmpty()) return Collections.emptyMap();
-        return checkWith( YamlUtils.loadFrom(sources) );
+        ConfigurationContext context = new ConfigurationContext(registry);
+        return checkWith(YamlUtils.loadFrom(sources, context), context);
     }
 
     private void closeSources(List<YamlSource> sources) {
@@ -740,27 +742,28 @@ public class ConfigurationAsCode extends ManagementLink {
         }
     }
 
-    private void configureWith(Mapping entries) throws ConfiguratorException {
+    private void configureWith(Mapping entries,
+        ConfigurationContext context) throws ConfiguratorException {
         // Initialize secret sources
         SecretSource.all().forEach(SecretSource::init);
 
         // Check input before actually applying changes,
         // so we don't let master in a weird state after some ConfiguratorException has been thrown
         final Mapping clone = entries.clone();
-        checkWith(clone);
+        checkWith(clone, context);
 
         final ObsoleteConfigurationMonitor monitor = ObsoleteConfigurationMonitor.get();
         monitor.reset();
-        ConfigurationContext context = new ConfigurationContext(registry);
+        context.clearListeners();
         context.addListener(monitor::record);
         try (ACLContext acl = ACL.as(ACL.SYSTEM)) {
             invokeWith(entries, (configurator, config) -> configurator.configure(config, context));
         }
     }
 
-    public Map<Source, String> checkWith(Mapping entries) throws ConfiguratorException {
+    public Map<Source, String> checkWith(Mapping entries,
+        ConfigurationContext context) throws ConfiguratorException {
         Map<Source, String> issues = new HashMap<>();
-        ConfigurationContext context = new ConfigurationContext(registry);
         context.addListener( (node,message) -> issues.put(node.getSource(), message) );
         invokeWith(entries, (configurator, config) -> configurator.check(config, context));
         return issues;
