@@ -68,4 +68,22 @@ public class TopReadmeTest {
         final LDAPSecurityRealm securityRealm = (LDAPSecurityRealm) jenkins.getSecurityRealm();
         assertEquals(1, securityRealm.getConfigurations().size());
     }
+
+    @Test
+    @ConfiguredWithReadme("README.md#2")
+    public void configure_demo_third_code_block() throws Exception {
+        final Jenkins jenkins = Jenkins.get();
+        assertEquals(2, jenkins.getNodes().size());
+        assertEquals("static-agent1", jenkins.getNode("static-agent1").getNodeName());
+        assertEquals("static-agent2", jenkins.getNode("static-agent2").getNodeName());
+    }
+
+    @Test
+    @ConfiguredWithReadme("README.md#3")
+    public void configure_demo_fourth_code_block() throws Exception {
+        final Jenkins jenkins = Jenkins.get();
+        assertEquals(2, jenkins.getNodes().size());
+        assertEquals("static-agent1", jenkins.getNode("static-agent1").getNodeName());
+        assertEquals("static-agent2", jenkins.getNode("static-agent2").getNodeName());
+    }
 }

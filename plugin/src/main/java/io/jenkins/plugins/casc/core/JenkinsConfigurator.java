@@ -29,7 +29,7 @@ import static io.jenkins.plugins.casc.Attribute.noop;
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-@Extension
+@Extension(ordinal = 1)
 @Restricted(NoExternalUse.class)
 public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements RootElementConfigurator<Jenkins> {
 

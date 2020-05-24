@@ -8,6 +8,7 @@ jobs:
             scanCredentialsId('github')
             repoOwner('my-org')
             repository('my-repository')
+            apiUri('http://my-github-server/api/v3') // Optional, needed for private github enterprise servers
           }
         }
         orphanedItemStrategy {

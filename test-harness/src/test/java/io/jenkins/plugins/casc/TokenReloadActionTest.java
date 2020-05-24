@@ -138,4 +138,9 @@ public class TokenReloadActionTest {
         assertEquals("Configuration reload triggered via token", messages.get(0).getMessage());
         assertEquals(Level.INFO, messages.get(0).getLevel());
     }
+
+    @Test
+    public void displayName() {
+        assertEquals("Reload Configuration as Code", tokenReloadAction.getDisplayName());
+    }
 }

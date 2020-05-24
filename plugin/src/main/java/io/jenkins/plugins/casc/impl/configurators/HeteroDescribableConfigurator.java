@@ -153,7 +153,7 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
                 "Will try parent classes to find proper extension points", target);
         DescriptorExtensionList parentDescriptorClassList = descriptorList;
         Class<?> effectiveTarget = target.getSuperclass();
-        while (parentDescriptorClassList.isEmpty() && effectiveTarget != Object.class) {
+        while (parentDescriptorClassList.isEmpty() && effectiveTarget != null && effectiveTarget != Object.class) {
             final Class<Describable> match;
             LOGGER.log(Level.FINEST, "getDescriptors() for {0}: Trying parent class {1}",
                     new Object[] {target, effectiveTarget});
