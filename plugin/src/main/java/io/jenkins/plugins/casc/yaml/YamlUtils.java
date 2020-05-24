@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.composer.Composer;
+import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.NodeId;
@@ -58,7 +59,17 @@ public final class YamlUtils {
             new ParserImpl(new StreamReaderWithSource(source)),
             new Resolver(),
             loaderOptions);
-        return composer.getSingleNode();
+        try {
+            return composer.getSingleNode();
+        } catch (YAMLException e) {
+            if (e.getMessage().startsWith("Number of aliases for non-scalar nodes exceeds the specified max")) {
+                throw new ConfiguratorException(String.format(
+                    "%s%nYou can increase the maximum by setting an environment variable or property%n  ENV: %s=\"100\"%n  PROPERTY: -D%s=\"100\"",
+                    e.getMessage(), ConfigurationContext.CASC_YAML_MAX_ALIASES_ENV,
+                    ConfigurationContext.CASC_YAML_MAX_ALIASES_PROPERTY));
+            }
+            throw e;
+        }
     }
 
     private static void merge(Node root, Node node, String source) throws ConfiguratorException {

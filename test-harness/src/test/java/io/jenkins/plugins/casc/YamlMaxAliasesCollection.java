@@ -18,7 +18,6 @@ public class YamlMaxAliasesCollection {
 
     private EnvVarsRule env;
 
-
     @Rule
     public RuleChain rc = RuleChain.outerRule(env = new EnvVarsRule())
         .around(new RestoreSystemProperties())
@@ -27,14 +26,14 @@ public class YamlMaxAliasesCollection {
     @Test
     public void testAMaxOfOneEnv() {
         env.set(ConfigurationContext.CASC_YAML_MAX_ALIASES_ENV, "1");
-        assertThrows(YAMLException.class, () ->
+        assertThrows(ConfiguratorException.class, () ->
             ConfigurationAsCode.get().configure(getClass().getResource("maxAliasesLimit.yml").toExternalForm()));
     }
 
     @Test
     public void testAMaxOfOneProp() {
         System.setProperty(ConfigurationContext.CASC_YAML_MAX_ALIASES_PROPERTY, "1");
-        assertThrows(YAMLException.class, () ->
+        assertThrows(ConfiguratorException.class, () ->
             ConfigurationAsCode.get().configure(getClass().getResource("maxAliasesLimit.yml").toExternalForm()));
     }
 
