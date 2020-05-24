@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import javax.servlet.http.HttpServletRequest;
-import org.eclipse.jetty.server.HttpInput;
 import org.eclipse.jetty.server.Request;
 import org.junit.Test;
 
