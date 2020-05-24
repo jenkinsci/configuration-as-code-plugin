@@ -2,10 +2,12 @@ package io.jenkins.plugins.casc;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import hudson.Util;
 import io.jenkins.plugins.casc.model.CNode;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang.math.NumberUtils;
 import org.kohsuke.stapler.Stapler;
 
 /**
@@ -14,9 +16,12 @@ import org.kohsuke.stapler.Stapler;
 
 public class ConfigurationContext implements ConfiguratorRegistry {
 
+    public static final String CASC_YAML_MAX_ALIASES_ENV = "CASC_YAML_MAX_ALIASES";
+    public static final String CASC_YAML_MAX_ALIASES_PROPERTY = "casc.yaml.max.aliases";
     private Deprecation deprecation = Deprecation.reject;
     private Restriction restriction = Restriction.reject;
     private Unknown unknown = Unknown.reject;
+    private final int yamlMaxAliasesForCollections;
 
     /**
      * the model-introspection model to be applied by configuration-as-code.
@@ -34,10 +39,19 @@ public class ConfigurationContext implements ConfiguratorRegistry {
 
     public ConfigurationContext(ConfiguratorRegistry registry) {
         this.registry = registry;
+        String prop = Util.fixEmptyAndTrim(System.getProperty(
+            CASC_YAML_MAX_ALIASES_PROPERTY,
+            System.getenv(CASC_YAML_MAX_ALIASES_ENV)
+        ));
+        yamlMaxAliasesForCollections = NumberUtils.toInt(prop, 50);
     }
 
     public void addListener(Listener listener) {
         listeners.add(listener);
+    }
+
+    public void clearListeners() {
+        listeners.clear();
     }
 
     public void warning(@NonNull CNode node, @NonNull String message) {
@@ -72,7 +86,9 @@ public class ConfigurationContext implements ConfiguratorRegistry {
         this.mode = mode;
     }
 
-
+    public int getYamlMaxAliasesForCollections() {
+        return yamlMaxAliasesForCollections;
+    }
 
     // --- delegate methods for ConfigurationContext
 
