@@ -178,23 +178,23 @@ jenkins:
     - permanent:
         name: "static-agent1"
         remoteFS: "/home/jenkins"
-          launcher:
-            jnlp:
-              workDirSettings:
-                disabled: true
-                failIfWorkDirIsMissing: false
-                internalDir: "remoting"
-                workDirPath: "/tmp"
+        launcher:
+          jnlp:
+            workDirSettings:
+              disabled: true
+              failIfWorkDirIsMissing: false
+              internalDir: "remoting"
+              workDirPath: "/tmp"
     - permanent:
         name: "static-agent2"
         remoteFS: "/home/jenkins"
-          launcher:
-            jnlp:
-              workDirSettings:
-                disabled: true
-                failIfWorkDirIsMissing: false
-                internalDir: "remoting"
-                workDirPath: "/tmp"
+        launcher:
+          jnlp:
+            workDirSettings:
+              disabled: true
+              failIfWorkDirIsMissing: false
+              internalDir: "remoting"
+              workDirPath: "/tmp"
 ```
 
 ## Documentation
