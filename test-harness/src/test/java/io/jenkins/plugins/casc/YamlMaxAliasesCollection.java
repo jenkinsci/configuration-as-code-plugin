@@ -25,15 +25,25 @@ public class YamlMaxAliasesCollection {
     @Test
     public void testAMaxOfOneEnv() {
         env.set(ConfigurationContext.CASC_YAML_MAX_ALIASES_ENV, "1");
-        assertThrows(ConfiguratorException.class, () ->
-            ConfigurationAsCode.get().configure(getClass().getResource("maxAliasesLimit.yml").toExternalForm()));
+        ConfiguratorException e = assertThrows(ConfiguratorException.class, () ->
+                ConfigurationAsCode.get()
+                    .configure(getClass().getResource("maxAliasesLimit.yml").toExternalForm()));
+        assertEquals("Number of aliases for non-scalar nodes exceeds the specified max=1\n"
+            + "You can increase the maximum by setting an environment variable or property\n"
+            + "  ENV: CASC_YAML_MAX_ALIASES=\"100\"\n"
+            + "  PROPERTY: -Dcasc.yaml.max.aliases=\"100\"", e.getCause().getMessage().replaceAll("\\r\\n?", "\n"));
     }
 
     @Test
     public void testAMaxOfOneProp() {
         System.setProperty(ConfigurationContext.CASC_YAML_MAX_ALIASES_PROPERTY, "1");
-        assertThrows(ConfiguratorException.class, () ->
-            ConfigurationAsCode.get().configure(getClass().getResource("maxAliasesLimit.yml").toExternalForm()));
+        ConfiguratorException e = assertThrows(ConfiguratorException.class, () ->
+                ConfigurationAsCode.get()
+                    .configure(getClass().getResource("maxAliasesLimit.yml").toExternalForm()));
+        assertEquals("Number of aliases for non-scalar nodes exceeds the specified max=1\n"
+            + "You can increase the maximum by setting an environment variable or property\n"
+            + "  ENV: CASC_YAML_MAX_ALIASES=\"100\"\n"
+            + "  PROPERTY: -Dcasc.yaml.max.aliases=\"100\"", e.getCause().getMessage().replaceAll("\\r\\n?", "\n"));
     }
 
     @Test
