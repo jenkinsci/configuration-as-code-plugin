@@ -6,4 +6,5 @@
 
 <suppressions>
   <suppress files="release\.properties" checks="[a-zA-Z0-9]*"/>
+  <suppress files=".+\.properties" checks=".+" />
 </suppressions>

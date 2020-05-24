@@ -23,6 +23,7 @@ package io.jenkins.plugins.casc;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import hudson.Extension;
 import hudson.ExtensionPoint;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
@@ -207,6 +208,30 @@ public interface Configurator<T> {
             }
         }
         return mapping;
+    }
+
+    static double extractExtensionOrdinal(Object obj) {
+        if (obj instanceof Attribute<?, ?>) {
+            return extractExtensionOrdinal((Attribute<?, ?>) obj);
+        } else {
+            return extractExtensionOrdinal(obj.getClass());
+        }
+    }
+
+    static double extractExtensionOrdinal(Attribute<?, ?> attribute) {
+        return extractExtensionOrdinal(attribute.type);
+    }
+
+    static double extractExtensionOrdinal(Class clazz) {
+        Extension extension = (Extension) clazz.getAnnotation(Extension.class);
+        if (extension == null) {
+            return 0.0;
+        }
+        return extension.ordinal();
+    }
+
+    static Comparator<Object> extensionOrdinalSort() {
+        return Comparator.comparingDouble(Configurator::extractExtensionOrdinal).reversed();
     }
 
 }

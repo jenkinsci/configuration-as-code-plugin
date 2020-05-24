@@ -29,6 +29,13 @@ Below configuration file includes root entries for various components of your pr
 ```yaml
 jenkins:
   systemMessage: "Jenkins configured automatically by Jenkins Configuration as Code plugin\n\n"
+  globalNodeProperties:
+  - envVars:
+      env:
+      - key: VARIABLE1
+        value: foo
+      - key: VARIABLE2
+        value: bar
   securityRealm:
     ldap:
       configurations:
