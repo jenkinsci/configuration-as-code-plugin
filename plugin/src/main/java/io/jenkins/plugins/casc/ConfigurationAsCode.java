@@ -712,9 +712,22 @@ public class ConfigurationAsCode extends ManagementLink {
         }
 
         if (!entries.isEmpty()) {
-            final Map.Entry<String, CNode> next = entries.entrySet().iterator().next();
-            throw new ConfiguratorException(format("No configurator for root element <%s>", next.getKey()));
+            List<String> unknownKeys = new ArrayList<>();
+            entries.entrySet().iterator().forEachRemaining(next -> {
+                String key = next.getKey();
+                if (isNotAliasEntry(key)) {
+                    unknownKeys.add(key);
+                }
+            });
+
+            if (!unknownKeys.isEmpty()) {
+                throw new ConfiguratorException(format("No configurator for the following root elements %s", String.join(", ", unknownKeys)));
+            }
         }
+    }
+
+    static boolean isNotAliasEntry(String key) {
+        return key != null && !key.startsWith("x-");
     }
 
     private static void detectVaultPluginMissing() {

@@ -1,10 +1,3 @@
-# Configure Amazon EC2 plugin
-
-Basic configuration of the [Amazon EC2 Plugin](https://plugins.jenkins.io/ec2)
-
-## sample configuration
-
-```yaml
 x-ec2_anchor: &ec2_anchor
   associatePublicIp: false
   connectBySSHProcess: false
@@ -51,4 +44,3 @@ jenkins:
             type: "T2Xlarge"
             labelString: "Large"
             <<: *ec2_anchor
-```
