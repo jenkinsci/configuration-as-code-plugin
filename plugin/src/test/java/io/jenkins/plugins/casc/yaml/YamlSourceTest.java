@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import javax.servlet.http.HttpServletRequest;
+import org.eclipse.jetty.server.HttpInput;
+import org.eclipse.jetty.server.Request;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -39,5 +42,12 @@ public class YamlSourceTest {
         String testPathToString = path.toString();
         YamlSource<Path> yamlSource = YamlSource.of(path);
         assertEquals("YamlSource: " + testPathToString, yamlSource.toString());
+    }
+
+    @Test
+    public void shouldHaveInformativeToStringForRequestSource() {
+        Request request = new Request(null, null);
+        YamlSource<HttpServletRequest> yamlSource = YamlSource.of(request);
+        assertEquals("YamlSource: a", yamlSource.toString());
     }
 }
