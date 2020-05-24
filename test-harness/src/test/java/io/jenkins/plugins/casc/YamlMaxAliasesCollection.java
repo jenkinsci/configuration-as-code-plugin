@@ -57,4 +57,17 @@ public class YamlMaxAliasesCollection {
         assertEquals("static-agent1", jenkins.getNode("static-agent1").getNodeName());
         assertEquals("static-agent2", jenkins.getNode("static-agent2").getNodeName());
     }
+
+    @Test
+    public void invalidInputShouldDefaultTo50() throws ConfiguratorException {
+        System.setProperty(ConfigurationContext.CASC_YAML_MAX_ALIASES_PROPERTY, "HELLO");
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        ConfigurationContext context = new ConfigurationContext(registry);
+        assertEquals(50, context.getYamlMaxAliasesForCollections());
+        ConfigurationAsCode.get().configure(getClass().getResource("maxAliasesLimit.yml").toExternalForm());
+        final Jenkins jenkins = Jenkins.get();
+        assertEquals(2, jenkins.getNodes().size());
+        assertEquals("static-agent1", jenkins.getNode("static-agent1").getNodeName());
+        assertEquals("static-agent2", jenkins.getNode("static-agent2").getNodeName());
+    }
 }
