@@ -276,12 +276,6 @@ public class SecretSourceResolverTest {
     }
 
     @Test
-    public void resolve_FileNull() {
-        resolve("${file}");
-
-    }
-
-    @Test
     @Issue("SECURITY-1446")
     @WithoutJenkins
     public void shouldEncodeInternalVarsProperly() {
