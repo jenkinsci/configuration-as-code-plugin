@@ -20,7 +20,6 @@ import org.jvnet.hudson.test.WithoutJenkins;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 public class SecretSourceResolverTest {
