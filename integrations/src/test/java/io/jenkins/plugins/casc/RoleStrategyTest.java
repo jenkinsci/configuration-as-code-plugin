@@ -43,8 +43,8 @@ public class RoleStrategyTest {
     @ConfiguredWithCode("RoleStrategy1.yml")
     public void shouldReadRolesCorrectly() throws Exception {
         j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
-        User admin = User.getById("admin", true);
-        User user1 = User.getById("user1", true);
+        User admin = User.getById("admin", false);
+        User user1 = User.getById("user1", false);
         User user2 = User.getById("user2", true);
         Computer agent1 = j.jenkins.getComputer("agent1");
         Computer agent2 = j.jenkins.getComputer("agent2");

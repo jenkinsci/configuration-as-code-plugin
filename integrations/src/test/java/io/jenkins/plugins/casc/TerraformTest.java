@@ -47,7 +47,7 @@ public class TerraformTest {
     public void export_terraform_tool() throws Exception {
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         ConfigurationContext context = new ConfigurationContext(registry);
-        CNode yourAttribute = getToolRoot(context).get("terraformInstallation");
+        CNode yourAttribute = getToolRoot(context).get("terraform");
 
         String exported = toYamlString(yourAttribute);
 

@@ -33,6 +33,8 @@ public interface RootElementConfigurator<T> extends Configurator<T> {
                 configurators.add(new DescriptorConfigurator(descriptor));
         }
 
+        configurators.sort(Configurator.extensionOrdinalSort());
+
         return configurators;
     }
 
