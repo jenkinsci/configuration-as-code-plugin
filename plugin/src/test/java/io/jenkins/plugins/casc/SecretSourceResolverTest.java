@@ -1,6 +1,8 @@
 package io.jenkins.plugins.casc;
 
 import io.jenkins.plugins.casc.SecretSourceResolver.FileStringLookup;
+import java.io.File;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -212,6 +214,32 @@ public class SecretSourceResolverTest {
     @Test
     public void resolve_File() throws Exception {
         String input = Paths.get(getClass().getResource("secret.json").toURI()).toFile().getAbsolutePath();
+        String output = resolve("${file:" + input + "}");
+        assertThat(output, equalTo(FILE.lookup(input)));
+        assertThat(output, containsString("\"Our secret\": \"Hello World\""));
+    }
+
+    @Test
+    public void resolve_FileWithRelative() throws Exception {
+        Path path = Paths.get(getClass().getResource("secret.json").toURI());
+        String input = Paths.get("").toUri().relativize(path.toUri()).getPath();
+        String output = resolve("${file:" + input + "}");
+        assertThat(output, equalTo(FILE.lookup(input)));
+        assertThat(output, containsString("\"Our secret\": \"Hello World\""));
+    }
+
+    @Test
+    public void resolve_FileWithSpace() throws Exception {
+        String path = Paths.get(getClass().getResource("some secret.json").toURI()).toFile().getAbsolutePath();
+        String output = resolve("${file:" + path + "}");
+        assertThat(output, equalTo(FILE.lookup(path)));
+        assertThat(output, containsString("\"Our secret\": \"Hello World\""));
+    }
+
+    @Test
+    public void resolve_FileWithSpaceAndRelative() throws Exception {
+        String path = Paths.get(getClass().getResource("some secret.json").toURI()).toFile().getAbsolutePath();
+        String input = Paths.get("").toUri().relativize(new File(path).toURI()).getPath();
         String output = resolve("${file:" + input + "}");
         assertThat(output, equalTo(FILE.lookup(input)));
         assertThat(output, containsString("\"Our secret\": \"Hello World\""));
