@@ -58,7 +58,7 @@ public class SecretSourceResolverTest {
     }
 
     public String resolve(String toInterpolate) {
-        return SecretSourceResolver.resolve(context, toInterpolate);
+        return context.getSecretSourceResolver().resolve(toInterpolate);
     }
 
     public boolean logContains(String text) {
@@ -286,7 +286,7 @@ public class SecretSourceResolverTest {
     }
 
     private static void assertVarEncoding(String expected, String toEncode) {
-        String encoded = SecretSourceResolver.encode(toEncode);
+        String encoded = context.getSecretSourceResolver().encode(toEncode);
         assertThat(encoded, equalTo(expected));
     }
 }

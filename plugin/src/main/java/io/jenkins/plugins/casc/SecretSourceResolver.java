@@ -26,24 +26,23 @@ public class SecretSourceResolver {
     private static final String escapeEnclosedBy = escapedWith + enclosedBy;
 
     private static final Logger LOGGER = Logger.getLogger(SecretSourceResolver.class.getName());
-    private static final StringSubstitutor NULL_SUBSTITUTOR = new StringSubstitutor(
-        UnresolvedLookup.INSTANCE);
-    private static final StringSubstitutor SUBSTITUTOR = new StringSubstitutor(
-        StringLookupFactory.INSTANCE.interpolatorStringLookup(
-            ImmutableMap.of(
-                "base64", StringLookupFactory.INSTANCE.base64EncoderStringLookup(),
-                "file", FileStringLookup.INSTANCE
-            ),
-            ConfigurationContextStringLookup.INSTANCE, false));
+    private final StringSubstitutor nullSubstitutor;
+    private final StringSubstitutor substitutor;
 
-    static {
-        SUBSTITUTOR
+    public SecretSourceResolver(ConfigurationContext configurationContext) {
+        ConfigurationContext context = configurationContext;
+        substitutor = new StringSubstitutor(
+            StringLookupFactory.INSTANCE.interpolatorStringLookup(ImmutableMap
+                    .of("base64", StringLookupFactory.INSTANCE.base64EncoderStringLookup(),
+                        "file", FileStringLookup.INSTANCE
+                    ),
+                new ConfigurationContextStringLookup(context), false))
             .setEscapeChar(escapedWith)
             .setVariablePrefix(enclosedBy)
             .setVariableSuffix(enclosedIn)
             .setEnableSubstitutionInVariables(true)
             .setPreserveEscapes(true);
-        NULL_SUBSTITUTOR
+        nullSubstitutor = new StringSubstitutor(UnresolvedLookup.INSTANCE)
             .setEscapeChar(escapedWith)
             .setVariablePrefix(enclosedBy)
             .setVariableSuffix(enclosedIn);
@@ -55,17 +54,36 @@ public class SecretSourceResolver {
      * @return Encoded string
      * @since 1.25
      */
-    public static String encode(@CheckForNull String toEncode) {
+    public String encode(@CheckForNull String toEncode) {
         if (toEncode == null) {
             return null;
         }
         return toEncode.replace(enclosedBy, escapeEnclosedBy);
     }
 
+    /**
+     * Resolve string with potential secrets
+     *
+     * @param context Configuration context
+     * @param toInterpolate potential variables that need to revealed
+     * @return original string with any secrets that could be resolved if secrets could not be resolved they will be defaulted to default value defined by ':-', otherwise default to empty String secrets are defined as anything enclosed by '${}'
+     * @deprecated use ${link {@link #resolve(String)}} instead.
+     * @since 1.42
+     */
+    @Deprecated
     public static String resolve(ConfigurationContext context, String toInterpolate) {
-        ConfigurationContextStringLookup.INSTANCE.context = context;
-        String text = SUBSTITUTOR.replace(toInterpolate);
-        return NULL_SUBSTITUTOR.replace(text);
+        return context.getSecretSourceResolver().resolve(toInterpolate);
+    }
+
+    /**
+     * Resolve string with potential secrets
+     *
+     * @param toInterpolate potential variables that need to revealed
+     * @return original string with any secrets that could be resolved if secrets could not be resolved they will be defaulted to default value defined by ':-', otherwise default to empty String secrets are defined as anything enclosed by '${}'
+     */
+    public String resolve(String toInterpolate) {
+        String text = substitutor.replace(toInterpolate);
+        return nullSubstitutor.replace(text);
     }
 
     static class UnresolvedLookup implements StringLookup {
@@ -86,11 +104,10 @@ public class SecretSourceResolver {
 
     static class ConfigurationContextStringLookup implements StringLookup {
 
-        static final ConfigurationContextStringLookup INSTANCE = new ConfigurationContextStringLookup();
+        private final ConfigurationContext context;
 
-        private ConfigurationContext context;
-
-        private ConfigurationContextStringLookup() {
+        private ConfigurationContextStringLookup(ConfigurationContext context) {
+            this.context = context;
         }
 
         @Override

@@ -42,7 +42,7 @@ public class PrimitiveConfigurator implements Configurator {
     @NonNull
     @Override
     public Object configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
-        return Stapler.lookupConverter(target).convert(target, SecretSourceResolver.resolve(context, config.asScalar().toString()));
+        return Stapler.lookupConverter(target).convert(target, context.getSecretSourceResolver().resolve(config.asScalar().toString()));
     }
 
     @Override
@@ -70,7 +70,7 @@ public class PrimitiveConfigurator implements Configurator {
             return new Scalar((Enum) instance);
         }
 
-        return new Scalar(SecretSourceResolver.encode(String.valueOf(instance)));
+        return new Scalar(context.getSecretSourceResolver().encode(String.valueOf(instance)));
     }
 
     @NonNull
