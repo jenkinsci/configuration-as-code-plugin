@@ -1,7 +1,11 @@
 package io.jenkins.plugins.casc;
 
+import io.jenkins.plugins.casc.SecretSourceResolver.FileStringLookup;
+import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.text.lookup.StringLookup;
+import org.apache.commons.text.lookup.StringLookupFactory;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -13,8 +17,10 @@ import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.LoggerRule;
 import org.jvnet.hudson.test.WithoutJenkins;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 public class SecretSourceResolverTest {
@@ -29,6 +35,9 @@ public class SecretSourceResolverTest {
 
     @Rule
     public LoggerRule logging = new LoggerRule();
+    public static final StringLookup ENCODE = StringLookupFactory.INSTANCE.base64EncoderStringLookup();
+    public static final StringLookup DECODE = StringLookupFactory.INSTANCE.base64DecoderStringLookup();
+    public static final StringLookup FILE = FileStringLookup.INSTANCE;
 
     @Before
     public void initLogging() {
@@ -44,139 +53,199 @@ public class SecretSourceResolverTest {
     @Test
     public void resolve_singleEntry() {
         environment.set("FOO", "hello");
-        assertThat(SecretSourceResolver.resolve(context, "${FOO}"), equalTo("hello"));
+        assertThat(resolve("${FOO}"), equalTo("hello"));
+    }
+
+    public String resolve(String toInterpolate) {
+        return SecretSourceResolver.resolve(context, toInterpolate);
+    }
+
+    public boolean logContains(String text) {
+        final String expectedText = text;
+        return logging.getMessages().stream().anyMatch(m -> m.contains(expectedText));
     }
 
     @Test
     public void resolve_singleEntryWithoutDefaultValue() {
-        assertThat(SecretSourceResolver.resolve(context, "${FOO}"), equalTo(""));
-
-        // TODO: Create a new utility method?
-        final String expectedText ="Configuration import: Found unresolved variable FOO";
-        assertTrue("The log should contain '" + expectedText + "'",
-                logging.getMessages().stream().anyMatch(m -> m.contains(expectedText)));
+        assertThat(resolve("${FOO}"), equalTo(""));
+        assertTrue(logContains("Configuration import: Found unresolved variable 'FOO'"));
     }
 
     @Test
     public void resolve_singleEntryWithDefaultValue() {
-        assertThat(SecretSourceResolver.resolve(context, "${FOO:-default}"), equalTo("default"));
+        assertThat(resolve("${FOO:-default}"), equalTo("default"));
     }
 
     @Test
     public void resolve_singleEntryWithDefaultValueAndWithEnvDefined() {
         environment.set("FOO", "hello");
-        assertThat(SecretSourceResolver.resolve(context, "${FOO:-default}"), equalTo("hello"));
+        assertThat(resolve("${FOO:-default}"), equalTo("hello"));
     }
 
     @Test
     public void resolve_singleEntryEscaped() {
-        assertThat(SecretSourceResolver.resolve(context, "^${FOO}"), equalTo("${FOO}"));
+        assertThat(resolve("^${FOO}"), equalTo("${FOO}"));
     }
 
     @Test
     public void resolve_singleEntryDoubleEscaped() {
-        assertThat(SecretSourceResolver.resolve(context, "^^${FOO}"), equalTo("^${FOO}"));
+        assertThat(resolve("^^${FOO}"), equalTo("^${FOO}"));
     }
 
     @Test
     public void resolve_multipleEntries() {
         environment.set("FOO", "hello");
         environment.set("BAR", "world");
-        assertThat(SecretSourceResolver.resolve(context, "${FOO}:${BAR}"), equalTo("hello:world"));
+        assertThat(resolve("${FOO}:${BAR}"), equalTo("hello:world"));
     }
 
     @Test
     public void resolve_multipleEntriesWithoutDefaultValue() {
-        assertThat(SecretSourceResolver.resolve(context, "${FOO}:${BAR}"), equalTo(":"));
+        assertThat(resolve("${FOO}:${BAR}"), equalTo(":"));
     }
 
     @Test
     public void resolve_multipleEntriesWithDefaultValue() {
-        assertThat(SecretSourceResolver.resolve(context, "${FOO:-hello}:${BAR:-world}"), equalTo("hello:world"));
+        assertThat(resolve("${FOO:-hello}:${BAR:-world}"), equalTo("hello:world"));
     }
 
     @Test
     public void resolve_multipleEntriesWithDefaultValueAndEnvDefined() {
         environment.set("FOO", "hello");
         environment.set("BAR", "world");
-        assertThat(SecretSourceResolver.resolve(context, "${FOO:-default}:${BAR:-default}"), equalTo("hello:world"));
+        assertThat(resolve("${FOO:-default}:${BAR:-default}"), equalTo("hello:world"));
     }
 
     @Test
     public void resolve_multipleEntriesEscaped() {
-        assertThat(SecretSourceResolver.resolve(context, "^${FOO}:^${BAR}"), equalTo("${FOO}:${BAR}"));
+        assertThat(resolve("^${FOO}:^${BAR}"), equalTo("${FOO}:${BAR}"));
     }
 
     @Test
     public void resolve_nothing() {
-        assertThat(SecretSourceResolver.resolve(context, "FOO"), equalTo("FOO"));
+        assertThat(resolve("FOO"), equalTo("FOO"));
     }
 
     @Test
     public void resolve_nothingSpace() {
-        assertThat(SecretSourceResolver.resolve(context, "${ }"), equalTo(""));
+        assertThat(resolve("${ }"), equalTo(""));
     }
 
     @Test
     public void resolve_nothingBrackets() {
-        assertThat(SecretSourceResolver.resolve(context, "${}"), equalTo(""));
+        assertThat(resolve("${}"), equalTo(""));
     }
 
     @Test
     public void resolve_nothingDefault() {
-        assertThat(SecretSourceResolver.resolve(context, "${:-default}"), equalTo("default"));
+        assertThat(resolve("${:-default}"), equalTo("default"));
     }
 
     @Test
     public void resolve_emptyDefault() {
-        assertThat(SecretSourceResolver.resolve(context, "${FOO:-}"), equalTo(""));
+        assertThat(resolve("${FOO:-}"), equalTo(""));
     }
 
     @Test
     public void resolve_emptyDefaultEnvDefined() {
         environment.set("FOO", "foo");
-        assertThat(SecretSourceResolver.resolve(context, "${FOO:-}"), equalTo("foo"));
+        assertThat(resolve("${FOO:-}"), equalTo("foo"));
     }
 
     @Test
     public void resolve_defaultValueLimit() {
-        assertThat(SecretSourceResolver.resolve(context, "${FOO:-default:-other}"), equalTo("default:-other"));
+        assertThat(resolve("${FOO:-default:-other}"), equalTo("default:-other"));
     }
 
     @Test
     public void resolve_mixedSingleEntry() {
         environment.set("FOO", "www.foo.io");
-        assertThat(SecretSourceResolver.resolve(context, "http://${FOO}"), equalTo("http://www.foo.io"));
+        assertThat(resolve("http://${FOO}"), equalTo("http://www.foo.io"));
     }
 
     @Test
     public void resolve_mixedSingleEntryWithDefault() {
         environment.set("FOO", "www.foo.io");
-        assertThat(SecretSourceResolver.resolve(context, "${protocol:-https}://${FOO:-www.bar.io}"), equalTo("https://www.foo.io"));
+        assertThat(resolve("${protocol:-https}://${FOO:-www.bar.io}"), equalTo("https://www.foo.io"));
     }
 
     @Test
     public void resolve_mixedSingleEntryEscaped() {
-        assertThat(SecretSourceResolver.resolve(context, "http://^${FOO}"), equalTo("http://${FOO}"));
+        assertThat(resolve("http://^${FOO}"), equalTo("http://${FOO}"));
     }
 
     @Test
     public void resolve_mixedMultipleEntries() {
         environment.set("FOO", "www.foo.io");
         environment.set("BAR", "8080");
-        assertThat(SecretSourceResolver.resolve(context, "http://${FOO}:${BAR}"), equalTo("http://www.foo.io:8080"));
+        assertThat(resolve("http://${FOO}:${BAR}"), equalTo("http://www.foo.io:8080"));
     }
 
     @Test
     public void resolve_mixedMultipleEntriesWithDefault() {
         environment.set("FOO", "www.foo.io");
         environment.set("protocol", "http");
-        assertThat(SecretSourceResolver.resolve(context, "${protocol:-https}://${FOO:-www.bar.io}"), equalTo("http://www.foo.io"));
+        assertThat(resolve("${protocol:-https}://${FOO:-www.bar.io}"), equalTo("http://www.foo.io"));
     }
 
     @Test
     public void resolve_mixedMultipleEntriesEscaped() {
-        assertThat(SecretSourceResolver.resolve(context, "http://^${FOO}:^${BAR}"), equalTo("http://${FOO}:${BAR}"));
+        assertThat(resolve("http://^${FOO}:^${BAR}"), equalTo("http://${FOO}:${BAR}"));
+    }
+
+    @Test
+    public void resolve_Base64() {
+        String input = "Hello World";
+        String output = resolve("${base64:" + input + "}");
+        assertThat(output, equalTo(ENCODE.lookup(input)));
+        assertThat(DECODE.lookup(output), equalTo(input));
+    }
+
+    @Test
+    public void resolve_Base64NestedEnv() {
+        String input = "Hello World";
+        environment.set("FOO", input);
+        String output = resolve("${base64:${FOO}}");
+        assertThat(output, equalTo(ENCODE.lookup(input)));
+        assertThat(DECODE.lookup(output), equalTo(input));
+    }
+
+    @Test
+    public void resolve_File() throws Exception {
+        String input = Paths.get(getClass().getResource("secret.json").toURI()).toFile().getAbsolutePath();
+        String output = resolve("${file:" + input + "}");
+        assertThat(output, equalTo(FILE.lookup(input)));
+        assertThat(output, containsString("\"Our secret\": \"Hello World\""));
+    }
+
+    @Test
+    public void resolve_FileBase64() throws Exception {
+        String input = Paths.get(getClass().getResource("secret.json").toURI()).toFile().getAbsolutePath();
+        String output = resolve("${base64:${file:" + input + "}}");
+        String decoded = DECODE.lookup(output);
+        String content = FILE.lookup(input);
+        assertThat(output, equalTo(ENCODE.lookup(content)));
+        assertThat(decoded, equalTo(content));
+        assertThat(decoded, containsString("\"Our secret\": \"Hello World\""));
+    }
+
+    @Test
+    public void resolve_FileBase64NestedEnv() throws Exception {
+        String input = Paths.get(getClass().getResource("secret.json").toURI()).toFile().getAbsolutePath();
+        environment.set("FOO", input);
+        String output = resolve("${base64:${file:${FOO}}}");
+        String decoded = DECODE.lookup(output);
+        String content = FILE.lookup(input);
+        assertThat(output, equalTo(ENCODE.lookup(content)));
+        assertThat(decoded, equalTo(content));
+        assertThat(decoded, containsString("\"Our secret\": \"Hello World\""));
+    }
+
+    @Test
+    public void resolve_FileNotFound() {
+        resolve("${file:./hello-world-not-found.txt}");
+        assertTrue(logContains("Configuration import: Error looking up file './hello-world-not-found.txt' with UTF-8 encoding."));
+        assertTrue(logContains("Configuration import: Found unresolved variable 'file:./hello-world-not-found.txt'."));
     }
 
     @Test
