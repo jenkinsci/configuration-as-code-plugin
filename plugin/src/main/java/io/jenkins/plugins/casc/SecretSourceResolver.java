@@ -22,6 +22,7 @@ public class SecretSourceResolver {
     private static final String enclosedBy = "${";
     private static final String enclosedIn = "}";
     private static final char escapedWith = '^';
+    private static final String escapeEnclosedBy = escapedWith + enclosedBy;
 
     private static final Logger LOGGER = Logger.getLogger(SecretSourceResolver.class.getName());
     private static final StringSubstitutor NULL_SUBSTITUTOR = new StringSubstitutor(
@@ -57,7 +58,7 @@ public class SecretSourceResolver {
         if (toEncode == null) {
             return null;
         }
-        return toEncode.replace(enclosedBy, "^${");
+        return toEncode.replace(enclosedBy, escapeEnclosedBy);
     }
 
     public static String resolve(ConfigurationContext context, String toInterpolate) {
