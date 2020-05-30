@@ -1,6 +1,7 @@
 package io.jenkins.plugins.casc;
 
 import com.google.common.collect.ImmutableMap;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -107,10 +108,7 @@ public class SecretSourceResolver {
         static final FileStringLookup INSTANCE = new FileStringLookup();
 
         @Override
-        public String lookup(final String key) {
-            if (key == null) {
-                return null;
-            }
+        public String lookup(@NonNull final String key) {
             try {
                 return new String(Files.readAllBytes(Paths.get(key)), StandardCharsets.UTF_8);
             } catch (IOException e) {

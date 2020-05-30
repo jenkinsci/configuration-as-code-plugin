@@ -276,12 +276,19 @@ public class SecretSourceResolverTest {
     }
 
     @Test
+    public void resolve_FileNull() {
+        resolve("${file}");
+
+    }
+
+    @Test
     @Issue("SECURITY-1446")
     @WithoutJenkins
     public void shouldEncodeInternalVarsProperly() {
         assertVarEncoding("^${TEST}", "${TEST}");
         assertVarEncoding("^^${TEST}", "^${TEST}");
         assertVarEncoding("$TEST", "$TEST");
+        assertVarEncoding(null, null);
     }
 
     private static void assertVarEncoding(String expected, String toEncode) {
