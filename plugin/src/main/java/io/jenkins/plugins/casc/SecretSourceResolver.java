@@ -66,9 +66,11 @@ public class SecretSourceResolver {
      *
      * @param context Configuration context
      * @param toInterpolate potential variables that need to revealed
-     * @return original string with any secrets that could be resolved if secrets could not be resolved they will be defaulted to default value defined by ':-', otherwise default to empty String secrets are defined as anything enclosed by '${}'
-     * @deprecated use ${link {@link #resolve(String)}} instead.
+     * @return original string with any secrets that could be resolved if secrets could not be
+     * resolved they will be defaulted to default value defined by ':-', otherwise default to empty
+     * String secrets are defined as anything enclosed by '${}'
      * @since 1.42
+     * @deprecated use ${link {@link #resolve(String)}} instead.
      */
     @Deprecated
     public static String resolve(ConfigurationContext context, String toInterpolate) {
@@ -79,7 +81,9 @@ public class SecretSourceResolver {
      * Resolve string with potential secrets
      *
      * @param toInterpolate potential variables that need to revealed
-     * @return original string with any secrets that could be resolved if secrets could not be resolved they will be defaulted to default value defined by ':-', otherwise default to empty String secrets are defined as anything enclosed by '${}'
+     * @return original string with any secrets that could be resolved if secrets could not be
+     * resolved they will be defaulted to default value defined by ':-', otherwise default to empty
+     * String secrets are defined as anything enclosed by '${}'
      */
     public String resolve(String toInterpolate) {
         String text = substitutor.replace(toInterpolate);
