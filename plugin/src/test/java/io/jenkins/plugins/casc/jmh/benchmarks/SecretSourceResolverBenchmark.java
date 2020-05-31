@@ -26,22 +26,22 @@ public class SecretSourceResolverBenchmark {
     }
 
     @Benchmark
-    public void secretSourceResolverObjects(JenkinsState state) {
+    public void emptyString(JenkinsState state) {
         state.context.getSecretSourceResolver().resolve("");
     }
 
     @Benchmark
-    public void secretSourceResolverNoSecret(JenkinsState state) {
+    public void textButNoSecret(JenkinsState state) {
         state.context.getSecretSourceResolver().resolve("HELLO:WORLD");
     }
 
     @Benchmark
-    public void secretSourceResolverSingle(JenkinsState state) {
+    public void singleSecret(JenkinsState state) {
         state.context.getSecretSourceResolver().resolve("${FOO}");
     }
 
     @Benchmark
-    public void secretSourceResolverMultiple(JenkinsState state) {
+    public void multipleSecrets(JenkinsState state) {
         state.context.getSecretSourceResolver().resolve("${FOO}:${BAR}");
     }
 }
