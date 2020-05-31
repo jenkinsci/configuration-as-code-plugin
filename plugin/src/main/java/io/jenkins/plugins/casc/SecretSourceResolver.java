@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 import javax.annotation.CheckForNull;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.commons.text.lookup.StringLookup;
 import org.apache.commons.text.lookup.StringLookupFactory;
@@ -89,6 +90,9 @@ public class SecretSourceResolver {
      * String. Secrets are defined as anything enclosed by '${}'
      */
     public String resolve(String toInterpolate) {
+        if (StringUtils.isBlank(toInterpolate) || !toInterpolate.contains(enclosedBy)) {
+            return toInterpolate;
+        }
         String text = substitutor.replace(toInterpolate);
         return nullSubstitutor.replace(text);
     }

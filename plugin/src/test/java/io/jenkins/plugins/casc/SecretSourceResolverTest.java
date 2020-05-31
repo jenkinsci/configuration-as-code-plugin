@@ -128,6 +128,16 @@ public class SecretSourceResolverTest {
     }
 
     @Test
+    public void resolve_empty() {
+        assertThat(resolve(""), equalTo(""));
+    }
+
+    @Test
+    public void resolve_blank() {
+        assertThat(resolve(" "), equalTo(" "));
+    }
+
+    @Test
     public void resolve_nothingSpace() {
         assertThat(resolve("${ }"), equalTo(""));
     }
