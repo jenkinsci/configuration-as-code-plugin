@@ -8,6 +8,7 @@ import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.infra.Blackhole;
 
 @JmhBenchmark
 @BenchmarkMode(Mode.Throughput)
@@ -26,22 +27,22 @@ public class SecretSourceResolverBenchmark {
     }
 
     @Benchmark
-    public void emptyString(JenkinsState state) {
-        state.context.getSecretSourceResolver().resolve("");
+    public void emptyString(JenkinsState state, Blackhole blackhole) {
+        blackhole.consume(state.context.getSecretSourceResolver().resolve(""));
     }
 
     @Benchmark
-    public void textButNoSecret(JenkinsState state) {
-        state.context.getSecretSourceResolver().resolve("HELLO:WORLD");
+    public void textButNoSecret(JenkinsState state, Blackhole blackhole) {
+        blackhole.consume(state.context.getSecretSourceResolver().resolve("HELLO:WORLD"));
     }
 
     @Benchmark
-    public void singleSecret(JenkinsState state) {
-        state.context.getSecretSourceResolver().resolve("${FOO}");
+    public void singleSecret(JenkinsState state, Blackhole blackhole) {
+        blackhole.consume(state.context.getSecretSourceResolver().resolve("${FOO}"));
     }
 
     @Benchmark
-    public void multipleSecrets(JenkinsState state) {
-        state.context.getSecretSourceResolver().resolve("${FOO}:${BAR}");
+    public void multipleSecrets(JenkinsState state, Blackhole blackhole) {
+        blackhole.consume(state.context.getSecretSourceResolver().resolve("${FOO}:${BAR}"));
     }
 }
