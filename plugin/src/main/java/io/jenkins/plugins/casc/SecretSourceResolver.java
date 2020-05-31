@@ -13,6 +13,8 @@ import javax.annotation.CheckForNull;
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.commons.text.lookup.StringLookup;
 import org.apache.commons.text.lookup.StringLookupFactory;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.DoNotUse;
 
 import static io.vavr.API.unchecked;
 
@@ -73,6 +75,7 @@ public class SecretSourceResolver {
      * @deprecated use ${link {@link #resolve(String)}} instead.
      */
     @Deprecated
+    @Restricted(DoNotUse.class)
     public static String resolve(ConfigurationContext context, String toInterpolate) {
         return context.getSecretSourceResolver().resolve(toInterpolate);
     }
