@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 import javax.annotation.CheckForNull;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
+import org.apache.commons.text.TextStringBuilder;
 import org.apache.commons.text.lookup.StringLookup;
 import org.apache.commons.text.lookup.StringLookupFactory;
 import org.kohsuke.accmod.Restricted;
@@ -93,8 +94,10 @@ public class SecretSourceResolver {
         if (StringUtils.isBlank(toInterpolate) || !toInterpolate.contains(enclosedBy)) {
             return toInterpolate;
         }
-        String text = substitutor.replace(toInterpolate);
-        return nullSubstitutor.replace(text);
+        final TextStringBuilder buf = new TextStringBuilder(toInterpolate);
+        substitutor.replaceIn(buf);
+        nullSubstitutor.replaceIn(buf);
+        return buf.toString();
     }
 
     static class UnresolvedLookup implements StringLookup {
