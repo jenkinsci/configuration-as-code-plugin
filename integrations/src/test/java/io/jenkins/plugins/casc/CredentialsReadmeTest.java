@@ -5,6 +5,7 @@ import com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey;
 import com.cloudbees.plugins.credentials.Credentials;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.CredentialsScope;
+import com.cloudbees.plugins.credentials.SecretBytes;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.impl.CertificateCredentialsImpl;
@@ -13,6 +14,8 @@ import io.jenkins.plugins.casc.misc.Env;
 import io.jenkins.plugins.casc.misc.EnvVarsRule;
 import io.jenkins.plugins.casc.misc.Envs;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
@@ -55,6 +58,7 @@ public class CredentialsReadmeTest {
     public static final String ACCESS_KEY = "access-key";
     public static final String SECRET_ACCESS_KEY = "secret-access-key";
     public static final String MYSECRETFILE_TXT = "mysecretfile.txt";
+    public static final String TEST_CERT = "test.p12";
     public JenkinsConfiguredWithReadmeRule j = new JenkinsConfiguredWithReadmeRule();
 
     public EnvVarsRule environment = new EnvVarsRule();
@@ -92,7 +96,7 @@ public class CredentialsReadmeTest {
         @Env(name = "AWS_SECRET_ACCESS_KEY", value = SECRET_ACCESS_KEY),
         @Env(name = "SECRET_FILE_PATH", value = MYSECRETFILE_TXT),
         @Env(name = "SECRET_PASSWORD_CERT", value = PASSWORD),
-        @Env(name = "SECRET_CERT_FILE_PATH", value = "test.p12"),
+        @Env(name = "SECRET_CERT_FILE_PATH", value = TEST_CERT),
     })
     public void testGlobalScopedCredentials() throws Exception {
         List<Credentials> creds = CredentialsProvider.lookupCredentials(
@@ -135,9 +139,15 @@ public class CredentialsReadmeTest {
                 CertificateCredentialsImpl cert = (CertificateCredentialsImpl) credentials;
                 assertThat(cert.getId(), is("secret-certificate"));
                 assertThat(cert.getPassword(), hasPlainText(PASSWORD));
-//                Path path = Paths.get(getClass().getResource("test.p12").toURI());
-//                SecretBytes uploadedKeystore = SecretBytes.fromBytes(Files.readAllBytes(path));
-//                assertThat(cert.getKeyStoreSource().getKeyStoreBytes(), is(uploadedKeystore.getPlainData()));
+                try (BufferedReader br = new BufferedReader(
+                    new InputStreamReader(getClass().getResourceAsStream(TEST_CERT),
+                        StandardCharsets.UTF_8))) {
+                    SecretBytes uploadedKeystore = SecretBytes
+                        .fromBytes(IOUtils.toByteArray(br, StandardCharsets.UTF_8));
+                    assertThat(cert.getKeyStoreSource().getKeyStoreBytes(),
+                        is(uploadedKeystore.getPlainData()));
+                }
+
                 assertThat(cert.getScope(), is(CredentialsScope.GLOBAL));
             }
         }

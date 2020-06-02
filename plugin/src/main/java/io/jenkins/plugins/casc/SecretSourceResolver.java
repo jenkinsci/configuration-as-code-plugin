@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 import javax.annotation.CheckForNull;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.commons.text.TextStringBuilder;
@@ -37,7 +38,7 @@ public class SecretSourceResolver {
         ConfigurationContext context = configurationContext;
         substitutor = new StringSubstitutor(
             StringLookupFactory.INSTANCE.interpolatorStringLookup(ImmutableMap
-                    .of("base64", StringLookupFactory.INSTANCE.base64EncoderStringLookup(),
+                    .of("base64", Base64Lookup.INSTANCE,
                         "file", FileStringLookup.INSTANCE
                     ),
                 new ConfigurationContextStringLookup(context), false))
@@ -148,6 +149,16 @@ public class SecretSourceResolver {
                     key), e);
                 return null;
             }
+        }
+    }
+
+    static class Base64Lookup implements StringLookup {
+
+        static final Base64Lookup INSTANCE = new Base64Lookup();
+
+        @Override
+        public String lookup(@NonNull final String key) {
+            return Base64.encodeBase64String(key.getBytes(StandardCharsets.UTF_8));
         }
     }
 }
