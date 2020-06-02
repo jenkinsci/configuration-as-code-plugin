@@ -200,6 +200,14 @@ public class SecretSourceResolverTest {
     }
 
     @Test
+    public void resolve_noInterpolatorStringLookupForARegularFileOrBase64Variable() {
+        environment.set("base64", "foo");
+        environment.set("file", "foo");
+        assertThat(resolve("${base64}"), equalTo("foo"));
+        assertThat(resolve("${file}"), equalTo("foo"));
+    }
+
+    @Test
     public void resolve_mixedMultipleEntriesEscaped() {
         assertThat(resolve("http://^${FOO}:^${BAR}"), equalTo("http://${FOO}:${BAR}"));
     }
