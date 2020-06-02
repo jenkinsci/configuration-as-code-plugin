@@ -33,8 +33,8 @@ jenkins:
           description: "Superwoman"
           password: "somethingsecret"
           properties:
-            #- mailer: # pending https://github.com/jenkinsci/mailer-plugin/pull/80
-            #    emailAddress: "admin3@example.com"
+            - mailer:
+                emailAddress: "admin3@example.com"
             - preferredProvider:
                 providerId: "default"
             - slack:
