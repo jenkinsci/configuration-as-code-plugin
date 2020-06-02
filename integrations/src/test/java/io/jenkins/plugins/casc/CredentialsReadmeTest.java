@@ -3,12 +3,15 @@ package io.jenkins.plugins.casc;
 import com.cloudbees.jenkins.plugins.awscredentials.AWSCredentialsImpl;
 import com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey;
 import com.cloudbees.plugins.credentials.Credentials;
+import com.cloudbees.plugins.credentials.CredentialsNameProvider;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.cloudbees.plugins.credentials.SecretBytes;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.impl.CertificateCredentialsImpl;
+import com.cloudbees.plugins.credentials.impl.CertificateCredentialsImpl.KeyStoreSource;
+import com.cloudbees.plugins.credentials.impl.CertificateCredentialsImpl.UploadedKeyStoreSource;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.Env;
 import io.jenkins.plugins.casc.misc.EnvVarsRule;
@@ -17,6 +20,10 @@ import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.cert.Certificate;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import jenkins.model.Jenkins;
@@ -26,6 +33,7 @@ import org.jenkinsci.plugins.plaincredentials.StringCredentials;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
+import sun.security.x509.X509CertImpl;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.anyOf;
@@ -139,15 +147,15 @@ public class CredentialsReadmeTest {
                 CertificateCredentialsImpl cert = (CertificateCredentialsImpl) credentials;
                 assertThat(cert.getId(), is("secret-certificate"));
                 assertThat(cert.getPassword(), hasPlainText(PASSWORD));
-                try (BufferedReader br = new BufferedReader(
-                    new InputStreamReader(getClass().getResourceAsStream(TEST_CERT),
-                        StandardCharsets.UTF_8))) {
-                    SecretBytes uploadedKeystore = SecretBytes
-                        .fromBytes(IOUtils.toByteArray(br, StandardCharsets.UTF_8));
-                    assertThat(cert.getKeyStoreSource().getKeyStoreBytes(),
-                        is(uploadedKeystore.getPlainData()));
-                }
-
+                byte[] fileContent = Files.readAllBytes(Paths.get(getClass().getResource(TEST_CERT).toURI()));
+                SecretBytes secretBytes = SecretBytes
+                    .fromString(Base64.getEncoder().encodeToString(fileContent));
+                UploadedKeyStoreSource keyStoreSource = (UploadedKeyStoreSource) cert.getKeyStoreSource();
+                assertThat(keyStoreSource.getUploadedKeystore().getPlainData(),
+                        is(secretBytes.getPlainData()));
+                assertThat(cert.getKeyStore().containsAlias("1"), is(true));
+                assertThat(cert.getKeyStore().getCertificate("1").getType(), is("X.509"));
+                assertThat(CredentialsNameProvider.name(cert), is("EMAILADDRESS=me@myhost.mydomain, CN=pkcs12, O=Fort-Funston, L=SanFrancisco, ST=CA, C=US (my secret cert)"));
                 assertThat(cert.getScope(), is(CredentialsScope.GLOBAL));
             }
         }

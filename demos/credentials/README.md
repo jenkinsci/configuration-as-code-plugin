@@ -92,7 +92,7 @@ credentials:
               description: "my secret cert"
               keyStoreSource:
                 uploaded:
-                  uploadedKeystore: "${base64:${file:${SECRET_CERT_FILE_PATH}}}" # uploadedKeystore requires base64 encoded content
+                  uploadedKeystore: "${fileBase64:${SECRET_CERT_FILE_PATH}}" # uploadedKeystore requires BINARY base64 encoded content
 ```
 
 ## implementation note

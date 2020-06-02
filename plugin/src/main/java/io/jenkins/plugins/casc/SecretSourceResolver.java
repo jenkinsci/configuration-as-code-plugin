@@ -6,11 +6,11 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 import javax.annotation.CheckForNull;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.commons.text.TextStringBuilder;
@@ -39,6 +39,7 @@ public class SecretSourceResolver {
         substitutor = new StringSubstitutor(
             StringLookupFactory.INSTANCE.interpolatorStringLookup(ImmutableMap
                     .of("base64", Base64Lookup.INSTANCE,
+                        "fileBase64", FileBase64Lookup.INSTANCE,
                         "file", FileStringLookup.INSTANCE
                     ),
                 new ConfigurationContextStringLookup(context), false))
@@ -158,7 +159,25 @@ public class SecretSourceResolver {
 
         @Override
         public String lookup(@NonNull final String key) {
-            return Base64.encodeBase64String(key.getBytes(StandardCharsets.UTF_8));
+            return Base64.getEncoder().encodeToString(key.getBytes(StandardCharsets.UTF_8));
+        }
+    }
+
+    static class FileBase64Lookup implements StringLookup {
+
+        static final FileBase64Lookup INSTANCE = new FileBase64Lookup();
+
+        @Override
+        public String lookup(@NonNull final String key) {
+            try {
+                byte[] fileContent = Files.readAllBytes(Paths.get(key));
+                return Base64.getEncoder().encodeToString(fileContent);
+            } catch (IOException e) {
+                LOGGER.log(Level.WARNING, String.format(
+                    "Configuration import: Error looking up file '%s'. Will default to empty string",
+                    key), e);
+                return null;
+            }
         }
     }
 }
