@@ -22,17 +22,6 @@ import io.jenkins.plugins.casc.model.Scalar;
 import io.jenkins.plugins.casc.model.Scalar.Format;
 import io.jenkins.plugins.casc.model.Sequence;
 import io.jenkins.plugins.casc.model.Source;
-import io.jenkins.plugins.casc.snakeyaml.DumperOptions;
-import io.jenkins.plugins.casc.snakeyaml.emitter.Emitter;
-import io.jenkins.plugins.casc.snakeyaml.error.YAMLException;
-import io.jenkins.plugins.casc.snakeyaml.nodes.MappingNode;
-import io.jenkins.plugins.casc.snakeyaml.nodes.Node;
-import io.jenkins.plugins.casc.snakeyaml.nodes.NodeTuple;
-import io.jenkins.plugins.casc.snakeyaml.nodes.ScalarNode;
-import io.jenkins.plugins.casc.snakeyaml.nodes.SequenceNode;
-import io.jenkins.plugins.casc.snakeyaml.nodes.Tag;
-import io.jenkins.plugins.casc.snakeyaml.resolver.Resolver;
-import io.jenkins.plugins.casc.snakeyaml.serializer.Serializer;
 import io.jenkins.plugins.casc.yaml.YamlSource;
 import io.jenkins.plugins.casc.yaml.YamlUtils;
 import java.io.ByteArrayOutputStream;
@@ -46,6 +35,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
+import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
@@ -85,14 +75,25 @@ import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.interceptor.RequirePOST;
 import org.kohsuke.stapler.lang.Klass;
 import org.kohsuke.stapler.verb.POST;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.emitter.Emitter;
+import org.yaml.snakeyaml.error.YAMLException;
+import org.yaml.snakeyaml.nodes.MappingNode;
+import org.yaml.snakeyaml.nodes.Node;
+import org.yaml.snakeyaml.nodes.NodeTuple;
+import org.yaml.snakeyaml.nodes.ScalarNode;
+import org.yaml.snakeyaml.nodes.SequenceNode;
+import org.yaml.snakeyaml.nodes.Tag;
+import org.yaml.snakeyaml.resolver.Resolver;
+import org.yaml.snakeyaml.serializer.Serializer;
 
 import static io.jenkins.plugins.casc.SchemaGeneration.writeJSONSchema;
-import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.FlowStyle.BLOCK;
-import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.DOUBLE_QUOTED;
-import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.LITERAL;
-import static io.jenkins.plugins.casc.snakeyaml.DumperOptions.ScalarStyle.PLAIN;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static org.yaml.snakeyaml.DumperOptions.FlowStyle.BLOCK;
+import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.DOUBLE_QUOTED;
+import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.LITERAL;
+import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.PLAIN;
 
 /**
  * {@linkplain #configure() Main entry point of the logic}.
@@ -137,6 +138,14 @@ public class ConfigurationAsCode extends ManagementLink {
     @Override
     public String getDescription() {
         return "Reload your configuration or update configuration source";
+    }
+
+    /**
+     * Name of the category for this management link.
+     * TODO: Use getCategory when core requirement is greater or equal to 2.226
+     */
+    public @NonNull String getCategoryName() {
+        return "CONFIGURATION";
     }
 
     @NonNull
@@ -237,8 +246,6 @@ public class ConfigurationAsCode extends ManagementLink {
             return FormValidation.okWithMarkup("The configuration can be applied");
         } catch (ConfiguratorException | IllegalArgumentException e) {
             return FormValidation.error(e, e.getCause() == null ? e.getMessage() : e.getCause().getMessage());
-        } finally {
-            closeSources(yamlSources);
         }
     }
 
@@ -277,16 +284,8 @@ public class ConfigurationAsCode extends ManagementLink {
      * @throws Exception when the file provided cannot be found or parsed
      */
     @Restricted(NoExternalUse.class)
-    @Initializer(after = InitMilestone.EXTENSIONS_AUGMENTED, before = InitMilestone.JOB_LOADED)
+    @Initializer(after = InitMilestone.SYSTEM_CONFIG_LOADED, before = InitMilestone.SYSTEM_CONFIG_ADAPTED)
     public static void init() throws Exception {
-        Long duration = Long.getLong(ConfigurationAsCode.class.getName() + ".initialDelay");
-        if (duration != null) {
-            try {
-                Thread.sleep(duration);
-            } catch (InterruptedException e) {
-                LOGGER.log(Level.WARNING, "Interrupted whilst delaying CasC startup", e);
-            }
-        }
         detectVaultPluginMissing();
         get().configure();
     }
@@ -613,8 +612,8 @@ public class ConfigurationAsCode extends ManagementLink {
 
     private void configureWith(List<YamlSource> sources) throws ConfiguratorException {
         lastTimeLoaded = System.currentTimeMillis();
-        configureWith( YamlUtils.loadFrom(sources) );
-        closeSources(sources);
+        ConfigurationContext context = new ConfigurationContext(registry);
+        configureWith(YamlUtils.loadFrom(sources, context), context);
     }
 
     @Restricted(NoExternalUse.class)
@@ -626,17 +625,8 @@ public class ConfigurationAsCode extends ManagementLink {
 
     private Map<Source, String> checkWith(List<YamlSource> sources) throws ConfiguratorException {
         if (sources.isEmpty()) return Collections.emptyMap();
-        return checkWith( YamlUtils.loadFrom(sources) );
-    }
-
-    private void closeSources(List<YamlSource> sources) {
-        for (YamlSource source : sources) {
-            try {
-                source.close();
-            } catch (IOException e) {
-                LOGGER.log(Level.WARNING, "Failed to close YAML Source", e);
-            }
-        }
+        ConfigurationContext context = new ConfigurationContext(registry);
+        return checkWith(YamlUtils.loadFrom(sources, context), context);
     }
 
     /**
@@ -659,7 +649,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
         final PathMatcher matcher = FileSystems.getDefault().getPathMatcher(YAML_FILES_PATTERN);
         try (Stream<Path> stream = Files.find(Paths.get(path), Integer.MAX_VALUE,
-                (next, attrs) -> !attrs.isDirectory() && !isHidden(next) && matcher.matches(next))) {
+                (next, attrs) -> !attrs.isDirectory() && !isHidden(next) && matcher.matches(next), FileVisitOption.FOLLOW_LINKS)) {
             return stream.sorted().collect(toList());
         } catch (IOException e) {
             throw new IllegalStateException("failed config scan for " + path, e);
@@ -711,9 +701,22 @@ public class ConfigurationAsCode extends ManagementLink {
         }
 
         if (!entries.isEmpty()) {
-            final Map.Entry<String, CNode> next = entries.entrySet().iterator().next();
-            throw new ConfiguratorException(format("No configurator for root element <%s>", next.getKey()));
+            List<String> unknownKeys = new ArrayList<>();
+            entries.entrySet().iterator().forEachRemaining(next -> {
+                String key = next.getKey();
+                if (isNotAliasEntry(key)) {
+                    unknownKeys.add(key);
+                }
+            });
+
+            if (!unknownKeys.isEmpty()) {
+                throw new ConfiguratorException(format("No configurator for the following root elements %s", String.join(", ", unknownKeys)));
+            }
         }
+    }
+
+    static boolean isNotAliasEntry(String key) {
+        return key != null && !key.startsWith("x-");
     }
 
     private static void detectVaultPluginMissing() {
@@ -726,27 +729,28 @@ public class ConfigurationAsCode extends ManagementLink {
         }
     }
 
-    private void configureWith(Mapping entries) throws ConfiguratorException {
+    private void configureWith(Mapping entries,
+        ConfigurationContext context) throws ConfiguratorException {
         // Initialize secret sources
         SecretSource.all().forEach(SecretSource::init);
 
         // Check input before actually applying changes,
         // so we don't let master in a weird state after some ConfiguratorException has been thrown
         final Mapping clone = entries.clone();
-        checkWith(clone);
+        checkWith(clone, context);
 
         final ObsoleteConfigurationMonitor monitor = ObsoleteConfigurationMonitor.get();
         monitor.reset();
-        ConfigurationContext context = new ConfigurationContext(registry);
+        context.clearListeners();
         context.addListener(monitor::record);
         try (ACLContext acl = ACL.as(ACL.SYSTEM)) {
             invokeWith(entries, (configurator, config) -> configurator.configure(config, context));
         }
     }
 
-    public Map<Source, String> checkWith(Mapping entries) throws ConfiguratorException {
+    public Map<Source, String> checkWith(Mapping entries,
+        ConfigurationContext context) throws ConfiguratorException {
         Map<Source, String> issues = new HashMap<>();
-        ConfigurationContext context = new ConfigurationContext(registry);
         context.addListener( (node,message) -> issues.put(node.getSource(), message) );
         invokeWith(entries, (configurator, config) -> configurator.check(config, context));
         return issues;

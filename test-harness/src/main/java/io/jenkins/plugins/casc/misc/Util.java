@@ -10,7 +10,6 @@ import io.jenkins.plugins.casc.core.JenkinsConfigurator;
 import io.jenkins.plugins.casc.impl.configurators.GlobalConfigurationCategoryConfigurator;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
-import io.jenkins.plugins.casc.snakeyaml.nodes.Node;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -32,6 +31,7 @@ import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.jvnet.hudson.test.LoggerRule;
+import org.yaml.snakeyaml.nodes.Node;
 
 import static io.jenkins.plugins.casc.ConfigurationAsCode.serializeYamlNode;
 import static io.jenkins.plugins.casc.SchemaGeneration.generateSchema;

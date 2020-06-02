@@ -58,7 +58,6 @@ public class TokenReloadAction implements UnprotectedRootAction {
             } else {
                 response.sendError(401);
                 LOGGER.warning("Invalid token received, not reloading configuration");
-
             }
         }
     }

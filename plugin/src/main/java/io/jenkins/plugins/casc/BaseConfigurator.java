@@ -298,7 +298,8 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
      */
     protected void configure(Mapping config, T instance, boolean dryrun, ConfigurationContext context) throws ConfiguratorException {
         final Set<Attribute<T,?>> attributes = describe();
-        for (Attribute<T,?> attribute : attributes) {
+        List<Attribute<T, ?>> sortedAttributes = attributes.stream().sorted(Configurator.extensionOrdinalSort()).collect(Collectors.toList());
+        for (Attribute<T,?> attribute : sortedAttributes) {
 
             final String name = attribute.getName();
             CNode sub = removeIgnoreCase(config, name);
@@ -339,18 +340,16 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
                 if (attribute.isMultiple()) {
                     List<Object> values = new ArrayList<>();
                     for (CNode o : sub.asSequence()) {
-                        Object value =
-                                dryrun ?
-                                        configurator.check(o, context):
-                                        configurator.configure(o, context);
+                        Object value = dryrun
+                            ? configurator.check(o, context)
+                            : configurator.configure(o, context);
                         values.add(value);
                     }
                     valueToSet= values;
                 } else {
-                    valueToSet =
-                            dryrun ?
-                                    configurator.check(sub, context):
-                                    configurator.configure(sub, context);
+                    valueToSet = dryrun
+                        ? configurator.check(sub, context)
+                        : configurator.configure(sub, context);
                 }
 
                 if (!dryrun) {
@@ -402,7 +401,6 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
         }
         return null;
     }
-
 
     public static final class TypePair {
 

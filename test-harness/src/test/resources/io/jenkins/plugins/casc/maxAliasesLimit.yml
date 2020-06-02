@@ -1,0 +1,17 @@
+x-jenkins-linux-node: &jenkins_linux_node_anchor
+  remoteFS: "/home/jenkins"
+  launcher:
+    jnlp:
+      workDirSettings:
+        disabled: true
+        failIfWorkDirIsMissing: false
+        internalDir: "remoting"
+        workDirPath: "/tmp"
+jenkins:
+  nodes:
+    - permanent:
+        name: "static-agent1"
+        <<: *jenkins_linux_node_anchor
+    - permanent:
+        name: "static-agent2"
+        <<: *jenkins_linux_node_anchor
