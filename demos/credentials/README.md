@@ -85,6 +85,11 @@ credentials:
               id: "secret-file"
               fileName: "mysecretfile.txt"
               secretBytes: "${base64:${file:${SECRET_FILE_PATH}}}" # secretBytes requires base64 encoded content
+          - file:
+              scope: GLOBAL
+              id: "secret-file_via_binary_file"
+              fileName: "mysecretfile.txt"
+              secretBytes: "${fileBase64:${SECRET_FILE_PATH}}" # secretBytes requires base64 encoded content
           - certificate:
               scope: GLOBAL
               id: "secret-certificate"

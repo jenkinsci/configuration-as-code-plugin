@@ -104,7 +104,7 @@ public class CredentialsReadmeTest {
     public void testGlobalScopedCredentials() throws Exception {
         List<Credentials> creds = CredentialsProvider.lookupCredentials(
             Credentials.class, Jenkins.get(), null, Collections.emptyList());
-        assertThat(creds, hasSize(7));
+        assertThat(creds, hasSize(8));
         for (Credentials credentials : creds) {
             if (credentials instanceof BasicSSHUserPrivateKey) {
                 BasicSSHUserPrivateKey key = (BasicSSHUserPrivateKey) credentials;
@@ -133,7 +133,7 @@ public class CredentialsReadmeTest {
                 assertThat(aws.getScope(), is(CredentialsScope.GLOBAL));
             } else if (credentials instanceof FileCredentials) {
                 FileCredentials file = (FileCredentials) credentials;
-                assertThat(file.getId(), is("secret-file"));
+                assertThat(file.getId(), anyOf(is("secret-file"), is("secret-file_via_binary_file")));
                 assertThat(file.getFileName(), is(MYSECRETFILE_TXT));
                 String fileContent = IOUtils.toString(file.getContent(), StandardCharsets.UTF_8);
                 assertThat(fileContent, containsString("SUPER SECRET"));
