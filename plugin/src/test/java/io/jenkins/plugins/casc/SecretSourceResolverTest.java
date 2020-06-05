@@ -1,9 +1,14 @@
 package io.jenkins.plugins.casc;
 
+import io.jenkins.plugins.casc.SecretSourceResolver.Base64Lookup;
+import io.jenkins.plugins.casc.SecretSourceResolver.FileBase64Lookup;
 import io.jenkins.plugins.casc.SecretSourceResolver.FileStringLookup;
 import java.io.File;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.text.lookup.StringLookup;
@@ -36,9 +41,10 @@ public class SecretSourceResolverTest {
 
     @Rule
     public LoggerRule logging = new LoggerRule();
-    public static final StringLookup ENCODE = StringLookupFactory.INSTANCE.base64EncoderStringLookup();
+    public static final StringLookup ENCODE = Base64Lookup.INSTANCE;
     public static final StringLookup DECODE = StringLookupFactory.INSTANCE.base64DecoderStringLookup();
     public static final StringLookup FILE = FileStringLookup.INSTANCE;
+    public static final StringLookup BINARYFILE = FileBase64Lookup.INSTANCE;
 
     @Before
     public void initLogging() {
@@ -51,12 +57,6 @@ public class SecretSourceResolverTest {
         context = new ConfigurationContext(registry);
     }
 
-    @Test
-    public void resolve_singleEntry() {
-        environment.set("FOO", "hello");
-        assertThat(resolve("${FOO}"), equalTo("hello"));
-    }
-
     public String resolve(String toInterpolate) {
         return context.getSecretSourceResolver().resolve(toInterpolate);
     }
@@ -64,6 +64,16 @@ public class SecretSourceResolverTest {
     public boolean logContains(String text) {
         final String expectedText = text;
         return logging.getMessages().stream().anyMatch(m -> m.contains(expectedText));
+    }
+
+    public Path getPath(String fileName) throws URISyntaxException {
+        return Paths.get(getClass().getResource(fileName).toURI());
+    }
+
+    @Test
+    public void resolve_singleEntry() {
+        environment.set("FOO", "hello");
+        assertThat(resolve("${FOO}"), equalTo("hello"));
     }
 
     @Test
@@ -231,7 +241,7 @@ public class SecretSourceResolverTest {
 
     @Test
     public void resolve_File() throws Exception {
-        String input = Paths.get(getClass().getResource("secret.json").toURI()).toFile().getAbsolutePath();
+        String input = getPath("secret.json").toAbsolutePath().toString();
         String output = resolve("${file:" + input + "}");
         assertThat(output, equalTo(FILE.lookup(input)));
         assertThat(output, containsString("\"Our secret\": \"Hello World\""));
@@ -239,7 +249,7 @@ public class SecretSourceResolverTest {
 
     @Test
     public void resolve_FileWithRelative() throws Exception {
-        Path path = Paths.get(getClass().getResource("secret.json").toURI());
+        Path path = getPath("secret.json");
         String input = Paths.get("").toUri().relativize(path.toUri()).getPath();
         String output = resolve("${file:" + input + "}");
         assertThat(output, equalTo(FILE.lookup(input)));
@@ -248,7 +258,7 @@ public class SecretSourceResolverTest {
 
     @Test
     public void resolve_FileWithSpace() throws Exception {
-        String path = Paths.get(getClass().getResource("some secret.json").toURI()).toFile().getAbsolutePath();
+        String path = getPath("some secret.json").toAbsolutePath().toString();
         String output = resolve("${file:" + path + "}");
         assertThat(output, equalTo(FILE.lookup(path)));
         assertThat(output, containsString("\"Our secret\": \"Hello World\""));
@@ -256,7 +266,7 @@ public class SecretSourceResolverTest {
 
     @Test
     public void resolve_FileWithSpaceAndRelative() throws Exception {
-        String path = Paths.get(getClass().getResource("some secret.json").toURI()).toFile().getAbsolutePath();
+        String path = getPath("some secret.json").toAbsolutePath().toString();
         String input = Paths.get("").toUri().relativize(new File(path).toURI()).getPath();
         String output = resolve("${file:" + input + "}");
         assertThat(output, equalTo(FILE.lookup(input)));
@@ -265,7 +275,7 @@ public class SecretSourceResolverTest {
 
     @Test
     public void resolve_FileBase64() throws Exception {
-        String input = Paths.get(getClass().getResource("secret.json").toURI()).toFile().getAbsolutePath();
+        String input = getPath("secret.json").toAbsolutePath().toString();
         String output = resolve("${base64:${file:" + input + "}}");
         String decoded = DECODE.lookup(output);
         String content = FILE.lookup(input);
@@ -276,7 +286,7 @@ public class SecretSourceResolverTest {
 
     @Test
     public void resolve_FileBase64NestedEnv() throws Exception {
-        String input = Paths.get(getClass().getResource("secret.json").toURI()).toFile().getAbsolutePath();
+        String input = getPath("secret.json").toAbsolutePath().toString();
         environment.set("FOO", input);
         String output = resolve("${base64:${file:${FOO}}}");
         String decoded = DECODE.lookup(output);
@@ -291,6 +301,29 @@ public class SecretSourceResolverTest {
         resolve("${file:./hello-world-not-found.txt}");
         assertTrue(logContains("Configuration import: Error looking up file './hello-world-not-found.txt' with UTF-8 encoding."));
         assertTrue(logContains("Configuration import: Found unresolved variable 'file:./hello-world-not-found.txt'."));
+    }
+
+    @Test
+    public void resolve_FileBase64NotFound() {
+        resolve("${fileBase64:./hello-world-not-found.txt}");
+        assertTrue(logContains("Configuration import: Error looking up file './hello-world-not-found.txt'."));
+        assertTrue(logContains("Configuration import: Found unresolved variable 'fileBase64:./hello-world-not-found.txt'."));
+    }
+
+    @Test
+    public void resolve_BinaryFileBase64() throws Exception {
+        Path path = getPath("secret.json");
+        String pathStr = path.toAbsolutePath().toString();
+        environment.set("FOO", pathStr);
+        byte[] bytes = Files.readAllBytes(path);
+        String expected = Base64.getEncoder().encodeToString(bytes);
+        byte[] expectedBytes = Base64.getDecoder().decode(expected);
+        String actual = resolve("${fileBase64:${FOO}}");
+        byte[] actualBytes = Base64.getDecoder().decode(actual);
+        String lookup = BINARYFILE.lookup(pathStr);
+        assertThat(lookup, equalTo(expected));
+        assertThat(actual, equalTo(expected));
+        assertThat(actualBytes, equalTo(expectedBytes));
     }
 
     @Test
