@@ -4,15 +4,10 @@ Requires `credentials` >= 2.2.0
 
 All values with `"${SOME_SECRET}"` is resolved by our Secret Sources Resolver you can [read more about which sources are supported](../../docs/features/secrets.adoc#secret-sources)
 
-Since JCasC version v1.42 we have added support for variable expansion for `base64` encoded content and `file` content
-You can also combine base64 and file together for those secrets that require base64 encoded
+Since JCasC version v1.42 we have added support for variable expansion for `base64`, `fileBase64` encoded and `file`
+[Read more about the syntax](../../docs/features/secrets.adoc#passing-secrets-through-variables)
 
-- `${base64:HELLO WORLD}` into `SEVMTE8gV09STEQ=`
-- `${file:/secret/file.txt}` into the content of a file.
-- `${base64:${file:/secret/file.txt}` into a base64 representation of the content in a file
-- `${base64:${file:${SECRET_FILE_PATH}}` nest it all together with regular secret expansion.
-
-See the [example below](#example)
+You can also see an [example below](#example)
 
 ## Sample Configuration
 
