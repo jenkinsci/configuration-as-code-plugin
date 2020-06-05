@@ -58,7 +58,7 @@ credentials:
               scope: SYSTEM
               id: ssh_with_passphrase_provided_via_file
               username: ssh_root
-              passphrase: ${SSH_KEY_PASSWORD}
+              passphrase: "${SSH_KEY_PASSWORD}"
               description: "SSH passphrase with private key file. Private key provided"
               privateKeySource:
                 directEntry:
