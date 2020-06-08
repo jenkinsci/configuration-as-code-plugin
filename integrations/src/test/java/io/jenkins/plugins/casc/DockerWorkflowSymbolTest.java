@@ -3,7 +3,7 @@ package io.jenkins.plugins.casc;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.model.CNode;
-import org.jenkinsci.plugins.pipeline.modeldefinition.config.GlobalConfig;
+import org.jenkinsci.plugins.docker.workflow.declarative.GlobalConfig;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
@@ -16,10 +16,10 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class PipelineModelDefinitionSymbolTest {
+public class DockerWorkflowSymbolTest {
 
     @ClassRule
-    @ConfiguredWithCode("PipelineModelDefinitionSymbol.yml")
+    @ConfiguredWithCode("DockerWorkflowSymbol.yml")
     public static JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 
     @Test
@@ -42,7 +42,7 @@ public class PipelineModelDefinitionSymbolTest {
 
         String exported = toYamlString(yourAttribute);
 
-        String expected = toStringFromYamlFile(this, "PipelineModelDefinitionSymbolExpected.yml");
+        String expected = toStringFromYamlFile(this, "DockerWorkflowSymbolExpected.yml");
 
         assertThat(exported, is(expected));
     }
