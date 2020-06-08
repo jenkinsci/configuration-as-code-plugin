@@ -73,7 +73,6 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>mailer</artifactId>
-      <version>1.32</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -154,7 +153,6 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>credentials</artifactId>
-      <version>2.3.3</version>
     </dependency>
 
     <dependency>
@@ -420,7 +418,6 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>display-url-api</artifactId>
-      <version>2.3.2</version>
       <scope>test</scope>
     </dependency>
 
@@ -695,7 +692,7 @@
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
         <artifactId>bom-2.176.x</artifactId>
-        <version>3</version>
+        <version>9</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>
