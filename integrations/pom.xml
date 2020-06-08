@@ -124,6 +124,12 @@
     </dependency>
 
     <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>docker-workflow</artifactId>
+      <version>1.23</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.csanchez.jenkins.plugins</groupId>
       <artifactId>kubernetes</artifactId>
       <version>1.6.4</version>
@@ -132,14 +138,14 @@
     <dependency>
       <groupId>org.jenkinsci.plugins</groupId>
       <artifactId>pipeline-model-extensions</artifactId>
-      <version>1.5.1</version>
+      <version>1.7.0</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.jenkinsci.plugins</groupId>
       <artifactId>pipeline-model-definition</artifactId>
-      <version>1.5.1</version>
+      <version>1.7.0</version>
       <scope>test</scope>
     </dependency>
 

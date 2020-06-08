@@ -1,6 +1,6 @@
-# Configure pipeline model definition
+# Configure Declarative agent settings for Docker Pipeline
 
-Global configuration for Pipeline Model Definition plugin belongs under `unclassified` root element
+Global configuration for Docker Workflow plugin belongs under `unclassified` root element
 
 ## Sample configuration
 
