@@ -244,7 +244,7 @@ Kubernetes users:\
 
 Most plugins should be supported out-of-the-box, or maybe require some minimal changes. See this [dashboard](https://issues.jenkins.io/secure/Dashboard.jspa?selectPageId=18341) for known compatibility issues.
 
-## Plugin developers
+## Adding JCasC support to a plugin
 
 Plugin developers wanting to support JCasC in their plugin should [check out our how-to guide](docs/PLUGINS.md).
 
