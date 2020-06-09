@@ -246,7 +246,7 @@ Most plugins should be supported out-of-the-box, or maybe require some minimal c
 
 ## Plugin developers
 
-Plugin developers willing to support JCasC in their plugin should [check out our guidelines](docs/PLUGINS.md).
+Plugin developers wanting to support JCasC in their plugin should [check out our how-to guide](docs/PLUGINS.md).
 
 ## Compatibility with Jenkins >= 2.199 for JCasC < 1.36
 
