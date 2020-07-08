@@ -24,12 +24,12 @@ The structure and validation of the Schema is done based on the user-installed p
 The Schema uses JSON draft v07. 
 http://json-schema.org/draft-07/schema#
 
-=== How to use
+***Using JSON Schema***
 
 * The schema will be available at /configuration-as-code/schema
 * Users can use various online JSON validators to check against their YAML/json.
 
-=== Progress
+***Progress***
 
 * The new JSON Schema is partially working and is in beta mode.
 * The schema validates any missing  configurator objects and invalid data formats.
@@ -37,14 +37,14 @@ http://json-schema.org/draft-07/schema#
 * The schema does not yet validate against deep nested configurations.
 * We are working towards supporting deep nested YAML files.
 
-== Improvements
+***Improvements***
 
 * The Old Schema was generated using Jelly files that did not generate a valid JSON Schema.
 * Without a valid schema it is not possible to validate a YAML file rendering the schema unusable.
 * The previous schema included an `"$ref":` for an `object` type, the new draft of the schema makes it mandatory
   to use `"$id":` hence the new schema uses it instead of ref.
 
-== What the schema does
+***What the schema does***
 
 * The schema validates simple YAML files with root configurators.
 ```yaml
@@ -54,7 +54,7 @@ jenkins:
 ```
 * In the above example if the data type of numExecutors is entered wrong, the schema will invalidate it.
 
-== What the schema does not do
+***What the schema does not do***
 
 * It cannot validate nested yml files, with multiple levels of configurators.
 ```yaml
@@ -68,5 +68,6 @@ jenkins:
         name: "agent1"
 ```
 * The above YAML has a deep level of nesting which the JSON Schema currently does not support.
+Blockquotes
 
-
+* 
