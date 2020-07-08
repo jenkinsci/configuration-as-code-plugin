@@ -36,6 +36,7 @@ http://json-schema.org/draft-07/schema#
 * It is built around the existing executable xml (jelly files) and follows the latest draft version of JSON.
 * The schema does not yet validate against deep nested configurations.
 * We are working towards supporting deep nested YAML files.
+* The project has improved Jenkins configuration as code development tools through a CommunityBridge project.
 
 ***Improvements***
 
@@ -43,7 +44,35 @@ http://json-schema.org/draft-07/schema#
 * Without a valid schema it is not possible to validate a YAML file rendering the schema unusable.
 * The previous schema included an `"$ref":` for an `object` type, the new draft of the schema makes it mandatory
   to use `"$id":` hence the new schema uses it instead of ref.
+* The new improvement on [DEV-Tools](https://www.jenkins.io/projects/jcasc/dev-tools/) will be used as an experiment with CommunityBridge and as a project to improve development tools for Jenkins configuration as a code.
 
+ *Issues* 
+ * Missing Schema Definitions
+ * Schema validation issues
+ * No automated shcema validation tests 
+ these issues has been worked on and the feasible solution has been given below,
+ 
+ *Solution*
+ * [NEW] Fix existing JSON schema issues.
+ * [NEW] Rewrite schema in Java fixes are infeasible.
+ 
+ *Phase-1: Fix the JSON schema Generator*
+ * Validate generated schema with a few plugins installed (see [issue 170](https://github.com/jenkinsci/configuration-as-code-plugin/issues/760))
+ * Validate generated schema with [Jenkins 2.176.2 suggested plugins](https://github.com/jenkinsci/jenkins/blob/stable-2.176/core/src/main/resources/jenkins/install/platform-plugins.json) installed
+  
+  *Resources*
+  * [JSON schema validators](https://json-schema.org/implementations.html#validators) 
+ 
+ *Phase-2 IDE Autocompletion For JCasC*
+ * IntelliJ IDE autocompletion with error detection for the yaml files
+ * Visual Studio Code autocompletion with error detection for the yaml files
+ * Atom autocompletion with error detection for the yaml files
+  
+  *Resources*
+  *[Intellij Grammar Kit](https://github.com/JetBrains/Grammar-Kit)
+  *[Visual Studio Code language support](https://code.visualstudio.com/api/language-extensions/programmatic-language-features)
+  *[Atom provider API](https://github.com/atom/autocomplete-plus/wiki/Provider-API)
+  
 ***What the schema does***
 
 * The schema validates simple YAML files with root configurators.
