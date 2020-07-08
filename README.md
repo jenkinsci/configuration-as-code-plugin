@@ -274,7 +274,6 @@ Jenkins 2.220 includes [JENKINS-51856](https://issues.jenkins-ci.org/browse/JENK
 - [hashicorp-vault-plugin](https://github.com/jenkinsci/hashicorp-vault-plugin)\
   Allows to resolve secrets from Hashicorp vault
 
-
 ## Jenkins Enhancement Proposal
 
 As configuration as code is demonstrated to be a highly requested topic in Jenkins community, we have published
