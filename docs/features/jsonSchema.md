@@ -69,9 +69,9 @@ http://json-schema.org/draft-07/schema#
  * Atom autocompletion with error detection for the yaml files
   
   *Resources*
-  *[Intellij Grammar Kit](https://github.com/JetBrains/Grammar-Kit)
-  *[Visual Studio Code language support](https://code.visualstudio.com/api/language-extensions/programmatic-language-features)
-  *[Atom provider API](https://github.com/atom/autocomplete-plus/wiki/Provider-API)
+  * [Intellij Grammar Kit](https://github.com/JetBrains/Grammar-Kit)
+  * [Visual Studio Code language support](https://code.visualstudio.com/api/language-extensions/programmatic-language-features)
+  * [Atom provider API](https://github.com/atom/autocomplete-plus/wiki/Provider-API)
   
 ***What the schema does***
 
