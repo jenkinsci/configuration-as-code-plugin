@@ -3,6 +3,7 @@ package io.jenkins.plugins.casc.core;
 import hudson.model.User;
 import hudson.security.FullControlOnceLoggedInAuthorizationStrategy;
 import hudson.security.HudsonPrivateSecurityRealm;
+import hudson.tasks.Mailer.UserProperty;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import jenkins.model.Jenkins;
@@ -61,9 +62,8 @@ public class HudsonPrivateSecurityRealmConfiguratorTest {
             .getProperty(SlackUserProperty.class);
         assertThat(slackUserProperty.getUserId(), is("ABCDEFGH"));
 
-//        pending https://github.com/jenkinsci/mailer-plugin/pull/80
-//        UserProperty mailerProperty = admin.getProperty(UserProperty.class);
-//        assertThat(mailerProperty.getEmailAddress(), is("admin3@example.com"));
+        UserProperty mailerProperty = admin.getProperty(UserProperty.class);
+        assertThat(mailerProperty.getEmailAddress(), is("admin3@example.com"));
 
 // Pending https://github.com/jenkinsci/ssh-cli-auth-module/pull/16
 //        UserPropertyImpl authorizedKeysProperty = admin.getProperty(UserPropertyImpl.class);

@@ -100,7 +100,21 @@ Second, the plugin looks for the `CASC_JENKINS_CONFIG` environment variable. The
 - A full path to a single file. For example, `/var/jenkins_home/casc_configs/jenkins.yaml`.
 - A URL pointing to a file served on the web. For example, `https://acme.org/jenkins.yaml`.
 
-If `CASC_JENKINS_CONFIG` points to a folder, the plugin will recursively traverse the folder to find file (suffix with .yml,.yaml,.YAML,.YML), but doesn't contain hidden files or hidden subdirectories. It follows symbolic links for both files and directories.
+If `CASC_JENKINS_CONFIG` points to a folder, the plugin will recursively traverse the folder to find file(s) with .yml,.yaml,.YAML,.YML suffix. It will exclude hidden files or files that contain a hidden folder in **any part** of the full path. It follows symbolic links for both files and directories.
+<details><summary>Exclusion examples</summary>
+
+`CASC_JENKINS_CONFIG=/jenkins/casc_configs`  
+:heavy_check_mark: `/jenkins/casc_configs/jenkins.yaml`  
+:heavy_check_mark: `/jenkins/casc_configs/dir1/config.yaml`  
+:x: `/jenkins/casc_configs/.dir1/config.yaml`  
+:x: `/jenkins/casc_configs/..dir2/config.yaml`  
+  
+`CASC_JENKINS_CONFIG=/jenkins/.configs/casc_configs` contains hidden folder `.config`  
+:x: `/jenkins/.configs/casc_configs/jenkins.yaml`  
+:x: `/jenkins/.configs/casc_configs/dir1/config.yaml`  
+:x: `/jenkins/.configs/casc_configs/.dir1/config.yaml`  
+:x: `/jenkins/.configs/casc_configs/..dir2/config.yaml`  
+</details>
 
 If you do not set the `CASC_JENKINS_CONFIG` environment variable, the plugin will
 default to looking for a single config file in `$JENKINS_HOME/jenkins.yaml`.
@@ -229,6 +243,10 @@ Kubernetes users:\
 ## Supported Plugins
 
 Most plugins should be supported out-of-the-box, or maybe require some minimal changes. See this [dashboard](https://issues.jenkins.io/secure/Dashboard.jspa?selectPageId=18341) for known compatibility issues.
+
+## Adding JCasC support to a plugin
+
+Plugin developers wanting to support JCasC in their plugin should [check out our how-to guide](docs/PLUGINS.md).
 
 ## Compatibility with Jenkins >= 2.199 for JCasC < 1.36
 

@@ -72,8 +72,14 @@
 
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>crowd2</artifactId>
+      <scope>test</scope>
+      <version>2.0.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>mailer</artifactId>
-      <version>1.25</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -125,6 +131,20 @@
     </dependency>
 
     <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>docker-commons</artifactId>
+      <version>1.14</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>docker-workflow</artifactId>
+      <version>1.23</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.csanchez.jenkins.plugins</groupId>
       <artifactId>kubernetes</artifactId>
       <version>1.6.4</version>
@@ -133,14 +153,14 @@
     <dependency>
       <groupId>org.jenkinsci.plugins</groupId>
       <artifactId>pipeline-model-extensions</artifactId>
-      <version>1.5.1</version>
+      <version>1.7.0</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.jenkinsci.plugins</groupId>
       <artifactId>pipeline-model-definition</artifactId>
-      <version>1.5.1</version>
+      <version>1.7.0</version>
       <scope>test</scope>
     </dependency>
 
@@ -154,7 +174,6 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>credentials</artifactId>
-      <version>2.3.7</version>
     </dependency>
 
     <dependency>
@@ -420,7 +439,6 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>display-url-api</artifactId>
-      <version>2.3.2</version>
       <scope>test</scope>
     </dependency>
 
@@ -695,7 +713,7 @@
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
         <artifactId>bom-2.176.x</artifactId>
-        <version>3</version>
+        <version>9</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>

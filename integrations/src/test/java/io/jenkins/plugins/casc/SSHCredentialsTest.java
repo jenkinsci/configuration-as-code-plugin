@@ -48,7 +48,8 @@ public class SSHCredentialsTest {
         assertNotInLog(logging, CREDENTIALS_PASSWORD);
 
         BasicSSHUserPrivateKey certKey = getCredentials(BasicSSHUserPrivateKey.class);
-        assertEquals(PRIVATE_KEY, certKey.getPrivateKey());
+        // JENKINS-50181 made getPrivateKey always append a trailing newline.
+        assertEquals(PRIVATE_KEY + "\n", certKey.getPrivateKey());
         assertNotInLog(logging, PRIVATE_KEY);
 
         // Verify that the password does not get exported
