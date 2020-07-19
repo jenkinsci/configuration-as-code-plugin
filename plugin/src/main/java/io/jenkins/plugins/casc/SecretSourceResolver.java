@@ -2,9 +2,12 @@ package io.jenkins.plugins.casc;
 
 import com.google.common.collect.ImmutableMap;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.logging.Level;
@@ -144,7 +147,7 @@ public class SecretSourceResolver {
         public String lookup(@NonNull final String key) {
             try {
                 return new String(Files.readAllBytes(Paths.get(key)), StandardCharsets.UTF_8);
-            } catch (IOException e) {
+            } catch (IOException | InvalidPathException e) {
                 LOGGER.log(Level.WARNING, String.format(
                     "Configuration import: Error looking up file '%s' with UTF-8 encoding. Will default to empty string",
                     key), e);
@@ -172,7 +175,7 @@ public class SecretSourceResolver {
             try {
                 byte[] fileContent = Files.readAllBytes(Paths.get(key));
                 return Base64.getEncoder().encodeToString(fileContent);
-            } catch (IOException e) {
+            } catch (IOException | InvalidPathException e) {
                 LOGGER.log(Level.WARNING, String.format(
                     "Configuration import: Error looking up file '%s'. Will default to empty string",
                     key), e);
