@@ -18,7 +18,7 @@ public class PropertiesSecretSourceTest {
 
     @Rule
     public RuleChain chain = RuleChain.outerRule(new EnvironmentVariables()
-        .set("SECRETS", getClass().getResource("secrets.properties").getFile()))
+        .set("SECRETS_FILE", getClass().getResource("secrets.properties").getFile()))
         .around(new JenkinsConfiguredWithCodeRule());
 
     @Test
