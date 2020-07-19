@@ -244,6 +244,10 @@ Kubernetes users:\
 
 Most plugins should be supported out-of-the-box, or maybe require some minimal changes. See this [dashboard](https://issues.jenkins.io/secure/Dashboard.jspa?selectPageId=18341) for known compatibility issues.
 
+## Adding JCasC support to a plugin
+
+Plugin developers wanting to support JCasC in their plugin should [check out our how-to guide](docs/PLUGINS.md).
+
 ## Compatibility with Jenkins >= 2.199 for JCasC < 1.36
 
 Jenkins 2.199 introduced [a check to prevent saving global configuration before loading the configuration has occurred](https://github.com/jenkinsci/jenkins/pull/4171). Configurations As Code needs to apply global configuration before Jenkins loads jobs (so they can load and correctly reference any global state) and as such there exists a race condition where by Jenkins may fail to start when used with this plugin.
@@ -269,11 +273,6 @@ Jenkins 2.220 includes [JENKINS-51856](https://issues.jenkins-ci.org/browse/JENK
 
 - [configuration-as-code-groovy-plugin](https://github.com/jenkinsci/configuration-as-code-groovy-plugin)\
   Allows to specify groovy code that should run on during configuration.
-- [configuration-as-code-secret-ssm-plugin](https://github.com/jenkinsci/configuration-as-code-secret-ssm-plugin)\
-  Allows to resolve secrets from AWS' SSM secrets
-- [hashicorp-vault-plugin](https://github.com/jenkinsci/hashicorp-vault-plugin)\
-  Allows to resolve secrets from Hashicorp vault
-
 
 ## Jenkins Enhancement Proposal
 

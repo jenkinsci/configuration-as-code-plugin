@@ -58,7 +58,7 @@ unclassified:
         artifactoryUrl: http://acme.com/artifactory
         resolverCredentialsConfig:
           username: artifactory_user
-          password: ${ARTIFACTORY_PASSWORD}
+          password: "${ARTIFACTORY_PASSWORD}"
 
   globalLibraries:
     libraries:
