@@ -242,7 +242,7 @@ public class SecretSourceResolverTest {
     @Test
     public void resolve_File() throws Exception {
         String input = getPath("secret.json").toAbsolutePath().toString();
-        String output = resolve("${file:" + input + "}");
+        String output = resolve("${readFile:" + input + "}");
         assertThat(output, equalTo(FILE.lookup(input)));
         assertThat(output, containsString("\"Our secret\": \"Hello World\""));
     }
@@ -251,7 +251,7 @@ public class SecretSourceResolverTest {
     public void resolve_FileWithRelative() throws Exception {
         Path path = getPath("secret.json");
         String input = Paths.get("").toUri().relativize(path.toUri()).getPath();
-        String output = resolve("${file:" + input + "}");
+        String output = resolve("${readFile:" + input + "}");
         assertThat(output, equalTo(FILE.lookup(input)));
         assertThat(output, containsString("\"Our secret\": \"Hello World\""));
     }
@@ -259,7 +259,7 @@ public class SecretSourceResolverTest {
     @Test
     public void resolve_FileWithSpace() throws Exception {
         String path = getPath("some secret.json").toAbsolutePath().toString();
-        String output = resolve("${file:" + path + "}");
+        String output = resolve("${readFile:" + path + "}");
         assertThat(output, equalTo(FILE.lookup(path)));
         assertThat(output, containsString("\"Our secret\": \"Hello World\""));
     }
@@ -268,7 +268,7 @@ public class SecretSourceResolverTest {
     public void resolve_FileWithSpaceAndRelative() throws Exception {
         String path = getPath("some secret.json").toAbsolutePath().toString();
         String input = Paths.get("").toUri().relativize(new File(path).toURI()).getPath();
-        String output = resolve("${file:" + input + "}");
+        String output = resolve("${readFile:" + input + "}");
         assertThat(output, equalTo(FILE.lookup(input)));
         assertThat(output, containsString("\"Our secret\": \"Hello World\""));
     }
@@ -276,7 +276,7 @@ public class SecretSourceResolverTest {
     @Test
     public void resolve_FileBase64() throws Exception {
         String input = getPath("secret.json").toAbsolutePath().toString();
-        String output = resolve("${base64:${file:" + input + "}}");
+        String output = resolve("${base64:${readFile:" + input + "}}");
         String decoded = DECODE.lookup(output);
         String content = FILE.lookup(input);
         assertThat(output, equalTo(ENCODE.lookup(content)));
@@ -288,7 +288,7 @@ public class SecretSourceResolverTest {
     public void resolve_FileBase64NestedEnv() throws Exception {
         String input = getPath("secret.json").toAbsolutePath().toString();
         environment.set("FOO", input);
-        String output = resolve("${base64:${file:${FOO}}}");
+        String output = resolve("${base64:${readFile:${FOO}}}");
         String decoded = DECODE.lookup(output);
         String content = FILE.lookup(input);
         assertThat(output, equalTo(ENCODE.lookup(content)));
@@ -298,16 +298,16 @@ public class SecretSourceResolverTest {
 
     @Test
     public void resolve_FileNotFound() {
-        resolve("${file:./hello-world-not-found.txt}");
+        resolve("${readFile:./hello-world-not-found.txt}");
         assertTrue(logContains("Configuration import: Error looking up file './hello-world-not-found.txt' with UTF-8 encoding."));
-        assertTrue(logContains("Configuration import: Found unresolved variable 'file:./hello-world-not-found.txt'."));
+        assertTrue(logContains("Configuration import: Found unresolved variable 'readFile:./hello-world-not-found.txt'."));
     }
 
     @Test
     public void resolve_FileBase64NotFound() {
-        resolve("${fileBase64:./hello-world-not-found.txt}");
+        resolve("${readFileBase64:./hello-world-not-found.txt}");
         assertTrue(logContains("Configuration import: Error looking up file './hello-world-not-found.txt'."));
-        assertTrue(logContains("Configuration import: Found unresolved variable 'fileBase64:./hello-world-not-found.txt'."));
+        assertTrue(logContains("Configuration import: Found unresolved variable 'readFileBase64:./hello-world-not-found.txt'."));
     }
 
     @Test
