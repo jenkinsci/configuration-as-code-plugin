@@ -4,7 +4,7 @@ Requires `credentials` >= 2.2.0
 
 All values with `"${SOME_SECRET}"` is resolved by our Secret Sources Resolver you can [read more about which sources are supported](../../docs/features/secrets.adoc#secret-sources)
 
-Since JCasC version v1.42 we have added support for variable expansion for `base64`, `fileBase64` encoded and `file`
+Since JCasC version v1.42 we have added support for variable expansion for `base64`, `readFileBase64` and `readFile`
 [Read more about the syntax](../../docs/features/secrets.adoc#passing-secrets-through-variables)
 
 You can also see an [example below](#example)
@@ -48,7 +48,7 @@ credentials:
               privateKeySource:
                 directEntry:
                   privateKey: "${SSH_PRIVATE_KEY}"
-          # Another option passing via a file via ${file:/path/to/file}
+          # Another option passing via a file via ${readFile:/path/to/file}
           - basicSSHUserPrivateKey:
               scope: SYSTEM
               id: ssh_with_passphrase_provided_via_file
@@ -57,7 +57,7 @@ credentials:
               description: "SSH passphrase with private key file. Private key provided"
               privateKeySource:
                 directEntry:
-                  privateKey: "${file:${SSH_PRIVATE_FILE_PATH}}" # Path to file loaded from Environment Variable
+                  privateKey: "${readFile:${SSH_PRIVATE_FILE_PATH}}" # Path to file loaded from Environment Variable
           - usernamePassword:
               scope: GLOBAL
               id: "username"
@@ -84,7 +84,7 @@ credentials:
               scope: GLOBAL
               id: "secret-file_via_binary_file"
               fileName: "mysecretfile.txt"
-              secretBytes: "${fileBase64:${SECRET_FILE_PATH}}" # secretBytes requires base64 encoded content
+              secretBytes: "${readFileBase64:${SECRET_FILE_PATH}}" # secretBytes requires base64 encoded content
           - certificate:
               scope: GLOBAL
               id: "secret-certificate"
@@ -92,7 +92,7 @@ credentials:
               description: "my secret cert"
               keyStoreSource:
                 uploaded:
-                  uploadedKeystore: "${fileBase64:${SECRET_CERT_FILE_PATH}}" # uploadedKeystore requires BINARY base64 encoded content
+                  uploadedKeystore: "${readFileBase64:${SECRET_CERT_FILE_PATH}}" # uploadedKeystore requires BINARY base64 encoded content
 ```
 
 ## implementation note

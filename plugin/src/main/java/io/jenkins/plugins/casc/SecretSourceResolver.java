@@ -43,7 +43,9 @@ public class SecretSourceResolver {
             StringLookupFactory.INSTANCE.interpolatorStringLookup(ImmutableMap
                     .of("base64", Base64Lookup.INSTANCE,
                         "fileBase64", FileBase64Lookup.INSTANCE,
-                        "file", FileStringLookup.INSTANCE
+                        "readFileBase64", FileBase64Lookup.INSTANCE,
+                        "file", FileStringLookup.INSTANCE,
+                        "readFile", FileStringLookup.INSTANCE
                     ),
                 new ConfigurationContextStringLookup(context), false))
             .setEscapeChar(escapedWith)
