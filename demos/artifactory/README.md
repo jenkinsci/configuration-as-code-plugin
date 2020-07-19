@@ -15,7 +15,7 @@ unclassified:
           credentialsId: "artifactory"
         resolverCredentialsConfig:
           username: artifactory_user
-          password: ${ARTIFACTORY_PASSWORD}
+          password: "${ARTIFACTORY_PASSWORD}"
 ```
 
 ## implementation note

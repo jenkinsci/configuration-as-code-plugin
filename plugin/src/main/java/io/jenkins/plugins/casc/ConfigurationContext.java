@@ -21,7 +21,7 @@ public class ConfigurationContext implements ConfiguratorRegistry {
     private Deprecation deprecation = Deprecation.reject;
     private Restriction restriction = Restriction.reject;
     private Unknown unknown = Unknown.reject;
-    private final int yamlMaxAliasesForCollections;
+    private transient final int yamlMaxAliasesForCollections;
 
     /**
      * the model-introspection model to be applied by configuration-as-code.
@@ -37,6 +37,8 @@ public class ConfigurationContext implements ConfiguratorRegistry {
 
     private transient String mode;
 
+    private transient SecretSourceResolver secretSourceResolver;
+
     public ConfigurationContext(ConfiguratorRegistry registry) {
         this.registry = registry;
         String prop = Util.fixEmptyAndTrim(System.getProperty(
@@ -44,6 +46,11 @@ public class ConfigurationContext implements ConfiguratorRegistry {
             System.getenv(CASC_YAML_MAX_ALIASES_ENV)
         ));
         yamlMaxAliasesForCollections = NumberUtils.toInt(prop, 50);
+        secretSourceResolver = new SecretSourceResolver(this);
+    }
+
+    public SecretSourceResolver getSecretSourceResolver() {
+        return secretSourceResolver;
     }
 
     public void addListener(Listener listener) {

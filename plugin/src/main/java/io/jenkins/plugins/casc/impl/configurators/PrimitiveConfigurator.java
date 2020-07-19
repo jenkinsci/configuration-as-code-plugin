@@ -7,7 +7,6 @@ import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.Configurator;
 import io.jenkins.plugins.casc.ConfiguratorException;
-import io.jenkins.plugins.casc.SecretSourceResolver;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Scalar;
 import java.util.Collections;
@@ -42,7 +41,7 @@ public class PrimitiveConfigurator implements Configurator {
     @NonNull
     @Override
     public Object configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
-        return Stapler.lookupConverter(target).convert(target, SecretSourceResolver.resolve(context, config.asScalar().toString()));
+        return Stapler.lookupConverter(target).convert(target, context.getSecretSourceResolver().resolve(config.asScalar().toString()));
     }
 
     @Override
@@ -70,7 +69,7 @@ public class PrimitiveConfigurator implements Configurator {
             return new Scalar((Enum) instance);
         }
 
-        return new Scalar(SecretSourceResolver.encode(String.valueOf(instance)));
+        return new Scalar(context.getSecretSourceResolver().encode(String.valueOf(instance)));
     }
 
     @NonNull

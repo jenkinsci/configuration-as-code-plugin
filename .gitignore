@@ -20,3 +20,5 @@ plugins.txt
 # Ignore DS_Store (Mac)
 .DS_Store
 
+# Ignore benchmark reports
+jmh-report*.json
