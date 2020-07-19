@@ -2,12 +2,10 @@ package io.jenkins.plugins.casc;
 
 import com.google.common.collect.ImmutableMap;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.logging.Level;
@@ -38,7 +36,6 @@ public class SecretSourceResolver {
     private final StringSubstitutor substitutor;
 
     public SecretSourceResolver(ConfigurationContext configurationContext) {
-        ConfigurationContext context = configurationContext;
         substitutor = new StringSubstitutor(
             StringLookupFactory.INSTANCE.interpolatorStringLookup(ImmutableMap
                     .of("base64", Base64Lookup.INSTANCE,
@@ -47,7 +44,7 @@ public class SecretSourceResolver {
                         "file", FileStringLookup.INSTANCE,
                         "readFile", FileStringLookup.INSTANCE
                     ),
-                new ConfigurationContextStringLookup(context), false))
+                new ConfigurationContextStringLookup(configurationContext), false))
             .setEscapeChar(escapedWith)
             .setVariablePrefix(enclosedBy)
             .setVariableSuffix(enclosedIn)
