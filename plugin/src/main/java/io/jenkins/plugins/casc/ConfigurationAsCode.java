@@ -85,10 +85,10 @@ import org.yaml.snakeyaml.nodes.ScalarNode;
 import org.yaml.snakeyaml.nodes.SequenceNode;
 import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.resolver.Resolver;
+import static java.lang.String.format;
 import org.yaml.snakeyaml.serializer.Serializer;
 
 import static io.jenkins.plugins.casc.SchemaGeneration.writeJSONSchema;
-import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.yaml.snakeyaml.DumperOptions.FlowStyle.BLOCK;
 import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.DOUBLE_QUOTED;
