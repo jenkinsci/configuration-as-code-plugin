@@ -32,9 +32,9 @@
           <f:entry title="${%Path or URL}" field="newSource" >
               <f:textbox checkUrl="'checkNewSource?newSource='+escape(this.value)" checkMethod="post" />
           </f:entry>
-          <f:bottomButtonBar>
-              <f:submit name="replace" value="${%Apply new configuration}"/>
-          </f:bottomButtonBar>
+          <f:block>
+            <f:submit name="replace" value="${%Apply new configuration}"/>
+          </f:block>
       </f:form>
     </l:isAdmin>
     <h2>${%Actions}</h2>
