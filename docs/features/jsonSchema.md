@@ -24,9 +24,9 @@ The structure and validation of the Schema is done based on the user-installed p
 The Schema uses JSON draft v07. 
 http://json-schema.org/draft-07/schema#
 
-**Using JSON Schema**
+- ===Using JSON Schema
 
-* The schema will be available at /configuration-as-code/schema
+* The schema is available at /configuration-as-code/schema
 * Users can use various online JSON validators to check against their YAML/json.
 
 **Progress**
@@ -44,7 +44,7 @@ http://json-schema.org/draft-07/schema#
 * Without a valid schema it is not possible to validate a YAML file rendering the schema unusable.
 * The previous schema included an `"$ref":` for an `object` type, the new draft of the schema makes it mandatory
   to use `"$id":` hence the new schema uses it instead of ref.
-* The new improvement on [DEV-Tools](https://www.jenkins.io/projects/jcasc/dev-tools/) will be used as an experiment with CommunityBridge and as a project to improve development tools for Jenkins configuration as a code.
+* [DEV-Tools](https://www.jenkins.io/projects/jcasc/dev-tools/) is used as an experiment with CommunityBridge and as a project to improve development tools for Jenkins configuration as a code.
 
  **Issues** 
  * Missing Schema Definitions
