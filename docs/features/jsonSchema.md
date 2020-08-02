@@ -60,20 +60,20 @@ http://json-schema.org/draft-07/schema#
  * Validate generated schema with a few plugins installed (see [issue 170](https://github.com/jenkinsci/configuration-as-code-plugin/issues/760))
  * Validate generated schema with [Jenkins 2.176.2 suggested plugins](https://github.com/jenkinsci/jenkins/blob/stable-2.176/core/src/main/resources/jenkins/install/platform-plugins.json) installed
   
-  *Resources*
+  Resources
   * [JSON schema validators](https://json-schema.org/implementations.html#validators) 
  
- *Phase-2 IDE Autocompletion For JCasC*
+ **Phase-2 IDE Autocompletion For JCasC**
  * IntelliJ IDE autocompletion with error detection for the yaml files
  * Visual Studio Code autocompletion with error detection for the yaml files
  * Atom autocompletion with error detection for the yaml files
   
-  *Resources*
+  Resources
   * [Intellij Grammar Kit](https://github.com/JetBrains/Grammar-Kit)
   * [Visual Studio Code language support](https://code.visualstudio.com/api/language-extensions/programmatic-language-features)
   * [Atom provider API](https://github.com/atom/autocomplete-plus/wiki/Provider-API)
   
-***What the schema does***
+**What the schema does**
 
 * The schema validates simple YAML files with root configurators.
 ```yaml
@@ -83,7 +83,7 @@ jenkins:
 ```
 * In the above example if the data type of numExecutors is entered wrong, the schema will invalidate it.
 
-***What the schema does not do***
+**What the schema does not do**
 
 * It cannot validate nested yml files, with multiple levels of configurators.
 ```yaml
