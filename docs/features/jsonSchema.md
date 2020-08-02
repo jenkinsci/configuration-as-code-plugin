@@ -24,7 +24,7 @@ The structure and validation of the Schema is done based on the user-installed p
 The Schema uses JSON draft v07. 
 http://json-schema.org/draft-07/schema#
 
-===Using JSON Schema
+**Using JSON Schema**
 
 * The schema is available at /configuration-as-code/schema
 * Users can use various online JSON validators to check against their YAML/json.
