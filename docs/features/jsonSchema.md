@@ -56,7 +56,7 @@ http://json-schema.org/draft-07/schema#
  * [NEW] Fix existing JSON schema issues.
  * [NEW] Rewrite schema in Java fixes are infeasible.
  
- *Phase-1: Fix the JSON schema Generator*
+ **Phase-1: Fix the JSON schema Generator**
  * Validate generated schema with a few plugins installed (see [issue 170](https://github.com/jenkinsci/configuration-as-code-plugin/issues/760))
  * Validate generated schema with [Jenkins 2.176.2 suggested plugins](https://github.com/jenkinsci/jenkins/blob/stable-2.176/core/src/main/resources/jenkins/install/platform-plugins.json) installed
   
