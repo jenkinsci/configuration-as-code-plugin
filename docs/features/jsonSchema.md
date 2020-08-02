@@ -19,7 +19,7 @@ The documentation below describes the new implementation.
 The new JSON Schema is structured to validate the YAML files that are loaded via JCasC.
 The structure and validation of the Schema is done based on the user-installed plugins.
 
- #Version
+ ######Version
 
 The Schema uses JSON draft v07. 
 http://json-schema.org/draft-07/schema#
