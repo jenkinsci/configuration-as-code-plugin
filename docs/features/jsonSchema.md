@@ -19,17 +19,17 @@ The documentation below describes the new implementation.
 The new JSON Schema is structured to validate the YAML files that are loaded via JCasC.
 The structure and validation of the Schema is done based on the user-installed plugins.
 
-######Version
+**Version**
 
 The Schema uses JSON draft v07. 
 http://json-schema.org/draft-07/schema#
 
-***Using JSON Schema***
+**Using JSON Schema**
 
 * The schema will be available at /configuration-as-code/schema
 * Users can use various online JSON validators to check against their YAML/json.
 
-***Progress***
+**Progress**
 
 * The new JSON Schema is partially working and is in beta mode.
 * The schema validates any missing  configurator objects and invalid data formats.
@@ -38,7 +38,7 @@ http://json-schema.org/draft-07/schema#
 * We are working towards supporting deep nested YAML files.
 * The project has improved Jenkins configuration as code development tools through a CommunityBridge project.
 
-***Improvements***
+**Improvements**
 
 * The Old Schema was generated using Jelly files that did not generate a valid JSON Schema.
 * Without a valid schema it is not possible to validate a YAML file rendering the schema unusable.
@@ -46,13 +46,13 @@ http://json-schema.org/draft-07/schema#
   to use `"$id":` hence the new schema uses it instead of ref.
 * The new improvement on [DEV-Tools](https://www.jenkins.io/projects/jcasc/dev-tools/) will be used as an experiment with CommunityBridge and as a project to improve development tools for Jenkins configuration as a code.
 
- *Issues* 
+ **Issues** 
  * Missing Schema Definitions
  * Schema validation issues
  * No automated shcema validation tests 
  these issues has been worked on and the feasible solution has been given below,
  
- *Solution*
+ **Solution**
  * [NEW] Fix existing JSON schema issues.
  * [NEW] Rewrite schema in Java fixes are infeasible.
  
