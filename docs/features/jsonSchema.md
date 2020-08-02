@@ -46,7 +46,7 @@ http://json-schema.org/draft-07/schema#
   to use `"$id":` hence the new schema uses it instead of ref.
 * [DEV-Tools](https://www.jenkins.io/projects/jcasc/dev-tools/) is used as an experiment with CommunityBridge and as a project to improve development tools for Jenkins configuration as a code.
 
- **Issues** 
+ ###Issues 
  * Missing Schema Definitions
  * Schema validation issues
  * No automated shcema validation tests 
