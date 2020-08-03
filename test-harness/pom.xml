@@ -12,7 +12,7 @@
   <description>Functionality to make testing jcasc integration easier</description>
 
   <properties>
-    <jackson.version>2.11.0</jackson.version>
+    <jackson.version>2.11.1</jackson.version>
     <spotbugs.skip>true</spotbugs.skip>
   </properties>
 
