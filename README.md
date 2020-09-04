@@ -116,8 +116,17 @@ If `CASC_JENKINS_CONFIG` points to a folder, the plugin will recursively travers
 :x: `/jenkins/.configs/casc_configs/..dir2/config.yaml`  
 </details>
 
-If you do not set the `CASC_JENKINS_CONFIG` environment variable, the plugin will
-default to looking for a single config file in `$JENKINS_HOME/jenkins.yaml`.
+Instead of setting the `CASC_JENKINS_CONFIG` environment variable, you can also define using
+the `casc.jenkins.config` Java property.  This is useful when installing Jenkins via a package
+management tool and can't set an environment variable outside of a package-managed file which could
+be overwritten by an update.  For RHEL/CentOS systems, you can append the following to the
+`JENKINS_JAVA_OPTIONS` entry in `/etc/sysconfig/jenkins`
+ 
+  `-Dcasc.jenkins.config=/jenkins/casc_configs`
+ 
+If you do not set the `CASC_JENKINS_CONFIG` environment variable or the `casc.jenkins.config` Java
+property, the plugin will default to looking for a single config file in
+`$JENKINS_HOME/jenkins.yaml`.
 
 If everything was setup correctly, you should now be able to browse the Configuration as Code page with `Manage Jenkins` -> `Configuration as Code`.
 
