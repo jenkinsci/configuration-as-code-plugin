@@ -17,7 +17,7 @@ jenkins:
         templates:
           - labelString: "docker-agent"
             dockerTemplateBase:
-              image: "jenkins/slave"
+              image: "jenkins/agent"
               volumes:
                 - hello:/hello
                 - world:/world
