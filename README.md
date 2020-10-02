@@ -10,11 +10,11 @@
 [![Gitter](https://badges.gitter.im/jenkinsci/configuration-as-code-plugin.svg)](https://gitter.im/jenkinsci/configuration-as-code-plugin)
 
 <img src="plugin/src/main/webapp/img/logo-head.svg" width="192">
-## Documentation
 
-<a name="handling-secrets"></a>
 
-You can find more documentation about JCasC here:
+<!--<a name="handling-secrets"></a>-->
+
+<!-- You can find more documentation about JCasC here: -->
 
 - [Handling Secrets](./docs/features/secrets.adoc)
 - [Exporting configurations](./docs/features/configExport.md)
@@ -27,7 +27,7 @@ with your favourite YAML tools.
 
 The JSON Schema documentation can be found [here](./docs/features/jsonSchema.md).
 
-**TODO**: Provide a Dockerfile to generate documentation from specified jenkins-core release and plugins.
+<!--**TODO**: Provide a Dockerfile to generate documentation from specified jenkins-core release and plugins.-->
 
 ## Introduction
 
