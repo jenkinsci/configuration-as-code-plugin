@@ -18,8 +18,6 @@
 - [Triggering Configuration Reload](./docs/features/configurationReload.md)
 
 
-Documentation is generated from a live instance, as well as a JSON schema you can use to validate configuration file with your favourite YAML tools.
-
 
 ## Introduction
 
