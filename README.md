@@ -20,12 +20,11 @@
 - [Exporting configurations](./docs/features/configExport.md)
 - [Validating configurations](./docs/features/jsonSchema.md)
 - [Triggering Configuration Reload](./docs/features/configurationReload.md)
+- [JSON Schema documentation](./docs/features/jsonSchema.md)
 
-The configuration file format depends on the version of jenkins-core and installed plugins.
-Documentation is generated from a live instance, as well as a JSON schema you can use to validate configuration file
-with your favourite YAML tools.
+Documentation is generated from a live instance, as well as a JSON schema you can use to validate configuration file with your favourite YAML tools.
 
-The JSON Schema documentation can be found [here](./docs/features/jsonSchema.md).
+<!--The JSON Schema documentation can be found [here](./docs/features/jsonSchema.md).-->
 
 <!--**TODO**: Provide a Dockerfile to generate documentation from specified jenkins-core release and plugins.-->
 
