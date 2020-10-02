@@ -11,6 +11,14 @@
 
 <img src="plugin/src/main/webapp/img/logo-head.svg" width="192">
 
+
+- [Handling Secrets](./docs/features/secrets.adoc)
+- [Exporting configurations](./docs/features/configExport.md)
+- [Validating configurations](./docs/features/jsonSchema.md)
+- [Triggering Configuration Reload](./docs/features/configurationReload.md)
+
+
+
 ## Introduction
 
 Setting up Jenkins is a complex process, as both Jenkins and its plugins require some tuning and configuration,
@@ -220,24 +228,6 @@ jenkins:
               workDirPath: "/tmp"
 ```
 
-## Documentation
-
-<a name="handling-secrets"></a>
-
-You can find more documentation about JCasC here:
-
-- [Handling Secrets](./docs/features/secrets.adoc)
-- [Exporting configurations](./docs/features/configExport.md)
-- [Validating configurations](./docs/features/jsonSchema.md)
-- [Triggering Configuration Reload](./docs/features/configurationReload.md)
-
-The configuration file format depends on the version of jenkins-core and installed plugins.
-Documentation is generated from a live instance, as well as a JSON schema you can use to validate configuration file
-with your favourite YAML tools.
-
-The JSON Schema documentation can be found [here](./docs/features/jsonSchema.md).
-
-**TODO**: Provide a Dockerfile to generate documentation from specified jenkins-core release and plugins.
 
 ## Installing plugins
 
