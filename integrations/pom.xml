@@ -14,7 +14,7 @@
   <properties>
     <jenkins.version>2.176.3</jenkins.version> <!-- Remove when parent base is updated. -->
     <maven.deploy.skip>true</maven.deploy.skip> <!-- no need to be deployed during release, this is a test-only module -->
-    <jackson.version>2.10.2</jackson.version>
+    <jackson.version>2.11.1</jackson.version>
   </properties>
 
   <dependencies>
@@ -471,14 +471,13 @@
       <dependency>
         <groupId>com.squareup.okhttp3</groupId>
         <artifactId>logging-interceptor</artifactId>
-        <version>3.12.2</version>
+        <version>3.12.12</version>
       </dependency>
       <dependency>
         <groupId>com.squareup.okhttp3</groupId>
         <artifactId>okhttp</artifactId>
-        <version>3.12.2</version>
+        <version>3.12.12</version>
       </dependency>
-
       <dependency>
         <groupId>com.github.docker-java</groupId>
         <artifactId>docker-java</artifactId>
