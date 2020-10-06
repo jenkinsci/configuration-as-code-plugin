@@ -48,20 +48,9 @@
       <artifactId>jenkins-test-harness</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>jackson2-api</artifactId>
       <version>${jackson.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.dataformat</groupId>
-      <artifactId>jackson-dataformat-yaml</artifactId>
-      <version>${jackson.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.yaml</groupId>
-          <artifactId>snakeyaml</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.vladsch.flexmark</groupId>
