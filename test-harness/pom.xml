@@ -12,7 +12,7 @@
   <description>Functionality to make testing jcasc integration easier</description>
 
   <properties>
-    <jackson.version>2.10.2</jackson.version>
+    <jackson.version>2.11.1</jackson.version>
     <spotbugs.skip>true</spotbugs.skip>
   </properties>
 
@@ -48,13 +48,8 @@
       <artifactId>jenkins-test-harness</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <version>${jackson.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.dataformat</groupId>
-      <artifactId>jackson-dataformat-yaml</artifactId>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>jackson2-api</artifactId>
       <version>${jackson.version}</version>
     </dependency>
     <dependency>
