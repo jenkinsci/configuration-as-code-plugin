@@ -292,7 +292,7 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
      * Run configuration process on the target instance
      * @param config configuration to apply. Can be partial if {@link #instance(Mapping, ConfigurationContext)} did already used some entries
      * @param instance target instance to configure
-     * @param dryrun only check configuration is valid regarding target component. Don't actually apply changes to jenkins master instance
+     * @param dryrun only check configuration is valid regarding target component. Don't actually apply changes to jenkins controller instance
      * @param context
      * @throws ConfiguratorException something went wrong...
      */

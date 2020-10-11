@@ -734,8 +734,8 @@ public class ConfigurationAsCode extends ManagementLink {
         // Initialize secret sources
         SecretSource.all().forEach(SecretSource::init);
 
-        // Check input before actually applying changes,
-        // so we don't let master in a weird state after some ConfiguratorException has been thrown
+        // Check input before actually applying changes, so we don't let controller in a
+        //weird state after some ConfiguratorException has been thrown
         final Mapping clone = entries.clone();
         checkWith(clone, context);
 

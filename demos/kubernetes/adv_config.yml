@@ -25,7 +25,7 @@ data:
             maxRequestsPerHostStr: 64
             retentionTimeout: 5
             templates:
-              - name: "k8s-slave"
+              - name: "k8s-agent"
                 namespace: "default"
                 label: "linux-x86_64"
                 nodeUsageMode: EXCLUSIVE
