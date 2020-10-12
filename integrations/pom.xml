@@ -433,7 +433,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>azure-keyvault</artifactId>
-      <version>1.4</version>
+      <version>2.0</version>
     </dependency>
 
     <dependency>
