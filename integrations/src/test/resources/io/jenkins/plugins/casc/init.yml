@@ -232,7 +232,7 @@ jenkins:
                 resourceRequestMemory: "100Mi"
                 resourceLimitMemory: "8192Mi"
               - name: "jnlp"
-                image: "jenkins-slave:latest"
+                image: "inbound-agent:latest"
                 command: "jenkins-slave"
                 args: "^${computer.jnlpmac} ^${computer.name}"
                 resourceRequestCpu: "50m"
