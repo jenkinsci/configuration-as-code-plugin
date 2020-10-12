@@ -66,7 +66,7 @@ jenkins:
             nodeUsageMode: EXCLUSIVE
             containers:
               - name: "jnlp"
-                image: "jenkinsci/inbound-agent:latest"
+                image: "jenkins/inbound-agent:latest"
                 alwaysPullImage: true
                 workingDir: "/home/jenkins"
                 ttyEnabled: true
