@@ -33,15 +33,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.everit.json</groupId>
-      <artifactId>org.everit.json.schema</artifactId>
-      <version>1.5.1</version>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-beanutils</groupId>
-          <artifactId>commons-beanutils</artifactId>
-        </exclusion>
-      </exclusions>
+      <groupId>com.github.erosb</groupId>
+      <artifactId>everit-json-schema</artifactId>
+      <version>1.12.1</version>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.main</groupId>
