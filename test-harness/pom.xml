@@ -12,7 +12,7 @@
   <description>Functionality to make testing jcasc integration easier</description>
 
   <properties>
-    <jackson.version>2.11.1</jackson.version>
+    <jackson.version>2.11.3</jackson.version>
     <spotbugs.skip>true</spotbugs.skip>
   </properties>
 
@@ -33,35 +33,18 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.everit.json</groupId>
-      <artifactId>org.everit.json.schema</artifactId>
-      <version>1.5.1</version>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-beanutils</groupId>
-          <artifactId>commons-beanutils</artifactId>
-        </exclusion>
-      </exclusions>
+      <groupId>com.github.erosb</groupId>
+      <artifactId>everit-json-schema</artifactId>
+      <version>1.12.1</version>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.main</groupId>
       <artifactId>jenkins-test-harness</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>jackson2-api</artifactId>
       <version>${jackson.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.dataformat</groupId>
-      <artifactId>jackson-dataformat-yaml</artifactId>
-      <version>${jackson.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.yaml</groupId>
-          <artifactId>snakeyaml</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.vladsch.flexmark</groupId>

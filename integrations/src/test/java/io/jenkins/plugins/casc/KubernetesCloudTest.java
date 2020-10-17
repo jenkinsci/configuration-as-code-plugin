@@ -66,7 +66,7 @@ public class KubernetesCloudTest {
         assertEquals("BAR", envVar.getValue());
 
         final PodTemplate template1 = templates.get(1);
-        assertEquals("k8s-slave", template1.getName());
+        assertEquals("k8s-agent", template1.getName());
         assertEquals("default", template1.getNamespace());
         assertEquals(Mode.EXCLUSIVE, template1.getNodeUsageMode());
     }

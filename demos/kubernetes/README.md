@@ -60,13 +60,13 @@ jenkins:
                   key: "FOO"
                   value: "BAR"
 
-          - name: "k8s-slave"
+          - name: "k8s-agent"
             namespace: "default"
             label: "linux-x86_64"
             nodeUsageMode: EXCLUSIVE
             containers:
               - name: "jnlp"
-                image: "jenkinsci/jnlp-slave:latest"
+                image: "jenkins/inbound-agent:latest"
                 alwaysPullImage: true
                 workingDir: "/home/jenkins"
                 ttyEnabled: true

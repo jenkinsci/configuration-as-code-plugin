@@ -65,13 +65,13 @@
     <dependency>
       <groupId>io.vavr</groupId>
       <artifactId>vavr</artifactId>
-      <version>0.10.2</version>
+      <version>0.10.3</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-text</artifactId>
-      <version>1.8</version>
+      <version>1.9</version>
     </dependency>
 
     <dependency>
