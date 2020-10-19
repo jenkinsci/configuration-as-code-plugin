@@ -59,7 +59,7 @@
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>snakeyaml-api</artifactId>
-      <version>1.26.4</version>
+      <version>1.27.0</version>
     </dependency>
 
     <dependency>
