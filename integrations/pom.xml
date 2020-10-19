@@ -105,7 +105,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>config-file-provider</artifactId>
-      <version>3.6.3</version>
+      <version>3.7.0</version>
       <scope>test</scope>
     </dependency>
 
