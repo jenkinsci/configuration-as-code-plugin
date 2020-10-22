@@ -618,7 +618,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
     @Restricted(NoExternalUse.class)
     public Map<Source, String> checkWith(YamlSource source) throws ConfiguratorException {
-        final List<YamlSource> sources = getStandardConfigSources();
+        List<YamlSource> sources = new ArrayList<>();
         sources.add(source);
         return checkWith(sources);
     }
