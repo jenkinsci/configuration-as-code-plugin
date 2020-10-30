@@ -1,0 +1,16 @@
+tool:
+  maven:
+    installations:
+      - name: "custom"
+        properties:
+          - installSource:
+              installers:
+                - maven:
+                    id: "3.6.3"
+  #mavenGlobalConfig:
+  #  globalSettingsProvider:
+  #    filePath:
+  #      path: "/tmp2/.m2"
+  #  settingsProvider:
+  #    filePath:
+  #      path: "/tmp2/settings.xml"
