@@ -30,11 +30,13 @@ public class GlobalToolGlobalMavenTest {
         assertThat("An installation with 'custom' name should have been configured.",
             mavenTool.get(0).getInstallations()[0].getName(), is("custom"));
 
+
         //The one with @Symbol("mavenGlobalConfig") since TODO
         ExtensionList<GlobalMavenConfig> globalMavenConfig = jenkins
             .getExtensionList(GlobalMavenConfig.class);
-
-        //TODO find how to test the configuration.
+        //TODO when https://github.com/jenkinsci/jenkins/pull/5008 is merged and released
+        // uncomment the mavenGlobalConfig in the GlobalToolGlobalMavenTest.yaml file and add assertions on configuration
+        // update the since comment above with Jenkins version
 
     }
 
