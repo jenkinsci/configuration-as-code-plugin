@@ -173,7 +173,7 @@ public class SecretSourceResolver {
 
         @Override
         public String lookup(@NonNull final String key) {
-            return new String(Base64.getDecoder().decode(key.getBytes(StandardCharsets.UTF_8)));
+            return new String(Base64.getDecoder().decode(key.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
         }
     }
 
