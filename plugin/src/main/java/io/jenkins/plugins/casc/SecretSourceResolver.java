@@ -44,7 +44,7 @@ public class SecretSourceResolver {
                     .put("readFileBase64", FileBase64Lookup.INSTANCE)
                     .put("file", FileStringLookup.INSTANCE)
                     .put("readFile", FileStringLookup.INSTANCE)
-                    .put("readBase64", DecodeBase64Lookup.INSTANCE)
+                    .put("decodeBase64", DecodeBase64Lookup.INSTANCE)
                     .build(),
                 new ConfigurationContextStringLookup(configurationContext), false))
             .setEscapeChar(escapedWith)
