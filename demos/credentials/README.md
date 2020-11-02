@@ -4,7 +4,8 @@ Requires `credentials` >= 2.2.0
 
 All values with `"${SOME_SECRET}"` is resolved by our Secret Sources Resolver you can [read more about which sources are supported](../../docs/features/secrets.adoc#secret-sources)
 
-Since JCasC version v1.42 we have added support for variable expansion for `base64`, `readFileBase64` and `readFile`
+Since JCasC version v1.42 we have added support for variable expansion for `base64`, `readFileBase64` and `readFile`.
+More variable expansion options have been added later.
 [Read more about the syntax](../../docs/features/secrets.adoc#passing-secrets-through-variables)
 
 You can also see an [example below](#example)

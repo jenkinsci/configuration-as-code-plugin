@@ -37,13 +37,15 @@ public class SecretSourceResolver {
 
     public SecretSourceResolver(ConfigurationContext configurationContext) {
         substitutor = new StringSubstitutor(
-            StringLookupFactory.INSTANCE.interpolatorStringLookup(ImmutableMap
-                    .of("base64", Base64Lookup.INSTANCE,
-                        "fileBase64", FileBase64Lookup.INSTANCE,
-                        "readFileBase64", FileBase64Lookup.INSTANCE,
-                        "file", FileStringLookup.INSTANCE,
-                        "readFile", FileStringLookup.INSTANCE
-                    ),
+            StringLookupFactory.INSTANCE.interpolatorStringLookup(
+                ImmutableMap.<String, org.apache.commons.text.lookup.StringLookup> builder()
+                    .put("base64", Base64Lookup.INSTANCE)
+                    .put("fileBase64", FileBase64Lookup.INSTANCE)
+                    .put("readFileBase64", FileBase64Lookup.INSTANCE)
+                    .put("file", FileStringLookup.INSTANCE)
+                    .put("readFile", FileStringLookup.INSTANCE)
+                    .put("decodeBase64", DecodeBase64Lookup.INSTANCE)
+                    .build(),
                 new ConfigurationContextStringLookup(configurationContext), false))
             .setEscapeChar(escapedWith)
             .setVariablePrefix(enclosedBy)
@@ -162,6 +164,16 @@ public class SecretSourceResolver {
         @Override
         public String lookup(@NonNull final String key) {
             return Base64.getEncoder().encodeToString(key.getBytes(StandardCharsets.UTF_8));
+        }
+    }
+
+    static class DecodeBase64Lookup implements StringLookup {
+
+        static final DecodeBase64Lookup INSTANCE = new DecodeBase64Lookup();
+
+        @Override
+        public String lookup(@NonNull final String key) {
+            return new String(Base64.getDecoder().decode(key.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
         }
     }
 
