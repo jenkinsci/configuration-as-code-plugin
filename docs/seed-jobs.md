@@ -2,12 +2,12 @@
 
 Requires `job-dsl` >= 1.74
 
-Configuration is not just about setting up Jenkins master, it's also about creating an initial set of jobs.
+Configuration is not just about setting up Jenkins controller, it's also about creating an initial set of jobs.
 For this purpose, we delegate to the popular [job-dsl-plugin](https://plugins.jenkins.io/job-dsl)
 and run a job-dsl script to create an initial set of jobs.
 
 Typical usage is to rely on a multi-branch, or organization folder job type, so further jobs will be dynamically
-created. So a multi-branch seed job will prepare a master to be fully configured for CI/CD targeting a repository
+created. So a multi-branch seed job will prepare a controller to be fully configured for CI/CD targeting a repository
 or organization.
 
 Job-DSL plugin uses groovy syntax for its job configuration DSL, so you'll have to mix YAML and groovy within your

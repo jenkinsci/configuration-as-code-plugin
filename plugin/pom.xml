@@ -14,7 +14,7 @@
   <packaging>hpi</packaging>
 
   <name>Configuration as Code Plugin</name>
-  <description>Manage Jenkins master configuration as code</description>
+  <description>Manage Jenkins configuration as code</description>
   <url>https://github.com/jenkinsci/configuration-as-code-plugin</url>
 
   <properties>
