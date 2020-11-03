@@ -368,7 +368,7 @@
       <artifactId>warnings-ng</artifactId>
       <version>8.4.4</version>
       <scope>test</scope>
-      <exclusions>
+      <exclusions> <!-- TODO: remove once on the 2.263.x baseline -->
         <exclusion>
           <groupId>org.slf4j</groupId>
           <artifactId>slf4j-api</artifactId>
