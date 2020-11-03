@@ -43,6 +43,12 @@
     </dependency>
 
     <dependency>
+      <groupId>com.github.spotbugs</groupId>
+      <artifactId>spotbugs-annotations</artifactId>
+      <version>4.1.2</version>
+    </dependency>
+
+    <dependency>
       <groupId>com.coravy.hudson.plugins.github</groupId>
       <artifactId>github</artifactId>
       <version>1.31.0</version>
@@ -121,13 +127,6 @@
       <artifactId>docker-plugin</artifactId>
       <version>1.1.2</version>
       <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <!-- Upper bounds conflict with the core -->
-          <groupId>com.google.code.findbugs</groupId>
-          <artifactId>annotations</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
@@ -365,10 +364,20 @@
     </dependency>
 
     <dependency>
-      <groupId>org.jvnet.hudson.plugins</groupId>
-      <artifactId>warnings</artifactId>
-      <version>5.0.2</version>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>warnings-ng</artifactId>
+      <version>8.4.4</version>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>commons-io</groupId>
+          <artifactId>commons-io</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- required to satisfy upper bound dependencies -->
@@ -457,6 +466,12 @@
       <version>1.13.1</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <scope>test</scope>
+    </dependency>
+
 
     <dependency>
       <groupId>com.vladsch.flexmark</groupId>
@@ -694,7 +709,7 @@
       <dependency>
         <groupId>org.json</groupId>
         <artifactId>json</artifactId>
-        <version>20190722</version>
+        <version>20200518</version>
       </dependency>
       <dependency>
         <groupId>joda-time</groupId>
