@@ -124,6 +124,8 @@ If `CASC_JENKINS_CONFIG` points to a folder, the plugin will recursively travers
 :x: `/jenkins/.configs/casc_configs/..dir2/config.yaml`  
 </details>
 
+Configuration file sets traversed in folders cannot overwrite configuration values, this will create a conflict and raise a `ConfiguratorException`. Thus, the order of traversal does not matter to the final outcome.
+
 Instead of setting the `CASC_JENKINS_CONFIG` environment variable, you can also define using
 the `casc.jenkins.config` Java property.  This is useful when installing Jenkins via a package
 management tool and can't set an environment variable outside of a package-managed file which could
