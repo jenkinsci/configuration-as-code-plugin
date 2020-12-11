@@ -19,15 +19,15 @@
 
 
 
--[Introduction](##introduction)
--[Initial Configuration](##initial-configuration)
--[Examples](##examples)
--[Installing plugins](##installing-plugins)
--[Supported Plugins](##supported-plugins)
--[Adding JCasC support to a plugin](##adding-jCasC-support-to-a-plugin)
--[Compatibility with Jenkins>=2.199 for JCasC<1.36](##compatibility-with-jenkins>=2.199-for-jCasC<1.36)
--[Configuration-as-Code extension plugins](##configuration-as-Code-extension-plugins)
--[Jenkins Enhancement Proposal](##jenkins-enhancement-proposal)
+- [Introduction](##introduction)
+- [Initial Configuration](##initial-configuration)
+- [Examples](##examples)
+- [Installing plugins](##installing-plugins)
+- [Supported Plugins](##supported-plugins)
+- [Adding JCasC support to a plugin](##adding-jCasC-support-to-a-plugin)
+- [Compatibility with Jenkins>=2.199 for JCasC<1.36](##compatibility-with-jenkins>=2.199-for-jCasC<1.36)
+- [Configuration-as-Code extension plugins](##configuration-as-Code-extension-plugins)
+- [Jenkins Enhancement Proposal](##jenkins-enhancement-proposal)
 
 ## Introduction
 
