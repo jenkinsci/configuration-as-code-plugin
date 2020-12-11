@@ -19,6 +19,16 @@
 
 
 
+-[Introduction](##introduction)
+-[Initial Configuration](##initial-configuration)
+-[Examples](##examples)
+-[Installing plugins](##installing-plugins)
+-[Supported Plugins](##supported-plugins)
+-[Adding JCasC support to a plugin](##adding-jCasC-support-to-a-plugin)
+-[Compatibility with Jenkins>=2.199 for JCasC<1.36](##compatibility-with-jenkins>=2.199-for-jCasC<1.36)
+-[Configuration-as-Code extension plugins](##configuration-as-Code-extension-plugins)
+-[Jenkins Enhancement Proposal](##jenkins-enhancement-proposal)
+
 ## Introduction
 
 Setting up Jenkins is a complex process, as both Jenkins and its plugins require some tuning and configuration,
@@ -247,7 +257,7 @@ Most plugins should be supported out-of-the-box, or maybe require some minimal c
 
 Plugin developers wanting to support JCasC in their plugin should [check out our how-to guide](docs/PLUGINS.md).
 
-## Compatibility with Jenkins >= 2.199 for JCasC < 1.36
+## Compatibility with Jenkins>=2.199 for JCasC<1.36
 
 Jenkins 2.199 introduced [a check to prevent saving global configuration before loading the configuration has occurred](https://github.com/jenkinsci/jenkins/pull/4171). Configurations As Code needs to apply global configuration before Jenkins loads jobs (so they can load and correctly reference any global state) and as such there exists a race condition where by Jenkins may fail to start when used with this plugin.
 
