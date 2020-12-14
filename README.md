@@ -13,8 +13,8 @@
 
 
 - [Introduction](##introduction)
-- [Examples](##examples)
-- [Initial Configuration](##initial-configuration)
+- [Getting Started](##getting-started)
+- [Examples and demos](./demos)
 - [Handling Secrets](./docs/features/secrets.adoc)
 - [Exporting configurations](./docs/features/configExport.md)
 - [Validating configurations](./docs/features/jsonSchema.md)
