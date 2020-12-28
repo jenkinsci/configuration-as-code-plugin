@@ -12,18 +12,18 @@
 <img src="plugin/src/main/webapp/img/logo-head.svg" width="192">
 
 
-- [Introduction](##introduction)
-- [Getting Started](##getting-started)
+- [Introduction](#introduction)
+- [Getting Started](#getting-started)
 - [Examples and demos](./demos)
 - [Handling Secrets](./docs/features/secrets.adoc)
 - [Exporting configurations](./docs/features/configExport.md)
 - [Validating configurations](./docs/features/jsonSchema.md)
 - [Triggering Configuration Reload](./docs/features/configurationReload.md)
-- [Installing plugins](##installing-plugins)
-- [Supported Plugins](##supported-plugins)
-- [Adding JCasC support to a plugin](##adding-jCasC-support-to-a-plugin)
-- [Configuration-as-Code extension plugins](##configuration-as-Code-extension-plugins)
-- [Jenkins Enhancement Proposal](##jenkins-enhancement-proposal)
+- [Installing plugins](#installing-plugins)
+- [Supported Plugins](#supported-plugins)
+- [Adding JCasC support to a plugin](#adding-jCasC-support-to-a-plugin)
+- [Configuration-as-Code extension plugins](#configuration-as-Code-extension-plugins)
+- [Jenkins Enhancement Proposal](#jenkins-enhancement-proposal)
 
 ## Introduction
 
