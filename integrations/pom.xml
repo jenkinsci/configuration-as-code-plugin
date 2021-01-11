@@ -15,6 +15,7 @@
     <maven.deploy.skip>true</maven.deploy.skip> <!-- no need to be deployed during release, this is a test-only module -->
     <jackson.version>2.11.3</jackson.version>
     <netty.version>4.1.52.Final</netty.version>
+    <jenkins.version>2.263.1</jenkins.version>
   </properties>
 
   <dependencies>
@@ -193,6 +194,12 @@
       <groupId>commons-validator</groupId>
       <artifactId>commons-validator</artifactId>
       <version>1.7</version>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-beanutils</groupId>
+          <artifactId>commons-beanutils</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -358,13 +365,6 @@
           <artifactId>groovy-all</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jvnet.hudson.plugins</groupId>
-      <artifactId>warnings</artifactId>
-      <version>5.0.2</version>
-      <scope>test</scope>
     </dependency>
 
     <!-- required to satisfy upper bound dependencies -->
@@ -709,14 +709,9 @@
         <version>1.20</version>
       </dependency>
       <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
-        <version>1.7.28</version>
-      </dependency>
-      <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.222.x</artifactId>
-        <version>13</version>
+        <artifactId>bom-2.263.x</artifactId>
+        <version>20</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>
