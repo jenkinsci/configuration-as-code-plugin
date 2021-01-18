@@ -184,7 +184,7 @@ jenkins:
 ### Yaml Aliases and Anchors
 
 Replace repeated elements with yaml anchors.
-Due note anchor keys must be prefixed with `x-` due to JCasC handling unknown root elements.
+Anchor keys must be prefixed with `x-` due to JCasC handling unknown root elements.
 
 ```yaml
 x-jenkins-linux-node: &jenkins_linux_node_anchor
