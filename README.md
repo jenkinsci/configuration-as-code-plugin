@@ -30,15 +30,15 @@
 Setting up Jenkins is a complex process, as both Jenkins and its plugins require some tuning and configuration,
 with dozens of parameters to set within the web UI `manage` section.
 
-Experienced Jenkins users rely on groovy init scripts to customize Jenkins and enforce desired state. Those
-scripts directly invoke Jenkins API and as such can do everything (at your own risk). But they also require
-you know Jenkins internals, and are confident in writing groovy scripts on top of Jenkins API.
+Experienced Jenkins users rely on groovy init scripts to customize Jenkins and enforce the desired state. Those
+scripts directly invoke Jenkins API and, as such, can do everything (at your own risk). But they also require
+you to know Jenkins internals and are confident in writing groovy scripts on top of Jenkins API.
 
-The Configuration as Code plugin has been designed as an _**opinionated**_ way to configure Jenkins based on
+The Configuration as Code plugin is an _**opinionated**_ way to configure Jenkins based on
 human-readable declarative configuration files. Writing such a file should be feasible without being a Jenkins
 expert, just translating into _code_ a configuration process one is used to executing in the web UI.
 
-Below configuration file includes root entries for various components of your primary Jenkins installation. The `jenkins` one is for the root Jenkins object, and other ones are for various global configuration elements.
+The below configuration file includes root entries for various components of your primary Jenkins installation. The `jenkins` one is for the root Jenkins object, and the other ones are for different global configuration elements.
 
 ```yaml
 jenkins:
@@ -97,10 +97,10 @@ credentials:
                   privateKey: ${SSH_PRIVATE_KEY}
 ```
 
-In addition, we want to have a well documented syntax file, and tooling to assist in writing and testing,
-so end users have full guidance in using this tool set and do not have to search for examples on the Internet.
+Additionally, we want to have a well-documented syntax file and tooling to assist in writing and testing,
+so end users have full guidance in using this toolset and do not have to search for examples on the Internet.
 
-Also see the [presentation slides](https://docs.google.com/presentation/d/1VsvDuffinmxOjg0a7irhgJSRWpCzLg_Yskf7Fw7FpBg/edit?usp=sharing) from DevOps World - Jenkins World 2018 for overview.
+See the [presentation slides](https://docs.google.com/presentation/d/1VsvDuffinmxOjg0a7irhgJSRWpCzLg_Yskf7Fw7FpBg/edit?usp=sharing) from DevOps World - Jenkins World 2018 for an overview.
 
 ## Getting Started
 
@@ -132,7 +132,7 @@ If `CASC_JENKINS_CONFIG` points to a folder, the plugin will recursively travers
 
 Instead of setting the `CASC_JENKINS_CONFIG` environment variable, you can also define using
 the `casc.jenkins.config` Java property.  This is useful when installing Jenkins via a package
-management tool and can't set an environment variable outside of a package-managed file which could
+management tool and can't set an environment variable outside of a package-managed file, which could
 be overwritten by an update.  For RHEL/CentOS systems, you can append the following to the
 `JENKINS_JAVA_OPTIONS` entry in `/etc/sysconfig/jenkins`
  
@@ -142,7 +142,7 @@ If you do not set the `CASC_JENKINS_CONFIG` environment variable or the `casc.je
 property, the plugin will default to looking for a single config file in
 `$JENKINS_HOME/jenkins.yaml`.
 
-If everything was setup correctly, you should now be able to browse the Configuration as Code page with `Manage Jenkins` -> `Configuration as Code`.
+If set up correctly, you should be able to browse the Configuration as Code page `Manage Jenkins` -> `Configuration as Code`.
 
 ## Initial Configuration
 
@@ -164,7 +164,7 @@ See [demos](demos) folder with various samples.
 
 ### LDAP
 
-Replacing user interface based configuration for LDAP with the text based configuration.
+Replace user interface based configuration for LDAP with the text-based configuration.
 
 ![configuration form](images/sample_form.png)
 
@@ -184,7 +184,7 @@ jenkins:
 ### Yaml Aliases and Anchors
 
 Replace repeated elements with yaml anchors.
-Due note anchor keys must be prefixed with `x-` due to JCasC handling of unknown root elements.
+Anchor keys must be prefixed with `x-` due to JCasC handling unknown root elements.
 
 ```yaml
 x-jenkins-linux-node: &jenkins_linux_node_anchor
@@ -237,7 +237,7 @@ jenkins:
 
 ## Installing plugins
 
-We don't support installing plugins with JCasC you need to use something else for this,
+We don't support installing plugins with JCasC, so you need to use something else for this,
 
 Dockers users can use:\
 [https://github.com/jenkinsci/docker/#preinstalling-plugins](https://github.com/jenkinsci/docker/#preinstalling-plugins)
@@ -247,7 +247,7 @@ Kubernetes users:\
 
 ## Supported Plugins
 
-Most plugins should be supported out-of-the-box, or maybe require some minimal changes. See this [dashboard](https://issues.jenkins.io/secure/Dashboard.jspa?selectPageId=18341) for known compatibility issues.
+Most plugins should be supported out-of-the-box or maybe require some minimal changes. See this [dashboard](https://issues.jenkins.io/secure/Dashboard.jspa?selectPageId=18341) for known compatibility issues.
 
 ## Adding JCasC support to a plugin
 
@@ -256,10 +256,10 @@ Plugin developers wanting to support JCasC in their plugin should [check out our
 ## Configuration-as-Code extension plugins
 
 - [configuration-as-code-groovy-plugin](https://github.com/jenkinsci/configuration-as-code-groovy-plugin)\
-  Allows to specify groovy code that should run on during configuration.
+  Allows specifying groovy code that should run on during configuration.
 
 ## Jenkins Enhancement Proposal
 
-As configuration as code is demonstrated to be a highly requested topic in Jenkins community, we have published
-[JEP 201](https://github.com/jenkinsci/jep/tree/master/jep/201) as proposal to make this a standard component
+As configuration as code is demonstrated to be a highly requested topic in the Jenkins community, we have published
+[JEP 201](https://github.com/jenkinsci/jep/tree/master/jep/201) as a proposal to make this a standard component
 of the Jenkins project. The proposal was accepted. :tada:
