@@ -21,6 +21,8 @@ import static org.junit.Assert.assertEquals;
 
 public class PropertiesSecretSourceTest {
 
+    private static final String USERNAME_SECRET = "ken";
+
     @Rule
     public RuleChain chain = RuleChain.outerRule(new EnvironmentVariables()
         .set("SECRETS_FILE", getClass().getResource("secrets.properties").getFile()))
@@ -37,7 +39,7 @@ public class PropertiesSecretSourceTest {
         UsernamePasswordCredentials credentials = credentialList.get(0);
 
         // https://leahneukirchen.org/blog/archive/2019/10/ken-thompson-s-unix-password.html
-        assertEquals("ken", credentials.getUsername());
+        assertEquals(USERNAME_SECRET, credentials.getUsername());
         assertEquals("p/q2-q4!", credentials.getPassword().getPlainText());
     }
 
@@ -68,7 +70,7 @@ public class PropertiesSecretSourceTest {
 
             assertEquals(updatedTestUserSecret, credentials.getUsername());
         } finally {
-            secrets.setProperty(secretName, "ken");
+            secrets.setProperty(secretName, USERNAME_SECRET);
             secrets.store(fileWriter, "store to properties file");
         }
     }
