@@ -96,7 +96,7 @@ public class DataBoundConfiguratorTest {
         assertEquals(Util.toYamlString(map.get("bar")).trim(), "true");
         assertEquals(Util.toYamlString(map.get("qix")).trim(), "42");
         assertEquals(Util.toYamlString(map.get("zot")).trim(), "\"zot\"");
-        assertEquals(Util.toYamlString(map.get("dbl")).trim(), "12.34");
+        assertEquals(Util.toYamlString(map.get("dbl")).trim(), "\"12.34\"");
         assertFalse(map.containsKey("other"));
     }
 
