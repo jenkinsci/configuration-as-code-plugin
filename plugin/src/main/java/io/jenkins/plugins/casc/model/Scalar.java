@@ -47,7 +47,7 @@ public final class Scalar implements CNode, CharSequence {
         this.value = String.valueOf(instance);
         this.raw = true;
         if (instance instanceof Float || instance instanceof Double) {
-            this.format = Format.FLOATING;
+            this.format = Format.STRING;
             this.raw = false;
         } else {
             this.format = Format.NUMBER;
