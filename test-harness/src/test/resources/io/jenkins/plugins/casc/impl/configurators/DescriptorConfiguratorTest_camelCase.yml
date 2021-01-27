@@ -3,4 +3,4 @@ unclassified:
   fooBar:
     foo: "foo"
     bar: "bar"
-    baz: 1.0
+    baz: "1.0"
