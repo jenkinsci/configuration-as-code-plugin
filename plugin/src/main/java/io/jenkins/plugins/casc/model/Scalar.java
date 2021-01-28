@@ -45,11 +45,10 @@ public final class Scalar implements CNode, CharSequence {
 
     public Scalar(Number instance) {
         this.value = String.valueOf(instance);
-        this.raw = true;
         if (instance instanceof Float || instance instanceof Double) {
             this.format = Format.STRING;
-            this.raw = false;
         } else {
+            this.raw = true;
             this.format = Format.NUMBER;
         }
     }

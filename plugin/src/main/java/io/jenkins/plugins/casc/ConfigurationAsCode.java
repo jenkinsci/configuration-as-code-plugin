@@ -559,8 +559,6 @@ public class ConfigurationAsCode extends ManagementLink {
         switch (format) {
             case NUMBER:
                 return Tag.INT;
-            case FLOATING:
-                return Tag.FLOAT;
             case BOOLEAN:
                 return Tag.BOOL;
             case STRING:
