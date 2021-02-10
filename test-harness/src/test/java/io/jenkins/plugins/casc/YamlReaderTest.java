@@ -24,11 +24,6 @@ public class YamlReaderTest {
     @Rule
     public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 
-    @Test(expected = IOException.class)
-    public void unknownReader() throws IOException {
-        YamlUtils.reader(new YamlSource<>(new StringBuilder()));
-    }
-
     @Test
     public void folder() throws Exception {
         String p = Paths.get(getClass().getResource("./folder").toURI()).toFile().getAbsolutePath();
