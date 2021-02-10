@@ -15,7 +15,7 @@
     <maven.deploy.skip>true</maven.deploy.skip> <!-- no need to be deployed during release, this is a test-only module -->
     <jackson.version>2.11.3</jackson.version>
     <netty.version>4.1.52.Final</netty.version>
-    <jenkins.version>2.263.3</jenkins.version>
+    <jenkins.version>2.263.4</jenkins.version>
   </properties>
 
   <dependencies>
