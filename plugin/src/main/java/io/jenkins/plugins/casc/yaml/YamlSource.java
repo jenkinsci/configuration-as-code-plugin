@@ -12,7 +12,7 @@ public class YamlSource<T> {
 
     public final T source;
 
-    public YamlSource(T source) {
+    private YamlSource(T source) {
         this.source = source;
     }
 
