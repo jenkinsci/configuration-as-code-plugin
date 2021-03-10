@@ -4,6 +4,7 @@ import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.model.CNode;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
 
@@ -16,12 +17,12 @@ import static org.hamcrest.core.Is.is;
 
 public class ToolDefaultPropertiesExportIgnoreListTest {
 
-    @ClassRule
-    @ConfiguredWithCode("ToolDefaultPropertiesExportIgnoreList.yml")
-    public static JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+    @Rule
+    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 
     @Test
     @Issue("JENKINS-57122")
+    @ConfiguredWithCode("ToolDefaultPropertiesExportIgnoreList.yml")
     public void export_tool_configuration() throws Exception {
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         ConfigurationContext context = new ConfigurationContext(registry);
