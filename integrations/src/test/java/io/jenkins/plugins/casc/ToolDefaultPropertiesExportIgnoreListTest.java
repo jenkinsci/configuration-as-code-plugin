@@ -14,10 +14,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 
-public class ToolDefaultPropertiesExportBlacklistTest {
+public class ToolDefaultPropertiesExportIgnoreListTest {
 
     @ClassRule
-    @ConfiguredWithCode("ToolDefaultPropertiesExportBlacklist.yml")
+    @ConfiguredWithCode("ToolDefaultPropertiesExportIgnoreList.yml")
     public static JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 
     @Test
@@ -29,7 +29,7 @@ public class ToolDefaultPropertiesExportBlacklistTest {
 
         String exported = toYamlString(yourAttribute).replaceAll("git\\.exe", "git");
 
-        String expected = toStringFromYamlFile(this, "ToolDefaultPropertiesExportBlacklistExpected.yml");
+        String expected = toStringFromYamlFile(this, "ToolDefaultPropertiesExportIgnoreListExpected.yml");
 
         assertThat(exported, is(expected));
     }
