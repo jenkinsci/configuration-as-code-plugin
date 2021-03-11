@@ -6,6 +6,9 @@ jdk:
   installations:
   - home: "/jdk"
     name: "default"
+mavenGlobalConfig:
+  globalSettingsProvider: "standard"
+  settingsProvider: "standard"
 msTestInstallation:
   installations:
   - defaultArgs: "/category:SmokeTests"

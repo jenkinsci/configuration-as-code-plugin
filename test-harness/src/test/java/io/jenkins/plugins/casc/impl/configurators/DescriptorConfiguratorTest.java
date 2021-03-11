@@ -37,18 +37,30 @@ public class DescriptorConfiguratorTest {
         assertThat(descriptor.getBar(), equalTo("bar"));
     }
 
+    @Test
+    @ConfiguredWithCode("DescriptorConfiguratorTest_camelCase.yml")
+    public void configurator_shouldResolveFloatAndDoubleValues() {
+        FooBar descriptor = (FooBar) j.jenkins.getDescriptorOrDie(FooBar.class);
+        assertThat(descriptor.getBaz(), equalTo(1.0));
+        assertThat(descriptor.getFlt(), equalTo(1000f));
+    }
+
     @Extension
     public static class FooBar extends GlobalConfiguration {
         private String foo;
         private String bar;
+        private Double baz;
+        private Float flt;
 
         public FooBar() {
         }
 
         @DataBoundConstructor
-        public FooBar(String foo, String bar) {
+        public FooBar(String foo, String bar, Double baz, Float flt) {
             this.foo = foo;
             this.bar = bar;
+            this.baz = baz;
+            this.flt = flt;
         }
 
         @NonNull
@@ -70,6 +82,19 @@ public class DescriptorConfiguratorTest {
         public void setBar(String bar) {
             this.bar = bar;
         }
+
+        @NonNull
+        public Double getBaz() { return baz; }
+
+        @DataBoundSetter
+        public void setBaz(Double baz) { this.baz = baz; }
+
+        @NonNull
+        public Float getFlt() { return flt; }
+
+        @DataBoundSetter
+        public void setFlt(Float flt) { this.flt = flt; }
+
     }
 
 }

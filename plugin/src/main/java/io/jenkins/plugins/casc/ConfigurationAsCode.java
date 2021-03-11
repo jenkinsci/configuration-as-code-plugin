@@ -559,8 +559,6 @@ public class ConfigurationAsCode extends ManagementLink {
         switch (format) {
             case NUMBER:
                 return Tag.INT;
-            case FLOATING:
-                return Tag.FLOAT;
             case BOOLEAN:
                 return Tag.BOOL;
             case STRING:
@@ -618,7 +616,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
     @Restricted(NoExternalUse.class)
     public Map<Source, String> checkWith(YamlSource source) throws ConfiguratorException {
-        final List<YamlSource> sources = getStandardConfigSources();
+        List<YamlSource> sources = new ArrayList<>();
         sources.add(source);
         return checkWith(sources);
     }
@@ -734,8 +732,8 @@ public class ConfigurationAsCode extends ManagementLink {
         // Initialize secret sources
         SecretSource.all().forEach(SecretSource::init);
 
-        // Check input before actually applying changes,
-        // so we don't let master in a weird state after some ConfiguratorException has been thrown
+        // Check input before actually applying changes, so we don't let controller in a
+        //weird state after some ConfiguratorException has been thrown
         final Mapping clone = entries.clone();
         checkWith(clone, context);
 

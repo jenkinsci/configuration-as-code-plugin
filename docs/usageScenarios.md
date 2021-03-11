@@ -8,15 +8,15 @@ In the early stage of the project, we use the scenarios to detect the most impor
 
 ## Manage and version control Jenkins global configuration
 
-A small group of devops engineers are maintaining the company's Jenkins installations. There are a handful of Jenkins masters, and a few hundred agents.
+A small group of devops engineers are maintaining the company's Jenkins installations. There are a handful of Jenkins controllers, and a few hundred agents.
 In general the devops team has full access to all the relevant infrastructure and is responsible for the documentation, compliance, maintenance and continued operation.
 
 From their IT department they are supplied with base server or client installations for servers and clients, and they apply configuration management practices to maintain the infrastructure.
 
-For their Jenkins masters the only configuration not under version control is the Jenkins global configuration. The devops engineers maintain that, together with a set of trusted lead developers.
+For their Jenkins controllers the only configuration not under version control is the Jenkins global configuration. The devops engineers maintain that, together with a set of trusted lead developers.
 
 Their global configuration is most frequently changed related to (in order of most changed first): agent configuration, Jenkins plug-in updates, Jenkins global configuration changes.
-All their Jenkins masters have pieces in common (e.g. Artifactory plugin configuration or mail setup) and some instance specific configuration because not all masters are used for the same kind of software development, so plug-ins differ.
+All their Jenkins controllers have pieces in common (e.g. Artifactory plugin configuration or mail setup) and some instance specific configuration because not all masters are used for the same kind of software development, so plug-ins differ.
 
 In general the devops team agrees that the running instances serve as documentation of the configuration themselves - one can always look in the UI. And they can restore from backup.
 Their problems are always related to changes, where they update a plug-in or change a global configuration that gives unexpected side-effects and is rather hard to debug for the users or devops team members that do not know about it.
@@ -24,7 +24,7 @@ They try to remember to ping each other on their chat to inform about changes.
 
 The devops team would like more traceability around changes, by completely moving to manage the Jenkins global configuration as code and put it under version control. They will like to benefit also from having it as code to be able to spin up test environments and re-use common configuration across instances.
 
-**With Jenkins Configuration as Code plug-in** installed on their master, the devops team will describe all the configuration in the `jenkins.yml` and maintain it through a git repository. Whenever they want to change anything, they will edit the file in git and their production server will refresh the configuration or the list of installed plug-ins.
+**With Jenkins Configuration as Code plug-in** installed on their controllers, the devops team will describe all the configuration in the `jenkins.yml` and maintain it through a git repository. Whenever they want to change anything, they will edit the file in git and their production server will refresh the configuration or the list of installed plug-ins.
 
 From that point on they all have full traceability of all the changes made, and they are able to roll it back easily by reverting commits. They can review the changes simply by looking at the git diffs on commits.
 
@@ -42,19 +42,19 @@ _Migration step-by-step guide:_ For the exact steps, see this part of the migrat
 - [#32 where to draft a migration to Jenkins Configuration as Code guide](https://github.com/jenkinsci/configuration-as-code-plugin/issues/32)
 - [#65 helping users migrate by export existing configuration](https://github.com/jenkinsci/configuration-as-code-plugin/issues/65)
 
-## Jenkins master already in docker
+## Jenkins controller already in docker
 
-A small full stack developer team has their single Jenkins master running in a container and they orchestrate and deploy it using one of the many container orchestration tools.
-Their Jenkins global configuration is the only piece not under version control, so they depend on the current data in `JENKINS_HOME` to persist the Jenkins global configuration and be able to redeploy the Jenkins master with existing installed plug-ins. They do not care about their historic build data.
+A small full stack developer team has their single Jenkins controller running in a container and they orchestrate and deploy it using one of the many container orchestration tools.
+Their Jenkins global configuration is the only piece not under version control, so they depend on the current data in `JENKINS_HOME` to persist the Jenkins global configuration and be able to redeploy the Jenkins controller with existing installed plug-ins. They do not care about their historic build data.
 
-**With Jenkins Configuration as Code plug-in** they can get their missing configuration under version control as well and their installed plug-in combinations and for this little full stack developer team it means they can always just redeploy their Jenkins, should something be wrong or failing, and their container orchestration tool will keep their Jenkins master always running for them completely automatically.
+**With Jenkins Configuration as Code plug-in** they can get their missing configuration under version control as well and their installed plug-in combinations and for this little full stack developer team it means they can always just redeploy their Jenkins, should something be wrong or failing, and their container orchestration tool will keep their Jenkins controller always running for them completely automatically.
 
 **Migrating to use the Jenkins Configuration as Code plug-in** is easy if they can live with doing just few manual steps before it is all automated. 
-They need to install the Jenkins Configuration as Code plug-in on their current master, 
+They need to install the Jenkins Configuration as Code plug-in on their current controller, 
 then use the [export functionality](/docs/features/configExport.md) to create the `jenkins.yml` file for them, which they need to add to a git repository.
 Then the last thing they need to do is to update their deployment recipe to use the customized Jenkins where the Jenkins Configuration as Code plug-in comes pre-installed, and have the recipe pass the URI to the `jenkins.yml` file when starting Jenkins.
 
-After that they only do changes in the configuration file through git, and Jenkins Configuration as Code will refresh global configuration. Should their infrastructure fail their orchestration tool will recreate their master from scratch, but still with the same configuration and without depending on old data sets.
+After that they only do changes in the configuration file through git, and Jenkins Configuration as Code will refresh global configuration. Should their infrastructure fail their orchestration tool will recreate their controller from scratch, but still with the same configuration and without depending on old data sets.
 
 Notice a slight difference between `plugins.yml` as part of the Configuration as Code vs `plugins.txt` known from the Jenkins container setups. The latter one will need to contain all plugins and their dependencies and will usually be auto generated to support starting a Jenkins container with all the plug-ins one likes. The `plugin.yml` takes the approach of only mentioning the plugin and their version (or latest) the user really cares about, and Configuration as Code will resolve dependencies for the user.
 

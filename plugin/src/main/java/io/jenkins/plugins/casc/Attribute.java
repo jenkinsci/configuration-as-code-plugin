@@ -30,7 +30,6 @@ import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.export.Exported;
 
-import static io.jenkins.plugins.casc.Blacklist.isBlacklisted;
 import static io.jenkins.plugins.casc.ConfigurationAsCode.printThrowable;
 
 /**
@@ -114,7 +113,7 @@ public class Attribute<Owner, Type> {
     }
 
     boolean isIgnored() {
-        return isDeprecated() || isRestricted() || isBlacklisted(this);
+        return isDeprecated() || isRestricted() || IgnoreList.isIgnored(this);
     }
 
     public Class<? extends AccessRestriction>[] getRestrictions() {

@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>4.12</version>
+    <version>4.15</version>
     <relativePath />
   </parent>
   <groupId>io.jenkins.configuration-as-code</groupId>
@@ -19,7 +19,7 @@
   </modules>
 
   <properties>
-    <revision>1.46</revision>
+    <revision>1.48</revision>
     <changelist>-SNAPSHOT</changelist>
     <jenkins.version>2.249</jenkins.version>
     <java.level>8</java.level>
@@ -69,7 +69,7 @@
             <dependency>
               <groupId>com.puppycrawl.tools</groupId>
               <artifactId>checkstyle</artifactId>
-              <version>8.36.2</version>
+              <version>8.39</version>
             </dependency>
           </dependencies>
         </plugin>

@@ -80,6 +80,7 @@ public class DataBoundConfiguratorTest {
         Foo foo = new Foo("foo", true, 42);
         foo.setZot("zot");
         foo.setDbl(12.34);
+        foo.setFlt(1f); // whole numbers are exported as "<number>.0"
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         final Configurator c = registry.lookupOrFail(Foo.class);
         final ConfigurationContext context = new ConfigurationContext(registry);
@@ -92,11 +93,13 @@ public class DataBoundConfiguratorTest {
         assertEquals(map.get("qix").toString(), "42");
         assertEquals(map.get("zot").toString(), "zot");
         assertEquals(map.get("dbl").toString(), "12.34");
+        assertEquals(map.get("flt").toString(), "1.0");
         assertEquals(Util.toYamlString(map.get("foo")).trim(), "\"foo\"");
         assertEquals(Util.toYamlString(map.get("bar")).trim(), "true");
         assertEquals(Util.toYamlString(map.get("qix")).trim(), "42");
         assertEquals(Util.toYamlString(map.get("zot")).trim(), "\"zot\"");
-        assertEquals(Util.toYamlString(map.get("dbl")).trim(), "12.34");
+        assertEquals(Util.toYamlString(map.get("dbl")).trim(), "\"12.34\"");
+        assertEquals(Util.toYamlString(map.get("flt")).trim(), "\"1.0\"");
         assertFalse(map.containsKey("other"));
     }
 
@@ -285,6 +288,7 @@ public class DataBoundConfiguratorTest {
         String zot;
         String other;
         double dbl;
+        private float flt;
         boolean initialized;
 
         @DataBoundConstructor
@@ -340,6 +344,11 @@ public class DataBoundConfiguratorTest {
         public double getDbl() {
             return dbl;
         }
+
+        public float getFlt() { return flt; }
+
+        @DataBoundSetter
+        public void setFlt(float flt) { this.flt = flt; }
     }
 
     public static class Bar {

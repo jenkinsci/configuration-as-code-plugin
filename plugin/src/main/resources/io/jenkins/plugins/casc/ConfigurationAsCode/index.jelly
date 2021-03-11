@@ -11,7 +11,7 @@
 
     <j:choose>
       <j:when test="${empty it.sources}">
-        <p>${%Master has no configuration as code file set.}</p>
+        <p>${%Controller has no configuration as code file set.}</p>
       </j:when>
       <j:otherwise>
         ${%Configuration loaded from :}

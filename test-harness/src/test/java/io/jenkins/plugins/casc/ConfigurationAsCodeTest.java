@@ -10,6 +10,8 @@ import hudson.util.FormValidation;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.model.CNode;
+import io.jenkins.plugins.casc.model.Source;
+import io.jenkins.plugins.casc.yaml.YamlSource;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +21,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
@@ -169,6 +172,25 @@ public class ConfigurationAsCodeTest {
         String configUri = getClass().getResource("merge3.yml").toExternalForm();
 
         assertEquals(casc.doCheckNewSource("  " + configUri + "  ").kind, FormValidation.Kind.OK);
+    }
+
+    @Test
+    @Issue("Issue #653")
+    public void checkWith_should_pass_against_valid_input() throws Exception {
+        String rawConf = getClass().getResource("JenkinsConfigTest.yml").toExternalForm();
+        YamlSource input = YamlSource.of(rawConf);
+        Map<Source, String> actual = ConfigurationAsCode.get().checkWith(input);
+        assertThat(actual.size(), is(0));
+    }
+
+    @Test
+    @Issue("Issue #653")
+    @ConfiguredWithCode("aNonEmpty.yml")
+    public void checkWith_should_pass_against_input_which_has_same_entries_with_initial_config() throws Exception {
+        String rawConf = getClass().getResource("JenkinsConfigTest.yml").toExternalForm();
+        YamlSource input = YamlSource.of(rawConf);
+        Map<Source, String> actual = ConfigurationAsCode.get().checkWith(input);
+        assertThat(actual.size(), is(0));
     }
 
     @Test

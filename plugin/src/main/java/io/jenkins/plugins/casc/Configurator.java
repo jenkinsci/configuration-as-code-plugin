@@ -163,7 +163,8 @@ public interface Configurator<T> {
 
     /**
      * Run the same logic as {@link #configure(CNode, ConfigurationContext)} in dry-run mode.
-     * Used to verify configuration is fine before being actually applied to a live jenkins master.
+     * Used to verify configuration is fine before being actually applied to a
+     * live jenkins controller.
      * @param config
      * @param context
      * @throws ConfiguratorException

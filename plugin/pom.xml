@@ -14,7 +14,7 @@
   <packaging>hpi</packaging>
 
   <name>Configuration as Code Plugin</name>
-  <description>Manage Jenkins master configuration as code</description>
+  <description>Manage Jenkins configuration as code</description>
   <url>https://github.com/jenkinsci/configuration-as-code-plugin</url>
 
   <properties>
@@ -49,7 +49,7 @@
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
-      <version>20190722</version>
+      <version>20201115</version>
     </dependency>
     <dependency>
       <groupId>com.google.code.findbugs</groupId>

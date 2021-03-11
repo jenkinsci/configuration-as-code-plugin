@@ -15,6 +15,7 @@
     <maven.deploy.skip>true</maven.deploy.skip> <!-- no need to be deployed during release, this is a test-only module -->
     <jackson.version>2.11.3</jackson.version>
     <netty.version>4.1.52.Final</netty.version>
+    <jenkins.version>2.277.1</jenkins.version>
   </properties>
 
   <dependencies>
@@ -98,7 +99,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>active-directory</artifactId>
-      <version>2.16</version>
+      <version>2.23</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -118,7 +119,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>ldap</artifactId>
-      <version>1.16</version>
+      <version>2.4</version>
       <scope>test</scope>
     </dependency>
 
@@ -139,7 +140,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>docker-workflow</artifactId>
-      <version>1.24</version>
+      <version>1.25</version>
       <scope>test</scope>
     </dependency>
 
@@ -287,7 +288,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>simple-theme-plugin</artifactId>
-      <version>0.5</version>
+      <version>0.6</version>
       <scope>test</scope>
     </dependency>
 
@@ -353,7 +354,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>job-dsl</artifactId>
-      <version>1.74</version>
+      <version>1.77</version>
       <optional>true</optional>
       <exclusions>
         <exclusion>
@@ -381,7 +382,6 @@
     </dependency>
 
     <!-- required to satisfy upper bound dependencies -->
-
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>aws-credentials</artifactId>
@@ -439,7 +439,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>mercurial</artifactId>
-      <version>2.10</version>
+      <version>2.12</version>
     </dependency>
 
     <dependency>
@@ -664,7 +664,7 @@
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpmime</artifactId>
-        <version>4.5.10</version>
+        <version>4.5.13</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
@@ -709,7 +709,7 @@
       <dependency>
         <groupId>org.json</groupId>
         <artifactId>json</artifactId>
-        <version>20200518</version>
+        <version>20201115</version>
       </dependency>
       <dependency>
         <groupId>joda-time</groupId>
@@ -717,9 +717,14 @@
         <version>2.10.6</version>
       </dependency>
       <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-compress</artifactId>
+        <version>1.20</version>
+      </dependency>
+      <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.249.x</artifactId>
-        <version>17</version>
+        <artifactId>bom-2.263.x</artifactId>
+        <version>26</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>
