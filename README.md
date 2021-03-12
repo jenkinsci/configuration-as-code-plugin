@@ -38,7 +38,7 @@ The Configuration as Code plugin is an _**opinionated**_ way to configure Jenkin
 human-readable declarative configuration files. Writing such a file should be feasible without being a Jenkins
 expert, just translating into _code_ a configuration process one is used to executing in the web UI.
 
-The below configuration file includes root entries for various components of your primary Jenkins installation. The `jenkins` one is for the root Jenkins object, and the other ones are for different global configuration elements.
+The below configuration file includes root entries for various components of your primary Jenkins installation. The `jenkins` one is for the root Jenkins object, and the others were for different global configuration elements.
 
 ```yaml
 jenkins:
