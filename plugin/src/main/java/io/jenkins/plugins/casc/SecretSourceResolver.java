@@ -1,6 +1,5 @@
 package io.jenkins.plugins.casc;
 
-import com.google.common.collect.ImmutableMap;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -8,6 +7,9 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
 import java.util.Base64;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -36,16 +38,19 @@ public class SecretSourceResolver {
     private final StringSubstitutor substitutor;
 
     public SecretSourceResolver(ConfigurationContext configurationContext) {
+        // TODO update to use Map.of in JDK11+
+        Map<String,  org.apache.commons.text.lookup.StringLookup> map = new HashMap<>(8);
+        map.put("base64", Base64Lookup.INSTANCE);
+        map.put("fileBase64", FileBase64Lookup.INSTANCE);
+        map.put("readFileBase64", FileBase64Lookup.INSTANCE);
+        map.put("file", FileStringLookup.INSTANCE);
+        map.put("readFile", FileStringLookup.INSTANCE);
+        map.put("decodeBase64", DecodeBase64Lookup.INSTANCE);
+        map = Collections.unmodifiableMap(map);
+
         substitutor = new StringSubstitutor(
             StringLookupFactory.INSTANCE.interpolatorStringLookup(
-                ImmutableMap.<String, org.apache.commons.text.lookup.StringLookup> builder()
-                    .put("base64", Base64Lookup.INSTANCE)
-                    .put("fileBase64", FileBase64Lookup.INSTANCE)
-                    .put("readFileBase64", FileBase64Lookup.INSTANCE)
-                    .put("file", FileStringLookup.INSTANCE)
-                    .put("readFile", FileStringLookup.INSTANCE)
-                    .put("decodeBase64", DecodeBase64Lookup.INSTANCE)
-                    .build(),
+                map,
                 new ConfigurationContextStringLookup(configurationContext), false))
             .setEscapeChar(escapedWith)
             .setVariablePrefix(enclosedBy)
