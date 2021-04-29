@@ -1,6 +1,5 @@
 package io.jenkins.plugins.casc.impl.configurators;
 
-import com.google.common.base.CaseFormat;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Descriptor;
 import io.jenkins.plugins.casc.BaseConfigurator;
@@ -68,7 +67,13 @@ public class DescriptorConfigurator extends BaseConfigurator<Descriptor> impleme
                     /* TODO: extract Descriptor parameter type such that DescriptorImpl extends Descriptor<XX> returns XX.
                      * Then, if `baseClass == fooXX` we get natural name `foo`.
                      */
-                    return singletonList(CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, descriptor.getKlass().toJavaClass().getSimpleName()));
+                    return singletonList(fromPascalCaseToCamelCase(descriptor.getKlass().toJavaClass().getSimpleName()));
                 });
+    }
+
+    private static String fromPascalCaseToCamelCase(String s) {
+        StringBuilder sb = new StringBuilder(s);
+        sb.setCharAt(0, Character.toLowerCase(s.charAt(0)));
+        return sb.toString();
     }
 }

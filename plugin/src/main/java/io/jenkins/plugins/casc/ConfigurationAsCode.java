@@ -1,6 +1,5 @@
 package io.jenkins.plugins.casc;
 
-import com.google.common.annotations.VisibleForTesting;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
@@ -485,8 +484,7 @@ public class ConfigurationAsCode extends ManagementLink {
         }
     }
 
-    @VisibleForTesting
-    @Restricted(NoExternalUse.class)
+    @Restricted(NoExternalUse.class) // for testing only
     public static void serializeYamlNode(Node root, Writer writer) throws IOException {
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(BLOCK);
@@ -501,8 +499,7 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     @CheckForNull
-    @VisibleForTesting
-    @Restricted(NoExternalUse.class)
+    @Restricted(NoExternalUse.class) // for testing only
     public Node toYaml(CNode config) throws ConfiguratorException {
 
         if (config == null) return null;

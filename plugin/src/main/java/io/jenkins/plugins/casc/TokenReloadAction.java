@@ -1,6 +1,5 @@
 package io.jenkins.plugins.casc;
 
-import com.google.common.base.Strings;
 import hudson.Extension;
 import hudson.model.UnprotectedRootAction;
 import hudson.security.ACL;
@@ -43,7 +42,7 @@ public class TokenReloadAction implements UnprotectedRootAction {
     public void doIndex(StaplerRequest request, StaplerResponse response) throws IOException {
         String token = getReloadTokenProperty();
 
-        if (Strings.isNullOrEmpty(token)) {
+        if (token == null || token.isEmpty()) {
             response.sendError(404);
             LOGGER.warning("Configuration reload via token is not enabled");
         } else {
@@ -71,6 +70,7 @@ public class TokenReloadAction implements UnprotectedRootAction {
     }
 
     public static boolean tokenReloadEnabled() {
-        return !Strings.isNullOrEmpty(getReloadTokenProperty());
+        String token = getReloadTokenProperty();
+        return token != null && !token.isEmpty();
     }
 }
