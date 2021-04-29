@@ -163,7 +163,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                                 new Object[]{target, names[i], t == Secret.class || Attribute.calculateIfSecret(target, names[i]) ? "****" : value});
                     }
                 } else if (t.isPrimitive()) {
-                    args[i] = defaultPrimativeValue(t);
+                    args[i] = defaultPrimitiveValue(t);
                 }
             }
         }
@@ -299,7 +299,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                     }
                 }
                 if (args[i] == null && p.getType().isPrimitive()) {
-                    args[i] = defaultPrimativeValue(p.getType());
+                    args[i] = defaultPrimitiveValue(p.getType());
                 }
                 attributes[i] = a;
             }
@@ -337,7 +337,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
         return descriptor != null ? descriptor.getDisplayName() : getName();
     }
 
-    private Object defaultPrimativeValue(Class<?> cls) {
+    private Object defaultPrimitiveValue(Class<?> cls) {
         if (boolean.class == cls) {
             return Boolean.FALSE;
         }
