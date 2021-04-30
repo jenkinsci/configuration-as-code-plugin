@@ -47,11 +47,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>io.jenkins.plugins</groupId>
-      <artifactId>caffeine-api</artifactId>
-      <version>2.9.0-17.v79e9099a51e3</version>
-    </dependency>
-    <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
       <version>20201115</version>
