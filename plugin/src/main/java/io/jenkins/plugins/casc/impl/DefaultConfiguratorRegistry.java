@@ -1,8 +1,8 @@
 package io.jenkins.plugins.casc.impl;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.CacheLoader;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
@@ -26,7 +26,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
 import java.util.Collection;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import jenkins.model.Jenkins;
@@ -65,11 +64,11 @@ public class DefaultConfiguratorRegistry implements ConfiguratorRegistry {
     @Override
     @NonNull
     public Configurator lookupOrFail(Type type) throws ConfiguratorException {
-        try {
-            return cache.get(type);
-        } catch (ExecutionException e) {
-            throw (ConfiguratorException) e.getCause();
+        Configurator configurator = cache.get(type);
+        if (configurator == null) {
+            throw new ConfiguratorException("Cannot find configurator for type " + type);
         }
+        return configurator;
     }
 
     /**
@@ -80,21 +79,15 @@ public class DefaultConfiguratorRegistry implements ConfiguratorRegistry {
     @Override
     @CheckForNull
     public Configurator lookup(Type type) {
-        try {
-            return cache.get(type);
-        } catch (ExecutionException e) {
-            return null;
-        }
+        return cache.get(type);
     }
 
-    private LoadingCache<Type, Configurator> cache = CacheBuilder.newBuilder()
-            .expireAfterAccess(10, TimeUnit.SECONDS)
+    private LoadingCache<Type, Configurator> cache = Caffeine.newBuilder()
+            .expireAfterAccess(10L, TimeUnit.SECONDS)
             .build(new CacheLoader<Type, Configurator>() {
                 @Override
                 public Configurator load(@NonNull Type type) throws Exception {
-                    final Configurator configurator = internalLookup(type);
-                    if (configurator == null) throw new ConfiguratorException("Cannot find configurator for type " + type);
-                    return configurator;
+                    return internalLookup(type);
                 }
             });
 
@@ -123,7 +116,7 @@ public class DefaultConfiguratorRegistry implements ConfiguratorRegistry {
             if (!(actualType instanceof Class)) {
                 throw new IllegalStateException("Can't handle " + type);
             }
-            return lookup(actualType);
+            return internalLookup(actualType); // cache is not reëntrant
         }
 
         if (Configurable.class.isAssignableFrom(clazz)) {
