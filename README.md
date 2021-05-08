@@ -108,13 +108,13 @@ First, start a Jenkins instance with the [Configuration as Code](https://plugins
 
 - Those running Jenkins as a [Docker](https://github.com/jenkinsci/docker) container (and maybe also [pre-installing plugins](https://github.com/jenkinsci/docker#preinstalling-plugins)), do include [Configuration as Code](https://plugins.jenkins.io/configuration-as-code) plugin.
 
-Second, the plugin looks for the `CASC_JENKINS_CONFIG` environment variable. The variable can point to any of the following:
+Second, the plugin looks for the `CASC_JENKINS_CONFIG` environment variable. The variable points to a comma-separated list of any of the following:
 
 - Path to a folder containing a set of config files. For example, `/var/jenkins_home/casc_configs`.
 - A full path to a single file. For example, `/var/jenkins_home/casc_configs/jenkins.yaml`.
 - A URL pointing to a file served on the web. For example, `https://acme.org/jenkins.yaml`.
 
-If `CASC_JENKINS_CONFIG` points to a folder, the plugin will recursively traverse the folder to find file(s) with .yml,.yaml,.YAML,.YML suffix. It will exclude hidden files or files that contain a hidden folder in **any part** of the full path. It follows symbolic links for both files and directories.
+If an element of `CASC_JENKINS_CONFIG` points to a folder, the plugin will recursively traverse the folder to find file(s) with .yml,.yaml,.YAML,.YML suffix. It will exclude hidden files or files that contain a hidden folder in **any part** of the full path. It follows symbolic links for both files and directories.
 <details><summary>Exclusion examples</summary>
 
 `CASC_JENKINS_CONFIG=/jenkins/casc_configs`  
