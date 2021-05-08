@@ -182,16 +182,18 @@ public class ConfigurationAsCode extends ManagementLink {
         String newSource = request.getParameter("_.newSource");
         String normalizedSource = Util.fixEmptyAndTrim(newSource);
         List<String> candidateSources = new ArrayList<>();
-        for (String candidateSource : normalizedSource.split("\\s+")) {
-            if (candidateSource.isEmpty()) {
-                continue;
-            }
-            File file = new File(candidateSource);
-            if (file.exists() || ConfigurationAsCode.isSupportedURI(candidateSource)) {
-                candidateSources.add(candidateSource);
-            } else {
-                LOGGER.log(Level.WARNING, "Source {0} could not be applied", candidateSource);
-                // todo: show message in UI
+        if (normalizedSource != null) {
+            for (String candidateSource : normalizedSource.split("\\s+")) {
+                if (candidateSource.isEmpty()) {
+                    continue;
+                }
+                File file = new File(candidateSource);
+                if (file.exists() || ConfigurationAsCode.isSupportedURI(candidateSource)) {
+                    candidateSources.add(candidateSource);
+                } else {
+                    LOGGER.log(Level.WARNING, "Source {0} could not be applied", candidateSource);
+                    // todo: show message in UI
+                }
             }
         }
         if (!candidateSources.isEmpty()) {
