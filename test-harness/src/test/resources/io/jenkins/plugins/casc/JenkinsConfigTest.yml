@@ -1,3 +1,2 @@
 jenkins:
   systemMessage: "configuration as code - JenkinsConfigTest"
-  quietPeriod: 10

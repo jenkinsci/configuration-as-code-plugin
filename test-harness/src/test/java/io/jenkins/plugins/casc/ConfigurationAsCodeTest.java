@@ -175,6 +175,19 @@ public class ConfigurationAsCodeTest {
     }
 
     @Test
+    public void doCheckNewSource_should_support_multiple_sources() {
+        ConfigurationAsCode casc = ConfigurationAsCode.get();
+
+        String configUri =
+                String.format(
+                        " %s , %s ",
+                        getClass().getResource("JenkinsConfigTest.yml").toExternalForm(),
+                        getClass().getResource("folder/jenkins2.yml").toExternalForm());
+
+        assertEquals(casc.doCheckNewSource(configUri).kind, FormValidation.Kind.OK);
+    }
+
+    @Test
     @Issue("Issue #653")
     public void checkWith_should_pass_against_valid_input() throws Exception {
         String rawConf = getClass().getResource("JenkinsConfigTest.yml").toExternalForm();
@@ -206,6 +219,26 @@ public class ConfigurationAsCodeTest {
         j.assertGoodStatus(resultPage);
 
         assertEquals("Configured by Configuration as Code plugin", j.jenkins.getSystemMessage());
+    }
+
+    @Test
+    public void doReplace_should_support_multiple_sources() throws Exception {
+        HtmlPage page = j.createWebClient().goTo("configuration-as-code");
+        j.assertGoodStatus(page);
+
+        HtmlForm form = page.getFormByName("replace");
+        HtmlInput input = form.getInputByName("_.newSource");
+        String configUri =
+                String.format(
+                        " %s , %s ",
+                        getClass().getResource("JenkinsConfigTest.yml").toExternalForm(),
+                        getClass().getResource("folder/jenkins2.yml").toExternalForm());
+        input.setValueAttribute(configUri);
+        HtmlPage resultPage = j.submit(form);
+        j.assertGoodStatus(resultPage);
+
+        assertEquals("configuration as code - JenkinsConfigTest", j.jenkins.getSystemMessage());
+        assertEquals(10, j.jenkins.getQuietPeriod());
     }
 
     @Test
