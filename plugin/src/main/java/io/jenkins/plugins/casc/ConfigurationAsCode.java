@@ -51,6 +51,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -182,18 +183,13 @@ public class ConfigurationAsCode extends ManagementLink {
         String newSource = request.getParameter("_.newSource");
         String normalizedSource = Util.fixEmptyAndTrim(newSource);
         List<String> candidateSources = new ArrayList<>();
-        if (normalizedSource != null) {
-            for (String candidateSource : normalizedSource.split("\\s+")) {
-                if (candidateSource.isEmpty()) {
-                    continue;
-                }
-                File file = new File(candidateSource);
-                if (file.exists() || ConfigurationAsCode.isSupportedURI(candidateSource)) {
-                    candidateSources.add(candidateSource);
-                } else {
-                    LOGGER.log(Level.WARNING, "Source {0} could not be applied", candidateSource);
-                    // todo: show message in UI
-                }
+        for (String candidateSource : inputToCandidateSources(normalizedSource)) {
+            File file = new File(candidateSource);
+            if (file.exists() || ConfigurationAsCode.isSupportedURI(candidateSource)) {
+                candidateSources.add(candidateSource);
+            } else {
+                LOGGER.log(Level.WARNING, "Source {0} could not be applied", candidateSource);
+                // todo: show message in UI
             }
         }
         if (!candidateSources.isEmpty()) {
@@ -238,10 +234,7 @@ public class ConfigurationAsCode extends ManagementLink {
             return FormValidation.ok(); // empty, do nothing
         }
         List<String> candidateSources = new ArrayList<>();
-        for (String candidateSource : normalizedSource.split("\\s+")) {
-            if (candidateSource.isEmpty()) {
-                continue;
-            }
+        for (String candidateSource : inputToCandidateSources(normalizedSource)) {
             File file = new File(candidateSource);
             if (!file.exists() && !ConfigurationAsCode.isSupportedURI(candidateSource)) {
                 return FormValidation.error("Configuration cannot be applied. File or URL cannot be parsed or do not exist.");
@@ -349,18 +342,30 @@ public class ConfigurationAsCode extends ManagementLink {
 
         if (configParameter != null) {
             // Add external config parameter(s)
-            for (String candidateSource : configParameter.split("\\s+")) {
-                if (candidateSource.isEmpty()) {
-                    continue;
-                }
-                configParameters.add(candidateSource);
-            }
+            configParameters.addAll(inputToCandidateSources(configParameter));
         }
 
         if (configParameters.isEmpty()) {
             LOGGER.log(Level.FINE, "No configuration set nor default config file");
         }
         return configParameters;
+    }
+
+    private static List<String> inputToCandidateSources(String input) {
+        if (input == null) {
+            return Collections.emptyList();
+        }
+
+        Scanner scanner = new Scanner(input);
+        scanner.useDelimiter(",");
+        List<String> result = new ArrayList<>();
+        while (scanner.hasNext()) {
+            String candidateSource = scanner.next().trim();
+            if (!candidateSource.isEmpty()) {
+                result.add(candidateSource);
+            }
+        }
+        return Collections.unmodifiableList(result);
     }
 
     @Restricted(NoExternalUse.class)
