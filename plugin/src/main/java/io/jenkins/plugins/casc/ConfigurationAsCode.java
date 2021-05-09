@@ -51,6 +51,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -181,12 +182,20 @@ public class ConfigurationAsCode extends ManagementLink {
         }
         String newSource = request.getParameter("_.newSource");
         String normalizedSource = Util.fixEmptyAndTrim(newSource);
-        File file = new File(Util.fixNull(normalizedSource));
-        if (file.exists() || ConfigurationAsCode.isSupportedURI(normalizedSource)) {
-            List<String> candidatePaths = Collections.singletonList(normalizedSource);
-            List<YamlSource> candidates = getConfigFromSources(candidatePaths);
+        List<String> candidateSources = new ArrayList<>();
+        for (String candidateSource : inputToCandidateSources(normalizedSource)) {
+            File file = new File(candidateSource);
+            if (file.exists() || ConfigurationAsCode.isSupportedURI(candidateSource)) {
+                candidateSources.add(candidateSource);
+            } else {
+                LOGGER.log(Level.WARNING, "Source {0} could not be applied", candidateSource);
+                // todo: show message in UI
+            }
+        }
+        if (!candidateSources.isEmpty()) {
+            List<YamlSource> candidates = getConfigFromSources(candidateSources);
             if (canApplyFrom(candidates)) {
-                sources = candidatePaths;
+                sources = candidateSources;
                 configureWith(getConfigFromSources(getSources()));
                 CasCGlobalConfig config = GlobalConfiguration.all().get(CasCGlobalConfig.class);
                 if (config != null) {
@@ -221,19 +230,20 @@ public class ConfigurationAsCode extends ManagementLink {
     public FormValidation doCheckNewSource(@QueryParameter String newSource) {
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
         String normalizedSource = Util.fixEmptyAndTrim(newSource);
-        File file = new File(Util.fixNull(normalizedSource));
         if (normalizedSource == null) {
             return FormValidation.ok(); // empty, do nothing
         }
-        if (!file.exists() && !ConfigurationAsCode.isSupportedURI(normalizedSource)) {
-            return FormValidation.error("Configuration cannot be applied. File or URL cannot be parsed or do not exist.");
+        List<String> candidateSources = new ArrayList<>();
+        for (String candidateSource : inputToCandidateSources(normalizedSource)) {
+            File file = new File(candidateSource);
+            if (!file.exists() && !ConfigurationAsCode.isSupportedURI(candidateSource)) {
+                return FormValidation.error("Configuration cannot be applied. File or URL cannot be parsed or do not exist.");
+            }
+            candidateSources.add(candidateSource);
         }
-
-        List<YamlSource> yamlSources = Collections.emptyList();
         try {
-            List<String> sources = Collections.singletonList(normalizedSource);
-            yamlSources = getConfigFromSources(sources);
-            final Map<Source, String> issues = checkWith(yamlSources);
+            List<YamlSource> candidates = getConfigFromSources(candidateSources);
+            final Map<Source, String> issues = checkWith(candidates);
             final JSONArray errors = collectProblems(issues, "error");
             if (!errors.isEmpty()) {
                 return FormValidation.error(errors.toString());
@@ -331,14 +341,31 @@ public class ConfigurationAsCode extends ManagementLink {
         }
 
         if (configParameter != null) {
-            // Add external config parameter
-            configParameters.add(configParameter);
+            // Add external config parameter(s)
+            configParameters.addAll(inputToCandidateSources(configParameter));
         }
 
         if (configParameters.isEmpty()) {
             LOGGER.log(Level.FINE, "No configuration set nor default config file");
         }
         return configParameters;
+    }
+
+    private static List<String> inputToCandidateSources(String input) {
+        if (input == null) {
+            return Collections.emptyList();
+        }
+
+        Scanner scanner = new Scanner(input);
+        scanner.useDelimiter(",");
+        List<String> result = new ArrayList<>();
+        while (scanner.hasNext()) {
+            String candidateSource = scanner.next().trim();
+            if (!candidateSource.isEmpty()) {
+                result.add(candidateSource);
+            }
+        }
+        return Collections.unmodifiableList(result);
     }
 
     @Restricted(NoExternalUse.class)
