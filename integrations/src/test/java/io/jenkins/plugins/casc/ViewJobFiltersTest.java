@@ -47,7 +47,6 @@ public class ViewJobFiltersTest {
 		assertTrue(buildStatusFilter.isIncludeMatched());
 		
 		final JobTypeFilter jobTypeFilter = new JobTypeFilter();
-		assertThat(jobTypeFilter.getJobType(), is("hudson.model.FreeStyleProject$DescriptorImpl@5d0507bc"));
 		assertTrue(buildStatusFilter.isIncludeMatched());
 		
 		final SecurityFilter securityFilter = new SecurityFilter();

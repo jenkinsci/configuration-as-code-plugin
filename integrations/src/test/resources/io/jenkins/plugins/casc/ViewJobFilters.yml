@@ -24,7 +24,6 @@ jenkins:
             neverBuilt: true
         - jobTypeFilter:
             includeExcludeTypeString: "includeMatched"
-            jobType: "hudson.model.FreeStyleProject$DescriptorImpl@5d0507bc"
         - securityFilter:
             build: false
             configure: true
