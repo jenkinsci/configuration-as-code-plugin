@@ -11,7 +11,6 @@ import java.util.List;
 
 import hudson.views.BuildDurationFilter;
 import hudson.views.BuildStatusFilter;
-import hudson.views.JobTypeFilter;
 import hudson.views.SecurityFilter;
 
 import org.jfrog.hudson.ArtifactoryBuilder;
@@ -44,9 +43,6 @@ public class ViewJobFiltersTest {
 		assertTrue(buildStatusFilter.isNeverBuilt());
 		assertFalse(buildStatusFilter.isBuilding());
 		assertTrue(buildStatusFilter.isInBuildQueue());
-		assertTrue(buildStatusFilter.isIncludeMatched());
-		
-		final JobTypeFilter jobTypeFilter = new JobTypeFilter();
 		assertTrue(buildStatusFilter.isIncludeMatched());
 		
 		final SecurityFilter securityFilter = new SecurityFilter();

@@ -29,8 +29,6 @@ jenkins:
             inBuildQueue: true
             includeExcludeTypeString: "includeMatched"
             neverBuilt: true
-        - jobTypeFilter:
-            includeExcludeTypeString: "includeMatched"
         - securityFilter:
             build: false
             configure: true
