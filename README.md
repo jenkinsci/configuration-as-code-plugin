@@ -245,7 +245,7 @@ Dockers users can use:\
 [https://github.com/jenkinsci/docker/#preinstalling-plugins](https://github.com/jenkinsci/docker/#preinstalling-plugins)
 
 Kubernetes users:\
-[https://github.com/helm/charts/tree/master/stable/jenkins](https://github.com/helm/charts/tree/master/stable/jenkins)
+[https://github.com/jenkinsci/helm-charts](https://github.com/jenkinsci/helm-charts)
 
 ## Supported Plugins
 
