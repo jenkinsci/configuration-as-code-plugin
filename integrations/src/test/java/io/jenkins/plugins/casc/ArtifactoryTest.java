@@ -5,7 +5,7 @@ import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import java.util.List;
 import jenkins.model.Jenkins;
 import org.jfrog.hudson.ArtifactoryBuilder;
-import org.jfrog.hudson.ArtifactoryServer;
+import org.jfrog.hudson.JFrogPlatformInstance;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
@@ -31,13 +31,13 @@ public class ArtifactoryTest {
         final ArtifactoryBuilder.DescriptorImpl descriptor = (ArtifactoryBuilder.DescriptorImpl) jenkins.getDescriptor(ArtifactoryBuilder.class);
         assertTrue(descriptor.getUseCredentialsPlugin());
 
-        final List<ArtifactoryServer> actifactoryServers = descriptor.getArtifactoryServers();
-        assertThat(actifactoryServers, hasSize(1));
-        assertThat(actifactoryServers.get(0).getName(), is(equalTo("artifactory")));
-        assertThat(actifactoryServers.get(0).getUrl(), is(equalTo("http://acme.com/artifactory")));
-        assertThat(actifactoryServers.get(0).getDeployerCredentialsConfig().getCredentialsId(), is(equalTo("artifactory")));
-        assertThat(actifactoryServers.get(0).getResolverCredentialsConfig().getUsername(), is(equalTo("artifactory_user")));
-        assertThat(actifactoryServers.get(0).getResolverCredentialsConfig().getPassword(), is(equalTo("password123")));
+        final List<JFrogPlatformInstance> jfrogInstances = descriptor.getJfrogInstances();
+        assertThat(jfrogInstances, hasSize(1));
+        assertThat(jfrogInstances.get(0).getId(), is(equalTo("artifactory")));
+        assertThat(jfrogInstances.get(0).getUrl(), is(equalTo("http://acme.com/artifactory")));
+        assertThat(jfrogInstances.get(0).getDeployerCredentialsConfig().getCredentialsId(), is(equalTo("artifactory")));
+        assertThat(jfrogInstances.get(0).getResolverCredentialsConfig().getUsername(), is(equalTo("artifactory_user")));
+        assertThat(jfrogInstances.get(0).getResolverCredentialsConfig().getPassword().getPlainText(), is(equalTo("password123")));
 
     }
 }

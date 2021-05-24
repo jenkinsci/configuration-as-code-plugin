@@ -1,10 +1,10 @@
 jenkins:
   artifactorybuilder:
     useCredentialsPlugin: true
-    artifactoryServers:
+    jfrogInstances:
       - name: foo
-        serverId: artifactory
-        artifactoryUrl: http://acme.com/artifactory
+        instanceId: artifactory
+        url: http://acme.com/artifactory
         resolverCredentialsConfig:
           username: artifactory_user
           password: ${ARTIFACTORY_PASSWORD}
