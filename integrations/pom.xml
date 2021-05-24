@@ -16,6 +16,7 @@
     <jackson.version>2.11.3</jackson.version>
     <netty.version>4.1.52.Final</netty.version>
     <jenkins.version>2.289</jenkins.version>
+    <junixsocket.version>2.2.0</junixsocket.version>
   </properties>
 
   <dependencies>
@@ -537,6 +538,16 @@
             <artifactId>jersey-hk2</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>com.kohlschutter.junixsocket</groupId>
+        <artifactId>junixsocket-common</artifactId>
+        <version>${junixsocket.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.kohlschutter.junixsocket</groupId>
+        <artifactId>junixsocket-native-common</artifactId>
+        <version>${junixsocket.version}</version>
       </dependency>
       <!-- force upper bound dependencies -->
       <dependency>
