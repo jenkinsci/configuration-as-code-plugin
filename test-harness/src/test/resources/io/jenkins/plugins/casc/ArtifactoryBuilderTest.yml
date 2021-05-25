@@ -1,9 +1,8 @@
-jenkins:
+unclassified:
   artifactorybuilder:
     useCredentialsPlugin: true
     jfrogInstances:
-      - name: foo
-        instanceId: artifactory
+      - instanceId: artifactory
         url: http://acme.com/artifactory
         resolverCredentialsConfig:
           username: artifactory_user
