@@ -155,7 +155,7 @@
     <dependency>
       <groupId>org.jenkinsci.plugins</groupId>
       <artifactId>pipeline-model-extensions</artifactId>
-      <version>1.7.0</version>
+      <version>1.8.4</version>
       <scope>test</scope>
     </dependency>
 
@@ -706,7 +706,7 @@
       <dependency>
         <groupId>org.jenkins-ci.main</groupId>
         <artifactId>maven-plugin</artifactId>
-        <version>3.4</version>
+        <version>3.10</version>
       </dependency>
       <dependency>
         <groupId>org.jenkins-ci.modules</groupId>
@@ -727,7 +727,7 @@
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <version>2.10.6</version>
+        <version>2.10.10</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
