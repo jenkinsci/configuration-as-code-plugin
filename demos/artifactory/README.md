@@ -18,6 +18,24 @@ unclassified:
           password: "${ARTIFACTORY_PASSWORD}"
 ```
 
+As of approximately version 3.11.0, there has been introduced some changes
+
+```yaml
+unclassified:
+  artifactorybuilder:
+    useCredentialsPlugin: true
+    jfrogInstances:
+      - instanceId: artifactory
+        platformUrl: "http://acme.com"
+        artifactoryUrl: http://acme.com/artifactory
+        deployerCredentialsConfig:
+          credentialsId: "artifactory"
+        resolverCredentialsConfig:
+          username: artifactory_user
+          password: "${ARTIFACTORY_PASSWORD}"
+```
+
+
 ## implementation note
 
 Currently setting credentials causes ERROR & `Enable Push to Bintray` is not supported (always enabled).
