@@ -121,7 +121,7 @@
     <dependency>
       <groupId>io.jenkins.docker</groupId>
       <artifactId>docker-plugin</artifactId>
-      <version>1.1.2</version>
+      <version>1.2.2</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -149,7 +149,7 @@
     <dependency>
       <groupId>org.csanchez.jenkins.plugins</groupId>
       <artifactId>kubernetes</artifactId>
-      <version>1.6.4</version>
+      <version>1.29.7</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -656,7 +656,7 @@
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpcore</artifactId>
-        <version>4.4.13</version>
+        <version>4.4.14</version>
       </dependency>
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
@@ -717,7 +717,7 @@
       <dependency>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>github-api</artifactId>
-        <version>1.116</version>
+        <version>1.222</version>
       </dependency>
       <dependency>
         <groupId>org.json</groupId>
