@@ -17,6 +17,7 @@ jenkins:
         - "Overall/Read:anonymous"
         - "Overall/Administer:authenticated"
 ```
+Permissions must be defined **per line**, meaning each line must grant permission to only a single role, and only a single user or group of users.
 
 ## sample-configuration (project-based matrix)
 
