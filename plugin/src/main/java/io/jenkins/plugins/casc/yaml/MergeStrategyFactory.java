@@ -16,21 +16,12 @@ public class MergeStrategyFactory {
     }
 
     /**
-     * Get strategy name from environment variables
+     * Get strategy from name
+     * @param strategyName is the name of strategy
      * @return MergeStrategy
      */
-    public static MergeStrategy getMergeStrategy() {
-        String strategyName = getDefaultStrategy();
-
+    public static MergeStrategy getMergeStrategyOrDefault(String strategyName) {
         return MergeStrategyFactory.getMergeStrategy(
             StringUtils.isEmpty(strategyName) ? MergeStrategy.DEFAULT_STRATEGY : strategyName);
-    }
-
-    private static String getDefaultStrategy() {
-        String strategyEnv = System.getenv("CASC_MERGE_STRATEGY");
-        if (StringUtils.isEmpty(strategyEnv)) {
-            strategyEnv = System.getProperty("casc.merge.strategy", MergeStrategy.DEFAULT_STRATEGY);
-        }
-        return strategyEnv;
     }
 }

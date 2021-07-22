@@ -6,7 +6,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class MergeStrategyTest {
@@ -21,7 +21,7 @@ public class MergeStrategyTest {
 
         assertTrue("should have at least one strategy",
             strategyExtensionList.size() > 0);
-        assertEquals("default merge strategy's name should be default",
-            MergeStrategy.DEFAULT_STRATEGY, MergeStrategyFactory.getMergeStrategy().getName());
+        assertNotNull("default merge strategy should be null",
+            MergeStrategyFactory.getMergeStrategyOrDefault(null));
     }
 }

@@ -32,9 +32,10 @@ public final class YamlUtils {
 
     public static final Logger LOGGER = Logger.getLogger(ConfigurationAsCode.class.getName());
 
-    public static Node merge(List<YamlSource> sources, ConfigurationContext context,
-        MergeStrategy mergeStrategy) throws ConfiguratorException {
+    public static Node merge(List<YamlSource> sources, ConfigurationContext context) throws ConfiguratorException {
         Node root = null;
+        MergeStrategy mergeStrategy = MergeStrategyFactory
+            .getMergeStrategyOrDefault(context.getMergeStrategy());
         for (YamlSource<?> source : sources) {
             try (Reader reader = reader(source)) {
                 final Node node = read(source, reader, context);
@@ -94,17 +95,11 @@ public final class YamlUtils {
     /**
      * Load configuration-as-code model from a set of Yaml sources, merging documents
      */
-    public static Mapping loadFrom(List<YamlSource> sources,
-        ConfigurationContext context) throws ConfiguratorException {
-        return loadFrom(sources, context, null);
-    }
-
-    public static Mapping loadFrom(List<YamlSource> sources, ConfigurationContext context,
-        MergeStrategy mergeStrategy) throws ConfiguratorException {
+    public static Mapping loadFrom(List<YamlSource> sources, ConfigurationContext context) throws ConfiguratorException {
         if (sources.isEmpty()) {
             return Mapping.EMPTY;
         }
-        final Node merged = merge(sources, context, mergeStrategy);
+        final Node merged = merge(sources, context);
         if (merged == null) {
             LOGGER.warning("configuration-as-code yaml source returned an empty document.");
             return Mapping.EMPTY;

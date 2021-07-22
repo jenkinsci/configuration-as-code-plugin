@@ -21,6 +21,7 @@ public class ConfigurationContext implements ConfiguratorRegistry {
     private Deprecation deprecation = Deprecation.reject;
     private Restriction restriction = Restriction.reject;
     private Unknown unknown = Unknown.reject;
+    private String mergeStrategy;
     private transient final int yamlMaxAliasesForCollections;
 
     /**
@@ -41,12 +42,17 @@ public class ConfigurationContext implements ConfiguratorRegistry {
 
     public ConfigurationContext(ConfiguratorRegistry registry) {
         this.registry = registry;
-        String prop = Util.fixEmptyAndTrim(System.getProperty(
-            CASC_YAML_MAX_ALIASES_PROPERTY,
-            System.getenv(CASC_YAML_MAX_ALIASES_ENV)
-        ));
+        String prop = getPropertyOrEnv(CASC_YAML_MAX_ALIASES_ENV);
         yamlMaxAliasesForCollections = NumberUtils.toInt(prop, 50);
         secretSourceResolver = new SecretSourceResolver(this);
+        mergeStrategy = getPropertyOrEnv("CASC_MERGE_STRATEGY");
+    }
+
+    private String getPropertyOrEnv(String key) {
+        return Util.fixEmptyAndTrim(System.getProperty(
+            CASC_YAML_MAX_ALIASES_PROPERTY,
+            System.getenv(key)
+        ));
     }
 
     public SecretSourceResolver getSecretSourceResolver() {
@@ -83,6 +89,14 @@ public class ConfigurationContext implements ConfiguratorRegistry {
 
     public void setUnknown(Unknown unknown) {
         this.unknown = unknown;
+    }
+
+    public String getMergeStrategy() {
+        return mergeStrategy;
+    }
+
+    public void setMergeStrategy(String mergeStrategy) {
+        this.mergeStrategy = mergeStrategy;
     }
 
     String getMode() {
