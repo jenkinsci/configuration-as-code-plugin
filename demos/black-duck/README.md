@@ -1,4 +1,4 @@
-# Configure Jira
+# Configure Black Duck
 
 Basic configuration of the [Synopsys(BlackDuck)](https://plugins.jenkins.io/blackduck-detect/)
 
