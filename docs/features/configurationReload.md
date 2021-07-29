@@ -6,7 +6,7 @@ You have the following option to trigger a configuration reload:
 - via http POST to `JENKINS_URL/configuration-as-code/reload`
   Note: this needs to include a valid CRUMB and authentication information e.g. username + token of a user with admin
   permissions. Since Jenkins 2.96 CRUMB is not needed for API tokens.
-- via [Jenkins CLI](https://www.jenkins.io/doc/book/managing/cli/): with the Jenkins CLI (either with SSH or JAR), the command `java -jar jenkins-cli.jar -s ${JENKINS_URL} reload-jcasc-configuration` triggers a configuration reload (which is faster and more efficient than a `safe-restart` when the configuration was changed)
+- via [Jenkins CLI](https://www.jenkins.io/doc/book/managing/cli/): with the Jenkins CLI (either with SSH or JAR), the command `java -jar jenkins-cli.jar -s ${JENKINS_URL} reload-jcasc-configuration` triggers a configuration reload.
   This Jenkins CLI command is only present when the plugin `configuration-as-code` is installed, and reported in the help message:
   
 ```shell
