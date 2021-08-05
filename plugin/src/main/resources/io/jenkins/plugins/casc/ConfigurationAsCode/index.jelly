@@ -39,11 +39,11 @@
     </l:isAdmin>
     <h2>${%Actions}</h2>
 
-    <l:isAdmin>
+    <l:hasAdministerOrManage>
       <f:form method="post" action="reload" name="reload">
         <f:submit name="reload" value="${%Reload existing configuration}"/>
       </f:form>
-    </l:isAdmin>
+    </l:hasAdministerOrManage>
     <f:form method="post" action="export" name="export">
       <f:submit name="export" value="${%Download Configuration}"/>
     </f:form>
