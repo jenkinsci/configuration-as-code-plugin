@@ -165,8 +165,7 @@ public class ConfigurationAsCode extends ManagementLink {
     @RequirePOST
     @Restricted(NoExternalUse.class)
     public void doReload(StaplerRequest request, StaplerResponse response) throws Exception {
-        final Jenkins jenkins = Jenkins.get();
-        if (!jenkins.hasPermission(Jenkins.ADMINISTER) && !jenkins.hasPermission(Jenkins.MANAGE)) {
+        if (!Jenkins.get().hasPermission(Jenkins.MANAGE)) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
