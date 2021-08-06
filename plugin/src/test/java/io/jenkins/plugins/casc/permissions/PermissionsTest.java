@@ -15,24 +15,45 @@ import static io.jenkins.plugins.casc.permissions.Action.DOWNLOAD_CONFIGURATION;
 import static io.jenkins.plugins.casc.permissions.Action.RELOAD_EXISTING_CONFIGURATION;
 import static io.jenkins.plugins.casc.permissions.Action.VIEW_CONFIGURATION;
 import static java.lang.String.format;
+import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 
 public class PermissionsTest {
 
+    private static final String RELATIVE_PATH_MANAGE_PAGE = "manage";
+    private static final String RELATIVE_PATH_CASC_PAGE = "configuration-as-code";
+
     @Rule
     public JenkinsRule j = new JenkinsRule();
 
     @Test
-    public void checkPermissionsForSimpleUser() throws Exception {
-        final String USER = "user";
+    public void checkPermissionsForReader() throws Exception {
+        final String READER = "reader";
         j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
         j.jenkins.setAuthorizationStrategy(new MockAuthorizationStrategy()
-            .grant(Jenkins.READ).everywhere().to(USER)
-            .grant(Jenkins.SYSTEM_READ).everywhere().to(USER)
+            .grant(Jenkins.READ).everywhere().to(READER)
+        );
+
+        JenkinsRule.WebClient webClient = j.createWebClient()
+            .withThrowExceptionOnFailingStatusCode(false);
+
+        webClient.login(READER);
+        assertCannotAccessPage(webClient, RELATIVE_PATH_CASC_PAGE);
+        assertCannotAccessPage(webClient, RELATIVE_PATH_MANAGE_PAGE);
+    }
+
+    @Test
+    public void checkPermissionsForSystemReader() throws Exception {
+        final String SYSTEM_READER = "systemReader";
+        j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
+        j.jenkins.setAuthorizationStrategy(new MockAuthorizationStrategy()
+            .grant(Jenkins.READ).everywhere().to(SYSTEM_READER)
+            .grant(Jenkins.SYSTEM_READ).everywhere().to(SYSTEM_READER)
         );
 
         JenkinsRule.WebClient webClient = j.createWebClient()
@@ -40,7 +61,7 @@ public class PermissionsTest {
 
         assertUserPermissions(
             webClient,
-            USER,
+            SYSTEM_READER,
             ImmutableMap.<Action, Boolean>builder()
                 .put(VIEW_CONFIGURATION, true)
                 .put(DOWNLOAD_CONFIGURATION, true)
@@ -56,7 +77,6 @@ public class PermissionsTest {
         j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
         j.jenkins.setAuthorizationStrategy(new MockAuthorizationStrategy()
             .grant(Jenkins.READ).everywhere().to(MANAGER)
-            .grant(Jenkins.SYSTEM_READ).everywhere().to(MANAGER)
             .grant(Jenkins.MANAGE).everywhere().to(MANAGER)
         );
 
@@ -104,7 +124,7 @@ public class PermissionsTest {
         webClient.login(user);
         assertCascTileShows(webClient);
 
-        HtmlPage cascPage = assertCanAccessPage(webClient, "configuration-as-code");
+        HtmlPage cascPage = assertCanAccessPage(webClient, RELATIVE_PATH_CASC_PAGE);
         allowedActions.forEach(
             (action, isAllowed) -> assertActionAvailable(cascPage, action, isAllowed)
         );
@@ -117,8 +137,18 @@ public class PermissionsTest {
         return page;
     }
 
+    private void assertCannotAccessPage(WebClient webClient, String relativePath) throws Exception {
+        final HtmlPage page = webClient.goTo(relativePath);
+        final int statusCode = page.getWebResponse().getStatusCode();
+        assertThat(
+            format("Page %s should not be accessible", relativePath),
+            statusCode,
+            is(HTTP_FORBIDDEN)
+        );
+    }
+
     private void assertCascTileShows(WebClient webClient) throws Exception {
-        HtmlPage managePage = assertCanAccessPage(webClient, "manage");
+        HtmlPage managePage = assertCanAccessPage(webClient, RELATIVE_PATH_MANAGE_PAGE);
         final String pageContent = managePage.getWebResponse().getContentAsString();
         assertThat(
             "The user should have access to the CasC tile in management page",
