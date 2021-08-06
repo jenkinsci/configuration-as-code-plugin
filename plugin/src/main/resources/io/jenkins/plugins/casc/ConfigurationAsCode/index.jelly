@@ -1,6 +1,6 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:st="jelly:stapler">
-  <l:layout norefresh="true" type="one-column" title="${%Configuration as Code}" permission="${app.MANAGE_AND_SYSTEM_READ}">
+  <l:layout norefresh="true" type="one-column" title="${%Configuration as Code}" permissions="${app.MANAGE_AND_SYSTEM_READ}">
   <l:main-panel>
   <st:adjunct includes="io.jenkins.plugins.casc.assets.index"/>
 
