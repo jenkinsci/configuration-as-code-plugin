@@ -87,9 +87,6 @@ public class PermissionsTest {
             webClient,
             MANAGER,
             ImmutableMap.<Action, Boolean>builder()
-                .put(VIEW_CONFIGURATION, true)
-                .put(DOWNLOAD_CONFIGURATION, true)
-                .put(APPLY_NEW_CONFIGURATION, false)
                 .put(RELOAD_EXISTING_CONFIGURATION, true)
                 .build()
         );
