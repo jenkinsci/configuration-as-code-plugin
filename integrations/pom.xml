@@ -16,7 +16,7 @@
     <jackson.version>2.11.3</jackson.version>
     <netty.version>4.1.52.Final</netty.version>
     <jenkins.version>2.302</jenkins.version>
-    <junixsocket.version>2.2.0</junixsocket.version>
+    <junixsocket.version>2.4.0</junixsocket.version>
   </properties>
 
   <dependencies>
