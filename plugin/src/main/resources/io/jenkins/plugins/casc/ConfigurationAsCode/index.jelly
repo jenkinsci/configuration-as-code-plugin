@@ -44,22 +44,24 @@
         <f:submit name="reload" value="${%Reload existing configuration}"/>
       </f:form>
     </l:hasAdministerOrManage>
-    <f:form method="post" action="export" name="export">
-      <f:submit name="export" value="${%Download Configuration}"/>
-    </f:form>
-    <f:form method="post" action="viewExport" name="viewExport">
-      <f:submit name="viewExport" value="${%View Configuration}"/>
-    </f:form>
-    <div class="alert alert-warning clear-action-forms">
-      <img src="${rootURL}/images/16x16/warning.png"/>
-      ${%exportWarning}
-    </div>
+    <l:hasPermission permission="${app.SYSTEM_READ}">
+      <f:form method="post" action="export" name="export">
+        <f:submit name="export" value="${%Download Configuration}"/>
+      </f:form>
+      <f:form method="post" action="viewExport" name="viewExport">
+        <f:submit name="viewExport" value="${%View Configuration}"/>
+      </f:form>
+      <div class="alert alert-warning clear-action-forms">
+        <img src="${rootURL}/images/16x16/warning.png"/>
+        ${%exportWarning}
+      </div>
 
-    <h2>${%Reference}</h2>
-    <dt>
-      <dl><a href="reference">${%Documentation}</a></dl>
-      <dl><a href="schema">${%JSON schema}</a></dl>
-    </dt>
+      <h2>${%Reference}</h2>
+      <dt>
+        <dl><a href="reference">${%Documentation}</a></dl>
+        <dl><a href="schema">${%JSON schema}</a></dl>
+      </dt>
+    </l:hasPermission>
 
   </div>
   </div>
