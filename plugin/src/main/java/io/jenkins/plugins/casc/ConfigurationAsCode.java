@@ -151,7 +151,7 @@ public class ConfigurationAsCode extends ManagementLink {
     @NonNull
     @Override
     public Permission getRequiredPermission() {
-        return Jenkins.SYSTEM_READ;
+        return Jenkins.READ;
     }
 
     public Date getLastTimeLoaded() {
