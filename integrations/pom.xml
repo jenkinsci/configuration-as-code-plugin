@@ -384,7 +384,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>aws-credentials</artifactId>
-      <version>1.28</version>
+      <version>1.29</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -405,7 +405,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>ec2</artifactId>
-      <version>1.44</version>
+      <version>1.63</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>

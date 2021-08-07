@@ -16,7 +16,7 @@ x-ec2_anchor: &ec2_anchor
   monitoring: false
   numExecutors: 1
   stopOnTerminate: false
-  useDedicatedTenancy: false
+  tenancy: Default
   useEphemeralDevices: false
   zone: "us-east-1"
   ami: "ami-0c6bb742864ffa3f3"
@@ -39,7 +39,7 @@ jenkins:
         # but let's be explicit to avoid issues.
         useInstanceProfileForCredentials: true
         # Reminder: the following key has multiple lines
-        privateKey: "${EC2_PRIVATE_KEY}"
+        sshKeysCredentialsId: "ssh-key-credential-id"
         noDelayProvisioning: true
         region: "eu-central-1"
         templates:
