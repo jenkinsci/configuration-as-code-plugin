@@ -460,7 +460,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>azure-keyvault</artifactId>
-      <version>2.0</version>
+      <version>123.v1aba71c2d365</version>
     </dependency>
 
     <dependency>
@@ -678,6 +678,11 @@
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpasyncclient</artifactId>
         <version>4.1.4</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jetbrains</groupId>
+        <artifactId>annotations</artifactId>
+        <version>15.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
