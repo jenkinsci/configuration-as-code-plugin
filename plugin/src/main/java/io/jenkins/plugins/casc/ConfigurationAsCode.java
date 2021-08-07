@@ -151,7 +151,7 @@ public class ConfigurationAsCode extends ManagementLink {
     @NonNull
     @Override
     public Permission getRequiredPermission() {
-        return Jenkins.SYSTEM_READ;
+        return Jenkins.READ;
     }
 
     public Date getLastTimeLoaded() {
@@ -165,7 +165,7 @@ public class ConfigurationAsCode extends ManagementLink {
     @RequirePOST
     @Restricted(NoExternalUse.class)
     public void doReload(StaplerRequest request, StaplerResponse response) throws Exception {
-        if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
+        if (!Jenkins.get().hasPermission(Jenkins.MANAGE)) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
