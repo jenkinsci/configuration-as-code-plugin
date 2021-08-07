@@ -27,14 +27,14 @@ public class SonarQubeTest {
 
     @Test
     @ConfiguredWithReadme("sonarqube/README.md")
-    public void configure_sonar_globalconfig() throws Exception {
+    public void configure_sonar_globalconfig() {
 
         final SonarGlobalConfiguration configuration = GlobalConfiguration.all().get(SonarGlobalConfiguration.class);
         assertTrue(configuration.isBuildWrapperEnabled());
         final SonarInstallation installation = configuration.getInstallations()[0];
         assertEquals("TEST", installation.getName());
         assertEquals("http://url:9000", installation.getServerUrl());
-        assertEquals("token", installation.getServerAuthenticationToken());
+        assertEquals("token", installation.getCredentialsId());
         assertEquals("mojoVersion", installation.getMojoVersion());
         assertEquals("additionalAnalysisProperties", installation.getAdditionalAnalysisProperties());
         final TriggersConfig triggers = installation.getTriggers();
