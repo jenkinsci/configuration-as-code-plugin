@@ -335,7 +335,7 @@
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>aws-global-configuration</artifactId>
-      <version>1.4</version>
+      <version>1.6</version>
       <scope>test</scope>
     </dependency>
 
