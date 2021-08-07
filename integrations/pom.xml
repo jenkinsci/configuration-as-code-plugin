@@ -13,10 +13,11 @@
 
   <properties>
     <maven.deploy.skip>true</maven.deploy.skip> <!-- no need to be deployed during release, this is a test-only module -->
-    <jackson.version>2.11.3</jackson.version>
+    <jackson.version>2.12.4</jackson.version>
     <netty.version>4.1.52.Final</netty.version>
     <jenkins.version>2.302</jenkins.version>
     <junixsocket.version>2.4.0</junixsocket.version>
+    <declarative-pipeline.version>1.9.1</declarative-pipeline.version>
   </properties>
 
   <dependencies>
@@ -155,14 +156,14 @@
     <dependency>
       <groupId>org.jenkinsci.plugins</groupId>
       <artifactId>pipeline-model-extensions</artifactId>
-      <version>1.7.0</version>
+      <version>${declarative-pipeline.version}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.jenkinsci.plugins</groupId>
       <artifactId>pipeline-model-definition</artifactId>
-      <version>1.7.2</version>
+      <version>${declarative-pipeline.version}</version>
       <scope>test</scope>
     </dependency>
 
@@ -212,10 +213,6 @@
         <exclusion>
           <groupId>com.infradna.tool</groupId>
           <artifactId>bridge-method-annotation</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.jenkins-ci.plugins</groupId>
-          <artifactId>jackson2-api</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.jenkins-ci.plugins</groupId>
@@ -379,12 +376,11 @@
     <dependency>
       <groupId>org.antlr</groupId>
       <artifactId>antlr4-runtime</artifactId>
-      <version>4.8-1</version>
+      <version>4.9.2</version>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>jackson2-api</artifactId>
-      <version>${jackson.version}</version>
     </dependency>
     <dependency>
       <groupId>jaxen</groupId>
@@ -402,7 +398,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>slack</artifactId>
-      <version>2.34</version>
+      <version>2.48</version>
       <scope>test</scope>
     </dependency>
 
@@ -736,8 +732,8 @@
       </dependency>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.263.x</artifactId>
-        <version>20</version>
+        <artifactId>bom-2.302.x</artifactId>
+        <version>919.v3c802a29576e</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>
