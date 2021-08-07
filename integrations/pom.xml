@@ -750,7 +750,7 @@
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
         <artifactId>bom-2.302.x</artifactId>
-        <version>919.v3c802a29576e</version>
+        <version>${plugin-bom.version}</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>

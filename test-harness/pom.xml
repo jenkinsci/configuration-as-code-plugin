@@ -12,9 +12,20 @@
   <description>Functionality to make testing jcasc integration easier</description>
 
   <properties>
-    <jackson.version>2.11.3</jackson.version>
     <spotbugs.skip>true</spotbugs.skip>
   </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.jenkins.tools.bom</groupId>
+        <artifactId>bom-2.249.x</artifactId>
+        <version>${plugin-bom.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <dependency>
@@ -44,7 +55,6 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>jackson2-api</artifactId>
-      <version>${jackson.version}</version>
     </dependency>
     <dependency>
       <groupId>com.vladsch.flexmark</groupId>
