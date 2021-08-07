@@ -4,5 +4,5 @@ unclassified:
     installations:
       - additionalAnalysisProperties: sonar.organization=jenkinsci
         name: SonarQube
-        serverAuthenticationToken: 'sonarcloud-api-token'
+        credentialsId: token
         serverUrl: 'https://sonarcloud.io'
