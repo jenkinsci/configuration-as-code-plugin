@@ -29,3 +29,4 @@ reload-jcasc-configuration
   import io.jenkins.plugins.casc.ConfigurationAsCode;
   ConfigurationAsCode.get().configure()
   ```
+  Note that running the above code in a declarative pipeline (either directly or via shared libraries) will put this plugin in a bad state where the configuration cannot be reload at all until Jenkins is restarted.
