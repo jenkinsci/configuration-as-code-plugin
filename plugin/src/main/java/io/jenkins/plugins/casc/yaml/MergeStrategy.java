@@ -15,7 +15,7 @@ public interface MergeStrategy {
      * @param secondNode the second node of a node list
      * @param source is the source of node
      * @return a merged node object
-     * @throws ConfiguratorException if the process gets some errors
+     * @throws ConfiguratorException if the merge fails
      */
     void merge(Node firstNode, Node secondNode, String source) throws ConfiguratorException;
 
