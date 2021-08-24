@@ -18,6 +18,8 @@ public class ConfigurationContext implements ConfiguratorRegistry {
 
     public static final String CASC_YAML_MAX_ALIASES_ENV = "CASC_YAML_MAX_ALIASES";
     public static final String CASC_YAML_MAX_ALIASES_PROPERTY = "casc.yaml.max.aliases";
+    public static final String CASC_MERGE_STRATEGY_ENV = "CASC_MERGE_STRATEGY";
+    public static final String CASC_MERGE_STRATEGY_PROPERTY = "casc.merge.strategy";
     private Deprecation deprecation = Deprecation.reject;
     private Restriction restriction = Restriction.reject;
     private Unknown unknown = Unknown.reject;
@@ -42,16 +44,16 @@ public class ConfigurationContext implements ConfiguratorRegistry {
 
     public ConfigurationContext(ConfiguratorRegistry registry) {
         this.registry = registry;
-        String prop = getPropertyOrEnv(CASC_YAML_MAX_ALIASES_ENV);
+        String prop = getPropertyOrEnv(CASC_YAML_MAX_ALIASES_ENV, CASC_YAML_MAX_ALIASES_PROPERTY);
         yamlMaxAliasesForCollections = NumberUtils.toInt(prop, 50);
         secretSourceResolver = new SecretSourceResolver(this);
-        mergeStrategy = getPropertyOrEnv("CASC_MERGE_STRATEGY");
+        mergeStrategy = getPropertyOrEnv(CASC_MERGE_STRATEGY_ENV, CASC_MERGE_STRATEGY_PROPERTY);
     }
 
-    private String getPropertyOrEnv(String key) {
+    private String getPropertyOrEnv(String envKey, String proKey) {
         return Util.fixEmptyAndTrim(System.getProperty(
-            CASC_YAML_MAX_ALIASES_PROPERTY,
-            System.getenv(key)
+            proKey,
+            System.getenv(envKey)
         ));
     }
 
