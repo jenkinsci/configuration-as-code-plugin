@@ -40,7 +40,7 @@ public class IrreconcilableMergeStrategy implements MergeStrategy {
                         final Node key = tuple.getKeyNode();
                         final Node key2 = t2.getKeyNode();
                         if (key.getNodeId() == NodeId.scalar) {
-                            // We dont support merge for more complex cases (yet)
+                            // We don't support merge for more complex cases (yet)
                             if (((ScalarNode) key).getValue()
                                 .equals(((ScalarNode) key2).getValue())) {
                                 merge(tuple.getValueNode(), t2.getValueNode(), source);
@@ -48,7 +48,7 @@ public class IrreconcilableMergeStrategy implements MergeStrategy {
                             }
                         } else {
                             throw new ConfiguratorException(
-                                String.format("Found unmergeable configuration keys %s %s)", source,
+                                String.format("Found non-mergeable configuration keys %s %s)", source,
                                     node.getEndMark()));
                         }
                     }

@@ -1,6 +1,7 @@
 package io.jenkins.plugins.casc.yaml;
 
 import hudson.Extension;
+import io.jenkins.plugins.casc.ConfiguratorConflictException;
 import io.jenkins.plugins.casc.ConfiguratorException;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
@@ -45,7 +46,7 @@ public class OverrideMergeStrategy implements MergeStrategy {
                                 .equals(((ScalarNode) key2).getValue())) {
                                 try {
                                     merge(tuple.getValueNode(), t2.getValueNode(), source);
-                                } catch (ConfiguratorException e) {
+                                } catch (ConfiguratorConflictException e) {
                                     map.getValue().set(i, tuple);
                                 }
                                 map2.getValue().remove(i);
@@ -54,7 +55,7 @@ public class OverrideMergeStrategy implements MergeStrategy {
                             }
                         } else {
                             throw new ConfiguratorException(
-                                String.format("Found unmergeable configuration keys %s %s)", source,
+                                String.format("Found non-mergeable configuration keys %s %s)", source,
                                     node.getEndMark()));
                         }
                     }
@@ -63,7 +64,7 @@ public class OverrideMergeStrategy implements MergeStrategy {
                 map.getValue().addAll(map2.getValue());
                 return;
             default:
-                throw new ConfiguratorException(
+                throw new ConfiguratorConflictException(
                     String.format("Found conflicting configuration at %s %s", source,
                         node.getStartMark()));
         }

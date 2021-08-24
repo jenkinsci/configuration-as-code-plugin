@@ -21,7 +21,7 @@ public class MergeStrategyTest {
 
         assertTrue("should have at least one strategy",
             strategyExtensionList.size() > 0);
-        assertNotNull("default merge strategy should be null",
+        assertNotNull("default merge strategy should not be null",
             MergeStrategyFactory.getMergeStrategyOrDefault(null));
     }
 }

@@ -47,7 +47,7 @@ public class MergeStrategyAction implements UnprotectedRootAction {
 
         ExtensionList<MergeStrategy> mergeStrategyList = Jenkins.getInstance()
             .getExtensionList(MergeStrategy.class);
-        mergeStrategyList.forEach(array::add);
+        array.addAll(mergeStrategyList);
 
         return HttpResponses.okJSON(array);
     }
