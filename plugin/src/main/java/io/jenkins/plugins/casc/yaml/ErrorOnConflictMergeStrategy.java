@@ -11,7 +11,7 @@ import org.yaml.snakeyaml.nodes.ScalarNode;
 import org.yaml.snakeyaml.nodes.SequenceNode;
 
 @Extension
-public class IrreconcilableMergeStrategy implements MergeStrategy {
+public class ErrorOnConflictMergeStrategy implements MergeStrategy {
 
     @Override
     public void merge(Node root, Node node, String source) throws ConfiguratorException {

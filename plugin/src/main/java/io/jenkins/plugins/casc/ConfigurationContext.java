@@ -97,10 +97,6 @@ public class ConfigurationContext implements ConfiguratorRegistry {
         return mergeStrategy;
     }
 
-    public void setMergeStrategy(String mergeStrategy) {
-        this.mergeStrategy = mergeStrategy;
-    }
-
     String getMode() {
         return mode;
     }

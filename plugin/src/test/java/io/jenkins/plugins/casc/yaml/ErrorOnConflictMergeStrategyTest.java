@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 
-public class IrreconcilableMergeStrategyTest {
+public class ErrorOnConflictMergeStrategyTest {
 
     @Rule
     public JenkinsRule j = new JenkinsRule();

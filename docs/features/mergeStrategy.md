@@ -3,19 +3,18 @@
 It's possible to load multiple config files. CasC can load YAML files from a directory.
 And it's convenient to maintain if we split different parts of Jenkins into multiple files.
 
-## Support strategies
+## Supported strategies
 
-* [IrreconcilableMergeStrategy]((../../plugin/src/main/java/io/jenkins/plugins/casc/yaml/IrreconcilableMergeStrategy.java)) (default)
+* [IrreconcilableMergeStrategy](../../plugin/src/main/java/io/jenkins/plugins/casc/yaml/ErrorOnConflictMergeStrategy.java) (default)
     * The strategy name is `errorOnConflict`.
-    * Throw an exception if there's a conflict exist in multiple YAML files.
+    * Throws an exception if there's a conflict in multiple YAML files.
 * [OverrideMergeStrategy](../../plugin/src/main/java/io/jenkins/plugins/casc/yaml/OverrideMergeStrategy.java)
     * The strategy name is `override`
     * Override the config files according to the loading order.
     
 ## Use cases
 
-You can provide two YAML config files. They can be system and user config files. Then allow users to change the users' part.
-So, the users' config file can override the system one.
+You can provide two YAML config files. They can be system and user config files. Then allow users to change their file and override the system configuration.
 
 ## How to
 
