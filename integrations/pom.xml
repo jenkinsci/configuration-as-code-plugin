@@ -15,7 +15,7 @@
     <maven.deploy.skip>true</maven.deploy.skip> <!-- no need to be deployed during release, this is a test-only module -->
     <jackson.version>2.12.4</jackson.version>
     <netty.version>4.1.67.Final</netty.version>
-    <jenkins.version>2.302</jenkins.version>
+    <jenkins.version>2.303.1</jenkins.version>
     <junixsocket.version>2.4.0</junixsocket.version>
     <declarative-pipeline.version>1.9.1</declarative-pipeline.version>
     <kotlin-stdlib.version>1.5.21</kotlin-stdlib.version>
@@ -767,7 +767,7 @@
       </dependency>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.302.x</artifactId>
+        <artifactId>bom-2.303.x</artifactId>
         <version>${plugin-bom.version}</version>
         <scope>import</scope>
         <type>pom</type>

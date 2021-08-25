@@ -25,7 +25,7 @@
     <java.level>8</java.level>
     <tagNameFormat>configuration-as-code-@{project.version}</tagNameFormat>
     <useBeta>true</useBeta>
-    <plugin-bom.version>923.v08bdc07cd40f</plugin-bom.version>
+    <plugin-bom.version>937.v51fde92016ed</plugin-bom.version>
   </properties>
 
   <name>Configuration as Code Parent</name>
