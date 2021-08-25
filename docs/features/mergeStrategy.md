@@ -5,7 +5,7 @@ And it's convenient to maintain if we split different parts of Jenkins into mult
 
 ## Supported strategies
 
-* [IrreconcilableMergeStrategy](../../plugin/src/main/java/io/jenkins/plugins/casc/yaml/ErrorOnConflictMergeStrategy.java) (default)
+* [ErrorOnConflictMergeStrategy](../../plugin/src/main/java/io/jenkins/plugins/casc/yaml/ErrorOnConflictMergeStrategy.java) (default)
     * The strategy name is `errorOnConflict`.
     * Throws an exception if there's a conflict in multiple YAML files.
 * [OverrideMergeStrategy](../../plugin/src/main/java/io/jenkins/plugins/casc/yaml/OverrideMergeStrategy.java)
