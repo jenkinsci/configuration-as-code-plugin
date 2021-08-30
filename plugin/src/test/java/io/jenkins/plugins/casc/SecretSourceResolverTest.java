@@ -26,6 +26,7 @@ import org.jvnet.hudson.test.WithoutJenkins;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -254,6 +255,15 @@ public class SecretSourceResolverTest {
         String output = resolve("${readFile:" + input + "}");
         assertThat(output, equalTo(FILE.lookup(input)));
         assertThat(output, containsString("\"Our secret\": \"Hello World\""));
+    }
+
+    @Test
+    public void resolve_FileKey() throws Exception {
+        Path path = getPath("secret.key");
+        String input = Paths.get("").toUri().relativize(path.toUri()).getPath();
+        String output = resolve("${readFile:" + input + "}");
+        assertThat(output, equalTo(FILE.lookup(input)));
+        assertThat(output, startsWith("-----BEGIN RSA PRIVATE KEY-----"));
     }
 
     @Test
