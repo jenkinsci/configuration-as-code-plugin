@@ -23,7 +23,7 @@ public class YamlExportTest {
 
     @Test
     @Issue("SECURITY-1458")
-    public void shouldDiscoverSecretsBasedOnTheAttributeType() throws Exception {
+    public void shouldDiscoverSecretsBasedOnTheAttributeType() {
         DataBoundConfigurator c = new DataBoundConfigurator<>(AttributeTest.SecretRenamedFieldFithSecretConstructor.class);
         Set<Attribute> attributes = c.describe();
         assertThat(attributes.size(), equalTo(1));

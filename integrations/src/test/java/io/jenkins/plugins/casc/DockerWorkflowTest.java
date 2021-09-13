@@ -16,7 +16,7 @@ public class DockerWorkflowTest {
 
     @Test
     @ConfiguredWithReadme("docker-workflow/README.md")
-    public void configure_global_definition() throws Exception {
+    public void configure_global_definition() {
         GlobalConfig config = GlobalConfig.get();
 
         assertNotNull(config);

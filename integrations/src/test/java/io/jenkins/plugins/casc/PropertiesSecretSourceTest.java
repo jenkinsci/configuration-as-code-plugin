@@ -30,7 +30,7 @@ public class PropertiesSecretSourceTest {
 
     @Test
     @ConfiguredWithCode("PropertiesSecretSourceTest.yaml")
-    public void testReadingSecretsFromProperties() throws Exception {
+    public void testReadingSecretsFromProperties() {
         List<UsernamePasswordCredentials> credentialList = CredentialsProvider
             .lookupCredentials(UsernamePasswordCredentials.class,
                 Jenkins.getInstanceOrNull(), null, Collections.emptyList());

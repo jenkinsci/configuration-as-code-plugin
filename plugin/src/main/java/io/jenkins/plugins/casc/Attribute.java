@@ -257,7 +257,7 @@ public class Attribute<Owner, Type> {
                         seq.add(_describe(c, context, value, shouldBeMasked));
                     }
                 } else {
-                    LOGGER.log(Level.FINE, o.getClass().toString() + " is not iterable");
+                    LOGGER.log(Level.FINE, o.getClass() + " is not iterable");
                 }
                 return seq;
             }
@@ -292,7 +292,7 @@ public class Attribute<Owner, Type> {
             boolean shouldBeMasked = isSecret(instance);
             if (multiple) {
                 Sequence seq = new Sequence();
-                if (o.getClass().isArray()) o = Arrays.asList(o);
+                if (o.getClass().isArray()) o = Collections.singletonList(o);
                 if (o instanceof Iterable) {
                     for (Object value : (Iterable) o) {
                         seq.add(_describe(c, context, value, shouldBeMasked));
@@ -524,7 +524,7 @@ public class Attribute<Owner, Type> {
         return name.hashCode();
     }
 
-    public static final <T,V> Setter<T,V> noop() {
+    public static <T,V> Setter<T,V> noop() {
         return NOOP;
     }
 

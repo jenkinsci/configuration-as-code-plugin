@@ -27,7 +27,7 @@ public class KubernetesCloudTest {
 
     @Test
     @ConfiguredWithReadme("kubernetes/README.md")
-    public void configure_kubernetes_cloud() throws Exception {
+    public void configure_kubernetes_cloud() {
         final KubernetesCloud cloud = j.jenkins.clouds.get(KubernetesCloud.class);
         assertNotNull(cloud);
         assertEquals("advanced-k8s-config", cloud.name);

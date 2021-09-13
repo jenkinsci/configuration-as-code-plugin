@@ -235,7 +235,6 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
                 if (superclass instanceof ParameterizedType) {
                     final ParameterizedType psc = (ParameterizedType) superclass;
                     t = psc.getActualTypeArguments()[0];
-                    continue;
                 } else {
                     c = (Class) ((TypeVariable) t).getBounds()[0];
                 }

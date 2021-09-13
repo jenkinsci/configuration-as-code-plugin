@@ -5,6 +5,7 @@ import io.jenkins.plugins.casc.impl.attributes.DescribableAttribute;
 import io.jenkins.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -155,12 +156,12 @@ public class SchemaGeneration {
                     elements.add(attribute);
                 }
             })
-            .map(attribute -> attribute.getType())
-            .map(type -> context.lookup(type))
-            .filter(obj -> Objects.nonNull(obj))
+            .map(Attribute::getType)
+            .map(context::lookup)
+            .filter(Objects::nonNull)
             .map(c -> c.getConfigurators(context))
-            .flatMap(configurators -> configurators.stream())
-            .filter(e -> elements.add(e))
+            .flatMap(Collection::stream)
+            .filter(elements::add)
             .forEach(
                 configurator -> listElements(elements, ((Configurator) configurator).describe(),
                     context, false)
@@ -233,10 +234,8 @@ public class SchemaGeneration {
             if (lookup != null) {
                 lookup
                     .getAttributes()
-                    .forEach(attr -> {
-                        properties
-                            .put(attr.getName(), generateNonEnumAttributeObject(attr, baseConfigurator));
-                    });
+                    .forEach(attr -> properties
+                        .put(attr.getName(), generateNonEnumAttributeObject(attr, baseConfigurator)));
             }
 
             JSONObject attributeObject = new JSONObject()

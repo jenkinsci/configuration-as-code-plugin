@@ -26,7 +26,7 @@ public class ArtifactoryTest {
 
     @Test
     @ConfiguredWithReadme(value = "artifactory/README.md")
-    public void configure_artifactory() throws Exception {
+    public void configure_artifactory() {
         final Jenkins jenkins = Jenkins.get();
         final ArtifactoryBuilder.DescriptorImpl descriptor = (ArtifactoryBuilder.DescriptorImpl) jenkins.getDescriptor(ArtifactoryBuilder.class);
         assertTrue(descriptor.getUseCredentialsPlugin());

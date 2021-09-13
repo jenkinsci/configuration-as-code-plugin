@@ -2,7 +2,6 @@ package io.jenkins.plugins.casc.yaml;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -15,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 public class YamlSourceTest {
 
     @Test
-    public void shouldHaveInformativeToStringForUrlSource() throws IOException {
+    public void shouldHaveInformativeToStringForUrlSource() {
         //given
         String testUrl = "http://example.com/foo/bar";
         //and

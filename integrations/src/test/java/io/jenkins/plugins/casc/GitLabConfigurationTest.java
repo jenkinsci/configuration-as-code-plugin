@@ -30,7 +30,7 @@ public class GitLabConfigurationTest {
 
     @Test
     @ConfiguredWithReadme("gitlab/README.md")
-    public void configure_gitlab_api_token() throws Exception {
+    public void configure_gitlab_api_token() {
         SystemCredentialsProvider systemCreds = SystemCredentialsProvider.getInstance();
         List<DomainCredentials> domainCredentials = systemCreds.getDomainCredentials();
         assertEquals(1, domainCredentials.size());
@@ -44,7 +44,7 @@ public class GitLabConfigurationTest {
     }
     @Test
     @ConfiguredWithReadme("gitlab/README.md")
-    public void configure_gitlab_connection() throws Exception {
+    public void configure_gitlab_connection() {
         final Jenkins jenkins = Jenkins.get();
         final GitLabConnectionConfig gitLabConnections = jenkins.getDescriptorByType(GitLabConnectionConfig.class);
         assertEquals(1, gitLabConnections.getConnections().size());

@@ -22,7 +22,7 @@ public class GlobalMatrixAuthorizationTest {
 
     @Test
     @ConfiguredWithReadme("matrix-auth/README.md")
-    public void checkCorrectlyConfiguredPermissions() throws Exception {
+    public void checkCorrectlyConfiguredPermissions() {
         assertEquals("The configured instance must use the Global Matrix Authentication Strategy", GlobalMatrixAuthorizationStrategy.class, Jenkins.get().getAuthorizationStrategy().getClass());
         GlobalMatrixAuthorizationStrategy gms = (GlobalMatrixAuthorizationStrategy) Jenkins.get().getAuthorizationStrategy();
 

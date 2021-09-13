@@ -39,7 +39,7 @@ public class JenkinsDemoTest {
 
     @Test
     @ConfiguredWithCode("jenkins/jenkins.yaml")
-    public void configure_demo_yaml() throws Exception {
+    public void configure_demo_yaml() {
         final Jenkins jenkins = Jenkins.get();
         assertEquals("Jenkins configured automatically by Jenkins Configuration as Code plugin\n\n", jenkins.getSystemMessage());
         assertEquals(5, jenkins.getNumExecutors());

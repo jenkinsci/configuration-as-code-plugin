@@ -21,7 +21,7 @@ public class ProjectMatrixAuthorizationTest {
 
     @Test
     @ConfiguredWithCode("ProjectMatrixStrategy.yml")
-    public void checkCorrectlyConfiguredPermissions() throws Exception {
+    public void checkCorrectlyConfiguredPermissions() {
         assertEquals("The configured instance must use the Global Matrix Authentication Strategy", ProjectMatrixAuthorizationStrategy.class, Jenkins.get().getAuthorizationStrategy().getClass());
         ProjectMatrixAuthorizationStrategy gms = (ProjectMatrixAuthorizationStrategy) Jenkins.get().getAuthorizationStrategy();
 

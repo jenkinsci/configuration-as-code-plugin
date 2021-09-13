@@ -108,7 +108,7 @@ public class RoleStrategyTest {
     @Test
     @Issue("Issue #214")
     @ConfiguredWithCode("RoleStrategy2.yml")
-    public void shouldHandleNullItemsAndAgentsCorrectly() throws Exception {
+    public void shouldHandleNullItemsAndAgentsCorrectly() {
         AuthorizationStrategy s = j.jenkins.getAuthorizationStrategy();
         assertThat("Authorization Strategy has been read incorrectly",
             s, instanceOf(RoleBasedAuthorizationStrategy.class));

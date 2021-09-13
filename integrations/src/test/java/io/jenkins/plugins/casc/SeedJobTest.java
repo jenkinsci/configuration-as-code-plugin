@@ -35,7 +35,7 @@ public class SeedJobTest {
 
     @Test
     @ConfiguredWithCode("SeedJobTest.yml")
-    public void configure_seed_job() throws Exception {
+    public void configure_seed_job() {
         final Jenkins jenkins = Jenkins.get();
         assertNotNull(jenkins.getItem("testJob1"));
         assertNotNull(jenkins.getItem("testJob2"));
@@ -43,14 +43,14 @@ public class SeedJobTest {
 
     @Test
     @ConfiguredWithCode("SeedJobTest_withSecrets.yml")
-    public void configure_seed_job_with_secrets() throws Exception {
+    public void configure_seed_job_with_secrets() {
         final Jenkins jenkins = Jenkins.get();
         assertNotNull(jenkins.getItem("testJob2"));
     }
 
     @Test
     @ConfiguredWithCode("SeedJobTest_withEnvVars.yml")
-    public void configure_seed_job_with_env_vars() throws Exception {
+    public void configure_seed_job_with_env_vars() {
         final Jenkins jenkins = Jenkins.get();
         assertNotNull(jenkins.getItem("seedJobWithEnvVars"));
     }

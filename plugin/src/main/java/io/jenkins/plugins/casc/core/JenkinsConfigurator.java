@@ -83,7 +83,7 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
                 .setter( noop() ));
 
         attributes.add(new MultivaluedAttribute<Jenkins, LabelAtom>("labelAtoms", LabelAtom.class)
-                .getter(jenkins -> jenkins.getLabelAtoms())
+                .getter(Jenkins::getLabelAtoms)
                 .setter((jenkins, labelAtoms) -> {
                     for (LabelAtom labelAtom : labelAtoms) {
                         // Get or create a LabelAtom instance

@@ -28,7 +28,7 @@ public class MesosTest {
 
     @Test
     @ConfiguredWithReadme("mesos/README.md")
-    public void configure_mesos_cloud() throws Exception {
+    public void configure_mesos_cloud() {
         final MesosCloud cloud = Jenkins.get().clouds.get(MesosCloud.class);
         assertNotNull(cloud);
 

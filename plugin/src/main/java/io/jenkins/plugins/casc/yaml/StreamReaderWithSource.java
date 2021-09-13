@@ -1,6 +1,5 @@
 package io.jenkins.plugins.casc.yaml;
 
-import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.Field;
 import org.yaml.snakeyaml.reader.StreamReader;
@@ -11,7 +10,7 @@ import org.yaml.snakeyaml.reader.StreamReader;
  */
 class StreamReaderWithSource extends StreamReader {
 
-    public StreamReaderWithSource(YamlSource source, Reader reader) throws IOException {
+    public StreamReaderWithSource(YamlSource source, Reader reader) {
         super(reader);
         try {
             final Field f = StreamReader.class.getDeclaredField("name");

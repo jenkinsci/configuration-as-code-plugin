@@ -42,14 +42,14 @@ public class JenkinsConfiguratorTest {
 
     @Test
     @ConfiguredWithCode("Primitives.yml")
-    public void jenkins_primitive_attributes() throws Exception {
+    public void jenkins_primitive_attributes() {
         final Jenkins jenkins = Jenkins.get();
         assertEquals(6666, jenkins.getSlaveAgentPort());
     }
 
     @Test
     @ConfiguredWithCode("HeteroDescribable.yml")
-    public void jenkins_abstract_describable_attributes() throws Exception {
+    public void jenkins_abstract_describable_attributes() {
         final Jenkins jenkins = Jenkins.get();
         assertTrue(jenkins.getSecurityRealm() instanceof HudsonPrivateSecurityRealm);
         assertTrue(jenkins.getAuthorizationStrategy() instanceof FullControlOnceLoggedInAuthorizationStrategy);

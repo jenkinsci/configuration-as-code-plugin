@@ -26,7 +26,7 @@ public class Crowd2Test {
 
     @Test
     @ConfiguredWithReadme("crowd2/README.md")
-    public void configure_artifact_manager() throws Exception {
+    public void configure_artifact_manager() {
         SecurityRealm realm = Jenkins.get().getSecurityRealm();
         assertThat(realm, instanceOf(CrowdSecurityRealm.class));
         CrowdSecurityRealm securityRealm = (CrowdSecurityRealm) realm;
