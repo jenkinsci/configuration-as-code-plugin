@@ -21,7 +21,7 @@ public class EssentialsTest {
 
     @Test
     @ConfiguredWithCode("EssentialsTest.yml")
-    public void essentialsTest() throws Exception {
+    public void essentialsTest() {
         final Jenkins jenkins = Jenkins.get();
         assertEquals("Welcome to Jenkins Essentials!", jenkins.getSystemMessage());
 

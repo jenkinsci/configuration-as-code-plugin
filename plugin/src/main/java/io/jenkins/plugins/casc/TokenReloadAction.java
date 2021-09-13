@@ -1,12 +1,12 @@
 package io.jenkins.plugins.casc;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import hudson.Extension;
 import hudson.model.UnprotectedRootAction;
 import hudson.security.ACL;
 import hudson.security.ACLContext;
 import java.io.IOException;
 import java.util.logging.Logger;
-import javax.annotation.CheckForNull;
 import javax.servlet.http.HttpServletRequest;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;

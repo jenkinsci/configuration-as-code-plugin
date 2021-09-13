@@ -43,7 +43,7 @@ public class GitTest {
     @Test
     @Issue("JENKINS-57604")
     @ConfiguredWithCode("GitTest.yml")
-    public void checkAssemblaWebIsLoaded() throws Exception {
+    public void checkAssemblaWebIsLoaded() {
         final Jenkins jenkins = Jenkins.get();
         final GlobalLibraries libs =  jenkins.getExtensionList(GlobalConfiguration.class)
                 .get(GlobalLibraries.class);

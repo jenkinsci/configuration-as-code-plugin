@@ -26,6 +26,6 @@ reload-jcasc-configuration
 
 - via Groovy script
   ```groovy
-  import io.jenkins.plugins.casc.ConfigurationAsCode;
+  import io.jenkins.plugins.casc.ConfigurationAsCode
   ConfigurationAsCode.get().configure()
   ```

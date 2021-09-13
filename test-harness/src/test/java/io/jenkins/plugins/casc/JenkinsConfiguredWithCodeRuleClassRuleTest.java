@@ -15,7 +15,7 @@ public class JenkinsConfiguredWithCodeRuleClassRuleTest {
     public static JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 
     @Test
-    public void user_created() throws Exception {
+    public void user_created() {
         User admin = User.get("admin", false, Collections.emptyMap());
         assertNotNull(admin);
     }

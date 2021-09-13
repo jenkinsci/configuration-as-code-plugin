@@ -196,8 +196,7 @@ public interface Configurator<T> {
      * @return CNode describing the attributes.
      */
     @CheckForNull
-    default CNode describeStructure(T instance, ConfigurationContext context)
-        throws Exception {
+    default CNode describeStructure(T instance, ConfigurationContext context) {
         Mapping mapping = new Mapping();
         for (Attribute attribute : getAttributes()) {
             if (context.getMode().equals("JSONSchema")) {

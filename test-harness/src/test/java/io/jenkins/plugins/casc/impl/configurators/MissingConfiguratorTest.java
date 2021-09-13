@@ -20,7 +20,7 @@ public class MissingConfiguratorTest {
     @ConfiguredWithCode(value = "MissingConfiguratorTest.yml", expected = IllegalArgumentException.class,
             message = "No hudson.security.AuthorizationStrategy implementation found for globalMatrix")
     @Test
-    public void testThrowsSuggestion() throws Exception {
+    public void testThrowsSuggestion() {
         //No config check needed, should fail with IllegalArgumentException
         //We're purposely trying to configure a plugin for which there is no configurator
         //admin user should not be created due to IllegalArgumentException

@@ -17,7 +17,7 @@ public class UnsecuredAuthorizationStrategyConfiguratorTest {
 
     @Test
     @ConfiguredWithCode("UnsecuredAuthorizationStrategyConfiguratorTest.yml")
-    public void unsecured() throws Exception {
+    public void unsecured() {
         assertSame(AuthorizationStrategy.UNSECURED, j.jenkins.getAuthorizationStrategy());
     }
 }

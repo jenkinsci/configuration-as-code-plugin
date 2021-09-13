@@ -3,6 +3,7 @@ package io.jenkins.plugins.casc;
 import com.cloudbees.hudson.plugins.folder.Folder;
 import com.michelin.cio.hudson.plugins.rolestrategy.Role;
 import com.michelin.cio.hudson.plugins.rolestrategy.RoleBasedAuthorizationStrategy;
+import com.synopsys.arc.jenkins.plugins.rolestrategy.RoleType;
 import hudson.model.Computer;
 import hudson.model.FreeStyleProject;
 import hudson.model.Item;
@@ -58,7 +59,7 @@ public class RoleStrategyTest {
                 s, instanceOf(RoleBasedAuthorizationStrategy.class));
         RoleBasedAuthorizationStrategy rbas = (RoleBasedAuthorizationStrategy) s;
 
-        Map<Role, Set<String>> globalRoles = rbas.getGrantedRoles(RoleBasedAuthorizationStrategy.GLOBAL);
+        Map<Role, Set<String>> globalRoles = rbas.getGrantedRoles(RoleType.Global);
         assertThat(globalRoles.size(), equalTo(2));
 
         // Admin has configuration access
@@ -108,13 +109,13 @@ public class RoleStrategyTest {
     @Test
     @Issue("Issue #214")
     @ConfiguredWithCode("RoleStrategy2.yml")
-    public void shouldHandleNullItemsAndAgentsCorrectly() throws Exception {
+    public void shouldHandleNullItemsAndAgentsCorrectly() {
         AuthorizationStrategy s = j.jenkins.getAuthorizationStrategy();
         assertThat("Authorization Strategy has been read incorrectly",
             s, instanceOf(RoleBasedAuthorizationStrategy.class));
         RoleBasedAuthorizationStrategy rbas = (RoleBasedAuthorizationStrategy) s;
 
-        Map<Role, Set<String>> globalRoles = rbas.getGrantedRoles(RoleBasedAuthorizationStrategy.GLOBAL);
+        Map<Role, Set<String>> globalRoles = rbas.getGrantedRoles(RoleType.Global);
         assertThat(globalRoles.size(), equalTo(2));
     }
 }

@@ -24,7 +24,7 @@ public class JiraTest {
     @Test
     @ConfiguredWithReadme("jira/README.md")
     @Issue("JENKINS-52906")
-    public void configure_jira_project_globalconfig() throws Exception {
+    public void configure_jira_project_globalconfig() {
 
         List<JiraSite> sites = JiraGlobalConfiguration.get().getSites();
         // Was failing due to JENKINS-52906

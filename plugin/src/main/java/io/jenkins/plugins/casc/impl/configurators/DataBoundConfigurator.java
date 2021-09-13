@@ -186,7 +186,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
             }
             throw new ConfiguratorException(this,
                     "Failed to construct instance of " + target +
-                            ".\n Constructor: " + constructor.toString() +
+                            ".\n Constructor: " + constructor +
                             ".\n Arguments: " + argumentTypes +
                             ".\n Expected Parameters: " + String.join(", ",expectedParamList)
                     , ex);
@@ -342,25 +342,25 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
             return Boolean.FALSE;
         }
         if (byte.class == cls) {
-            return Byte.valueOf((byte)0);
+            return (byte) 0;
         }
         if (char.class == cls) {
-            return Character.valueOf('\0');
+            return '\0';
         }
         if (short.class == cls) {
-            return Short.valueOf((short)0);
+            return (short) 0;
         }
         if (int.class == cls) {
-            return Integer.valueOf(0);
+            return 0;
         }
         if (long.class == cls) {
-            return Long.valueOf(0L);
+            return 0L;
         }
         if (float.class == cls) {
-            return Float.valueOf(0F);
+            return 0F;
         }
         if (double.class == cls) {
-            return Double.valueOf(0D);
+            return 0D;
         }
         throw new AssertionError("Class is not a primative or missing primative coverage: " + cls.getName());
     }

@@ -28,7 +28,7 @@ public class SlackTest {
 
     @Test
     @ConfiguredWithReadme("slack/README.md")
-    public void configure_slack() throws Exception {
+    public void configure_slack() {
         // Already validated within the plugin itself, so let's run some simple validations
         // https://github.com/jenkinsci/slack-plugin/pull/582
         SlackNotifier.DescriptorImpl slackNotifier = ExtensionList.lookupSingleton(SlackNotifier.DescriptorImpl.class);

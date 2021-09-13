@@ -43,7 +43,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -536,7 +535,7 @@ public class ConfigurationAsCode extends ManagementLink {
                 final Mapping mapping = config.asMapping();
                 final List<NodeTuple> tuples = new ArrayList<>();
                 final List<Map.Entry<String, CNode>> entries = new ArrayList<>(mapping.entrySet());
-                entries.sort(Comparator.comparing(Map.Entry::getKey));
+                entries.sort(Map.Entry.comparingByKey());
                 for (Map.Entry<String, CNode> entry : entries) {
                     final Node valueNode = toYaml(entry.getValue());
                     if (valueNode == null) continue;
@@ -603,7 +602,7 @@ public class ConfigurationAsCode extends ManagementLink {
         for (String p : configParameters) {
             appendSources(configs, p);
         }
-        sources = Collections.unmodifiableList(configParameters.stream().collect(toList()));
+        sources = Collections.unmodifiableList(new ArrayList<>(configParameters));
         configureWith(configs);
         lastTimeLoaded = System.currentTimeMillis();
     }

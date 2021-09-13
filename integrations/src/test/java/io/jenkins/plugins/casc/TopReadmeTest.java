@@ -36,7 +36,7 @@ public class TopReadmeTest {
 
     @Test
     @ConfiguredWithReadme("README.md#0")
-    public void configure_demo_first_code_block() throws Exception {
+    public void configure_demo_first_code_block() {
         final Jenkins jenkins = Jenkins.get();
         assertEquals("Jenkins configured automatically by Jenkins Configuration as Code plugin\n\n", jenkins.getSystemMessage());
         final LDAPSecurityRealm securityRealm = (LDAPSecurityRealm) jenkins.getSecurityRealm();
@@ -63,7 +63,7 @@ public class TopReadmeTest {
 
     @Test
     @ConfiguredWithReadme("README.md#1")
-    public void configure_demo_second_code_block() throws Exception {
+    public void configure_demo_second_code_block() {
         final Jenkins jenkins = Jenkins.get();
         final LDAPSecurityRealm securityRealm = (LDAPSecurityRealm) jenkins.getSecurityRealm();
         assertEquals(1, securityRealm.getConfigurations().size());
@@ -71,7 +71,7 @@ public class TopReadmeTest {
 
     @Test
     @ConfiguredWithReadme("README.md#2")
-    public void configure_demo_third_code_block() throws Exception {
+    public void configure_demo_third_code_block() {
         final Jenkins jenkins = Jenkins.get();
         assertEquals(2, jenkins.getNodes().size());
         assertEquals("static-agent1", jenkins.getNode("static-agent1").getNodeName());
@@ -80,7 +80,7 @@ public class TopReadmeTest {
 
     @Test
     @ConfiguredWithReadme("README.md#3")
-    public void configure_demo_fourth_code_block() throws Exception {
+    public void configure_demo_fourth_code_block() {
         final Jenkins jenkins = Jenkins.get();
         assertEquals(2, jenkins.getNodes().size());
         assertEquals("static-agent1", jenkins.getNode("static-agent1").getNodeName());

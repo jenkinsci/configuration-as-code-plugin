@@ -115,7 +115,7 @@ public class JenkinsConfiguredWithReadmeRule extends JenkinsConfiguredRule {
     }
 
     private List<String> transformFencedCodeBlockFromMarkdownToString(InputStream markdownContent) throws IOException {
-        ArrayList<String> results = new ArrayList<String>();
+        ArrayList<String> results = new ArrayList<>();
         final MutableDataSet FORMAT_OPTIONS = new MutableDataSet();
         FORMAT_OPTIONS.set(Parser.EXTENSIONS, OPTIONS.get(Parser.EXTENSIONS));
         Reader targetReader = new InputStreamReader(markdownContent);

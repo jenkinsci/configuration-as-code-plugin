@@ -134,7 +134,7 @@ public class ConfigurationAsCodeTest {
 
     @Test
     @ConfiguredWithCode(value = {"merge1.yml", "merge3.yml"}, expected = ConfiguratorException.class)
-    public void test_loads_multi_files() throws Exception {
+    public void test_loads_multi_files() {
         ConfigurationAsCode casc = ConfigurationAsCode.get();
 
         List<String> sources = casc.getSources();
@@ -166,7 +166,7 @@ public class ConfigurationAsCodeTest {
     }
 
     @Test
-    public void doCheckNewSource_should_trim_input() throws Exception {
+    public void doCheckNewSource_should_trim_input() {
         ConfigurationAsCode casc = ConfigurationAsCode.get();
 
         String configUri = getClass().getResource("merge3.yml").toExternalForm();

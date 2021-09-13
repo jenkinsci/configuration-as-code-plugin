@@ -24,7 +24,7 @@ public class GithubOrganisationFolderTest {
     // @Test
     // Fails as Items do override submit() with manual data-binding implementation
     @ConfiguredWithCode("GithubOrganisationFolderTest.yml")
-    public void configure_github_organisation_folder_seed_job() throws Exception {
+    public void configure_github_organisation_folder_seed_job() {
         final TopLevelItem job = Jenkins.get().getItem("ndeloof");
         assertNotNull(job);
         assertTrue(job instanceof OrganizationFolder);

@@ -1,5 +1,6 @@
 package io.jenkins.plugins.casc;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -13,7 +14,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
-import javax.annotation.CheckForNull;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.commons.text.TextStringBuilder;

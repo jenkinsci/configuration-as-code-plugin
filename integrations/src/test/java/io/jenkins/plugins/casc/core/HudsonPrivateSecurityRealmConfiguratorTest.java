@@ -27,7 +27,7 @@ public class HudsonPrivateSecurityRealmConfiguratorTest {
 
     @Test
     @ConfiguredWithReadme("embedded-userdatabase/README.md#0")
-    public void configure_local_security_and_admin_user() throws Exception {
+    public void configure_local_security_and_admin_user() {
         final Jenkins jenkins = Jenkins.get();
         final HudsonPrivateSecurityRealm securityRealm = (HudsonPrivateSecurityRealm) jenkins.getSecurityRealm();
         assertFalse(securityRealm.allowsSignup());

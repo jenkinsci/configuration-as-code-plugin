@@ -148,7 +148,7 @@ public class JenkinsConfiguratorCloudSupportTest {
         }
 
         @Override
-        protected void _terminate(TaskListener taskListener) throws IOException, InterruptedException {
+        protected void _terminate(TaskListener taskListener) {
             // empty
         }
     }
