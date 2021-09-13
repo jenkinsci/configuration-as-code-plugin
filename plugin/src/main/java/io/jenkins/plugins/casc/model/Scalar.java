@@ -126,11 +126,13 @@ public final class Scalar implements CNode, CharSequence {
         return value;
     }
 
+    @NonNull
     @Override
     public IntStream chars() {
         return value.chars();
     }
 
+    @NonNull
     @Override
     public IntStream codePoints() {
         return value.codePoints();
@@ -146,6 +148,7 @@ public final class Scalar implements CNode, CharSequence {
         return value.charAt(index);
     }
 
+    @NonNull
     @Override
     public CharSequence subSequence(int start, int end) {
         return value.subSequence(start, end);

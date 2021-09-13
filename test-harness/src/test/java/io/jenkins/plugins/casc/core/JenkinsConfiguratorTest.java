@@ -1,5 +1,6 @@
 package io.jenkins.plugins.casc.core;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.EnvVars;
 import hudson.model.TaskListener;
 import hudson.model.labels.LabelAtom;
@@ -109,6 +110,7 @@ public class JenkinsConfiguratorTest {
         @TestExtension
         @Symbol("myProperty")
         public static class DescriptorImpl extends LabelAtomPropertyDescriptor {
+            @NonNull
             @Override
             public String getDisplayName() {
                 return "A simple value";
@@ -127,6 +129,7 @@ public class JenkinsConfiguratorTest {
 
         @TestExtension
         public static class DescriptorImpl extends LabelAtomPropertyDescriptor {
+            @NonNull
             @Override
             public String getDisplayName() {
                 return "Another simple value";
