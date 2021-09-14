@@ -1,55 +1,66 @@
 package io.jenkins.plugins.casc;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
-
-import java.util.List;
-
+import hudson.model.Descriptor;
+import hudson.model.ListView;
+import hudson.model.View;
+import hudson.util.DescribableList;
 import hudson.views.BuildDurationFilter;
 import hudson.views.BuildStatusFilter;
 import hudson.views.SecurityFilter;
-
-import org.jfrog.hudson.ArtifactoryBuilder;
-import org.jfrog.hudson.ArtifactoryServer;
+import hudson.views.ViewJobFilter;
+import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
+import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
+import java.util.Collection;
+import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
 
-import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
-import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
-import jenkins.model.Jenkins;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class ViewJobFiltersTest {
-	
-	@Rule
+
+    @Rule
     public JenkinsConfiguredWithReadmeRule j = new JenkinsConfiguredWithReadmeRule();
-	
-	@Test
+
+    @Test
     @ConfiguredWithReadme(value = "view-job-filters/README.md")
     public void configure_view_job_filters() throws Exception {
-		
-		final BuildDurationFilter buildDurationFilter = new BuilDurationFilter();
-		assertTrue(buildDurationFilter.isLessThan());
-		assertThat(buildDurationFilter.getBuildDurationMinutes, is(5));
-		assertThat(buildDurationFilter.getAmount(), is(60.0));
-		assertThat(buildDurationFilter.getAmountTypeString(), is("Days"));
-		assertThat(buildDurationFilter.getBuildCountTypeString(), is("Latest"));
-		assertTrue(buildDurationFilter.isIncludeMatched());	
-		
-		final BuildStatusFilter buildStatusFilter = new BuildStatusFilter();
-		assertTrue(buildStatusFilter.isNeverBuilt());
-		assertFalse(buildStatusFilter.isBuilding());
-		assertTrue(buildStatusFilter.isInBuildQueue());
-		assertTrue(buildStatusFilter.isIncludeMatched());
-		
-		final SecurityFilter securityFilter = new SecurityFilter();
-		assertThat(securityFilter.getPermissionCheckType(), is("MustMatchAll"));
-		assertTrue(securityFilter.isConfigure());
-		assertFalse(securityFilter.isBuild());
-		assertFalse(securityFilter.isWorkspace());
-		assertTrue(buildStatusFilter.isIncludeMatched());
+        BuildDurationFilter duration = null;
+        BuildStatusFilter status = null;
+        SecurityFilter security = null;
+
+        Jenkins jenkins = j.jenkins;
+        Collection<View> views = jenkins.getViews();
+        for (View view : views) {
+            ListView listView = (ListView) view;
+            DescribableList<ViewJobFilter, Descriptor<ViewJobFilter>> a = listView.getJobFilters();
+            duration = a.get(BuildDurationFilter.class);
+            status = a.get(BuildStatusFilter.class);
+            security = a.get(SecurityFilter.class);
+        }
+
+        final BuildDurationFilter buildDurationFilter = duration;
+        assertTrue(buildDurationFilter.isLessThan());
+        assertThat(buildDurationFilter.getBuildDurationMinutes(), is("5"));
+        assertThat(buildDurationFilter.getAmount(), is(60.0f));
+        assertThat(buildDurationFilter.getAmountTypeString(), is("Days"));
+        assertThat(buildDurationFilter.getBuildCountTypeString(), is("Latest"));
+        assertTrue(buildDurationFilter.isIncludeMatched());
+
+        final BuildStatusFilter buildStatusFilter = status;
+        assertTrue(buildStatusFilter.isNeverBuilt());
+        assertFalse(buildStatusFilter.isBuilding());
+        assertTrue(buildStatusFilter.isInBuildQueue());
+        assertTrue(buildStatusFilter.isIncludeMatched());
+
+        final SecurityFilter securityFilter = security;
+        assertThat(securityFilter.getPermissionCheckType(), is("MustMatchAll"));
+        assertTrue(securityFilter.isConfigure());
+        assertFalse(securityFilter.isBuild());
+        assertFalse(securityFilter.isWorkspace());
+        assertTrue(buildStatusFilter.isIncludeMatched());
     }
 }
