@@ -1,0 +1,8 @@
+jenkins:
+  globalNodeProperties:
+    - envVars:
+        env:
+          - key: VARIABLE2
+            value: bar
+  agentProtocols:
+    - "jnlp2"

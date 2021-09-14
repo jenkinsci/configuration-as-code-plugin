@@ -18,6 +18,7 @@
 - [Handling Secrets](./docs/features/secrets.adoc)
 - [Exporting configurations](./docs/features/configExport.md)
 - [Validating configurations](./docs/features/jsonSchema.md)
+- [Merge Strategy](./docs/features/mergeStrategy.md)
 - [Triggering Configuration Reload](./docs/features/configurationReload.md)
 - [Installing plugins](#installing-plugins)
 - [Supported Plugins](#supported-plugins)

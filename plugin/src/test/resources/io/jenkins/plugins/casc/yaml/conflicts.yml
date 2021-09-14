@@ -1,0 +1,9 @@
+jenkins:
+  systemMessage: overwrite
+  globalNodeProperties:
+    - envVars:
+        env:
+          - key: VARIABLE2
+            value: bar
+  agentProtocols:
+    - "jnlp2"
