@@ -25,7 +25,7 @@ public class DockerCloudTest {
 
     @Test
     @ConfiguredWithReadme("docker/README.md")
-    public void configure_docker_cloud() throws Exception {
+    public void configure_docker_cloud() {
         final DockerCloud docker = DockerCloud.getCloudByName("docker");
         assertNotNull(docker);
         assertNotNull(docker.getDockerApi());

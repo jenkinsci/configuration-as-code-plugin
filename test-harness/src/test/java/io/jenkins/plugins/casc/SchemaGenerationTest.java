@@ -24,7 +24,7 @@ public class SchemaGenerationTest {
     @Test
     public void invalidSchemaShouldNotSucceed() throws Exception {
         assertThat(validateSchema(convertYamlFileToJson(this, "invalidSchemaConfig.yml")),
-            contains("#/jenkins/numExecutors: expected type: Number, found: String"));
+            contains("#/jenkins/numExecutors: expected type: Integer, found: String"));
     }
 
     @Test

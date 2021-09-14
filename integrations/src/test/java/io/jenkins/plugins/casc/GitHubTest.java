@@ -23,7 +23,7 @@ public class GitHubTest {
 
     @Test
     @ConfiguredWithReadme("github/README.md")
-    public void configure_github() throws Exception {
+    public void configure_github() {
 
         final GitHubPluginConfig configuration = GlobalConfiguration.all().get(GitHubPluginConfig.class);
         assertThat(configuration.getConfigs(), hasSize(1));

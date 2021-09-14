@@ -8,6 +8,7 @@ import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.Configurator;
 import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.model.CNode;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.Set;
 
@@ -37,10 +38,10 @@ public class ConfigurableConfigurator<T extends Configurable> implements Configu
     @Override
     public T configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
         try {
-            final T instance = target.newInstance();
+            final T instance = target.getDeclaredConstructor().newInstance();
             instance.configure(config);
             return instance;
-        } catch (InstantiationException | IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             throw new ConfiguratorException("Cannot instantiate Configurable "+target+" with default constructor", e);
         }
     }
@@ -48,10 +49,10 @@ public class ConfigurableConfigurator<T extends Configurable> implements Configu
     @Override
     public T check(CNode config, ConfigurationContext context) throws ConfiguratorException {
         try {
-            final T instance = target.newInstance();
+            final T instance = target.getDeclaredConstructor().newInstance();
             instance.check(config);
             return instance;
-        } catch (InstantiationException | IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             throw new ConfiguratorException("Cannot instantiate Configurable "+target+" with default constructor", e);
         }
     }

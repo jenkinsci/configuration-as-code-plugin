@@ -26,7 +26,7 @@ public class ActiveDirectoryTest {
 
     @Test
     @ConfiguredWithReadme("active-directory/README.md")
-    public void configure_active_directory() throws Exception {
+    public void configure_active_directory() {
         final Jenkins jenkins = Jenkins.get();
         final ActiveDirectorySecurityRealm realm = (ActiveDirectorySecurityRealm) jenkins.getSecurityRealm();
         assertEquals(1, realm.domains.size());

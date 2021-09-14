@@ -21,7 +21,7 @@ public class BuildAgentsTest {
 
     @Test
     @ConfiguredWithReadme(value = "build_agents/README.md")
-    public void configure_build_agents() throws Exception {
+    public void configure_build_agents() {
         assertThat(j.getInstance().getComputers().length, is(3));
 
         Slave slave = (Slave)j.getInstance().getNode("utility-node");

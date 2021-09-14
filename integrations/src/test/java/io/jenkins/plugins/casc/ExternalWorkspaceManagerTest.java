@@ -21,7 +21,7 @@ public class ExternalWorkspaceManagerTest {
 
     @Test
     @ConfiguredWithReadme("external-workspace-manager/README.md")
-    public void configure_external_workspace_manager() throws Exception {
+    public void configure_external_workspace_manager() {
         // Already validated in the plugin itself:
         // https://github.com/jenkinsci/external-workspace-manager-plugin/pull/68
 

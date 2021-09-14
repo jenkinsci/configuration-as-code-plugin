@@ -24,7 +24,7 @@ public class DockerWorkflowSymbolTest {
 
     @Test
     @Issue("1260")
-    public void configure_global_definition() throws Exception {
+    public void configure_global_definition() {
         GlobalConfig config = GlobalConfig.get();
 
         assertNotNull(config);

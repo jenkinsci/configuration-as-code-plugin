@@ -21,7 +21,7 @@ public class WorkflowCpsGlobalLibTest {
 
     @Test
     @ConfiguredWithReadme("workflow-cps-global-lib/README.md")
-    public void configure_global_library() throws Exception {
+    public void configure_global_library() {
         assertEquals(1, GlobalLibraries.get().getLibraries().size());
         final LibraryConfiguration library = GlobalLibraries.get().getLibraries().get(0);
         assertEquals("awesome-lib", library.getName());

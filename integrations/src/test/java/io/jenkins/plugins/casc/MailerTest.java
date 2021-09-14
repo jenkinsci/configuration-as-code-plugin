@@ -19,7 +19,7 @@ public class MailerTest {
 
     @Test
     @ConfiguredWithReadme("mailer/README.md")
-    public void configure_mailer() throws Exception {
+    public void configure_mailer() {
         final Jenkins jenkins = Jenkins.get();
         final Mailer.DescriptorImpl descriptor = (Mailer.DescriptorImpl) jenkins.getDescriptor(Mailer.class);
         assertEquals("4441", descriptor.getSmtpPort());

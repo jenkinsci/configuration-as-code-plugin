@@ -21,7 +21,7 @@ public class KeycloakTest {
 
     @Test
     @ConfiguredWithReadme("keycloak/README.md")
-    public void configure_artifact_manager() throws Exception {
+    public void configure_artifact_manager() {
         SecurityRealm realm = j.jenkins.get().getSecurityRealm();
         assertThat(realm, instanceOf(KeycloakSecurityRealm.class));
         KeycloakSecurityRealm securityRealm = (KeycloakSecurityRealm)realm;

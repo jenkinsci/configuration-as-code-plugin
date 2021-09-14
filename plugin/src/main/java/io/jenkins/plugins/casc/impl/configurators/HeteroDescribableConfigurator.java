@@ -178,9 +178,9 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
         List<Descriptor<T>> descriptorsWithProperType = new ArrayList<>();
         Iterator<Descriptor> iterator = parentDescriptorClassList.iterator();
         while (iterator.hasNext()) {
-            Descriptor<?> d = iterator.next();
+            Descriptor<T> d = iterator.next();
             try {
-                descriptorsWithProperType.add((Descriptor<T>) d);
+                descriptorsWithProperType.add(d);
                 LOGGER.log(Level.FINEST, "getDescriptors() for {0}: Accepting {1} as a suitable descriptor",
                         new Object[] {target, d});
             } catch (ClassCastException ex) {

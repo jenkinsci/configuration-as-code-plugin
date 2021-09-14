@@ -38,7 +38,7 @@ public class LabelAtomConfigurator extends BaseConfigurator<LabelAtom> {
             new Attribute<LabelAtom, String>("name", String.class)
                 .getter(Label::getName),
             new MultivaluedAttribute<LabelAtom, LabelAtomProperty>("properties", LabelAtomProperty.class)
-            .getter(labelAtom -> labelAtom.getProperties())
+            .getter(LabelAtom::getProperties)
             .setter((labelAtom, properties) -> labelAtom.getProperties().addAll(properties))
         ));
     }

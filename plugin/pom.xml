@@ -45,16 +45,27 @@
     </developer>
   </developers>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.jenkins.tools.bom</groupId>
+        <artifactId>bom-2.249.x</artifactId>
+        <version>${plugin-bom.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>caffeine-api</artifactId>
-      <version>2.9.1-23.v51c4e2c879c8</version>
     </dependency>
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
-      <version>20201115</version>
+      <version>20210307</version>
     </dependency>
     <dependency>
       <groupId>com.google.code.findbugs</groupId>
@@ -64,13 +75,12 @@
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>snakeyaml-api</artifactId>
-      <version>1.26.4</version>
     </dependency>
 
     <dependency>
       <groupId>io.vavr</groupId>
       <artifactId>vavr</artifactId>
-      <version>0.10.3</version>
+      <version>0.10.4</version>
     </dependency>
 
     <dependency>

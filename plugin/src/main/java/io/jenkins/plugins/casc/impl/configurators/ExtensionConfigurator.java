@@ -42,7 +42,7 @@ public class ExtensionConfigurator<T> extends BaseConfigurator<T> {
     @CheckForNull
     @Override
     public CNode describe(T instance, ConfigurationContext context) throws Exception {
-        final T ref = target.newInstance();
+        final T ref = target.getDeclaredConstructor().newInstance();
         return compare(instance, ref, context);
     }
 

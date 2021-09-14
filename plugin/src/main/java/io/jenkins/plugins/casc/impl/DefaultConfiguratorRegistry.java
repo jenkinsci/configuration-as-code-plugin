@@ -1,6 +1,5 @@
 package io.jenkins.plugins.casc.impl;
 
-import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -84,12 +83,7 @@ public class DefaultConfiguratorRegistry implements ConfiguratorRegistry {
 
     private LoadingCache<Type, Configurator> cache = Caffeine.newBuilder()
             .expireAfterAccess(10L, TimeUnit.SECONDS)
-            .build(new CacheLoader<Type, Configurator>() {
-                @Override
-                public Configurator load(@NonNull Type type) throws Exception {
-                    return internalLookup(type);
-                }
-            });
+            .build(type -> internalLookup(type));
 
     private Configurator internalLookup(Type type) {
         Class clazz = Types.erasure(type);

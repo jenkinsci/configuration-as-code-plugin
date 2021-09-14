@@ -18,7 +18,7 @@ public class SecretSourceResolverBenchmark {
         private ConfigurationContext context = null;
 
         @Override
-        public void setup() throws Exception {
+        public void setup() {
             ConfiguratorRegistry registry = ConfiguratorRegistry.get();
             context = new ConfigurationContext(registry);
             environmentVariables.set("FOO", "HELLO");

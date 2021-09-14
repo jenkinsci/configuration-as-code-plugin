@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.logging.Level;
 import org.apache.commons.io.IOUtils;
@@ -134,7 +135,7 @@ public abstract class RoundTripAbstractTest {
 
     private String getResourceContent(String resourcePath) throws IOException {
         return IOUtils.toString(getClass().getResourceAsStream(resourcePath),
-                "UTF-8");
+            StandardCharsets.UTF_8);
     }
 
     private void writeToFile(String text, String path) throws FileNotFoundException {

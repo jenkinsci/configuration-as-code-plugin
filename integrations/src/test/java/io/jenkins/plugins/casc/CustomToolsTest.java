@@ -24,7 +24,7 @@ public class CustomToolsTest {
 
     @Test @Issue("#97") @Ignore
     @ConfiguredWithCode(value = "CustomToolsTest.yml")
-    public void configure_custom_tools() throws Exception {
+    public void configure_custom_tools() {
         DescriptorImpl descriptor = (DescriptorImpl) j.jenkins.getDescriptorOrDie(CustomTool.class);
         assertEquals(1, descriptor.getInstallations().length);
         final CustomTool customTool = descriptor.getInstallations()[0];

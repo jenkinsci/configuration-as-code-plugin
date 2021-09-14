@@ -22,7 +22,7 @@ public class ArtifactManagerS3Test {
 
     @Test
     @ConfiguredWithReadme(value = "artifact-manager-s3/README.md")
-    public void configure_artifact_manager() throws Exception {
+    public void configure_artifact_manager() {
         assertThat(CredentialsAwsGlobalConfiguration.get().getRegion(), is(equalTo("us-east-1")));
         assertThat(S3BlobStoreConfig.get().getPrefix(), is(equalTo("jenkins_data/")));
 

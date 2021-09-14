@@ -6,7 +6,6 @@ import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -65,7 +64,7 @@ public class SSHCredentialsTest {
     @Test
     @ConfiguredWithCode("SSHCredentialsTest_Multiline_Key.yml")
     @Issue("https://github.com/jenkinsci/configuration-as-code-plugin/issues/1189")
-    public void shouldSupportMultilineCertificates() throws Exception {
+    public void shouldSupportMultilineCertificates() {
         BasicSSHUserPrivateKey certKey = getCredentials(BasicSSHUserPrivateKey.class);
         assertThat("Private key roundtrip failed",
             certKey.getPrivateKey().trim(), equalTo(MySSHKeySecretSource.PRIVATE_SSH_KEY.trim()));
@@ -74,7 +73,7 @@ public class SSHCredentialsTest {
     @Test
     @ConfiguredWithCode("SSHCredentialsTest_Singleline_Key.yml")
     @Issue("https://github.com/jenkinsci/configuration-as-code-plugin/issues/1189")
-    public void shouldSupportSinglelineBase64Certificates() throws Exception {
+    public void shouldSupportSinglelineBase64Certificates() {
         BasicSSHUserPrivateKey certKey = getCredentials(BasicSSHUserPrivateKey.class);
         assertThat("Private key roundtrip failed",
             certKey.getPrivateKey().trim().replace("\r\n", "\n"), equalTo(MySSHKeySecretSource.PRIVATE_SSH_KEY));
@@ -85,7 +84,7 @@ public class SSHCredentialsTest {
                 clazz, Jenkins.getInstanceOrNull(),
                 null, Collections.emptyList());
         assertEquals("There should be only one credential", 1, creds.size());
-        return (T)creds.get(0);
+        return creds.get(0);
     }
 
     @TestExtension
@@ -104,7 +103,7 @@ public class SSHCredentialsTest {
         private static final String PRIVATE_SSH_KEY_BASE64 = "LS0tLS1CRUdJTiBPUEVOU1NIIFBSSVZBVEUgS0VZLS0tLS0NCmIzQmxibk56YUMxclpYa3RkakVBQUFBQUJHNXZibVVBQUFBRWJtOXVaUUFBQUFBQUFBQUJBQUFBTXdBQUFBdHpjMmd0WlcNClF5TlRVeE9RQUFBQ0NZZHZ6NExkSGcwRzVLRlM4UGxhdXVPd1ZCbXM2WTcwRmFMNEpZMVlWYWhnQUFBS0NqSjFsK295ZFoNCmZnQUFBQXR6YzJndFpXUXlOVFV4T1FBQUFDQ1lkdno0TGRIZzBHNUtGUzhQbGF1dU93VkJtczZZNzBGYUw0SlkxWVZhaGcNCkFBQUVCV3J0RlpHWDF5T2cxL2VzZ20zNFRQRTVadzhFWFExT3V4Y2dZR0lhUlJWcGgyL1BndDBlRFFia29WTHcrVnE2NDcNCkJVR2F6cGp2UVZvdmdsalZoVnFHQUFBQUdXOXVaVzVoYzJobGRrQk1RVkJVVDFBdE1qVkxOalZNVDFNQkFnTUUNCi0tLS0tRU5EIE9QRU5TU0ggUFJJVkFURSBLRVktLS0tLQ0K";
 
         @Override
-        public Optional<String> reveal(String secret) throws IOException {
+        public Optional<String> reveal(String secret) {
             if (secret.equals("MY_PRIVATE_KEY")) {
                 return Optional.of(PRIVATE_SSH_KEY);
             }

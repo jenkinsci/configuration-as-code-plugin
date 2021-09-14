@@ -18,7 +18,7 @@ public class NodeJSTest {
 
     @Test
     @ConfiguredWithReadme("nodejs/README.md")
-    public void configure_nodejs() throws Exception {
+    public void configure_nodejs() {
         final NodeJSInstallation.DescriptorImpl descriptor = ExtensionList.lookupSingleton(NodeJSInstallation.DescriptorImpl.class);
         assertEquals(1, descriptor.getInstallations().length);
 

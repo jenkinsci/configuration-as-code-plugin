@@ -1,5 +1,6 @@
 package io.jenkins.plugins.casc.core;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.EnvVars;
 import hudson.model.TaskListener;
 import hudson.model.labels.LabelAtom;
@@ -42,14 +43,14 @@ public class JenkinsConfiguratorTest {
 
     @Test
     @ConfiguredWithCode("Primitives.yml")
-    public void jenkins_primitive_attributes() throws Exception {
+    public void jenkins_primitive_attributes() {
         final Jenkins jenkins = Jenkins.get();
         assertEquals(6666, jenkins.getSlaveAgentPort());
     }
 
     @Test
     @ConfiguredWithCode("HeteroDescribable.yml")
-    public void jenkins_abstract_describable_attributes() throws Exception {
+    public void jenkins_abstract_describable_attributes() {
         final Jenkins jenkins = Jenkins.get();
         assertTrue(jenkins.getSecurityRealm() instanceof HudsonPrivateSecurityRealm);
         assertTrue(jenkins.getAuthorizationStrategy() instanceof FullControlOnceLoggedInAuthorizationStrategy);
@@ -109,6 +110,7 @@ public class JenkinsConfiguratorTest {
         @TestExtension
         @Symbol("myProperty")
         public static class DescriptorImpl extends LabelAtomPropertyDescriptor {
+            @NonNull
             @Override
             public String getDisplayName() {
                 return "A simple value";
@@ -127,6 +129,7 @@ public class JenkinsConfiguratorTest {
 
         @TestExtension
         public static class DescriptorImpl extends LabelAtomPropertyDescriptor {
+            @NonNull
             @Override
             public String getDisplayName() {
                 return "Another simple value";

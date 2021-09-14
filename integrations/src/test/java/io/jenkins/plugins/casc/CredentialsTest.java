@@ -6,6 +6,7 @@ import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.cloudbees.plugins.credentials.casc.CredentialsRootConfigurator;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.ExtensionList;
 import hudson.util.Secret;
 import io.jenkins.plugins.casc.impl.configurators.DataBoundConfigurator;
@@ -16,7 +17,6 @@ import io.jenkins.plugins.casc.model.Mapping;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
@@ -140,8 +140,8 @@ public class CredentialsTest {
                 new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL, "1", "2", "3", "4")));
     }
 
-    @Nonnull
-    private <T> Attribute<T,?> getFromDatabound(Class<T> clazz, @Nonnull String attributeName) {
+    @NonNull
+    private <T> Attribute<T,?> getFromDatabound(Class<T> clazz, @NonNull String attributeName) {
         DataBoundConfigurator<T> cfg = new DataBoundConfigurator<>(clazz);
         Set<Attribute<T,?>> attributes = cfg.describe();
         for (Attribute<T,?> a : attributes) {

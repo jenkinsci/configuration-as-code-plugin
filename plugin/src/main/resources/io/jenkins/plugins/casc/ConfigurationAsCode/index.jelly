@@ -1,6 +1,6 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:st="jelly:stapler">
-  <l:layout norefresh="true" type="one-column" title="${%Configuration as Code}">
+  <l:layout norefresh="true" type="one-column" title="${%Configuration as Code}" permissions="${app.MANAGE_AND_SYSTEM_READ}">
   <l:main-panel>
   <st:adjunct includes="io.jenkins.plugins.casc.assets.index"/>
 
@@ -39,27 +39,29 @@
     </l:isAdmin>
     <h2>${%Actions}</h2>
 
-    <l:isAdmin>
+    <l:hasAdministerOrManage>
       <f:form method="post" action="reload" name="reload">
         <f:submit name="reload" value="${%Reload existing configuration}"/>
       </f:form>
-    </l:isAdmin>
-    <f:form method="post" action="export" name="export">
-      <f:submit name="export" value="${%Download Configuration}"/>
-    </f:form>
-    <f:form method="post" action="viewExport" name="viewExport">
-      <f:submit name="viewExport" value="${%View Configuration}"/>
-    </f:form>
-    <div class="alert alert-warning clear-action-forms">
-      <img src="${rootURL}/images/16x16/warning.png"/>
-      ${%exportWarning}
-    </div>
+    </l:hasAdministerOrManage>
+    <l:hasPermission permission="${app.SYSTEM_READ}">
+      <f:form method="post" action="export" name="export">
+        <f:submit name="export" value="${%Download Configuration}"/>
+      </f:form>
+      <f:form method="post" action="viewExport" name="viewExport">
+        <f:submit name="viewExport" value="${%View Configuration}"/>
+      </f:form>
+      <div class="alert alert-warning clear-action-forms">
+        <img src="${rootURL}/images/16x16/warning.png"/>
+        ${%exportWarning}
+      </div>
 
-    <h2>${%Reference}</h2>
-    <dt>
-      <dl><a href="reference">${%Documentation}</a></dl>
-      <dl><a href="schema">${%JSON schema}</a></dl>
-    </dt>
+      <h2>${%Reference}</h2>
+      <dt>
+        <dl><a href="reference">${%Documentation}</a></dl>
+        <dl><a href="schema">${%JSON schema}</a></dl>
+      </dt>
+    </l:hasPermission>
 
   </div>
   </div>

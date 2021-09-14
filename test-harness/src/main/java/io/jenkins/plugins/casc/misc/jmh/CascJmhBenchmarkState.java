@@ -1,11 +1,11 @@
 package io.jenkins.plugins.casc.misc.jmh;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfiguratorException;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.Nonnull;
 import jenkins.benchmark.jmh.JmhBenchmark;
 import jenkins.benchmark.jmh.JmhBenchmarkState;
 
@@ -20,7 +20,7 @@ public abstract class CascJmhBenchmarkState extends JmhBenchmarkState {
      *
      * @return String containing the location of YAML file in the classpath
      */
-    @Nonnull
+    @NonNull
     protected abstract String getResourcePath();
 
     /**
@@ -28,7 +28,7 @@ public abstract class CascJmhBenchmarkState extends JmhBenchmarkState {
      *
      * @return the class containing this benchmark state
      */
-    @Nonnull
+    @NonNull
     protected abstract Class<?> getEnclosingClass();
 
     /**

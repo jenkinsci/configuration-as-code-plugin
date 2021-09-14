@@ -30,7 +30,7 @@ public class GlobalLibrariesTest {
     @Issue("JENKINS-57557")
     @Test
     @ConfiguredWithCode("GlobalLibrariesGitHubTest.yml")
-    public void configure_global_library_using_github() throws Exception {
+    public void configure_global_library_using_github() {
         assertEquals(1, GlobalLibraries.get().getLibraries().size());
         final LibraryConfiguration library = GlobalLibraries.get().getLibraries().get(0);
         assertEquals("jenkins-pipeline-lib", library.getName());

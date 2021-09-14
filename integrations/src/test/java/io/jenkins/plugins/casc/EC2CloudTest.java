@@ -12,8 +12,6 @@ import java.util.List;
 import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
-import org.junit.rules.RuleChain;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -28,18 +26,16 @@ import static org.junit.Assert.assertTrue;
 public class EC2CloudTest {
 
     @Rule
-    public RuleChain chain = RuleChain.outerRule(new EnvironmentVariables()
-        .set("EC2_PRIVATE_KEY", "ADMIN123"))
-        .around(new JenkinsConfiguredWithReadmeRule());
+    public JenkinsConfiguredWithReadmeRule j = new JenkinsConfiguredWithReadmeRule();
 
     @Test
     @ConfiguredWithReadme("ec2/README.md")
-    public void configure_ec2_cloud() throws Exception {
+    public void configure_ec2_cloud() {
         final AmazonEC2Cloud ec2Cloud = (AmazonEC2Cloud) Jenkins.get().getCloud("ec2-ec2");
         assertNotNull(ec2Cloud);
 
         assertTrue(ec2Cloud.isUseInstanceProfileForCredentials());
-        assertThat(ec2Cloud.getPrivateKey().getPrivateKey(), is("ADMIN123"));
+        assertThat(ec2Cloud.getSshKeysCredentialsId(), is("ssh-key-credential-id"));
         final List<SlaveTemplate> templates = ec2Cloud.getTemplates();
         assertThat(templates, hasSize(2));
 
@@ -51,7 +47,6 @@ public class EC2CloudTest {
         assertFalse(slaveTemplate.ebsOptimized);
         assertFalse(slaveTemplate.monitoring);
         assertFalse(slaveTemplate.stopOnTerminate);
-        assertFalse(slaveTemplate.getUseDedicatedTenancy());
         assertFalse(slaveTemplate.useEphemeralDevices);
         assertThat(slaveTemplate.type, is(InstanceType.T2Small));
         assertThat(slaveTemplate.getAmi(), equalTo("ami-0c6bb742864ffa3f3"));
@@ -83,7 +78,6 @@ public class EC2CloudTest {
         assertFalse(slaveTemplate.ebsOptimized);
         assertFalse(slaveTemplate.monitoring);
         assertFalse(slaveTemplate.stopOnTerminate);
-        assertFalse(slaveTemplate.getUseDedicatedTenancy());
         assertFalse(slaveTemplate.useEphemeralDevices);
         assertThat(slaveTemplate.type, is(InstanceType.T2Xlarge));
         assertThat(slaveTemplate.getAmi(), equalTo("ami-0c6bb742864ffa3f3"));
