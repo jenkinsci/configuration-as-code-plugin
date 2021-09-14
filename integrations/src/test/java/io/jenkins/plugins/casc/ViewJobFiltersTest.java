@@ -34,13 +34,11 @@ public class ViewJobFiltersTest {
 
         Jenkins jenkins = j.jenkins;
         Collection<View> views = jenkins.getViews();
-        for (View view : views) {
-            ListView listView = (ListView) view;
-            DescribableList<ViewJobFilter, Descriptor<ViewJobFilter>> a = listView.getJobFilters();
-            duration = a.get(BuildDurationFilter.class);
-            status = a.get(BuildStatusFilter.class);
-            security = a.get(SecurityFilter.class);
-        }
+        ListView listView = (ListView) views.get(0);
+        DescribableList<ViewJobFilter, Descriptor<ViewJobFilter>> a = listView.getJobFilters();
+        duration = a.get(BuildDurationFilter.class);
+        status = a.get(BuildStatusFilter.class);
+        security = a.get(SecurityFilter.class);
 
         final BuildDurationFilter buildDurationFilter = duration;
         assertTrue(buildDurationFilter.isLessThan());
