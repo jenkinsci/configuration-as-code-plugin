@@ -18,7 +18,7 @@
     <jenkins.version>2.303.1</jenkins.version>
     <junixsocket.version>2.4.0</junixsocket.version>
     <declarative-pipeline.version>1.9.1</declarative-pipeline.version>
-    <kotlin-stdlib.version>1.5.30</kotlin-stdlib.version>
+    <kotlin-stdlib.version>1.5.31</kotlin-stdlib.version>
   </properties>
 
   <dependencies>
