@@ -24,9 +24,9 @@ reload-jcasc-configuration
 
   `curl  -X POST "JENKINS_URL:8080/reload-configuration-as-code/?casc-reload-token=32424324rdsadsa"`
 
-- via Groovy script
+- via Groovy script (not recommended)
   ```groovy
   import io.jenkins.plugins.casc.ConfigurationAsCode;
   ConfigurationAsCode.get().configure()
   ```
-  Note that running the above code in a declarative pipeline (either directly or via shared libraries) will put this plugin in a bad state where the configuration cannot be reload at all until Jenkins is restarted. See #1227 for more info.
+  _Note: that running the above code in a pipeline will put this plugin in a bad state where the configuration cannot be reloaded at all until Jenkins is restarted. See #1227 for more info._
