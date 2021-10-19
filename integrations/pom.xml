@@ -343,7 +343,7 @@
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>aws-global-configuration</artifactId>
-      <version>1.6</version>
+      <version>1.7</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -405,7 +405,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>ec2</artifactId>
-      <version>1.64</version>
+      <version>1.65</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
