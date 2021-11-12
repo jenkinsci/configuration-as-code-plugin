@@ -23,7 +23,7 @@ public class ConfigFileProviderTest {
 
     @Test
     @ConfiguredWithReadme(value = "config-file-provider/README.md")
-    public void configure_config_file_provider() throws Exception {
+    public void configure_config_file_provider() {
         assertThat(GlobalConfigFiles.get().getConfigs(), hasSize(4));
 
         Config config = GlobalConfigFiles.get().getById("custom-test");

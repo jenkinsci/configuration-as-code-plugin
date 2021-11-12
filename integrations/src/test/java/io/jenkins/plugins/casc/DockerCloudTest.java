@@ -25,14 +25,14 @@ public class DockerCloudTest {
 
     @Test
     @ConfiguredWithReadme("docker/README.md")
-    public void configure_docker_cloud() throws Exception {
+    public void configure_docker_cloud() {
         final DockerCloud docker = DockerCloud.getCloudByName("docker");
         assertNotNull(docker);
         assertNotNull(docker.getDockerApi());
         assertNotNull(docker.getDockerApi().getDockerHost());
         assertEquals("unix:///var/run/docker.sock", docker.getDockerApi().getDockerHost().getUri());
 
-        final DockerTemplate template = docker.getTemplate("jenkins/slave");
+        final DockerTemplate template = docker.getTemplate("jenkins/agent");
         checkTemplate(template, "docker-agent", "jenkins", "/home/jenkins/agent", "10",
                 new String[] { "hello:/hello", "world:/world"}, "hello=world\nfoo=bar");
         assertTrue(template.getRetentionStrategy() instanceof DockerOnceRetentionStrategy);

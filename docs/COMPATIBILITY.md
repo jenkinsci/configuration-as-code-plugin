@@ -5,7 +5,7 @@ Because of how the JCasC was designed, plugins _should_ be expected to work out 
 We rely heavily on data bindings so if a plugin is not setup according to expected design pattern for data binding.
 
 JCasC cannot communicate properly with the plugin without fixing their data binding issues or writing a special configurator.
-The path of least resistence is fixing the data binding, since other plugins in the Jenkins eco-system relies heavely on data binding.
+The path of least resistance is fixing the data binding, since other plugins in the Jenkins eco-system rely heavily on data binding.
 
 The list of already known issues in the Jenkins issue tracker, are tracked through using the label `jcasc-compatibility` [see dashboard][dashboard].
 
@@ -13,7 +13,7 @@ The list of already known issues in the Jenkins issue tracker, are tracked throu
 
 Create an issue at [issues.jenkins-ci.org](https://issues.jenkins-ci.org) with the label `jcasc-compatibility` and fill out the details.
 [Link to create issue][new-jira-issue]
-Create an github issue for crosslink purposes on this repository.
+Create a Github issue for crosslink purposes on this repository.
 
 If you prefer the [new issue for plugin compatibility][new-github-issue] should take you through the entire workflow.
 

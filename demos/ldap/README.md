@@ -10,7 +10,7 @@ jenkins:
         - server: ldap.acme.com
           rootDN: dc=acme,dc=fr
           managerDN: "manager"
-          managerPasswordSecret: ${LDAP_PASSWORD}
+          managerPasswordSecret: "${LDAP_PASSWORD}"
           userSearch: "(&(objectCategory=User)(sAMAccountName={0}))"
           groupSearchFilter: "(&(cn={0})(objectclass=group))"
           groupMembershipStrategy:

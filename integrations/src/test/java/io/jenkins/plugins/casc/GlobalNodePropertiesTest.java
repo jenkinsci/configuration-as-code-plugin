@@ -28,7 +28,7 @@ public class GlobalNodePropertiesTest {
     public static JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 
     @Test
-    public void configure() throws Exception {
+    public void configure() {
         final Jenkins jenkins = Jenkins.get();
 
         DescribableList<NodeProperty<?>, NodePropertyDescriptor> nodeProperties = jenkins.getGlobalNodeProperties();

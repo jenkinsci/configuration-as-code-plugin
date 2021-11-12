@@ -22,7 +22,7 @@ public class JenkinsReadmeDemoTest {
 
     @Test
     @ConfiguredWithReadme("jenkins/README.md#0")
-    public void configure_demo_first_code_block() throws Exception {
+    public void configure_demo_first_code_block() {
         final Jenkins jenkins = Jenkins.get();
         assertEquals("Jenkins configured automatically by Jenkins Configuration as Code plugin\n\n", jenkins.getSystemMessage());
         assertEquals(5, jenkins.getNumExecutors());
@@ -32,7 +32,7 @@ public class JenkinsReadmeDemoTest {
 
     @Test
     @ConfiguredWithReadme("jenkins/README.md#1")
-    public void configure_demo_second_code_block() throws Exception {
+    public void configure_demo_second_code_block() {
         final Jenkins jenkins = Jenkins.get();
         assertThat(jenkins.getSystemMessage(), containsString("Welcome to our build server."));
         assertEquals(1, jenkins.getNumExecutors());

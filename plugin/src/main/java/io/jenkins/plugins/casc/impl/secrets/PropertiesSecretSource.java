@@ -15,8 +15,8 @@ import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 /**
  * This {@link SecretSource} implementation allows to use a .properties file for providing secrets.
- * The default file path is {@code /run/secrets/secrets.properties}, which can be changed via {@code
- * SECRETS} environment variable.
+ * The default file path is {@code /run/secrets/secrets.properties}, which can be changed via
+ * {@code SECRETS_FILE} environment variable.
  *
  * @author <a href="mailto:d.estermann.de@gmail.com">Daniel Estermann</a>
  * @since 1.33
@@ -32,30 +32,26 @@ public class PropertiesSecretSource extends SecretSource {
      */
     public static final String SECRETS_DEFAULT_PATH = "/run/secrets/secrets.properties";
 
-    private Properties secrets;
+    private final Properties secrets = new Properties();
 
     @Override
     public Optional<String> reveal(String secret) {
-        // lazy initialization
-        if (secrets == null) {
-            secrets = new Properties();
-            final String secretsEnv = System.getenv("SECRETS");
-            final String secretsPath = secretsEnv == null ? SECRETS_DEFAULT_PATH : secretsEnv;
-            final File secretsFile = new File(secretsPath);
-            if (secretsFile.exists()) {
-                try (InputStream input = new FileInputStream(secretsFile)) {
-                    secrets.load(input);
-                } catch (IOException ioe) {
-                    LOGGER.log(Level.WARNING,
-                        "Source properties file " + secretsPath + " could not be loaded", ioe);
-                }
-            }
-        }
+        return Optional.ofNullable(secrets.getProperty(secret));
+    }
 
-        if (secrets.getProperty(secret) == null) {
-            return Optional.empty();
-        } else {
-            return Optional.of(secrets.getProperty(secret));
+    @Override
+    public void init() {
+        final String secretsEnv = System.getenv("SECRETS_FILE");
+        final String secretsPath = secretsEnv == null ? SECRETS_DEFAULT_PATH : secretsEnv;
+        final File secretsFile = new File(secretsPath);
+        if (secretsFile.exists() && secretsFile.isFile()) {
+            try (InputStream input = new FileInputStream(secretsFile)) {
+                secrets.clear();
+                secrets.load(input);
+            } catch (IOException ioe) {
+                LOGGER.log(Level.WARNING,
+                    "Source properties file " + secretsPath + " could not be loaded", ioe);
+            }
         }
     }
 }

@@ -27,7 +27,7 @@ public class KubernetesCloudTest {
 
     @Test
     @ConfiguredWithReadme("kubernetes/README.md")
-    public void configure_kubernetes_cloud() throws Exception {
+    public void configure_kubernetes_cloud() {
         final KubernetesCloud cloud = j.jenkins.clouds.get(KubernetesCloud.class);
         assertNotNull(cloud);
         assertEquals("advanced-k8s-config", cloud.name);
@@ -66,7 +66,7 @@ public class KubernetesCloudTest {
         assertEquals("BAR", envVar.getValue());
 
         final PodTemplate template1 = templates.get(1);
-        assertEquals("k8s-slave", template1.getName());
+        assertEquals("k8s-agent", template1.getName());
         assertEquals("default", template1.getNamespace());
         assertEquals(Mode.EXCLUSIVE, template1.getNodeUsageMode());
     }

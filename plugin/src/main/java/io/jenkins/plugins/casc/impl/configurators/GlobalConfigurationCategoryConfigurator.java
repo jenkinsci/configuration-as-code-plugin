@@ -11,6 +11,7 @@ import io.jenkins.plugins.casc.RootElementConfigurator;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import io.jenkins.plugins.casc.model.Scalar;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -23,6 +24,8 @@ import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import static io.jenkins.plugins.casc.Attribute.Setter.NOP;
 import static io.jenkins.plugins.casc.ConfigurationAsCode.printThrowable;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -31,7 +34,6 @@ import static io.jenkins.plugins.casc.ConfigurationAsCode.printThrowable;
 public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<GlobalConfigurationCategory> implements RootElementConfigurator<GlobalConfigurationCategory> {
 
     private static final Logger LOGGER = Logger.getLogger(GlobalConfigurationCategoryConfigurator.class.getName());
-    private static final String CREDENTIALS_PROVIDER_MANAGER_CONFIGURATION = "com.cloudbees.plugins.credentials.CredentialsProviderManager$Configuration";
 
     private final GlobalConfigurationCategory category;
 
@@ -42,15 +44,21 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
     @NonNull
     @Override
     public String getName() {
+        return getNames().get(0);
+    }
+
+    @NonNull
+    @Override
+    public List<String> getNames() {
         final Class c = category.getClass();
         final Symbol symbol = (Symbol) c.getAnnotation(Symbol.class);
-        if (symbol != null) return symbol.value()[0];
+        if (symbol != null) return asList(symbol.value());
 
         String name = c.getSimpleName();
         name = StringUtils.remove(name, "Global");
         name = StringUtils.remove(name, "Configuration");
         name = StringUtils.remove(name, "Category");
-        return name.toLowerCase();
+        return singletonList(name.toLowerCase());
     }
 
     @Override
@@ -77,7 +85,7 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
                 .filter(d -> d.getGlobalConfigPage() != null)
                 .map(DescriptorConfigurator::new)
                 .filter(GlobalConfigurationCategoryConfigurator::reportDescriptorWithoutSetters)
-                .map(c -> new Attribute<GlobalConfigurationCategory, Object>(c.getName(), c.getTarget()).setter(NOP))
+                .map(c -> new Attribute<GlobalConfigurationCategory, Object>(c.getNames(), c.getTarget()).setter(NOP))
                 .collect(Collectors.toSet());
     }
 
@@ -113,14 +121,7 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
     }
 
     private boolean filterDescriptors(Descriptor d) {
-        if (d.clazz.getName().equals(CREDENTIALS_PROVIDER_MANAGER_CONFIGURATION)) {
-            // CREDENTIALS_PROVIDER_MANAGER_CONFIGURATION is located in the wrong category.
-            // JCasC will also turn the simple name into empty string
-            // It should be a part of the credentials root configurator node.
-            return false;
-        } else {
-            return d.getCategory() == category && d.getGlobalConfigPage() != null;
-        }
+        return d.getCategory() == category && d.getGlobalConfigPage() != null;
     }
 
 }

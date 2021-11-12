@@ -14,7 +14,7 @@
   <packaging>hpi</packaging>
 
   <name>Configuration as Code Plugin</name>
-  <description>Manage Jenkins master configuration as code</description>
+  <description>Manage Jenkins configuration as code</description>
   <url>https://github.com/jenkinsci/configuration-as-code-plugin</url>
 
   <properties>
@@ -32,7 +32,7 @@
 
   <developers>
     <developer>
-      <id>casz</id>
+      <id>jetersen</id>
       <name>Joseph Petersen</name>
     </developer>
     <developer>
@@ -45,28 +45,48 @@
     </developer>
   </developers>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.jenkins.tools.bom</groupId>
+        <artifactId>bom-2.249.x</artifactId>
+        <version>${plugin-bom.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
+    <dependency>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>caffeine-api</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
-      <version>20190722</version>
+      <version>20210307</version>
     </dependency>
     <dependency>
-      <groupId>io.jenkins.configuration-as-code</groupId>
-      <artifactId>snakeyaml</artifactId>
-      <version>${project.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.yaml</groupId>
-          <artifactId>snakeyaml</artifactId>
-        </exclusion>
-      </exclusions>
+      <groupId>com.google.code.findbugs</groupId>
+      <artifactId>jsr305</artifactId>
+      <version>3.0.2</version>
+    </dependency>
+    <dependency>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>snakeyaml-api</artifactId>
     </dependency>
 
     <dependency>
       <groupId>io.vavr</groupId>
       <artifactId>vavr</artifactId>
-      <version>0.10.2</version>
+      <version>0.10.4</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-text</artifactId>
+      <version>1.9</version>
     </dependency>
 
     <dependency>

@@ -1,5 +1,7 @@
 package io.jenkins.plugins.casc;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.util.Secret;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Scalar;
@@ -21,8 +23,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.accmod.AccessRestriction;
@@ -30,7 +30,6 @@ import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.export.Exported;
 
-import static io.jenkins.plugins.casc.Blacklist.isBlacklisted;
 import static io.jenkins.plugins.casc.ConfigurationAsCode.printThrowable;
 
 /**
@@ -79,6 +78,15 @@ public class Attribute<Owner, Type> {
         this.secret = type == Secret.class || calculateIfSecret(null, this.name);
     }
 
+    public Attribute(List<String> name, Class type) {
+        this.name = name.get(0);
+        this.type = type;
+        this.getter = this::_getValue;
+        this.setter = this::_setValue;
+        this.aliases = name;
+        this.secret = type == Secret.class || calculateIfSecret(null, this.name);
+    }
+
     @SuppressWarnings("unchecked")
     public static <O,T> Optional<Attribute<O,T>> get(Set<Attribute<O,?>> attributes, String name) {
         return attributes.stream()
@@ -105,7 +113,7 @@ public class Attribute<Owner, Type> {
     }
 
     boolean isIgnored() {
-        return isDeprecated() || isRestricted() || isBlacklisted(this);
+        return isDeprecated() || isRestricted() || IgnoreList.isIgnored(this);
     }
 
     public Class<? extends AccessRestriction>[] getRestrictions() {
@@ -249,7 +257,7 @@ public class Attribute<Owner, Type> {
                         seq.add(_describe(c, context, value, shouldBeMasked));
                     }
                 } else {
-                    LOGGER.log(Level.FINE, o.getClass().toString() + " is not iterable");
+                    LOGGER.log(Level.FINE, o.getClass() + " is not iterable");
                 }
                 return seq;
             }
@@ -284,7 +292,7 @@ public class Attribute<Owner, Type> {
             boolean shouldBeMasked = isSecret(instance);
             if (multiple) {
                 Sequence seq = new Sequence();
-                if (o.getClass().isArray()) o = Arrays.asList(o);
+                if (o.getClass().isArray()) o = Collections.singletonList(o);
                 if (o instanceof Iterable) {
                     for (Object value : (Iterable) o) {
                         seq.add(_describe(c, context, value, shouldBeMasked));
@@ -355,7 +363,7 @@ public class Attribute<Owner, Type> {
     }
 
     @CheckForNull
-    private static Method locateGetter(Class<?> clazz, @Nonnull String fieldName) {
+    private static Method locateGetter(Class<?> clazz, @NonNull String fieldName) {
         final String upname = StringUtils.capitalize(fieldName);
         final List<String> accessors = Arrays.asList("get" + upname, "is" + upname);
 
@@ -374,12 +382,12 @@ public class Attribute<Owner, Type> {
     }
 
     @CheckForNull
-    private static Field locatePublicField(Class<?> clazz, @Nonnull String fieldName) {
+    private static Field locatePublicField(Class<?> clazz, @NonNull String fieldName) {
         return ExtraFieldUtils.getField(clazz, fieldName, false);
     }
 
     @CheckForNull
-    private static Field locatePrivateFieldInHierarchy(Class<?> clazz, @Nonnull String fieldName) {
+    private static Field locatePrivateFieldInHierarchy(Class<?> clazz, @NonNull String fieldName) {
         return ExtraFieldUtils.getFieldNoForce(clazz, fieldName);
     }
 
@@ -392,7 +400,7 @@ public class Attribute<Owner, Type> {
      *         {@code false} if not or if there is no conclusive answer.
      */
     @Restricted(NoExternalUse.class)
-    public static boolean calculateIfSecret(@CheckForNull Class<?> targetClass, @Nonnull String fieldName) {
+    public static boolean calculateIfSecret(@CheckForNull Class<?> targetClass, @NonNull String fieldName) {
         if (targetClass == Secret.class) { // Class is final, so the check is safe
             LOGGER.log(Level.FINER, "Attribute {0}#{1} is secret, because it has a Secret type",
                     new Object[] {targetClass.getName(), fieldName});
@@ -516,7 +524,7 @@ public class Attribute<Owner, Type> {
         return name.hashCode();
     }
 
-    public static final <T,V> Setter<T,V> noop() {
+    public static <T,V> Setter<T,V> noop() {
         return NOOP;
     }
 

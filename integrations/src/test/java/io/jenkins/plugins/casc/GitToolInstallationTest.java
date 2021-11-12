@@ -26,7 +26,7 @@ public class GitToolInstallationTest {
     public static JenkinsConfiguredWithReadmeRule j = new JenkinsConfiguredWithReadmeRule();
 
     @Test
-    public void configure_git_installations() throws Exception {
+    public void configure_git_installations() {
         final Jenkins jenkins = Jenkins.get();
         final GitTool.DescriptorImpl descriptor = (GitTool.DescriptorImpl) jenkins.getDescriptor(GitTool.class);
         assertEquals(2, descriptor.getInstallations().length);

@@ -19,7 +19,7 @@ public class StatisticsGathererTest {
 
     @Test
     @ConfiguredWithReadme("statistics-gatherer/README.md")
-    public void configure_statistics() throws Exception {
+    public void configure_statistics() {
         StatisticsConfiguration config = StatisticsConfiguration.get();
         assertNotNull(config);
 

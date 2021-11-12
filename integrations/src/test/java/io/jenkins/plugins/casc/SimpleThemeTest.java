@@ -19,7 +19,7 @@ public class SimpleThemeTest {
 
     @Test
     @ConfiguredWithReadme("simple-theme-plugin/README.md")
-    public void configure_simple_theme() throws Exception {
+    public void configure_simple_theme() {
         // Already tested within the plugin itself, let's run some basic tests.
         // https://github.com/jenkinsci/simple-theme-plugin/blob/master/src/test/java/org/jenkinsci/plugins/simpletheme/ConfigurationAsCodeTest.java
         SimpleThemeDecorator decorator = ExtensionList.lookupSingleton(SimpleThemeDecorator.class);

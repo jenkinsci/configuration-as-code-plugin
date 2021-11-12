@@ -23,9 +23,11 @@ package io.jenkins.plugins.casc;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import hudson.Extension;
 import hudson.ExtensionPoint;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -57,13 +59,30 @@ public interface Configurator<T> {
 
     /**
      * Get a configurator name.
+     *
+     * This should return the default name for the configurator,
+     * used for exporting yaml
+     * see {@link #getNames()} for all possible names which will be considered when configuring.
+     *
      * @return short name for this component when used in a configuration.yaml file
      */
     @NonNull
     default String getName() {
+        return getNames().get(0);
+    }
+
+    /**
+     * Get all possible configurator names
+     *
+     * @return a list of all possible short names for this component when used in a configuration.yaml file
+     */
+    @NonNull
+    default List<String> getNames() {
         final Symbol annotation = getTarget().getAnnotation(Symbol.class);
-        if (annotation != null) return annotation.value()[0];
-        return normalize(getTarget().getSimpleName());
+        if (annotation != null) {
+            return Arrays.asList(annotation.value());
+        }
+        return Collections.singletonList(normalize(getTarget().getSimpleName()));
     }
 
     /**
@@ -97,7 +116,7 @@ public interface Configurator<T> {
 
 
     /**
-     * @return list of {@link Configurator<T>}s to be considered so one can fully configure this component.
+     * @return list of {@link Configurator}s to be considered so one can fully configure this component.
      * Typically, configurator for an abstract extension point will return Configurators for available implementations.
      */
     @NonNull
@@ -144,7 +163,8 @@ public interface Configurator<T> {
 
     /**
      * Run the same logic as {@link #configure(CNode, ConfigurationContext)} in dry-run mode.
-     * Used to verify configuration is fine before being actually applied to a live jenkins master.
+     * Used to verify configuration is fine before being actually applied to a
+     * live jenkins controller.
      * @param config
      * @param context
      * @throws ConfiguratorException
@@ -176,8 +196,7 @@ public interface Configurator<T> {
      * @return CNode describing the attributes.
      */
     @CheckForNull
-    default CNode describeStructure(T instance, ConfigurationContext context)
-        throws Exception {
+    default CNode describeStructure(T instance, ConfigurationContext context) {
         Mapping mapping = new Mapping();
         for (Attribute attribute : getAttributes()) {
             if (context.getMode().equals("JSONSchema")) {
@@ -189,6 +208,30 @@ public interface Configurator<T> {
             }
         }
         return mapping;
+    }
+
+    static double extractExtensionOrdinal(Object obj) {
+        if (obj instanceof Attribute<?, ?>) {
+            return extractExtensionOrdinal((Attribute<?, ?>) obj);
+        } else {
+            return extractExtensionOrdinal(obj.getClass());
+        }
+    }
+
+    static double extractExtensionOrdinal(Attribute<?, ?> attribute) {
+        return extractExtensionOrdinal(attribute.type);
+    }
+
+    static double extractExtensionOrdinal(Class clazz) {
+        Extension extension = (Extension) clazz.getAnnotation(Extension.class);
+        if (extension == null) {
+            return 0.0;
+        }
+        return extension.ordinal();
+    }
+
+    static Comparator<Object> extensionOrdinalSort() {
+        return Comparator.comparingDouble(Configurator::extractExtensionOrdinal).reversed();
     }
 
 }

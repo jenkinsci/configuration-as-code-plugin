@@ -40,13 +40,48 @@ jobs:
         // https://issues.jenkins.io/browse/JENKINS-45504
         configure { node ->
             def traits = node / navigators / 'com.cloudbees.jenkins.plugins.bitbucket.BitbucketSCMNavigator' / traits
+
+            // Discover branches
             traits << 'com.cloudbees.jenkins.plugins.bitbucket.BranchDiscoveryTrait' {
-                strategyId('3')
-            }
-            traits << 'com.cloudbees.jenkins.plugins.bitbucket.SSHCheckoutTrait' {
-                credentialsId('bitbucket-ssh')
+                strategyId('1')
+                // Values
+                //  1 : Exclude branches that are also filed as PRs
+                //  2 : Only branches that are also filed as PRs
+                //  3 : All branches
             }
 
+            traits << 'com.cloudbees.jenkins.plugins.bitbucket.SSHCheckoutTrait' {
+                credentialsId('bitbucket-ssh')
+            }            
+
+            // Filter by name (with regular expression)
+            traits << 'jenkins.scm.impl.trait.RegexSCMSourceFilterTrait' {
+                regex('some-regex-you-need')
+            }
+
+            // Discover pull requests from origin
+            traits << 'com.cloudbees.jenkins.plugins.bitbucket.OriginPullRequestDiscoveryTrait' {
+                strategyId('1')
+                // Values
+                // 1 : Merging the pull request with the current target branch revision
+                // 2 : The current pull request revision
+                // 3 : Both the current pull request revision and the pull request merged with the current target branch revision
+            }
+
+            // Discover pull requests from forks
+            traits << 'com.cloudbees.jenkins.plugins.bitbucket.ForkPullRequestDiscoveryTrait' {
+                strategyId('1')
+                // Values
+                // 1 : Merging the pull request with the current target branch revision
+                // 2 : The current pull request revision
+                // 3 : Both the current pull request revision and the pull request merged with the current target branch revision
+
+                trustID('1')
+                // Values
+                // 0 : Everyone
+                // 1 : Forks in the same account
+                // 2 : Nobody
+            }
         }
 
         // "Project Recognizers"

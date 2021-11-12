@@ -4,7 +4,7 @@
 # name: value
 
 master:
-  componentName: jenkins-master
+  componentName: jenkins-controller
   image: "jenkins/jenkins"
   tag: "lts"
   imagePullPolicy: "Always"
@@ -28,7 +28,7 @@ master:
   # Below is the implementation of Jenkins Configuration as Code.  Add a key under ConfigScripts for each configuration area,
   # where each corresponds to a plugin or section of the UI.  Each key (prior to | character) is just a label, and can be any value.
   # Keys are only used to give the section a meaningful name.  The only restriction is they may only contain RFC 1123 \ DNS label
-  # characters: lowercase letters, numbers, and hyphens.  The keys become the name of a configuration YAML file on the master in
+  # characters: lowercase letters, numbers, and hyphens.  The keys become the name of a configuration YAML file on the controller in
   # /var/jenkins_home/casc_configs (by default) and will be processed by the Configuration as Code plugin.  The lines after each |
   # become the content of the configuration YAML file.  The first line after this is a JCasC root element, eg jenkins, credentials,
   # etc.  Best reference is https://<jenkins_url>/configuration-as-code/reference.  The example below creates a welcome message:
@@ -57,7 +57,7 @@ master:
       #     cpu: 50m
       #     memory: 50Mi
       # SSH port value can be set to any unused TCP port.  The default, 1044, is a non-standard SSH port that has been chosen at random.
-      # Is only used to reload JCasC config from the sidecar container running in the Jenkins master pod.
+      # Is only used to reload JCasC config from the sidecar container running in the Jenkins controller pod.
       # This TCP port will not be open in the pod (unless you specifically configure this), so Jenkins will not be
       # accessible via SSH from outside of the pod.  Note if you use non-root pod privileges (RunAsUser & FsGroup),
       # this must be > 1024:
@@ -83,7 +83,7 @@ master:
   #   -Dcom.sun.management.jmxremote.authenticate=false
   #   -Dcom.sun.management.jmxremote.ssl=false
   # JMXPort: 4000
-  # List of plugins to be install during Jenkins master start
+  # List of plugins to be install during Jenkins controller start
   installPlugins:
     - kubernetes:latest
     - kubernetes-credentials:latest
@@ -98,7 +98,7 @@ master:
   # ScriptApproval:
   #   - "method groovy.json.JsonSlurperClassic parseText java.lang.String"
   #   - "new groovy.json.JsonSlurperClassic"
-  # List of groovy init scripts to be executed during Jenkins master start
+  # List of groovy init scripts to be executed during Jenkins controller start
   initScripts:
   #  - |
   #    print 'adding global pipeline libraries, register properties, bootstrap jobs...'

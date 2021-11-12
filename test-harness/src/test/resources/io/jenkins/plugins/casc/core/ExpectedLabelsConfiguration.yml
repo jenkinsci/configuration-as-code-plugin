@@ -1,0 +1,13 @@
+labelAtoms:
+  - name: "label1"
+    properties:
+    - myProperty:
+        value: 2
+    - anotherTestProperty:
+        otherProperty: 4
+    - myProperty:
+        value: 1
+  - name: "label2"
+    properties:
+    - myProperty:
+        value: 3

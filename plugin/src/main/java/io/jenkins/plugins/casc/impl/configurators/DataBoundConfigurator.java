@@ -34,7 +34,6 @@ import org.kohsuke.stapler.ClassDescriptor;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.Stapler;
 
-import static com.google.common.base.Defaults.defaultValue;
 
 /**
  * A generic {@link Configurator} to configure components with a {@link org.kohsuke.stapler.DataBoundConstructor}.
@@ -164,7 +163,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                                 new Object[]{target, names[i], t == Secret.class || Attribute.calculateIfSecret(target, names[i]) ? "****" : value});
                     }
                 } else if (t.isPrimitive()) {
-                    args[i] = defaultValue(t);
+                    args[i] = defaultPrimitiveValue(t);
                 }
             }
         }
@@ -187,7 +186,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
             }
             throw new ConfiguratorException(this,
                     "Failed to construct instance of " + target +
-                            ".\n Constructor: " + constructor.toString() +
+                            ".\n Constructor: " + constructor +
                             ".\n Arguments: " + argumentTypes +
                             ".\n Expected Parameters: " + String.join(", ",expectedParamList)
                     , ex);
@@ -205,6 +204,13 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
     public String getName() {
         final Descriptor d = getDescriptor();
         return DescribableAttribute.getPreferredSymbol(d, getImplementedAPI(), getTarget());
+    }
+
+    @NonNull
+    @Override
+    public List<String> getNames() {
+        final Descriptor d = getDescriptor();
+        return DescribableAttribute.getSymbols(d, getImplementedAPI(), getTarget());
     }
 
     private Descriptor getDescriptor() {
@@ -293,7 +299,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                     }
                 }
                 if (args[i] == null && p.getType().isPrimitive()) {
-                    args[i] = defaultValue(p.getType());
+                    args[i] = defaultPrimitiveValue(p.getType());
                 }
                 attributes[i] = a;
             }
@@ -329,5 +335,33 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
     public String getDisplayName() {
         final Descriptor descriptor = getDescriptor();
         return descriptor != null ? descriptor.getDisplayName() : getName();
+    }
+
+    private Object defaultPrimitiveValue(Class<?> cls) {
+        if (boolean.class == cls) {
+            return Boolean.FALSE;
+        }
+        if (byte.class == cls) {
+            return (byte) 0;
+        }
+        if (char.class == cls) {
+            return '\0';
+        }
+        if (short.class == cls) {
+            return (short) 0;
+        }
+        if (int.class == cls) {
+            return 0;
+        }
+        if (long.class == cls) {
+            return 0L;
+        }
+        if (float.class == cls) {
+            return 0F;
+        }
+        if (double.class == cls) {
+            return 0D;
+        }
+        throw new AssertionError("Class is not a primative or missing primative coverage: " + cls.getName());
     }
 }

@@ -3,6 +3,7 @@ package io.jenkins.plugins.casc;
 import com.cloudbees.hudson.plugins.folder.Folder;
 import com.michelin.cio.hudson.plugins.rolestrategy.Role;
 import com.michelin.cio.hudson.plugins.rolestrategy.RoleBasedAuthorizationStrategy;
+import com.synopsys.arc.jenkins.plugins.rolestrategy.RoleType;
 import hudson.model.Computer;
 import hudson.model.FreeStyleProject;
 import hudson.model.Item;
@@ -43,8 +44,8 @@ public class RoleStrategyTest {
     @ConfiguredWithCode("RoleStrategy1.yml")
     public void shouldReadRolesCorrectly() throws Exception {
         j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
-        User admin = User.getById("admin", true);
-        User user1 = User.getById("user1", true);
+        User admin = User.getById("admin", false);
+        User user1 = User.getById("user1", false);
         User user2 = User.getById("user2", true);
         Computer agent1 = j.jenkins.getComputer("agent1");
         Computer agent2 = j.jenkins.getComputer("agent2");
@@ -58,7 +59,7 @@ public class RoleStrategyTest {
                 s, instanceOf(RoleBasedAuthorizationStrategy.class));
         RoleBasedAuthorizationStrategy rbas = (RoleBasedAuthorizationStrategy) s;
 
-        Map<Role, Set<String>> globalRoles = rbas.getGrantedRoles(RoleBasedAuthorizationStrategy.GLOBAL);
+        Map<Role, Set<String>> globalRoles = rbas.getGrantedRoles(RoleType.Global);
         assertThat(globalRoles.size(), equalTo(2));
 
         // Admin has configuration access
@@ -108,13 +109,13 @@ public class RoleStrategyTest {
     @Test
     @Issue("Issue #214")
     @ConfiguredWithCode("RoleStrategy2.yml")
-    public void shouldHandleNullItemsAndAgentsCorrectly() throws Exception {
+    public void shouldHandleNullItemsAndAgentsCorrectly() {
         AuthorizationStrategy s = j.jenkins.getAuthorizationStrategy();
         assertThat("Authorization Strategy has been read incorrectly",
             s, instanceOf(RoleBasedAuthorizationStrategy.class));
         RoleBasedAuthorizationStrategy rbas = (RoleBasedAuthorizationStrategy) s;
 
-        Map<Role, Set<String>> globalRoles = rbas.getGrantedRoles(RoleBasedAuthorizationStrategy.GLOBAL);
+        Map<Role, Set<String>> globalRoles = rbas.getGrantedRoles(RoleType.Global);
         assertThat(globalRoles.size(), equalTo(2));
     }
 }

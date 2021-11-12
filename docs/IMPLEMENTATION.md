@@ -94,7 +94,7 @@ Jenkins has hundreds of Descriptors, most of them for internal technical reasons
 so only the ones that have a `global` view are accessible from JCasC.
 
 For Descriptors to work well with JCasC, they need to follow
-[some design best practices](docs/PLUGINS.md) in terms of data binding. This is not such a common thing,
+[some design best practices](PLUGINS.md) in terms of data binding. This is not such a common thing,
 so we expect this will require some evangelism on plugin developers.
 
 As short term workaround, a custom `Configurator` glue-code implementation can be implemented.

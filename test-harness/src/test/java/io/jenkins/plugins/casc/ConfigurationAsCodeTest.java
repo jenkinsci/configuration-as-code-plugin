@@ -10,6 +10,8 @@ import hudson.util.FormValidation;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.model.CNode;
+import io.jenkins.plugins.casc.model.Source;
+import io.jenkins.plugins.casc.yaml.YamlSource;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +21,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
@@ -85,9 +88,15 @@ public class ConfigurationAsCodeTest {
         Files.createSymbolicLink(Paths.get(tempFolder.getRoot().getAbsolutePath(), "jenkins_6.yaml"),
                                  data.resolve("jenkins_6.yaml"));
 
+        // Create a symbolic linked folder with 1 configuration file
+        final File folderLinkTarget = tempFolder.newFolder("..2019_11_26_16_29_08.094515937");
+        new File(folderLinkTarget, "jenkins_7.yaml").createNewFile();
+        Files.createSymbolicLink(Paths.get(tempFolder.getRoot().getAbsolutePath(), "linked_folder"),
+            folderLinkTarget.toPath());
+
         assertThat(casc.configs(exactFile.getAbsolutePath()), hasSize(1));
         final List<Path> foo = casc.configs(tempFolder.getRoot().getAbsolutePath());
-        assertThat("failed to find 6 configs in " + Arrays.toString(tempFolder.getRoot().list()), foo, hasSize(6));
+        assertThat("failed to find 7 configs in " + Arrays.toString(tempFolder.getRoot().list()), foo, hasSize(7));
     }
 
     @Test
@@ -125,7 +134,7 @@ public class ConfigurationAsCodeTest {
 
     @Test
     @ConfiguredWithCode(value = {"merge1.yml", "merge3.yml"}, expected = ConfiguratorException.class)
-    public void test_loads_multi_files() throws Exception {
+    public void test_loads_multi_files() {
         ConfigurationAsCode casc = ConfigurationAsCode.get();
 
         List<String> sources = casc.getSources();
@@ -157,12 +166,44 @@ public class ConfigurationAsCodeTest {
     }
 
     @Test
-    public void doCheckNewSource_should_trim_input() throws Exception {
+    public void doCheckNewSource_should_trim_input() {
         ConfigurationAsCode casc = ConfigurationAsCode.get();
 
         String configUri = getClass().getResource("merge3.yml").toExternalForm();
 
         assertEquals(casc.doCheckNewSource("  " + configUri + "  ").kind, FormValidation.Kind.OK);
+    }
+
+    @Test
+    public void doCheckNewSource_should_support_multiple_sources() {
+        ConfigurationAsCode casc = ConfigurationAsCode.get();
+
+        String configUri =
+                String.format(
+                        " %s , %s ",
+                        getClass().getResource("JenkinsConfigTest.yml").toExternalForm(),
+                        getClass().getResource("folder/jenkins2.yml").toExternalForm());
+
+        assertEquals(casc.doCheckNewSource(configUri).kind, FormValidation.Kind.OK);
+    }
+
+    @Test
+    @Issue("Issue #653")
+    public void checkWith_should_pass_against_valid_input() throws Exception {
+        String rawConf = getClass().getResource("JenkinsConfigTest.yml").toExternalForm();
+        YamlSource input = YamlSource.of(rawConf);
+        Map<Source, String> actual = ConfigurationAsCode.get().checkWith(input);
+        assertThat(actual.size(), is(0));
+    }
+
+    @Test
+    @Issue("Issue #653")
+    @ConfiguredWithCode("aNonEmpty.yml")
+    public void checkWith_should_pass_against_input_which_has_same_entries_with_initial_config() throws Exception {
+        String rawConf = getClass().getResource("JenkinsConfigTest.yml").toExternalForm();
+        YamlSource input = YamlSource.of(rawConf);
+        Map<Source, String> actual = ConfigurationAsCode.get().checkWith(input);
+        assertThat(actual.size(), is(0));
     }
 
     @Test
@@ -178,6 +219,26 @@ public class ConfigurationAsCodeTest {
         j.assertGoodStatus(resultPage);
 
         assertEquals("Configured by Configuration as Code plugin", j.jenkins.getSystemMessage());
+    }
+
+    @Test
+    public void doReplace_should_support_multiple_sources() throws Exception {
+        HtmlPage page = j.createWebClient().goTo("configuration-as-code");
+        j.assertGoodStatus(page);
+
+        HtmlForm form = page.getFormByName("replace");
+        HtmlInput input = form.getInputByName("_.newSource");
+        String configUri =
+                String.format(
+                        " %s , %s ",
+                        getClass().getResource("JenkinsConfigTest.yml").toExternalForm(),
+                        getClass().getResource("folder/jenkins2.yml").toExternalForm());
+        input.setValueAttribute(configUri);
+        HtmlPage resultPage = j.submit(form);
+        j.assertGoodStatus(resultPage);
+
+        assertEquals("configuration as code - JenkinsConfigTest", j.jenkins.getSystemMessage());
+        assertEquals(10, j.jenkins.getQuietPeriod());
     }
 
     @Test
@@ -264,5 +325,11 @@ public class ConfigurationAsCodeTest {
             + "</div>\n";
         String actualDocString = ConfigurationAsCode.get().getHtmlHelp(hudson.security.FullControlOnceLoggedInAuthorizationStrategy.class, "allowAnonymousRead");
         assertEquals(expectedDocString, actualDocString);
+    }
+
+    @Test
+    public void configurationCategory() {
+        ConfigurationAsCode configurationAsCode = ConfigurationAsCode.get();
+        assertThat(configurationAsCode.getCategoryName(), is("CONFIGURATION"));
     }
 }

@@ -1,0 +1,9 @@
+x-alias:
+  message: &message
+    systemMessage: "Configured by Configuration as Code plugin"
+
+jenkins:
+  <<: *message
+  agentProtocols:
+    - JNLP4-connect
+    - Ping

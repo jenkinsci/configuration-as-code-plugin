@@ -4,6 +4,24 @@ Artifactory plugin configuration belongs under `unclassified` root element
 
 ## sample configuration
 
+Since 3.11.0:
+
+```yaml
+unclassified:
+  artifactorybuilder:
+    useCredentialsPlugin: true
+    jfrogInstances:
+      - instanceId: artifactory
+        url: http://acme.com/artifactory
+        deployerCredentialsConfig:
+          credentialsId: "artifactory"
+        resolverCredentialsConfig:
+          username: artifactory_user
+          password: "${ARTIFACTORY_PASSWORD}"
+```
+
+Before 3.11.0:
+
 ```yaml
 unclassified:
   artifactorybuilder:
@@ -15,7 +33,7 @@ unclassified:
           credentialsId: "artifactory"
         resolverCredentialsConfig:
           username: artifactory_user
-          password: ${ARTIFACTORY_PASSWORD}
+          password: "${ARTIFACTORY_PASSWORD}"
 ```
 
 ## implementation note

@@ -38,7 +38,7 @@ public class TokenReloadActionTest {
 
     private ServletResponseSpy response;
 
-    private class ServletResponseSpy extends Response {
+    private static class ServletResponseSpy extends Response {
         private int error = 200;
 
         public ServletResponseSpy() {
@@ -46,7 +46,7 @@ public class TokenReloadActionTest {
         }
 
         @Override
-        public void sendError(int sc) throws IOException {
+        public void sendError(int sc) {
             error = sc;
         }
 
@@ -57,7 +57,7 @@ public class TokenReloadActionTest {
         }
     }
 
-    private class RequestStub extends Request {
+    private static class RequestStub extends Request {
         private final String authorization;
 
         public RequestStub(String authorization) {
@@ -137,5 +137,10 @@ public class TokenReloadActionTest {
         assertEquals(1, messages.size());
         assertEquals("Configuration reload triggered via token", messages.get(0).getMessage());
         assertEquals(Level.INFO, messages.get(0).getLevel());
+    }
+
+    @Test
+    public void displayName() {
+        assertEquals("Reload Configuration as Code", tokenReloadAction.getDisplayName());
     }
 }

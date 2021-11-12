@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>4.0-beta-5</version>
+    <version>4.29</version>
     <relativePath />
   </parent>
   <groupId>io.jenkins.configuration-as-code</groupId>
@@ -13,19 +13,19 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>snakeyaml</module>
     <module>plugin</module>
     <module>test-harness</module>
     <module>integrations</module>
   </modules>
 
   <properties>
-    <revision>1.37</revision>
+    <revision>1.55</revision>
     <changelist>-SNAPSHOT</changelist>
-    <jenkins.version>2.223-rc29394.4f22d639a7c7</jenkins.version>
+    <jenkins.version>2.321-rc31714.3b4c18a6f62f</jenkins.version>
     <java.level>8</java.level>
     <tagNameFormat>configuration-as-code-@{project.version}</tagNameFormat>
     <useBeta>true</useBeta>
+    <plugin-bom.version>950.v396cb834de1e</plugin-bom.version>
   </properties>
 
   <name>Configuration as Code Parent</name>
@@ -65,12 +65,12 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>3.1.0</version>
+          <version>3.1.2</version>
           <dependencies>
             <dependency>
               <groupId>com.puppycrawl.tools</groupId>
               <artifactId>checkstyle</artifactId>
-              <version>8.29</version>
+              <version>9.0</version>
             </dependency>
           </dependencies>
         </plugin>

@@ -2,10 +2,12 @@ package io.jenkins.plugins.casc;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import hudson.Util;
 import io.jenkins.plugins.casc.model.CNode;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang.math.NumberUtils;
 import org.kohsuke.stapler.Stapler;
 
 /**
@@ -14,9 +16,15 @@ import org.kohsuke.stapler.Stapler;
 
 public class ConfigurationContext implements ConfiguratorRegistry {
 
+    public static final String CASC_YAML_MAX_ALIASES_ENV = "CASC_YAML_MAX_ALIASES";
+    public static final String CASC_YAML_MAX_ALIASES_PROPERTY = "casc.yaml.max.aliases";
+    public static final String CASC_MERGE_STRATEGY_ENV = "CASC_MERGE_STRATEGY";
+    public static final String CASC_MERGE_STRATEGY_PROPERTY = "casc.merge.strategy";
     private Deprecation deprecation = Deprecation.reject;
     private Restriction restriction = Restriction.reject;
     private Unknown unknown = Unknown.reject;
+    private String mergeStrategy;
+    private transient final int yamlMaxAliasesForCollections;
 
     /**
      * the model-introspection model to be applied by configuration-as-code.
@@ -32,12 +40,33 @@ public class ConfigurationContext implements ConfiguratorRegistry {
 
     private transient String mode;
 
+    private transient SecretSourceResolver secretSourceResolver;
+
     public ConfigurationContext(ConfiguratorRegistry registry) {
         this.registry = registry;
+        String prop = getPropertyOrEnv(CASC_YAML_MAX_ALIASES_ENV, CASC_YAML_MAX_ALIASES_PROPERTY);
+        yamlMaxAliasesForCollections = NumberUtils.toInt(prop, 50);
+        secretSourceResolver = new SecretSourceResolver(this);
+        mergeStrategy = getPropertyOrEnv(CASC_MERGE_STRATEGY_ENV, CASC_MERGE_STRATEGY_PROPERTY);
+    }
+
+    private String getPropertyOrEnv(String envKey, String proKey) {
+        return Util.fixEmptyAndTrim(System.getProperty(
+            proKey,
+            System.getenv(envKey)
+        ));
+    }
+
+    public SecretSourceResolver getSecretSourceResolver() {
+        return secretSourceResolver;
     }
 
     public void addListener(Listener listener) {
         listeners.add(listener);
+    }
+
+    public void clearListeners() {
+        listeners.clear();
     }
 
     public void warning(@NonNull CNode node, @NonNull String message) {
@@ -64,6 +93,10 @@ public class ConfigurationContext implements ConfiguratorRegistry {
         this.unknown = unknown;
     }
 
+    public String getMergeStrategy() {
+        return mergeStrategy;
+    }
+
     String getMode() {
         return mode;
     }
@@ -72,7 +105,9 @@ public class ConfigurationContext implements ConfiguratorRegistry {
         this.mode = mode;
     }
 
-
+    public int getYamlMaxAliasesForCollections() {
+        return yamlMaxAliasesForCollections;
+    }
 
     // --- delegate methods for ConfigurationContext
 

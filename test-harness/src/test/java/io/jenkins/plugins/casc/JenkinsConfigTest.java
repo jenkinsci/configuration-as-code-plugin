@@ -28,7 +28,7 @@ public class JenkinsConfigTest {
 
     @Rule
     public RuleChain chain = RuleChain.outerRule( new EnvironmentVariables()
-            .set("CASC_JENKINS_CONFIG", getClass().getResource("JenkinsConfigTest.yml").toExternalForm()))
+            .set("CASC_JENKINS_CONFIG", String.format("%s,%s", getClass().getResource("JenkinsConfigTest.yml").toExternalForm(), getClass().getResource("folder/jenkins2.yml").toExternalForm())))
             .around(new JenkinsConfiguredWithCodeRule());
 
 

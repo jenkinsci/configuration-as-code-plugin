@@ -13,10 +13,10 @@ jenkins:
   nodeProperties:
     - exwsNodeConfigurationDiskPools:
         nodeDiskPools:
-          - diskPoolRefId: "master-node-id"
+          - diskPoolRefId: "controller-node-id"
             nodeDisks:
-              - diskRefId: "master-node-disk"
-                nodeMountPoint: "/tmp/master-node"
+              - diskRefId: "controller-node-disk"
+                nodeMountPoint: "/tmp/controller-node"
 
   nodes:
     - permanent:

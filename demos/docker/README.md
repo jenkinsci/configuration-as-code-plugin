@@ -17,7 +17,8 @@ jenkins:
         templates:
           - labelString: "docker-agent"
             dockerTemplateBase:
-              image: "jenkins/slave"
+              # TODO: pin sha256 or versions when using in production
+              image: "jenkins/agent"
               volumes:
                 - hello:/hello
                 - world:/world

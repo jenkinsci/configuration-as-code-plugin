@@ -18,6 +18,6 @@ The Job DSL plugin uses groovy syntax for its job configuration DSL, so a mix of
 
 ## implementation note
 
-The main issue with the `jobs` declaration for now is the difference in the `Traits` declaration due to [JENKINS-45504](https://issues.jenkins.io/browse/JENKINS-45504). When is is resolved, the workaround using the `configure` part will no longer be needed and all traits will be declared under the organizations section.
+The main issue with the `jobs` declaration for now is the difference in the `Traits` declaration due to [JENKINS-45504](https://issues.jenkins.io/browse/JENKINS-45504). When this is resolved, the workaround using the `configure` part will no longer be needed and all traits will be declared under the organizations section.
 
 Job DSL only allows `periodic(int min)` for configuring a trigger for now. So to configure "1 day" for example, we need to use the `configure` workaround as shown in [bitbucket.yaml](bitbucket.yaml#L68)
