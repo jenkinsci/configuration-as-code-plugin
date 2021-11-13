@@ -9,7 +9,7 @@ jenkins:
   log:
     recorders:
     - name: "JCasC"
-      targets:
+      loggers:
       - level: "WARNING"
         name: "io.jenkins.plugins.casc"
 ```
