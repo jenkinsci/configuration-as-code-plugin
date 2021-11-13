@@ -8,7 +8,6 @@ import io.jenkins.plugins.casc.model.CNode;
 import java.util.List;
 import java.util.logging.Level;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 
 import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
