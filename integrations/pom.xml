@@ -337,7 +337,7 @@
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>artifact-manager-s3</artifactId>
-      <version>1.15</version>
+      <version>1.16</version>
       <scope>test</scope>
     </dependency>
     <dependency>
