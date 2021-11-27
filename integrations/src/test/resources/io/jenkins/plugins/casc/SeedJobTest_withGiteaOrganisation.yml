@@ -1,0 +1,11 @@
+jobs:
+  - script: >
+      organizationFolder('Gitea Organization Folder') {
+        organizations {
+          gitea {
+            serverUrl("https://git.example.com")
+            repoOwner("OWN")
+            credentialsId("gitea-token")
+          }
+        }
+      }
