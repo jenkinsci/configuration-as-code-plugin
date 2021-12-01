@@ -15,7 +15,7 @@
     <maven.deploy.skip>true</maven.deploy.skip> <!-- no need to be deployed during release, this is a test-only module -->
     <jackson.version>2.12.4</jackson.version>
     <netty.version>4.1.69.Final</netty.version>
-    <jenkins.version>2.319</jenkins.version>
+    <jenkins.version>2.319.1</jenkins.version>
     <junixsocket.version>2.4.0</junixsocket.version>
     <declarative-pipeline.version>1.9.1</declarative-pipeline.version>
     <kotlin-stdlib.version>1.5.31</kotlin-stdlib.version>
@@ -442,7 +442,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>gitlab-plugin</artifactId>
-      <version>1.5.20</version>
+      <version>1.5.24</version>
     </dependency>
 
     <dependency>
