@@ -454,7 +454,7 @@
     <dependency>
       <groupId>com.datapipe.jenkins.plugins</groupId>
       <artifactId>hashicorp-vault-plugin</artifactId>
-      <version>3.0.0</version>
+      <version>336.v182c0fbaaeb7</version>
     </dependency>
 
     <dependency>
