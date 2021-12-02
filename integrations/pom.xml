@@ -652,7 +652,7 @@
       <dependency>
         <groupId>com.squareup.okio</groupId>
         <artifactId>okio</artifactId>
-        <version>2.10.0</version>
+        <version>3.0.0</version>
       </dependency>
       <dependency>
         <groupId>org.jetbrains.kotlin</groupId>
