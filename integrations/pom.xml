@@ -264,7 +264,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>gitea</artifactId>
-      <version>1.4.0--rc182.9eb947470fcf</version>
+      <version>1.4.1</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>

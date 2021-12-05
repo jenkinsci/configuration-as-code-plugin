@@ -6,6 +6,29 @@ jobs:
             serverUrl("https://git.example.com")
             repoOwner("OWN")
             credentialsId("gitea-token")
+
+            traits {
+              giteaExcludeArchivedRepositories {}
+              giteaTagDiscovery {}
+              giteaBranchDiscovery {
+                strategyId(1)
+              }
+              giteaPullRequestDiscovery {
+                strategyId(2)
+              }
+              giteaForkDiscovery {
+                strategyId(1)
+                trust {
+                  giteaTrustContributors {}
+                }
+              }
+              giteaWebhookRegistration {
+                mode('ITEM')
+              }
+              giteaSSHCheckout {
+                credentialsId('ssh-gitea')
+              }
+            }
           }
         }
       }
