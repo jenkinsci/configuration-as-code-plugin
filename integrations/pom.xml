@@ -123,7 +123,7 @@
     <dependency>
       <groupId>io.jenkins.docker</groupId>
       <artifactId>docker-plugin</artifactId>
-      <version>1.2.2</version>
+      <version>1.2.5</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -259,6 +259,25 @@
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>git-client</artifactId>
       <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>gitea</artifactId>
+      <version>1.4.1</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <!-- Otherwise provided -->
+          <groupId>org.jenkins-ci.plugins</groupId>
+          <artifactId>jackson2-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <!-- Otherwise provided -->
+          <groupId>org.jenkins-ci.plugins</groupId>
+          <artifactId>git</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
