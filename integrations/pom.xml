@@ -89,7 +89,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>email-ext</artifactId>
-      <version>2.69</version>
+      <version>2.86</version>
       <scope>test</scope>
     </dependency>
 
@@ -259,6 +259,25 @@
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>git-client</artifactId>
       <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>gitea</artifactId>
+      <version>1.4.1</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <!-- Otherwise provided -->
+          <groupId>org.jenkins-ci.plugins</groupId>
+          <artifactId>jackson2-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <!-- Otherwise provided -->
+          <groupId>org.jenkins-ci.plugins</groupId>
+          <artifactId>git</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
