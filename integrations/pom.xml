@@ -263,6 +263,25 @@
 
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>gitea</artifactId>
+      <version>1.4.1</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <!-- Otherwise provided -->
+          <groupId>org.jenkins-ci.plugins</groupId>
+          <artifactId>jackson2-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <!-- Otherwise provided -->
+          <groupId>org.jenkins-ci.plugins</groupId>
+          <artifactId>git</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>keycloak</artifactId>
       <version>2.3.0</version>
       <scope>test</scope>
