@@ -6,6 +6,8 @@ import hudson.model.UnprotectedRootAction;
 import hudson.security.ACL;
 import hudson.security.ACLContext;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.logging.Logger;
 import javax.annotation.CheckForNull;
 import javax.servlet.http.HttpServletRequest;
@@ -49,7 +51,8 @@ public class TokenReloadAction implements UnprotectedRootAction {
         } else {
             String requestToken = getRequestToken(request);
 
-            if (token.equals(requestToken)) {
+            if (requestToken != null && MessageDigest.isEqual(token.getBytes(StandardCharsets.UTF_8), requestToken.getBytes(
+                StandardCharsets.UTF_8))) {
                 LOGGER.info("Configuration reload triggered via token");
 
                 try (ACLContext ignored = ACL.as(ACL.SYSTEM)) {
