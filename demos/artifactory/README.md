@@ -12,6 +12,7 @@ unclassified:
     useCredentialsPlugin: true
     jfrogInstances:
       - instanceId: artifactory
+        url: http://acme.com/artifactory
         artifactoryUrl: http://acme.com/artifactory
         distributionUrl: http://acme.com/distribution
         deployerCredentialsConfig:
