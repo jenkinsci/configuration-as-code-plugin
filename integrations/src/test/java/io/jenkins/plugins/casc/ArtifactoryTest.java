@@ -34,7 +34,7 @@ public class ArtifactoryTest {
         final List<JFrogPlatformInstance> jfrogInstances = descriptor.getJfrogInstances();
         assertThat(jfrogInstances, hasSize(1));
         assertThat(jfrogInstances.get(0).getId(), is(equalTo("artifactory")));
-        assertThat(jfrogInstances.get(0).getplatformUrl(), is(equalTo("http://acme.com/artifactory")));
+        assertThat(jfrogInstances.get(0).getPlatformUrl(), is(equalTo("http://acme.com/artifactory")));
         assertThat(jfrogInstances.get(0).getArtifactoryUrl(), is(equalTo("http://acme.com/artifactory")));
         assertThat(jfrogInstances.get(0).getDistributionUrl(), is(equalTo("http://acme.com/distribution")));
         assertThat(jfrogInstances.get(0).getDeployerCredentialsConfig().getCredentialsId(), is(equalTo("artifactory")));
