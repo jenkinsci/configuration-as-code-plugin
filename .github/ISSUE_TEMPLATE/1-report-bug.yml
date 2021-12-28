@@ -1,0 +1,94 @@
+name: '🐛 Bug report'
+labels: 'bug'
+description: Create a bug report to help us improve
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Never report security issues on GitHub or other public channels (Gitter/Twitter/etc.)**
+        Follow these instruction to report security issues: https://www.jenkins.io/security/#reporting-vulnerabilities
+
+  - type: textarea
+    attributes:
+      label: Jenkins and plugins versions report
+      description: |
+        For easier bug reporting, you can get the full list of plugins with this Groovy script that you can run in **Jenkins > Manage Jenkins > Script Console**:
+        ```groovy
+        println("Jenkins: ${Jenkins.instance.getVersion()}")
+        println("OS: ${System.getProperty('os.name')} - ${System.getProperty('os.version')}")
+        println "---"
+        
+        Jenkins.instance.pluginManager.plugins
+          .collect()
+          .sort { it.getShortName() }
+          .each {
+            plugin -> println("${plugin.getShortName()}:${plugin.getVersion()}")
+          }
+        return
+        ```
+      placeholder: |
+        Jenkins: 2.326
+        OS: Linux - 3.10.0-1160.45.1.el7.x86_64
+        ---
+        ace-editor:1.1
+        ant:1.13
+        antisamy-markup-formatter:2.5
+        apache-httpcomponents-client-4-api:4.5.13-1.0
+        authentication-tokens:1.4
+        bootstrap4-api:4.6.0-3
+        bootstrap5-api:5.1.3-4
+        bouncycastle-api:2.25
+        ...
+      value: |
+        <details>
+          <summary>Environment</summary>
+
+          <!-- Paste your environment details below -->
+          ```text
+          Paste the output here
+          ```
+
+        </details>
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: What Operating System are you using (both controller, and any agents involved in the problem)?
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Reproduction steps
+      description: |
+        Write bullet-point reproduction steps.
+        Be explicit about any relevant configuration, jobs, build history, user accounts, etc., redacting confidential information as needed.
+        The best reproduction steps start with a clean Jenkins install, perhaps a `docker run` command if possible.
+        Use screenshots where appropriate, copy textual output otherwise. When in doubt, do both.
+        Include relevant logs, debug if needed - https://www.jenkins.io/doc/book/system-administration/viewing-logs/
+      placeholder: |
+        1. Step 1: ...
+        2. Step 2: ...
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Expected Results
+      description: What was your expected result?
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Actual Results
+      description: What was the actual result?
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Anything else?
+      description: You can provide additional context below.
