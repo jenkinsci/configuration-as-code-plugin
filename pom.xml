@@ -19,7 +19,7 @@
   </modules>
 
   <properties>
-    <revision>1.56</revision>
+    <revision>1.55.2</revision>
     <changelist>-SNAPSHOT</changelist>
     <jenkins.version>2.249.1</jenkins.version>
     <java.level>8</java.level>
