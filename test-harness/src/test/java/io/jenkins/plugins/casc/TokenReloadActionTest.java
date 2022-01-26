@@ -180,6 +180,18 @@ public class TokenReloadActionTest {
     }
 
     @Test
+    @Envs({
+        @Env(name = "CASC_RELOAD_TOKEN", value = "")
+    })
+    public void reloadShouldUsePropertyAsTokenIfEnvVarIsEmpty() throws IOException {
+        System.setProperty("casc.reload.token", "someSecretValue");
+
+        tokenReloadAction.doIndex(newRequest("someSecretValue"), new ResponseImpl(null, response));
+
+        assertConfigReloaded();
+    }
+
+    @Test
     public void displayName() {
         assertEquals("Reload Configuration as Code", tokenReloadAction.getDisplayName());
     }
