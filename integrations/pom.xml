@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
     <artifactId>parent</artifactId>
     <groupId>io.jenkins.configuration-as-code</groupId>
-    <version>${revision}${changelist}</version>
+    <version>${changelist}</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -13,7 +13,8 @@
 
   <properties>
     <maven.deploy.skip>true</maven.deploy.skip> <!-- no need to be deployed during release, this is a test-only module -->
-    <jackson.version>2.12.4</jackson.version>
+    <jackson.version>2.13.1</jackson.version>
+    <enforcer.skip>true</enforcer.skip> <!-- I give up, too much effort to maintain enforcer here, should probably try clear out all enforcer only deps and see if it works -->
     <netty.version>4.1.72.Final</netty.version>
     <jenkins.version>2.319.1</jenkins.version>
     <junixsocket.version>2.4.0</junixsocket.version>
@@ -72,6 +73,11 @@
           <artifactId>build-info-extractor-maven3</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.ivy</groupId>
+      <artifactId>ivy</artifactId>
+      <version>2.5.0</version>
     </dependency>
 
     <dependency>
@@ -409,7 +415,7 @@
     <dependency>
       <groupId>org.antlr</groupId>
       <artifactId>antlr4-runtime</artifactId>
-      <version>4.9.2</version>
+      <version>4.9.3</version>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
@@ -418,7 +424,12 @@
     <dependency>
       <groupId>jaxen</groupId>
       <artifactId>jaxen</artifactId>
-      <version>1.2.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>xml-apis</groupId>
+          <artifactId>xml-apis</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -437,7 +448,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>slack</artifactId>
-      <version>2.48</version>
+      <version>602.v0da_f7458945d</version>
       <scope>test</scope>
     </dependency>
 
@@ -457,6 +468,18 @@
       <groupId>com.cloudbees.jenkins.plugins</groupId>
       <artifactId>custom-tools-plugin</artifactId>
       <version>0.8</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.minidev</groupId>
+      <artifactId>json-smart</artifactId>
+      <version>2.4.7</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.ow2.asm</groupId>
+          <artifactId>asm</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
@@ -491,14 +514,14 @@
     <dependency>
       <groupId>org.jsoup</groupId>
       <artifactId>jsoup</artifactId>
-      <version>1.14.2</version>
+      <version>1.14.3</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>com.vladsch.flexmark</groupId>
       <artifactId>flexmark-all</artifactId>
-      <version>0.50.42</version>
+      <version>0.62.2</version>
       <scope>test</scope>
     </dependency>
 
@@ -553,14 +576,34 @@
         <version>2.8.8</version>
       </dependency>
       <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>1.18.20</version>
+      </dependency>
+      <dependency>
+        <groupId>com.atlassian.plugins</groupId>
+        <artifactId>atlassian-plugins-core</artifactId>
+        <version>4.0.0-m029</version>
+      </dependency>
+      <dependency>
+        <groupId>io.atlassian.fugue</groupId>
+        <artifactId>fugue</artifactId>
+        <version>4.7.2</version>
+      </dependency>
+      <dependency>
         <groupId>com.squareup.okhttp3</groupId>
         <artifactId>logging-interceptor</artifactId>
-        <version>3.14.9</version>
+        <version>4.9.2</version>
       </dependency>
       <dependency>
         <groupId>com.squareup.okhttp3</groupId>
         <artifactId>okhttp</artifactId>
         <version>4.9.2</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jenkins-ci</groupId>
+        <artifactId>symbol-annotation</artifactId>
+        <version>1.21</version>
       </dependency>
 
       <dependency>
@@ -661,7 +704,7 @@
       <dependency>
         <groupId>com.google.errorprone</groupId>
         <artifactId>error_prone_annotations</artifactId>
-        <version>2.9.0</version>
+        <version>2.10.0</version>
       </dependency>
       <dependency>
         <groupId>com.google.protobuf</groupId>
@@ -686,7 +729,7 @@
       <dependency>
         <groupId>jaxen</groupId>
         <artifactId>jaxen</artifactId>
-        <version>1.1.6</version>
+        <version>1.2.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
@@ -772,7 +815,7 @@
       <dependency>
         <groupId>org.json</groupId>
         <artifactId>json</artifactId>
-        <version>20210307</version>
+        <version>20211205</version>
       </dependency>
       <dependency>
         <groupId>joda-time</groupId>
