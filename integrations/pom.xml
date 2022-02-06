@@ -781,7 +781,7 @@
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-plugin-api</artifactId>
-        <version>3.8.1</version>
+        <version>3.8.4</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
