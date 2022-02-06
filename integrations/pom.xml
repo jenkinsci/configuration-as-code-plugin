@@ -102,7 +102,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>active-directory</artifactId>
-      <version>2.25</version>
+      <version>2.25.1</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
