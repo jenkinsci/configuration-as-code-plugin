@@ -3,7 +3,7 @@ package io.jenkins.plugins.casc;
 import hudson.ExtensionList;
 import hudson.model.JDK;
 import hudson.tools.InstallSourceProperty;
-import hudson.tools.JDKInstaller;
+import io.jenkins.plugins.adoptopenjdk.AdoptOpenJDKInstaller;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import io.jenkins.plugins.casc.model.CNode;
@@ -16,7 +16,6 @@ import static io.jenkins.plugins.casc.misc.Util.toYamlString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author <a href="mailto:vektory79@gmail.com">Viktor Verbitsky</a>
@@ -33,15 +32,14 @@ public class JdkConfiguratorTest {
         assertEquals(1, descriptor.getInstallations().length);
 
         JDK jdk = descriptor.getInstallations()[0];
-        assertEquals("jdk8", jdk.getName());
+        assertEquals("jdk11", jdk.getName());
         assertEquals("/jdk", jdk.getHome());
 
         InstallSourceProperty installSourceProperty = jdk.getProperties().get(InstallSourceProperty.class);
         assertEquals(1, installSourceProperty.installers.size());
 
-        JDKInstaller installer = installSourceProperty.installers.get(JDKInstaller.class);
-        assertEquals("jdk-8u181-oth-JPR", installer.id);
-        assertTrue(installer.acceptLicense);
+        AdoptOpenJDKInstaller installer = installSourceProperty.installers.get(AdoptOpenJDKInstaller.class);
+        assertEquals("jdk-11.0.14+9", installer.id);
     }
 
     @Test

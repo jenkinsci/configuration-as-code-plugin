@@ -1,6 +1,6 @@
 # Configure JDK
 
-Basic configuration of the [JDK](https://plugins.jenkins.io/jdk-tool)
+Basic configuration of the [JDK](https://plugins.jenkins.io/jdk-tool), using [AdoptOpenJDK installer](https://plugins.jenkins.io/adoptopenjdk/)
 
 ## sample configuration
 
@@ -8,12 +8,11 @@ Basic configuration of the [JDK](https://plugins.jenkins.io/jdk-tool)
 tool:
   jdk:
     installations:
-      - name: jdk8
+      - name: jdk11
         home: "/jdk"
         properties:
           - installSource:
               installers:
-                - jdkInstaller:
-                    id: "jdk-8u181-oth-JPR"
-                    acceptLicense: true
+                - adoptOpenJdkInstaller:
+                    id: "jdk-11.0.14+9"
 ```

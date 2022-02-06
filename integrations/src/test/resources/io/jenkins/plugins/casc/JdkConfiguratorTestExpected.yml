@@ -1,9 +1,8 @@
 installations:
 - home: "/jdk"
-  name: "jdk8"
+  name: "jdk11"
   properties:
   - installSource:
       installers:
-      - jdkInstaller:
-          acceptLicense: true
-          id: "jdk-8u181-oth-JPR"
+      - adoptOpenJdkInstaller:
+          id: "jdk-11.0.14+9"

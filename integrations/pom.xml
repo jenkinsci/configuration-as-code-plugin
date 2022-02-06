@@ -386,6 +386,13 @@
 
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
+      <artifactId>adoptopenjdk</artifactId>
+      <version>1.4</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.jenkins.plugins</groupId>
       <artifactId>sge-cloud-plugin</artifactId>
       <version>1.22</version>
       <scope>test</scope>
