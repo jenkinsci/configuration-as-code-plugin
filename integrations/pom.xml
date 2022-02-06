@@ -401,7 +401,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>job-dsl</artifactId>
-      <version>1.77</version>
+      <version>1.78.3</version>
       <optional>true</optional>
       <exclusions>
         <exclusion>
