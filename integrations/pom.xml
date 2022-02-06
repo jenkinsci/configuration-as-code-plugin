@@ -616,7 +616,7 @@
       <dependency>
         <groupId>org.jenkins-ci</groupId>
         <artifactId>symbol-annotation</artifactId>
-        <version>1.21</version>
+        <version>1.23</version>
       </dependency>
 
       <dependency>
