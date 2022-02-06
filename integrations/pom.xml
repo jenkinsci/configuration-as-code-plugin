@@ -442,7 +442,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>ec2</artifactId>
-      <version>1.65</version>
+      <version>1.66</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
