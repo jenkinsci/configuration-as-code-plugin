@@ -491,7 +491,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>gitlab-plugin</artifactId>
-      <version>1.5.20</version>
+      <version>1.5.28</version>
     </dependency>
 
     <dependency>
