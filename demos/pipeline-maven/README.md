@@ -2,6 +2,8 @@
 
 Configuration examples for the [Pipeline Maven plugin](https://plugins.jenkins.io/pipeline-maven)
 
+This part only concerns the Maven integration into Jenkins pipelines. To configure Maven itself, refer to [its own examples](../maven/README.md)
+
 ## Default configuration
 
 This is the default configuration of the plugin, doing this or nothing is equal
@@ -29,7 +31,7 @@ tool:
     triggerDownstreamUponResultSuccess: false
 ```
 
-## Configurre database
+## Configure database
 
 To compute dependencies triggering, the plugin [has a database](https://github.com/jenkinsci/pipeline-maven-plugin#db-setup).
 By default, an in-memory H2 one. For production use, it is recommended to configure a PostgreSQL or a MySQL database.
