@@ -115,7 +115,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>config-file-provider</artifactId>
-      <version>3.8.1</version>
+      <version>3.9.0</version>
       <scope>test</scope>
     </dependency>
 
@@ -611,7 +611,7 @@
       <dependency>
         <groupId>com.squareup.okhttp3</groupId>
         <artifactId>okhttp</artifactId>
-        <version>4.9.2</version>
+        <version>4.9.3</version>
       </dependency>
       <dependency>
         <groupId>org.jenkins-ci</groupId>
@@ -752,7 +752,7 @@
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpasyncclient</artifactId>
-        <version>4.1.4</version>
+        <version>4.1.5</version>
       </dependency>
       <dependency>
         <groupId>org.jetbrains</groupId>
