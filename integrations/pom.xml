@@ -250,7 +250,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>github-oauth</artifactId>
-      <version>0.34</version>
+      <version>0.37</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
