@@ -57,7 +57,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>metrics</artifactId>
-      <version>4.0.2.8</version>
+      <version>4.0.2.8.1</version>
       <scope>test</scope>
     </dependency>
 
@@ -509,7 +509,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>azure-keyvault</artifactId>
-      <version>123.v1aba71c2d365</version>
+      <version>131.v867845ef6ae9</version>
     </dependency>
 
     <dependency>
@@ -616,7 +616,7 @@
       <dependency>
         <groupId>org.jenkins-ci</groupId>
         <artifactId>symbol-annotation</artifactId>
-        <version>1.21</version>
+        <version>1.23</version>
       </dependency>
 
       <dependency>
@@ -722,7 +722,7 @@
       <dependency>
         <groupId>com.google.protobuf</groupId>
         <artifactId>protobuf-java</artifactId>
-        <version>3.18.2</version>
+        <version>3.19.4</version>
       </dependency>
       <dependency>
         <groupId>com.squareup.okio</groupId>
@@ -767,7 +767,7 @@
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpcore</artifactId>
-        <version>4.4.14</version>
+        <version>4.4.15</version>
       </dependency>
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
