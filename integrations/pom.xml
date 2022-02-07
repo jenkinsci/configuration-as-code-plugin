@@ -416,7 +416,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>aws-credentials</artifactId>
-      <version>1.32</version>
+      <version>1.33</version>
       <scope>test</scope>
     </dependency>
     <dependency>
