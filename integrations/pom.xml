@@ -18,7 +18,7 @@
     <netty.version>4.1.72.Final</netty.version>
     <jenkins.version>2.319.1</jenkins.version>
     <junixsocket.version>2.4.0</junixsocket.version>
-    <declarative-pipeline.version>1.9.3</declarative-pipeline.version>
+    <declarative-pipeline.version>2.2064.v5eef7d0982b_e</declarative-pipeline.version>
     <kotlin-stdlib.version>1.6.10</kotlin-stdlib.version>
   </properties>
 
@@ -143,7 +143,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>docker-commons</artifactId>
-      <version>1.17</version>
+      <version>1.19</version>
       <scope>test</scope>
     </dependency>
 
@@ -591,7 +591,7 @@
       <dependency>
         <groupId>org.projectlombok</groupId>
         <artifactId>lombok</artifactId>
-        <version>1.18.20</version>
+        <version>1.18.22</version>
       </dependency>
       <dependency>
         <groupId>com.atlassian.plugins</groupId>
@@ -757,7 +757,7 @@
       <dependency>
         <groupId>org.jetbrains</groupId>
         <artifactId>annotations</artifactId>
-        <version>22.0.0</version>
+        <version>23.0.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
@@ -777,12 +777,12 @@
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-artifact</artifactId>
-        <version>3.8.3</version>
+        <version>3.8.4</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-model</artifactId>
-        <version>3.8.2</version>
+        <version>3.8.4</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
@@ -823,7 +823,7 @@
       <dependency>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>github-api</artifactId>
-        <version>1.222</version>
+        <version>1.301-378.v9807bd746da5</version>
       </dependency>
       <dependency>
         <groupId>org.json</groupId>
