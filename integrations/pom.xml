@@ -823,7 +823,7 @@
       <dependency>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>github-api</artifactId>
-        <version>1.222</version>
+        <version>1.301-378.v9807bd746da5</version>
       </dependency>
       <dependency>
         <groupId>org.json</groupId>
