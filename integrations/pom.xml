@@ -535,7 +535,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>nodejs</artifactId>
-      <version>1.4.0</version>
+      <version>1.5.1</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -812,7 +812,7 @@
       <dependency>
         <groupId>org.jenkins-ci.main</groupId>
         <artifactId>maven-plugin</artifactId>
-        <version>3.13</version>
+        <version>3.16</version>
       </dependency>
       <dependency>
         <groupId>org.jenkins-ci.modules</groupId>
