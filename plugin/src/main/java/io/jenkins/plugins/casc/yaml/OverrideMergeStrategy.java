@@ -36,7 +36,7 @@ public class OverrideMergeStrategy implements MergeStrategy {
                 // merge common entries
                 for (int i = 0; i < map2.getValue().size();) {
                     NodeTuple t2 = map2.getValue().get(i);
-                    boolean found = false; 
+                    boolean found = false;
                     for (NodeTuple tuple : map.getValue()) {
 
                         final Node key = tuple.getKeyNode();
@@ -60,7 +60,7 @@ public class OverrideMergeStrategy implements MergeStrategy {
                                     node.getEndMark()));
                         }
                     }
-                    if( !found ) {
+                    if ( !found ) {
                         ++i;
                     }
                 }
