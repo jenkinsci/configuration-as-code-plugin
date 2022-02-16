@@ -1,5 +1,6 @@
 package io.jenkins.plugins.casc.yaml;
 
+import io.jenkins.plugins.casc.CasCGlobalConfig;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.ConfiguratorException;
@@ -93,5 +94,22 @@ public class OverrideMergeStrategyTest {
             agentProtocals.contains("Ping"));
         assertTrue("unexpected sequence merging (missing JNLP4-connect) with override merge strategy",
             agentProtocals.contains("JNLP4-connect"));
+    }
+
+    @Test
+    public void multipleKeys() throws ConfiguratorException {
+        String multipleKeysA = getClass().getResource("multiple-keys-a.yml").toExternalForm();
+        String multipleKeysB = getClass().getResource("multiple-keys-b.yml").toExternalForm();
+
+        CasCGlobalConfig descriptor = (CasCGlobalConfig) j.jenkins.getDescriptor(CasCGlobalConfig.class);
+        assertNotNull(descriptor);
+
+        // merge without conflicts, A <- B
+        ConfigurationAsCode.get().configure(multipleKeysA, multipleKeysB);
+        assertEquals("b", descriptor.getConfigurationPath());
+
+        // merge without conflicts, B <- A
+        ConfigurationAsCode.get().configure(multipleKeysB, multipleKeysA);
+        assertEquals("a", descriptor.getConfigurationPath());
     }
 }
