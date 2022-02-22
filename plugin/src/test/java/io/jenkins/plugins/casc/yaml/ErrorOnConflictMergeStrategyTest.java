@@ -4,7 +4,6 @@ import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfiguratorException;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import static org.junit.Assert.assertEquals;
@@ -15,9 +14,6 @@ public class ErrorOnConflictMergeStrategyTest {
 
     @Rule
     public JenkinsRule j = new JenkinsRule();
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void merge() throws ConfiguratorException {

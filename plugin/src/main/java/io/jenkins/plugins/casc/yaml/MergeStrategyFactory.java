@@ -8,7 +8,7 @@ import org.apache.commons.lang.StringUtils;
 
 public class MergeStrategyFactory {
     private static MergeStrategy getMergeStrategy(@Nonnull String name) {
-        ExtensionList<MergeStrategy> mergeStrategyList = Jenkins.getInstance()
+        ExtensionList<MergeStrategy> mergeStrategyList = Jenkins.get()
             .getExtensionList(MergeStrategy.class);
         Optional<MergeStrategy> opt = mergeStrategyList.stream().
             filter(strategy -> strategy.getName().equals(name)).findFirst();
