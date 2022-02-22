@@ -16,7 +16,7 @@ public class MergeStrategyTest {
 
     @Test
     public void haveTheDefaultStrategy() {
-        ExtensionList<MergeStrategy> strategyExtensionList = Jenkins.getInstance()
+        ExtensionList<MergeStrategy> strategyExtensionList = Jenkins.get()
             .getExtensionList(MergeStrategy.class);
 
         assertTrue("should have at least one strategy",

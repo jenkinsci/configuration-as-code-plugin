@@ -764,7 +764,7 @@ public class ConfigurationAsCode extends ManagementLink {
         monitor.reset();
         context.clearListeners();
         context.addListener(monitor::record);
-        try (ACLContext acl = ACL.as(ACL.SYSTEM)) {
+        try (ACLContext acl = ACL.as2(ACL.SYSTEM2)) {
             invokeWith(entries, (configurator, config) -> configurator.configure(config, context));
         }
     }

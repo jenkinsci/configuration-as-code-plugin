@@ -9,10 +9,8 @@ import java.util.Set;
 import jenkins.model.Jenkins;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
-import org.junit.rules.ExpectedException;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import static org.junit.Assert.assertEquals;
@@ -29,9 +27,6 @@ public class OverrideMergeStrategyTest {
 
     @ClassRule
     public static final EnvironmentVariables environment = new EnvironmentVariables();
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @BeforeClass
     public static void setUp() {

@@ -55,7 +55,7 @@ public class TokenReloadAction implements UnprotectedRootAction {
                 StandardCharsets.UTF_8))) {
                 LOGGER.info("Configuration reload triggered via token");
 
-                try (ACLContext ignored = ACL.as(ACL.SYSTEM)) {
+                try (ACLContext ignored = ACL.as2(ACL.SYSTEM2)) {
                     ConfigurationAsCode.get().configure();
                 }
             } else {
