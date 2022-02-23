@@ -1,2 +1,3 @@
 jenkins:
   systemMessage: "hello a"
+  numExecutors: 0

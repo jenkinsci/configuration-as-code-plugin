@@ -102,9 +102,17 @@ public class OverrideMergeStrategyTest {
         // merge without conflicts, A <- B
         ConfigurationAsCode.get().configure(multipleKeysA, multipleKeysB);
         assertEquals("b", descriptor.getConfigurationPath());
+        assertEquals("unexpected systemMessage with override merge strategy",
+            "hello b", Jenkins.get().getSystemMessage());
+        assertEquals("unexpected numExecutors with override merge strategy",
+        1, Jenkins.get().getNumExecutors());
 
         // merge without conflicts, B <- A
         ConfigurationAsCode.get().configure(multipleKeysB, multipleKeysA);
         assertEquals("a", descriptor.getConfigurationPath());
+        assertEquals("unexpected systemMessage with override merge strategy",
+            "hello a", Jenkins.get().getSystemMessage());
+        assertEquals("unexpected numExecutors with override merge strategy",
+        0, Jenkins.get().getNumExecutors());
     }
 }
