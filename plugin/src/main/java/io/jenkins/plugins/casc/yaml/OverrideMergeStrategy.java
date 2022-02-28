@@ -48,7 +48,7 @@ public class OverrideMergeStrategy implements MergeStrategy {
                                 try {
                                     merge(tuple.getValueNode(), t2.getValueNode(), source);
                                 } catch (ConfiguratorConflictException e) {
-                                    map.getValue().set(i, t2);
+                                    map.getValue().set(map.getValue().indexOf(tuple), t2);
                                 }
                                 map2.getValue().remove(i);
                                 found = true;

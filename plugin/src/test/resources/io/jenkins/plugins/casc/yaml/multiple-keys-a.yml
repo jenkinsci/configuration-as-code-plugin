@@ -1,5 +1,6 @@
 jenkins:
   systemMessage: "hello a"
+  numExecutors: 0
 unclassified:
   casCGlobalConfig:
     configurationPath: "a"
