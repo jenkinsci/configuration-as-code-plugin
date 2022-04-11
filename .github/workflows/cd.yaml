@@ -40,7 +40,7 @@ jobs:
     if: needs.validate.outputs.should_release == 'true'
     steps:
       - name: Check out
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3.0.0
         with:
           fetch-depth: 0
       - name: Set up JDK 8
