@@ -32,6 +32,6 @@ jobs:
       run: mvn -Pjacoco clean verify -B -V --no-transfer-progress ${{ matrix.flags }}
 
     - name: Codecov coverage
-      uses: codecov/codecov-action@v2
+      uses: codecov/codecov-action@v3
       with:
         file: '*jacoco.xml'
