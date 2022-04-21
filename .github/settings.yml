@@ -71,3 +71,6 @@ labels:
   - name: dependencies
     color: 0366d6
     description: A PR that updates dependencies - used by Release Drafter
+  - name: developer
+    color: 80D14D
+    description: A PR that merits a release for plugin developers
