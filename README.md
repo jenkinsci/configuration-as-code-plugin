@@ -14,6 +14,7 @@
 - [Getting Started](#getting-started)
 - [Examples and demos](./demos)
 - [Handling Secrets](./docs/features/secrets.adoc)
+- [Important security aspect](#important-security-aspect)
 - [Exporting configurations](./docs/features/configExport.md)
 - [Validating configurations](./docs/features/jsonSchema.md)
 - [Merge Strategy](./docs/features/mergeStrategy.md)
@@ -235,6 +236,14 @@ jenkins:
               workDirPath: "/tmp"
 ```
 
+## Important security aspect
+
+It's important to understand that the writer of the ConfigAsCode yaml may not be the one that "runs" the instance
+(think separation between the configuration of the service and the installation of the service)
+and as such the user running the service needs to trust the writer of the yaml,
+otherwise they may be able to exfiltrate environment variables (which may contain sensitive data).
+They can also do that by granting themselves admin rights and using the script console,
+however the runner of the service may be wise to that and check that things are locked down correctly.
 
 ## Installing plugins
 
