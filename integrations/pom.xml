@@ -18,7 +18,6 @@
     <netty.version>4.1.74.Final</netty.version>
     <jenkins.version>2.332.2</jenkins.version>
     <junixsocket.version>2.4.0</junixsocket.version>
-    <declarative-pipeline.version>2.2064.v5eef7d0982b_e</declarative-pipeline.version>
     <kotlin-stdlib.version>1.6.10</kotlin-stdlib.version>
   </properties>
 
@@ -57,7 +56,6 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>metrics</artifactId>
-      <version>4.0.2.8</version>
       <scope>test</scope>
     </dependency>
 
@@ -95,7 +93,6 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>email-ext</artifactId>
-      <version>2.69</version>
       <scope>test</scope>
     </dependency>
 
@@ -170,14 +167,12 @@
     <dependency>
       <groupId>org.jenkinsci.plugins</groupId>
       <artifactId>pipeline-model-extensions</artifactId>
-      <version>${declarative-pipeline.version}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.jenkinsci.plugins</groupId>
       <artifactId>pipeline-model-definition</artifactId>
-      <version>${declarative-pipeline.version}</version>
       <scope>test</scope>
     </dependency>
 
@@ -355,7 +350,6 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>matrix-auth</artifactId>
-      <version>3.0.1</version>
       <scope>test</scope>
     </dependency>
 
@@ -455,7 +449,6 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>slack</artifactId>
-      <version>602.v0da_f7458945d</version>
       <scope>test</scope>
     </dependency>
 
@@ -491,7 +484,6 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>gitlab-plugin</artifactId>
-      <version>1.5.28</version>
     </dependency>
 
     <dependency>
@@ -842,7 +834,7 @@
       </dependency>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.303.x</artifactId>
+        <artifactId>bom-2.332.x</artifactId>
         <version>${plugin-bom.version}</version>
         <scope>import</scope>
         <type>pom</type>

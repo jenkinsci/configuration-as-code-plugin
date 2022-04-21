@@ -35,7 +35,7 @@ public class EssentialsTest {
         assertThat(accessKeys, hasSize(1));
 
         MetricsAccessKey accessKey = accessKeys.get(0);
-        assertThat(accessKey.getKey(), is("evergreen"));
+        assertThat(accessKey.getKey().getPlainText(), is("evergreen"));
         assertThat(accessKey.getDescription(), is("Key for evergreen health-check"));
         assertThat(accessKey.isCanHealthCheck(), is(true));
         assertThat(accessKey.isCanPing(), is(false));
