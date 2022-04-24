@@ -126,7 +126,7 @@
     <dependency>
       <groupId>io.jenkins.docker</groupId>
       <artifactId>docker-plugin</artifactId>
-      <version>1.2.2</version>
+      <version>1.2.8</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>

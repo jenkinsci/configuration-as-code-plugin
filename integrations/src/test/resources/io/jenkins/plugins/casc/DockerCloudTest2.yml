@@ -9,9 +9,9 @@ jenkins:
           - labelString: "docker-agent"
             dockerTemplateBase:
               image: "jenkins/slave"
-              volumes:
-                - hello:/hello
-                - world:/world
+              mounts:
+                - type=volume,source=hello,destination=/hello
+                - type=volume,source=world,destination=/world
               environmentsString: |
                 hello=world
                 foo=bar
@@ -24,9 +24,9 @@ jenkins:
           - labelString: "generic"
             dockerTemplateBase:
               image: "jenkins/slave"
-              volumes:
-                - hello:/hello
-                - world:/world
+              mounts:
+                - type=volume,source=hello,destination=/hello
+                - type=volume,source=world,destination=/world
               environmentsString: |
                 hello=world
                 foo=bar
