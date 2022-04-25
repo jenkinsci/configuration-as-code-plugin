@@ -19,9 +19,10 @@ jenkins:
             dockerTemplateBase:
               # TODO: pin sha256 or versions when using in production
               image: "jenkins/agent"
-              volumes:
-                - hello:/hello
-                - world:/world
+              mounts:
+                - "type=tmpfs,destination=/run"
+                - "type=bind,source=/var/run/docker.sock,destination=/var/run/docker.sock"
+                - "type=volume,src=hello,dst=/world"
               environmentsString: |
                 hello=world
                 foo=bar
