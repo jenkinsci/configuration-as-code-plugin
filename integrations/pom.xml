@@ -18,7 +18,7 @@
     <netty.version>4.1.74.Final</netty.version>
     <jenkins.version>2.332.2</jenkins.version>
     <junixsocket.version>2.4.0</junixsocket.version>
-    <kotlin-stdlib.version>1.6.10</kotlin-stdlib.version>
+    <kotlin-stdlib.version>1.6.21</kotlin-stdlib.version>
   </properties>
 
   <dependencies>
