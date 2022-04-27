@@ -1,5 +1,8 @@
 package io.jenkins.plugins.casc;
 
+import io.jenkins.plugins.casc.misc.Env;
+import io.jenkins.plugins.casc.misc.EnvVarsRule;
+import io.jenkins.plugins.casc.misc.Envs;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import java.io.IOException;
 import java.util.Collections;
@@ -13,6 +16,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.RestoreSystemProperties;
+import org.junit.rules.RuleChain;
 import org.jvnet.hudson.test.LoggerRule;
 import org.kohsuke.stapler.RequestImpl;
 import org.kohsuke.stapler.ResponseImpl;
@@ -33,8 +37,14 @@ public class TokenReloadActionTest {
     @Rule
     public final LoggerRule loggerRule = new LoggerRule();
 
-    @Rule
     public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+
+    public EnvVarsRule environment = new EnvVarsRule();
+
+    @Rule
+    public RuleChain chain = RuleChain
+        .outerRule(environment)
+        .around(j);
 
     private ServletResponseSpy response;
 
@@ -81,6 +91,28 @@ public class TokenReloadActionTest {
         return !lastTimeLoaded.equals(ConfigurationAsCode.get().getLastTimeLoaded());
     }
 
+    private void assertConfigReloaded() {
+        assertEquals(200, response.getStatus());
+
+        assertTrue(configWasReloaded());
+
+        List<LogRecord> messages = loggerRule.getRecords();
+        assertEquals(1, messages.size());
+        assertEquals("Configuration reload triggered via token", messages.get(0).getMessage());
+        assertEquals(Level.INFO, messages.get(0).getLevel());
+    }
+
+    private void assertConfigNotReloadedInvalidToken() {
+        assertEquals(401, response.getStatus());
+
+        assertFalse(configWasReloaded());
+
+        List<LogRecord> messages = loggerRule.getRecords();
+        assertEquals(1, messages.size());
+        assertEquals("Invalid token received, not reloading configuration", messages.get(0).getMessage());
+        assertEquals(Level.WARNING, messages.get(0).getLevel());
+    }
+
     @Before
     public void setUp() {
         tokenReloadAction = new TokenReloadAction();
@@ -113,14 +145,7 @@ public class TokenReloadActionTest {
         RequestImpl request = newRequest(null);
         tokenReloadAction.doIndex(request, new ResponseImpl(null, response));
 
-        assertEquals(401, response.getStatus());
-
-        assertFalse(configWasReloaded());
-
-        List<LogRecord> messages = loggerRule.getRecords();
-        assertEquals(1, messages.size());
-        assertEquals("Invalid token received, not reloading configuration", messages.get(0).getMessage());
-        assertEquals(Level.WARNING, messages.get(0).getLevel());
+        assertConfigNotReloadedInvalidToken();
     }
 
     @Test
@@ -129,14 +154,41 @@ public class TokenReloadActionTest {
 
         tokenReloadAction.doIndex(newRequest("someSecretValue"), new ResponseImpl(null, response));
 
-        assertEquals(200, response.getStatus());
+        assertConfigReloaded();
+    }
 
-        assertTrue(configWasReloaded());
+    @Test
+    @Envs({
+        @Env(name = "CASC_RELOAD_TOKEN", value = "someSecretValue")
+    })
+    public void reloadReturnsOkWhenCalledWithValidTokenSetByEnvVar() throws IOException {
+        tokenReloadAction.doIndex(newRequest("someSecretValue"), new ResponseImpl(null, response));
 
-        List<LogRecord> messages = loggerRule.getRecords();
-        assertEquals(1, messages.size());
-        assertEquals("Configuration reload triggered via token", messages.get(0).getMessage());
-        assertEquals(Level.INFO, messages.get(0).getLevel());
+        assertConfigReloaded();
+    }
+
+    @Test
+    @Envs({
+        @Env(name = "CASC_RELOAD_TOKEN", value = "someSecretValue")
+    })
+    public void reloadShouldNotUseTokenFromPropertyIfEnvVarIsSet() throws IOException {
+        System.setProperty("casc.reload.token", "otherSecretValue");
+
+        tokenReloadAction.doIndex(newRequest("otherSecretValue"), new ResponseImpl(null, response));
+
+        assertConfigNotReloadedInvalidToken();
+    }
+
+    @Test
+    @Envs({
+        @Env(name = "CASC_RELOAD_TOKEN", value = "")
+    })
+    public void reloadShouldUsePropertyAsTokenIfEnvVarIsEmpty() throws IOException {
+        System.setProperty("casc.reload.token", "someSecretValue");
+
+        tokenReloadAction.doIndex(newRequest("someSecretValue"), new ResponseImpl(null, response));
+
+        assertConfigReloaded();
     }
 
     @Test

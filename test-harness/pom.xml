@@ -1,10 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>parent</artifactId>
     <groupId>io.jenkins.configuration-as-code</groupId>
-    <version>${revision}${changelist}</version>
-    <relativePath>..</relativePath>
+    <version>${changelist}</version>
   </parent>
 
   <artifactId>test-harness</artifactId>
@@ -19,7 +18,7 @@
     <dependencies>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.249.x</artifactId>
+        <artifactId>bom-2.289.x</artifactId>
         <version>${plugin-bom.version}</version>
         <scope>import</scope>
         <type>pom</type>
@@ -59,7 +58,7 @@
     <dependency>
       <groupId>com.vladsch.flexmark</groupId>
       <artifactId>flexmark-all</artifactId>
-      <version>0.50.42</version>
+      <version>0.62.2</version>
     </dependency>
     <dependency>
       <groupId>com.github.stefanbirkner</groupId>

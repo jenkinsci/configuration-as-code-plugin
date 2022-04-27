@@ -1,5 +1,6 @@
 package io.jenkins.plugins.casc.yaml;
 
+import io.jenkins.plugins.casc.CasCGlobalConfig;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.ConfiguratorException;
@@ -8,10 +9,8 @@ import java.util.Set;
 import jenkins.model.Jenkins;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
-import org.junit.rules.ExpectedException;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import static org.junit.Assert.assertEquals;
@@ -28,9 +27,6 @@ public class OverrideMergeStrategyTest {
 
     @ClassRule
     public static final EnvironmentVariables environment = new EnvironmentVariables();
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @BeforeClass
     public static void setUp() {
@@ -93,5 +89,30 @@ public class OverrideMergeStrategyTest {
             agentProtocals.contains("Ping"));
         assertTrue("unexpected sequence merging (missing JNLP4-connect) with override merge strategy",
             agentProtocals.contains("JNLP4-connect"));
+    }
+
+    @Test
+    public void multipleKeys() throws ConfiguratorException {
+        String multipleKeysA = getClass().getResource("multiple-keys-a.yml").toExternalForm();
+        String multipleKeysB = getClass().getResource("multiple-keys-b.yml").toExternalForm();
+
+        CasCGlobalConfig descriptor = (CasCGlobalConfig) j.jenkins.getDescriptor(CasCGlobalConfig.class);
+        assertNotNull(descriptor);
+
+        // merge without conflicts, A <- B
+        ConfigurationAsCode.get().configure(multipleKeysA, multipleKeysB);
+        assertEquals("b", descriptor.getConfigurationPath());
+        assertEquals("unexpected systemMessage with override merge strategy",
+            "hello b", Jenkins.get().getSystemMessage());
+        assertEquals("unexpected numExecutors with override merge strategy",
+        1, Jenkins.get().getNumExecutors());
+
+        // merge without conflicts, B <- A
+        ConfigurationAsCode.get().configure(multipleKeysB, multipleKeysA);
+        assertEquals("a", descriptor.getConfigurationPath());
+        assertEquals("unexpected systemMessage with override merge strategy",
+            "hello a", Jenkins.get().getSystemMessage());
+        assertEquals("unexpected numExecutors with override merge strategy",
+        0, Jenkins.get().getNumExecutors());
     }
 }

@@ -36,6 +36,7 @@ public class OverrideMergeStrategy implements MergeStrategy {
                 // merge common entries
                 for (int i = 0; i < map2.getValue().size();) {
                     NodeTuple t2 = map2.getValue().get(i);
+                    boolean found = false;
                     for (NodeTuple tuple : map.getValue()) {
 
                         final Node key = tuple.getKeyNode();
@@ -47,17 +48,20 @@ public class OverrideMergeStrategy implements MergeStrategy {
                                 try {
                                     merge(tuple.getValueNode(), t2.getValueNode(), source);
                                 } catch (ConfiguratorConflictException e) {
-                                    map.getValue().set(i, t2);
+                                    map.getValue().set(map.getValue().indexOf(tuple), t2);
                                 }
                                 map2.getValue().remove(i);
-                            } else {
-                                i++;
+                                found = true;
+                                break;
                             }
                         } else {
                             throw new ConfiguratorException(
                                 String.format("Found non-mergeable configuration keys %s %s)", source,
                                     node.getEndMark()));
                         }
+                    }
+                    if ( !found ) {
+                        ++i;
                     }
                 }
                 // .. and add others

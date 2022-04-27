@@ -1,0 +1,16 @@
+name: '🚀 Feature request'
+labels: 'enhancement'
+description: I have a suggestion
+
+body:
+  - type: textarea
+    attributes:
+      label: What feature do you want to see added?
+      description: A clear and concise description of your feature request.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Upstream changes
+      description: Link here any upstream changes that might be relevant to this request
