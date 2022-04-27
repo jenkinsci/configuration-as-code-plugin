@@ -14,7 +14,7 @@
 - [Getting Started](#getting-started)
 - [Examples and demos](./demos)
 - [Handling Secrets](./docs/features/secrets.adoc)
-- [Important security aspect](#important-security-aspect)
+- [Security considerations](#security-considerations)
 - [Exporting configurations](./docs/features/configExport.md)
 - [Validating configurations](./docs/features/jsonSchema.md)
 - [Merge Strategy](./docs/features/mergeStrategy.md)
@@ -236,14 +236,13 @@ jenkins:
               workDirPath: "/tmp"
 ```
 
-## Important security aspect
-
-It's important to understand that the writer of the ConfigAsCode yaml may not be the one that "runs" the instance
-(think separation between the configuration of the service and the installation of the service)
-and as such the user running the service needs to trust the writer of the yaml,
-otherwise they may be able to exfiltrate environment variables (which may contain sensitive data).
-They can also do that by granting themselves admin rights and using the script console,
-however the runner of the service may be wise to that and check that things are locked down correctly.
+## Security considerations
+Only Jenkins administrators are able to create or update a Jenkins instance using configuration as code configuration files.
+However, in some environments, administrators may choose to allow less privileged users to modify portions of the configuration files, for example by storing them in an SCM repository that those users have access to.
+Allowing non-administrators to edit these configuration files can pose various security risks, so any changes made by non-administrators must be reviewed for safety before they are applied.
+Here are some examples of changes that could be problematic:
+- Modification of the security realm or authorization strategy settings could give users higher permissions than intended.
+- Interpolation of secrets in unprotected contexts may expose sensitive data. For example, a snippet like `systemMessage: "${SENSITIVE_VARIABLE}"` could expose the value of a sensitive environment variable to all users who are able to access Jenkins.
 
 ## Installing plugins
 
