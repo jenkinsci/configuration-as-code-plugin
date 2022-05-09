@@ -49,7 +49,7 @@ jobs:
           distribution: temurin
           java-version: 8
       - name: Release
-        uses: jenkins-infra/jenkins-maven-cd-action@v1.2.0
+        uses: jenkins-infra/jenkins-maven-cd-action@v1.3.0
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
