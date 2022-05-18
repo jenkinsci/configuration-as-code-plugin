@@ -240,7 +240,9 @@ jenkins:
 Only Jenkins administrators are able to create or update a Jenkins instance using configuration as code configuration files.
 However, in some environments, administrators may choose to allow less privileged users to modify portions of the configuration files, for example by storing them in an SCM repository that those users have access to.
 Allowing non-administrators to edit these configuration files can pose various security risks, so any changes made by non-administrators must be reviewed for safety before they are applied.
+
 Here are some examples of changes that could be problematic:
+
 - Modification of the security realm or authorization strategy settings could give users higher permissions than intended.
 - Interpolation of secrets in unprotected contexts may expose sensitive data. For example, a snippet like `systemMessage: "${SENSITIVE_VARIABLE}"` could expose the value of a sensitive environment variable to all users who are able to access Jenkins.
 
