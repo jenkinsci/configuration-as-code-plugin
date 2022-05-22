@@ -27,8 +27,8 @@ jenkins:
         retentionTimeout: 5
         connectTimeout: 10
         readTimeout: 20
-        # POD Yaml is not displayed in each build log
-        showRawYaml: false
+        # Enable whether the POD Yaml is displayed in each build log or not, `true` by default.
+        showRawYaml: true
 
         templates:
           - name: "test"
