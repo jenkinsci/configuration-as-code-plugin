@@ -27,6 +27,8 @@ jenkins:
         retentionTimeout: 5
         connectTimeout: 10
         readTimeout: 20
+        # POD Yaml is not displayed in each build log
+        showRawYaml: false
 
         templates:
           - name: "test"
@@ -78,6 +80,11 @@ jenkins:
               - emptyDirVolume:
                   memory: false
                   mountPath: "/tmp"
+              # Mount the content of the ConfigMap `configmap-name` with the data `config`.
+              - configMapVolume:
+                  configMapName: configmap-name
+                  mountPath: /home/jenkins/.aws/config
+                  subPath: config
             idleMinutes: "1"
             activeDeadlineSeconds: "120"
             slaveConnectTimeout: "1000"
