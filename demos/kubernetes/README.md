@@ -27,8 +27,6 @@ jenkins:
         retentionTimeout: 5
         connectTimeout: 10
         readTimeout: 20
-        # Enable whether the POD Yaml is displayed in each build log or not, `true` by default.
-        showRawYaml: true
 
         templates:
           - name: "test"
@@ -36,6 +34,9 @@ jenkins:
             instanceCap: 1234
             idleMinutes: 0
             label: "label"
+            # Enable whether the POD Yaml is displayed in each build log or not, `true` by default.
+            showRawYaml: true
+            
             volumes:
               - hostPathVolume:
                   mountPath: "mountPath"
