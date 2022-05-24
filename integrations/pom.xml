@@ -335,8 +335,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.jenkins-ci.plugins.workflow</groupId>
-      <artifactId>workflow-cps-global-lib</artifactId>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>pipeline-groovy-lib</artifactId>
+      <version>589.vb_a_b_4a_a_8c443c</version> <!-- TODO until in BOM -->
       <scope>test</scope>
     </dependency>
 
