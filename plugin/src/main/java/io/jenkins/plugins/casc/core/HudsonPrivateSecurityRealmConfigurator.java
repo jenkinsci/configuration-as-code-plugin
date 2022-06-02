@@ -15,8 +15,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.accmod.Restricted;
@@ -30,8 +28,7 @@ import org.kohsuke.stapler.DataBoundSetter;
 @Extension
 @Restricted(NoExternalUse.class)
 public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurator<HudsonPrivateSecurityRealm> {
-    private static final Logger logger = Logger.getLogger(HudsonPrivateSecurityRealmConfigurator.class.getName());
-    /// matches HudsonPrivateSecurityRealm.JBCRYPT_HEADER
+    // matches HudsonPrivateSecurityRealm.JBCRYPT_HEADER
     private static final String HASHED_PASSWORD_PREFIX = "#jbcrypt:";
 
     public HudsonPrivateSecurityRealmConfigurator() {
@@ -95,15 +92,7 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
         User updatedUser;
         if (StringUtils.isNotBlank(user.password)) {
             if (StringUtils.startsWith(user.password, HASHED_PASSWORD_PREFIX)) {
-                try {
-                    updatedUser = target
-                        .createAccountWithHashedPassword(user.id, user.password);
-                } catch (IllegalArgumentException | IOException e) {
-                    logger.log(Level.WARNING,
-                        "Failed to create user with presumed hashed password", e);
-                    // fallback, just create the account as is
-                    updatedUser = target.createAccount(user.id, user.password);
-                }
+                updatedUser = target.createAccountWithHashedPassword(user.id, user.password);
             } else {
                 updatedUser = target.createAccount(user.id, user.password);
             }
