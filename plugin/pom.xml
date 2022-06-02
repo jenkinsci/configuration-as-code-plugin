@@ -83,9 +83,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-text</artifactId>
-      <version>1.9</version>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>commons-text-api</artifactId>
+      <version>1.9-5.v7ea_44fe6061c</version>
     </dependency>
 
     <dependency>
