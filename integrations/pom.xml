@@ -357,7 +357,7 @@
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>artifact-manager-s3</artifactId>
-      <version>1.18</version>
+      <version>633.v4813787e78a_9</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -805,7 +805,7 @@
       <dependency>
         <groupId>org.jenkins-ci.main</groupId>
         <artifactId>maven-plugin</artifactId>
-        <version>3.17</version>
+        <version>3.19</version>
       </dependency>
       <dependency>
         <groupId>org.jenkins-ci.modules</groupId>
@@ -821,7 +821,7 @@
       <dependency>
         <groupId>org.json</groupId>
         <artifactId>json</artifactId>
-        <version>20211205</version>
+        <version>20220320</version>
       </dependency>
       <dependency>
         <groupId>joda-time</groupId>
