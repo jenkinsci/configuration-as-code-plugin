@@ -82,7 +82,7 @@
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>crowd2</artifactId>
       <scope>test</scope>
-      <version>2.0.2</version>
+      <version>3.1.2</version>
     </dependency>
 
     <dependency>
