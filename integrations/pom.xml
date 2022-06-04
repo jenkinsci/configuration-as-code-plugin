@@ -805,7 +805,7 @@
       <dependency>
         <groupId>org.jenkins-ci.main</groupId>
         <artifactId>maven-plugin</artifactId>
-        <version>3.17</version>
+        <version>3.19</version>
       </dependency>
       <dependency>
         <groupId>org.jenkins-ci.modules</groupId>
@@ -816,12 +816,12 @@
       <dependency>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>github-api</artifactId>
-        <version>1.301-378.v9807bd746da5</version>
+        <version>1.303-400.v35c2d8258028</version>
       </dependency>
       <dependency>
         <groupId>org.json</groupId>
         <artifactId>json</artifactId>
-        <version>20211205</version>
+        <version>20220320</version>
       </dependency>
       <dependency>
         <groupId>joda-time</groupId>
