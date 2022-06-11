@@ -238,7 +238,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>external-workspace-manager</artifactId>
-      <version>1.2.2</version>
+      <version>1.2.3</version>
       <scope>test</scope>
     </dependency>
 
@@ -589,7 +589,7 @@
       <dependency>
         <groupId>com.atlassian.plugins</groupId>
         <artifactId>atlassian-plugins-core</artifactId>
-        <version>7.0.0</version>
+        <version>7.1.2-ee2c3d6e1</version>
       </dependency>
       <dependency>
         <groupId>io.atlassian.fugue</groupId>
