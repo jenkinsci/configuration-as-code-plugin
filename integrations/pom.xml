@@ -18,7 +18,7 @@
     <netty.version>4.1.74.Final</netty.version>
     <jenkins.version>2.346</jenkins.version>
     <junixsocket.version>2.4.0</junixsocket.version>
-    <kotlin-stdlib.version>1.6.21</kotlin-stdlib.version>
+    <kotlin-stdlib.version>1.7.0</kotlin-stdlib.version>
   </properties>
 
   <dependencies>
@@ -238,7 +238,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>external-workspace-manager</artifactId>
-      <version>1.2.2</version>
+      <version>1.2.3</version>
       <scope>test</scope>
     </dependency>
 
