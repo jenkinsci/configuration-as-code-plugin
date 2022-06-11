@@ -238,7 +238,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>external-workspace-manager</artifactId>
-      <version>1.2.2</version>
+      <version>1.2.3</version>
       <scope>test</scope>
     </dependency>
 
