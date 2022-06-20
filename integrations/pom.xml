@@ -557,6 +557,12 @@
       <artifactId>maven-plugin</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.jenkins-ci.modules</groupId>
+      <artifactId>sshd</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <dependencyManagement>
@@ -835,7 +841,7 @@
       </dependency>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.332.x</artifactId>
+        <artifactId>bom-2.346.x</artifactId>
         <version>${plugin-bom.version}</version>
         <scope>import</scope>
         <type>pom</type>
