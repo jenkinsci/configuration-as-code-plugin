@@ -11,7 +11,7 @@ jobs:
       should_release: ${{ steps.verify-ci-status.outputs.result == 'success' && steps.interesting-categories.outputs.interesting == 'true' }}
     steps:
       - name: Verify CI status
-        uses: jenkins-infra/verify-ci-status-action@v1.2.0
+        uses: jenkins-infra/verify-ci-status-action@v1.2.1
         id: verify-ci-status
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
