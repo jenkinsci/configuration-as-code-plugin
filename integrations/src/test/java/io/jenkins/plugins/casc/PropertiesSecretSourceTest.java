@@ -5,9 +5,9 @@ import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
@@ -48,7 +48,7 @@ public class PropertiesSecretSourceTest {
     public void testSecretsFromPropertiesAreUpdatedAfterReload() throws Exception {
         File secretsFile =  new File(getClass().getResource("secrets.properties").getFile());
         Properties secrets = new Properties();
-        InputStream inputStream = new FileInputStream(secretsFile);
+        InputStream inputStream = Files.newInputStream(secretsFile.toPath());
         secrets.load(inputStream);
 
         FileWriter fileWriter = new FileWriter(secretsFile);
