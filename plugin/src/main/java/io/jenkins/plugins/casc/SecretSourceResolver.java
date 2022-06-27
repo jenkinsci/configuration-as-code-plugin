@@ -18,7 +18,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.commons.text.TextStringBuilder;
 import org.apache.commons.text.lookup.StringLookup;
-import org.apache.commons.text.lookup.StringLookupFactory;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.DoNotUse;
 
@@ -34,6 +33,7 @@ public class SecretSourceResolver {
     private static final String escapeEnclosedBy = escapedWith + enclosedBy;
 
     private static final Logger LOGGER = Logger.getLogger(SecretSourceResolver.class.getName());
+
     private final StringSubstitutor nullSubstitutor;
     private final StringSubstitutor substitutor;
 
@@ -49,9 +49,9 @@ public class SecretSourceResolver {
         map = Collections.unmodifiableMap(map);
 
         substitutor = new StringSubstitutor(
-            StringLookupFactory.INSTANCE.interpolatorStringLookup(
+            new FixedInterpolatorStringLookup(
                 map,
-                new ConfigurationContextStringLookup(configurationContext), false))
+                new ConfigurationContextStringLookup(configurationContext)))
             .setEscapeChar(escapedWith)
             .setVariablePrefix(enclosedBy)
             .setVariableSuffix(enclosedIn)

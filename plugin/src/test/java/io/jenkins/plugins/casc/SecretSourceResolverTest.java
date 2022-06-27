@@ -203,6 +203,18 @@ public class SecretSourceResolverTest {
         assertThat(resolve("http://${FOO}:${BAR}"), equalTo("http://www.foo.io:8080"));
     }
 
+    /**
+     * Ensures that prefixes in the secret ID which are not covered by the CasC protocol substitutors (e.g. base64:, file:)
+     * are left untouched and not removed.
+     */
+    @Test
+    public void resolve_preservesPrefixesNotCoveredBySubstitutors() {
+        final String secret = "foobar";
+
+        environment.set("arn:aws:secretsmanager:eu-central-1:123456789012:secret:my-secret", secret);
+        assertThat(resolve("${arn:aws:secretsmanager:eu-central-1:123456789012:secret:my-secret}"), equalTo(secret));
+    }
+
     @Test
     public void resolve_mixedMultipleEntriesWithDefault() {
         environment.set("FOO", "www.foo.io");
