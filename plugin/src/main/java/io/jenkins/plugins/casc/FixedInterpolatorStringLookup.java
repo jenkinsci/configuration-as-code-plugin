@@ -233,64 +233,18 @@ class FixedInterpolatorStringLookup implements StringLookup {
     private final Map<String, StringLookup> stringLookupMap;
 
     /**
-     * Creates an instance using only lookups that work without initial properties and are stateless.
-     * <p>
-     * Uses the {@link StringLookupFactory default lookups}.
-     * </p>
-     */
-    FixedInterpolatorStringLookup() {
-        this((Map<String, String>) null);
-    }
-
-    /**
      * Creates a fully customized instance.
      *
      * @param stringLookupMap the map of string lookups.
      * @param defaultStringLookup the default string lookup.
-     * @param addDefaultLookups whether the default lookups should be used.
      */
-    FixedInterpolatorStringLookup(final Map<String, StringLookup> stringLookupMap, final StringLookup defaultStringLookup,
-        final boolean addDefaultLookups) {
+    FixedInterpolatorStringLookup(final Map<String, StringLookup> stringLookupMap, final StringLookup defaultStringLookup) {
         super();
         this.defaultStringLookup = defaultStringLookup;
         this.stringLookupMap = new HashMap<>(stringLookupMap.size());
         for (final Entry<String, StringLookup> entry : stringLookupMap.entrySet()) {
             this.stringLookupMap.put(toKey(entry.getKey()), entry.getValue());
         }
-        if (addDefaultLookups) {
-            StringLookupFactory.INSTANCE.addDefaultStringLookups(this.stringLookupMap);
-        }
-    }
-
-    /**
-     * Creates an instance using only lookups that work without initial properties and are stateless.
-     * <p>
-     * Uses the {@link StringLookupFactory default lookups}.
-     * </p>
-     *
-     * @param <V> the map's value type.
-     * @param defaultMap the default map for string lookups.
-     */
-    <V> FixedInterpolatorStringLookup(final Map<String, V> defaultMap) {
-        this(StringLookupFactory.INSTANCE.mapStringLookup(defaultMap == null ? new HashMap<String, V>() : defaultMap));
-    }
-
-    /**
-     * Creates an instance with the given lookup.
-     *
-     * @param defaultStringLookup the default lookup.
-     */
-    FixedInterpolatorStringLookup(final StringLookup defaultStringLookup) {
-        this(new HashMap<>(), defaultStringLookup, true);
-    }
-
-    /**
-     * Gets the lookup map.
-     *
-     * @return The lookup map.
-     */
-    public Map<String, StringLookup> getStringLookupMap() {
-        return stringLookupMap;
     }
 
     /**

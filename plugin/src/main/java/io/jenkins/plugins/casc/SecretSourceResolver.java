@@ -51,7 +51,7 @@ public class SecretSourceResolver {
         substitutor = new StringSubstitutor(
             new FixedInterpolatorStringLookup(
                 map,
-                new ConfigurationContextStringLookup(configurationContext), false))
+                new ConfigurationContextStringLookup(configurationContext)))
             .setEscapeChar(escapedWith)
             .setVariablePrefix(enclosedBy)
             .setVariableSuffix(enclosedIn)
