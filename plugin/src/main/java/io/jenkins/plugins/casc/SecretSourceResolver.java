@@ -34,6 +34,7 @@ public class SecretSourceResolver {
     private static final String escapeEnclosedBy = escapedWith + enclosedBy;
 
     private static final Logger LOGGER = Logger.getLogger(SecretSourceResolver.class.getName());
+
     private final StringSubstitutor nullSubstitutor;
     private final StringSubstitutor substitutor;
 
@@ -49,7 +50,7 @@ public class SecretSourceResolver {
         map = Collections.unmodifiableMap(map);
 
         substitutor = new StringSubstitutor(
-            StringLookupFactory.INSTANCE.interpolatorStringLookup(
+            new FixedInterpolatorStringLookup(
                 map,
                 new ConfigurationContextStringLookup(configurationContext), false))
             .setEscapeChar(escapedWith)
