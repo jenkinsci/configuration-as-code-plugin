@@ -381,7 +381,7 @@ public class SecretSourceResolverTest {
 
     @Test
     public void resolve_JsonWithNewlineInValue() {
-        String input = "{ \"a\": \"hello\nworld\", \"b\": 2 }";
+        String input = "{ \"a\": \"hello\\nworld\", \"b\": 2 }";
         environment.set("FOO", input);
         String output = resolve("${json:a:${FOO}}");
         assertThat(output, equalTo("hello\nworld"));
