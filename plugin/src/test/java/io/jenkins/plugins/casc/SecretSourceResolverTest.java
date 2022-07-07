@@ -3,7 +3,6 @@ package io.jenkins.plugins.casc;
 import io.jenkins.plugins.casc.SecretSourceResolver.Base64Lookup;
 import io.jenkins.plugins.casc.SecretSourceResolver.FileBase64Lookup;
 import io.jenkins.plugins.casc.SecretSourceResolver.FileStringLookup;
-import io.jenkins.plugins.casc.SecretSourceResolver.JsonLookup;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -47,8 +46,6 @@ public class SecretSourceResolverTest {
     public static final StringLookup DECODE = StringLookupFactory.INSTANCE.base64DecoderStringLookup();
     public static final StringLookup FILE = FileStringLookup.INSTANCE;
     public static final StringLookup BINARYFILE = FileBase64Lookup.INSTANCE;
-
-    public static final StringLookup JSON = JsonLookup.INSTANCE;
 
     @Before
     public void initLogging() {
@@ -360,15 +357,6 @@ public class SecretSourceResolverTest {
     }
 
     /**
-     * Check that JSON embedded directly in the statement is supported
-     */
-    @Test
-    public void resolve_JsonWithoutExpansion() {
-        String output = resolve("${json:a:{ \"a\": 1, \"b\": 2 }}");
-        assertThat(output, equalTo("1"));
-    }
-
-    /**
      * Check that prettified / multi-line JSON is supported
      */
     @Test
@@ -385,6 +373,24 @@ public class SecretSourceResolverTest {
         environment.set("FOO", input);
         String output = resolve("${json:a:${FOO}}");
         assertThat(output, equalTo("hello\nworld"));
+    }
+
+    @Test
+    public void resolve_JsonWithSpaceInKey() {
+        String input = "{ \"abc def\": 1, \"b\": 2 }";
+        environment.set("FOO", input);
+        String output = resolve("${json:abc def:${FOO}}");
+        assertThat(output, equalTo("1"));
+    }
+
+    /**
+     * Test a mix of JSON and other lookups
+     */
+    @Test
+    public void resolve_JsonFromFile() throws Exception {
+        String input = getPath("secret.json").toAbsolutePath().toString();
+        String output = resolve("${json:Our secret:${file:" + input + "}}");
+        assertThat(output, equalTo("Hello World"));
     }
 
     @Test
