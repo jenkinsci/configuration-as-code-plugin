@@ -359,10 +359,32 @@ public class SecretSourceResolverTest {
         assertThat(output, equalTo("1"));
     }
 
+    /**
+     * Check that JSON embedded directly in the statement is supported
+     */
     @Test
-    public void resolve_JsonLookup() {
-        String lookup = JSON.lookup("a:{ \"a\": 1, \"b\": 2 }");
-        assertThat(lookup, equalTo("1"));
+    public void resolve_JsonWithoutExpansion() {
+        String output = resolve("${json:a:{ \"a\": 1, \"b\": 2 }}");
+        assertThat(output, equalTo("1"));
+    }
+
+    /**
+     * Check that prettified / multi-line JSON is supported
+     */
+    @Test
+    public void resolve_JsonWithNewlineBetweenTokens() {
+        String input = "{ \n \"a\": 1, \n \"b\": 2 }";
+        environment.set("FOO", input);
+        String output = resolve("${json:a:${FOO}}");
+        assertThat(output, equalTo("1"));
+    }
+
+    @Test
+    public void resolve_JsonWithNewlineInValue() {
+        String input = "{ \"a\": \"hello\nworld\", \"b\": 2 }";
+        environment.set("FOO", input);
+        String output = resolve("${json:a:${FOO}}");
+        assertThat(output, equalTo("hello\nworld"));
     }
 
     @Test
