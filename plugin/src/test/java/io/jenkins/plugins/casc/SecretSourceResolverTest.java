@@ -349,6 +349,60 @@ public class SecretSourceResolverTest {
     }
 
     @Test
+    public void resolve_Json() {
+        String input = "{ \"a\": 1, \"b\": 2 }";
+        environment.set("FOO", input);
+        String output = resolve("${json:a:${FOO}}");
+        assertThat(output, equalTo("1"));
+    }
+
+    /**
+     * Check that prettified / multi-line JSON is supported
+     */
+    @Test
+    public void resolve_JsonWithNewlineBetweenTokens() {
+        String input = "{ \n \"a\": 1, \n \"b\": 2 }";
+        environment.set("FOO", input);
+        String output = resolve("${json:a:${FOO}}");
+        assertThat(output, equalTo("1"));
+    }
+
+    @Test
+    public void resolve_JsonWithNewlineInValue() {
+        String input = "{ \"a\": \"hello\\nworld\", \"b\": 2 }";
+        environment.set("FOO", input);
+        String output = resolve("${json:a:${FOO}}");
+        assertThat(output, equalTo("hello\nworld"));
+    }
+
+    @Test
+    public void resolve_JsonWithSpaceInKey() {
+        String input = "{ \"abc def\": 1, \"b\": 2 }";
+        environment.set("FOO", input);
+        String output = resolve("${json:abc def:${FOO}}");
+        assertThat(output, equalTo("1"));
+    }
+
+    /**
+     * Test a mix of JSON and other lookups
+     */
+    @Test
+    public void resolve_JsonFromFile() throws Exception {
+        String input = getPath("secret.json").toAbsolutePath().toString();
+        String output = resolve("${json:Our secret:${file:" + input + "}}");
+        assertThat(output, equalTo("Hello World"));
+    }
+
+    @Test
+    public void resolve_JsonMissingKey() {
+        String input ="{ \"b\": 2 }";
+        environment.set("FOO", input);
+        String output = resolve("${json:a:${FOO}}");
+        assertTrue(logContains("Configuration import: JSON secret did not contain the specified key 'a'. Will default to empty string."));
+        assertThat(output, equalTo(""));
+    }
+
+    @Test
     @Issue("SECURITY-1446")
     @WithoutJenkins
     public void shouldEncodeInternalVarsProperly() {

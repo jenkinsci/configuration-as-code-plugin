@@ -18,6 +18,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.commons.text.TextStringBuilder;
 import org.apache.commons.text.lookup.StringLookup;
+import org.json.JSONObject;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.DoNotUse;
 
@@ -46,6 +47,7 @@ public class SecretSourceResolver {
         map.put("file", FileStringLookup.INSTANCE);
         map.put("readFile", FileStringLookup.INSTANCE);
         map.put("decodeBase64", DecodeBase64Lookup.INSTANCE);
+        map.put("json", JsonLookup.INSTANCE);
         map = Collections.unmodifiableMap(map);
 
         substitutor = new StringSubstitutor(
@@ -199,4 +201,29 @@ public class SecretSourceResolver {
             }
         }
     }
+
+    static class JsonLookup implements StringLookup {
+
+        static final JsonLookup INSTANCE = new JsonLookup();
+
+        private JsonLookup() {
+
+        }
+
+        @Override
+        public String lookup(@NonNull final String key) {
+            final String[] components = key.split(":", 2);
+            final String jsonFieldName = components[0];
+            final String json = components[1];
+            final JSONObject root = new JSONObject(json);
+
+            final String output = root.optString(jsonFieldName, null);
+            if (output == null) {
+                LOGGER.log(Level.WARNING, String.format("Configuration import: JSON secret did not contain the specified key '%s'. Will default to empty string.", jsonFieldName));
+                return "";
+            }
+            return output;
+        }
+    }
+
 }
