@@ -24,7 +24,7 @@
     <jenkins.version>2.289.3</jenkins.version>
     <tagNameFormat>configuration-as-code-@{project.version}</tagNameFormat>
     <useBeta>true</useBeta>
-    <plugin-bom.version>1409.v7659b_c072f18</plugin-bom.version>
+    <plugin-bom.version>1478.v81d3dc4f9a_43</plugin-bom.version>
   </properties>
 
   <name>Configuration as Code Parent</name>
