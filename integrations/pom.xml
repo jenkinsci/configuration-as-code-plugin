@@ -595,7 +595,7 @@
       <dependency>
         <groupId>com.atlassian.plugins</groupId>
         <artifactId>atlassian-plugins-core</artifactId>
-        <version>7.1.3</version>
+        <version>7.1.4</version>
       </dependency>
       <dependency>
         <groupId>io.atlassian.fugue</groupId>
