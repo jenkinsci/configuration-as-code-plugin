@@ -216,7 +216,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>github-branch-source</artifactId>
-      <version>1598.v91207e9f9b_4a_</version>
+      <version>1656.v77eddb_b_e95df</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -496,7 +496,7 @@
     <dependency>
       <groupId>com.datapipe.jenkins.plugins</groupId>
       <artifactId>hashicorp-vault-plugin</artifactId>
-      <version>336.v182c0fbaaeb7</version>
+      <version>351.vdb_f83a_1c6a_9d</version>
     </dependency>
 
     <dependency>
