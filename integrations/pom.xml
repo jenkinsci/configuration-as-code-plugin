@@ -363,7 +363,7 @@
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>aws-global-configuration</artifactId>
-      <version>1.7</version>
+      <version>100.v4619b_45d2dfc</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
