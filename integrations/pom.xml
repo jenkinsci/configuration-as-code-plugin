@@ -265,7 +265,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>gitea</artifactId>
-      <version>1.4.1</version>
+      <version>1.4.3</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -721,7 +721,7 @@
       <dependency>
         <groupId>com.google.protobuf</groupId>
         <artifactId>protobuf-java</artifactId>
-        <version>3.19.4</version>
+        <version>3.21.2</version>
       </dependency>
       <dependency>
         <groupId>com.squareup.okio</groupId>
@@ -786,7 +786,7 @@
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-plugin-api</artifactId>
-        <version>3.8.5</version>
+        <version>3.8.6</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
