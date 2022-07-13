@@ -85,7 +85,7 @@
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>commons-text-api</artifactId>
-      <version>1.9-5.v7ea_44fe6061c</version>
+      <version>1.9-9.v39a_53e2e0343</version>
     </dependency>
 
     <dependency>
