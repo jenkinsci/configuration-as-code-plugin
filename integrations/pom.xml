@@ -502,7 +502,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>azure-keyvault</artifactId>
-      <version>131.v867845ef6ae9</version>
+      <version>136.veb1d1296db97</version>
     </dependency>
 
     <dependency>
@@ -595,7 +595,7 @@
       <dependency>
         <groupId>com.atlassian.plugins</groupId>
         <artifactId>atlassian-plugins-core</artifactId>
-        <version>7.1.3</version>
+        <version>7.1.4</version>
       </dependency>
       <dependency>
         <groupId>io.atlassian.fugue</groupId>
@@ -610,7 +610,7 @@
       <dependency>
         <groupId>com.squareup.okhttp3</groupId>
         <artifactId>okhttp</artifactId>
-        <version>4.9.3</version>
+        <version>4.10.0</version>
       </dependency>
       <dependency>
         <groupId>org.jenkins-ci</groupId>
