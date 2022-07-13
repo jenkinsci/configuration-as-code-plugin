@@ -490,13 +490,13 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>mercurial</artifactId>
-      <version>2.16.1</version>
+      <version>2.16.2</version>
     </dependency>
 
     <dependency>
       <groupId>com.datapipe.jenkins.plugins</groupId>
       <artifactId>hashicorp-vault-plugin</artifactId>
-      <version>336.v182c0fbaaeb7</version>
+      <version>351.vdb_f83a_1c6a_9d</version>
     </dependency>
 
     <dependency>
