@@ -4,7 +4,6 @@ import io.jenkins.plugins.casc.SecretSourceResolver.Base64Lookup;
 import io.jenkins.plugins.casc.SecretSourceResolver.FileBase64Lookup;
 import io.jenkins.plugins.casc.SecretSourceResolver.FileStringLookup;
 import io.jenkins.plugins.casc.SecretSourceResolver.SystemPropertyLookup;
-
 import java.io.File;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
