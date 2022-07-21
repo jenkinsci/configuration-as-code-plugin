@@ -3,6 +3,7 @@ package io.jenkins.plugins.casc;
 import io.jenkins.plugins.casc.SecretSourceResolver.Base64Lookup;
 import io.jenkins.plugins.casc.SecretSourceResolver.FileBase64Lookup;
 import io.jenkins.plugins.casc.SecretSourceResolver.FileStringLookup;
+import io.jenkins.plugins.casc.SecretSourceResolver.SystemPropertyLookup;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -46,6 +47,7 @@ public class SecretSourceResolverTest {
     public static final StringLookup DECODE = StringLookupFactory.INSTANCE.base64DecoderStringLookup();
     public static final StringLookup FILE = FileStringLookup.INSTANCE;
     public static final StringLookup BINARYFILE = FileBase64Lookup.INSTANCE;
+    public static final StringLookup SYSPROP = SystemPropertyLookup.INSTANCE;
 
     @Before
     public void initLogging() {
@@ -346,6 +348,24 @@ public class SecretSourceResolverTest {
         assertThat(lookup, equalTo(expected));
         assertThat(actual, equalTo(expected));
         assertThat(actualBytes, equalTo(expectedBytes));
+    }
+
+    @Test
+    public void resolve_SystemProperty() throws Exception {
+        String input = "java.version";
+        String expected = System.getProperty(input);
+        String output = resolve("${sysProp:" + input + "}");
+        assertThat(output, equalTo(SYSPROP.lookup(input)));
+        assertThat(output, equalTo(expected));
+    }
+
+    @Test
+    public void resolve_SystemPropertyNotFound() throws Exception {
+        String input = "java.version.non-existent";
+        String expected = "";
+        String output = resolve("${sysProp:" + input + "}");
+        assertThat(output, equalTo(SYSPROP.lookup(input)));
+        assertThat(output, equalTo(expected));
     }
 
     @Test

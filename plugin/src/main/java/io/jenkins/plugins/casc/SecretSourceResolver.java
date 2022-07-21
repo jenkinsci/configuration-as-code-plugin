@@ -46,6 +46,7 @@ public class SecretSourceResolver {
         map.put("readFileBase64", FileBase64Lookup.INSTANCE);
         map.put("file", FileStringLookup.INSTANCE);
         map.put("readFile", FileStringLookup.INSTANCE);
+        map.put("sysProp", SystemPropertyLookup.INSTANCE);
         map.put("decodeBase64", DecodeBase64Lookup.INSTANCE);
         map.put("json", JsonLookup.INSTANCE);
         map = Collections.unmodifiableMap(map);
@@ -144,6 +145,21 @@ public class SecretSourceResolver {
                 .flatMap(o -> o.map(Stream::of).orElseGet(Stream::empty))
                 .findFirst()
                 .orElse(null);
+        }
+    }
+
+    static class SystemPropertyLookup implements StringLookup {
+
+        static final SystemPropertyLookup INSTANCE = new SystemPropertyLookup();
+
+        @Override
+        public String lookup(@NonNull final String key) {
+            final String output = System.getProperty(key);
+            if (output == null) {
+                LOGGER.log(Level.WARNING, String.format("Configuration import: System Properties did not contain the specified key '%s'. Will default to empty string.", key));
+                return "";
+            }
+            return output;
         }
     }
 
