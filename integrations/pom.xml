@@ -63,7 +63,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>artifactory</artifactId>
-      <version>3.16.3</version>
+      <version>3.17.0</version>
       <scope>test</scope>
       <exclusions>
         <exclusion> <!-- Found Banned Dependency: org.sonatype.sisu:sisu-guice:jar:no_aop:3.2.5 -->
