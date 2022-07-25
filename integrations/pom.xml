@@ -643,7 +643,7 @@
       <dependency>
         <groupId>com.amazonaws</groupId>
         <artifactId>aws-java-sdk-sns</artifactId>
-        <version>1.12.262</version>
+        <version>1.12.267</version>
       </dependency>
       <dependency>
         <groupId>org.jenkins-ci.plugins</groupId>
