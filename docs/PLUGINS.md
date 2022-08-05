@@ -26,12 +26,11 @@ Before you start, make sure the following pre-conditions are met:
 </parent>
 ```
 
-- The Jenkins core version and the Java level of your plugin are aligned with the Configuration as Code plugin versions (also in the [pom.xml](/pom.xml)).
+- The Jenkins core version of your plugin are aligned with the Configuration as Code plugin versions (also in the [pom.xml](/pom.xml)).
 
 ```xml
 <properties>
     <jenkins.version>THE_JENKINS_CORE_VERSION_HERE</jenkins.version>
-    <java.level>THE_JAVA_VERSION_HERE</java.level>
 </properties>
 ```
 
