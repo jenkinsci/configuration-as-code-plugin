@@ -6,8 +6,9 @@ Basic configuration of the [Git plugin](https://plugins.jenkins.io/git)
 
 ```yaml
 unclassified:
-  gitscm:
-    globalConfigName: jenkins
-    globalConfigEmail: jenkins@domain.local
-    createAccountBasedOnEmail: true
+  gitSCM:
+    createAccountBasedOnEmail: false
+    globalConfigEmail: "jenkins@example.com"
+    globalConfigName: "Jenkins User"
+    hideCredentials: true
 ```
