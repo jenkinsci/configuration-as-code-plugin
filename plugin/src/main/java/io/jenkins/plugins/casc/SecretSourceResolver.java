@@ -88,7 +88,7 @@ public class SecretSourceResolver {
      * resolved they will be defaulted to default value defined by ':-', otherwise default to empty
      * String. Secrets are defined as anything enclosed by '${}'
      * @since 1.42
-     * @deprecated use ${link {@link ConfigurationContext#getSecretSourceResolver()#resolve(String)}} instead.
+     * @deprecated use {@link #resolve(String)}} instead.
      */
     @Deprecated
     @Restricted(DoNotUse.class)
