@@ -21,10 +21,10 @@
   <properties>
     <changelist>999999-SNAPSHOT</changelist>
     <gitHubRepo>jenkinsci/configuration-as-code-plugin</gitHubRepo>
-    <jenkins.version>2.289.3</jenkins.version>
+    <jenkins.version>2.319.3</jenkins.version>
     <tagNameFormat>configuration-as-code-@{project.version}</tagNameFormat>
     <useBeta>true</useBeta>
-    <plugin-bom.version>1500.ve4d05cd32975</plugin-bom.version>
+    <plugin-bom.version>1580.v47b_429a_c853a</plugin-bom.version>
   </properties>
 
   <name>Configuration as Code Parent</name>

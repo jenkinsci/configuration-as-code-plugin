@@ -1,4 +1,5 @@
 labelAtoms:
+  - name: "built-in"
   - name: "label1"
     properties:
     - myProperty:
@@ -11,3 +12,4 @@ labelAtoms:
     properties:
     - myProperty:
         value: 3
+  - name: "myNode"
