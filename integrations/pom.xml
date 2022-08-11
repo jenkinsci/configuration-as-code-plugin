@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
     <artifactId>parent</artifactId>
@@ -16,7 +16,7 @@
     <jackson.version>2.13.3</jackson.version>
     <enforcer.skip>true</enforcer.skip> <!-- I give up, too much effort to maintain enforcer here, should probably try clear out all enforcer only deps and see if it works -->
     <netty.version>4.1.79.Final</netty.version>
-    <jenkins.version>2.346.2</jenkins.version>
+    <jenkins.version>2.346.3</jenkins.version>
     <junixsocket.version>2.5.1</junixsocket.version>
     <kotlin-stdlib.version>1.7.10</kotlin-stdlib.version>
   </properties>
