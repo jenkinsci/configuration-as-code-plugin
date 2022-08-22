@@ -643,7 +643,7 @@
       <dependency>
         <groupId>com.amazonaws</groupId>
         <artifactId>aws-java-sdk-sns</artifactId>
-        <version>1.12.276</version>
+        <version>1.12.286</version>
       </dependency>
       <dependency>
         <groupId>org.jenkins-ci.plugins</groupId>
@@ -721,7 +721,7 @@
       <dependency>
         <groupId>com.google.protobuf</groupId>
         <artifactId>protobuf-java</artifactId>
-        <version>3.21.4</version>
+        <version>3.21.5</version>
       </dependency>
       <dependency>
         <groupId>com.squareup.okio</groupId>
