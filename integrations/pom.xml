@@ -15,7 +15,7 @@
     <maven.deploy.skip>true</maven.deploy.skip> <!-- no need to be deployed during release, this is a test-only module -->
     <jackson.version>2.13.4</jackson.version>
     <enforcer.skip>true</enforcer.skip> <!-- I give up, too much effort to maintain enforcer here, should probably try clear out all enforcer only deps and see if it works -->
-    <netty.version>4.1.79.Final</netty.version>
+    <netty.version>4.1.81.Final</netty.version>
     <jenkins.version>2.361.1</jenkins.version>
     <junixsocket.version>2.5.1</junixsocket.version>
     <kotlin-stdlib.version>1.7.10</kotlin-stdlib.version>
