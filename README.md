@@ -65,7 +65,7 @@ jenkins:
         name: "static-agent"
         remoteFS: "/home/jenkins"
         launcher:
-          jnlp:
+          inbound:
             workDirSettings:
               disabled: true
               failIfWorkDirIsMissing: false
@@ -192,7 +192,7 @@ Anchor keys must be prefixed with `x-` due to JCasC handling unknown root elemen
 x-jenkins-linux-node: &jenkins_linux_node_anchor
   remoteFS: "/home/jenkins"
   launcher:
-    jnlp:
+    inbound:
       workDirSettings:
         disabled: true
         failIfWorkDirIsMissing: false
@@ -218,7 +218,7 @@ jenkins:
         name: "static-agent1"
         remoteFS: "/home/jenkins"
         launcher:
-          jnlp:
+          inbound:
             workDirSettings:
               disabled: true
               failIfWorkDirIsMissing: false
@@ -228,7 +228,7 @@ jenkins:
         name: "static-agent2"
         remoteFS: "/home/jenkins"
         launcher:
-          jnlp:
+          inbound:
             workDirSettings:
               disabled: true
               failIfWorkDirIsMissing: false
