@@ -45,11 +45,8 @@ just ask in [our Gitter Channel](https://gitter.im/jenkinsci/configuration-as-co
 
 ### Project meetings
 
-Join our Jenkins Configuration as Code office hours meeting scheduled for every second Wednesday. 
-At these meetings we discuss recent releases and incoming changes, everybody is welcome to present their JCasC-related work and case studies.
-See the [Jenkins Event Calendar](https://jenkins.io/event-calendar/) for exact times, we also repost links in our [Gitter chat](https://gitter.im/jenkinsci/configuration-as-code-plugin). 
-
-Archive: [meeting minutes](https://docs.google.com/document/d/1Hm07Q1egWL6VVAqNgu27bcMnqNZhYJmXKRvknVw4Y84/edit?usp=sharing) and [meeting recordings](https://www.google.com/url?q=https://www.youtube.com/playlist?list%3DPLN7ajX_VdyaNgevVZbfczE4IeGifW-t87&sa=D&usd=2&usg=AOvVaw0QPw6eDS-jw_DgHgOaft3Z).
+[Meeting minutes](https://docs.google.com/document/d/1Hm07Q1egWL6VVAqNgu27bcMnqNZhYJmXKRvknVw4Y84/edit?usp=sharing) and [meeting recordings](https://www.google.com/url?q=https://www.youtube.com/playlist?list%3DPLN7ajX_VdyaNgevVZbfczE4IeGifW-t87&sa=D&usd=2&usg=AOvVaw0QPw6eDS-jw_DgHgOaft3Z) of Jenkins Configuration as Code office hours are available for reference.
+See our [Gitter chat](https://gitter.im/jenkinsci/configuration-as-code-plugin) for online chat.
 
 ## Run Locally
 
