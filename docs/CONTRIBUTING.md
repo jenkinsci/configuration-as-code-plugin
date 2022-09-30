@@ -93,7 +93,7 @@ Prerequisites: _Java_, _Maven_ & _IntelliJ IDEA_
 - Ensure Maven is included in the PATH environment variable.
 
   ```shell
-  export PATH=$PATH:/path/to/apache-maven-x.y.z/bin
+  export PATH=$PATH:/path/to/apache-maven-3.8.6/bin
   ```
   
   ### IntelliJ IDEA
@@ -116,7 +116,7 @@ Prerequisites: _Java_, _Maven_ & _IntelliJ IDEA_
 
 ```shell
 export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
-export PATH=$PATH:/path/to/apache-maven-x.y.z/bin
+export PATH=$PATH:/path/to/apache-maven-3.8.6/bin
 mvn hpi:run
 ```
 
