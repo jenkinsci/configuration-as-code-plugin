@@ -18,7 +18,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.commons.text.TextStringBuilder;
 import org.apache.commons.text.lookup.StringLookup;
-import org.apache.commons.text.lookup.StringLookupFactory;
+import org.json.JSONObject;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.DoNotUse;
 
@@ -34,6 +34,7 @@ public class SecretSourceResolver {
     private static final String escapeEnclosedBy = escapedWith + enclosedBy;
 
     private static final Logger LOGGER = Logger.getLogger(SecretSourceResolver.class.getName());
+
     private final StringSubstitutor nullSubstitutor;
     private final StringSubstitutor substitutor;
 
@@ -45,13 +46,15 @@ public class SecretSourceResolver {
         map.put("readFileBase64", FileBase64Lookup.INSTANCE);
         map.put("file", FileStringLookup.INSTANCE);
         map.put("readFile", FileStringLookup.INSTANCE);
+        map.put("sysProp", SystemPropertyLookup.INSTANCE);
         map.put("decodeBase64", DecodeBase64Lookup.INSTANCE);
+        map.put("json", JsonLookup.INSTANCE);
         map = Collections.unmodifiableMap(map);
 
         substitutor = new StringSubstitutor(
-            StringLookupFactory.INSTANCE.interpolatorStringLookup(
+            new FixedInterpolatorStringLookup(
                 map,
-                new ConfigurationContextStringLookup(configurationContext), false))
+                new ConfigurationContextStringLookup(configurationContext)))
             .setEscapeChar(escapedWith)
             .setVariablePrefix(enclosedBy)
             .setVariableSuffix(enclosedIn)
@@ -85,7 +88,7 @@ public class SecretSourceResolver {
      * resolved they will be defaulted to default value defined by ':-', otherwise default to empty
      * String. Secrets are defined as anything enclosed by '${}'
      * @since 1.42
-     * @deprecated use ${link {@link ConfigurationContext#getSecretSourceResolver()#resolve(String)}} instead.
+     * @deprecated use {@link #resolve(String)}} instead.
      */
     @Deprecated
     @Restricted(DoNotUse.class)
@@ -145,6 +148,21 @@ public class SecretSourceResolver {
         }
     }
 
+    static class SystemPropertyLookup implements StringLookup {
+
+        static final SystemPropertyLookup INSTANCE = new SystemPropertyLookup();
+
+        @Override
+        public String lookup(@NonNull final String key) {
+            final String output = System.getProperty(key);
+            if (output == null) {
+                LOGGER.log(Level.WARNING, String.format("Configuration import: System Properties did not contain the specified key '%s'. Will default to empty string.", key));
+                return "";
+            }
+            return output;
+        }
+    }
+
     static class FileStringLookup implements StringLookup {
 
         static final FileStringLookup INSTANCE = new FileStringLookup();
@@ -199,4 +217,29 @@ public class SecretSourceResolver {
             }
         }
     }
+
+    static class JsonLookup implements StringLookup {
+
+        static final JsonLookup INSTANCE = new JsonLookup();
+
+        private JsonLookup() {
+
+        }
+
+        @Override
+        public String lookup(@NonNull final String key) {
+            final String[] components = key.split(":", 2);
+            final String jsonFieldName = components[0];
+            final String json = components[1];
+            final JSONObject root = new JSONObject(json);
+
+            final String output = root.optString(jsonFieldName, null);
+            if (output == null) {
+                LOGGER.log(Level.WARNING, String.format("Configuration import: JSON secret did not contain the specified key '%s'. Will default to empty string.", jsonFieldName));
+                return "";
+            }
+            return output;
+        }
+    }
+
 }

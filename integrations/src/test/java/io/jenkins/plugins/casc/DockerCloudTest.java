@@ -34,7 +34,8 @@ public class DockerCloudTest {
 
         final DockerTemplate template = docker.getTemplate("jenkins/agent");
         checkTemplate(template, "docker-agent", "jenkins", "/home/jenkins/agent", "10",
-                new String[] { "hello:/hello", "world:/world"}, "hello=world\nfoo=bar");
+                new String[] { "type=tmpfs,destination=/run", "type=bind,source=/var/run/docker.sock,destination=/var/run/docker.sock", "type=volume,src=hello,dst=/world" },
+                "hello=world\nfoo=bar");
         assertTrue(template.getRetentionStrategy() instanceof DockerOnceRetentionStrategy);
         assertEquals(1, ((DockerOnceRetentionStrategy) template.getRetentionStrategy()).getIdleMinutes());
     }
@@ -50,7 +51,8 @@ public class DockerCloudTest {
 
         DockerTemplate template = docker.getTemplate(Label.get("docker-agent"));
         checkTemplate(template, "docker-agent", "jenkins", "/home/jenkins/agent", "10",
-                new String[] { "hello:/hello", "world:/world"}, "hello=world\nfoo=bar");
+                new String[] { "type=tmpfs,destination=/run", "type=bind,source=/var/run/docker.sock,destination=/var/run/docker.sock", "type=volume,src=hello,dst=/world" },
+                "hello=world\nfoo=bar");
 
         ConfigurationAsCode.get().configure(getClass().getResource("DockerCloudTest2.yml").toExternalForm());
 
@@ -62,21 +64,23 @@ public class DockerCloudTest {
 
         template = docker.getTemplate(Label.get("docker-agent"));
         checkTemplate(template, "docker-agent", "jenkins", "/home/jenkins/agent", "10",
-                new String[] { "hello:/hello", "world:/world"}, "hello=world\nfoo=bar");
+                new String[] { "type=volume,source=hello,destination=/hello", "type=volume,source=world,destination=/world"},
+                "hello=world\nfoo=bar");
 
         template = docker.getTemplate(Label.get("generic"));
         checkTemplate(template, "generic", "jenkins", "/home/jenkins/agent2", "5",
-                new String[] { "hello:/hello", "world:/world"}, "hello=world\nfoo=bar");
+                new String[] { "type=volume,source=hello,destination=/hello", "type=volume,source=world,destination=/world"},
+                "hello=world\nfoo=bar");
     }
 
     private void checkTemplate(DockerTemplate template, String labelString, String user, String remoteFs,
-                               String instanceCapStr, String[] volumes, String environmentsString) {
+                               String instanceCapStr, String[] mounts, String environmentsString) {
         assertNotNull(template);
         assertEquals(labelString, template.getLabelString());
         assertEquals(user, ((DockerComputerAttachConnector) template.getConnector()).getUser());
         assertEquals(remoteFs, template.getRemoteFs());
         assertEquals(instanceCapStr, template.getInstanceCapStr());
-        assertArrayEquals(volumes, template.getVolumes());
+        assertArrayEquals(mounts, template.getMounts());
         assertEquals(environmentsString, template.getEnvironmentsString());
     }
 }

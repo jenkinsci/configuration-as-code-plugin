@@ -1,5 +1,6 @@
 package io.jenkins.plugins.casc.core;
 
+import hudson.model.TimeZoneProperty;
 import hudson.model.User;
 import hudson.security.FullControlOnceLoggedInAuthorizationStrategy;
 import hudson.security.HudsonPrivateSecurityRealm;
@@ -8,6 +9,7 @@ import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import jenkins.model.Jenkins;
 import jenkins.plugins.slack.user.SlackUserProperty;
+import org.jenkinsci.main.modules.cli.auth.ssh.UserPropertyImpl;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -65,9 +67,11 @@ public class HudsonPrivateSecurityRealmConfiguratorTest {
         UserProperty mailerProperty = admin.getProperty(UserProperty.class);
         assertThat(mailerProperty.getEmailAddress(), is("admin3@example.com"));
 
-// Pending https://github.com/jenkinsci/ssh-cli-auth-module/pull/16
-//        UserPropertyImpl authorizedKeysProperty = admin.getProperty(UserPropertyImpl.class);
-//        assertThat(authorizedKeysProperty.authorizedKeys, is("ssh-rsa some-key\n"));
+        TimeZoneProperty timeZoneProperty = admin.getProperty(TimeZoneProperty.class);
+        assertThat(timeZoneProperty.getTimeZoneName(), is("Europe/London"));
+
+        UserPropertyImpl authorizedKeysProperty = admin.getProperty(UserPropertyImpl.class);
+        assertThat(authorizedKeysProperty.authorizedKeys, is("ssh-rsa some-key\n"));
     }
 
 }

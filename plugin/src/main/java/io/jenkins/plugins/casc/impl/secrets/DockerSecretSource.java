@@ -12,7 +12,7 @@ import org.apache.commons.lang.StringUtils;
 
 /**
  * {@link SecretSource} implementation relying on <a href="https://docs.docker.com/engine/swarm/secrets">docker secrets</a>.
- * The path to secret directory can be overridden by setting environment variable <tt>SECRETS</tt>.
+ * The path to secret directory can be overridden by setting environment variable <code>SECRETS</code>.
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Extension

@@ -16,6 +16,7 @@ import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.util.Objects;
 import jenkins.model.Jenkins;
 import org.apache.commons.io.FileUtils;
 import org.jenkinsci.Symbol;
@@ -72,8 +73,8 @@ public class JenkinsConfiguratorTest {
     @Test
     @ConfiguredWithCode("ConfigureLabels.yml")
     public void shouldExportLabelAtoms() throws Exception {
-        DescribableList properties = Jenkins.get().getLabelAtom("label1").getProperties();
-        properties.add(new TestProperty(1));
+        Objects.requireNonNull(Jenkins.get().getLabelAtom("label1"))
+            .getProperties().add(new TestProperty(1));
 
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         ConfigurationAsCode.get().export(out);

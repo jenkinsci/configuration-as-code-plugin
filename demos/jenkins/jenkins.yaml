@@ -24,9 +24,10 @@ jenkins:
           - labelString: "docker-agent"
             dockerTemplateBase:
               image: "jenkins/slave"
-              volumes:
-                - hello:/hello
-                - world:/world
+              mounts:
+                - "type=tmpfs,destination=/run"
+                - "type=bind,source=/var/run/docker.sock,destination=/var/run/docker.sock"
+                - "type=volume,src=hello,dst=/world"
               environmentsString: |
                 hello=world
                 foo=bar
@@ -55,7 +56,9 @@ unclassified:
     useCredentialsPlugin: true
     jfrogInstances:
       - instanceId: artifactory
-        url: http://acme.com/artifactory
+        platformUrl: http://acme.com/artifactory
+        artifactoryUrl: http://acme.com/artifactory
+        distributionUrl: http://acme.com/distribution
         resolverCredentialsConfig:
           username: artifactory_user
           password: "${ARTIFACTORY_PASSWORD}"

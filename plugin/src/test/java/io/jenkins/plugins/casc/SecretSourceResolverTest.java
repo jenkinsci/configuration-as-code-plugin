@@ -3,6 +3,7 @@ package io.jenkins.plugins.casc;
 import io.jenkins.plugins.casc.SecretSourceResolver.Base64Lookup;
 import io.jenkins.plugins.casc.SecretSourceResolver.FileBase64Lookup;
 import io.jenkins.plugins.casc.SecretSourceResolver.FileStringLookup;
+import io.jenkins.plugins.casc.SecretSourceResolver.SystemPropertyLookup;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -46,6 +47,7 @@ public class SecretSourceResolverTest {
     public static final StringLookup DECODE = StringLookupFactory.INSTANCE.base64DecoderStringLookup();
     public static final StringLookup FILE = FileStringLookup.INSTANCE;
     public static final StringLookup BINARYFILE = FileBase64Lookup.INSTANCE;
+    public static final StringLookup SYSPROP = SystemPropertyLookup.INSTANCE;
 
     @Before
     public void initLogging() {
@@ -203,6 +205,18 @@ public class SecretSourceResolverTest {
         assertThat(resolve("http://${FOO}:${BAR}"), equalTo("http://www.foo.io:8080"));
     }
 
+    /**
+     * Ensures that prefixes in the secret ID which are not covered by the CasC protocol substitutors (e.g. base64:, file:)
+     * are left untouched and not removed.
+     */
+    @Test
+    public void resolve_preservesPrefixesNotCoveredBySubstitutors() {
+        final String secret = "foobar";
+
+        environment.set("arn:aws:secretsmanager:eu-central-1:123456789012:secret:my-secret", secret);
+        assertThat(resolve("${arn:aws:secretsmanager:eu-central-1:123456789012:secret:my-secret}"), equalTo(secret));
+    }
+
     @Test
     public void resolve_mixedMultipleEntriesWithDefault() {
         environment.set("FOO", "www.foo.io");
@@ -334,6 +348,78 @@ public class SecretSourceResolverTest {
         assertThat(lookup, equalTo(expected));
         assertThat(actual, equalTo(expected));
         assertThat(actualBytes, equalTo(expectedBytes));
+    }
+
+    @Test
+    public void resolve_SystemProperty() throws Exception {
+        String input = "java.version";
+        String expected = System.getProperty(input);
+        String output = resolve("${sysProp:" + input + "}");
+        assertThat(output, equalTo(SYSPROP.lookup(input)));
+        assertThat(output, equalTo(expected));
+    }
+
+    @Test
+    public void resolve_SystemPropertyNotFound() throws Exception {
+        String input = "java.version.non-existent";
+        String expected = "";
+        String output = resolve("${sysProp:" + input + "}");
+        assertThat(output, equalTo(SYSPROP.lookup(input)));
+        assertThat(output, equalTo(expected));
+    }
+
+    @Test
+    public void resolve_Json() {
+        String input = "{ \"a\": 1, \"b\": 2 }";
+        environment.set("FOO", input);
+        String output = resolve("${json:a:${FOO}}");
+        assertThat(output, equalTo("1"));
+    }
+
+    /**
+     * Check that prettified / multi-line JSON is supported
+     */
+    @Test
+    public void resolve_JsonWithNewlineBetweenTokens() {
+        String input = "{ \n \"a\": 1, \n \"b\": 2 }";
+        environment.set("FOO", input);
+        String output = resolve("${json:a:${FOO}}");
+        assertThat(output, equalTo("1"));
+    }
+
+    @Test
+    public void resolve_JsonWithNewlineInValue() {
+        String input = "{ \"a\": \"hello\\nworld\", \"b\": 2 }";
+        environment.set("FOO", input);
+        String output = resolve("${json:a:${FOO}}");
+        assertThat(output, equalTo("hello\nworld"));
+    }
+
+    @Test
+    public void resolve_JsonWithSpaceInKey() {
+        String input = "{ \"abc def\": 1, \"b\": 2 }";
+        environment.set("FOO", input);
+        String output = resolve("${json:abc def:${FOO}}");
+        assertThat(output, equalTo("1"));
+    }
+
+    /**
+     * Test a mix of JSON and other lookups
+     */
+    @Test
+    public void resolve_JsonFromFile() throws Exception {
+        String input = getPath("secret.json").toAbsolutePath().toString();
+        String output = resolve("${json:Our secret:${file:" + input + "}}");
+        assertThat(output, equalTo("Hello World"));
+    }
+
+    @Test
+    public void resolve_JsonMissingKey() {
+        String input ="{ \"b\": 2 }";
+        environment.set("FOO", input);
+        String output = resolve("${json:a:${FOO}}");
+        assertTrue(logContains("Configuration import: JSON secret did not contain the specified key 'a'. Will default to empty string."));
+        assertThat(output, equalTo(""));
     }
 
     @Test

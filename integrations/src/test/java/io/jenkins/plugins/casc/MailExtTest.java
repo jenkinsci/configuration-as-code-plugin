@@ -45,7 +45,7 @@ public class MailExtTest {
 
         // Verify that the password does not get exported
         String exportedConfig = j.exportToString(false);
-        assertThat("No entry was exported for SMTP credentials", exportedConfig, containsString("smtpPassword"));
+        assertThat("SMTP credentials were migrated", exportedConfig, containsString("credentialsId"));
         assertThat("There should be no SMTP password in the exported YAML", exportedConfig, not(containsString(SMTP_PASSWORD)));
     }
 

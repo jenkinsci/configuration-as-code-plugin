@@ -669,7 +669,7 @@ public class ConfigurationAsCode extends ManagementLink {
         }
 
         final PathMatcher matcher = FileSystems.getDefault().getPathMatcher(YAML_FILES_PATTERN);
-        try (Stream<Path> stream = Files.find(Paths.get(path), Integer.MAX_VALUE,
+        try (Stream<Path> stream = Files.find(root, Integer.MAX_VALUE,
                 (next, attrs) -> !attrs.isDirectory() && !isHidden(next) && matcher.matches(next), FileVisitOption.FOLLOW_LINKS)) {
             return stream.sorted().collect(toList());
         } catch (IOException e) {
@@ -764,7 +764,7 @@ public class ConfigurationAsCode extends ManagementLink {
         monitor.reset();
         context.clearListeners();
         context.addListener(monitor::record);
-        try (ACLContext acl = ACL.as(ACL.SYSTEM)) {
+        try (ACLContext acl = ACL.as2(ACL.SYSTEM2)) {
             invokeWith(entries, (configurator, config) -> configurator.configure(config, context));
         }
     }
