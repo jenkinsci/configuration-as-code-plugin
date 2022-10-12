@@ -10,7 +10,6 @@ import hudson.views.SecurityFilter;
 import hudson.views.ViewJobFilter;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
-import java.util.Collection;
 import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,8 +32,7 @@ public class ViewJobFiltersTest {
         SecurityFilter security = null;
 
         Jenkins jenkins = j.jenkins;
-        Collection<View> views = jenkins.getViews();
-        ListView listView = (ListView) views.get(0);
+        ListView listView = (ListView) jenkins.getView("MyFirstView");
         DescribableList<ViewJobFilter, Descriptor<ViewJobFilter>> a = listView.getJobFilters();
         duration = a.get(BuildDurationFilter.class);
         status = a.get(BuildStatusFilter.class);
