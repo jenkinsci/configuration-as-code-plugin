@@ -1,0 +1,6 @@
+globalSettingsProvider:
+  filePath:
+    path: "/conf/maven/global-settings.xml"
+settingsProvider:
+  filePath:
+    path: "/conf/maven/settings.xml"

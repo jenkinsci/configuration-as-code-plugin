@@ -52,7 +52,7 @@
         <f:submit name="viewExport" value="${%View Configuration}"/>
       </f:form>
       <div class="alert alert-warning clear-action-forms">
-        <img src="${rootURL}/images/16x16/warning.png"/>
+        <l:icon class="icon-warning icon-sm"/>
         ${%exportWarning}
       </div>
 

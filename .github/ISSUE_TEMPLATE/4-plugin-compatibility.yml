@@ -1,0 +1,42 @@
+name: "💥 Plugin Compatibility"
+labels: plugin-compatibility
+description: Create a plugin compatibility issue report
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        To better understand plugin compatibility issues, you can read more on our [compatibility](../blob/master/docs/COMPATIBILITY.md) page.
+        Plugin developers should read our [compatibility guide](../blob/master/docs/PLUGINS.md).
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I've checked the existing [dashboard](https://issues.jenkins.io/secure/Dashboard.jspa?selectPageId=18341) for an open issue first
+          required: true
+        - label: I've created an issue on the plugins issue tracker, (Jira or GitHub depending on the plugin), use this link for [Jira](https://issues.jenkins-ci.org/secure/CreateIssueDetails!init.jspa?pid=10172&issuetype=1&summary=Cannot+configure+X+plugin+with+JCasC&labels=jcasc-compatibility)
+          required: true
+        - label: If the plugin uses Jira for issues you've added the label `jcasc-compatibility`
+          required: true
+  - type: input
+    id: plugin-issue
+    attributes:
+      label: Plugin issue link
+      description: Include a link to where the issue is reported in it's issue tracker
+    validations:
+      required: true
+  - type: input
+    id: plugin-link
+    attributes:
+      label: Plugin GitHub repository link
+      placeholder: https://github.com/jenkinsci/?
+    validations:
+      required: true
+  - type: textarea
+    id: error
+    attributes:
+      label: Description
+      placeholder: Describe your issue here...
+    validations:
+      required: true

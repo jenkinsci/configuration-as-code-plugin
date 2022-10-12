@@ -1,5 +1,5 @@
 tool:
-  maven:
+  mavenGlobalConfig:
     settingsProvider:
       filePath:
         path: /usr/share/maven-settings.xml

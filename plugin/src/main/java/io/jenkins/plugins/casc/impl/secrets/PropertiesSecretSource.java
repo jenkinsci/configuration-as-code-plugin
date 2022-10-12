@@ -3,9 +3,9 @@ package io.jenkins.plugins.casc.impl.secrets;
 import hudson.Extension;
 import io.jenkins.plugins.casc.SecretSource;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -45,7 +45,7 @@ public class PropertiesSecretSource extends SecretSource {
         final String secretsPath = secretsEnv == null ? SECRETS_DEFAULT_PATH : secretsEnv;
         final File secretsFile = new File(secretsPath);
         if (secretsFile.exists() && secretsFile.isFile()) {
-            try (InputStream input = new FileInputStream(secretsFile)) {
+            try (InputStream input = Files.newInputStream(secretsFile.toPath())) {
                 secrets.clear();
                 secrets.load(input);
             } catch (IOException ioe) {

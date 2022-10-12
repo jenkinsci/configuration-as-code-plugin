@@ -8,12 +8,12 @@ The latest stable helm chart can be found [here](https://github.com/jenkinsci/he
 Now grab a copy of the helm chart [values file](https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/values.yaml) and adjust the Master part a little bit:
 
 ```yaml
-master:
+controller:
   componentName: jenkins-controller
   image: 'jenkins/jenkins'
   tag: 'lts'
   imagePullPolicy: 'Always'
-  useSecurity: true
+  adminSecret: true
   adminUser: admin
   adminPassword: 'formetoknowforyoutofindout'
   resources:

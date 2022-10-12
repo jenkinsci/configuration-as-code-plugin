@@ -1,0 +1,113 @@
+jenkins:
+  systemMessage: "Jenkins configured automatically by Jenkins Configuration as Code plugin\n\n"
+
+jobs:
+  - script: >
+      organizationFolder('Gitea Organization Folder') {
+        description("Gitea orga folder configured with JCasC")
+        displayName('My Project')
+
+        organizations {
+          gitea {
+            serverUrl("https://$GITEA_URL")
+            repoOwner("OWN")
+            credentialsId("gitea-token")
+
+            traits {
+              giteaExcludeArchivedRepositories {}
+
+              // Repository filter
+              sourceWildcardFilter {
+                includes("gitea-plugin")
+                excludes("")
+              }
+
+              // Branch/tag/PR filter using regular expressions
+              headRegexFilter {
+                regex("^(main|develop\\/.*|v\\d+|PR-.*)\$")
+              }
+
+              // Branch/Tag/PR filter using space-separated list of name patterns
+              headWildcardFilter {
+                includes("main develop/* v* PR-*")
+                excludes("")
+              }
+
+              giteaTagDiscovery {}
+
+              giteaBranchDiscovery {
+                strategyId(1)
+                // Values
+                //  1 : Exclude branches that are also filed as PRs
+                //  2 : Only branches that are also filed as PRs
+                //  3 : All branches
+              }
+
+              // consider pull requests from origin
+              giteaPullRequestDiscovery {
+                strategyId(1)
+                // Values
+                //  1 : Merging the pull request with the current target branch revision
+                //  2 : The current pull request revision
+                //  3 : Both the current pull request revision and the pull request merged with the current target branch revision
+              }
+
+              // consider pull requests from forks
+              giteaForkDiscovery {
+                strategyId(1)
+                // Values
+                //  1 : Merging the pull request with the current target branch revision
+                //  2 : The current pull request revision
+                //  3 : Both the current pull request revision and the pull request merged with the current target branch revision
+
+                // only one trust level is allowed; default: trust contributors
+                trust {
+                  giteaTrustContributors {}
+                  // giteaTrustEveryone {}
+                  // giteaTrustNobody {}
+                }
+              }
+
+              // Override webhook management; only one mode is allowed
+              giteaWebhookRegistration {
+                mode('ITEM')
+                // mode('DISABLED')
+              }
+
+              giteaSSHCheckout {
+                credentialsId('ssh-gitea')
+              }
+            }
+          }
+
+          // not unique to Gitea but useful for fine-grained configuration of e.g. tag building strategies
+          buildStrategies {
+            buildRegularBranches {}
+            buildChangeRequests {
+              ignoreTargetOnlyChanges(true)
+              ignoreUntrustedChanges(false)
+            }
+            buildTags {
+              atLeastDays('-1')
+              atMostDays('1')
+            }
+          }
+        }
+
+        // "Orphaned Item Strategy"
+        orphanedItemStrategy {
+          discardOldItems {
+            daysToKeep(-1)
+            numToKeep(-1)
+          }
+        }
+
+        // "Scan Organization Folder Triggers" : 1 day
+        // We need to configure this stuff by hand because JobDSL only allow 'periodic(int min)' for now
+        configure { node ->
+          node / triggers / 'com.cloudbees.hudson.plugins.folder.computed.PeriodicFolderTrigger' {
+            spec('H H * * *')
+            interval(86400000)
+          }
+        }
+      }

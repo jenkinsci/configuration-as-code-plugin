@@ -45,11 +45,8 @@ just ask in [our Gitter Channel](https://gitter.im/jenkinsci/configuration-as-co
 
 ### Project meetings
 
-Join our Jenkins Configuration as Code office hours meeting scheduled for every second Wednesday. 
-At these meetings we discuss recent releases and incoming changes, everybody is welcome to present their JCasC-related work and case studies.
-See the [Jenkins Event Calendar](https://jenkins.io/event-calendar/) for exact times, we also repost links in our [Gitter chat](https://gitter.im/jenkinsci/configuration-as-code-plugin). 
-
-Archive: [meeting minutes](https://docs.google.com/document/d/1Hm07Q1egWL6VVAqNgu27bcMnqNZhYJmXKRvknVw4Y84/edit?usp=sharing) and [meeting recordings](https://www.google.com/url?q=https://www.youtube.com/playlist?list%3DPLN7ajX_VdyaNgevVZbfczE4IeGifW-t87&sa=D&usd=2&usg=AOvVaw0QPw6eDS-jw_DgHgOaft3Z).
+[Meeting minutes](https://docs.google.com/document/d/1Hm07Q1egWL6VVAqNgu27bcMnqNZhYJmXKRvknVw4Y84/edit?usp=sharing) and [meeting recordings](https://www.google.com/url?q=https://www.youtube.com/playlist?list%3DPLN7ajX_VdyaNgevVZbfczE4IeGifW-t87&sa=D&usd=2&usg=AOvVaw0QPw6eDS-jw_DgHgOaft3Z) of Jenkins Configuration as Code office hours are available for reference.
+See our [Gitter chat](https://gitter.im/jenkinsci/configuration-as-code-plugin) for online chat.
 
 ## Run Locally
 
@@ -62,7 +59,7 @@ Prerequisites: _Java_, _Maven_ & _IntelliJ IDEA_
   ```
 
   ```text
-  /Library/Java/JavaVirtualMachines/jdk-11.0.1.jdk/Contents/Home
+  /Library/Java/JavaVirtualMachines/jdk-11.0.16.jdk/Contents/Home
   ```
 
   - If Java 11 is selected by default, check other available Java version below.
@@ -73,11 +70,10 @@ Prerequisites: _Java_, _Maven_ & _IntelliJ IDEA_
 
   ```text
   Matching Java Virtual Machines (3):
-      11.0.1, x86_64: "Java SE 11.0.1"  /Library/Java/JavaVirtualMachines/jdk-11.0.1.jdk/Contents/Home
-      10.0.2, x86_64: "Java SE 10.0.2"  /Library/Java/JavaVirtualMachines/jdk-10.0.2.jdk/Contents/Home
-      1.8.0_192, x86_64:  "Java SE 8"  /Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home
+      11.0.16, x86_64: "Java SE 11.0.16"  /Library/Java/JavaVirtualMachines/jdk-11.0.16.jdk/Contents/Home
+      1.8.0_345, x86_64:  "Java SE 8"  /Library/Java/JavaVirtualMachines/jdk1.8.0_345.jdk/Contents/Home
 
-  /Library/Java/JavaVirtualMachines/jdk-11.0.1.jdk/Contents/Home
+  /Library/Java/JavaVirtualMachines/jdk-11.0.16.jdk/Contents/Home
   ```
 
   - Use the alternate Java 8.
@@ -88,13 +84,13 @@ Prerequisites: _Java_, _Maven_ & _IntelliJ IDEA_
   ```
 
   ```text
-  /Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home
+  /Library/Java/JavaVirtualMachines/jdk1.8.0_345.jdk/Contents/Home
   ```
 
 - Ensure Maven is included in the PATH environment variable.
 
   ```shell
-  export PATH=$PATH:/path/to/apache-maven-x.y.z/bin
+  export PATH=$PATH:/path/to/apache-maven-3.8.6/bin
   ```
   
   ### IntelliJ IDEA
@@ -117,7 +113,7 @@ Prerequisites: _Java_, _Maven_ & _IntelliJ IDEA_
 
 ```shell
 export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
-export PATH=$PATH:/path/to/apache-maven-x.y.z/bin
+export PATH=$PATH:/path/to/apache-maven-3.8.6/bin
 mvn hpi:run
 ```
 

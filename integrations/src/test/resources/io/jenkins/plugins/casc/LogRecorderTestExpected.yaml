@@ -1,0 +1,5 @@
+recorders:
+- loggers:
+  - level: "WARNING"
+    name: "io.jenkins.plugins.casc"
+  name: "JCasC"

@@ -39,10 +39,10 @@ jenkins:
                 providerId: "default"
             - slack:
                 userId: "ABCDEFGH"
-            #- timezone: # pending https://github.com/jenkinsci/jenkins/pull/4557
-            #    timeZoneName: "Europe/London"
-            #- sshPublicKey: # pending https://github.com/jenkinsci/ssh-cli-auth-module/pull/16
-            #    authorizedKeys: |
-            #      ssh-rsa some-key
+            - timezone:
+                timeZoneName: "Europe/London"
+            - sshPublicKey:
+                authorizedKeys: |
+                  ssh-rsa some-key
   authorizationStrategy: loggedInUsersCanDoAnything
 ```

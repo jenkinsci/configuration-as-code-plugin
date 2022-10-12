@@ -11,12 +11,12 @@ The list of already known issues in the Jenkins issue tracker, are tracked throu
 
 ## Reporting Plugin Compatibility issue
 
-Create an issue at [issues.jenkins-ci.org](https://issues.jenkins-ci.org) with the label `jcasc-compatibility` and fill out the details.
+Create an issue at [issues.jenkins.io](https://issues.jenkins.io) with the label `jcasc-compatibility` and fill out the details.
 [Link to create issue][new-jira-issue]
 Create a Github issue for crosslink purposes on this repository.
 
 If you prefer the [new issue for plugin compatibility][new-github-issue] should take you through the entire workflow.
 
 [dashboard]: https://issues.jenkins.io/secure/Dashboard.jspa?selectPageId=18341
-[new-jira-issue]: https://issues.jenkins-ci.org/secure/CreateIssueDetails!init.jspa?pid=10172&issuetype=1&summary=Cannot+configure+X+plugin+with+JCasC&labels=jcasc-compatibility
-[new-github-issue]: https://github.com/jenkinsci/configuration-as-code-plugin/issues/new?labels=plugin-compatibility&template=3-plugin-compatibility.md
+[new-jira-issue]: https://issues.jenkins.io/secure/CreateIssueDetails!init.jspa?pid=10172&issuetype=1&summary=Cannot+configure+X+plugin+with+JCasC&labels=jcasc-compatibility
+[new-github-issue]: https://github.com/jenkinsci/configuration-as-code-plugin/issues/new?assignees=&labels=plugin-compatibility&template=4-plugin-compatibility.yml

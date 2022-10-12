@@ -1,3 +1,5 @@
+configuration-as-code:
+  deprecated: "warn"
 unclassified:
   extendedEmailPublisher:
     smtpUsername: email@acmecorp.com
