@@ -2,7 +2,6 @@ package io.jenkins.plugins.casc;
 
 import hudson.model.Descriptor;
 import hudson.model.ListView;
-import hudson.model.View;
 import hudson.util.DescribableList;
 import hudson.views.BuildDurationFilter;
 import hudson.views.BuildStatusFilter;
