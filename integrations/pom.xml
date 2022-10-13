@@ -80,6 +80,13 @@
 
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>view-job-filters</artifactId>
+      <scope>test</scope>
+      <version>2.3</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>crowd2</artifactId>
       <scope>test</scope>
       <version>3.1.2</version>
