@@ -101,5 +101,5 @@ As short term workaround, a custom `Configurator` glue-code implementation can b
 
 ## Initial secrets
 
-Initial secrets are handled by the concrete implementations of the [SecretSource](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/plugin/src/main/java/io.jenkins/plugins/casc/SecretSource.java). In order to implement a new
+Initial secrets are handled by the concrete implementations of the [SecretSource](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/plugin/src/main/java/io/jenkins/plugins/casc/SecretSource.java). In order to implement a new
 secret source, subclass `SecretSource` by extending it, and mark the new class with the `@Extension` annotation.
