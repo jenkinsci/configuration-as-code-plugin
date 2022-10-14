@@ -668,9 +668,8 @@
         <version>2.6</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.commons</groupId>
-        <artifactId>commons-text</artifactId>
-        <version>1.9</version>
+        <groupId>io.jenkins.plugins</groupId>
+        <artifactId>commons-text-api</artifactId>
       </dependency>
       <dependency>
         <groupId>io.netty</groupId>
