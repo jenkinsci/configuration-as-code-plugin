@@ -52,39 +52,10 @@ See our [Gitter chat](https://gitter.im/jenkinsci/configuration-as-code-plugin) 
 
 Prerequisites: _Java_, _Maven_ & _IntelliJ IDEA_
 
-- Ensure Java 8 is available. There are unresolved issues with Java 10/11 as of October 24, 2018.
+- Ensure Java 11 or 17 is available.
 
   ```shell
-  /usr/libexec/java_home
-  ```
-
-  ```text
-  /Library/Java/JavaVirtualMachines/jdk-11.0.16.jdk/Contents/Home
-  ```
-
-  - If Java 11 is selected by default, check other available Java version below.
-
-  ```shell
-  /usr/libexec/java_home --verbose
-  ```
-
-  ```text
-  Matching Java Virtual Machines (3):
-      11.0.16, x86_64: "Java SE 11.0.16"  /Library/Java/JavaVirtualMachines/jdk-11.0.16.jdk/Contents/Home
-      1.8.0_345, x86_64:  "Java SE 8"  /Library/Java/JavaVirtualMachines/jdk1.8.0_345.jdk/Contents/Home
-
-  /Library/Java/JavaVirtualMachines/jdk-11.0.16.jdk/Contents/Home
-  ```
-
-  - Use the alternate Java 8.
-
-  ```shell
-  export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
-  echo $JAVA_HOME
-  ```
-
-  ```text
-  /Library/Java/JavaVirtualMachines/jdk1.8.0_345.jdk/Contents/Home
+  java --version
   ```
 
 - Ensure Maven is included in the PATH environment variable.
