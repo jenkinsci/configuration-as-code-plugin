@@ -161,7 +161,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>docker-workflow</artifactId>
-      <version>1.29</version>
+      <version>528.v7c193a_0b_e67c</version>
       <scope>test</scope>
     </dependency>
 
