@@ -49,7 +49,7 @@
     <dependency>
       <groupId>com.coravy.hudson.plugins.github</groupId>
       <artifactId>github</artifactId>
-      <version>1.34.5</version>
+      <version>1.36.0</version>
       <scope>test</scope>
     </dependency>
 
