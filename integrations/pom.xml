@@ -817,7 +817,7 @@
       <dependency>
         <groupId>org.jenkins-ci.main</groupId>
         <artifactId>maven-plugin</artifactId>
-        <version>3.19</version>
+        <version>3.20</version>
       </dependency>
       <dependency>
         <groupId>org.jenkins-ci.modules</groupId>
