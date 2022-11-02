@@ -21,9 +21,9 @@ unclassified:
   sonarglobalconfiguration:                  # mandatory
     buildWrapperEnabled: true
     installations:                           # mandatory
-      - name: "TEST"                         # id of the SonarQube configuration - to be used in jobs
+        name: "TEST"                         # id of the SonarQube configuration - to be used in jobs
         serverUrl: "http://url:9000"
-        credentialsId: token       # id of the credentials containing sonar auth token (since 2.9 version)
+        - credentialsId: token       # id of the credentials containing sonar auth token (since 2.9 version)
         #serverAuthenticationToken: "token"   # for retrocompatibility with versions < 2.9
         mojoVersion: "mojoVersion"
         additionalProperties: "blah=blah"
