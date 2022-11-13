@@ -31,7 +31,7 @@ public class KubernetesCloudTest {
         final KubernetesCloud cloud = j.jenkins.clouds.get(KubernetesCloud.class);
         assertNotNull(cloud);
         assertEquals("advanced-k8s-config", cloud.name);
-        assertEquals("https://avanced-k8s-config:443", cloud.getServerUrl());
+        assertEquals("https://advanced-k8s-config:443", cloud.getServerUrl());
         assertEquals("serverCertificate", cloud.getServerCertificate());
         assertTrue(cloud.isSkipTlsVerify());
         assertEquals("default", cloud.getNamespace());
