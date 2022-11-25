@@ -1,6 +1,6 @@
 # matrix-auth-plugin
 
-Requires `matrix-auth` >= 2.4
+Requires `matrix-auth` >= 3.0
 
 There are a couple of built-in authorizations to consider.
 
@@ -14,22 +14,11 @@ jenkins:
   authorizationStrategy:
     globalMatrix:
       permissions:
-        - "Overall/Read:anonymous"
-        - "Overall/Administer:authenticated"
-        - "Overall/Administer:admin"
-```
-Permissions must be defined **per line**, meaning each line must grant permission to only a single role, and only a single user or group of users.
-
-Since version 3.0 permission string should include type prefix, otherwise you will get warning that your configuration is ambigous. For example:
-
-```yaml
-jenkins:
-  authorizationStrategy:
-    globalMatrix:
-      permissions:
         - "GROUP:Overall/Read:anonymous"
+        - "GROUP:Overall/Administer:authenticated"
         - "USER:Overall/Administer:admin"
 ```
+Permissions must be defined **per line**, meaning each line must grant permission to only a single role, and only a single user or group of users.
 
 ## sample-configuration (project based matrix)
 
