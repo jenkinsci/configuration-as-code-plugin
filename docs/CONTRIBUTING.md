@@ -77,6 +77,10 @@ Prerequisites: _Java_, _Maven_ & _IntelliJ IDEA_
 - Click `Add New Configuration` (`+`) in the top left of the shown dialog. Select `Maven`.
 - Under `Parameters` tab group, `Command line:` is `hpi:run`.
 - Under `Parameters` tab group, `Working directory:` is `/path/to/configuration-as-code-plugin/plugin`.
+- `Java Options` -> `Modify` -> Select `Properties`
+- Under `Java Options` tab group, `Properties:` is `java.awt.headless=true jenkins.version=2.xxx port=8085`
+  - Change `jenkins.version=2.xxx` by your version of jenkis (use the command `jenkins --version`)
+  - If your local jenkins installation is mapped to port 8080 you need to set `port=8085`
 - Open <http://localhost:8080/jenkins/configuration-as-code/> to test the plugin locally.
 
 ### CLI
