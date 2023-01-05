@@ -68,6 +68,8 @@ Prerequisites: _Java_, _Maven_ & _IntelliJ IDEA_
 
 - Open the root directory of this project in IntelliJ IDEA.
 - If you are opening the first time, wait patiently while project dependencies are being downloaded.
+- Verify that The Project SDK is set to 11 or 17.
+  - Click `File` -> `Project Structure` -> `Project` -> `SDK`.
 - Click `Run` in the menu. Select `Edit Configurations` in the menu item.
 - Click `Add New Configuration` (`+`) in the top left of the shown dialog. Select `Maven`.
 - Under `Parameters` tab group, `Working directory:` is `/path/to/configuration-as-code-plugin/plugin`.
