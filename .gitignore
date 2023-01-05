@@ -4,6 +4,9 @@ work/
 !.idea/codeStyles/
 *.iml
 
+#ignore run Configurations
+.run/
+
 # ignore jenkins.yaml from root and plugin folder (used by many for testing)
 /jenkins.yaml
 /plugin/jenkins.yaml
