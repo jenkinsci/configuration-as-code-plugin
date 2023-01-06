@@ -12,7 +12,6 @@
           <option name="mavenProperties">
             <map>
               <entry key="java.awt.headless" value="true" />
-              <entry key="jenkins.version" value="2.302" />
               <entry key="port" value="8085" />
             </map>
           </option>

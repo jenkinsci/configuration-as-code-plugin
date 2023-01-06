@@ -29,26 +29,11 @@
     <hpi.pluginLogoUrl>https://raw.githubusercontent.com/jenkinsci/configuration-as-code-plugin/master/plugin/src/main/webapp/img/logo-head.svg</hpi.pluginLogoUrl>
   </properties>
 
-  <developers>
-    <developer>
-      <id>jetersen</id>
-      <name>Joseph Petersen</name>
-    </developer>
-    <developer>
-      <id>timja</id>
-      <name>Tim Jacomb</name>
-    </developer>
-    <developer>
-      <id>oleg_nenashev</id>
-      <name>Oleg Nenashev</name>
-    </developer>
-  </developers>
-
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.319.x</artifactId>
+        <artifactId>bom-2.361.x</artifactId>
         <version>${plugin-bom.version}</version>
         <scope>import</scope>
         <type>pom</type>

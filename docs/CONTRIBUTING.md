@@ -68,14 +68,11 @@ Prerequisites: _Java_, _Maven_ & _IntelliJ IDEA_
 
 - Open the root directory of this project in IntelliJ IDEA.
 - If you are opening the first time, wait patiently while project dependencies are being downloaded.
-- Click `Run` in the menu. Select `Edit Configurations` in the menu item.
-- Click `Add New Configuration` (`+`) in the top left of the shown dialog. Select `Maven`.
-- Under `Parameters` tab group, `Working directory:` is `/path/to/configuration-as-code-plugin/plugin`.
-- Under `Parameters` tab group, `Command line:` is `hpi:run`.
 - Verify that IntelliJ IDEA is not using bundled maven.
   - Click `File` -> `Preferences...` -> `Build, Execution, Deployment` -> `Build Tools` -> `Maven`.
   - `Maven home directory:` has `/path/to/apache-maven-x.y.z` value, not `Bundled (Maven 3)`.
-- Open <http://localhost:8080/jenkins/configuration-as-code/> to test the plugin locally.
+- Use the `start jenkins` run configuration stored in the `.run` folder of this project, (if you wish to change it then duplicate it and maintain your own local copy)
+- Open <http://localhost:8085/jenkins/configuration-as-code/> to test the plugin locally.
 
 ### CLI
 
