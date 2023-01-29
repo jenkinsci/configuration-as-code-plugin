@@ -734,7 +734,6 @@ public class ConfigurationAsCode extends ManagementLink {
                 LOGGER.log(Level.SEVERE, "No configurator for the following root elements: " + String.join(", ", unknownKeys));
                 throw new ConfiguratorException("Invalid Configuration. Please check your configuration and try again.");
             }
-
         }
     }
 
