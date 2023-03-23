@@ -16,9 +16,7 @@
     <jackson.version>2.14.2</jackson.version>
     <enforcer.skip>true</enforcer.skip> <!-- I give up, too much effort to maintain enforcer here, should probably try clear out all enforcer only deps and see if it works -->
     <netty.version>4.1.81.Final</netty.version>
-    <jenkins.version>2.387.1</jenkins.version>
     <junixsocket.version>2.5.1</junixsocket.version>
-    <kotlin-stdlib.version>1.7.20</kotlin-stdlib.version>
   </properties>
 
   <dependencies>
@@ -26,17 +24,13 @@
       <groupId>io.jenkins</groupId>
       <artifactId>configuration-as-code</artifactId>
       <version>${project.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.json</groupId>
-          <artifactId>json</artifactId>
-        </exclusion>
-      </exclusions>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>io.jenkins.configuration-as-code</groupId>
       <artifactId>test-harness</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -49,7 +43,6 @@
     <dependency>
       <groupId>com.coravy.hudson.plugins.github</groupId>
       <artifactId>github</artifactId>
-      <version>1.36.0</version>
       <scope>test</scope>
     </dependency>
 
@@ -66,16 +59,26 @@
       <version>3.17.0</version>
       <scope>test</scope>
       <exclusions>
+        <!-- RequireUpperBoundDeps with apache-httpcomponents-client-4-api plugin -->
+        <exclusion>
+          <groupId>org.apache.httpcomponents</groupId>
+          <artifactId>httpclient</artifactId>
+        </exclusion>
+        <!-- RequireUpperBoundDeps with pipeline-groovy-lib plugin -->
+        <exclusion>
+          <groupId>org.apache.ivy</groupId>
+          <artifactId>ivy</artifactId>
+        </exclusion>
+        <!-- Provided by bouncycastle-api-plugin -->
+        <exclusion>
+          <groupId>org.bouncycastle</groupId>
+          <artifactId>bcpkix-jdk15on</artifactId>
+        </exclusion>
         <exclusion> <!-- Found Banned Dependency: org.sonatype.sisu:sisu-guice:jar:no_aop:3.2.5 -->
           <groupId>org.jfrog.buildinfo</groupId>
           <artifactId>build-info-extractor-maven3</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.ivy</groupId>
-      <artifactId>ivy</artifactId>
-      <version>2.5.1</version>
     </dependency>
 
     <dependency>
@@ -83,13 +86,20 @@
       <artifactId>view-job-filters</artifactId>
       <scope>test</scope>
       <version>2.3</version>
+      <exclusions>
+        <!-- RequireUpperBoundDeps with jersey2-api plugin -->
+        <exclusion>
+          <groupId>org.javassist</groupId>
+          <artifactId>javassist</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>crowd2</artifactId>
       <scope>test</scope>
-      <version>3.1.2</version>
+      <version>3.2.1</version>
     </dependency>
 
     <dependency>
@@ -106,48 +116,39 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>active-directory</artifactId>
-      <version>2.25.1</version>
+      <version>2.30</version>
       <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.jvnet.com4j</groupId>
-          <artifactId>com4j</artifactId>
-        </exclusion>
-      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>bouncycastle-api</artifactId>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>config-file-provider</artifactId>
-      <version>3.11.1</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>ldap</artifactId>
-      <version>2.11</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.jenkins.docker</groupId>
       <artifactId>docker-plugin</artifactId>
-      <version>1.2.9</version>
+      <version>1.3.0</version>
       <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <!-- Upper bounds conflict with the core -->
-          <groupId>com.google.code.findbugs</groupId>
-          <artifactId>annotations</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>docker-commons</artifactId>
-      <version>1.19</version>
+      <version>419.v8e3cd84ef49c</version>
       <scope>test</scope>
     </dependency>
 
@@ -161,14 +162,14 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>docker-workflow</artifactId>
-      <version>528.v7c193a_0b_e67c</version>
+      <version>563.vd5d2e5c4007f</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.csanchez.jenkins.plugins</groupId>
       <artifactId>kubernetes</artifactId>
-      <version>1.31.3</version>
+      <version>3900.va_dce992317b_4</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -188,11 +189,29 @@
       <artifactId>statistics-gatherer</artifactId>
       <version>2.0.3</version>
       <scope>test</scope>
+      <exclusions>
+        <!-- Provided by aws-java-sdk-sns plugin -->
+        <exclusion>
+          <groupId>com.amazonaws</groupId>
+          <artifactId>aws-java-sdk-sns</artifactId>
+        </exclusion>
+        <!-- RequireUpperBoundDeps with apache-httpcomponents-client-4-api plugin -->
+        <exclusion>
+          <groupId>org.apache.httpcomponents</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins.aws-java-sdk</groupId>
+      <artifactId>aws-java-sdk-sns</artifactId>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>credentials</artifactId>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -209,32 +228,15 @@
     </dependency>
 
     <dependency>
-      <groupId>commons-validator</groupId>
-      <artifactId>commons-validator</artifactId>
-      <version>1.7</version>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-beanutils</groupId>
-          <artifactId>commons-beanutils</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>github-branch-source</artifactId>
-      <version>1694.vd46793a_c4a_57</version>
+      <version>1701.v00cc8184df93</version>
       <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>com.infradna.tool</groupId>
-          <artifactId>bridge-method-annotation</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.jenkins-ci.plugins</groupId>
-          <artifactId>display-url-api</artifactId>
-        </exclusion>
-      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>gitlab-branch-source</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
@@ -245,7 +247,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>external-workspace-manager</artifactId>
-      <version>1.3.0</version>
+      <version>1.3.1</version>
       <scope>test</scope>
     </dependency>
 
@@ -254,13 +256,6 @@
       <artifactId>github-oauth</artifactId>
       <version>0.39</version>
       <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <!-- Provided by the Git plugin -->
-          <groupId>org.jenkins-ci.plugins</groupId>
-          <artifactId>matrix-project</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
@@ -274,18 +269,6 @@
       <artifactId>gitea</artifactId>
       <version>1.4.5</version>
       <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <!-- Otherwise provided -->
-          <groupId>org.jenkins-ci.plugins</groupId>
-          <artifactId>jackson2-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <!-- Otherwise provided -->
-          <groupId>org.jenkins-ci.plugins</groupId>
-          <artifactId>git</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
@@ -293,6 +276,18 @@
       <artifactId>keycloak</artifactId>
       <version>2.3.0</version>
       <scope>test</scope>
+      <exclusions>
+        <!-- Provided by bouncycastle-api-plugin -->
+        <exclusion>
+          <groupId>org.bouncycastle</groupId>
+          <artifactId>bcpkix-jdk15on</artifactId>
+        </exclusion>
+        <!-- RequireUpperBoundDeps with gitlab-plugin -->
+        <exclusion>
+          <groupId>org.jboss.logging</groupId>
+          <artifactId>jboss-logging</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -311,7 +306,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>sbt</artifactId>
-      <version>1.5</version>
+      <version>81.vb_82499046630</version>
       <scope>test</scope>
     </dependency>
 
@@ -344,7 +339,6 @@
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>pipeline-groovy-lib</artifactId>
-      <version>621.vb_44ce045b_582</version> <!-- TODO until in BOM -->
       <scope>test</scope>
     </dependency>
 
@@ -366,18 +360,19 @@
       <artifactId>artifact-manager-s3</artifactId>
       <version>754.vb_5d21c758eb_3</version>
       <scope>test</scope>
+      <exclusions>
+        <!-- Provided by Jenkins core -->
+        <exclusion>
+          <groupId>javax.annotation</groupId>
+          <artifactId>javax.annotation-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>aws-global-configuration</artifactId>
-      <version>100.v4619b_45d2dfc</version>
+      <version>108.v47b_fd43dfec6</version>
       <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.jenkins-ci.plugins</groupId>
-          <artifactId>aws-java-sdk</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
@@ -389,7 +384,7 @@
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>adoptopenjdk</artifactId>
-      <version>1.4</version>
+      <version>1.5</version>
       <scope>test</scope>
     </dependency>
 
@@ -416,36 +411,16 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.antlr</groupId>
-      <artifactId>antlr4-runtime</artifactId>
-      <version>4.12.0</version>
-    </dependency>
-    <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>jackson2-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>jaxen</groupId>
-      <artifactId>jaxen</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>xml-apis</groupId>
-          <artifactId>xml-apis</artifactId>
-        </exclusion>
-      </exclusions>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>ec2</artifactId>
-      <version>2.0.3</version>
+      <version>2.0.6</version>
       <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.jenkins-ci.plugins</groupId>
-          <artifactId>aws-java-sdk</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
@@ -457,53 +432,49 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>sonar</artifactId>
-      <version>2.14</version>
+      <version>2.15</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>jira</artifactId>
-      <version>3.8</version>
+      <version>3.9</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>com.cloudbees.jenkins.plugins</groupId>
       <artifactId>custom-tools-plugin</artifactId>
       <version>0.8</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
-      <groupId>net.minidev</groupId>
-      <artifactId>json-smart</artifactId>
-      <version>2.4.8</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.ow2.asm</groupId>
-          <artifactId>asm</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>gitlab-plugin</artifactId>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>mercurial</artifactId>
       <version>1260.vdfb_723cdcc81</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>com.datapipe.jenkins.plugins</groupId>
       <artifactId>hashicorp-vault-plugin</artifactId>
-      <version>356.ved18810a_b_828</version>
+      <version>360.v0a_1c04cf807d</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>azure-keyvault</artifactId>
-      <version>136.veb1d1296db97</version>
+      <version>185.v950b_a_591c8d5</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -513,30 +484,10 @@
     </dependency>
 
     <dependency>
-      <groupId>org.jsoup</groupId>
-      <artifactId>jsoup</artifactId>
-      <version>1.15.4</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.vladsch.flexmark</groupId>
-      <artifactId>flexmark-all</artifactId>
-      <version>0.62.2</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>nodejs</artifactId>
       <version>1.5.1</version>
       <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.jenkins-ci.plugins</groupId>
-          <artifactId>config-file-provider</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
@@ -557,6 +508,18 @@
       <groupId>org.jenkins-ci.main</groupId>
       <artifactId>maven-plugin</artifactId>
       <scope>test</scope>
+      <exclusions>
+        <!-- RequireUpperBoundDeps with jenkins-test-harness-htmlunit plugin -->
+        <exclusion>
+          <groupId>commons-net</groupId>
+          <artifactId>commons-net</artifactId>
+        </exclusion>
+        <!-- Provided by Jenkins core -->
+        <exclusion>
+          <groupId>javax.annotation</groupId>
+          <artifactId>javax.annotation-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -569,68 +532,6 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>com.microsoft.azure</groupId>
-        <artifactId>azure-annotations</artifactId>
-        <version>1.10.0</version>
-      </dependency>
-      <dependency>
-        <groupId>io.reactivex</groupId>
-        <artifactId>rxjava</artifactId>
-        <version>1.3.8</version>
-      </dependency>
-      <dependency>
-        <groupId>com.squareup.retrofit2</groupId>
-        <artifactId>retrofit</artifactId>
-        <version>2.9.0</version>
-      </dependency>
-      <dependency>
-        <groupId>com.google.code.gson</groupId>
-        <artifactId>gson</artifactId>
-        <version>2.10.1</version>
-      </dependency>
-      <dependency>
-        <groupId>org.projectlombok</groupId>
-        <artifactId>lombok</artifactId>
-        <version>1.18.24</version>
-      </dependency>
-      <dependency>
-        <groupId>com.atlassian.plugins</groupId>
-        <artifactId>atlassian-plugins-core</artifactId>
-        <version>7.1.5</version>
-      </dependency>
-      <dependency>
-        <groupId>io.atlassian.fugue</groupId>
-        <artifactId>fugue</artifactId>
-        <version>4.7.2</version>
-      </dependency>
-      <dependency>
-        <groupId>com.squareup.okhttp3</groupId>
-        <artifactId>logging-interceptor</artifactId>
-        <version>4.10.0</version>
-      </dependency>
-      <dependency>
-        <groupId>com.squareup.okhttp3</groupId>
-        <artifactId>okhttp</artifactId>
-        <version>4.10.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jenkins-ci</groupId>
-        <artifactId>symbol-annotation</artifactId>
-        <version>1.23</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.github.docker-java</groupId>
-        <artifactId>docker-java</artifactId>
-        <version>3.2.14</version>
-        <exclusions>
-          <exclusion> <!-- https://issues.jenkins-ci.org/browse/JENKINS-39689 -->
-            <groupId>org.glassfish.jersey.inject</groupId>
-            <artifactId>jersey-hk2</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
         <groupId>com.kohlschutter.junixsocket</groupId>
         <artifactId>junixsocket-common</artifactId>
         <version>${junixsocket.version}</version>
@@ -641,30 +542,6 @@
         <version>${junixsocket.version}</version>
       </dependency>
       <!-- force upper bound dependencies -->
-      <dependency>
-        <groupId>com.amazonaws</groupId>
-        <artifactId>aws-java-sdk-sns</artifactId>
-        <version>1.12.430</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jenkins-ci.plugins</groupId>
-        <artifactId>aws-java-sdk</artifactId>
-        <version>1.12.287-357.vf82d85a_6eefd</version>
-      </dependency>
-      <dependency>
-        <groupId>commons-codec</groupId>
-        <artifactId>commons-codec</artifactId>
-        <version>1.15</version>
-      </dependency>
-      <dependency>
-        <groupId>commons-lang</groupId>
-        <artifactId>commons-lang</artifactId>
-        <version>2.6</version>
-      </dependency>
-      <dependency>
-        <groupId>io.jenkins.plugins</groupId>
-        <artifactId>commons-text-api</artifactId>
-      </dependency>
       <dependency>
         <groupId>io.netty</groupId>
         <artifactId>netty-bom</artifactId>
@@ -677,21 +554,6 @@
         <groupId>com.jcraft</groupId>
         <artifactId>jsch</artifactId>
         <version>0.1.55</version>
-      </dependency>
-      <dependency>
-        <groupId>com.jcraft</groupId>
-        <artifactId>jzlib</artifactId>
-        <version>1.1.3-kohsuke-1</version>
-      </dependency>
-      <dependency>
-        <groupId>com.squareup.okhttp</groupId>
-        <artifactId>okhttp</artifactId>
-        <version>2.7.5</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-core</artifactId>
-        <version>${jackson.version}</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
@@ -714,79 +576,9 @@
         <version>${jackson.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.google.errorprone</groupId>
-        <artifactId>error_prone_annotations</artifactId>
-        <version>2.15.0</version>
-      </dependency>
-      <dependency>
         <groupId>com.google.protobuf</groupId>
         <artifactId>protobuf-java</artifactId>
         <version>3.22.2</version>
-      </dependency>
-      <dependency>
-        <groupId>com.squareup.okio</groupId>
-        <artifactId>okio</artifactId>
-        <version>3.2.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jetbrains.kotlin</groupId>
-        <artifactId>kotlin-stdlib</artifactId>
-        <version>${kotlin-stdlib.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jetbrains.kotlin</groupId>
-        <artifactId>kotlin-stdlib-common</artifactId>
-        <version>${kotlin-stdlib.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>jaxen</groupId>
-        <artifactId>jaxen</artifactId>
-        <version>1.2.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.commons</groupId>
-        <artifactId>commons-lang3</artifactId>
-        <version>3.12.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.httpcomponents</groupId>
-        <artifactId>httpasyncclient</artifactId>
-        <version>4.1.5</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jetbrains</groupId>
-        <artifactId>annotations</artifactId>
-        <version>23.0.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.httpcomponents</groupId>
-        <artifactId>httpclient</artifactId>
-        <version>4.5.13</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.httpcomponents</groupId>
-        <artifactId>httpcore</artifactId>
-        <version>4.4.16</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.httpcomponents</groupId>
-        <artifactId>httpmime</artifactId>
-        <version>4.5.13</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-artifact</artifactId>
-        <version>3.8.6</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-model</artifactId>
-        <version>3.8.6</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-plugin-api</artifactId>
-        <version>3.8.6</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
@@ -799,35 +591,9 @@
         <version>3.5.0</version>
       </dependency>
       <dependency>
-        <groupId>org.jdom</groupId>
-        <artifactId>jdom</artifactId>
-        <version>2.0.2</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jenkins-ci.plugins</groupId>
-        <artifactId>bouncycastle-api</artifactId>
-        <version>2.26</version>
-      </dependency>
-      <dependency>
         <groupId>org.jenkins-ci.main</groupId>
         <artifactId>maven-plugin</artifactId>
-        <version>3.20</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jenkins-ci.modules</groupId>
-        <artifactId>instance-identity</artifactId>
-        <version>2.2</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.jenkins-ci.plugins</groupId>
-        <artifactId>github-api</artifactId>
-        <version>1.303-400.v35c2d8258028</version>
-      </dependency>
-      <dependency>
-        <groupId>org.json</groupId>
-        <artifactId>json</artifactId>
-        <version>20230227</version>
+        <version>3.21</version>
       </dependency>
       <dependency>
         <groupId>joda-time</groupId>
@@ -835,13 +601,8 @@
         <version>2.12.1</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.commons</groupId>
-        <artifactId>commons-compress</artifactId>
-        <version>1.21</version>
-      </dependency>
-      <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.346.x</artifactId>
+        <artifactId>bom-2.361.x</artifactId>
         <version>${plugin-bom.version}</version>
         <scope>import</scope>
         <type>pom</type>
@@ -861,6 +622,29 @@
         </includes>
       </resource>
     </resources>
+    <plugins>
+      <plugin>
+        <groupId>org.jenkins-ci.tools</groupId>
+        <artifactId>maven-hpi-plugin</artifactId>
+        <extensions>true</extensions>
+        <executions>
+          <execution>
+            <id>prepare-test-plugins</id>
+            <goals>
+              <goal>resolve-test-dependencies</goal>
+            </goals>
+            <phase>test-compile</phase>
+          </execution>
+          <execution>
+            <id>test-runtime</id>
+            <goals>
+              <goal>test-runtime</goal>
+            </goals>
+            <phase>test</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
 
   <profiles>

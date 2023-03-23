@@ -48,7 +48,7 @@
     <dependencies>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.319.x</artifactId>
+        <artifactId>bom-2.361.x</artifactId>
         <version>${plugin-bom.version}</version>
         <scope>import</scope>
         <type>pom</type>
@@ -65,11 +65,6 @@
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
       <version>20230227</version>
-    </dependency>
-    <dependency>
-      <groupId>com.google.code.findbugs</groupId>
-      <artifactId>jsr305</artifactId>
-      <version>3.0.2</version>
     </dependency>
     <dependency>
       <groupId>io.jenkins.plugins</groupId>

@@ -1,5 +1,4 @@
-def configurations = [
-    [ platform: "linux", jdk: "11" ],
-    [ platform: 'linux', jdk: '17', jenkins: '2.342' ]
-]
-buildPlugin(configurations: configurations, timeout: 180, useContainerAgent: true)
+buildPlugin(useContainerAgent: true, timeout: 180, configurations: [
+    [platform: 'linux', jdk: 17],
+    [platform: 'windows', jdk: 11],
+])
