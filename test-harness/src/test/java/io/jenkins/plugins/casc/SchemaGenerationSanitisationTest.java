@@ -15,7 +15,7 @@ public class SchemaGenerationSanitisationTest {
 
     @Test
     public void testRetrieveDocStringFromAttribute() {
-        String expectedDocString = "If checked, this will allow users who are not authenticated to access Jenkins\n  in a read-only mode.";
+        String expectedDocString = "If checked, this will allow users who are not authenticated to access Jenkins in a read-only mode.";
         String actualDocString = retrieveDocStringFromAttribute(
             hudson.security.FullControlOnceLoggedInAuthorizationStrategy.class,
             "allowAnonymousRead");

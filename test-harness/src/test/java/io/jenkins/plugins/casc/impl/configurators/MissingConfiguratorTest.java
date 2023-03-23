@@ -9,7 +9,6 @@ import org.junit.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assume.assumeThat;
 
 
 
@@ -22,8 +21,6 @@ public class MissingConfiguratorTest {
             message = "No hudson.security.AuthorizationStrategy implementation found for globalMatrix")
     @Test
     public void testThrowsSuggestion() {
-        // The conditions for this test can be false in PCT runs
-        assumeThat(j.jenkins.getPlugin("matrix-auth"), nullValue());
         //No config check needed, should fail with IllegalArgumentException
         //We're purposely trying to configure a plugin for which there is no configurator
         //admin user should not be created due to IllegalArgumentException

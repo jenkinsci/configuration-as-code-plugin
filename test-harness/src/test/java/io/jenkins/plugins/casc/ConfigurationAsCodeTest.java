@@ -321,7 +321,7 @@ public class ConfigurationAsCodeTest {
     @Test
     public void testHtmlDocStringRetrieval() throws Exception {
         String expectedDocString = "<div>\n"
-            + "  If checked, this will allow users who are not authenticated to access Jenkins\n  in a read-only mode.\n"
+            + "  If checked, this will allow users who are not authenticated to access Jenkins in a read-only mode.\n"
             + "</div>\n";
         String actualDocString = ConfigurationAsCode.get().getHtmlHelp(hudson.security.FullControlOnceLoggedInAuthorizationStrategy.class, "allowAnonymousRead");
         assertEquals(expectedDocString, actualDocString);
