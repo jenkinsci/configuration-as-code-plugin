@@ -51,12 +51,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.datapipe.jenkins.plugins</groupId>
-      <artifactId>hashicorp-vault-plugin</artifactId>
-      <version>360.v0a_1c04cf807d</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>com.github.stefanbirkner</groupId>
       <artifactId>system-rules</artifactId>
       <version>1.19.0</version>
@@ -202,18 +196,6 @@
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>authentication-tokens</artifactId>
-      <version>1.4</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>aws-credentials</artifactId>
-      <version>191.vcb_f183ce58b_9</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>azure-keyvault</artifactId>
       <version>185.v950b_a_591c8d5</version>
       <scope>test</scope>
@@ -232,11 +214,6 @@
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>branch-api</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>config-file-provider</artifactId>
       <scope>test</scope>
     </dependency>
@@ -249,11 +226,6 @@
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>crowd2</artifactId>
       <version>3.2.1</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>display-url-api</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -471,11 +443,6 @@
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>trilead-api</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>view-job-filters</artifactId>
       <version>2.3</version>
       <scope>test</scope>
@@ -509,16 +476,6 @@
           <artifactId>*</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkinsci.plugins</groupId>
-      <artifactId>pipeline-model-definition</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkinsci.plugins</groupId>
-      <artifactId>pipeline-model-extensions</artifactId>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 
