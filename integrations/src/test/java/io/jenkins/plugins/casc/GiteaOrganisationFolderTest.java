@@ -15,7 +15,6 @@ import org.jenkinsci.plugin.gitea.TagDiscoveryTrait;
 import org.jenkinsci.plugin.gitea.WebhookRegistrationTrait;
 import org.junit.Rule;
 import org.junit.Test;
-import org.jvnet.hudson.test.recipes.WithPlugin;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -26,7 +25,6 @@ public class GiteaOrganisationFolderTest {
     public JenkinsConfiguredWithCodeRule r = new JenkinsConfiguredWithCodeRule();
 
     @Test
-    @WithPlugin({"branch-api.jpi", "cloudbees-folder.jpi", "scm-api.jpi", "structs.jpi"})
     @ConfiguredWithCode("SeedJobTest_withGiteaOrganisation.yml")
     public void configure_gitea_organisation_folder_seed_job() {
         OrganizationFolder folder = (OrganizationFolder) r.jenkins.getItem("Gitea Organization Folder");
