@@ -117,12 +117,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>io.jenkins.plugins</groupId>
-      <artifactId>sge-cloud-plugin</artifactId>
-      <version>1.22</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.csanchez.jenkins.plugins</groupId>
       <artifactId>kubernetes</artifactId>
       <version>3900.va_dce992317b_4</version>
@@ -313,24 +307,6 @@
       <artifactId>job-dsl</artifactId>
       <version>1.82</version>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>keycloak</artifactId>
-      <version>2.3.0</version>
-      <scope>test</scope>
-      <exclusions>
-        <!-- Provided by bouncycastle-api-plugin -->
-        <exclusion>
-          <groupId>org.bouncycastle</groupId>
-          <artifactId>bcpkix-jdk15on</artifactId>
-        </exclusion>
-        <!-- RequireUpperBoundDeps with gitlab-plugin -->
-        <exclusion>
-          <groupId>org.jboss.logging</groupId>
-          <artifactId>jboss-logging</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
