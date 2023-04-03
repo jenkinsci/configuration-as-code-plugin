@@ -368,7 +368,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>role-strategy</artifactId>
-      <version>587.v2872c41fa_e51</version>
+      <version>587.588.v850a_20a_30162</version>
       <scope>test</scope>
     </dependency>
     <dependency>
