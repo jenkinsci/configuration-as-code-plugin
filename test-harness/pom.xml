@@ -18,7 +18,7 @@
     <dependencies>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.319.x</artifactId>
+        <artifactId>bom-2.387.x</artifactId>
         <version>${plugin-bom.version}</version>
         <scope>import</scope>
         <type>pom</type>
@@ -45,7 +45,7 @@
     <dependency>
       <groupId>com.github.erosb</groupId>
       <artifactId>everit-json-schema</artifactId>
-      <version>1.14.1</version>
+      <version>1.14.2</version>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.main</groupId>
@@ -58,13 +58,44 @@
     <dependency>
       <groupId>com.vladsch.flexmark</groupId>
       <artifactId>flexmark-all</artifactId>
-      <version>0.62.2</version>
+      <version>0.64.0</version>
     </dependency>
     <dependency>
       <groupId>com.github.stefanbirkner</groupId>
       <artifactId>system-rules</artifactId>
       <version>1.19.0</version>
     </dependency>
+    <!-- Needed for AgentProtocolsTest -->
+    <dependency>
+      <groupId>org.jenkins-ci.modules</groupId>
+      <artifactId>instance-identity</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.jenkins-ci.tools</groupId>
+        <artifactId>maven-hpi-plugin</artifactId>
+        <extensions>true</extensions>
+        <executions>
+          <execution>
+            <id>prepare-test-plugins</id>
+            <goals>
+              <goal>resolve-test-dependencies</goal>
+            </goals>
+            <phase>test-compile</phase>
+          </execution>
+          <execution>
+            <id>test-runtime</id>
+            <goals>
+              <goal>test-runtime</goal>
+            </goals>
+            <phase>test</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

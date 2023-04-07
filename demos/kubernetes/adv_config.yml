@@ -14,7 +14,7 @@ data:
       clouds:
         - kubernetes:
             name: "advanced-k8s-config"
-            serverUrl: "https://avanced-k8s-config:443"
+            serverUrl: "https://advanced-k8s-config:443"
             skipTlsVerify: true
             namespace: "default"
             credentialsId: "advanced-k8s-credentials"

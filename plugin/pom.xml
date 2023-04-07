@@ -48,7 +48,7 @@
     <dependencies>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.319.x</artifactId>
+        <artifactId>bom-2.387.x</artifactId>
         <version>${plugin-bom.version}</version>
         <scope>import</scope>
         <type>pom</type>
@@ -64,7 +64,7 @@
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
-      <version>20220320</version>
+      <version>20230227</version>
     </dependency>
     <dependency>
       <groupId>com.google.code.findbugs</groupId>
@@ -106,7 +106,7 @@
     </plugins>
   </build>
   <scm>
-    <connection>scm:git:git://github.com/jenkinsci/configuration-as-code-plugin.git</connection>
+    <connection>scm:git:https://github.com/jenkinsci/configuration-as-code-plugin.git</connection>
     <developerConnection>scm:git:git@github.com:jenkinsci/configuration-as-code-plugin.git</developerConnection>
     <url>https://github.com/jenkinsci/configuration-as-code-plugin</url>
     <tag>${scmTag}</tag>
