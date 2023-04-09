@@ -1,5 +1,8 @@
 package io.jenkins.plugins.casc.core;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import hudson.model.UpdateCenter;
 import hudson.model.UpdateSite;
 import io.jenkins.plugins.casc.ConfigurationContext;
@@ -12,9 +15,6 @@ import io.jenkins.plugins.casc.model.Mapping;
 import java.util.List;
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class UpdateCenterConfiguratorTest {
 
@@ -41,7 +41,5 @@ public class UpdateCenterConfiguratorTest {
         assertNotNull(node);
         Mapping site1 = node.asMapping().get("sites").asSequence().get(1).asMapping();
         assertEquals("experimental", site1.getScalarValue("id"));
-
     }
-
 }

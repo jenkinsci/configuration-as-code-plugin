@@ -42,7 +42,6 @@ public class DefaultConfiguratorRegistry implements ConfiguratorRegistry {
 
     private static final Logger LOGGER = Logger.getLogger(DefaultConfiguratorRegistry.class.getName());
 
-
     @Override
     @CheckForNull
     public RootElementConfigurator lookupRootElement(String name) {
@@ -81,9 +80,8 @@ public class DefaultConfiguratorRegistry implements ConfiguratorRegistry {
         return cache.get(type);
     }
 
-    private LoadingCache<Type, Configurator> cache = Caffeine.newBuilder()
-            .expireAfterAccess(10L, TimeUnit.SECONDS)
-            .build(type -> internalLookup(type));
+    private LoadingCache<Type, Configurator> cache =
+            Caffeine.newBuilder().expireAfterAccess(10L, TimeUnit.SECONDS).build(type -> internalLookup(type));
 
     private Configurator internalLookup(Type type) {
         Class clazz = Types.erasure(type);
@@ -97,7 +95,7 @@ public class DefaultConfiguratorRegistry implements ConfiguratorRegistry {
             }
         }
 
-        //TODO: Only try to cast if we can actually get the parameterized type
+        // TODO: Only try to cast if we can actually get the parameterized type
         if (Collection.class.isAssignableFrom(clazz) && type instanceof ParameterizedType) {
             ParameterizedType pt = (ParameterizedType) type;
             Type actualType = pt.getActualTypeArguments()[0];
@@ -145,9 +143,7 @@ public class DefaultConfiguratorRegistry implements ConfiguratorRegistry {
             return new EnumConfigurator(clazz);
         }
 
-        LOGGER.warning("Configuration-as-Code can't handle type "+ type);
+        LOGGER.warning("Configuration-as-Code can't handle type " + type);
         return null;
     }
-
-
 }

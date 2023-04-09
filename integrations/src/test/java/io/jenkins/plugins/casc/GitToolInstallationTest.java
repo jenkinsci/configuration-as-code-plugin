@@ -1,13 +1,5 @@
 package io.jenkins.plugins.casc;
 
-import hudson.plugins.git.GitTool;
-import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
-import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
-import io.jenkins.plugins.casc.model.CNode;
-import jenkins.model.Jenkins;
-import org.junit.ClassRule;
-import org.junit.Test;
-
 import static io.jenkins.plugins.casc.misc.Util.getToolRoot;
 import static io.jenkins.plugins.casc.misc.Util.toStringFromYamlFile;
 import static io.jenkins.plugins.casc.misc.Util.toYamlString;
@@ -15,6 +7,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 
+import hudson.plugins.git.GitTool;
+import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
+import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
+import io.jenkins.plugins.casc.model.CNode;
+import jenkins.model.Jenkins;
+import org.junit.ClassRule;
+import org.junit.Test;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -30,7 +29,8 @@ public class GitToolInstallationTest {
         final Jenkins jenkins = Jenkins.get();
         final GitTool.DescriptorImpl descriptor = (GitTool.DescriptorImpl) jenkins.getDescriptor(GitTool.class);
         assertEquals(2, descriptor.getInstallations().length);
-        assertEquals("/usr/local/bin/git", descriptor.getInstallation("another_git").getGitExe());
+        assertEquals(
+                "/usr/local/bin/git", descriptor.getInstallation("another_git").getGitExe());
         assertEquals("/bin/git", descriptor.getInstallation("git").getGitExe());
     }
 

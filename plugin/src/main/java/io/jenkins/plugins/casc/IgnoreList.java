@@ -17,9 +17,8 @@ class IgnoreList {
      * <p>
      * Enable FINE logging for this class to see all potential candidates
      */
-    private static final List<String> IGNORE_LIST = Collections.singletonList(
-            "defaultProperties hudson.tools.ToolProperty"
-    );
+    private static final List<String> IGNORE_LIST =
+            Collections.singletonList("defaultProperties hudson.tools.ToolProperty");
 
     /**
      * Checks if an attribute should be ignored
@@ -28,7 +27,8 @@ class IgnoreList {
      * @return true if the attribute should be ignored
      */
     static boolean isIgnored(Attribute attribute) {
-        String attributeRepresentation = attribute.getName() + " " + attribute.getType().getName();
+        String attributeRepresentation =
+                attribute.getName() + " " + attribute.getType().getName();
 
         LOGGER.log(Level.FINE, attributeRepresentation);
         return IGNORE_LIST.contains(attributeRepresentation);

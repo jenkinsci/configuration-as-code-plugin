@@ -1,5 +1,11 @@
 package io.jenkins.plugins.casc;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
+
 import com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey;
 import com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey.DirectEntryPrivateKeySource;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
@@ -21,13 +27,6 @@ import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.rules.RuleChain;
 import org.jvnet.hudson.test.LoggerRule;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.not;
-
-
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
@@ -35,17 +34,16 @@ public class SystemCredentialsTest {
 
     @Rule
     public LoggerRule log = new LoggerRule()
-        .recordPackage(DataBoundConfigurator.class, Level.INFO)
-        .capture(100);
+            .recordPackage(DataBoundConfigurator.class, Level.INFO)
+            .capture(100);
 
     @Rule
     public RuleChain chain = RuleChain.outerRule(new EnvironmentVariables()
-            .set("SUDO_PASSWORD", "1234")
-            .set("SSH_PRIVATE_KEY", "s3cr3t")
-            .set("SSH_KEY_PASSWORD", "ABCD"))
+                    .set("SUDO_PASSWORD", "1234")
+                    .set("SSH_PRIVATE_KEY", "s3cr3t")
+                    .set("SSH_KEY_PASSWORD", "ABCD"))
             .around(log)
             .around(new JenkinsConfiguredWithCodeRule());
-
 
     @Test
     @ConfiguredWithCode("SystemCredentialsTest.yml")
@@ -53,8 +51,7 @@ public class SystemCredentialsTest {
         Jenkins jenkins = Jenkins.get();
 
         List<UsernamePasswordCredentials> ups = CredentialsProvider.lookupCredentials(
-                UsernamePasswordCredentials.class, jenkins, ACL.SYSTEM, Collections.emptyList()
-        );
+                UsernamePasswordCredentials.class, jenkins, ACL.SYSTEM, Collections.emptyList());
         assertThat(ups, hasSize(1));
         final UsernamePasswordCredentials up = ups.get(0);
         assertThat(up.getPassword().getPlainText(), equalTo("1234"));
@@ -64,32 +61,27 @@ public class SystemCredentialsTest {
         final CNode node = context.lookup(up.getClass()).describe(up, context);
         assertThat(node.asMapping().getScalarValue("password"), not(equals("1234")));
 
-
         List<CertificateCredentials> certs = CredentialsProvider.lookupCredentials(
-                CertificateCredentials.class, jenkins, ACL.SYSTEM, Collections.emptyList()
-        );
+                CertificateCredentials.class, jenkins, ACL.SYSTEM, Collections.emptyList());
         assertThat(certs, hasSize(0));
-//       TODO: add test for uploaded certificate
-//        assertThat(certs.get(0).getPassword().getPlainText(), equalTo("ABCD"));
+        //       TODO: add test for uploaded certificate
+        //        assertThat(certs.get(0).getPassword().getPlainText(), equalTo("ABCD"));
 
         List<BasicSSHUserPrivateKey> sshPrivateKeys = CredentialsProvider.lookupCredentials(
-                BasicSSHUserPrivateKey.class, jenkins, ACL.SYSTEM, Collections.emptyList()
-        );
+                BasicSSHUserPrivateKey.class, jenkins, ACL.SYSTEM, Collections.emptyList());
         assertThat(sshPrivateKeys, hasSize(1));
 
         final BasicSSHUserPrivateKey ssh_with_passphrase = sshPrivateKeys.get(0);
         assertThat(ssh_with_passphrase.getPassphrase().getPlainText(), equalTo("ABCD"));
 
-        final DirectEntryPrivateKeySource source = (DirectEntryPrivateKeySource) ssh_with_passphrase.getPrivateKeySource();
+        final DirectEntryPrivateKeySource source =
+                (DirectEntryPrivateKeySource) ssh_with_passphrase.getPrivateKeySource();
         assertThat(source.getPrivateKey().getPlainText(), equalTo("s3cr3t"));
-
 
         // credentials should not appear in plain text in log
         for (LogRecord logRecord : log.getRecords()) {
             assertThat(logRecord.getMessage(), not(containsString("1234")));
             assertThat(logRecord.getMessage(), not(containsString("ABCD")));
         }
-
-
     }
 }

@@ -12,7 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 public class TokenReloadCrumbExclusion extends CrumbExclusion {
 
     @Override
-    public boolean process(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+    public boolean process(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
 
         if (TokenReloadAction.tokenReloadEnabled()) {
             String pathInfo = request.getPathInfo();

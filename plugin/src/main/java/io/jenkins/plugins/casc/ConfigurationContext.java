@@ -13,7 +13,6 @@ import org.kohsuke.stapler.Stapler;
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-
 public class ConfigurationContext implements ConfiguratorRegistry {
 
     public static final String CASC_YAML_MAX_ALIASES_ENV = "CASC_YAML_MAX_ALIASES";
@@ -24,7 +23,7 @@ public class ConfigurationContext implements ConfiguratorRegistry {
     private Restriction restriction = Restriction.reject;
     private Unknown unknown = Unknown.reject;
     private String mergeStrategy;
-    private transient final int yamlMaxAliasesForCollections;
+    private final transient int yamlMaxAliasesForCollections;
 
     /**
      * the model-introspection model to be applied by configuration-as-code.
@@ -36,7 +35,7 @@ public class ConfigurationContext implements ConfiguratorRegistry {
 
     private transient List<Listener> listeners = new ArrayList<>();
 
-    private transient final ConfiguratorRegistry registry;
+    private final transient ConfiguratorRegistry registry;
 
     private transient String mode;
 
@@ -51,10 +50,7 @@ public class ConfigurationContext implements ConfiguratorRegistry {
     }
 
     private String getPropertyOrEnv(String envKey, String proKey) {
-        return Util.fixEmptyAndTrim(System.getProperty(
-            proKey,
-            System.getenv(envKey)
-        ));
+        return Util.fixEmptyAndTrim(System.getProperty(proKey, System.getenv(envKey)));
     }
 
     public SecretSourceResolver getSecretSourceResolver() {
@@ -75,11 +71,17 @@ public class ConfigurationContext implements ConfiguratorRegistry {
         }
     }
 
-    public Deprecation getDeprecated() { return deprecation; }
+    public Deprecation getDeprecated() {
+        return deprecation;
+    }
 
-    public Restriction getRestricted() { return restriction; }
+    public Restriction getRestricted() {
+        return restriction;
+    }
 
-    public Unknown getUnknown() { return unknown; }
+    public Unknown getUnknown() {
+        return unknown;
+    }
 
     public void setDeprecated(Deprecation deprecation) {
         this.deprecation = deprecation;
@@ -110,7 +112,6 @@ public class ConfigurationContext implements ConfiguratorRegistry {
     }
 
     // --- delegate methods for ConfigurationContext
-
 
     @Override
     @CheckForNull
@@ -147,7 +148,8 @@ public class ConfigurationContext implements ConfiguratorRegistry {
 
     // Once we introduce some breaking change on the model inference mechanism, we will introduce `TWO` and so on
     // And this new mechanism will only get enabled when configuration file uses this version or later
-    enum Version { ONE("1");
+    enum Version {
+        ONE("1");
 
         private final String value;
 
@@ -157,8 +159,10 @@ public class ConfigurationContext implements ConfiguratorRegistry {
 
         public static Version of(String version) {
             switch (version) {
-                case "1": return Version.ONE;
-                default: throw new IllegalArgumentException("unsupported version "+version);
+                case "1":
+                    return Version.ONE;
+                default:
+                    throw new IllegalArgumentException("unsupported version " + version);
             }
         }
 
@@ -183,21 +187,30 @@ public class ConfigurationContext implements ConfiguratorRegistry {
     /**
      * Policy regarding unknown attributes.
      */
-    enum Unknown { reject, warn }
+    enum Unknown {
+        reject,
+        warn
+    }
 
     /**
      * Policy regarding {@link org.kohsuke.accmod.Restricted} attributes.
      */
-    enum Restriction { reject, beta, warn }
+    enum Restriction {
+        reject,
+        beta,
+        warn
+    }
 
     /**
      * Policy regarding {@link Deprecated} attributes.
      */
-    enum Deprecation { reject, warn }
+    enum Deprecation {
+        reject,
+        warn
+    }
 
     @FunctionalInterface
     public interface Listener {
         void warning(@NonNull CNode node, @NonNull String error);
     }
-
 }

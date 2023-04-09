@@ -1,5 +1,12 @@
 package io.jenkins.plugins.casc;
 
+import static io.jenkins.plugins.casc.misc.Util.getToolRoot;
+import static io.jenkins.plugins.casc.misc.Util.toStringFromYamlFile;
+import static io.jenkins.plugins.casc.misc.Util.toYamlString;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
+
 import hudson.ExtensionList;
 import hudson.tools.InstallSourceProperty;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
@@ -9,14 +16,6 @@ import org.jenkinsci.plugins.terraform.TerraformInstallation;
 import org.jenkinsci.plugins.terraform.TerraformInstaller;
 import org.junit.ClassRule;
 import org.junit.Test;
-
-import static io.jenkins.plugins.casc.misc.Util.getToolRoot;
-import static io.jenkins.plugins.casc.misc.Util.toStringFromYamlFile;
-import static io.jenkins.plugins.casc.misc.Util.toYamlString;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-
 
 /**
  * @author v1v (Victor Martinez)
@@ -29,7 +28,8 @@ public class TerraformTest {
 
     @Test
     public void configure_terraform_tool() {
-        final TerraformInstallation.DescriptorImpl descriptor = ExtensionList.lookupSingleton(TerraformInstallation.DescriptorImpl.class);
+        final TerraformInstallation.DescriptorImpl descriptor =
+                ExtensionList.lookupSingleton(TerraformInstallation.DescriptorImpl.class);
         assertEquals(1, descriptor.getInstallations().length);
 
         TerraformInstallation terraform = descriptor.getInstallations()[0];

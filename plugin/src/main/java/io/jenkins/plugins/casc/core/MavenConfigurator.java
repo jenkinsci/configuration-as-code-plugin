@@ -33,7 +33,6 @@ import org.kohsuke.accmod.restrictions.NoExternalUse;
 @Restricted(NoExternalUse.class)
 public class MavenConfigurator extends BaseConfigurator<GlobalMavenConfig> {
 
-
     @Override
     public Class<GlobalMavenConfig> getTarget() {
         return GlobalMavenConfig.class;
@@ -46,16 +45,16 @@ public class MavenConfigurator extends BaseConfigurator<GlobalMavenConfig> {
 
     @NonNull
     @Override
-    public Set<Attribute<GlobalMavenConfig,?>> describe() {
-        final Set<Attribute<GlobalMavenConfig,?>> attributes = super.describe();
+    public Set<Attribute<GlobalMavenConfig, ?>> describe() {
+        final Set<Attribute<GlobalMavenConfig, ?>> attributes = super.describe();
         final Descriptor descriptor = Jenkins.get().getDescriptorOrDie(Maven.class);
         final Configurator<Descriptor> task = new DescriptorConfigurator(descriptor);
 
         for (Attribute attribute : task.describe()) {
-            attributes.add(new Attribute<GlobalMavenConfig,Object>(attribute.getName(), attribute.getType())
-                .multiple(attribute.isMultiple())
-                .getter(g -> attribute.getValue(descriptor))
-                .setter((g,v) -> attribute.setValue(descriptor,v)));
+            attributes.add(new Attribute<GlobalMavenConfig, Object>(attribute.getName(), attribute.getType())
+                    .multiple(attribute.isMultiple())
+                    .getter(g -> attribute.getValue(descriptor))
+                    .setter((g, v) -> attribute.setValue(descriptor, v)));
         }
         return attributes;
     }

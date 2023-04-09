@@ -1,5 +1,10 @@
 package io.jenkins.plugins.casc;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertEquals;
+
 import com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey;
 import com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey.DirectEntryPrivateKeySource;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
@@ -16,12 +21,6 @@ import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.rules.RuleChain;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertEquals;
-
-
 /**
  * @author v1v (Victor Martinez)
  */
@@ -29,16 +28,18 @@ public class TopReadmeTest {
 
     @Rule
     public RuleChain chain = RuleChain.outerRule(new EnvironmentVariables()
-        .set("SUDO_PASSWORD", "1234")
-        .set("SSH_PRIVATE_KEY", "s3cr3t")
-        .set("SSH_KEY_PASSWORD", "ABCD"))
-        .around(new JenkinsConfiguredWithReadmeRule());
+                    .set("SUDO_PASSWORD", "1234")
+                    .set("SSH_PRIVATE_KEY", "s3cr3t")
+                    .set("SSH_KEY_PASSWORD", "ABCD"))
+            .around(new JenkinsConfiguredWithReadmeRule());
 
     @Test
     @ConfiguredWithReadme("README.md#0")
     public void configure_demo_first_code_block() {
         final Jenkins jenkins = Jenkins.get();
-        assertEquals("Jenkins configured automatically by Jenkins Configuration as Code plugin\n\n", jenkins.getSystemMessage());
+        assertEquals(
+                "Jenkins configured automatically by Jenkins Configuration as Code plugin\n\n",
+                jenkins.getSystemMessage());
         final LDAPSecurityRealm securityRealm = (LDAPSecurityRealm) jenkins.getSecurityRealm();
         assertEquals(1, securityRealm.getConfigurations().size());
         assertEquals(50000, jenkins.getSlaveAgentPort());
@@ -50,14 +51,14 @@ public class TopReadmeTest {
         assertEquals(1, gitTool.getInstallations().length);
 
         List<BasicSSHUserPrivateKey> sshPrivateKeys = CredentialsProvider.lookupCredentials(
-            BasicSSHUserPrivateKey.class, jenkins, ACL.SYSTEM, Collections.emptyList()
-        );
+                BasicSSHUserPrivateKey.class, jenkins, ACL.SYSTEM, Collections.emptyList());
         assertThat(sshPrivateKeys, hasSize(1));
 
         final BasicSSHUserPrivateKey ssh_with_passphrase = sshPrivateKeys.get(0);
         assertThat(ssh_with_passphrase.getPassphrase().getPlainText(), equalTo("ABCD"));
 
-        final DirectEntryPrivateKeySource source = (DirectEntryPrivateKeySource) ssh_with_passphrase.getPrivateKeySource();
+        final DirectEntryPrivateKeySource source =
+                (DirectEntryPrivateKeySource) ssh_with_passphrase.getPrivateKeySource();
         assertThat(source.getPrivateKey().getPlainText(), equalTo("s3cr3t"));
     }
 

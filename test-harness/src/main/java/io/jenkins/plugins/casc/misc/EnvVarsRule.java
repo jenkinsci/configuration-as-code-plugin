@@ -34,8 +34,8 @@ public class EnvVarsRule extends EnvironmentVariables {
             final String[] resource = configuredWithEnvsFromFile.value();
 
             final List<String> envFiles = Arrays.stream(resource)
-                .map(s -> Paths.get(System.getProperty("java.io.tmpdir"), s).toString())
-                .collect(Collectors.toList());
+                    .map(s -> Paths.get(System.getProperty("java.io.tmpdir"), s).toString())
+                    .collect(Collectors.toList());
 
             Properties properties = new Properties();
             for (String file : envFiles) {

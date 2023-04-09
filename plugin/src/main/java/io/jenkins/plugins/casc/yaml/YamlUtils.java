@@ -1,5 +1,7 @@
 package io.jenkins.plugins.casc.yaml;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.ConfiguratorException;
@@ -22,20 +24,16 @@ import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.parser.ParserImpl;
 import org.yaml.snakeyaml.resolver.Resolver;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-
 public final class YamlUtils {
 
     public static final Logger LOGGER = Logger.getLogger(ConfigurationAsCode.class.getName());
 
     public static Node merge(List<YamlSource> sources, ConfigurationContext context) throws ConfiguratorException {
         Node root = null;
-        MergeStrategy mergeStrategy = MergeStrategyFactory
-            .getMergeStrategyOrDefault(context.getMergeStrategy());
+        MergeStrategy mergeStrategy = MergeStrategyFactory.getMergeStrategyOrDefault(context.getMergeStrategy());
         for (YamlSource<?> source : sources) {
             try (Reader reader = reader(source)) {
                 final Node node = read(source, reader, context);
@@ -55,23 +53,20 @@ public final class YamlUtils {
         return root;
     }
 
-    public static Node read(YamlSource source, Reader reader, ConfigurationContext context)
-        throws IOException {
+    public static Node read(YamlSource source, Reader reader, ConfigurationContext context) throws IOException {
         LoaderOptions loaderOptions = new LoaderOptions();
         loaderOptions.setMaxAliasesForCollections(context.getYamlMaxAliasesForCollections());
-        Composer composer = new Composer(
-            new ParserImpl(new StreamReaderWithSource(source, reader)),
-            new Resolver(),
-            loaderOptions);
+        Composer composer =
+                new Composer(new ParserImpl(new StreamReaderWithSource(source, reader)), new Resolver(), loaderOptions);
         try {
             return composer.getSingleNode();
         } catch (YAMLException e) {
-            if (e.getMessage()
-                .startsWith("Number of aliases for non-scalar nodes exceeds the specified max")) {
+            if (e.getMessage().startsWith("Number of aliases for non-scalar nodes exceeds the specified max")) {
                 throw new ConfiguratorException(String.format(
-                    "%s%nYou can increase the maximum by setting an environment variable or property%n  ENV: %s=\"100\"%n  PROPERTY: -D%s=\"100\"",
-                    e.getMessage(), ConfigurationContext.CASC_YAML_MAX_ALIASES_ENV,
-                    ConfigurationContext.CASC_YAML_MAX_ALIASES_PROPERTY));
+                        "%s%nYou can increase the maximum by setting an environment variable or property%n  ENV: %s=\"100\"%n  PROPERTY: -D%s=\"100\"",
+                        e.getMessage(),
+                        ConfigurationContext.CASC_YAML_MAX_ALIASES_ENV,
+                        ConfigurationContext.CASC_YAML_MAX_ALIASES_PROPERTY));
             }
             throw e;
         }
@@ -95,7 +90,8 @@ public final class YamlUtils {
     /**
      * Load configuration-as-code model from a set of Yaml sources, merging documents
      */
-    public static Mapping loadFrom(List<YamlSource> sources, ConfigurationContext context) throws ConfiguratorException {
+    public static Mapping loadFrom(List<YamlSource> sources, ConfigurationContext context)
+            throws ConfiguratorException {
         if (sources.isEmpty()) {
             return Mapping.EMPTY;
         }

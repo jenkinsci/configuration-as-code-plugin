@@ -1,5 +1,14 @@
 package io.jenkins.plugins.casc.core;
 
+import static io.jenkins.plugins.casc.misc.Util.assertLogContains;
+import static io.jenkins.plugins.casc.misc.Util.assertNotInLog;
+import static java.util.Objects.requireNonNull;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.jvnet.hudson.test.JenkinsMatchers.hasPlainText;
+
 import hudson.ProxyConfiguration;
 import hudson.util.Secret;
 import io.jenkins.plugins.casc.Attribute;
@@ -21,15 +30,6 @@ import org.junit.rules.RuleChain;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.LoggerRule;
 
-import static io.jenkins.plugins.casc.misc.Util.assertLogContains;
-import static io.jenkins.plugins.casc.misc.Util.assertNotInLog;
-import static java.util.Objects.requireNonNull;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.jvnet.hudson.test.JenkinsMatchers.hasPlainText;
-
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class ProxyConfiguratorTest {
 
@@ -37,8 +37,9 @@ public class ProxyConfiguratorTest {
     public LoggerRule logging = new LoggerRule();
 
     @Rule
-    public RuleChain chain = RuleChain
-            .outerRule(logging.record(Logger.getLogger(Attribute.class.getName()), Level.FINER).capture(2048))
+    public RuleChain chain = RuleChain.outerRule(
+                    logging.record(Logger.getLogger(Attribute.class.getName()), Level.FINER)
+                            .capture(2048))
             .around(new EnvVarsRule())
             .around(j);
 
@@ -129,15 +130,17 @@ public class ProxyConfiguratorTest {
         Secret password = requireNonNull(Secret.decrypt(getProxyNode(context).getScalarValue("secretPassword")));
 
         final String yamlConfig = Util.toYamlString(configNode);
-        assertEquals(String.join("\n",
-                "name: \"proxyhost\"",
-                "noProxyHost: \"externalhost\"",
-                "port: 80",
-                "secretPassword: \"" + password.getEncryptedValue() + "\"",
-                "testUrl: \"http://google.com\"",
-                "userName: \"login\"",
-                ""
-        ), yamlConfig);
+        assertEquals(
+                String.join(
+                        "\n",
+                        "name: \"proxyhost\"",
+                        "noProxyHost: \"externalhost\"",
+                        "port: 80",
+                        "secretPassword: \"" + password.getEncryptedValue() + "\"",
+                        "testUrl: \"http://google.com\"",
+                        "userName: \"login\"",
+                        ""),
+                yamlConfig);
     }
 
     @Test
@@ -148,11 +151,7 @@ public class ProxyConfiguratorTest {
         final CNode configNode = getProxyNode(context);
 
         final String yamlConfig = Util.toYamlString(configNode);
-        assertEquals(String.join("\n",
-                "name: \"proxyhost\"",
-                "port: 80",
-                ""
-        ), yamlConfig);
+        assertEquals(String.join("\n", "name: \"proxyhost\"", "port: 80", ""), yamlConfig);
     }
 
     private Mapping getProxyNode(ConfigurationContext context) throws Exception {

@@ -1,13 +1,13 @@
 package io.jenkins.plugins.casc;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.eclipse.jetty.server.Request;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.RestoreSystemProperties;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class TokenReloadCrumbExclusionTest {
 
@@ -48,7 +48,10 @@ public class TokenReloadCrumbExclusionTest {
         TokenReloadCrumbExclusion crumbExclusion = new TokenReloadCrumbExclusion();
 
         AtomicBoolean callProcessed = new AtomicBoolean(false);
-        assertTrue(crumbExclusion.process(newRequestWithPath("/reload-configuration-as-code/"), null, (request, response) -> callProcessed.set(true)));
+        assertTrue(crumbExclusion.process(
+                newRequestWithPath("/reload-configuration-as-code/"),
+                null,
+                (request, response) -> callProcessed.set(true)));
 
         assertTrue(callProcessed.get());
     }

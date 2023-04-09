@@ -1,5 +1,9 @@
 package io.jenkins.plugins.casc;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import hudson.ExtensionList;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
@@ -7,10 +11,6 @@ import org.jenkinsci.plugins.MsTestInstallation;
 import org.jenkinsci.plugins.MsTestInstallation.DescriptorImpl;
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class MSTestRunnerTest {
     @Rule
@@ -23,9 +23,12 @@ public class MSTestRunnerTest {
         assertNotNull(msTestRunnerDescriptor);
         assertEquals(1, msTestRunnerDescriptor.getInstallations().length);
 
-        final MsTestInstallation msTestRunnerInstallation = msTestRunnerDescriptor.getInstallations()[0];
+        final MsTestInstallation msTestRunnerInstallation =
+                msTestRunnerDescriptor.getInstallations()[0];
         assertEquals("MSTest test", msTestRunnerInstallation.getName());
-        assertEquals("C:\\Program Files (x86)\\Microsoft Visual Studio 10.0\\Common7\\IDE\\MSTest.exe", msTestRunnerInstallation.getHome());
+        assertEquals(
+                "C:\\Program Files (x86)\\Microsoft Visual Studio 10.0\\Common7\\IDE\\MSTest.exe",
+                msTestRunnerInstallation.getHome());
         assertEquals("/category:SmokeTests", msTestRunnerInstallation.getDefaultArgs());
         assertTrue(msTestRunnerInstallation.getOmitNoIsolation());
     }

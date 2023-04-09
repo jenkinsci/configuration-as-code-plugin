@@ -1,5 +1,9 @@
 package io.jenkins.plugins.casc;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertNotNull;
+
 import javaposse.jobdsl.plugin.GlobalJobDslSecurityConfiguration;
 import jenkins.model.GlobalConfiguration;
 import org.junit.Rule;
@@ -7,11 +11,6 @@ import org.junit.Test;
 import org.junit.runners.model.Statement;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.RestartableJenkinsRule;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertNotNull;
-
 
 /**
  * Created by odavid on 23/12/2017.
@@ -34,14 +33,17 @@ public class JobDslGlobalSecurityConfigurationTest {
     }
 
     private GlobalJobDslSecurityConfiguration getGlobalJobDslSecurityConfiguration() {
-        final GlobalJobDslSecurityConfiguration dslSecurity = GlobalConfiguration.all()
-            .get(GlobalJobDslSecurityConfiguration.class);
+        final GlobalJobDslSecurityConfiguration dslSecurity =
+                GlobalConfiguration.all().get(GlobalJobDslSecurityConfiguration.class);
         assertNotNull(dslSecurity);
         return dslSecurity;
     }
 
     private void configure() throws ConfiguratorException {
-        ConfigurationAsCode.get().configure(getClass().getResource("JobDslGlobalSecurityConfigurationTest.yml").toExternalForm());
+        ConfigurationAsCode.get()
+                .configure(getClass()
+                        .getResource("JobDslGlobalSecurityConfigurationTest.yml")
+                        .toExternalForm());
     }
 
     private Statement validateGlobalDSLSecurity = new Statement() {
@@ -73,5 +75,4 @@ public class JobDslGlobalSecurityConfigurationTest {
             assertThat("ScriptSecurity", dslSecurity.isUseScriptSecurity(), is(false));
         }
     };
-
 }

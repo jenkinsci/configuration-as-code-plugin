@@ -1,5 +1,10 @@
 package io.jenkins.plugins.casc;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.junit.Assert.assertTrue;
+
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import jenkins.model.GlobalConfiguration;
@@ -7,11 +12,6 @@ import org.jenkinsci.plugins.github.config.GitHubPluginConfig;
 import org.jenkinsci.plugins.github.config.GitHubServerConfig;
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author v1v (Victor Martinez)
@@ -33,6 +33,5 @@ public class GitHubTest {
         assertThat(config.getCredentialsId(), is("[GitHubEEUser]"));
         assertThat(config.getName(), is("InHouse GitHub EE"));
         assertTrue(config.isManageHooks());
-
     }
 }
