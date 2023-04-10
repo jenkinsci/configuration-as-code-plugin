@@ -1,5 +1,9 @@
 package io.jenkins.plugins.casc;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import hudson.model.Node.Mode;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
@@ -12,10 +16,6 @@ import org.csanchez.jenkins.plugins.kubernetes.volumes.HostPathVolume;
 import org.csanchez.jenkins.plugins.kubernetes.volumes.PodVolume;
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -57,7 +57,7 @@ public class KubernetesCloudTest {
         final PodVolume volume = volumes.get(0);
         assertTrue(volume instanceof HostPathVolume);
         assertEquals("mountPath", volume.getMountPath());
-        assertEquals("hostPath", ((HostPathVolume)volume).getHostPath());
+        assertEquals("hostPath", ((HostPathVolume) volume).getHostPath());
 
         final List<TemplateEnvVar> envVars = template.getEnvVars();
         assertEquals(1, envVars.size());
@@ -71,4 +71,3 @@ public class KubernetesCloudTest {
         assertEquals(Mode.EXCLUSIVE, template1.getNodeUsageMode());
     }
 }
-

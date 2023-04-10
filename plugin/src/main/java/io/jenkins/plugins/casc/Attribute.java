@@ -1,5 +1,7 @@
 package io.jenkins.plugins.casc;
 
+import static io.jenkins.plugins.casc.ConfigurationAsCode.printThrowable;
+
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.util.Secret;
@@ -30,15 +32,12 @@ import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.export.Exported;
 
-import static io.jenkins.plugins.casc.ConfigurationAsCode.printThrowable;
-
 /**
  * One attribute of {@link Configurator}.
  *
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  * @see Configurator#describe()
  */
-
 public class Attribute<Owner, Type> {
 
     private static final Logger LOGGER = Logger.getLogger(Attribute.class.getName());
@@ -49,8 +48,8 @@ public class Attribute<Owner, Type> {
         // Nop
     };
 
-    //TODO: Concurrent cache?
-    //private static final HashMap<Class, Boolean> SECRET_ATTRIBUTE_CACHE =
+    // TODO: Concurrent cache?
+    // private static final HashMap<Class, Boolean> SECRET_ATTRIBUTE_CACHE =
     //        new HashMap<>();
 
     protected final String name;
@@ -88,10 +87,10 @@ public class Attribute<Owner, Type> {
     }
 
     @SuppressWarnings("unchecked")
-    public static <O,T> Optional<Attribute<O,T>> get(Set<Attribute<O,?>> attributes, String name) {
+    public static <O, T> Optional<Attribute<O, T>> get(Set<Attribute<O, ?>> attributes, String name) {
         return attributes.stream()
                 .filter(a -> a.name.equals(name))
-                .map(a -> (Attribute<O,T>) a)
+                .map(a -> (Attribute<O, T>) a)
                 .findFirst();
     }
 
@@ -186,7 +185,6 @@ public class Attribute<Owner, Type> {
         return this;
     }
 
-
     public Setter<Owner, Type> getSetter() {
         return setter;
     }
@@ -226,8 +224,8 @@ public class Attribute<Owner, Type> {
     }
 
     public void setValue(Owner target, Type value) throws Exception {
-        LOGGER.log(Level.FINE, "Setting {0}.{1} = {2}",
-                new Object[] {target, name, (isSecret(target) ? "****" : value)});
+        LOGGER.log(
+                Level.FINE, "Setting {0}.{1} = {2}", new Object[] {target, name, (isSecret(target) ? "****" : value)});
         setter.setValue(target, value);
     }
 
@@ -238,8 +236,8 @@ public class Attribute<Owner, Type> {
     public CNode describe(Owner instance, ConfigurationContext context) throws ConfiguratorException {
         final Configurator c = context.lookup(type);
         if (c == null) {
-            return new Scalar("FAILED TO EXPORT\n" + instance.getClass().getName()+"#"+name +
-                    ": No configurator found for type " + type);
+            return new Scalar("FAILED TO EXPORT\n" + instance.getClass().getName() + "#" + name
+                    + ": No configurator found for type " + type);
         }
         try {
             Object o = getValue(instance);
@@ -251,7 +249,9 @@ public class Attribute<Owner, Type> {
             boolean shouldBeMasked = isSecret(instance);
             if (multiple) {
                 Sequence seq = new Sequence();
-                if (o.getClass().isArray()) o = Arrays.asList((Object[]) o);
+                if (o.getClass().isArray()) {
+                    o = Arrays.asList((Object[]) o);
+                }
                 if (o instanceof Iterable) {
                     for (Object value : (Iterable) o) {
                         seq.add(_describe(c, context, value, shouldBeMasked));
@@ -262,11 +262,11 @@ public class Attribute<Owner, Type> {
                 return seq;
             }
             return _describe(c, context, o, shouldBeMasked);
-        } catch (Exception | /* Jenkins.getDescriptorOrDie */AssertionError e) {
+        } catch (Exception | /* Jenkins.getDescriptorOrDie */ AssertionError e) {
             // Don't fail the whole export, prefer logging this error
             LOGGER.log(Level.WARNING, "Failed to export", e);
-            return new Scalar("FAILED TO EXPORT\n" + instance.getClass().getName() + "#" + name + ": "
-                + printThrowable(e));
+            return new Scalar(
+                    "FAILED TO EXPORT\n" + instance.getClass().getName() + "#" + name + ": " + printThrowable(e));
         }
     }
 
@@ -276,11 +276,11 @@ public class Attribute<Owner, Type> {
      * @param context Context to be passed
      * @return CNode object describing the structure of the node
      */
-    public CNode describeForSchema (Owner instance, ConfigurationContext context) {
+    public CNode describeForSchema(Owner instance, ConfigurationContext context) {
         final Configurator c = context.lookup(type);
         if (c == null) {
-            return new Scalar("FAILED TO EXPORT\n" + instance.getClass().getName()+"#"+name +
-                ": No configurator found for type " + type);
+            return new Scalar("FAILED TO EXPORT\n" + instance.getClass().getName() + "#" + name
+                    + ": No configurator found for type " + type);
         }
         try {
             Object o = getType();
@@ -292,7 +292,9 @@ public class Attribute<Owner, Type> {
             boolean shouldBeMasked = isSecret(instance);
             if (multiple) {
                 Sequence seq = new Sequence();
-                if (o.getClass().isArray()) o = Collections.singletonList(o);
+                if (o.getClass().isArray()) {
+                    o = Collections.singletonList(o);
+                }
                 if (o instanceof Iterable) {
                     for (Object value : (Iterable) o) {
                         seq.add(_describe(c, context, value, shouldBeMasked));
@@ -304,8 +306,8 @@ public class Attribute<Owner, Type> {
         } catch (Exception e) {
             // Don't fail the whole export, prefer logging this error
             LOGGER.log(Level.WARNING, "Failed to export", e);
-            return new Scalar("FAILED TO EXPORT\n" + instance.getClass().getName() + "#" + name + ": "
-                + printThrowable(e));
+            return new Scalar(
+                    "FAILED TO EXPORT\n" + instance.getClass().getName() + "#" + name + ": " + printThrowable(e));
         }
     }
 
@@ -328,7 +330,7 @@ public class Attribute<Owner, Type> {
             node = c.describe(value, context);
         }
         if (shouldBeMasked && node instanceof Scalar) {
-            ((Scalar)node).sensitive(true);
+            ((Scalar) node).sensitive(true);
         }
         return node;
     }
@@ -336,7 +338,9 @@ public class Attribute<Owner, Type> {
     public boolean equals(Owner o1, Owner o2) throws Exception {
         final Object v1 = getValue(o1);
         final Object v2 = getValue(o2);
-        if (v1 == null && v2 == null) return true;
+        if (v1 == null && v2 == null) {
+            return true;
+        }
         if (multiple && v1 instanceof Collection && v2 instanceof Collection) {
             Collection c1 = (Collection) v1;
             Collection c2 = (Collection) v2;
@@ -349,8 +353,9 @@ public class Attribute<Owner, Type> {
      * Abstracts away how to assign a value to a 'target' Jenkins object.
      */
     @FunctionalInterface
-    public interface Setter<O,T> {
-        Setter NOP =  (o,v) -> {};
+    public interface Setter<O, T> {
+        Setter NOP = (o, v) -> {};
+
         void setValue(O target, T value) throws Exception;
     }
 
@@ -358,7 +363,7 @@ public class Attribute<Owner, Type> {
      * Abstracts away how to retrieve attribute value from a 'target' Jenkins object.
      */
     @FunctionalInterface
-    public interface Getter<O,T> {
+    public interface Getter<O, T> {
         T getValue(O target) throws Exception;
     }
 
@@ -368,7 +373,9 @@ public class Attribute<Owner, Type> {
         final List<String> accessors = Arrays.asList("get" + upname, "is" + upname);
 
         for (Method method : clazz.getMethods()) {
-            if (method.getParameterCount() != 0) continue;
+            if (method.getParameterCount() != 0) {
+                continue;
+            }
             if (accessors.contains(method.getName())) {
                 return method;
             }
@@ -391,7 +398,7 @@ public class Attribute<Owner, Type> {
         return ExtraFieldUtils.getFieldNoForce(clazz, fieldName);
     }
 
-    //TODO: consider Boolean and third condition
+    // TODO: consider Boolean and third condition
     /**
      * This is a method which tries to guess whether an attribute is {@link Secret}.
      * @param targetClass Class of the target object. {@code null} if unknown
@@ -402,44 +409,54 @@ public class Attribute<Owner, Type> {
     @Restricted(NoExternalUse.class)
     public static boolean calculateIfSecret(@CheckForNull Class<?> targetClass, @NonNull String fieldName) {
         if (targetClass == Secret.class) { // Class is final, so the check is safe
-            LOGGER.log(Level.FINER, "Attribute {0}#{1} is secret, because it has a Secret type",
-                    new Object[] {targetClass.getName(), fieldName});
+            LOGGER.log(Level.FINER, "Attribute {0}#{1} is secret, because it has a Secret type", new Object[] {
+                targetClass.getName(), fieldName
+            });
             return true;
         }
 
         if (targetClass == null) {
-            LOGGER.log(Level.FINER, "Attribute {0} is assumed to be non-secret, because there is no class instance in the call. " +
-                            "This call is used only for fast-fetch caching, and the result may be adjusted later",
+            LOGGER.log(
+                    Level.FINER,
+                    "Attribute {0} is assumed to be non-secret, because there is no class instance in the call. "
+                            + "This call is used only for fast-fetch caching, and the result may be adjusted later",
                     new Object[] {fieldName});
             return false; // All methods below require a known target class
         }
 
-        //TODO: Cache decisions?
+        // TODO: Cache decisions?
 
         Method m = locateGetter(targetClass, fieldName);
         if (m != null && m.getReturnType() == Secret.class) {
-            LOGGER.log(Level.FINER, "Attribute {0}#{1} is secret, because there is a getter {2} which returns a Secret type",
+            LOGGER.log(
+                    Level.FINER,
+                    "Attribute {0}#{1} is secret, because there is a getter {2} which returns a Secret type",
                     new Object[] {targetClass.getName(), fieldName, m});
             return true;
         }
 
         Field f = locatePublicField(targetClass, fieldName);
         if (f != null && f.getType() == Secret.class) {
-            LOGGER.log(Level.FINER, "Attribute {0}#{1} is secret, because there is a public field {2} which has a Secret type",
+            LOGGER.log(
+                    Level.FINER,
+                    "Attribute {0}#{1} is secret, because there is a public field {2} which has a Secret type",
                     new Object[] {targetClass.getName(), fieldName, f});
             return true;
         }
 
         f = locatePrivateFieldInHierarchy(targetClass, fieldName);
         if (f != null && f.getType() == Secret.class) {
-            LOGGER.log(Level.FINER, "Attribute {0}#{1} is secret, because there is a private field {2} which has a Secret type",
+            LOGGER.log(
+                    Level.FINER,
+                    "Attribute {0}#{1} is secret, because there is a private field {2} which has a Secret type",
                     new Object[] {targetClass.getName(), fieldName, f});
             return true;
         }
 
         // TODO(oleg_nenashev): Consider setters? Gonna be more interesting since there might be many of them
-        LOGGER.log(Level.FINER, "Attribute {0}#{1} is not a secret, because all checks have passed",
-                new Object[] {targetClass.getName(), fieldName});
+        LOGGER.log(Level.FINER, "Attribute {0}#{1} is not a secret, because all checks have passed", new Object[] {
+            targetClass.getName(), fieldName
+        });
         return false;
     }
 
@@ -458,9 +475,9 @@ public class Attribute<Owner, Type> {
                 return (Type) field.get(target);
             }
 
-            throw new ConfiguratorException("Can't read attribute '" + name + "' from "+ target);
+            throw new ConfiguratorException("Can't read attribute '" + name + "' from " + target);
         } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
-            throw new ConfiguratorException("Can't read attribute '" + name + "' from "+ target, e);
+            throw new ConfiguratorException("Can't read attribute '" + name + "' from " + target, e);
         }
     }
 
@@ -469,23 +486,21 @@ public class Attribute<Owner, Type> {
      *
      */
     private void _setValue(Owner target, Type value) throws Exception {
-        final String setterId = target.getClass().getCanonicalName()+'#'+name;
+        final String setterId = target.getClass().getCanonicalName() + '#' + name;
 
         Method writeMethod = null;
         for (Method method : target.getClass().getMethods()) {
             // Find most specialized variant of setter because the method
             // can to have been overridden with concretized type
-            if (method.getName().equals("set" + StringUtils.capitalize(name)) && (
-                writeMethod == null
-                    || writeMethod.getParameterTypes()[0]
-                    .isAssignableFrom(method.getParameterTypes()[0]))) {
+            if (method.getName().equals("set" + StringUtils.capitalize(name))
+                    && (writeMethod == null
+                            || writeMethod.getParameterTypes()[0].isAssignableFrom(method.getParameterTypes()[0]))) {
                 writeMethod = method;
             }
         }
 
         if (writeMethod == null) {
-            throw new IllegalStateException(
-                "Default value setter cannot find Property Descriptor for " + setterId);
+            throw new IllegalStateException("Default value setter cannot find Property Descriptor for " + setterId);
         }
 
         Object o = value;
@@ -503,8 +518,8 @@ public class Attribute<Owner, Type> {
 
                 // if setter expect a Set, convert Collection to Set
                 // see jenkins.agentProtocols
-            } else if(c.isAssignableFrom(Set.class)){
-                o = new HashSet((Collection)value);
+            } else if (c.isAssignableFrom(Set.class)) {
+                o = new HashSet((Collection) value);
             }
         }
 
@@ -513,8 +528,12 @@ public class Attribute<Owner, Type> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Attribute<?, ?> attribute = (Attribute<?, ?>) o;
         return Objects.equals(name, attribute.name);
     }
@@ -524,8 +543,7 @@ public class Attribute<Owner, Type> {
         return name.hashCode();
     }
 
-    public static <T,V> Setter<T,V> noop() {
+    public static <T, V> Setter<T, V> noop() {
         return NOOP;
     }
-
 }

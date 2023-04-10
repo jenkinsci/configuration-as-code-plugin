@@ -1,5 +1,8 @@
 package io.jenkins.plugins.casc.misc;
 
+import static java.lang.reflect.Modifier.isPublic;
+import static java.lang.reflect.Modifier.isStatic;
+
 import com.vladsch.flexmark.ast.FencedCodeBlock;
 import com.vladsch.flexmark.ast.util.TextCollectingVisitor;
 import com.vladsch.flexmark.parser.Parser;
@@ -28,17 +31,12 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 import org.hamcrest.core.StringContains;
 
-import static java.lang.reflect.Modifier.isPublic;
-import static java.lang.reflect.Modifier.isStatic;
-
 /**
  * @author v1v (Victor Martinez)
  */
 public class JenkinsConfiguredWithReadmeRule extends JenkinsConfiguredRule {
 
-    static final DataHolder OPTIONS = PegdownOptionsAdapter.flexmarkOptions(
-        Extensions.ALL
-    );
+    static final DataHolder OPTIONS = PegdownOptionsAdapter.flexmarkOptions(Extensions.ALL);
     static final Parser PARSER = Parser.builder(OPTIONS).build();
 
     @Override
@@ -51,22 +49,23 @@ public class JenkinsConfiguredWithReadmeRule extends JenkinsConfiguredRule {
             final String[] resource = configuredWithReadme.value();
 
             final List<String> configs = Arrays.stream(resource)
-                .map(s -> {
-                    try {
-                        String currentResource = s.replaceAll("#.*", "");
-                        int position = getFencedCodeBlockIndex(s);
-                        File codeBlockFile = File.createTempFile("integrations", "markdown");
-                        InputStream inputStream = clazz.getClassLoader().getResourceAsStream(currentResource);
-                        List<String> lines = Collections.singletonList(
-                            transformFencedCodeBlockFromMarkdownToString(inputStream).get(position));
-                        Path file = Paths.get(codeBlockFile.getCanonicalPath());
-                        Files.write(file, lines, StandardCharsets.UTF_8);
-                        return  codeBlockFile.toURI().toString();
-                    } catch (IOException e) {
-                        throw new AssertionError("Exception when accessing the resources: " + s , e);
-                    }
-                })
-                .collect(Collectors.toList());
+                    .map(s -> {
+                        try {
+                            String currentResource = s.replaceAll("#.*", "");
+                            int position = getFencedCodeBlockIndex(s);
+                            File codeBlockFile = File.createTempFile("integrations", "markdown");
+                            InputStream inputStream = clazz.getClassLoader().getResourceAsStream(currentResource);
+                            List<String> lines =
+                                    Collections.singletonList(transformFencedCodeBlockFromMarkdownToString(inputStream)
+                                            .get(position));
+                            Path file = Paths.get(codeBlockFile.getCanonicalPath());
+                            Files.write(file, lines, StandardCharsets.UTF_8);
+                            return codeBlockFile.toURI().toString();
+                        } catch (IOException e) {
+                            throw new AssertionError("Exception when accessing the resources: " + s, e);
+                        }
+                    })
+                    .collect(Collectors.toList());
 
             try {
                 ConfigurationAsCode.get().configure(configs);
@@ -75,13 +74,11 @@ public class JenkinsConfiguredWithReadmeRule extends JenkinsConfiguredRule {
                     throw new AssertionError("Unexpected exception ", t);
                 } else {
                     if (!StringUtils.isBlank(configuredWithReadme.message())) {
-                        boolean match = new StringContains(false, configuredWithReadme.message())
-                            .matches(t.getMessage());
+                        boolean match =
+                                new StringContains(false, configuredWithReadme.message()).matches(t.getMessage());
                         if (!match) {
-                            throw new AssertionError(
-                                "Exception did not contain the expected string: "
-                                    + configuredWithReadme.message() + "\nMessage was:\n" + t
-                                    .getMessage());
+                            throw new AssertionError("Exception did not contain the expected string: "
+                                    + configuredWithReadme.message() + "\nMessage was:\n" + t.getMessage());
                         }
                     }
                 }
@@ -90,8 +87,7 @@ public class JenkinsConfiguredWithReadmeRule extends JenkinsConfiguredRule {
     }
 
     private ConfiguredWithReadme getConfiguredWithReadme() {
-        ConfiguredWithReadme configuredWithReadme = env.description()
-            .getAnnotation(ConfiguredWithReadme.class);
+        ConfiguredWithReadme configuredWithReadme = env.description().getAnnotation(ConfiguredWithReadme.class);
         if (Objects.nonNull(configuredWithReadme)) {
             return configuredWithReadme;
         }
@@ -99,15 +95,13 @@ public class JenkinsConfiguredWithReadmeRule extends JenkinsConfiguredRule {
             if (field.isAnnotationPresent(ConfiguredWithReadme.class)) {
                 int m = field.getModifiers();
                 Class<?> clazz = field.getType();
-                if (isPublic(m) && isStatic(m) &&
-                    clazz.isAssignableFrom(JenkinsConfiguredWithReadmeRule.class)) {
+                if (isPublic(m) && isStatic(m) && clazz.isAssignableFrom(JenkinsConfiguredWithReadmeRule.class)) {
                     configuredWithReadme = field.getAnnotation(ConfiguredWithReadme.class);
                     if (Objects.nonNull(configuredWithReadme)) {
                         return configuredWithReadme;
                     }
                 } else {
-                    throw new IllegalStateException(
-                        "Field must be public static JenkinsConfiguredWithReadmeRule");
+                    throw new IllegalStateException("Field must be public static JenkinsConfiguredWithReadmeRule");
                 }
             }
         }
@@ -136,5 +130,4 @@ public class JenkinsConfiguredWithReadmeRule extends JenkinsConfiguredRule {
         }
         return position;
     }
-
 }

@@ -35,11 +35,10 @@ public class LabelAtomConfigurator extends BaseConfigurator<LabelAtom> {
     @Override
     public Set<Attribute<LabelAtom, ?>> describe() {
         return new HashSet<>(Arrays.asList(
-            new Attribute<LabelAtom, String>("name", String.class)
-                .getter(Label::getName),
-            new MultivaluedAttribute<LabelAtom, LabelAtomProperty>("properties", LabelAtomProperty.class)
-            .getter(LabelAtom::getProperties)
-            .setter((labelAtom, properties) -> labelAtom.getProperties().addAll(properties))
-        ));
+                new Attribute<LabelAtom, String>("name", String.class).getter(Label::getName),
+                new MultivaluedAttribute<LabelAtom, LabelAtomProperty>("properties", LabelAtomProperty.class)
+                        .getter(LabelAtom::getProperties)
+                        .setter((labelAtom, properties) ->
+                                labelAtom.getProperties().addAll(properties))));
     }
 }

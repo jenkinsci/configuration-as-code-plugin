@@ -8,10 +8,10 @@ import org.apache.commons.lang.StringUtils;
 
 public class MergeStrategyFactory {
     private static MergeStrategy getMergeStrategy(@Nonnull String name) {
-        ExtensionList<MergeStrategy> mergeStrategyList = Jenkins.get()
-            .getExtensionList(MergeStrategy.class);
-        Optional<MergeStrategy> opt = mergeStrategyList.stream().
-            filter(strategy -> strategy.getName().equals(name)).findFirst();
+        ExtensionList<MergeStrategy> mergeStrategyList = Jenkins.get().getExtensionList(MergeStrategy.class);
+        Optional<MergeStrategy> opt = mergeStrategyList.stream()
+                .filter(strategy -> strategy.getName().equals(name))
+                .findFirst();
         return opt.orElse(null);
     }
 
@@ -22,6 +22,6 @@ public class MergeStrategyFactory {
      */
     public static MergeStrategy getMergeStrategyOrDefault(String strategyName) {
         return MergeStrategyFactory.getMergeStrategy(
-            StringUtils.isEmpty(strategyName) ? MergeStrategy.DEFAULT_STRATEGY : strategyName);
+                StringUtils.isEmpty(strategyName) ? MergeStrategy.DEFAULT_STRATEGY : strategyName);
     }
 }

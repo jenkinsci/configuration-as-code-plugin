@@ -1,5 +1,10 @@
 package io.jenkins.plugins.casc;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import org.jenkinsci.lib.configprovider.model.Config;
@@ -7,11 +12,6 @@ import org.jenkinsci.plugins.configfiles.GlobalConfigFiles;
 import org.jenkinsci.plugins.configfiles.maven.MavenSettingsConfig;
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 /**
  * @author <a href="mailto:VictorMartinezRubio@gmail.com">Victor Martinez</a>
@@ -41,7 +41,8 @@ public class ConfigFileProviderTest {
         assertThat(config.comment, is("dummy xml config"));
         assertThat(config.content, containsString("<root><dummy test=\"abc\"></dummy></root>"));
 
-        MavenSettingsConfig mavenSettings = (MavenSettingsConfig) GlobalConfigFiles.get().getById("maven-test");
+        MavenSettingsConfig mavenSettings =
+                (MavenSettingsConfig) GlobalConfigFiles.get().getById("maven-test");
         assertThat(mavenSettings.name, is("DummySettings"));
         assertThat(mavenSettings.comment, is("dummy settings"));
         assertThat(mavenSettings.isReplaceAll, is(false));

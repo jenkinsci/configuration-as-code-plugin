@@ -1,5 +1,7 @@
 package io.jenkins.plugins.casc.core;
 
+import static io.jenkins.plugins.casc.Attribute.noop;
+
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.ProxyConfiguration;
@@ -23,8 +25,6 @@ import jenkins.model.Jenkins;
 import jenkins.security.s2m.AdminWhitelistRule;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
-
-import static io.jenkins.plugins.casc.Attribute.noop;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -50,37 +50,34 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
 
     @NonNull
     @Override
-    public Set<Attribute<Jenkins,?>> describe() {
-        final Set<Attribute<Jenkins,?>> attributes = super.describe();
+    public Set<Attribute<Jenkins, ?>> describe() {
+        final Set<Attribute<Jenkins, ?>> attributes = super.describe();
 
         // Add remoting security, all legwork will be done by a configurator
         attributes.add(new Attribute<Jenkins, AdminWhitelistRule>("remotingSecurity", AdminWhitelistRule.class)
-                .getter( j -> j.getInjector().getInstance(AdminWhitelistRule.class) )
-                .setter( noop() ));
+                .getter(j -> j.getInjector().getInstance(AdminWhitelistRule.class))
+                .setter(noop()));
 
         // Override "nodes" getter so we don't export Nodes registered by Cloud plugins
-        Attribute.<Jenkins, List<Node>>get(attributes, "nodes").ifPresent(attribute ->
-                attribute
-                        .getter(jenkins -> jenkins.getNodes().stream()
-                                .filter(node -> !isCloudNode(node))
-                                .collect(Collectors.toList()))
-                        .setter((jenkins, configuredNodes) -> {
-                            List<String> configuredNodesNames = configuredNodes.stream()
-                                    .map(Node::getNodeName)
-                                    .collect(Collectors.toList());
-                            List<Node> nodesToKeep = jenkins.getNodes().stream()
-                                    .filter(node -> !configuredNodesNames.contains(node.getNodeName()))
-                                    .filter(this::isCloudNode)
-                                    .collect(Collectors.toList());
-                            nodesToKeep.addAll(configuredNodes);
-                            jenkins.setNodes(nodesToKeep);
-                        })
-        );
+        Attribute.<Jenkins, List<Node>>get(attributes, "nodes").ifPresent(attribute -> attribute
+                .getter(jenkins -> jenkins.getNodes().stream()
+                        .filter(node -> !isCloudNode(node))
+                        .collect(Collectors.toList()))
+                .setter((jenkins, configuredNodes) -> {
+                    List<String> configuredNodesNames =
+                            configuredNodes.stream().map(Node::getNodeName).collect(Collectors.toList());
+                    List<Node> nodesToKeep = jenkins.getNodes().stream()
+                            .filter(node -> !configuredNodesNames.contains(node.getNodeName()))
+                            .filter(this::isCloudNode)
+                            .collect(Collectors.toList());
+                    nodesToKeep.addAll(configuredNodes);
+                    jenkins.setNodes(nodesToKeep);
+                }));
 
         // Add updateCenter, all legwork will be done by a configurator
         attributes.add(new Attribute<Jenkins, UpdateCenter>("updateCenter", UpdateCenter.class)
                 .getter(Jenkins::getUpdateCenter)
-                .setter( noop() ));
+                .setter(noop()));
 
         attributes.add(new MultivaluedAttribute<Jenkins, LabelAtom>("labelAtoms", LabelAtom.class)
                 .getter(Jenkins::getLabelAtoms)
@@ -94,19 +91,18 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
                             atom.getProperties().addAll(labelAtom.getProperties());
                         }
                     }
-                })
-        );
+                }));
 
         attributes.add(new Attribute<Jenkins, ProxyConfiguration>("proxy", ProxyConfiguration.class)
-                .getter( j -> j.proxy)
+                .getter(j -> j.proxy)
                 .setter((o, v) -> o.proxy = v));
 
         return attributes;
     }
 
-
     private boolean isCloudNode(Node node) {
-        boolean instantiable = Try.of(() -> node.getDescriptor().isInstantiable()).getOrElse(true);
+        boolean instantiable =
+                Try.of(() -> node.getDescriptor().isInstantiable()).getOrElse(true);
         final boolean cloudSlave = node instanceof AbstractCloudSlave;
         final boolean ephemeral = node instanceof EphemeralNode;
         return !instantiable || cloudSlave || ephemeral;

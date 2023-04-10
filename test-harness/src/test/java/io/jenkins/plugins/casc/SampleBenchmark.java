@@ -1,12 +1,12 @@
 package io.jenkins.plugins.casc;
 
+import static org.junit.Assert.assertEquals;
+
 import edu.umd.cs.findbugs.annotations.NonNull;
 import io.jenkins.plugins.casc.misc.jmh.CascJmhBenchmarkState;
 import jenkins.benchmark.jmh.JmhBenchmark;
 import jenkins.model.Jenkins;
 import org.openjdk.jmh.annotations.Benchmark;
-
-import static org.junit.Assert.assertEquals;
 
 @JmhBenchmark
 public class SampleBenchmark {

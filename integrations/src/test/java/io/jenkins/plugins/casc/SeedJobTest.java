@@ -1,5 +1,10 @@
 package io.jenkins.plugins.casc;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
@@ -15,11 +20,6 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.jvnet.hudson.test.JenkinsRule;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
@@ -29,8 +29,8 @@ public class SeedJobTest {
 
     @Rule
     public RuleChain rc = RuleChain.outerRule(new EnvVarsRule()
-            .set("SEED_JOB_PATH", "./src/test/resources/io/jenkins/plugins/casc/testJob2.groovy")
-            .set("REPO_URL", "git://github.com/jenkinsci/configuration-as-code-plugin.git"))
+                    .set("SEED_JOB_PATH", "./src/test/resources/io/jenkins/plugins/casc/testJob2.groovy")
+                    .set("REPO_URL", "git://github.com/jenkinsci/configuration-as-code-plugin.git"))
             .around(j = new JenkinsConfiguredWithCodeRule());
 
     @Test
@@ -57,14 +57,12 @@ public class SeedJobTest {
 
     @Test
     @ConfiguredWithCode("SeedJobTest_withSecurityConfig.yml")
-    @Envs(
-        @Env(name = "SEED_JOB_FOLDER_FILE_PATH", value = ".")
-    )
+    @Envs(@Env(name = "SEED_JOB_FOLDER_FILE_PATH", value = "."))
     public void configure_seed_job_with_security_config() throws Exception {
         final Jenkins jenkins = Jenkins.get();
 
-        final GlobalJobDslSecurityConfiguration dslSecurity = GlobalConfiguration.all()
-            .get(GlobalJobDslSecurityConfiguration.class);
+        final GlobalJobDslSecurityConfiguration dslSecurity =
+                GlobalConfiguration.all().get(GlobalJobDslSecurityConfiguration.class);
         assertNotNull(dslSecurity);
         assertThat("ScriptSecurity", dslSecurity.isUseScriptSecurity(), is(false));
 

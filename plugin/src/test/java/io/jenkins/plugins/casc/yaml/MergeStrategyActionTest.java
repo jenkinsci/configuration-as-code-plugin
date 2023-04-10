@@ -1,5 +1,9 @@
 package io.jenkins.plugins.casc.yaml;
 
+import static com.gargoylesoftware.htmlunit.HttpMethod.GET;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import com.gargoylesoftware.htmlunit.WebRequest;
 import com.gargoylesoftware.htmlunit.WebResponse;
 import java.io.IOException;
@@ -10,10 +14,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
-import static com.gargoylesoftware.htmlunit.HttpMethod.GET;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 public class MergeStrategyActionTest {
 
     @Rule
@@ -21,13 +21,11 @@ public class MergeStrategyActionTest {
 
     @Test
     public void test() throws IOException {
-        URL apiURL = new URL(MessageFormat.format(
-            "{0}cascMergeStrategy",
-            j.getURL().toString()));
+        URL apiURL =
+                new URL(MessageFormat.format("{0}cascMergeStrategy", j.getURL().toString()));
         WebRequest request = new WebRequest(apiURL, GET);
 
-        WebResponse response = j.createWebClient().getPage(request)
-            .getWebResponse();
+        WebResponse response = j.createWebClient().getPage(request).getWebResponse();
         String strategies = response.getContentAsString();
 
         JSONObject strategiesJSON = JSONObject.fromObject(strategies);
@@ -35,7 +33,8 @@ public class MergeStrategyActionTest {
         assertNotNull("Should have data field", strategiesJSON.getJSONArray("data"));
         for (Object item : strategiesJSON.getJSONArray("data")) {
             String name = JSONObject.fromObject(item).getString("name");
-            assertEquals(name, MergeStrategyFactory.getMergeStrategyOrDefault(name).getName());
+            assertEquals(
+                    name, MergeStrategyFactory.getMergeStrategyOrDefault(name).getName());
         }
     }
 }

@@ -39,7 +39,7 @@ public class UnsecuredAuthorizationStrategyConfigurator extends BaseConfigurator
 
     @Override
     protected Unsecured instance(Mapping mapping, ConfigurationContext context) {
-        return (Unsecured)AuthorizationStrategy.UNSECURED;
+        return (Unsecured) AuthorizationStrategy.UNSECURED;
     }
 
     @CheckForNull

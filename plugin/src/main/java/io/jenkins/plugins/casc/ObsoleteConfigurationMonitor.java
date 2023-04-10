@@ -29,7 +29,6 @@ public class ObsoleteConfigurationMonitor extends AdministrativeMonitor {
         return errors;
     }
 
-
     public void reset() {
         errors.clear();
     }

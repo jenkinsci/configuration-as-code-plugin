@@ -49,8 +49,7 @@ public class PropertiesSecretSource extends SecretSource {
                 secrets.clear();
                 secrets.load(input);
             } catch (IOException ioe) {
-                LOGGER.log(Level.WARNING,
-                    "Source properties file " + secretsPath + " could not be loaded", ioe);
+                LOGGER.log(Level.WARNING, "Source properties file " + secretsPath + " could not be loaded", ioe);
             }
         }
     }

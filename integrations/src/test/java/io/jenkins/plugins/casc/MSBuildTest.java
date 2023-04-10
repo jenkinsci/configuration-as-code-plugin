@@ -1,5 +1,8 @@
 package io.jenkins.plugins.casc;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import hudson.ExtensionList;
 import hudson.plugins.msbuild.MsBuildInstallation;
 import hudson.plugins.msbuild.MsBuildInstallation.DescriptorImpl;
@@ -7,9 +10,6 @@ import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class MSBuildTest {
     @Rule

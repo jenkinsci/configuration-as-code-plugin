@@ -1,5 +1,15 @@
 package io.jenkins.plugins.casc;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import com.amazonaws.services.ec2.model.InstanceType;
 import hudson.model.labels.LabelAtom;
 import hudson.plugins.ec2.AMITypeData;
@@ -12,16 +22,6 @@ import java.util.List;
 import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class EC2CloudTest {
 
@@ -68,7 +68,6 @@ public class EC2CloudTest {
         assertThat(unixData.getRootCommandPrefix(), equalTo("sudo"));
         assertThat(unixData.getSlaveCommandPrefix(), equalTo("sudo -u jenkins"));
         assertThat(unixData.getSshPort(), equalTo("61120"));
-
 
         slaveTemplate = templates.get(1);
         assertThat(slaveTemplate.getDisplayName(), containsString("Auto configured EC2 Agent Large"));

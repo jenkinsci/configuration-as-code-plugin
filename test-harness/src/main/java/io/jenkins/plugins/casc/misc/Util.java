@@ -1,5 +1,12 @@
 package io.jenkins.plugins.casc.misc;
 
+import static io.jenkins.plugins.casc.ConfigurationAsCode.serializeYamlNode;
+import static io.jenkins.plugins.casc.SchemaGeneration.generateSchema;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -33,17 +40,10 @@ import org.json.JSONTokener;
 import org.jvnet.hudson.test.LoggerRule;
 import org.yaml.snakeyaml.nodes.Node;
 
-import static io.jenkins.plugins.casc.ConfigurationAsCode.serializeYamlNode;
-import static io.jenkins.plugins.casc.SchemaGeneration.generateSchema;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 public class Util {
 
     private static final Logger LOGGER = Logger.getLogger(Util.class.getName());
-    private static final String failureMessage  = "The YAML file provided for this schema is invalid";
+    private static final String failureMessage = "The YAML file provided for this schema is invalid";
 
     /**
      * Gets the Jenkins configurator.
@@ -70,7 +70,8 @@ public class Util {
     public static Mapping getJenkinsRoot(ConfigurationContext context) throws Exception {
         JenkinsConfigurator root = getJenkinsConfigurator();
 
-        return Objects.requireNonNull(root.describe(root.getTargetComponent(context), context)).asMapping();
+        return Objects.requireNonNull(root.describe(root.getTargetComponent(context), context))
+                .asMapping();
     }
 
     /**
@@ -87,10 +88,15 @@ public class Util {
      * @throws Exception something's not right...
      */
     public static Mapping getUnclassifiedRoot(ConfigurationContext context) throws Exception {
-        GlobalConfigurationCategory.Unclassified unclassified = ExtensionList.lookup(GlobalConfigurationCategory.Unclassified.class).get(0);
+        GlobalConfigurationCategory.Unclassified unclassified = ExtensionList.lookup(
+                        GlobalConfigurationCategory.Unclassified.class)
+                .get(0);
 
-        GlobalConfigurationCategoryConfigurator unclassifiedConfigurator = new GlobalConfigurationCategoryConfigurator(unclassified);
-        return Objects.requireNonNull(unclassifiedConfigurator.describe(unclassifiedConfigurator.getTargetComponent(context), context)).asMapping();
+        GlobalConfigurationCategoryConfigurator unclassifiedConfigurator =
+                new GlobalConfigurationCategoryConfigurator(unclassified);
+        return Objects.requireNonNull(unclassifiedConfigurator.describe(
+                        unclassifiedConfigurator.getTargetComponent(context), context))
+                .asMapping();
     }
 
     /**
@@ -107,10 +113,14 @@ public class Util {
      * @throws Exception something's not right...
      */
     public static Mapping getSecurityRoot(ConfigurationContext context) throws Exception {
-        GlobalConfigurationCategory.Security security = ExtensionList.lookup(GlobalConfigurationCategory.Security.class).get(0);
+        GlobalConfigurationCategory.Security security =
+                ExtensionList.lookup(GlobalConfigurationCategory.Security.class).get(0);
 
-        GlobalConfigurationCategoryConfigurator securityConfigurator = new GlobalConfigurationCategoryConfigurator(security);
-        return Objects.requireNonNull(securityConfigurator.describe(securityConfigurator.getTargetComponent(context), context)).asMapping();
+        GlobalConfigurationCategoryConfigurator securityConfigurator =
+                new GlobalConfigurationCategoryConfigurator(security);
+        return Objects.requireNonNull(
+                        securityConfigurator.describe(securityConfigurator.getTargetComponent(context), context))
+                .asMapping();
     }
 
     /**
@@ -127,10 +137,12 @@ public class Util {
      * @throws Exception something's not right...
      */
     public static Mapping getToolRoot(ConfigurationContext context) throws Exception {
-        ToolConfigurationCategory category = ExtensionList.lookup(ToolConfigurationCategory.class).get(0);
+        ToolConfigurationCategory category =
+                ExtensionList.lookup(ToolConfigurationCategory.class).get(0);
 
         GlobalConfigurationCategoryConfigurator configurator = new GlobalConfigurationCategoryConfigurator(category);
-        return Objects.requireNonNull(configurator.describe(configurator.getTargetComponent(context), context)).asMapping();
+        return Objects.requireNonNull(configurator.describe(configurator.getTargetComponent(context), context))
+                .asMapping();
     }
 
     /**
@@ -169,8 +181,7 @@ public class Util {
      * @return the string content of the file
      * @throws URISyntaxException if an invalid URI is passed.
      */
-    public static String toStringFromYamlFile(Object clazz, String resourcePath)
-        throws URISyntaxException {
+    public static String toStringFromYamlFile(Object clazz, String resourcePath) throws URISyntaxException {
         try {
             URL resource = clazz.getClass().getResource(resourcePath);
             if (resource == null) {
@@ -191,8 +202,9 @@ public class Util {
      * @since 1.25
      */
     public static void assertNotInLog(LoggerRule logging, String unexpectedText) {
-        assertFalse("The log should not contain '" + unexpectedText + "'",
-            logging.getMessages().stream().anyMatch(m -> m.contains(unexpectedText)));
+        assertFalse(
+                "The log should not contain '" + unexpectedText + "'",
+                logging.getMessages().stream().anyMatch(m -> m.contains(unexpectedText)));
     }
 
     /**
@@ -202,8 +214,9 @@ public class Util {
      * @since 1.25
      */
     public static void assertLogContains(LoggerRule logging, String expectedText) {
-        assertTrue("The log should contain '" + expectedText + "'",
-            logging.getMessages().stream().anyMatch(m -> m.contains(expectedText)));
+        assertTrue(
+                "The log should contain '" + expectedText + "'",
+                logging.getMessages().stream().anyMatch(m -> m.contains(expectedText)));
     }
 
     /**
@@ -238,8 +251,7 @@ public class Util {
      */
     public static Schema returnSchema() {
         JSONObject schemaObject = generateSchema();
-        JSONObject jsonSchema = new JSONObject(
-            new JSONTokener(schemaObject.toString()));
+        JSONObject jsonSchema = new JSONObject(new JSONTokener(schemaObject.toString()));
         return SchemaLoader.load(jsonSchema);
     }
 
@@ -285,8 +297,7 @@ public class Util {
      * @return JSONObject pertaining to that yaml file.
      * @throws URISyntaxException if an invalid URI is passed.
      */
-    public static JSONObject convertYamlFileToJson(Object clazz, String yamlFileName)
-        throws URISyntaxException {
+    public static JSONObject convertYamlFileToJson(Object clazz, String yamlFileName) throws URISyntaxException {
         String yamlStringContents = toStringFromYamlFile(clazz, yamlFileName);
         return new JSONObject(new JSONTokener(convertToJson(yamlStringContents)));
     }

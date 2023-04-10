@@ -1,5 +1,11 @@
 package io.jenkins.plugins.casc;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertTrue;
+
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
@@ -20,12 +26,6 @@ import org.jvnet.hudson.test.Issue;
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.nodes.Node;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertTrue;
-
 public class Security1446Test {
 
     @Rule
@@ -38,17 +38,25 @@ public class Security1446Test {
     @Test
     @Issue("SECURITY-1446")
     public void testImportWithEnvVar() {
-        List<StandardUsernamePasswordCredentials> userPasswCred = CredentialsProvider.lookupCredentials(StandardUsernamePasswordCredentials.class,Jenkins.getInstanceOrNull(), null, Collections.emptyList());
+        List<StandardUsernamePasswordCredentials> userPasswCred = CredentialsProvider.lookupCredentials(
+                StandardUsernamePasswordCredentials.class, Jenkins.getInstanceOrNull(), null, Collections.emptyList());
         assertThat(userPasswCred.size(), is(1));
         for (StandardUsernamePasswordCredentials cred : userPasswCred) {
-            assertTrue("The JAVA_HOME environment variable should not be resolved", cred.getUsername().matches(JAVA_HOME_PATTERN));
-            assertTrue("The PATH environment variable should not be resolved", cred.getDescription().matches(PATH_PATTERN));
+            assertTrue(
+                    "The JAVA_HOME environment variable should not be resolved",
+                    cred.getUsername().matches(JAVA_HOME_PATTERN));
+            assertTrue(
+                    "The PATH environment variable should not be resolved",
+                    cred.getDescription().matches(PATH_PATTERN));
         }
 
-        List<StringCredentials> stringCred = CredentialsProvider.lookupCredentials(StringCredentials.class,Jenkins.getInstanceOrNull(), null, Collections.emptyList());
+        List<StringCredentials> stringCred = CredentialsProvider.lookupCredentials(
+                StringCredentials.class, Jenkins.getInstanceOrNull(), null, Collections.emptyList());
         assertThat(stringCred.size(), is(1));
         for (StringCredentials cred : stringCred) {
-            assertTrue("The PATH environment variable should not be resolved", cred.getDescription().matches(PATH_PATTERN));
+            assertTrue(
+                    "The PATH environment variable should not be resolved",
+                    cred.getDescription().matches(PATH_PATTERN));
         }
     }
 
@@ -59,9 +67,10 @@ public class Security1446Test {
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         ConfigurationContext context = new ConfigurationContext(registry);
 
-        DataBoundConfigurator<UsernamePasswordCredentialsImpl> configurator = new DataBoundConfigurator<>(UsernamePasswordCredentialsImpl.class);
-        UsernamePasswordCredentialsImpl creds = new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL, "test",
-                message, "foo", "bar");
+        DataBoundConfigurator<UsernamePasswordCredentialsImpl> configurator =
+                new DataBoundConfigurator<>(UsernamePasswordCredentialsImpl.class);
+        UsernamePasswordCredentialsImpl creds =
+                new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL, "test", message, "foo", "bar");
         final CNode config = configurator.describe(creds, context);
         final Node valueNode = ConfigurationAsCode.get().toYaml(config);
         final String exported;
@@ -76,5 +85,4 @@ public class Security1446Test {
         assertThat("Improper masking for PATH", exported, containsString("^${PATH}"));
         assertThat("Improper masking for JAVA_HOME", exported, containsString("^^${JAVA_HOME}"));
     }
-
 }
