@@ -91,7 +91,7 @@
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>artifact-manager-s3</artifactId>
-      <version>754.vb_5d21c758eb_3</version>
+      <version>801.vc0e0c53d70ee</version>
       <scope>test</scope>
       <exclusions>
         <!-- Provided by Jenkins core -->
