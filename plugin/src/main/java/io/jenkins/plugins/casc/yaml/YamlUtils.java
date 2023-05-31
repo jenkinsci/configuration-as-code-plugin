@@ -22,6 +22,7 @@ import org.yaml.snakeyaml.composer.Composer;
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.parser.ParserImpl;
+import org.yaml.snakeyaml.reader.StreamReader;
 import org.yaml.snakeyaml.resolver.Resolver;
 
 /**
@@ -56,8 +57,10 @@ public final class YamlUtils {
     public static Node read(YamlSource source, Reader reader, ConfigurationContext context) throws IOException {
         LoaderOptions loaderOptions = new LoaderOptions();
         loaderOptions.setMaxAliasesForCollections(context.getYamlMaxAliasesForCollections());
-        Composer composer =
-                new Composer(new ParserImpl(new StreamReaderWithSource(source, reader)), new Resolver(), loaderOptions);
+        Composer composer = new Composer(
+                new ParserImpl(new StreamReaderWithSource(source, reader), loaderOptions),
+                new Resolver(),
+                loaderOptions);
         try {
             return composer.getSingleNode();
         } catch (YAMLException e) {
@@ -100,21 +103,27 @@ public final class YamlUtils {
             LOGGER.warning("configuration-as-code yaml source returned an empty document.");
             return Mapping.EMPTY;
         }
-        return loadFrom(merged);
+        return loadFrom(merged, context);
     }
 
     /**
      * Load configuration-as-code model from a snakeyaml Node
      */
-    private static Mapping loadFrom(Node node) {
-        final ModelConstructor constructor = new ModelConstructor();
-        constructor.setComposer(new Composer(null, null) {
+    private static Mapping loadFrom(Node node, ConfigurationContext context) {
+        final LoaderOptions loaderOptions = new LoaderOptions();
+        loaderOptions.setMaxAliasesForCollections(context.getYamlMaxAliasesForCollections());
+        final ModelConstructor constructor = new ModelConstructor(loaderOptions);
+        constructor.setComposer(
+                new Composer(
+                        new ParserImpl(new StreamReader(Reader.nullReader()), loaderOptions),
+                        new Resolver(),
+                        loaderOptions) {
 
-            @Override
-            public Node getSingleNode() {
-                return node;
-            }
-        });
+                    @Override
+                    public Node getSingleNode() {
+                        return node;
+                    }
+                });
         return (Mapping) constructor.getSingleData(Mapping.class);
     }
 }
