@@ -1,12 +1,10 @@
 package io.jenkins.plugins.casc;
 
-import static com.gargoylesoftware.htmlunit.HttpMethod.POST;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.htmlunit.HttpMethod.POST;
 import static org.junit.Assert.assertEquals;
 
-import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
-import com.gargoylesoftware.htmlunit.WebRequest;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.yaml.YamlSource;
 import io.jenkins.plugins.casc.yaml.YamlUtils;
@@ -16,6 +14,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
 import jenkins.model.Jenkins;
+import org.htmlunit.FailingHttpStatusCodeException;
+import org.htmlunit.WebRequest;
 import org.junit.Rule;
 import org.junit.Test;
 

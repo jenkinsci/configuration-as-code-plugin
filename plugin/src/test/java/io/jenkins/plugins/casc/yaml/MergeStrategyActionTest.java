@@ -1,15 +1,15 @@
 package io.jenkins.plugins.casc.yaml;
 
-import static com.gargoylesoftware.htmlunit.HttpMethod.GET;
+import static org.htmlunit.HttpMethod.GET;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import com.gargoylesoftware.htmlunit.WebRequest;
-import com.gargoylesoftware.htmlunit.WebResponse;
 import java.io.IOException;
 import java.net.URL;
 import java.text.MessageFormat;
 import net.sf.json.JSONObject;
+import org.htmlunit.WebRequest;
+import org.htmlunit.WebResponse;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
