@@ -1,6 +1,5 @@
 package io.jenkins.plugins.casc;
 
-import static com.gargoylesoftware.htmlunit.HttpMethod.POST;
 import static io.jenkins.plugins.casc.ConfigurationAsCode.CASC_JENKINS_CONFIG_PROPERTY;
 import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
 import static io.jenkins.plugins.casc.misc.Util.toYamlString;
@@ -10,15 +9,11 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.htmlunit.HttpMethod.POST;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import com.gargoylesoftware.htmlunit.WebRequest;
-import com.gargoylesoftware.htmlunit.WebResponse;
-import com.gargoylesoftware.htmlunit.html.HtmlForm;
-import com.gargoylesoftware.htmlunit.html.HtmlInput;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import hudson.Functions;
 import hudson.util.FormValidation;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
@@ -36,6 +31,11 @@ import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import org.htmlunit.WebRequest;
+import org.htmlunit.WebResponse;
+import org.htmlunit.html.HtmlForm;
+import org.htmlunit.html.HtmlInput;
+import org.htmlunit.html.HtmlPage;
 import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
@@ -228,7 +228,7 @@ public class ConfigurationAsCodeTest {
         HtmlForm form = page.getFormByName("replace");
         HtmlInput input = form.getInputByName("_.newSource");
         String configUri = getClass().getResource("merge3.yml").toExternalForm();
-        input.setValueAttribute("  " + configUri + "  ");
+        input.setValue("  " + configUri + "  ");
         HtmlPage resultPage = j.submit(form);
         j.assertGoodStatus(resultPage);
 
@@ -246,7 +246,7 @@ public class ConfigurationAsCodeTest {
                 " %s , %s ",
                 getClass().getResource("JenkinsConfigTest.yml").toExternalForm(),
                 getClass().getResource("folder/jenkins2.yml").toExternalForm());
-        input.setValueAttribute(configUri);
+        input.setValue(configUri);
         HtmlPage resultPage = j.submit(form);
         j.assertGoodStatus(resultPage);
 
