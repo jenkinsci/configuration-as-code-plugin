@@ -226,7 +226,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>docker-commons</artifactId>
-      <version>419.v8e3cd84ef49c</version>
+      <version>434.v3dc53576ec32</version>
       <scope>test</scope>
     </dependency>
     <dependency>
