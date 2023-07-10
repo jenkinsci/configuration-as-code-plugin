@@ -120,7 +120,7 @@
     <dependency>
       <groupId>org.csanchez.jenkins.plugins</groupId>
       <artifactId>kubernetes</artifactId>
-      <version>3952.v88e3b_0cf300b_</version>
+      <version>3971.v94b_4c914ca_75</version>
       <scope>test</scope>
     </dependency>
     <dependency>
