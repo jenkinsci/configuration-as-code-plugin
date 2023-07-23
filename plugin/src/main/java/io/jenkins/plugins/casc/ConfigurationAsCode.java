@@ -58,6 +58,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeSet;
@@ -262,7 +263,7 @@ public class ConfigurationAsCode extends ManagementLink {
     private JSONArray collectProblems(Map<Source, String> issues, String severity) {
         final JSONArray problems = new JSONArray();
         issues.entrySet().stream()
-                .map(e -> new JSONObject().accumulate("line", e.getKey().line).accumulate(severity, e.getValue()))
+                .map(e -> new JSONObject().accumulate("line", Optional.ofNullable(e.getKey()).map(it -> it.line).orElse(-1)).accumulate(severity, e.getValue()))
                 .forEach(problems::add);
         return problems;
     }
