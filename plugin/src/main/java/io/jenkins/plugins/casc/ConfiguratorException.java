@@ -32,13 +32,13 @@ import java.io.IOException;
  * @see Configurator#configure(CNode, ConfigurationContext)
  * @see Configurator
  */
-
 public class ConfiguratorException extends IOException {
 
     @CheckForNull
     private final Configurator configurator;
 
-    public ConfiguratorException(@CheckForNull Configurator configurator, @CheckForNull String message, @CheckForNull Throwable cause) {
+    public ConfiguratorException(
+            @CheckForNull Configurator configurator, @CheckForNull String message, @CheckForNull Throwable cause) {
         super(message, cause);
         this.configurator = configurator;
     }

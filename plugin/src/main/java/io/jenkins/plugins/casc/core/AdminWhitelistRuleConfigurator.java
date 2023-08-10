@@ -61,11 +61,10 @@ public class AdminWhitelistRuleConfigurator extends BaseConfigurator<AdminWhitel
 
     @NonNull
     @Override
-    public Set<Attribute<AdminWhitelistRule,?>> describe() {
-        return new HashSet<>(Collections.singletonList(
-            new Attribute<AdminWhitelistRule, Boolean>("enabled", Boolean.class)
-                .getter(target -> !target.getMasterKillSwitch())
-                .setter((target, value) -> target.setMasterKillSwitch(!value))
-        ));
+    public Set<Attribute<AdminWhitelistRule, ?>> describe() {
+        return new HashSet<>(
+                Collections.singletonList(new Attribute<AdminWhitelistRule, Boolean>("enabled", Boolean.class)
+                        .getter(target -> !target.getMasterKillSwitch())
+                        .setter((target, value) -> target.setMasterKillSwitch(!value))));
     }
 }

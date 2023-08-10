@@ -1,7 +1,6 @@
 package io.jenkins.plugins.casc.permissions;
 
 public enum Action {
-
     VIEW_CONFIGURATION("View Configuration"),
     DOWNLOAD_CONFIGURATION("Download Configuration"),
     APPLY_NEW_CONFIGURATION("Apply new configuration"),

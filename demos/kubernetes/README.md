@@ -15,7 +15,7 @@ jenkins:
   clouds:
     - kubernetes:
         name: "advanced-k8s-config"
-        serverUrl: "https://avanced-k8s-config:443"
+        serverUrl: "https://advanced-k8s-config:443"
         serverCertificate: "serverCertificate"
         skipTlsVerify: true
         credentialsId: "advanced-k8s-credentials"

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base",
+    ":semanticCommitsDisabled",
+    "schedule:earlyMondays"
+  ],
+  "automerge": true,
+  "labels": [
+    "dependencies"
+  ],
+  "rebaseWhen": "conflicted"
+}

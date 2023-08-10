@@ -1,5 +1,13 @@
 package io.jenkins.plugins.casc.core;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.EnvVars;
 import hudson.model.TaskListener;
@@ -16,6 +24,7 @@ import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.util.Objects;
 import jenkins.model.Jenkins;
 import org.apache.commons.io.FileUtils;
 import org.jenkinsci.Symbol;
@@ -24,14 +33,6 @@ import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.TestExtension;
 import org.kohsuke.stapler.DataBoundConstructor;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -54,14 +55,16 @@ public class JenkinsConfiguratorTest {
         final Jenkins jenkins = Jenkins.get();
         assertTrue(jenkins.getSecurityRealm() instanceof HudsonPrivateSecurityRealm);
         assertTrue(jenkins.getAuthorizationStrategy() instanceof FullControlOnceLoggedInAuthorizationStrategy);
-        assertFalse(((FullControlOnceLoggedInAuthorizationStrategy) jenkins.getAuthorizationStrategy()).isAllowAnonymousRead());
+        assertFalse(((FullControlOnceLoggedInAuthorizationStrategy) jenkins.getAuthorizationStrategy())
+                .isAllowAnonymousRead());
     }
 
     @Test
     @Issue("Issue #173")
     @ConfiguredWithCode("SetEnvironmentVariable.yml")
     public void shouldSetEnvironmentVariable() throws Exception {
-        final DescribableList<NodeProperty<?>, NodePropertyDescriptor> properties = Jenkins.get().getNodeProperties();
+        final DescribableList<NodeProperty<?>, NodePropertyDescriptor> properties =
+                Jenkins.get().getNodeProperties();
         EnvVars env = new EnvVars();
         for (NodeProperty<?> property : properties) {
             property.buildEnvVars(env, TaskListener.NULL);
@@ -72,14 +75,19 @@ public class JenkinsConfiguratorTest {
     @Test
     @ConfiguredWithCode("ConfigureLabels.yml")
     public void shouldExportLabelAtoms() throws Exception {
-        DescribableList properties = Jenkins.get().getLabelAtom("label1").getProperties();
-        properties.add(new TestProperty(1));
+        Objects.requireNonNull(Jenkins.get().getLabelAtom("label1"))
+                .getProperties()
+                .add(new TestProperty(1));
 
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         ConfigurationAsCode.get().export(out);
         final String exported = out.toString();
 
-        String content = FileUtils.readFileToString(new File(getClass().getResource("ExpectedLabelsConfiguration.yml").toURI()), "UTF-8");
+        String content = FileUtils.readFileToString(
+                new File(getClass()
+                        .getResource("ExpectedLabelsConfiguration.yml")
+                        .toURI()),
+                "UTF-8");
         assertThat(exported, containsString(content));
     }
 
@@ -136,5 +144,4 @@ public class JenkinsConfiguratorTest {
             }
         }
     }
-
 }

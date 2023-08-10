@@ -1,5 +1,15 @@
 package io.jenkins.plugins.casc;
 
+import static io.jenkins.plugins.casc.PermissionAssert.assertHasNoPermission;
+import static io.jenkins.plugins.casc.PermissionAssert.assertHasPermission;
+import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
+import static io.jenkins.plugins.casc.misc.Util.toStringFromYamlFile;
+import static io.jenkins.plugins.casc.misc.Util.toYamlString;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+
 import com.cloudbees.hudson.plugins.folder.Folder;
 import com.michelin.cio.hudson.plugins.rolestrategy.Role;
 import com.michelin.cio.hudson.plugins.rolestrategy.RoleBasedAuthorizationStrategy;
@@ -18,17 +28,6 @@ import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
-
-import static io.jenkins.plugins.casc.PermissionAssert.assertHasNoPermission;
-import static io.jenkins.plugins.casc.PermissionAssert.assertHasPermission;
-import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
-import static io.jenkins.plugins.casc.misc.Util.toStringFromYamlFile;
-import static io.jenkins.plugins.casc.misc.Util.toYamlString;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-
 
 /**
  * @author Oleg Nenashev
@@ -55,8 +54,10 @@ public class RoleStrategyTest {
         folderB.createProject(FreeStyleProject.class, "2");
 
         AuthorizationStrategy s = j.jenkins.getAuthorizationStrategy();
-        assertThat("Authorization Strategy has been read incorrectly",
-                s, instanceOf(RoleBasedAuthorizationStrategy.class));
+        assertThat(
+                "Authorization Strategy has been read incorrectly",
+                s,
+                instanceOf(RoleBasedAuthorizationStrategy.class));
         RoleBasedAuthorizationStrategy rbas = (RoleBasedAuthorizationStrategy) s;
 
         Map<Role, Set<String>> globalRoles = rbas.getGrantedRoles(RoleType.Global);
@@ -105,14 +106,15 @@ public class RoleStrategyTest {
         assertThat(exported, is(expected));
     }
 
-
     @Test
     @Issue("Issue #214")
     @ConfiguredWithCode("RoleStrategy2.yml")
     public void shouldHandleNullItemsAndAgentsCorrectly() {
         AuthorizationStrategy s = j.jenkins.getAuthorizationStrategy();
-        assertThat("Authorization Strategy has been read incorrectly",
-            s, instanceOf(RoleBasedAuthorizationStrategy.class));
+        assertThat(
+                "Authorization Strategy has been read incorrectly",
+                s,
+                instanceOf(RoleBasedAuthorizationStrategy.class));
         RoleBasedAuthorizationStrategy rbas = (RoleBasedAuthorizationStrategy) s;
 
         Map<Role, Set<String>> globalRoles = rbas.getGrantedRoles(RoleType.Global);

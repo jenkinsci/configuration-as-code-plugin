@@ -7,7 +7,7 @@ import org.jvnet.hudson.test.JenkinsRule;
 
 public class JenkinsConfiguredRule extends JenkinsRule {
 
-    //TODO: Looks like API defect, exception should be thrown
+    // TODO: Looks like API defect, exception should be thrown
     /**
      * Exports the Jenkins configuration to a string.
      * @return YAML as string

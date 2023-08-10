@@ -1,5 +1,12 @@
 package io.jenkins.plugins.casc;
 
+import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
+import static io.jenkins.plugins.casc.misc.Util.toStringFromYamlFile;
+import static io.jenkins.plugins.casc.misc.Util.toYamlString;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
+
 import hudson.slaves.EnvironmentVariablesNodeProperty;
 import hudson.slaves.NodeProperty;
 import hudson.slaves.NodePropertyDescriptor;
@@ -13,14 +20,6 @@ import jenkins.model.Jenkins;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
-import static io.jenkins.plugins.casc.misc.Util.toStringFromYamlFile;
-import static io.jenkins.plugins.casc.misc.Util.toYamlString;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-
-
 public class GlobalNodePropertiesTest {
 
     @ClassRule
@@ -33,7 +32,9 @@ public class GlobalNodePropertiesTest {
 
         DescribableList<NodeProperty<?>, NodePropertyDescriptor> nodeProperties = jenkins.getGlobalNodeProperties();
 
-        Set<Map.Entry<String, String>> entries = ((EnvironmentVariablesNodeProperty) nodeProperties.get(0)).getEnvVars().entrySet();
+        Set<Map.Entry<String, String>> entries = ((EnvironmentVariablesNodeProperty) nodeProperties.get(0))
+                .getEnvVars()
+                .entrySet();
         assertEquals(1, entries.size());
 
         Map.Entry<String, String> envVar = entries.iterator().next();

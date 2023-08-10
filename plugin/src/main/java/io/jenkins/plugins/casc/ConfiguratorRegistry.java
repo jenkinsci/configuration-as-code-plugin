@@ -9,7 +9,6 @@ import jenkins.model.Jenkins;
  * A Registry to allow {@link Configurator}s retrieval.
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-
 public interface ConfiguratorRegistry {
 
     /**

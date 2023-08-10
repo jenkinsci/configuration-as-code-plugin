@@ -1,5 +1,8 @@
 package io.jenkins.plugins.casc.yaml;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import hudson.util.Secret;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
@@ -16,10 +19,6 @@ import org.jvnet.hudson.test.JenkinsRule;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.nodes.Node;
-
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Contains tests for particular export cases.
@@ -47,7 +46,8 @@ public class ExportTest {
     @Test
     @Issue("SECURITY-1458")
     public void shouldNotExportValuesWithSecretConstructors() throws Exception {
-        DataBoundConfigurator<DataBoundSecretConstructor> c = new DataBoundConfigurator<>(DataBoundSecretConstructor.class);
+        DataBoundConfigurator<DataBoundSecretConstructor> c =
+                new DataBoundConfigurator<>(DataBoundSecretConstructor.class);
         String res = export(c, new DataBoundSecretConstructor(Secret.fromString("test")));
         assertThat(res, not(containsString("test")));
     }
@@ -112,5 +112,4 @@ public class ExportTest {
             return mySecretValueField.getPlainText();
         }
     }
-
 }

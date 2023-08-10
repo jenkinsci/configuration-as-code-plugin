@@ -12,11 +12,10 @@ import org.apache.commons.lang.StringUtils;
 
 /**
  * {@link SecretSource} implementation relying on <a href="https://docs.docker.com/engine/swarm/secrets">docker secrets</a>.
- * The path to secret directory can be overridden by setting environment variable <tt>SECRETS</tt>.
+ * The path to secret directory can be overridden by setting environment variable <code>SECRETS</code>.
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 @Extension
-
 public class DockerSecretSource extends SecretSource {
 
     public static final String DOCKER_SECRETS = "/run/secrets/";
@@ -30,10 +29,13 @@ public class DockerSecretSource extends SecretSource {
 
     @Override
     public Optional<String> reveal(String secret) throws IOException {
-        if (StringUtils.isBlank(secret)) return Optional.empty();
+        if (StringUtils.isBlank(secret)) {
+            return Optional.empty();
+        }
         final File file = new File(secrets, secret);
         if (file.exists()) {
-            return Optional.of(FileUtils.readFileToString(file, StandardCharsets.UTF_8).trim());
+            return Optional.of(
+                    FileUtils.readFileToString(file, StandardCharsets.UTF_8).trim());
         }
         return Optional.empty();
     }

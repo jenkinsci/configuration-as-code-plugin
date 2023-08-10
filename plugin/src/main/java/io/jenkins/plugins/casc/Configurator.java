@@ -36,14 +36,12 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 
-
 /**
  * Define a {@link Configurator} which handles a configuration element, identified by name.
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  * @author Oleg Nenashev
  * @see RootElementConfigurator
  */
-
 public interface Configurator<T> {
 
     @NonNull
@@ -88,7 +86,9 @@ public interface Configurator<T> {
     /**
      * @return Human friendly display name for this component, used in generated documentation.
      */
-    default String getDisplayName() { return getName(); }
+    default String getDisplayName() {
+        return getName();
+    }
 
     /**
      * Target type this configurator can handle.
@@ -114,7 +114,6 @@ public interface Configurator<T> {
         return getTarget();
     }
 
-
     /**
      * @return list of {@link Configurator}s to be considered so one can fully configure this component.
      * Typically, configurator for an abstract extension point will return Configurators for available implementations.
@@ -124,22 +123,20 @@ public interface Configurator<T> {
         return Collections.singletonList(this);
     }
 
-
     /**
      * Determine the list of Attribute available for configuration of the managed component.
      *
      * @return A set of {@link Attribute}s that describes this object
      */
     @NonNull
-    Set<Attribute<T,?>> describe();
-
+    Set<Attribute<T, ?>> describe();
 
     /**
      * @return Ordered version of {@link #describe()} for documentation generation.
      * Only include non-ignored attribute
      */
     @NonNull
-    default List<Attribute<T,?>> getAttributes() {
+    default List<Attribute<T, ?>> getAttributes() {
         return describe().stream()
                 .filter(a -> !a.isIgnored())
                 .sorted(Comparator.comparing(a -> a.name))
@@ -170,7 +167,6 @@ public interface Configurator<T> {
      * @throws ConfiguratorException
      */
     T check(CNode config, ConfigurationContext context) throws ConfiguratorException;
-
 
     /**
      * Describe a component as a Configuration Nodes {@link CNode} to be exported as yaml.
@@ -233,5 +229,4 @@ public interface Configurator<T> {
     static Comparator<Object> extensionOrdinalSort() {
         return Comparator.comparingDouble(Configurator::extractExtensionOrdinal).reversed();
     }
-
 }

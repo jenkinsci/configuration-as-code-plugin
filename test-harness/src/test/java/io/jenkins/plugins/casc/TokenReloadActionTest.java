@@ -1,5 +1,9 @@
 package io.jenkins.plugins.casc;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import io.jenkins.plugins.casc.misc.Env;
 import io.jenkins.plugins.casc.misc.EnvVarsRule;
 import io.jenkins.plugins.casc.misc.Envs;
@@ -21,10 +25,6 @@ import org.jvnet.hudson.test.LoggerRule;
 import org.kohsuke.stapler.RequestImpl;
 import org.kohsuke.stapler.ResponseImpl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 public class TokenReloadActionTest {
 
     private Date lastTimeLoaded;
@@ -42,9 +42,7 @@ public class TokenReloadActionTest {
     public EnvVarsRule environment = new EnvVarsRule();
 
     @Rule
-    public RuleChain chain = RuleChain
-        .outerRule(environment)
-        .around(j);
+    public RuleChain chain = RuleChain.outerRule(environment).around(j);
 
     private ServletResponseSpy response;
 
@@ -59,7 +57,6 @@ public class TokenReloadActionTest {
         public void sendError(int sc) {
             error = sc;
         }
-
 
         @Override
         public int getStatus() {
@@ -80,7 +77,8 @@ public class TokenReloadActionTest {
             if (TokenReloadAction.RELOAD_TOKEN_QUERY_PARAMETER.equals(name)) {
                 return authorization;
             }
-            return super.getHeader(name);        }
+            return super.getHeader(name);
+        }
     }
 
     private RequestImpl newRequest(String authorization) {
@@ -109,7 +107,9 @@ public class TokenReloadActionTest {
 
         List<LogRecord> messages = loggerRule.getRecords();
         assertEquals(1, messages.size());
-        assertEquals("Invalid token received, not reloading configuration", messages.get(0).getMessage());
+        assertEquals(
+                "Invalid token received, not reloading configuration",
+                messages.get(0).getMessage());
         assertEquals(Level.WARNING, messages.get(0).getLevel());
     }
 
@@ -133,7 +133,8 @@ public class TokenReloadActionTest {
 
         List<LogRecord> messages = loggerRule.getRecords();
         assertEquals(1, messages.size());
-        assertEquals("Configuration reload via token is not enabled", messages.get(0).getMessage());
+        assertEquals(
+                "Configuration reload via token is not enabled", messages.get(0).getMessage());
         assertEquals(Level.WARNING, messages.get(0).getLevel());
         assertFalse(configWasReloaded());
     }
@@ -158,9 +159,7 @@ public class TokenReloadActionTest {
     }
 
     @Test
-    @Envs({
-        @Env(name = "CASC_RELOAD_TOKEN", value = "someSecretValue")
-    })
+    @Envs({@Env(name = "CASC_RELOAD_TOKEN", value = "someSecretValue")})
     public void reloadReturnsOkWhenCalledWithValidTokenSetByEnvVar() throws IOException {
         tokenReloadAction.doIndex(newRequest("someSecretValue"), new ResponseImpl(null, response));
 
@@ -168,9 +167,7 @@ public class TokenReloadActionTest {
     }
 
     @Test
-    @Envs({
-        @Env(name = "CASC_RELOAD_TOKEN", value = "someSecretValue")
-    })
+    @Envs({@Env(name = "CASC_RELOAD_TOKEN", value = "someSecretValue")})
     public void reloadShouldNotUseTokenFromPropertyIfEnvVarIsSet() throws IOException {
         System.setProperty("casc.reload.token", "otherSecretValue");
 
@@ -180,9 +177,7 @@ public class TokenReloadActionTest {
     }
 
     @Test
-    @Envs({
-        @Env(name = "CASC_RELOAD_TOKEN", value = "")
-    })
+    @Envs({@Env(name = "CASC_RELOAD_TOKEN", value = "")})
     public void reloadShouldUsePropertyAsTokenIfEnvVarIsEmpty() throws IOException {
         System.setProperty("casc.reload.token", "someSecretValue");
 

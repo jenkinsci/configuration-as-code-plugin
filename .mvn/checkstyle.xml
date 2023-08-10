@@ -10,9 +10,14 @@
     <property name="message" value="Trailing spaces are not allowed."/>
   </module>
   <module name="TreeWalker">
-    <module name="ImportOrder">
-      <property name="separatedStaticGroups" value="true" />
-      <property name="option" value="bottom" />
+    <module name="CustomImportOrder">
+      <property name="sortImportsInGroupAlphabetically" value="true"/>
+      <property name="separateLineBetweenGroups" value="true"/>
+      <property name="customImportOrderRules" value="STATIC###THIRD_PARTY_PACKAGE"/>
+      <property name="tokens" value="IMPORT, STATIC_IMPORT, PACKAGE_DEF"/>
+    </module>
+    <module name="NeedBraces">
+      <property name="tokens" value="LITERAL_DO, LITERAL_ELSE, LITERAL_FOR, LITERAL_IF, LITERAL_WHILE"/>
     </module>
     <module name="UnusedImports" />
     <module name="AvoidStarImport" />

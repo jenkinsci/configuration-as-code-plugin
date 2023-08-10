@@ -46,5 +46,4 @@ public class CasCGlobalConfig extends GlobalConfiguration {
         save();
         return super.configure(req, json);
     }
-
 }

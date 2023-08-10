@@ -1,5 +1,13 @@
 package io.jenkins.plugins.casc;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.jvnet.hudson.test.JenkinsMatchers.hasPlainText;
+
 import com.cloudbees.jenkins.plugins.awscredentials.AWSCredentialsImpl;
 import com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey;
 import com.cloudbees.plugins.credentials.Credentials;
@@ -30,32 +38,24 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.anyOf;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.jvnet.hudson.test.JenkinsMatchers.hasPlainText;
-
 public class CredentialsReadmeTest {
 
     public static final String PASSPHRASE = "passphrase";
     public static final String PRIVATE_KEY = "-----BEGIN RSA PRIVATE KEY-----\n"
-        + "MIICXgIBAAKBgQC2xOoDBS+RQiwYN+rY0YXYQ/WwmC9ICH7BCXfLUBSHAkF2Dvd0\n"
-        + "cvM2Ph2nOPiHdntrvD8JkzIv+S1RIqlBrzK6NRQ0ojoCvyawzY3cgzfQ4dfaOqUF\n"
-        + "2bn4PscioLlq+Pbi3KYYwWUFue2iagRIxp0+/3F5WqOWPPy1twW7ddWPLQIDAQAB\n"
-        + "AoGBAKOX7DKZ4LLvfRKMcpxyJpCme/L+tUuPtw1IUT7dxhH2deubh+lmvsXtoZM9\n"
-        + "jk+KQPz0+aOzanfAXMzD7qZJkGfQ91aG8OiD+YJnRqOc6C6vQBXiZgeHRqWH0VMG\n"
-        + "rp9Xqd8MxEYScaJYMwoHiBCG/cb3c4kpEpZ03IzkekZdXlmhAkEA7iFEk5k1BZ1+\n"
-        + "BnKN9LxLR0EOKoSFJjxBihRP6+UD9BF+/1AlKlLW4hSq4458ppV5Wt4glHTcAQi/\n"
-        + "U+wOOz6DyQJBAMR8G0yjtmLjMBy870GaDxmwWjqSeYwPoHbvRTOml8Fz9fP4gBMi\n"
-        + "PUEGJaEHMuPECIegZ93kwAGBT51Q7AZcukUCQGGmnNOWISsjUXndYh85U/ltURzY\n"
-        + "aS2rygiQmdGXgY6F2jliqUr424ushAN6+9zoMPK1YlDetxVpe+QzSga7dRkCQQCB\n"
-        + "+DI6rORdXziZGeUNuPGaJYxZyEA8hK25Xqag9ubVYXZlLpDRl0l7dKx5awCfpzGZ\n"
-        + "PWLXZZQYqsfWIQwvXTEdAkEA2bziyReYAb9fi17alcvwZXGzyyMY8WOGns8NZKcq\n"
-        + "INF8D3PDpcCyOvQI/TS3qHYmGyWdHiKCWsgBqE6kyjqpNQ==\n"
-        + "-----END RSA PRIVATE KEY-----\n";
+            + "MIICXgIBAAKBgQC2xOoDBS+RQiwYN+rY0YXYQ/WwmC9ICH7BCXfLUBSHAkF2Dvd0\n"
+            + "cvM2Ph2nOPiHdntrvD8JkzIv+S1RIqlBrzK6NRQ0ojoCvyawzY3cgzfQ4dfaOqUF\n"
+            + "2bn4PscioLlq+Pbi3KYYwWUFue2iagRIxp0+/3F5WqOWPPy1twW7ddWPLQIDAQAB\n"
+            + "AoGBAKOX7DKZ4LLvfRKMcpxyJpCme/L+tUuPtw1IUT7dxhH2deubh+lmvsXtoZM9\n"
+            + "jk+KQPz0+aOzanfAXMzD7qZJkGfQ91aG8OiD+YJnRqOc6C6vQBXiZgeHRqWH0VMG\n"
+            + "rp9Xqd8MxEYScaJYMwoHiBCG/cb3c4kpEpZ03IzkekZdXlmhAkEA7iFEk5k1BZ1+\n"
+            + "BnKN9LxLR0EOKoSFJjxBihRP6+UD9BF+/1AlKlLW4hSq4458ppV5Wt4glHTcAQi/\n"
+            + "U+wOOz6DyQJBAMR8G0yjtmLjMBy870GaDxmwWjqSeYwPoHbvRTOml8Fz9fP4gBMi\n"
+            + "PUEGJaEHMuPECIegZ93kwAGBT51Q7AZcukUCQGGmnNOWISsjUXndYh85U/ltURzY\n"
+            + "aS2rygiQmdGXgY6F2jliqUr424ushAN6+9zoMPK1YlDetxVpe+QzSga7dRkCQQCB\n"
+            + "+DI6rORdXziZGeUNuPGaJYxZyEA8hK25Xqag9ubVYXZlLpDRl0l7dKx5awCfpzGZ\n"
+            + "PWLXZZQYqsfWIQwvXTEdAkEA2bziyReYAb9fi17alcvwZXGzyyMY8WOGns8NZKcq\n"
+            + "INF8D3PDpcCyOvQI/TS3qHYmGyWdHiKCWsgBqE6kyjqpNQ==\n"
+            + "-----END RSA PRIVATE KEY-----\n";
     public static final String PASSWORD = "password";
     public static final String TEXT = "text";
     public static final String ACCESS_KEY = "access-key";
@@ -67,19 +67,14 @@ public class CredentialsReadmeTest {
     public EnvVarsRule environment = new EnvVarsRule();
 
     @Rule
-    public RuleChain chain = RuleChain
-        .outerRule(environment)
-        .around(j);
+    public RuleChain chain = RuleChain.outerRule(environment).around(j);
 
     @Test
     @ConfiguredWithReadme("credentials/README.md#0")
-    @Envs({
-        @Env(name = "SUDO_PASSWORD", value = "SUDO")
-    })
+    @Envs({@Env(name = "SUDO_PASSWORD", value = "SUDO")})
     public void testDomainScopedCredentials() {
-        List<StandardUsernamePasswordCredentials> creds = CredentialsProvider
-            .lookupCredentials(StandardUsernamePasswordCredentials.class,
-                Jenkins.getInstanceOrNull(), null, Collections.emptyList());
+        List<StandardUsernamePasswordCredentials> creds = CredentialsProvider.lookupCredentials(
+                StandardUsernamePasswordCredentials.class, Jenkins.getInstanceOrNull(), null, Collections.emptyList());
         assertThat(creds.size(), is(1));
         StandardUsernamePasswordCredentials cred = creds.get(0);
         assertThat(cred.getId(), is("sudo_password"));
@@ -102,17 +97,17 @@ public class CredentialsReadmeTest {
         @Env(name = "SECRET_CERT_FILE_PATH", value = TEST_CERT),
     })
     public void testGlobalScopedCredentials() throws Exception {
-        List<Credentials> creds = CredentialsProvider.lookupCredentials(
-            Credentials.class, Jenkins.get(), null, Collections.emptyList());
+        List<Credentials> creds =
+                CredentialsProvider.lookupCredentials(Credentials.class, Jenkins.get(), null, Collections.emptyList());
         assertThat(creds, hasSize(8));
         for (Credentials credentials : creds) {
             if (credentials instanceof BasicSSHUserPrivateKey) {
                 BasicSSHUserPrivateKey key = (BasicSSHUserPrivateKey) credentials;
                 assertThat(key.getPassphrase(), hasPlainText(PASSPHRASE));
                 assertThat(key.getPrivateKey(), equalTo(PRIVATE_KEY));
-                assertThat(key.getId(), anyOf(
-                    is("ssh_with_passphrase_provided"),
-                    is("ssh_with_passphrase_provided_via_file")));
+                assertThat(
+                        key.getId(),
+                        anyOf(is("ssh_with_passphrase_provided"), is("ssh_with_passphrase_provided_via_file")));
                 assertThat(key.getUsername(), is("ssh_root"));
                 assertThat(key.getScope(), is(CredentialsScope.SYSTEM));
             } else if (credentials instanceof UsernamePasswordCredentials) {
@@ -142,18 +137,20 @@ public class CredentialsReadmeTest {
                 CertificateCredentialsImpl cert = (CertificateCredentialsImpl) credentials;
                 assertThat(cert.getId(), is("secret-certificate"));
                 assertThat(cert.getPassword(), hasPlainText(PASSWORD));
-                byte[] fileContent = Files.readAllBytes(Paths.get(getClass().getResource(TEST_CERT).toURI()));
-                SecretBytes secretBytes = SecretBytes
-                    .fromString(Base64.getEncoder().encodeToString(fileContent));
+                byte[] fileContent = Files.readAllBytes(
+                        Paths.get(getClass().getResource(TEST_CERT).toURI()));
+                SecretBytes secretBytes =
+                        SecretBytes.fromString(Base64.getEncoder().encodeToString(fileContent));
                 UploadedKeyStoreSource keyStoreSource = (UploadedKeyStoreSource) cert.getKeyStoreSource();
-                assertThat(keyStoreSource.getUploadedKeystore().getPlainData(),
-                        is(secretBytes.getPlainData()));
+                assertThat(keyStoreSource.getUploadedKeystore().getPlainData(), is(secretBytes.getPlainData()));
                 assertThat(cert.getKeyStore().containsAlias("1"), is(true));
                 assertThat(cert.getKeyStore().getCertificate("1").getType(), is("X.509"));
-                assertThat(CredentialsNameProvider.name(cert), is("EMAILADDRESS=me@myhost.mydomain, CN=pkcs12, O=Fort-Funston, L=SanFrancisco, ST=CA, C=US (my secret cert)"));
+                assertThat(
+                        CredentialsNameProvider.name(cert),
+                        is(
+                                "EMAILADDRESS=me@myhost.mydomain, CN=pkcs12, O=Fort-Funston, L=SanFrancisco, ST=CA, C=US (my secret cert)"));
                 assertThat(cert.getScope(), is(CredentialsScope.GLOBAL));
             }
         }
     }
-
 }

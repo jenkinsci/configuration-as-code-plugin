@@ -1,5 +1,9 @@
 package io.jenkins.plugins.casc;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import hudson.plugins.active_directory.ActiveDirectoryDomain;
 import hudson.plugins.active_directory.ActiveDirectorySecurityRealm;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
@@ -10,18 +14,13 @@ import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.rules.RuleChain;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 public class ActiveDirectoryTest {
 
     @Rule
-    public RuleChain chain = RuleChain.outerRule(new EnvironmentVariables()
-            .set("BIND_PASSWORD", "ADMIN123"))
+    public RuleChain chain = RuleChain.outerRule(new EnvironmentVariables().set("BIND_PASSWORD", "ADMIN123"))
             .around(new JenkinsConfiguredWithReadmeRule());
 
     @Test
@@ -42,6 +41,5 @@ public class ActiveDirectoryTest {
         assertNotNull(realm.getCache());
         assertEquals(500, realm.getCache().getSize());
         assertEquals(600, realm.getCache().getTtl());
-
     }
 }

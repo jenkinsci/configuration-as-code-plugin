@@ -39,19 +39,20 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
     @Override
     public Set<Attribute<HudsonPrivateSecurityRealm, ?>> describe() {
         final Set<Attribute<HudsonPrivateSecurityRealm, ?>> describe = super.describe();
-        describe.add(new MultivaluedAttribute<HudsonPrivateSecurityRealm, UserWithPassword>("users", UserWithPassword.class)
-            .getter(HudsonPrivateSecurityRealmConfigurator::getter)
-            .setter(HudsonPrivateSecurityRealmConfigurator::setter)
-        );
+        describe.add(
+                new MultivaluedAttribute<HudsonPrivateSecurityRealm, UserWithPassword>("users", UserWithPassword.class)
+                        .getter(HudsonPrivateSecurityRealmConfigurator::getter)
+                        .setter(HudsonPrivateSecurityRealmConfigurator::setter));
         return describe;
     }
 
     @CheckForNull
     @Override
-    public CNode describe(HudsonPrivateSecurityRealm instance, ConfigurationContext context)
-        throws Exception {
+    public CNode describe(HudsonPrivateSecurityRealm instance, ConfigurationContext context) throws Exception {
         // allow disabling exporting users if an instance has too many
-        if (System.getProperty("io.jenkins.plugins.casc.core.HudsonPrivateSecurityRealmConfigurator.exportUsers", "true").equals("true")) {
+        if (System.getProperty(
+                        "io.jenkins.plugins.casc.core.HudsonPrivateSecurityRealmConfigurator.exportUsers", "true")
+                .equals("true")) {
             return super.describe(instance, context);
         }
         return null;
@@ -63,10 +64,14 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
                     UserWithPassword user = new UserWithPassword(u.getId(), null);
                     user.setName(u.getFullName());
                     user.setDescription(u.getDescription());
-                    List<UserProperty> properties = u.getAllProperties()
-                        .stream()
-                        .filter(userProperty -> !userProperty.getClass().getName().equals("com.cloudbees.plugins.credentials.UserCredentialsProvider$UserCredentialsProperty"))
-                        .collect(Collectors.toList());
+                    List<UserProperty> properties = u.getAllProperties().stream()
+                            .filter(
+                                    userProperty -> !userProperty
+                                            .getClass()
+                                            .getName()
+                                            .equals(
+                                                    "com.cloudbees.plugins.credentials.UserCredentialsProvider$UserCredentialsProperty"))
+                            .collect(Collectors.toList());
                     user.setProperties(properties);
 
                     return user;
@@ -74,7 +79,8 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
                 .collect(Collectors.toList());
     }
 
-    private static void setter(HudsonPrivateSecurityRealm target, Collection<UserWithPassword> value) throws IOException {
+    private static void setter(HudsonPrivateSecurityRealm target, Collection<UserWithPassword> value)
+            throws IOException {
         for (UserWithPassword user : value) {
             User updatedUser = createAccount(target, user);
             updatedUser.setFullName(user.name);
@@ -87,8 +93,7 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
         }
     }
 
-    private static User createAccount(HudsonPrivateSecurityRealm target, UserWithPassword user)
-        throws IOException {
+    private static User createAccount(HudsonPrivateSecurityRealm target, UserWithPassword user) throws IOException {
         User updatedUser;
         if (StringUtils.isNotBlank(user.password)) {
             if (StringUtils.startsWith(user.password, HASHED_PASSWORD_PREFIX)) {

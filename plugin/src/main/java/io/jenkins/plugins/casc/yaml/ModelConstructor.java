@@ -9,9 +9,10 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.collections.map.AbstractMapDecorator;
 import org.apache.commons.lang.ObjectUtils;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.constructor.AbstractConstruct;
 import org.yaml.snakeyaml.constructor.Construct;
-import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
+import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.Mark;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
@@ -22,18 +23,26 @@ import org.yaml.snakeyaml.nodes.Tag;
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-class ModelConstructor extends CustomClassLoaderConstructor {
+class ModelConstructor extends Constructor {
 
-    public ModelConstructor() {
-        super(Mapping.class, ModelConstructor.class.getClassLoader());
+    /*
+     * TODO remove loader field and getClassForName method and extend CustomClassLoaderConstructor instead after this
+     * plugin requires SnakeYAML 2.0
+     */
+
+    private final ClassLoader loader;
+
+    public ModelConstructor(LoaderOptions loadingConfig) {
+        super(Mapping.class, loadingConfig);
+
+        this.loader = ModelConstructor.class.getClassLoader();
 
         this.yamlConstructors.put(Tag.BOOL, ConstructScalar);
         this.yamlConstructors.put(Tag.INT, ConstructScalar);
         this.yamlConstructors.put(Tag.STR, ConstructScalar);
-
     }
 
-    private final static Construct ConstructScalar = new AbstractConstruct() {
+    private static final Construct ConstructScalar = new AbstractConstruct() {
         @Override
         public Object construct(Node node) {
             final String value = ((ScalarNode) node).getValue();
@@ -43,7 +52,7 @@ class ModelConstructor extends CustomClassLoaderConstructor {
 
     private static Source getSource(Node node) {
         final Mark mark = node.getStartMark();
-        return new Source(mark.getName(), mark.getLine()+ 1);
+        return new Source(mark.getName(), mark.getLine() + 1);
     }
 
     protected Map createDefaultMap(int initSize) {
@@ -57,14 +66,18 @@ class ModelConstructor extends CustomClassLoaderConstructor {
     @Override
     protected void constructMapping2ndStep(MappingNode node, final Map mapping) {
         ((Mapping) mapping).setSource(getSource(node));
-        super.constructMapping2ndStep(node,
-                new AbstractMapDecorator(mapping) {
+        super.constructMapping2ndStep(node, new AbstractMapDecorator(mapping) {
             @Override
             public Object put(Object key, Object value) {
-                if (!(key instanceof Scalar)) throw new IllegalStateException("We only support scalar map keys");
+                if (!(key instanceof Scalar)) {
+                    throw new IllegalStateException("We only support scalar map keys");
+                }
                 Object scalar = ObjectUtils.clone(value);
-                if (scalar instanceof Number) scalar = new Scalar(scalar.toString());
-                else if (scalar instanceof Boolean) scalar = new Scalar(scalar.toString());
+                if (scalar instanceof Number) {
+                    scalar = new Scalar(scalar.toString());
+                } else if (scalar instanceof Boolean) {
+                    scalar = new Scalar(scalar.toString());
+                }
 
                 return mapping.put(key.toString(), scalar);
             }
@@ -81,5 +94,17 @@ class ModelConstructor extends CustomClassLoaderConstructor {
     protected void constructSequenceStep2(SequenceNode node, Collection collection) {
         ((Sequence) collection).setSource(getSource(node));
         super.constructSequenceStep2(node, collection);
+    }
+
+    /**
+     * Load the class
+     *
+     * @param name - the name
+     * @return Class to create
+     * @throws ClassNotFoundException - when cannot load the class
+     */
+    @Override
+    protected Class<?> getClassForName(String name) throws ClassNotFoundException {
+        return Class.forName(name, true, loader);
     }
 }

@@ -13,7 +13,4 @@ public class LabelAtomPropertyConfigurator extends HeteroDescribableConfigurator
     public LabelAtomPropertyConfigurator() {
         super(LabelAtomProperty.class);
     }
-
 }
-
-

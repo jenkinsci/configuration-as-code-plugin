@@ -13,7 +13,7 @@ jenkins:
         name: "utility-node"
         remoteFS: "/home/user1"
         launcher:
-          jnlp:
+          inbound:
             workDirSettings:
               disabled: true
               failIfWorkDirIsMissing: false
