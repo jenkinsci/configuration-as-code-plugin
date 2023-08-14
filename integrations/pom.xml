@@ -232,7 +232,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>docker-workflow</artifactId>
-      <version>563.vd5d2e5c4007f</version>
+      <version>572.v950f58993843</version>
       <scope>test</scope>
     </dependency>
     <dependency>
