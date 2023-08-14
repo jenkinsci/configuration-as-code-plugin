@@ -104,7 +104,7 @@
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>aws-global-configuration</artifactId>
-      <version>108.v47b_fd43dfec6</version>
+      <version>128.ve2c5685a_09c3</version>
       <scope>test</scope>
     </dependency>
     <dependency>
