@@ -273,7 +273,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>github-branch-source</artifactId>
-      <version>1730.vff97c8a_1f804</version>
+      <version>1732.v3f1889a_c475b_</version>
       <scope>test</scope>
     </dependency>
     <dependency>
