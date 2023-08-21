@@ -363,7 +363,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>nodejs</artifactId>
-      <version>1.6.0.1</version>
+      <version>1.6.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
