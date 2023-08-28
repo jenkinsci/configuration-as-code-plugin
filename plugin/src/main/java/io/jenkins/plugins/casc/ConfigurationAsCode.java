@@ -169,7 +169,28 @@ public class ConfigurationAsCode extends ManagementLink {
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
-        configure();
+
+        try {
+            configure();
+        } catch (ConfiguratorException e) {
+            LOGGER.log(Level.SEVERE, "Failed to reload configuration", e);
+
+            Throwable throwableCause = e.getCause();
+            if (throwableCause instanceof ConfiguratorException) {
+                ConfiguratorException cause = (ConfiguratorException) throwableCause;
+
+                Configurator<?> configurator = cause.getConfigurator();
+                if (configurator != null) {
+                    request.setAttribute("target", configurator.getName());
+                }
+                request.setAttribute("invalidAttribute", cause.getInvalidAttribute());
+                request.setAttribute("validAttributes", cause.getValidAttributes());
+                request.getView(this, "error.jelly").forward(request, response);
+                return;
+            } else {
+                throw e;
+            }
+        }
         response.sendRedirect("");
     }
 
@@ -303,7 +324,11 @@ public class ConfigurationAsCode extends ManagementLink {
     @Initializer(after = InitMilestone.SYSTEM_CONFIG_LOADED, before = InitMilestone.SYSTEM_CONFIG_ADAPTED)
     public static void init() throws Exception {
         detectVaultPluginMissing();
-        get().configure();
+        try {
+            get().configure();
+        } catch (ConfiguratorException e) {
+            throw new ConfigurationAsCodeBootFailure(e);
+        }
     }
 
     /**
@@ -727,18 +752,9 @@ public class ConfigurationAsCode extends ManagementLink {
                 if (!entry.getKey().equalsIgnoreCase(configurator.getName())) {
                     continue;
                 }
-                try {
-                    function.apply(configurator, entry.getValue());
-                    it.remove();
-                    break;
-                } catch (ConfiguratorException e) {
-                    throw new ConfiguratorException(
-                            configurator,
-                            format(
-                                    "error configuring '%s' with %s configurator",
-                                    entry.getKey(), configurator.getClass()),
-                            e);
-                }
+                function.apply(configurator, entry.getValue());
+                it.remove();
+                break;
             }
         }
 
