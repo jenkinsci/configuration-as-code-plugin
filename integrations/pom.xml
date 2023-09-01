@@ -31,11 +31,6 @@
         <artifactId>joda-time</artifactId>
         <version>2.12.5</version>
       </dependency>
-      <dependency>
-        <groupId>org.jenkins-ci.main</groupId>
-        <artifactId>maven-plugin</artifactId>
-        <version>3.23</version>
-      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -153,7 +148,6 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>active-directory</artifactId>
-      <version>2.33</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -226,7 +220,6 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>docker-commons</artifactId>
-      <version>439.va_3cb_0a_6a_fb_29</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -273,7 +266,6 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>github-branch-source</artifactId>
-      <version>1732.v3f1889a_c475b_</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -421,7 +413,6 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>view-job-filters</artifactId>
-      <version>364.v48a_33389553d</version>
       <scope>test</scope>
       <exclusions>
         <!-- RequireUpperBoundDeps with jersey2-api plugin -->
