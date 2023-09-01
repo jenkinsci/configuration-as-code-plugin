@@ -231,7 +231,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>ec2</artifactId>
-      <version>2.0.6</version>
+      <version>1601.v09101155c9a_3</version>
       <scope>test</scope>
     </dependency>
     <dependency>
