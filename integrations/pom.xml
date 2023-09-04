@@ -298,7 +298,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>job-dsl</artifactId>
-      <version>1.84</version>
+      <version>1.85</version>
       <scope>test</scope>
     </dependency>
     <dependency>
