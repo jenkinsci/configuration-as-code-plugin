@@ -12,7 +12,7 @@ import org.apache.commons.lang.ObjectUtils;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.constructor.AbstractConstruct;
 import org.yaml.snakeyaml.constructor.Construct;
-import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 import org.yaml.snakeyaml.error.Mark;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
@@ -23,19 +23,10 @@ import org.yaml.snakeyaml.nodes.Tag;
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-class ModelConstructor extends Constructor {
-
-    /*
-     * TODO remove loader field and getClassForName method and extend CustomClassLoaderConstructor instead after this
-     * plugin requires SnakeYAML 2.0
-     */
-
-    private final ClassLoader loader;
+class ModelConstructor extends CustomClassLoaderConstructor {
 
     public ModelConstructor(LoaderOptions loadingConfig) {
-        super(Mapping.class, loadingConfig);
-
-        this.loader = ModelConstructor.class.getClassLoader();
+        super(Mapping.class, ModelConstructor.class.getClassLoader(), loadingConfig);
 
         this.yamlConstructors.put(Tag.BOOL, ConstructScalar);
         this.yamlConstructors.put(Tag.INT, ConstructScalar);
@@ -94,17 +85,5 @@ class ModelConstructor extends Constructor {
     protected void constructSequenceStep2(SequenceNode node, Collection collection) {
         ((Sequence) collection).setSource(getSource(node));
         super.constructSequenceStep2(node, collection);
-    }
-
-    /**
-     * Load the class
-     *
-     * @param name - the name
-     * @return Class to create
-     * @throws ClassNotFoundException - when cannot load the class
-     */
-    @Override
-    protected Class<?> getClassForName(String name) throws ClassNotFoundException {
-        return Class.forName(name, true, loader);
     }
 }
