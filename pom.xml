@@ -46,6 +46,17 @@
     <spotless.check.skip>false</spotless.check.skip>
   </properties>
 
+  <dependencyManagement>
+    <dependencies>
+      <!-- TODO until in BOM -->
+      <dependency>
+        <groupId>io.jenkins.plugins</groupId>
+        <artifactId>snakeyaml-api</artifactId>
+        <version>2.2-111.vc6598e30cc65</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <repositories>
     <repository>
       <id>repo.jenkins-ci.org</id>
