@@ -68,6 +68,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
@@ -179,19 +180,24 @@ public class ConfigurationAsCode extends ManagementLink {
             if (throwableCause instanceof ConfiguratorException) {
                 ConfiguratorException cause = (ConfiguratorException) throwableCause;
 
-                Configurator<?> configurator = cause.getConfigurator();
-                if (configurator != null) {
-                    request.setAttribute("target", configurator.getName());
-                }
-                request.setAttribute("invalidAttribute", cause.getInvalidAttribute());
-                request.setAttribute("validAttributes", cause.getValidAttributes());
-                request.getView(this, "error.jelly").forward(request, response);
-                return;
+                handleExceptionOnReloading(request, response, cause);
             } else {
-                throw e;
+                handleExceptionOnReloading(request, response, e);
             }
+            return;
         }
         response.sendRedirect("");
+    }
+
+    private void handleExceptionOnReloading(StaplerRequest request, StaplerResponse response,
+        ConfiguratorException cause) throws ServletException, IOException {
+        Configurator<?> configurator = cause.getConfigurator();
+        if (configurator != null) {
+            request.setAttribute("target", configurator.getName());
+        }
+        request.setAttribute("invalidAttribute", cause.getInvalidAttribute());
+        request.setAttribute("validAttributes", cause.getValidAttributes());
+        request.getView(this, "error.jelly").forward(request, response);
     }
 
     @RequirePOST
