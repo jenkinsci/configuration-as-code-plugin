@@ -21,7 +21,7 @@
     <dependencies>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.387.x</artifactId>
+        <artifactId>bom-2.414.x</artifactId>
         <version>${plugin-bom.version}</version>
         <type>pom</type>
         <scope>import</scope>
@@ -231,7 +231,8 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>ec2</artifactId>
-      <version>2.0.6</version>
+      <version>1626.v601e0a_3c7514</version>
+      <!-- TODO https://github.com/jenkinsci/ec2-plugin/pull/892 -->
       <scope>test</scope>
     </dependency>
     <dependency>
