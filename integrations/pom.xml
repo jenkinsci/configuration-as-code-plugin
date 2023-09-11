@@ -21,7 +21,7 @@
     <dependencies>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.387.x</artifactId>
+        <artifactId>bom-2.401.x</artifactId>
         <version>${plugin-bom.version}</version>
         <type>pom</type>
         <scope>import</scope>
@@ -99,7 +99,6 @@
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>aws-global-configuration</artifactId>
-      <version>128.ve2c5685a_09c3</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -115,7 +114,6 @@
     <dependency>
       <groupId>org.csanchez.jenkins.plugins</groupId>
       <artifactId>kubernetes</artifactId>
-      <version>4029.v5712230ccb_f8</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -225,7 +223,6 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>docker-workflow</artifactId>
-      <version>572.v950f58993843</version>
       <scope>test</scope>
     </dependency>
     <dependency>
