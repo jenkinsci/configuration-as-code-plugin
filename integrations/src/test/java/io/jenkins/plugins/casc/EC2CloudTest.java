@@ -31,7 +31,7 @@ public class EC2CloudTest {
     @Test
     @ConfiguredWithReadme("ec2/README.md")
     public void configure_ec2_cloud() {
-        final AmazonEC2Cloud ec2Cloud = (AmazonEC2Cloud) Jenkins.get().getCloud("ec2-ec2");
+        final AmazonEC2Cloud ec2Cloud = (AmazonEC2Cloud) Jenkins.get().getCloud("ec2");
         assertNotNull(ec2Cloud);
 
         assertTrue(ec2Cloud.isUseInstanceProfileForCredentials());
