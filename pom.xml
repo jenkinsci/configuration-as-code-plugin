@@ -42,20 +42,9 @@
     <jenkins.version>2.414.1</jenkins.version>
     <tagNameFormat>configuration-as-code-@{project.version}</tagNameFormat>
     <useBeta>true</useBeta>
-    <plugin-bom.version>2401.v7a_d68f8d0b_09</plugin-bom.version>
+    <plugin-bom.version>2423.vce598171d115</plugin-bom.version>
     <spotless.check.skip>false</spotless.check.skip>
   </properties>
-
-  <dependencyManagement>
-    <dependencies>
-      <!-- TODO until in BOM -->
-      <dependency>
-        <groupId>io.jenkins.plugins</groupId>
-        <artifactId>snakeyaml-api</artifactId>
-        <version>2.2-111.vc6598e30cc65</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <repositories>
     <repository>
