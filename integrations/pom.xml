@@ -22,7 +22,7 @@
     <dependencies>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.401.x</artifactId>
+        <artifactId>bom-2.414.x</artifactId>
         <version>${plugin-bom.version}</version>
         <type>pom</type>
         <scope>import</scope>
@@ -229,7 +229,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>ec2</artifactId>
-      <version>1609.v53b_02a_b_9e52d</version>
+      <version>1628.v6d7b_fc58b_a_1d</version>
       <scope>test</scope>
     </dependency>
     <dependency>
