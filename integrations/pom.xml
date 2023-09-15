@@ -228,8 +228,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>ec2</artifactId>
-      <version>1626.v601e0a_3c7514</version>
-      <!-- TODO https://github.com/jenkinsci/ec2-plugin/pull/892 -->
+      <version>1628.v6d7b_fc58b_a_1d</version>
       <scope>test</scope>
     </dependency>
     <dependency>
