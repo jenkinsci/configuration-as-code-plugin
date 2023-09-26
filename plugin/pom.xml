@@ -80,6 +80,11 @@
     </dependency>
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
+      <artifactId>prism-api</artifactId>
+      <version>1.29.0-8</version>
+    </dependency>
+    <dependency>
+      <groupId>io.jenkins.plugins</groupId>
       <artifactId>snakeyaml-api</artifactId>
     </dependency>
     <dependency>

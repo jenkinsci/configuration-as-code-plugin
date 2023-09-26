@@ -31,6 +31,7 @@ import io.jenkins.plugins.casc.model.Sequence;
 import io.jenkins.plugins.casc.model.Source;
 import io.jenkins.plugins.casc.yaml.YamlSource;
 import io.jenkins.plugins.casc.yaml.YamlUtils;
+import io.jenkins.plugins.prism.PrismConfiguration;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -482,6 +483,11 @@ public class ConfigurationAsCode extends ManagementLink {
 
         req.setAttribute("export", out.toString(StandardCharsets.UTF_8.name()));
         req.getView(this, "viewExport.jelly").forward(req, res);
+    }
+
+    @Restricted(NoExternalUse.class)
+    public PrismConfiguration getPrismConfiguration() {
+        return PrismConfiguration.getInstance();
     }
 
     @Restricted(NoExternalUse.class)
