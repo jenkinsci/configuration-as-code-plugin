@@ -157,7 +157,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>artifactory</artifactId>
-      <version>3.18.9</version>
+      <version>3.18.10</version>
       <scope>test</scope>
       <exclusions>
         <!-- RequireUpperBoundDeps with apache-httpcomponents-client-4-api plugin -->
