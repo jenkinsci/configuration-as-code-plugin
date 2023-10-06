@@ -37,4 +37,4 @@ jenkins:
 
 ## implementation note
 
-The example above is only a subset of commonly used settings. The full list is available in the generated documentation, click on `Documentation` link at the bottom of the Configuration as Code page in your Jenkins instance.
+The example above is only a subset of commonly used settings. The full list is available in the generated documentation by clicking on the `Documentation` link at the bottom of the Configuration as Code page in your Jenkins instance.
