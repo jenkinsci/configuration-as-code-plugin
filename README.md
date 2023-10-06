@@ -150,7 +150,7 @@ If set up correctly, you should be able to browse the Configuration as Code page
 
 When configuring the first Jenkins instance, browse the examples shown in the [demos](demos)
 directory of this repository. If you have a plugin that does not have an example, consult the reference
-help document. Click the `Documentation` link at the bottom of the Configuration as Code page.
+help document. Click the `Documentation` link at the bottom of the Configuration as Code page in your Jenkins instance.
 
 ![Reference Page](images/reference.png)
 
