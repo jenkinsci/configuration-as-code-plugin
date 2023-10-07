@@ -70,13 +70,6 @@
       <artifactId>docker-plugin</artifactId>
       <version>1.5</version>
       <scope>test</scope>
-      <exclusions>
-        <!-- RequireUpperBoundDeps with azure-keyvault plugin -->
-        <exclusion>
-          <groupId>com.github.docker-java</groupId>
-          <artifactId>docker-java-transport-netty</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
@@ -89,13 +82,6 @@
       <artifactId>artifact-manager-s3</artifactId>
       <version>822.vf129d4836c31</version>
       <scope>test</scope>
-      <exclusions>
-        <!-- Provided by Jenkins core -->
-        <exclusion>
-          <groupId>javax.annotation</groupId>
-          <artifactId>javax.annotation-api</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
@@ -122,20 +108,10 @@
       <artifactId>maven-plugin</artifactId>
       <scope>test</scope>
       <exclusions>
-        <!-- RequireUpperBoundDeps with jenkins-test-harness-htmlunit plugin -->
-        <exclusion>
-          <groupId>commons-net</groupId>
-          <artifactId>commons-net</artifactId>
-        </exclusion>
         <!-- Provided by Jenkins core -->
         <exclusion>
           <groupId>javax.annotation</groupId>
           <artifactId>javax.annotation-api</artifactId>
-        </exclusion>
-        <!-- RequireUpperBoundDeps with email-ext plugin -->
-        <exclusion>
-          <groupId>org.jsoup</groupId>
-          <artifactId>jsoup</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
