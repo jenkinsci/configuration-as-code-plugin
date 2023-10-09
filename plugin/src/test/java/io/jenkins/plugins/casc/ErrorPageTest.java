@@ -1,5 +1,8 @@
 package io.jenkins.plugins.casc;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,9 +16,6 @@ import org.junit.rules.TemporaryFolder;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.JenkinsRule.WebClient;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-
 public class ErrorPageTest {
 
     @ClassRule
@@ -23,6 +23,7 @@ public class ErrorPageTest {
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
+
     private Path cascFile;
 
     @Before
@@ -34,10 +35,8 @@ public class ErrorPageTest {
     public void reloadSimple() throws Exception {
         Files.write(cascFile, "jenkins:\n  systemMessage2: Hello World\n".getBytes());
 
-        try (WebClient webClient = r.createWebClient()
-            .withThrowExceptionOnFailingStatusCode(false)) {
-            System.setProperty(ConfigurationAsCode.CASC_JENKINS_CONFIG_PROPERTY,
-                cascFile.toString());
+        try (WebClient webClient = r.createWebClient().withThrowExceptionOnFailingStatusCode(false)) {
+            System.setProperty(ConfigurationAsCode.CASC_JENKINS_CONFIG_PROPERTY, cascFile.toString());
 
             HtmlPage htmlPage = webClient.goTo("manage/configuration-as-code/");
             HtmlForm reload = htmlPage.getFormByName("reload");
@@ -67,5 +66,4 @@ public class ErrorPageTest {
 
         // TODO not handled well
     }
-
 }

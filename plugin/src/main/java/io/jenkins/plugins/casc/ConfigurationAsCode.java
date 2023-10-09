@@ -189,8 +189,9 @@ public class ConfigurationAsCode extends ManagementLink {
         response.sendRedirect("");
     }
 
-    private void handleExceptionOnReloading(StaplerRequest request, StaplerResponse response,
-        ConfiguratorException cause) throws ServletException, IOException {
+    private void handleExceptionOnReloading(
+            StaplerRequest request, StaplerResponse response, ConfiguratorException cause)
+            throws ServletException, IOException {
         Configurator<?> configurator = cause.getConfigurator();
         if (configurator != null) {
             request.setAttribute("target", configurator.getName());

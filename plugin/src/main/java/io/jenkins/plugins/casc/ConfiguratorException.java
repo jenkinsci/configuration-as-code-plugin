@@ -40,14 +40,16 @@ public class ConfiguratorException extends IOException {
     private final Configurator configurator;
 
     private final List<String> validAttributes;
+
     @CheckForNull
     private final String invalidAttribute;
 
     public ConfiguratorException(
-        @CheckForNull Configurator configurator, @CheckForNull String message,
-        String invalidAttribute,
-        List<String> validAttributes,
-        @CheckForNull Throwable cause) {
+            @CheckForNull Configurator configurator,
+            @CheckForNull String message,
+            String invalidAttribute,
+            List<String> validAttributes,
+            @CheckForNull Throwable cause) {
         super(message, cause);
         this.configurator = configurator;
 
