@@ -105,18 +105,17 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
                 .setter((o, v) -> o.proxy = v));
 
         attributes.add(new MultivaluedAttribute<Jenkins, NodeMonitor>("nodeMonitors", NodeMonitor.class)
-            .getter(j -> ComputerSet.getMonitors())
-            .setter((jenkins, nodeMonitors) -> {
-                DescribableList<NodeMonitor, Descriptor<NodeMonitor>> monitors = ComputerSet.getMonitors();
-                monitors.clear();
-                monitors.addAll(nodeMonitors);
-                for (Descriptor<NodeMonitor> d : NodeMonitor.all())
-                    if (monitors.get(d) == null) {
-                        NodeMonitor i = createDefaultInstance(d);
-                        if (i != null)
-                            monitors.add(i);
-                    }
-            }));
+                .getter(j -> ComputerSet.getMonitors())
+                .setter((jenkins, nodeMonitors) -> {
+                    DescribableList<NodeMonitor, Descriptor<NodeMonitor>> monitors = ComputerSet.getMonitors();
+                    monitors.clear();
+                    monitors.addAll(nodeMonitors);
+                    for (Descriptor<NodeMonitor> d : NodeMonitor.all())
+                        if (monitors.get(d) == null) {
+                            NodeMonitor i = createDefaultInstance(d);
+                            if (i != null) monitors.add(i);
+                        }
+                }));
 
         return attributes;
     }
@@ -126,8 +125,10 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
             NodeMonitor nm = d.clazz.getDeclaredConstructor().newInstance();
             nm.setIgnored(true);
             return nm;
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException |
-                 InvocationTargetException e) {
+        } catch (NoSuchMethodException
+                | InstantiationException
+                | IllegalAccessException
+                | InvocationTargetException e) {
             LOGGER.log(Level.SEVERE, "Failed to instantiate " + d.clazz, e);
         }
         return null;
