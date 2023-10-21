@@ -110,11 +110,14 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
                     DescribableList<NodeMonitor, Descriptor<NodeMonitor>> monitors = ComputerSet.getMonitors();
                     monitors.clear();
                     monitors.addAll(nodeMonitors);
-                    for (Descriptor<NodeMonitor> d : NodeMonitor.all())
+                    for (Descriptor<NodeMonitor> d : NodeMonitor.all()) {
                         if (monitors.get(d) == null) {
                             NodeMonitor i = createDefaultInstance(d);
-                            if (i != null) monitors.add(i);
+                            if (i != null) {
+                                monitors.add(i);
+                            }
                         }
+                    }
                 }));
 
         return attributes;
