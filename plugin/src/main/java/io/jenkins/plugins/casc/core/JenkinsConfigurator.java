@@ -5,11 +5,15 @@ import static io.jenkins.plugins.casc.Attribute.noop;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.ProxyConfiguration;
+import hudson.model.ComputerSet;
+import hudson.model.Descriptor;
 import hudson.model.Node;
 import hudson.model.UpdateCenter;
 import hudson.model.labels.LabelAtom;
+import hudson.node_monitors.NodeMonitor;
 import hudson.slaves.AbstractCloudSlave;
 import hudson.slaves.EphemeralNode;
+import hudson.util.DescribableList;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
@@ -17,9 +21,12 @@ import io.jenkins.plugins.casc.RootElementConfigurator;
 import io.jenkins.plugins.casc.impl.attributes.MultivaluedAttribute;
 import io.jenkins.plugins.casc.model.Mapping;
 import io.vavr.control.Try;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import jenkins.model.Jenkins;
 import jenkins.security.s2m.AdminWhitelistRule;
@@ -97,7 +104,33 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
                 .getter(j -> j.proxy)
                 .setter((o, v) -> o.proxy = v));
 
+        attributes.add(new MultivaluedAttribute<Jenkins, NodeMonitor>("nodeMonitors", NodeMonitor.class)
+            .getter(j -> ComputerSet.getMonitors())
+            .setter((jenkins, nodeMonitors) -> {
+                DescribableList<NodeMonitor, Descriptor<NodeMonitor>> monitors = ComputerSet.getMonitors();
+                monitors.clear();
+                monitors.addAll(nodeMonitors);
+                for (Descriptor<NodeMonitor> d : NodeMonitor.all())
+                    if (monitors.get(d) == null) {
+                        NodeMonitor i = createDefaultInstance(d);
+                        if (i != null)
+                            monitors.add(i);
+                    }
+            }));
+
         return attributes;
+    }
+
+    private static NodeMonitor createDefaultInstance(Descriptor<NodeMonitor> d) {
+        try {
+            NodeMonitor nm = d.clazz.getDeclaredConstructor().newInstance();
+            nm.setIgnored(true);
+            return nm;
+        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException |
+                 InvocationTargetException e) {
+            LOGGER.log(Level.SEVERE, "Failed to instantiate " + d.clazz, e);
+        }
+        return null;
     }
 
     private boolean isCloudNode(Node node) {
@@ -118,4 +151,6 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
     public String getName() {
         return "jenkins";
     }
+
+    private static final Logger LOGGER = Logger.getLogger(JenkinsConfigurator.class.getName());
 }
