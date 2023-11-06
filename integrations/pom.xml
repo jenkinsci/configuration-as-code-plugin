@@ -161,7 +161,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>azure-keyvault</artifactId>
-      <version>214.vf667264ea_ccd</version>
+      <version>228.va_31b_a_451e7d6</version>
       <scope>test</scope>
       <exclusions>
         <!-- RequireUpperBoundDeps with docker-plugin -->
