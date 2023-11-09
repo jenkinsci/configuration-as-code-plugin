@@ -379,13 +379,14 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
             final String invalid = StringUtils.join(config.keySet(), ',');
             List<String> validAttributes =
                     getAttributes().stream().map(Attribute::getName).collect(Collectors.toList());
-            final String message = "Invalid configuration elements for type " + getTarget() + " : " + invalid + ".\n"
+            String baseErrorMessage = "Invalid configuration elements for type: ";
+            final String message = baseErrorMessage + getTarget() + " : " + invalid + ".\n"
                     + "Available attributes : "
                     + StringUtils.join(validAttributes, ", ");
             context.warning(config, message);
             switch (context.getUnknown()) {
                 case reject:
-                    throw new ConfiguratorException(this, message, invalid, validAttributes, null);
+                    throw new UnknownAttributesException(this, baseErrorMessage, message, invalid, validAttributes);
 
                 case warn:
                     LOGGER.warning(message);

@@ -193,8 +193,12 @@ public class ConfigurationAsCode extends ManagementLink {
             StaplerRequest request, StaplerResponse response, ConfiguratorException cause)
             throws ServletException, IOException {
         Configurator<?> configurator = cause.getConfigurator();
+        request.setAttribute("errorMessage", cause.getErrorMessage());
         if (configurator != null) {
             request.setAttribute("target", configurator.getName());
+        } else if (cause instanceof UnknownConfiguratorException) {
+            List<String> configuratorNames = ((UnknownConfiguratorException) cause).getConfiguratorNames();
+            request.setAttribute("target", String.join(", ", configuratorNames));
         }
         request.setAttribute("invalidAttribute", cause.getInvalidAttribute());
         request.setAttribute("validAttributes", cause.getValidAttributes());
@@ -775,8 +779,7 @@ public class ConfigurationAsCode extends ManagementLink {
             });
 
             if (!unknownKeys.isEmpty()) {
-                throw new ConfiguratorException(
-                        format("No configurator for the following root elements %s", String.join(", ", unknownKeys)));
+                throw new UnknownConfiguratorException(unknownKeys, "No configurator for the following root elements:");
             }
         }
     }

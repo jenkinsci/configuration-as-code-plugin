@@ -23,7 +23,6 @@ package io.jenkins.plugins.casc;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import io.jenkins.plugins.casc.model.CNode;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -34,7 +33,7 @@ import java.util.List;
  * @see Configurator#configure(CNode, ConfigurationContext)
  * @see Configurator
  */
-public class ConfiguratorException extends IOException {
+public class ConfiguratorException extends RuntimeException {
 
     @CheckForNull
     private final Configurator configurator;
@@ -92,6 +91,10 @@ public class ConfiguratorException extends IOException {
 
     public String getInvalidAttribute() {
         return invalidAttribute;
+    }
+
+    public String getErrorMessage() {
+        return super.getMessage();
     }
 
     @Override
