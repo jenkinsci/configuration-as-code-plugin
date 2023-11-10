@@ -56,6 +56,9 @@ public final class YamlUtils {
 
     public static Node read(YamlSource source, Reader reader, ConfigurationContext context) throws IOException {
         LoaderOptions loaderOptions = new LoaderOptions();
+        loaderOptions.setCodePointLimit(context.getYamlCodePointLimit());
+        LOGGER.info("configuration-as-code yaml Code Point Limit 1" + context.getYamlCodePointLimit());
+        LOGGER.info("configuration-as-code yaml Code Point Limit 2" + loaderOptions.getCodePointLimit());
         loaderOptions.setMaxAliasesForCollections(context.getYamlMaxAliasesForCollections());
         Composer composer = new Composer(
                 new ParserImpl(new StreamReaderWithSource(source, reader), loaderOptions),
@@ -112,6 +115,9 @@ public final class YamlUtils {
     private static Mapping loadFrom(Node node, ConfigurationContext context) {
         final LoaderOptions loaderOptions = new LoaderOptions();
         loaderOptions.setMaxAliasesForCollections(context.getYamlMaxAliasesForCollections());
+        loaderOptions.setCodePointLimit(context.getYamlCodePointLimit());
+        LOGGER.info("configuration-as-code yaml Code Point Limit 1" + context.getYamlCodePointLimit());
+        LOGGER.info("configuration-as-code yaml Code Point Limit 2" + loaderOptions.getCodePointLimit());
         final ModelConstructor constructor = new ModelConstructor(loaderOptions);
         constructor.setComposer(
                 new Composer(
