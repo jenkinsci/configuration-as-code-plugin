@@ -1,13 +1,11 @@
 package io.jenkins.plugins.casc;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
 
 import io.jenkins.plugins.casc.misc.EnvVarsRule;
 import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.contrib.java.lang.system.RestoreSystemProperties;
 import org.junit.rules.RuleChain;
 import org.jvnet.hudson.test.JenkinsRule;
 
@@ -37,8 +35,8 @@ public class YamlCodePointLimitTest {
         ConfigurationContext context = new ConfigurationContext(registry);
         assertEquals(3 * 1024 * 1024, context.getYamlCodePointLimit());
     }
-    @Test
 
+    @Test
     public void defaultCodePointLimit() throws ConfiguratorException {
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         ConfigurationContext context = new ConfigurationContext(registry);
