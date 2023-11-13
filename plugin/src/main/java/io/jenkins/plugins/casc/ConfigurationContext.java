@@ -17,6 +17,8 @@ public class ConfigurationContext implements ConfiguratorRegistry {
 
     public static final String CASC_YAML_MAX_ALIASES_ENV = "CASC_YAML_MAX_ALIASES";
     public static final String CASC_YAML_MAX_ALIASES_PROPERTY = "casc.yaml.max.aliases";
+    public static final String CASC_YAML_CODE_POINT_LIMIT_ENV = "CASC_YAML_CODE_POINT_LIMIT";
+    public static final String CASC_YAML_CODE_POINT_LIMIT_PROPERTY = "casc.yaml.code_point_limit";
     public static final String CASC_MERGE_STRATEGY_ENV = "CASC_MERGE_STRATEGY";
     public static final String CASC_MERGE_STRATEGY_PROPERTY = "casc.merge.strategy";
     private Deprecation deprecation = Deprecation.reject;
@@ -24,6 +26,7 @@ public class ConfigurationContext implements ConfiguratorRegistry {
     private Unknown unknown = Unknown.reject;
     private String mergeStrategy;
     private final transient int yamlMaxAliasesForCollections;
+    private final transient int yamlCodePointLimit;
 
     /**
      * the model-introspection model to be applied by configuration-as-code.
@@ -45,6 +48,8 @@ public class ConfigurationContext implements ConfiguratorRegistry {
         this.registry = registry;
         String prop = getPropertyOrEnv(CASC_YAML_MAX_ALIASES_ENV, CASC_YAML_MAX_ALIASES_PROPERTY);
         yamlMaxAliasesForCollections = NumberUtils.toInt(prop, 50);
+        prop = getPropertyOrEnv(CASC_YAML_CODE_POINT_LIMIT_ENV, CASC_YAML_CODE_POINT_LIMIT_PROPERTY);
+        yamlCodePointLimit = NumberUtils.toInt(prop, 3) * 1024 * 1024;
         secretSourceResolver = new SecretSourceResolver(this);
         mergeStrategy = getPropertyOrEnv(CASC_MERGE_STRATEGY_ENV, CASC_MERGE_STRATEGY_PROPERTY);
     }
@@ -109,6 +114,10 @@ public class ConfigurationContext implements ConfiguratorRegistry {
 
     public int getYamlMaxAliasesForCollections() {
         return yamlMaxAliasesForCollections;
+    }
+
+    public int getYamlCodePointLimit() {
+        return yamlCodePointLimit;
     }
 
     // --- delegate methods for ConfigurationContext
