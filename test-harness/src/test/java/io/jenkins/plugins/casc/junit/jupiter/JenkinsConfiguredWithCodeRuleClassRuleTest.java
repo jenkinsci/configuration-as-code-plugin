@@ -1,15 +1,14 @@
-package io.jenkins.plugins.casc.junit5;
+package io.jenkins.plugins.casc.junit.jupiter;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import hudson.model.User;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
-import io.jenkins.plugins.casc.misc.junit5.WithJenkinsConfiguredWithCode;
+import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
+import java.util.Collections;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import java.util.Collections;
-
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @WithJenkinsConfiguredWithCode
 public class JenkinsConfiguredWithCodeRuleClassRuleTest {

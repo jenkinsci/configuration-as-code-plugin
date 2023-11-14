@@ -1,11 +1,10 @@
-package io.jenkins.plugins.casc.misc.junit5;
+package io.jenkins.plugins.casc.misc.junit.jupiter;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.jvnet.hudson.test.JenkinsRule;
 
