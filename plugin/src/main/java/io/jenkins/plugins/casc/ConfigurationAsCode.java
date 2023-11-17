@@ -189,7 +189,8 @@ public class ConfigurationAsCode extends ManagementLink {
         response.sendRedirect("");
     }
 
-    private void handleExceptionOnReloading(
+    @Restricted(NoExternalUse.class)
+    public static void handleExceptionOnReloading(
             StaplerRequest request, StaplerResponse response, ConfiguratorException cause)
             throws ServletException, IOException {
         Configurator<?> configurator = cause.getConfigurator();
@@ -202,7 +203,7 @@ public class ConfigurationAsCode extends ManagementLink {
         }
         request.setAttribute("invalidAttribute", cause.getInvalidAttribute());
         request.setAttribute("validAttributes", cause.getValidAttributes());
-        request.getView(this, "error.jelly").forward(request, response);
+        request.getView(ConfigurationAsCode.class, "error.jelly").forward(request, response);
     }
 
     @RequirePOST
