@@ -13,14 +13,12 @@ import org.jvnet.hudson.test.JenkinsRule;
 
 public class YamlMaxAliasesCollectionTest {
 
-    private JenkinsRule j;
-
-    private EnvVarsRule env;
+    private final EnvVarsRule env;
 
     @Rule
     public RuleChain rc = RuleChain.outerRule(env = new EnvVarsRule())
             .around(new RestoreSystemProperties())
-            .around(j = new JenkinsRule());
+            .around(new JenkinsRule());
 
     @Test
     public void testAMaxOfOneEnv() {
@@ -32,7 +30,7 @@ public class YamlMaxAliasesCollectionTest {
                         + "You can increase the maximum by setting an environment variable or property\n"
                         + "  ENV: CASC_YAML_MAX_ALIASES=\"100\"\n"
                         + "  PROPERTY: -Dcasc.yaml.max.aliases=\"100\"",
-                e.getCause().getMessage().replaceAll("\\r\\n?", "\n"));
+                e.getMessage().replaceAll("\\r\\n?", "\n"));
     }
 
     @Test
@@ -45,7 +43,7 @@ public class YamlMaxAliasesCollectionTest {
                         + "You can increase the maximum by setting an environment variable or property\n"
                         + "  ENV: CASC_YAML_MAX_ALIASES=\"100\"\n"
                         + "  PROPERTY: -Dcasc.yaml.max.aliases=\"100\"",
-                e.getCause().getMessage().replaceAll("\\r\\n?", "\n"));
+                e.getMessage().replaceAll("\\r\\n?", "\n"));
     }
 
     @Test
