@@ -21,7 +21,7 @@ import org.junit.Test;
 public class GitToolInstallationTest {
 
     @ClassRule
-    @ConfiguredWithReadme("git/README.md")
+    @ConfiguredWithReadme("git-client/README.md")
     public static JenkinsConfiguredWithReadmeRule j = new JenkinsConfiguredWithReadmeRule();
 
     @Test

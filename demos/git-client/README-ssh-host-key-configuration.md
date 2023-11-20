@@ -1,0 +1,17 @@
+# Configure Git client plugin
+
+## Sample ssh host key verification policy configuration
+
+The [ssh host key verification policy](https://plugins.jenkins.io/git-client/#plugin-content-ssh-host-key-verification) can be configured with configuration as code.
+Other ssh host key verification policy examples are available in the [git client plugin documentation](https://plugins.jenkins.io/git-client/#plugin-content-configuration-as-code-sample).
+
+```yaml
+security:
+  gitHostKeyVerificationConfiguration:
+    sshHostKeyVerificationStrategy:
+      manuallyProvidedKeyVerificationStrategy:
+        approvedHostKeys: |-
+          bitbucket.org ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIazEu89wgQZ4bqs3d63QSMzYVa0MuJ2e2gKTKqu+UUO
+          github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
+          gitlab.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAfuCHKVTjquxvt6CM6tdG4SLp1Btn/nOeHHE5UOzRdf
+```
