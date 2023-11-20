@@ -14,6 +14,7 @@ import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.Configurator;
 import io.jenkins.plugins.casc.ObsoleteConfigurationMonitor;
+import io.jenkins.plugins.casc.UnknownAttributesException;
 import io.jenkins.plugins.casc.impl.attributes.DescribableAttribute;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
@@ -33,6 +34,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import jenkins.model.Jenkins;
 import org.jenkinsci.Symbol;
 import org.kohsuke.accmod.Restricted;
@@ -214,7 +216,8 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
     }
 
     private Option<Descriptor<T>> lookupDescriptor(String symbol, CNode config) {
-        return getDescriptors()
+        Stream<Descriptor<T>> descriptors = getDescriptors();
+        return descriptors
                 .filter(descriptor ->
                         findByPreferredSymbol(descriptor, symbol) || findBySymbols(descriptor, symbol, config))
                 .map(descriptor -> Tuple.of(preferredSymbol(descriptor), descriptor))
@@ -222,8 +225,17 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
                 .values()
                 .headOption()
                 .orElse(() -> {
-                    throw new IllegalArgumentException(
-                            "No " + target.getName() + " implementation found for " + symbol);
+                    List<String> availableImplementations = descriptors
+                            .toJavaStream()
+                            .map(d -> DescribableAttribute.getPreferredSymbol(d, getImplementedAPI(), target))
+                            .collect(Collectors.toList());
+
+                    throw new UnknownAttributesException(
+                            this,
+                            "No implementation found for:",
+                            "No " + target.getName() + " implementation found for " + symbol,
+                            symbol,
+                            availableImplementations);
                 });
     }
 

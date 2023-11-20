@@ -1,0 +1,24 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout">
+  <l:layout type="one-column" title="${%Error loading configuration}">
+    <l:main-panel>
+     <l:app-bar title="${%Error loading configuration}" />
+
+      <p>${errorMessage}<pre><code>${target}</code></pre></p>
+
+      <j:if test="${invalidAttribute != null}">
+        <p>Attribute was: <pre><code>${invalidAttribute}</code></pre></p>
+      </j:if>
+
+      <j:if test="${!empty(validAttributes)}">
+        <p>Valid attributes are:</p>
+
+        <ul>
+          <j:forEach var="attribute" items="${validAttributes}">
+            <li>${attribute}</li>
+          </j:forEach>
+        </ul>
+      </j:if>
+    </l:main-panel>
+  </l:layout>
+</j:jelly>

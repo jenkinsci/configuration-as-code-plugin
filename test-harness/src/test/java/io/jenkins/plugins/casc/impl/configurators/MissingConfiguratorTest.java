@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assume.assumeThat;
 
 import hudson.model.User;
+import io.jenkins.plugins.casc.UnknownAttributesException;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import org.junit.Rule;
@@ -18,7 +19,7 @@ public class MissingConfiguratorTest {
 
     @ConfiguredWithCode(
             value = "MissingConfiguratorTest.yml",
-            expected = IllegalArgumentException.class,
+            expected = UnknownAttributesException.class,
             message = "No hudson.security.AuthorizationStrategy implementation found for globalMatrix")
     @Test
     public void testThrowsSuggestion() {

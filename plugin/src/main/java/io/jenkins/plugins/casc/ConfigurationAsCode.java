@@ -69,6 +69,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
@@ -170,8 +171,40 @@ public class ConfigurationAsCode extends ManagementLink {
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
-        configure();
+
+        try {
+            configure();
+        } catch (ConfiguratorException e) {
+            LOGGER.log(Level.SEVERE, "Failed to reload configuration", e);
+
+            Throwable throwableCause = e.getCause();
+            if (throwableCause instanceof ConfiguratorException) {
+                ConfiguratorException cause = (ConfiguratorException) throwableCause;
+
+                handleExceptionOnReloading(request, response, cause);
+            } else {
+                handleExceptionOnReloading(request, response, e);
+            }
+            return;
+        }
         response.sendRedirect("");
+    }
+
+    @Restricted(NoExternalUse.class)
+    public static void handleExceptionOnReloading(
+            StaplerRequest request, StaplerResponse response, ConfiguratorException cause)
+            throws ServletException, IOException {
+        Configurator<?> configurator = cause.getConfigurator();
+        request.setAttribute("errorMessage", cause.getErrorMessage());
+        if (configurator != null) {
+            request.setAttribute("target", configurator.getName());
+        } else if (cause instanceof UnknownConfiguratorException) {
+            List<String> configuratorNames = ((UnknownConfiguratorException) cause).getConfiguratorNames();
+            request.setAttribute("target", String.join(", ", configuratorNames));
+        }
+        request.setAttribute("invalidAttribute", cause.getInvalidAttribute());
+        request.setAttribute("validAttributes", cause.getValidAttributes());
+        request.getView(ConfigurationAsCode.class, "error.jelly").forward(request, response);
     }
 
     @RequirePOST
@@ -304,7 +337,11 @@ public class ConfigurationAsCode extends ManagementLink {
     @Initializer(after = InitMilestone.SYSTEM_CONFIG_LOADED, before = InitMilestone.SYSTEM_CONFIG_ADAPTED)
     public static void init() throws Exception {
         detectVaultPluginMissing();
-        get().configure();
+        try {
+            get().configure();
+        } catch (ConfiguratorException e) {
+            throw new ConfigurationAsCodeBootFailure(e);
+        }
     }
 
     /**
@@ -733,18 +770,9 @@ public class ConfigurationAsCode extends ManagementLink {
                 if (!entry.getKey().equalsIgnoreCase(configurator.getName())) {
                     continue;
                 }
-                try {
-                    function.apply(configurator, entry.getValue());
-                    it.remove();
-                    break;
-                } catch (ConfiguratorException e) {
-                    throw new ConfiguratorException(
-                            configurator,
-                            format(
-                                    "error configuring '%s' with %s configurator",
-                                    entry.getKey(), configurator.getClass()),
-                            e);
-                }
+                function.apply(configurator, entry.getValue());
+                it.remove();
+                break;
             }
         }
 
@@ -758,8 +786,7 @@ public class ConfigurationAsCode extends ManagementLink {
             });
 
             if (!unknownKeys.isEmpty()) {
-                throw new ConfiguratorException(
-                        format("No configurator for the following root elements %s", String.join(", ", unknownKeys)));
+                throw new UnknownConfiguratorException(unknownKeys, "No configurator for the following root elements:");
             }
         }
     }
