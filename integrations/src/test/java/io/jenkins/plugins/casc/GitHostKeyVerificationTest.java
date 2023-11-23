@@ -19,7 +19,7 @@ import org.junit.Test;
 public class GitHostKeyVerificationTest {
 
     @ClassRule
-    @ConfiguredWithReadme("git-client/README.md#1")
+    @ConfiguredWithReadme("git-client/README.md#2")
     public static JenkinsConfiguredWithReadmeRule j = new JenkinsConfiguredWithReadmeRule();
 
     @Test

@@ -14,6 +14,31 @@ tool:
         home: /usr/local/bin/git
 ```
 
+## More detailed tool configuration
+
+```yaml
+tool:
+  git:
+    installations:
+    - home: "git"
+      name: "Default"
+      properties:
+      - installSource:
+          installers:
+          - command:
+              command: "true"
+              label: "!windows && !freebsd && !openbsd"
+              toolHome: "/usr/bin/git"
+          - command:
+              command: "true"
+              label: "freebsd || openbsd"
+              toolHome: "/usr/local/bin/git"
+          - batchFile:
+              command: "exit 0"
+              label: "windows"
+              toolHome: "C:\\tools\\MinGit-2.42.0.2\\mingw64\\bin\\git.exe"
+```
+
 ## Sample ssh host key verification policy configuration
 
 The [ssh host key verification policy](https://plugins.jenkins.io/git-client/#plugin-content-ssh-host-key-verification) can be configured with configuration as code.
