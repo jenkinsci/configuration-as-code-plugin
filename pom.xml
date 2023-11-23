@@ -39,7 +39,7 @@
   <properties>
     <changelist>999999-SNAPSHOT</changelist>
     <gitHubRepo>jenkinsci/configuration-as-code-plugin</gitHubRepo>
-    <jenkins.version>2.433</jenkins.version>
+    <jenkins.version>2.414.1</jenkins.version>
     <tagNameFormat>configuration-as-code-@{project.version}</tagNameFormat>
     <useBeta>true</useBeta>
     <plugin-bom.version>2507.vcb_18c56b_f57c</plugin-bom.version>

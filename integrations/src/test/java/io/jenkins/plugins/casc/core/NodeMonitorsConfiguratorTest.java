@@ -5,10 +5,10 @@ import static org.hamcrest.Matchers.is;
 
 import hudson.model.ComputerSet;
 import hudson.node_monitors.ArchitectureMonitor;
+import hudson.node_monitors.ClockMonitor;
 import hudson.node_monitors.DiskSpaceMonitor;
-import hudson.node_monitors.ResponseTimeMonitor;
-import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
-import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
+import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
@@ -16,10 +16,10 @@ import org.junit.Test;
 public class NodeMonitorsConfiguratorTest {
 
     @Rule
-    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+    public JenkinsConfiguredWithReadmeRule j = new JenkinsConfiguredWithReadmeRule();
 
     @Test
-    @ConfiguredWithCode("NodeMonitors.yml")
+    @ConfiguredWithReadme("node-monitors/README.md")
     public void should_configure_node_monitors() {
         DiskSpaceMonitor dsm = (DiskSpaceMonitor) ComputerSet.getMonitors().get(DiskSpaceMonitor.DESCRIPTOR);
         assertThat(dsm.freeSpaceThreshold, is("3GB"));
@@ -30,10 +30,11 @@ public class NodeMonitorsConfiguratorTest {
     }
 
     @Test
-    @ConfiguredWithCode("NodeMonitors.yml")
+    @ConfiguredWithReadme("node-monitors/README.md")
     public void not_configured_monitors_are_ignored() {
-        ResponseTimeMonitor rtm =
-                (ResponseTimeMonitor) ComputerSet.getMonitors().get(ResponseTimeMonitor.DESCRIPTOR);
-        assertThat(rtm.isIgnored(), is(true));
+        ClockMonitor.DescriptorImpl cmd =
+                (ClockMonitor.DescriptorImpl) Jenkins.get().getDescriptorOrDie(ClockMonitor.class);
+        ClockMonitor cm = (ClockMonitor) ComputerSet.getMonitors().get(cmd);
+        assertThat(cm.isIgnored(), is(true));
     }
 }
