@@ -261,9 +261,9 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
     /**
      * Build or identify the target component this configurator has to handle based on the provided configuration node.
      * @param mapping configuration for target component. Implementation may consume some entries to create a fresh new instance.
-     * @param context
+     * @param context Fully configured Jenkins object used as the starting point for this configuration.
      * @return instance to be configured, but not yet fully configured, see {@link #configure(Mapping, Object, boolean, ConfigurationContext)}
-     * @throws ConfiguratorException
+     * @throws ConfiguratorException something went wrong...
      */
     protected abstract T instance(Mapping mapping, ConfigurationContext context) throws ConfiguratorException;
 
@@ -299,7 +299,7 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
      * @param config configuration to apply. Can be partial if {@link #instance(Mapping, ConfigurationContext)} did already used some entries
      * @param instance target instance to configure
      * @param dryrun only check configuration is valid regarding target component. Don't actually apply changes to jenkins controller instance
-     * @param context
+     * @param context Fully configured Jenkins object used as the starting point for this configuration.
      * @throws ConfiguratorException something went wrong...
      */
     protected void configure(Mapping config, T instance, boolean dryrun, ConfigurationContext context)

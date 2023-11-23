@@ -150,6 +150,7 @@ public interface Configurator<T> {
      *      Map/List/primitive objects (think YAML) that represents the configuration from which
      *      a Jenkins object is configured.
      * @param context
+     *      Fully configured Jenkins object used as the starting point for this configuration.
      * @return
      *      Fully configured Jenkins object that results from this configuration.
      *      if no new objects got created, but some existing objects may have been modified, return updated target object.
@@ -163,8 +164,11 @@ public interface Configurator<T> {
      * Used to verify configuration is fine before being actually applied to a
      * live jenkins controller.
      * @param config
+     *      Map/List/primitive objects (think YAML) that represents the configuration from which
+     *      a Jenkins object is configured.
      * @param context
-     * @throws ConfiguratorException
+     *      Fully configured Jenkins object used as the starting point for this configuration.
+     * @throws ConfiguratorException on configuration error
      */
     T check(CNode config, ConfigurationContext context) throws ConfiguratorException;
 
@@ -187,7 +191,9 @@ public interface Configurator<T> {
     /**
      * Describe Structure of the attributes, as required by the schema.
      * @param instance
+     *      Object whose attributes will be described.
      * @param context
+     *      Fully configured Jenkins object used as the starting point for this configuration.
      * @since 1.35
      * @return CNode describing the attributes.
      */
