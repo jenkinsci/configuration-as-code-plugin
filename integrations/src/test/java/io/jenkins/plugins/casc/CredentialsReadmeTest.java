@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assume.assumeTrue;
 import static org.jvnet.hudson.test.JenkinsMatchers.hasPlainText;
 
 import com.cloudbees.jenkins.plugins.awscredentials.AWSCredentialsImpl;
@@ -34,11 +35,16 @@ import jenkins.model.Jenkins;
 import org.apache.commons.io.IOUtils;
 import org.jenkinsci.plugins.plaincredentials.FileCredentials;
 import org.jenkinsci.plugins.plaincredentials.StringCredentials;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
 public class CredentialsReadmeTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     public static final String PASSPHRASE = "passphrase";
     public static final String PRIVATE_KEY = "-----BEGIN RSA PRIVATE KEY-----\n"

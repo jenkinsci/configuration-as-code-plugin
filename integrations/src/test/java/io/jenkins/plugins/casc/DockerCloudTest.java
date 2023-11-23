@@ -4,6 +4,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 import com.nirima.jenkins.plugins.docker.DockerCloud;
 import com.nirima.jenkins.plugins.docker.DockerTemplate;
@@ -12,6 +13,7 @@ import hudson.model.Label;
 import io.jenkins.docker.connector.DockerComputerAttachConnector;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -19,6 +21,10 @@ import org.junit.Test;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 public class DockerCloudTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     @Rule
     public JenkinsConfiguredWithReadmeRule j = new JenkinsConfiguredWithReadmeRule();

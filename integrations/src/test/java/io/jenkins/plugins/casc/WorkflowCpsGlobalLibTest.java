@@ -1,6 +1,7 @@
 package io.jenkins.plugins.casc;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.assumeTrue;
 
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
@@ -8,6 +9,7 @@ import jenkins.plugins.git.GitSCMSource;
 import org.jenkinsci.plugins.workflow.libs.GlobalLibraries;
 import org.jenkinsci.plugins.workflow.libs.LibraryConfiguration;
 import org.jenkinsci.plugins.workflow.libs.SCMSourceRetriever;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -15,6 +17,10 @@ import org.junit.Test;
  * @author <a href="mailto:VictorMartinezRubio@gmail.com">Victor Martinez</a>
  */
 public class WorkflowCpsGlobalLibTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     @Rule
     public JenkinsConfiguredWithReadmeRule j2 = new JenkinsConfiguredWithReadmeRule();

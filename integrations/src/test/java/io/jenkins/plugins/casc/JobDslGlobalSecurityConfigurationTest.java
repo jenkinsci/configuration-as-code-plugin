@@ -3,9 +3,11 @@ package io.jenkins.plugins.casc;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assume.assumeTrue;
 
 import javaposse.jobdsl.plugin.GlobalJobDslSecurityConfiguration;
 import jenkins.model.GlobalConfiguration;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.model.Statement;
@@ -16,6 +18,10 @@ import org.jvnet.hudson.test.RestartableJenkinsRule;
  * Created by odavid on 23/12/2017.
  */
 public class JobDslGlobalSecurityConfigurationTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     @Rule
     public RestartableJenkinsRule j = new RestartableJenkinsRule();

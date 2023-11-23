@@ -7,6 +7,7 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 import hudson.model.Node.Mode;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
@@ -15,6 +16,7 @@ import java.util.List;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.mesos.MesosCloud;
 import org.jenkinsci.plugins.mesos.MesosSlaveInfo;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -22,6 +24,10 @@ import org.junit.Test;
  * @author v1v (Victor Martinez)
  */
 public class MesosTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     @Rule
     public JenkinsConfiguredWithReadmeRule j = new JenkinsConfiguredWithReadmeRule();

@@ -4,6 +4,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 import hudson.model.Descriptor;
 import hudson.model.ListView;
@@ -15,10 +16,15 @@ import hudson.views.ViewJobFilter;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import jenkins.model.Jenkins;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
 public class ViewJobFiltersTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     @Rule
     public JenkinsConfiguredWithReadmeRule j = new JenkinsConfiguredWithReadmeRule();

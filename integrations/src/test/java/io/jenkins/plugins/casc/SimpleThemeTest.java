@@ -1,11 +1,13 @@
 package io.jenkins.plugins.casc;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assume.assumeTrue;
 
 import hudson.ExtensionList;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import org.codefirst.SimpleThemeDecorator;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -13,6 +15,10 @@ import org.junit.Test;
  * @author v1v (Victor Martinez)
  */
 public class SimpleThemeTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     @Rule
     public JenkinsConfiguredWithReadmeRule j = new JenkinsConfiguredWithReadmeRule();

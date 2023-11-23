@@ -3,12 +3,14 @@ package io.jenkins.plugins.casc;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assume.assumeTrue;
 import static org.jvnet.hudson.test.JenkinsMatchers.hasPlainText;
 
 import hudson.ProxyConfiguration;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import jenkins.model.Jenkins;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -16,6 +18,10 @@ import org.junit.Test;
  * @author v1v (Victor Martinez)
  */
 public class ProxyTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     @Rule
     public JenkinsConfiguredWithReadmeRule j = new JenkinsConfiguredWithReadmeRule();

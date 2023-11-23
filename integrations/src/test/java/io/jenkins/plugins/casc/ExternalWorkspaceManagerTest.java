@@ -2,12 +2,14 @@ package io.jenkins.plugins.casc;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.junit.Assume.assumeTrue;
 
 import hudson.ExtensionList;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import org.jenkinsci.plugins.ewm.steps.ExwsAllocateStep;
 import org.jenkinsci.plugins.ewm.steps.ExwsStep;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -15,6 +17,10 @@ import org.junit.Test;
  * @author <a href="mailto:VictorMartinezRubio@gmail.com">Victor Martinez</a>
  */
 public class ExternalWorkspaceManagerTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     @Rule
     public JenkinsConfiguredWithReadmeRule j = new JenkinsConfiguredWithReadmeRule();

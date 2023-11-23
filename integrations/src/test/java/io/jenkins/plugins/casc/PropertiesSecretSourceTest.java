@@ -1,6 +1,7 @@
 package io.jenkins.plugins.casc;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.assumeTrue;
 
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
@@ -14,12 +15,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import jenkins.model.Jenkins;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.rules.RuleChain;
 
 public class PropertiesSecretSourceTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     private static final String USERNAME_SECRET = "ken";
 

@@ -4,6 +4,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 import hudson.model.Node.Mode;
 import hudson.model.Slave;
@@ -11,10 +12,15 @@ import hudson.plugins.sshslaves.SSHLauncher;
 import hudson.slaves.JNLPLauncher;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
 public class BuildAgentsTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     @Rule
     public JenkinsConfiguredWithReadmeRule j = new JenkinsConfiguredWithReadmeRule();

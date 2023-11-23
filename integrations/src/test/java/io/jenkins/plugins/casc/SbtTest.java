@@ -6,12 +6,14 @@ import static io.jenkins.plugins.casc.misc.Util.toYamlString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.assumeTrue;
 
 import hudson.ExtensionList;
 import hudson.tools.InstallSourceProperty;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import io.jenkins.plugins.casc.model.CNode;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.jvnet.hudson.plugins.SbtPluginBuilder;
@@ -22,6 +24,10 @@ import org.jvnet.hudson.plugins.SbtPluginBuilder.SbtInstaller;
  * @author v1v (Victor Martinez)
  */
 public class SbtTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     @ClassRule
     @ConfiguredWithReadme("sbt/README.md")

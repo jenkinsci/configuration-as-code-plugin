@@ -5,6 +5,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assume.assumeTrue;
 
 import hudson.ExtensionList;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
@@ -12,10 +13,16 @@ import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import java.util.List;
 import jenkins.metrics.api.MetricsAccessKey;
 import jenkins.model.Jenkins;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
 public class EssentialsTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
+
     @Rule
     public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 

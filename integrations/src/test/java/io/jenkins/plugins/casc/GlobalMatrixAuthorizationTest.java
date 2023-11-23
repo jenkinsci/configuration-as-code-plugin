@@ -1,6 +1,7 @@
 package io.jenkins.plugins.casc;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.assumeTrue;
 
 import hudson.security.GlobalMatrixAuthorizationStrategy;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
@@ -8,6 +9,7 @@ import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import java.util.ArrayList;
 import java.util.List;
 import jenkins.model.Jenkins;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -16,6 +18,10 @@ import org.junit.Test;
  * @since 1.0
  */
 public class GlobalMatrixAuthorizationTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     @Rule
     public JenkinsConfiguredWithReadmeRule j = new JenkinsConfiguredWithReadmeRule();

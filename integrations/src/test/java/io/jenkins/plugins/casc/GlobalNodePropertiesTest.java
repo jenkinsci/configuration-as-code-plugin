@@ -6,6 +6,7 @@ import static io.jenkins.plugins.casc.misc.Util.toYamlString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.assumeTrue;
 
 import hudson.slaves.EnvironmentVariablesNodeProperty;
 import hudson.slaves.NodeProperty;
@@ -17,10 +18,15 @@ import io.jenkins.plugins.casc.model.CNode;
 import java.util.Map;
 import java.util.Set;
 import jenkins.model.Jenkins;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
 public class GlobalNodePropertiesTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     @ClassRule
     @ConfiguredWithCode("GlobalNodePropertiesTest.yml")

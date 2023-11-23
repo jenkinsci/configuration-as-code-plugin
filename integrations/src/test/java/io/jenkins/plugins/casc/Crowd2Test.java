@@ -3,6 +3,7 @@ package io.jenkins.plugins.casc;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assume.assumeTrue;
 import static org.jvnet.hudson.test.JenkinsMatchers.hasPlainText;
 
 import de.theit.jenkins.crowd.CrowdSecurityRealm;
@@ -10,12 +11,17 @@ import hudson.security.SecurityRealm;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import jenkins.model.Jenkins;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.rules.RuleChain;
 
 public class Crowd2Test {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     public static final String PASSWORD_123 = "password123";
 

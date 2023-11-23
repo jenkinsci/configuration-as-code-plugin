@@ -9,6 +9,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assume.assumeTrue;
 
 import com.cloudbees.hudson.plugins.folder.Folder;
 import com.michelin.cio.hudson.plugins.rolestrategy.Role;
@@ -25,6 +26,7 @@ import io.jenkins.plugins.casc.model.CNode;
 import java.util.Map;
 import java.util.Set;
 import jenkins.model.Jenkins;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
@@ -34,6 +36,10 @@ import org.jvnet.hudson.test.Issue;
  * @since 1.0
  */
 public class RoleStrategyTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     @Rule
     public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();

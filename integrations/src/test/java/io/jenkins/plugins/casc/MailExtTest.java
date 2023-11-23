@@ -7,6 +7,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.assumeTrue;
 
 import hudson.plugins.emailext.ExtendedEmailPublisher;
 import hudson.plugins.emailext.ExtendedEmailPublisherDescriptor;
@@ -16,6 +17,7 @@ import io.jenkins.plugins.casc.yaml.YamlSource;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.tools.ant.filters.StringInputStream;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -23,6 +25,10 @@ import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.LoggerRule;
 
 public class MailExtTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
     public LoggerRule logging = new LoggerRule();

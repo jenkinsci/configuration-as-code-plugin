@@ -2,6 +2,7 @@ package io.jenkins.plugins.casc;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assume.assumeTrue;
 
 import com.cloudbees.jenkins.plugins.customtools.CustomTool;
 import com.cloudbees.jenkins.plugins.customtools.CustomTool.DescriptorImpl;
@@ -9,6 +10,7 @@ import hudson.tools.CommandInstaller;
 import hudson.tools.InstallSourceProperty;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -18,6 +20,10 @@ import org.jvnet.hudson.test.Issue;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 public class CustomToolsTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     @Rule
     public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();

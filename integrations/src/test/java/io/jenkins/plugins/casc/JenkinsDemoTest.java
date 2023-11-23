@@ -8,6 +8,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 import com.nirima.jenkins.plugins.docker.DockerCloud;
 import hudson.model.Node.Mode;
@@ -22,6 +23,7 @@ import org.jenkinsci.plugins.workflow.libs.GlobalLibraries;
 import org.jenkinsci.plugins.workflow.libs.LibraryConfiguration;
 import org.jfrog.hudson.ArtifactoryBuilder;
 import org.jfrog.hudson.JFrogPlatformInstance;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
@@ -31,6 +33,10 @@ import org.junit.rules.RuleChain;
  * @author v1v (Victor Martinez)
  */
 public class JenkinsDemoTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     @Rule
     public RuleChain chain = RuleChain.outerRule(new EnvironmentVariables().set("ARTIFACTORY_PASSWORD", "password123"))

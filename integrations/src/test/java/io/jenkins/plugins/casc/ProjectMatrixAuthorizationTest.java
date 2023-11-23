@@ -1,6 +1,7 @@
 package io.jenkins.plugins.casc;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.assumeTrue;
 
 import hudson.security.ProjectMatrixAuthorizationStrategy;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
@@ -8,6 +9,7 @@ import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import java.util.ArrayList;
 import java.util.List;
 import jenkins.model.Jenkins;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -15,6 +17,10 @@ import org.junit.Test;
  * Created by mads on 2/22/18.
  */
 public class ProjectMatrixAuthorizationTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     @Rule
     public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();

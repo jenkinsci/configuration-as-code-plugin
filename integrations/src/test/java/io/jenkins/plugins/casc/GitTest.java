@@ -1,6 +1,7 @@
 package io.jenkins.plugins.casc;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.assumeTrue;
 
 import hudson.plugins.git.GitSCM;
 import hudson.plugins.git.browser.AssemblaWeb;
@@ -14,6 +15,7 @@ import org.jenkinsci.plugins.workflow.libs.GlobalLibraries;
 import org.jenkinsci.plugins.workflow.libs.LibraryConfiguration;
 import org.jenkinsci.plugins.workflow.libs.SCMRetriever;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -24,6 +26,10 @@ import org.jvnet.hudson.test.LoggerRule;
  * Tests for Git plugin global configurations.
  */
 public class GitTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
     public LoggerRule logging = new LoggerRule();

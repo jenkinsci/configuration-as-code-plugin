@@ -2,6 +2,7 @@ package io.jenkins.plugins.casc;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 import hudson.security.LDAPSecurityRealm;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
@@ -10,6 +11,7 @@ import jenkins.model.IdStrategy;
 import jenkins.model.Jenkins;
 import jenkins.security.plugins.ldap.FromGroupSearchLDAPGroupMembershipStrategy;
 import jenkins.security.plugins.ldap.LDAPConfiguration;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
@@ -19,6 +21,10 @@ import org.junit.rules.RuleChain;
  * @author v1v (Victor Martinez)
  */
 public class LDAPTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     @Rule
     public RuleChain chain = RuleChain.outerRule(new EnvironmentVariables().set("LDAP_PASSWORD", "SECRET"))

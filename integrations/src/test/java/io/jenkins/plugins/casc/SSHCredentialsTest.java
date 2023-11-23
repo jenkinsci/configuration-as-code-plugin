@@ -6,6 +6,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.assumeTrue;
 
 import com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey;
 import com.cloudbees.plugins.credentials.Credentials;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import jenkins.model.Jenkins;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -29,6 +31,10 @@ import org.jvnet.hudson.test.TestExtension;
  * Integration tests for the SSH Credentials Plugin.
  */
 public class SSHCredentialsTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
     public LoggerRule logging = new LoggerRule();

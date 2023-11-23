@@ -1,6 +1,7 @@
 package io.jenkins.plugins.casc;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.assumeTrue;
 
 import hudson.ExtensionList;
 import hudson.tools.InstallSourceProperty;
@@ -8,10 +9,15 @@ import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import jenkins.plugins.nodejs.tools.NodeJSInstallation;
 import jenkins.plugins.nodejs.tools.NodeJSInstaller;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
 public class NodeJSTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     @Rule
     public JenkinsConfiguredWithReadmeRule j = new JenkinsConfiguredWithReadmeRule();

@@ -7,16 +7,22 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assume.assumeTrue;
 
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.docker.workflow.declarative.GlobalConfig;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
 
 public class DockerWorkflowSymbolTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     @ClassRule
     @ConfiguredWithCode("DockerWorkflowSymbol.yml")

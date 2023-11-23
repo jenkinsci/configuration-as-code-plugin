@@ -3,6 +3,7 @@ package io.jenkins.plugins.casc;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 import hudson.model.TopLevelItem;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
@@ -10,12 +11,17 @@ import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import jenkins.branch.OrganizationFolder;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.github_branch_source.GitHubSCMNavigator;
+import org.junit.Before;
 import org.junit.Rule;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 public class GithubOrganisationFolderTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     @Rule
     public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();

@@ -7,6 +7,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.assumeTrue;
 
 import hudson.ExtensionList;
 import hudson.tasks.Maven;
@@ -20,12 +21,17 @@ import jenkins.mvn.DefaultSettingsProvider;
 import jenkins.mvn.FilePathGlobalSettingsProvider;
 import jenkins.mvn.FilePathSettingsProvider;
 import jenkins.mvn.GlobalMavenConfig;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
 
 @Issue("JENKINS-62446")
 public class MavenConfiguratorTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     @Rule
     public JenkinsConfiguredWithReadmeRule j = new JenkinsConfiguredWithReadmeRule();

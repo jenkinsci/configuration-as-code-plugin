@@ -4,6 +4,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.junit.Assume.assumeTrue;
 
 import hudson.DescriptorExtensionList;
 import io.jenkins.plugins.artifact_manager_jclouds.s3.S3BlobStoreConfig;
@@ -12,10 +13,15 @@ import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import jenkins.model.ArtifactManagerFactory;
 import jenkins.model.ArtifactManagerFactoryDescriptor;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
 public class ArtifactManagerS3Test {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     @Rule
     public JenkinsConfiguredWithReadmeRule j = new JenkinsConfiguredWithReadmeRule();

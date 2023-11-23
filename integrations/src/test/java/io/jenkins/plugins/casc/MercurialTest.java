@@ -1,11 +1,14 @@
 package io.jenkins.plugins.casc;
 
+import static org.junit.Assume.assumeTrue;
+
 import hudson.plugins.mercurial.MercurialInstallation;
 import hudson.tools.CommandInstaller;
 import hudson.tools.InstallSourceProperty;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -13,6 +16,10 @@ import org.junit.Test;
  * @author <a href="mailto:vektory79@gmail.com">Viktor Verbitsky</a>
  */
 public class MercurialTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     @Rule
     public JenkinsConfiguredWithReadmeRule j = new JenkinsConfiguredWithReadmeRule();

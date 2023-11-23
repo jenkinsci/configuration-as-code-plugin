@@ -4,12 +4,14 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.junit.Assume.assumeTrue;
 
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import org.jenkinsci.lib.configprovider.model.Config;
 import org.jenkinsci.plugins.configfiles.GlobalConfigFiles;
 import org.jenkinsci.plugins.configfiles.maven.MavenSettingsConfig;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -17,6 +19,10 @@ import org.junit.Test;
  * @author <a href="mailto:VictorMartinezRubio@gmail.com">Victor Martinez</a>
  */
 public class ConfigFileProviderTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     @Rule
     public JenkinsConfiguredWithReadmeRule j = new JenkinsConfiguredWithReadmeRule();

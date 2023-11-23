@@ -3,12 +3,14 @@ package io.jenkins.plugins.casc;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 import hudson.plugins.active_directory.ActiveDirectoryDomain;
 import hudson.plugins.active_directory.ActiveDirectorySecurityRealm;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import jenkins.model.Jenkins;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
@@ -18,6 +20,10 @@ import org.junit.rules.RuleChain;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 public class ActiveDirectoryTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     @Rule
     public RuleChain chain = RuleChain.outerRule(new EnvironmentVariables().set("BIND_PASSWORD", "ADMIN123"))

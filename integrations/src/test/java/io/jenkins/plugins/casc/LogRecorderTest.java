@@ -5,6 +5,7 @@ import static io.jenkins.plugins.casc.misc.Util.toStringFromYamlFile;
 import static io.jenkins.plugins.casc.misc.Util.toYamlString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assume.assumeTrue;
 
 import hudson.logging.LogRecorder;
 import hudson.logging.LogRecorder.Target;
@@ -13,10 +14,15 @@ import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import io.jenkins.plugins.casc.model.CNode;
 import java.util.List;
 import java.util.logging.Level;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
 public class LogRecorderTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     @ClassRule
     @ConfiguredWithReadme("log-recorder/README.md")

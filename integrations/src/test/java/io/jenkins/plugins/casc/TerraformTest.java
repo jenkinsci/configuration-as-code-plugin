@@ -6,6 +6,7 @@ import static io.jenkins.plugins.casc.misc.Util.toYamlString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.assumeTrue;
 
 import hudson.ExtensionList;
 import hudson.tools.InstallSourceProperty;
@@ -14,6 +15,7 @@ import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import io.jenkins.plugins.casc.model.CNode;
 import org.jenkinsci.plugins.terraform.TerraformInstallation;
 import org.jenkinsci.plugins.terraform.TerraformInstaller;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
@@ -21,6 +23,10 @@ import org.junit.Test;
  * @author v1v (Victor Martinez)
  */
 public class TerraformTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     @ClassRule
     @ConfiguredWithReadme("terraform/README.md")

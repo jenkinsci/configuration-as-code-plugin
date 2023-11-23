@@ -3,6 +3,7 @@ package io.jenkins.plugins.casc;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 import hudson.model.Node.Mode;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
@@ -14,6 +15,7 @@ import org.csanchez.jenkins.plugins.kubernetes.model.KeyValueEnvVar;
 import org.csanchez.jenkins.plugins.kubernetes.model.TemplateEnvVar;
 import org.csanchez.jenkins.plugins.kubernetes.volumes.HostPathVolume;
 import org.csanchez.jenkins.plugins.kubernetes.volumes.PodVolume;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -21,6 +23,10 @@ import org.junit.Test;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 public class KubernetesCloudTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     @Rule
     public JenkinsConfiguredWithReadmeRule j = new JenkinsConfiguredWithReadmeRule();

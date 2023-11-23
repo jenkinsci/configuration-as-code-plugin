@@ -2,6 +2,7 @@ package io.jenkins.plugins.casc;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assume.assumeTrue;
 
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
@@ -16,10 +17,15 @@ import org.jenkinsci.plugin.gitea.OriginPullRequestDiscoveryTrait;
 import org.jenkinsci.plugin.gitea.SSHCheckoutTrait;
 import org.jenkinsci.plugin.gitea.TagDiscoveryTrait;
 import org.jenkinsci.plugin.gitea.WebhookRegistrationTrait;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
 public class GiteaOrganisationFolderTest {
+    @Before
+    public void shouldThisRun() {
+        assumeTrue(ShouldRun.thisTest());
+    }
 
     @Rule
     public JenkinsConfiguredWithCodeRule r = new JenkinsConfiguredWithCodeRule();
