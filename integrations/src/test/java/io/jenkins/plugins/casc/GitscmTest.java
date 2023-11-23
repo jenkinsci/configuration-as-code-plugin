@@ -20,7 +20,7 @@ public class GitscmTest {
     public JenkinsConfiguredWithReadmeRule j = new JenkinsConfiguredWithReadmeRule();
 
     @Test
-    @ConfiguredWithReadme("gitscm/README.md")
+    @ConfiguredWithReadme("git/README.md")
     public void configure_git() {
         final GitSCM.DescriptorImpl descriptor = ExtensionList.lookupSingleton(GitSCM.DescriptorImpl.class);
         assertNotNull(descriptor);
