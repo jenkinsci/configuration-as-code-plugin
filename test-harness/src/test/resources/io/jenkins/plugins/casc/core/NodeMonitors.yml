@@ -1,5 +1,6 @@
 jenkins:
   nodeMonitors:
+    - "architecture"
     - diskSpaceMonitor:
         freeSpaceThreshold: "3GB"
     - tmpSpace:
