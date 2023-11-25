@@ -1,5 +1,7 @@
-// Windows controller tests crash with unexpected errors
-buildPlugin(useContainerAgent: true, forkCount: '0.5C', timeout: 360, configurations: [
+buildPlugin(useContainerAgent: true, forkCount: '1C', timeout: 180, configurations: [
     [platform: 'linux', jdk: 21],
-    [platform: 'windows', jdk: 17],
+    // Integration tests fail in unexpected ways with Java 17 on Windows
+    // https://github.com/jenkinsci/configuration-as-code-plugin/pull/2392
+    // Switch to Java 17 on Windows when unexpected failures are resolved
+    [platform: 'windows', jdk: 11],
 ])
