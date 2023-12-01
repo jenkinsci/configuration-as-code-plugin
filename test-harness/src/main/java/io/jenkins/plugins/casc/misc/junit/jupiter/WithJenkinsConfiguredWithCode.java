@@ -55,6 +55,31 @@ import org.jvnet.hudson.test.JenkinsRule;
  *
  * </blockquote>
  *
+ * <p>Class static fields are also supported</p>
+ *
+ * <blockquote>
+ *
+ * <pre>
+ * class ExampleJUnit5Test {
+ *
+ *     &#64;WithJenkinsConfiguredWithCode
+ *     static JenkinsRule r;
+ *
+ *     &#64;Test
+ *     public void example() {
+ *         // use 'r' ...
+ *     }
+ *
+ *     &#64;Test
+ *     public void anotherExample() {
+ *         // use 'r' ...
+ *     }
+ *
+ * }
+ * </pre>
+ *
+ * </blockquote>
+ *
  * @see JenkinsConfiguredWithCodeExtension
  * @see ExtendWith
  */
