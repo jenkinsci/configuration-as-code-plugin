@@ -63,7 +63,7 @@ import org.jvnet.hudson.test.JenkinsRule;
  * class ExampleJUnit5Test {
  *
  *     &#64;WithJenkinsConfiguredWithCode
- *     static JenkinsRule r;
+ *     static JenkinsConfiguredWithCodeRule r;
  *
  *     &#64;Test
  *     public void example() {
