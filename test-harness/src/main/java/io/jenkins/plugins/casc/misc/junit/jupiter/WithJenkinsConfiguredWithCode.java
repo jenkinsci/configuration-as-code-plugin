@@ -25,7 +25,7 @@ import org.jvnet.hudson.test.JenkinsRule;
  * class ExampleJUnit5Test {
  *
  *     &#64;Test
- *     public void example(JenkinsRule r) {
+ *     public void example(JenkinsConfiguredWithCodeRule r) {
  *         // use 'r' ...
  *     }
  *
