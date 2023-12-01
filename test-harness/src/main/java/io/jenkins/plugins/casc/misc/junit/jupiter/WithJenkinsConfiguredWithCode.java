@@ -47,7 +47,7 @@ import org.jvnet.hudson.test.JenkinsRule;
  *
  *     &#64;WithJenkinsConfiguredWithCode
  *     &#64;Test
- *     public void example(JenkinsRule r) {
+ *     public void example(JenkinsConfiguredWithCodeRule r) {
  *         // use 'r' ...
  *     }
  * }
