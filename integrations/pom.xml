@@ -420,6 +420,19 @@
     </dependency>
   </dependencies>
 
+  <repositories>
+    <repository>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>atlassian-maven-external</id>
+      <url>https://packages.atlassian.com/maven-external/</url>
+    </repository>
+  </repositories>
+
   <build>
     <resources>
       <resource>
