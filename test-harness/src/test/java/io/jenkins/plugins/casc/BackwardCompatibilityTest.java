@@ -18,10 +18,6 @@ import org.junit.Test;
  */
 public class BackwardCompatibilityTest {
 
-    // TODO Remove once we are above 2.127 Jenkins Core
-    // see https://github.com/jenkinsci/jenkins/pull/3475
-    private static final VersionNumber MIN_VERSION_SYMBOL = new VersionNumber("2.127");
-
     @Rule
     public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 
@@ -34,8 +30,6 @@ public class BackwardCompatibilityTest {
         assertNotNull(j.jenkins.getNode("foo"));
         assertNotNull(j.jenkins.getNode("bar"));
         assertNotNull(j.jenkins.getNode("qix"));
-        // see # see https://github.com/jenkinsci/jenkins/pull/3475
-        // assertNotNull(j.jenkins.getNode("zot"));
 
         final List<ObsoleteConfigurationMonitor.Error> errors =
                 ObsoleteConfigurationMonitor.get().getErrors();
@@ -48,6 +42,6 @@ public class BackwardCompatibilityTest {
         if (currentVersion == null) {
             throw new IllegalArgumentException("Couldn't get jenkins version");
         }
-        return currentVersion.isOlderThan(MIN_VERSION_SYMBOL) ? "dumb" : "permanent";
+        return "permanent";
     }
 }
