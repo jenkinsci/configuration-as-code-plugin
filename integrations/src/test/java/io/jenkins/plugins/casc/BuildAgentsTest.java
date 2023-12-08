@@ -28,9 +28,10 @@ public class BuildAgentsTest {
         assertThat(slave.getRemoteFS(), is("/home/user1"));
         JNLPLauncher jnlpLauncher = ((JNLPLauncher) slave.getLauncher());
         assertThat(jnlpLauncher.getWorkDirSettings().getWorkDirPath(), is("/tmp"));
-        assertThat(jnlpLauncher.getWorkDirSettings().getInternalDir(), is("remoting"));
+        assertThat(jnlpLauncher.getWorkDirSettings().getInternalDir(), is("remoting2"));
         assertTrue(jnlpLauncher.getWorkDirSettings().isDisabled());
         assertFalse(jnlpLauncher.getWorkDirSettings().isFailIfWorkDirIsMissing());
+        assertTrue(jnlpLauncher.isWebSocket());
 
         assertThat(j.getInstance().getNode("utility-node-2").getNumExecutors(), is(4));
         assertThat(j.getInstance().getNode("utility-node-2").getMode(), is(Mode.NORMAL));

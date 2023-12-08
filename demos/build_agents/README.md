@@ -14,10 +14,11 @@ jenkins:
         remoteFS: "/home/user1"
         launcher:
           inbound:
+            webSocket: true
             workDirSettings:
               disabled: true
               failIfWorkDirIsMissing: false
-              internalDir: "remoting"
+              internalDir: "remoting2"
               workDirPath: "/tmp"
 
     - permanent:
