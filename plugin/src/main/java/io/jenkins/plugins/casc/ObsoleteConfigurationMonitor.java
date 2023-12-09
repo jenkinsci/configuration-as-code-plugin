@@ -52,10 +52,6 @@ public class ObsoleteConfigurationMonitor extends AdministrativeMonitor {
     }
 
     public String getCss() {
-        final VersionNumber version = Jenkins.getVersion();
-        if (version == null) {
-            return "alert alert-warning";
-        }
-        return "warning";
+        return "alert alert-warning";
     }
 }
