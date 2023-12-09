@@ -2,12 +2,10 @@ package io.jenkins.plugins.casc;
 
 import hudson.Extension;
 import hudson.model.AdministrativeMonitor;
-import hudson.util.VersionNumber;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Source;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import jenkins.model.Jenkins;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
