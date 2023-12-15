@@ -32,10 +32,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>io.jenkins.plugins</groupId>
-      <artifactId>joda-time-api</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.cloudbees.jenkins.plugins</groupId>
       <artifactId>custom-tools-plugin</artifactId>
       <version>0.8</version>
@@ -90,6 +86,11 @@
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>gitlab-branch-source</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>joda-time-api</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -205,13 +206,6 @@
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>email-ext</artifactId>
       <scope>test</scope>
-      <exclusions>
-        <!-- RequireUpperBoundDeps with maven-plugin -->
-        <exclusion>
-          <groupId>org.jsoup</groupId>
-          <artifactId>jsoup</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
@@ -380,13 +374,6 @@
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>view-job-filters</artifactId>
       <scope>test</scope>
-      <exclusions>
-        <!-- RequireUpperBoundDeps with jersey2-api plugin -->
-        <exclusion>
-          <groupId>org.javassist</groupId>
-          <artifactId>javassist</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins.aws-java-sdk</groupId>
