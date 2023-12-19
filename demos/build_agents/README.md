@@ -15,6 +15,7 @@ jenkins:
         launcher:
           inbound:
             webSocket: true
+            tunnel: some.proxy
             workDirSettings:
               disabled: true
               failIfWorkDirIsMissing: false
