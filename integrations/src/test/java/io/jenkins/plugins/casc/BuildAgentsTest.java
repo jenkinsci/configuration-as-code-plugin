@@ -32,6 +32,7 @@ public class BuildAgentsTest {
         assertTrue(jnlpLauncher.getWorkDirSettings().isDisabled());
         assertFalse(jnlpLauncher.getWorkDirSettings().isFailIfWorkDirIsMissing());
         assertTrue(jnlpLauncher.isWebSocket());
+        assertThat(jnlpLauncher.tunnel, is("some.proxy"));
 
         assertThat(j.getInstance().getNode("utility-node-2").getNumExecutors(), is(4));
         assertThat(j.getInstance().getNode("utility-node-2").getMode(), is(Mode.NORMAL));
