@@ -19,8 +19,8 @@ If configuration requires additional files (like Kubernetes) add them too.
 *All provided configurations in demo have to be tested:*
 
 * create test class for your demo
-* use `JenkinsConfiguredWithReadmeRule` to get configuration from your `README.md` file
-* implement test cases for your demo to cover whole configuration
+* use https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/test-harness/src/main/java/io/jenkins/plugins/casc/misc/JenkinsConfiguredWithReadmeRule.java[`JenkinsConfiguredWithReadmeRule`] to get configuration from your `README.md` file
+* implement https://github.com/jenkinsci/configuration-as-code-plugin/tree/master/test-harness/src/test/java/io/jenkins/plugins/casc[test cases] for your demo to cover whole configuration
 * for example check `ArtifactoryTest` and others.
 See also https://github.com/jenkinsci/configuration-as-code-plugin/pull/1055[PR #1055]
 
