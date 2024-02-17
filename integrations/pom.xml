@@ -338,7 +338,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>simple-theme-plugin</artifactId>
-      <version>172.v4b_8766c70078</version>
+      <version>176.v39740c03a_a_f5</version>
       <scope>test</scope>
     </dependency>
     <dependency>
