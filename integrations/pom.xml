@@ -232,7 +232,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>github-oauth</artifactId>
-      <version>588.vf696a_350572a_</version>
+      <version>597.ve0c3480fcb_d0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
