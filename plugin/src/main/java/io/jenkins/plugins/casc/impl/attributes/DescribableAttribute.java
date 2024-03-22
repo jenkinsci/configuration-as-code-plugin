@@ -1,5 +1,7 @@
 package io.jenkins.plugins.casc.impl.attributes;
 
+import static io.jenkins.plugins.casc.Configurator.normalize;
+
 import hudson.model.Describable;
 import hudson.model.Descriptor;
 import io.jenkins.plugins.casc.Attribute;
@@ -11,12 +13,9 @@ import java.util.stream.Collectors;
 import jenkins.model.Jenkins;
 import org.jenkinsci.Symbol;
 
-import static io.jenkins.plugins.casc.Configurator.normalize;
-
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-
 public class DescribableAttribute<Owner, Type> extends Attribute<Owner, Type> {
 
     public DescribableAttribute(String name, Class<? extends Describable> type) {
@@ -38,7 +37,6 @@ public class DescribableAttribute<Owner, Type> extends Attribute<Owner, Type> {
         return getSymbols(d, extensionPoint, target).get(0);
     }
 
-
     /**
      * Retrieve all possible symbols for this descriptor, first one being preferred one.
      * If a {@link Symbol} annotation is set, all values are accepted the last one being preferred
@@ -59,25 +57,21 @@ public class DescribableAttribute<Owner, Type> extends Attribute<Owner, Type> {
             final String ext = extensionPoint.getSimpleName();
             final String cn = d.getKlass().toJavaClass().getSimpleName();
             if (cn.endsWith(ext)) {
-                symbols.add( normalize(cn.substring(0, cn.length() - ext.length())) );
+                symbols.add(normalize(cn.substring(0, cn.length() - ext.length())));
             }
 
             // extension type Foo is implemented as SomeFooImpl. => "some"
             final String in = extensionPoint.getSimpleName() + "Impl";
             if (cn.endsWith(in)) {
-                symbols.add( normalize(cn.substring(0, cn.length() - in.length())) );
+                symbols.add(normalize(cn.substring(0, cn.length() - in.length())));
             }
 
             // Fall back to simple class name
-            symbols.add( normalize(cn) );
+            symbols.add(normalize(cn));
             return symbols;
         }
 
         // Fall back to simple class name
         return Collections.singletonList(normalize(target.getSimpleName()));
-
     }
-
-
-
 }

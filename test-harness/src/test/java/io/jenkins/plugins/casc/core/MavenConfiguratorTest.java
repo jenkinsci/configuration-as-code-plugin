@@ -22,15 +22,16 @@ public class MavenConfiguratorTest {
     @Test
     @ConfiguredWithCode("MavenConfiguratorTest.yml")
     public void should_configure_maven_tools_and_global_config() {
-        final Maven.DescriptorImpl descriptor= (Maven.DescriptorImpl) j.jenkins.getDescriptorOrDie(Maven.class);
+        final Maven.DescriptorImpl descriptor = (Maven.DescriptorImpl) j.jenkins.getDescriptorOrDie(Maven.class);
         Assert.assertEquals(1, descriptor.getInstallations().length);
         Assert.assertEquals("/usr/share/maven", descriptor.getInstallations()[0].getHome());
 
-        InstallSourceProperty installSourceProperty = descriptor.getInstallations()[0].getProperties().get(InstallSourceProperty.class);
+        InstallSourceProperty installSourceProperty =
+                descriptor.getInstallations()[0].getProperties().get(InstallSourceProperty.class);
         Assert.assertEquals("3.5.0", installSourceProperty.installers.get(Maven.MavenInstaller.class).id);
 
         final SettingsProvider provider = GlobalMavenConfig.get().getSettingsProvider();
         Assert.assertTrue(provider instanceof FilePathSettingsProvider);
-        Assert.assertEquals("/usr/share/maven-settings.xml", ((FilePathSettingsProvider)provider).getPath());
+        Assert.assertEquals("/usr/share/maven-settings.xml", ((FilePathSettingsProvider) provider).getPath());
     }
 }

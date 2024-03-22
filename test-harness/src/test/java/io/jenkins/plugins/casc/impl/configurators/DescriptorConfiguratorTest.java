@@ -1,5 +1,8 @@
 package io.jenkins.plugins.casc.impl.configurators;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
@@ -9,9 +12,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -52,8 +52,7 @@ public class DescriptorConfiguratorTest {
         private Double baz;
         private Float flt;
 
-        public FooBar() {
-        }
+        public FooBar() {}
 
         @DataBoundConstructor
         public FooBar(String foo, String bar, Double baz, Float flt) {
@@ -84,17 +83,23 @@ public class DescriptorConfiguratorTest {
         }
 
         @NonNull
-        public Double getBaz() { return baz; }
+        public Double getBaz() {
+            return baz;
+        }
 
         @DataBoundSetter
-        public void setBaz(Double baz) { this.baz = baz; }
+        public void setBaz(Double baz) {
+            this.baz = baz;
+        }
 
         @NonNull
-        public Float getFlt() { return flt; }
+        public Float getFlt() {
+            return flt;
+        }
 
         @DataBoundSetter
-        public void setFlt(Float flt) { this.flt = flt; }
-
+        public void setFlt(Float flt) {
+            this.flt = flt;
+        }
     }
-
 }

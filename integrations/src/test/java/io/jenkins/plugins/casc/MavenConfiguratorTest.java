@@ -1,5 +1,13 @@
 package io.jenkins.plugins.casc;
 
+import static io.jenkins.plugins.casc.misc.Util.getToolRoot;
+import static io.jenkins.plugins.casc.misc.Util.toStringFromYamlFile;
+import static io.jenkins.plugins.casc.misc.Util.toYamlString;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.junit.Assert.assertEquals;
+
 import hudson.ExtensionList;
 import hudson.tasks.Maven;
 import hudson.tasks.Maven.MavenInstaller;
@@ -15,14 +23,6 @@ import jenkins.mvn.GlobalMavenConfig;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
-
-import static io.jenkins.plugins.casc.misc.Util.getToolRoot;
-import static io.jenkins.plugins.casc.misc.Util.toStringFromYamlFile;
-import static io.jenkins.plugins.casc.misc.Util.toYamlString;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.assertEquals;
 
 @Issue("JENKINS-62446")
 public class MavenConfiguratorTest {
@@ -89,7 +89,8 @@ public class MavenConfiguratorTest {
         final GlobalMavenConfig descriptor = ExtensionList.lookupSingleton(GlobalMavenConfig.class);
 
         assertThat(descriptor.getGlobalSettingsProvider(), instanceOf(FilePathGlobalSettingsProvider.class));
-        FilePathGlobalSettingsProvider globalProvider = (FilePathGlobalSettingsProvider) descriptor.getGlobalSettingsProvider();
+        FilePathGlobalSettingsProvider globalProvider =
+                (FilePathGlobalSettingsProvider) descriptor.getGlobalSettingsProvider();
         assertThat(globalProvider.getPath(), is("/conf/maven/global-settings.xml"));
 
         assertThat(descriptor.getSettingsProvider(), instanceOf(FilePathSettingsProvider.class));

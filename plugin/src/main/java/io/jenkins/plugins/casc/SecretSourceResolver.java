@@ -1,5 +1,7 @@
 package io.jenkins.plugins.casc;
 
+import static io.vavr.API.unchecked;
+
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
@@ -22,8 +24,6 @@ import org.json.JSONObject;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.DoNotUse;
 
-import static io.vavr.API.unchecked;
-
 /**
  * Resolves secret variables and converts escaped internal variables.
  */
@@ -40,7 +40,7 @@ public class SecretSourceResolver {
 
     public SecretSourceResolver(ConfigurationContext configurationContext) {
         // TODO update to use Map.of in JDK11+
-        Map<String,  org.apache.commons.text.lookup.StringLookup> map = new HashMap<>(8);
+        Map<String, org.apache.commons.text.lookup.StringLookup> map = new HashMap<>(8);
         map.put("base64", Base64Lookup.INSTANCE);
         map.put("fileBase64", FileBase64Lookup.INSTANCE);
         map.put("readFileBase64", FileBase64Lookup.INSTANCE);
@@ -51,19 +51,17 @@ public class SecretSourceResolver {
         map.put("json", JsonLookup.INSTANCE);
         map = Collections.unmodifiableMap(map);
 
-        substitutor = new StringSubstitutor(
-            new FixedInterpolatorStringLookup(
-                map,
-                new ConfigurationContextStringLookup(configurationContext)))
-            .setEscapeChar(escapedWith)
-            .setVariablePrefix(enclosedBy)
-            .setVariableSuffix(enclosedIn)
-            .setEnableSubstitutionInVariables(true)
-            .setPreserveEscapes(true);
+        substitutor = new StringSubstitutor(new FixedInterpolatorStringLookup(
+                        map, new ConfigurationContextStringLookup(configurationContext)))
+                .setEscapeChar(escapedWith)
+                .setVariablePrefix(enclosedBy)
+                .setVariableSuffix(enclosedIn)
+                .setEnableSubstitutionInVariables(true)
+                .setPreserveEscapes(true);
         nullSubstitutor = new StringSubstitutor(UnresolvedLookup.INSTANCE)
-            .setEscapeChar(escapedWith)
-            .setVariablePrefix(enclosedBy)
-            .setVariableSuffix(enclosedIn);
+                .setEscapeChar(escapedWith)
+                .setVariablePrefix(enclosedBy)
+                .setVariableSuffix(enclosedIn);
     }
 
     /**
@@ -118,14 +116,14 @@ public class SecretSourceResolver {
 
         static final UnresolvedLookup INSTANCE = new UnresolvedLookup();
 
-        private UnresolvedLookup() {
-        }
+        private UnresolvedLookup() {}
 
         @Override
         public String lookup(String key) {
-            LOGGER.log(Level.WARNING, String.format(
-                "Configuration import: Found unresolved variable '%s'. Will default to empty string",
-                key));
+            LOGGER.log(
+                    Level.WARNING,
+                    String.format(
+                            "Configuration import: Found unresolved variable '%s'. Will default to empty string", key));
             return "";
         }
     }
@@ -141,10 +139,10 @@ public class SecretSourceResolver {
         @Override
         public String lookup(String key) {
             return context.getSecretSources().stream()
-                .map(source -> unchecked(() -> source.reveal(key)).apply())
-                .flatMap(o -> o.map(Stream::of).orElseGet(Stream::empty))
-                .findFirst()
-                .orElse(null);
+                    .map(source -> unchecked(() -> source.reveal(key)).apply())
+                    .flatMap(o -> o.map(Stream::of).orElseGet(Stream::empty))
+                    .findFirst()
+                    .orElse(null);
         }
     }
 
@@ -156,7 +154,11 @@ public class SecretSourceResolver {
         public String lookup(@NonNull final String key) {
             final String output = System.getProperty(key);
             if (output == null) {
-                LOGGER.log(Level.WARNING, String.format("Configuration import: System Properties did not contain the specified key '%s'. Will default to empty string.", key));
+                LOGGER.log(
+                        Level.WARNING,
+                        String.format(
+                                "Configuration import: System Properties did not contain the specified key '%s'. Will default to empty string.",
+                                key));
                 return "";
             }
             return output;
@@ -172,9 +174,12 @@ public class SecretSourceResolver {
             try {
                 return new String(Files.readAllBytes(Paths.get(key)), StandardCharsets.UTF_8);
             } catch (IOException | InvalidPathException e) {
-                LOGGER.log(Level.WARNING, String.format(
-                    "Configuration import: Error looking up file '%s' with UTF-8 encoding. Will default to empty string",
-                    key), e);
+                LOGGER.log(
+                        Level.WARNING,
+                        String.format(
+                                "Configuration import: Error looking up file '%s' with UTF-8 encoding. Will default to empty string",
+                                key),
+                        e);
                 return null;
             }
         }
@@ -210,9 +215,11 @@ public class SecretSourceResolver {
                 byte[] fileContent = Files.readAllBytes(Paths.get(key));
                 return Base64.getEncoder().encodeToString(fileContent);
             } catch (IOException | InvalidPathException e) {
-                LOGGER.log(Level.WARNING, String.format(
-                    "Configuration import: Error looking up file '%s'. Will default to empty string",
-                    key), e);
+                LOGGER.log(
+                        Level.WARNING,
+                        String.format(
+                                "Configuration import: Error looking up file '%s'. Will default to empty string", key),
+                        e);
                 return null;
             }
         }
@@ -222,9 +229,7 @@ public class SecretSourceResolver {
 
         static final JsonLookup INSTANCE = new JsonLookup();
 
-        private JsonLookup() {
-
-        }
+        private JsonLookup() {}
 
         @Override
         public String lookup(@NonNull final String key) {
@@ -235,11 +240,14 @@ public class SecretSourceResolver {
 
             final String output = root.optString(jsonFieldName, null);
             if (output == null) {
-                LOGGER.log(Level.WARNING, String.format("Configuration import: JSON secret did not contain the specified key '%s'. Will default to empty string.", jsonFieldName));
+                LOGGER.log(
+                        Level.WARNING,
+                        String.format(
+                                "Configuration import: JSON secret did not contain the specified key '%s'. Will default to empty string.",
+                                jsonFieldName));
                 return "";
             }
             return output;
         }
     }
-
 }

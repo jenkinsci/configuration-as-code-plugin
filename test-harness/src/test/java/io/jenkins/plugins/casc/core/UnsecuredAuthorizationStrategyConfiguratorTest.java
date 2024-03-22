@@ -1,12 +1,12 @@
 package io.jenkins.plugins.casc.core;
 
+import static org.junit.Assert.assertSame;
+
 import hudson.security.AuthorizationStrategy;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.junit.Assert.assertSame;
 
 /**
  * @author Kohsuke Kawaguchi

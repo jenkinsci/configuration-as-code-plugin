@@ -1,5 +1,13 @@
 package io.jenkins.plugins.casc;
 
+import static io.jenkins.plugins.casc.SchemaGeneration.writeJSONSchema;
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
+import static org.yaml.snakeyaml.DumperOptions.FlowStyle.BLOCK;
+import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.DOUBLE_QUOTED;
+import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.LITERAL;
+import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.PLAIN;
+
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
@@ -23,6 +31,8 @@ import io.jenkins.plugins.casc.model.Sequence;
 import io.jenkins.plugins.casc.model.Source;
 import io.jenkins.plugins.casc.yaml.YamlSource;
 import io.jenkins.plugins.casc.yaml.YamlUtils;
+import io.jenkins.plugins.prism.PrismConfiguration;
+import jakarta.inject.Inject;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -50,6 +60,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeSet;
@@ -57,8 +68,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import javax.inject.Inject;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
@@ -85,14 +96,6 @@ import org.yaml.snakeyaml.nodes.SequenceNode;
 import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.resolver.Resolver;
 import org.yaml.snakeyaml.serializer.Serializer;
-
-import static io.jenkins.plugins.casc.SchemaGeneration.writeJSONSchema;
-import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
-import static org.yaml.snakeyaml.DumperOptions.FlowStyle.BLOCK;
-import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.DOUBLE_QUOTED;
-import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.LITERAL;
-import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.PLAIN;
 
 /**
  * {@linkplain #configure() Main entry point of the logic}.
@@ -168,8 +171,40 @@ public class ConfigurationAsCode extends ManagementLink {
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
-        configure();
+
+        try {
+            configure();
+        } catch (ConfiguratorException e) {
+            LOGGER.log(Level.SEVERE, "Failed to reload configuration", e);
+
+            Throwable throwableCause = e.getCause();
+            if (throwableCause instanceof ConfiguratorException) {
+                ConfiguratorException cause = (ConfiguratorException) throwableCause;
+
+                handleExceptionOnReloading(request, response, cause);
+            } else {
+                handleExceptionOnReloading(request, response, e);
+            }
+            return;
+        }
         response.sendRedirect("");
+    }
+
+    @Restricted(NoExternalUse.class)
+    public static void handleExceptionOnReloading(
+            StaplerRequest request, StaplerResponse response, ConfiguratorException cause)
+            throws ServletException, IOException {
+        Configurator<?> configurator = cause.getConfigurator();
+        request.setAttribute("errorMessage", cause.getErrorMessage());
+        if (configurator != null) {
+            request.setAttribute("target", configurator.getName());
+        } else if (cause instanceof UnknownConfiguratorException) {
+            List<String> configuratorNames = ((UnknownConfiguratorException) cause).getConfiguratorNames();
+            request.setAttribute("target", String.join(", ", configuratorNames));
+        }
+        request.setAttribute("invalidAttribute", cause.getInvalidAttribute());
+        request.setAttribute("validAttributes", cause.getValidAttributes());
+        request.getView(ConfigurationAsCode.class, "error.jelly").forward(request, response);
     }
 
     @RequirePOST
@@ -236,7 +271,8 @@ public class ConfigurationAsCode extends ManagementLink {
         for (String candidateSource : inputToCandidateSources(normalizedSource)) {
             File file = new File(candidateSource);
             if (!file.exists() && !ConfigurationAsCode.isSupportedURI(candidateSource)) {
-                return FormValidation.error("Configuration cannot be applied. File or URL cannot be parsed or do not exist.");
+                return FormValidation.error(
+                        "Configuration cannot be applied. File or URL cannot be parsed or do not exist.");
             }
             candidateSources.add(candidateSource);
         }
@@ -253,13 +289,21 @@ public class ConfigurationAsCode extends ManagementLink {
             }
             return FormValidation.okWithMarkup("The configuration can be applied");
         } catch (ConfiguratorException | IllegalArgumentException e) {
-            return FormValidation.error(e, e.getCause() == null ? e.getMessage() : e.getCause().getMessage());
+            return FormValidation.error(
+                    e, e.getCause() == null ? e.getMessage() : e.getCause().getMessage());
         }
     }
 
     private JSONArray collectProblems(Map<Source, String> issues, String severity) {
         final JSONArray problems = new JSONArray();
-        issues.entrySet().stream().map(e -> new JSONObject().accumulate("line", e.getKey().line).accumulate(severity, e.getValue()))
+        issues.entrySet().stream()
+                .map(e -> new JSONObject()
+                        .accumulate(
+                                "line",
+                                Optional.ofNullable(e.getKey())
+                                        .map(it -> it.line)
+                                        .orElse(-1))
+                        .accumulate(severity, e.getValue()))
                 .forEach(problems::add);
         return problems;
     }
@@ -268,9 +312,7 @@ public class ConfigurationAsCode extends ManagementLink {
         if (isSupportedURI(source)) {
             sources.add(YamlSource.of(source));
         } else {
-            sources.addAll(configs(source).stream()
-                .map(YamlSource::of)
-                .collect(toList()));
+            sources.addAll(configs(source).stream().map(YamlSource::of).collect(toList()));
         }
     }
 
@@ -295,7 +337,11 @@ public class ConfigurationAsCode extends ManagementLink {
     @Initializer(after = InitMilestone.SYSTEM_CONFIG_LOADED, before = InitMilestone.SYSTEM_CONFIG_ADAPTED)
     public static void init() throws Exception {
         detectVaultPluginMissing();
-        get().configure();
+        try {
+            get().configure();
+        } catch (ConfiguratorException e) {
+            throw new ConfigurationAsCodeBootFailure(e);
+        }
     }
 
     /**
@@ -322,10 +368,8 @@ public class ConfigurationAsCode extends ManagementLink {
         CasCGlobalConfig casc = GlobalConfiguration.all().get(CasCGlobalConfig.class);
         String cascPath = casc != null ? casc.getConfigurationPath() : null;
 
-        String configParameter = System.getProperty(
-                CASC_JENKINS_CONFIG_PROPERTY,
-                System.getenv(CASC_JENKINS_CONFIG_ENV)
-        );
+        String configParameter =
+                System.getProperty(CASC_JENKINS_CONFIG_PROPERTY, System.getenv(CASC_JENKINS_CONFIG_ENV));
 
         // We prefer to rely on environment variable over global config
         if (StringUtils.isNotBlank(cascPath) && StringUtils.isBlank(configParameter)) {
@@ -385,14 +429,14 @@ public class ConfigurationAsCode extends ManagementLink {
 
         PathMatcher matcher = FileSystems.getDefault().getPathMatcher(YAML_FILES_PATTERN);
         Set<String> resources = servletContext.getResourcePaths(cascDirectory);
-        if (resources!=null) {
+        if (resources != null) {
             // sort to execute them in a deterministic order
             for (String cascItem : new TreeSet<>(resources)) {
                 try {
                     URL bundled = servletContext.getResource(cascItem);
                     if (bundled != null && matcher.matches(new File(bundled.getPath()).toPath())) {
                         res.add(bundled.toString());
-                    } //TODO: else do some handling?
+                    } // TODO: else do some handling?
                 } catch (IOException e) {
                     LOGGER.log(Level.WARNING, "Failed to execute " + res, e);
                 }
@@ -414,7 +458,8 @@ public class ConfigurationAsCode extends ManagementLink {
         final Map<Source, String> issues = checkWith(YamlSource.of(req));
         res.setContentType("application/json");
         final JSONArray warnings = new JSONArray();
-        issues.entrySet().stream().map(e -> new JSONObject().accumulate("line", e.getKey().line).accumulate("warning", e.getValue()))
+        issues.entrySet().stream()
+                .map(e -> new JSONObject().accumulate("line", e.getKey().line).accumulate("warning", e.getValue()))
                 .forEach(warnings::add);
         warnings.write(res.getWriter());
     }
@@ -478,6 +523,11 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     @Restricted(NoExternalUse.class)
+    public PrismConfiguration getPrismConfiguration() {
+        return PrismConfiguration.getInstance();
+    }
+
+    @Restricted(NoExternalUse.class)
     public void doReference(StaplerRequest req, StaplerResponse res) throws Exception {
         if (!Jenkins.get().hasPermission(Jenkins.SYSTEM_READ)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
@@ -496,10 +546,10 @@ public class ConfigurationAsCode extends ManagementLink {
         for (RootElementConfigurator root : RootElementConfigurator.all()) {
             final CNode config = root.describe(root.getTargetComponent(context), context);
             final Node valueNode = toYaml(config);
-            if (valueNode == null) continue;
-            tuples.add(new NodeTuple(
-                    new ScalarNode(Tag.STR, root.getName(), null, null, PLAIN),
-                    valueNode));
+            if (valueNode == null) {
+                continue;
+            }
+            tuples.add(new NodeTuple(new ScalarNode(Tag.STR, root.getName(), null, null, PLAIN), valueNode));
         }
 
         MappingNode root = new MappingNode(Tag.MAP, tuples, BLOCK);
@@ -517,8 +567,7 @@ public class ConfigurationAsCode extends ManagementLink {
         options.setDefaultScalarStyle(PLAIN);
         options.setSplitLines(true);
         options.setPrettyFlow(true);
-        Serializer serializer = new Serializer(new Emitter(writer, options), new Resolver(),
-                options, null);
+        Serializer serializer = new Serializer(new Emitter(writer, options), new Resolver(), options, null);
         serializer.open();
         serializer.serialize(root);
         serializer.close();
@@ -528,7 +577,9 @@ public class ConfigurationAsCode extends ManagementLink {
     @Restricted(NoExternalUse.class) // for testing only
     public Node toYaml(CNode config) throws ConfiguratorException {
 
-        if (config == null) return null;
+        if (config == null) {
+            return null;
+        }
 
         switch (config.getType()) {
             case MAPPING:
@@ -538,13 +589,14 @@ public class ConfigurationAsCode extends ManagementLink {
                 entries.sort(Map.Entry.comparingByKey());
                 for (Map.Entry<String, CNode> entry : entries) {
                     final Node valueNode = toYaml(entry.getValue());
-                    if (valueNode == null) continue;
-                    tuples.add(new NodeTuple(
-                            new ScalarNode(Tag.STR, entry.getKey(), null, null, PLAIN),
-                            valueNode));
-
+                    if (valueNode == null) {
+                        continue;
+                    }
+                    tuples.add(new NodeTuple(new ScalarNode(Tag.STR, entry.getKey(), null, null, PLAIN), valueNode));
                 }
-                if (tuples.isEmpty()) return null;
+                if (tuples.isEmpty()) {
+                    return null;
+                }
 
                 return new MappingNode(Tag.MAP, tuples, BLOCK);
 
@@ -553,17 +605,23 @@ public class ConfigurationAsCode extends ManagementLink {
                 List<Node> nodes = new ArrayList<>();
                 for (CNode cNode : sequence) {
                     final Node valueNode = toYaml(cNode);
-                    if (valueNode == null) continue;
+                    if (valueNode == null) {
+                        continue;
+                    }
                     nodes.add(valueNode);
                 }
-                if (nodes.isEmpty()) return null;
+                if (nodes.isEmpty()) {
+                    return null;
+                }
                 return new SequenceNode(Tag.SEQ, nodes, BLOCK);
 
             case SCALAR:
             default:
                 final Scalar scalar = config.asScalar();
                 final String value = scalar.getValue();
-                if (value == null || value.length() == 0) return null;
+                if (value == null || value.length() == 0) {
+                    return null;
+                }
 
                 final DumperOptions.ScalarStyle style;
                 if (scalar.getFormat().equals(Format.MULTILINESTRING) && !scalar.isRaw()) {
@@ -591,7 +649,7 @@ public class ConfigurationAsCode extends ManagementLink {
         }
     }
 
-    public void configure(String ... configParameters) throws ConfiguratorException {
+    public void configure(String... configParameters) throws ConfiguratorException {
         configure(Arrays.asList(configParameters));
     }
 
@@ -608,17 +666,17 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     public static boolean isSupportedURI(String configurationParameter) {
-        if(configurationParameter == null) {
+        if (configurationParameter == null) {
             return false;
         }
-        final List<String> supportedProtocols = Arrays.asList("https","http","file");
+        final List<String> supportedProtocols = Arrays.asList("https", "http", "file");
         URI uri;
         try {
             uri = new URI(configurationParameter);
         } catch (URISyntaxException ex) {
             return false;
         }
-        if(uri.getScheme() == null) {
+        if (uri.getScheme() == null) {
             return false;
         }
         return supportedProtocols.contains(uri.getScheme());
@@ -645,7 +703,9 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     private Map<Source, String> checkWith(List<YamlSource> sources) throws ConfiguratorException {
-        if (sources.isEmpty()) return Collections.emptyMap();
+        if (sources.isEmpty()) {
+            return Collections.emptyMap();
+        }
         ConfigurationContext context = new ConfigurationContext(registry);
         return checkWith(YamlUtils.loadFrom(sources, context), context);
     }
@@ -661,7 +721,7 @@ public class ConfigurationAsCode extends ManagementLink {
         final Path root = Paths.get(path);
 
         if (!Files.exists(root)) {
-            throw new ConfiguratorException("Invalid configuration: '"+path+"' isn't a valid path.");
+            throw new ConfiguratorException("Invalid configuration: '" + path + "' isn't a valid path.");
         }
 
         if (Files.isRegularFile(root) && Files.isReadable(root)) {
@@ -669,8 +729,11 @@ public class ConfigurationAsCode extends ManagementLink {
         }
 
         final PathMatcher matcher = FileSystems.getDefault().getPathMatcher(YAML_FILES_PATTERN);
-        try (Stream<Path> stream = Files.find(root, Integer.MAX_VALUE,
-                (next, attrs) -> !attrs.isDirectory() && !isHidden(next) && matcher.matches(next), FileVisitOption.FOLLOW_LINKS)) {
+        try (Stream<Path> stream = Files.find(
+                root,
+                Integer.MAX_VALUE,
+                (next, attrs) -> !attrs.isDirectory() && !isHidden(next) && matcher.matches(next),
+                FileVisitOption.FOLLOW_LINKS)) {
             return stream.sorted().collect(toList());
         } catch (IOException e) {
             throw new IllegalStateException("failed config scan for " + path, e);
@@ -678,9 +741,8 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     private static boolean isHidden(Path path) {
-        return IntStream.range(0, path.getNameCount())
-            .mapToObj(path::getName)
-            .anyMatch(subPath -> subPath.toString().startsWith("."));
+        return IntStream.range(0, path.getNameCount()).mapToObj(path::getName).anyMatch(subPath -> subPath.toString()
+                .startsWith("."));
     }
 
     @FunctionalInterface
@@ -705,19 +767,12 @@ public class ConfigurationAsCode extends ManagementLink {
             final Iterator<Map.Entry<String, CNode>> it = entries.entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry<String, CNode> entry = it.next();
-                if (! entry.getKey().equalsIgnoreCase(configurator.getName())) {
+                if (!entry.getKey().equalsIgnoreCase(configurator.getName())) {
                     continue;
                 }
-                try {
-                    function.apply(configurator, entry.getValue());
-                    it.remove();
-                    break;
-                } catch (ConfiguratorException e) {
-                    throw new ConfiguratorException(
-                            configurator,
-                            format("error configuring '%s' with %s configurator", entry.getKey(), configurator.getClass()), e
-                    );
-                }
+                function.apply(configurator, entry.getValue());
+                it.remove();
+                break;
             }
         }
 
@@ -731,7 +786,7 @@ public class ConfigurationAsCode extends ManagementLink {
             });
 
             if (!unknownKeys.isEmpty()) {
-                throw new ConfiguratorException(format("No configurator for the following root elements %s", String.join(", ", unknownKeys)));
+                throw new UnknownConfiguratorException(unknownKeys, "No configurator for the following root elements:");
             }
         }
     }
@@ -744,19 +799,19 @@ public class ConfigurationAsCode extends ManagementLink {
         PluginManager pluginManager = Jenkins.get().getPluginManager();
         Set<String> envKeys = System.getenv().keySet();
         if (envKeys.stream().anyMatch(s -> s.startsWith("CASC_VAULT_"))
-            && pluginManager.getPlugin("hashicorp-vault-plugin") == null) {
-            LOGGER.log(Level.SEVERE,
-                "Vault secret resolver is not installed, consider installing hashicorp-vault-plugin v2.4.0 or higher\nor consider removing any 'CASC_VAULT_' variables");
+                && pluginManager.getPlugin("hashicorp-vault-plugin") == null) {
+            LOGGER.log(
+                    Level.SEVERE,
+                    "Vault secret resolver is not installed, consider installing hashicorp-vault-plugin v2.4.0 or higher\nor consider removing any 'CASC_VAULT_' variables");
         }
     }
 
-    private void configureWith(Mapping entries,
-        ConfigurationContext context) throws ConfiguratorException {
+    private void configureWith(Mapping entries, ConfigurationContext context) throws ConfiguratorException {
         // Initialize secret sources
         SecretSource.all().forEach(SecretSource::init);
 
         // Check input before actually applying changes, so we don't let controller in a
-        //weird state after some ConfiguratorException has been thrown
+        // weird state after some ConfiguratorException has been thrown
         final Mapping clone = entries.clone();
         checkWith(clone, context);
 
@@ -769,14 +824,12 @@ public class ConfigurationAsCode extends ManagementLink {
         }
     }
 
-    public Map<Source, String> checkWith(Mapping entries,
-        ConfigurationContext context) throws ConfiguratorException {
+    public Map<Source, String> checkWith(Mapping entries, ConfigurationContext context) throws ConfiguratorException {
         Map<Source, String> issues = new HashMap<>();
-        context.addListener( (node,message) -> issues.put(node.getSource(), message) );
+        context.addListener((node, message) -> issues.put(node.getSource(), message));
         invokeWith(entries, (configurator, config) -> configurator.check(config, context));
         return issues;
     }
-
 
     public static ConfigurationAsCode get() {
         return Jenkins.get().getExtensionList(ConfigurationAsCode.class).get(0);
@@ -809,7 +862,7 @@ public class ConfigurationAsCode extends ManagementLink {
      * @param attributes siblings to find associated configurators and dive to next tree levels
      * @param context
      */
-    private void listElements(Set<Object> elements, Set<Attribute<?,?>> attributes, ConfigurationContext context) {
+    private void listElements(Set<Object> elements, Set<Attribute<?, ?>> attributes, ConfigurationContext context) {
         attributes.stream()
                 .map(Attribute::getType)
                 .map(context::lookup)
@@ -818,7 +871,10 @@ public class ConfigurationAsCode extends ManagementLink {
                 .flatMap(Collection::stream)
                 .forEach(configurator -> {
                     if (elements.add(configurator)) {
-                        listElements(elements, ((Configurator)configurator).describe(), context);   // some unexpected type erasure force to cast here
+                        listElements(
+                                elements,
+                                ((Configurator) configurator).describe(),
+                                context); // some unexpected type erasure force to cast here
                     }
                 });
     }
@@ -861,9 +917,8 @@ public class ConfigurationAsCode extends ManagementLink {
     @Restricted(NoExternalUse.class)
     public static String printThrowable(@NonNull Throwable t) {
         String s = Functions.printThrowable(t)
-            .split("at io.jenkins.plugins.casc.ConfigurationAsCode.export")[0]
-            .replaceAll("\t", "  ");
+                .split("at io.jenkins.plugins.casc.ConfigurationAsCode.export")[0]
+                .replaceAll("\t", "  ");
         return s.substring(0, s.lastIndexOf(")") + 1);
     }
-
 }

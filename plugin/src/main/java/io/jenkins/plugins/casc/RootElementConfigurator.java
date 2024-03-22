@@ -14,13 +14,12 @@ import jenkins.model.Jenkins;
  * Note: we assume any configurator here will use a unique name for root element.
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-
 public interface RootElementConfigurator<T> extends Configurator<T> {
 
     static List<RootElementConfigurator> all() {
         final Jenkins jenkins = Jenkins.get();
-        List<RootElementConfigurator> configurators = new ArrayList<>(
-            jenkins.getExtensionList(RootElementConfigurator.class));
+        List<RootElementConfigurator> configurators =
+                new ArrayList<>(jenkins.getExtensionList(RootElementConfigurator.class));
 
         for (GlobalConfigurationCategory category : GlobalConfigurationCategory.all()) {
             configurators.add(new GlobalConfigurationCategoryConfigurator(category));
@@ -29,8 +28,9 @@ public interface RootElementConfigurator<T> extends Configurator<T> {
         for (ManagementLink link : ManagementLink.all()) {
             final String name = link.getUrlName();
             final Descriptor descriptor = Jenkins.get().getDescriptor(name);
-            if (descriptor != null)
+            if (descriptor != null) {
                 configurators.add(new DescriptorConfigurator(descriptor));
+            }
         }
 
         configurators.sort(Configurator.extensionOrdinalSort());

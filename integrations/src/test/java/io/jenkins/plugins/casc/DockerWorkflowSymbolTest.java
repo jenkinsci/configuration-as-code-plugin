@@ -1,13 +1,5 @@
 package io.jenkins.plugins.casc;
 
-import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
-import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
-import io.jenkins.plugins.casc.model.CNode;
-import org.jenkinsci.plugins.docker.workflow.declarative.GlobalConfig;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.jvnet.hudson.test.Issue;
-
 import static io.jenkins.plugins.casc.misc.Util.getUnclassifiedRoot;
 import static io.jenkins.plugins.casc.misc.Util.toStringFromYamlFile;
 import static io.jenkins.plugins.casc.misc.Util.toYamlString;
@@ -15,6 +7,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
+import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
+import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.model.CNode;
+import org.jenkinsci.plugins.docker.workflow.declarative.GlobalConfig;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.jvnet.hudson.test.Issue;
 
 public class DockerWorkflowSymbolTest {
 
@@ -46,5 +46,4 @@ public class DockerWorkflowSymbolTest {
 
         assertThat(exported, is(expected));
     }
-
 }

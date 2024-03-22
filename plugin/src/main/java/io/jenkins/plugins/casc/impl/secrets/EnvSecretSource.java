@@ -13,7 +13,9 @@ public class EnvSecretSource extends SecretSource {
 
     @Override
     public Optional<String> reveal(String secret) {
-        if (StringUtils.isBlank(secret)) return Optional.empty();
+        if (StringUtils.isBlank(secret)) {
+            return Optional.empty();
+        }
         return Optional.ofNullable(System.getProperty(secret, System.getenv(secret)));
     }
 }

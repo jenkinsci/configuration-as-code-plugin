@@ -1,5 +1,12 @@
 package io.jenkins.plugins.casc;
 
+import static io.jenkins.plugins.casc.misc.Util.getToolRoot;
+import static io.jenkins.plugins.casc.misc.Util.toStringFromYamlFile;
+import static io.jenkins.plugins.casc.misc.Util.toYamlString;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
+
 import hudson.ExtensionList;
 import hudson.tools.InstallSourceProperty;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
@@ -10,14 +17,6 @@ import org.junit.Test;
 import org.jvnet.hudson.plugins.SbtPluginBuilder;
 import org.jvnet.hudson.plugins.SbtPluginBuilder.SbtInstallation;
 import org.jvnet.hudson.plugins.SbtPluginBuilder.SbtInstaller;
-
-import static io.jenkins.plugins.casc.misc.Util.getToolRoot;
-import static io.jenkins.plugins.casc.misc.Util.toStringFromYamlFile;
-import static io.jenkins.plugins.casc.misc.Util.toYamlString;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-
 
 /**
  * @author v1v (Victor Martinez)
@@ -30,7 +29,8 @@ public class SbtTest {
 
     @Test
     public void configure_sbt_tool() {
-        final SbtPluginBuilder.DescriptorImpl descriptor = ExtensionList.lookupSingleton(SbtPluginBuilder.DescriptorImpl.class);
+        final SbtPluginBuilder.DescriptorImpl descriptor =
+                ExtensionList.lookupSingleton(SbtPluginBuilder.DescriptorImpl.class);
         assertEquals(1, descriptor.getInstallations().length);
 
         SbtInstallation sbt = descriptor.getInstallations()[0];

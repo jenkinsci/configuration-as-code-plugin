@@ -24,7 +24,6 @@ public class ExtensionConfigurator<T> extends BaseConfigurator<T> {
         this.target = clazz;
     }
 
-
     @Override
     public Class<T> getTarget() {
         return target;
@@ -34,7 +33,7 @@ public class ExtensionConfigurator<T> extends BaseConfigurator<T> {
     protected T instance(Mapping mapping, ConfigurationContext context) throws ConfiguratorException {
         final ExtensionList<T> list = Jenkins.get().getExtensionList(target);
         if (list.size() != 1) {
-            throw new ConfiguratorException("Expected a unique instance of extension "+target);
+            throw new ConfiguratorException("Expected a unique instance of extension " + target);
         }
         return list.get(0);
     }
@@ -45,5 +44,4 @@ public class ExtensionConfigurator<T> extends BaseConfigurator<T> {
         final T ref = target.getDeclaredConstructor().newInstance();
         return compare(instance, ref, context);
     }
-
 }

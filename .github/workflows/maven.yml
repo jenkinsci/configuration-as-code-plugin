@@ -17,15 +17,15 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        java: [11, 17]
-        os: [ubuntu-latest, windows-latest]
+        java: [17]
+        os: [ubuntu-latest]
 
     steps:
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Set up JDK ${{ matrix.java }}
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         java-version: ${{ matrix.java }}
         distribution: 'temurin'
@@ -35,6 +35,6 @@ jobs:
       run: mvn -Pjacoco clean verify -B -V --no-transfer-progress ${{ matrix.flags }}
 
     - name: Codecov coverage
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         file: '*jacoco.xml'

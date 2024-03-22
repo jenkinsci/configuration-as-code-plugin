@@ -1,5 +1,10 @@
 package io.jenkins.plugins.casc.yaml;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
+
 import io.jenkins.plugins.casc.CasCGlobalConfig;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfigurationContext;
@@ -12,11 +17,6 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.jvnet.hudson.test.JenkinsRule;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 
 public class OverrideMergeStrategyTest {
 
@@ -53,8 +53,10 @@ public class OverrideMergeStrategyTest {
         String normalSource = getClass().getResource("normal.yml").toExternalForm();
         String incompatibleSource = getClass().getResource("incompatible.yml").toExternalForm();
 
-        assertThrows("Incompatible config files merging process", ConfiguratorException.class,
-            () -> ConfigurationAsCode.get().configure(normalSource, incompatibleSource));
+        assertThrows(
+                "Incompatible config files merging process",
+                ConfiguratorException.class,
+                () -> ConfigurationAsCode.get().configure(normalSource, incompatibleSource));
     }
 
     @Test
@@ -72,8 +74,10 @@ public class OverrideMergeStrategyTest {
         // merge without conflicts
         ConfigurationAsCode.get().configure(sysA, sysB);
 
-        assertEquals("unexpected systemMessage with override merge strategy",
-            "hello b", Jenkins.get().getSystemMessage());
+        assertEquals(
+                "unexpected systemMessage with override merge strategy",
+                "hello b",
+                Jenkins.get().getSystemMessage());
     }
 
     @Test
@@ -85,10 +89,12 @@ public class OverrideMergeStrategyTest {
         ConfigurationAsCode.get().configure(sequenceA, sequenceB);
 
         Set<String> agentProtocals = Jenkins.get().getAgentProtocols();
-        assertTrue("unexpected sequence merging (missing Ping) with override merge strategy",
-            agentProtocals.contains("Ping"));
-        assertTrue("unexpected sequence merging (missing JNLP4-connect) with override merge strategy",
-            agentProtocals.contains("JNLP4-connect"));
+        assertTrue(
+                "unexpected sequence merging (missing Ping) with override merge strategy",
+                agentProtocals.contains("Ping"));
+        assertTrue(
+                "unexpected sequence merging (missing JNLP4-connect) with override merge strategy",
+                agentProtocals.contains("JNLP4-connect"));
     }
 
     @Test
@@ -102,17 +108,25 @@ public class OverrideMergeStrategyTest {
         // merge without conflicts, A <- B
         ConfigurationAsCode.get().configure(multipleKeysA, multipleKeysB);
         assertEquals("b", descriptor.getConfigurationPath());
-        assertEquals("unexpected systemMessage with override merge strategy",
-            "hello b", Jenkins.get().getSystemMessage());
-        assertEquals("unexpected numExecutors with override merge strategy",
-        1, Jenkins.get().getNumExecutors());
+        assertEquals(
+                "unexpected systemMessage with override merge strategy",
+                "hello b",
+                Jenkins.get().getSystemMessage());
+        assertEquals(
+                "unexpected numExecutors with override merge strategy",
+                1,
+                Jenkins.get().getNumExecutors());
 
         // merge without conflicts, B <- A
         ConfigurationAsCode.get().configure(multipleKeysB, multipleKeysA);
         assertEquals("a", descriptor.getConfigurationPath());
-        assertEquals("unexpected systemMessage with override merge strategy",
-            "hello a", Jenkins.get().getSystemMessage());
-        assertEquals("unexpected numExecutors with override merge strategy",
-        0, Jenkins.get().getNumExecutors());
+        assertEquals(
+                "unexpected systemMessage with override merge strategy",
+                "hello a",
+                Jenkins.get().getSystemMessage());
+        assertEquals(
+                "unexpected numExecutors with override merge strategy",
+                0,
+                Jenkins.get().getNumExecutors());
     }
 }

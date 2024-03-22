@@ -1,5 +1,8 @@
 package io.jenkins.plugins.casc.impl.configurators;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import hudson.model.Node;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.Configurator;
@@ -12,9 +15,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.jvnet.hudson.test.JenkinsRule;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -70,7 +70,6 @@ public class PrimitiveConfiguratorTest {
         Configurator<Node.Mode> c = registry.lookupOrFail(Node.Mode.class);
         final Node.Mode value = c.configure(new Scalar("NORMAL"), context);
         assertEquals(Node.Mode.NORMAL, value);
-
     }
 
     @Test
@@ -79,7 +78,6 @@ public class PrimitiveConfiguratorTest {
         Configurator<TimeUnit> c = registry.lookupOrFail(TimeUnit.class);
         final TimeUnit value = c.configure(new Scalar("DAYS"), context);
         assertEquals(TimeUnit.DAYS, value);
-
     }
 
     @Test

@@ -51,8 +51,9 @@ public class TokenReloadAction implements UnprotectedRootAction {
         } else {
             String requestToken = getRequestToken(request);
 
-            if (requestToken != null && MessageDigest.isEqual(token.getBytes(StandardCharsets.UTF_8), requestToken.getBytes(
-                StandardCharsets.UTF_8))) {
+            if (requestToken != null
+                    && MessageDigest.isEqual(
+                            token.getBytes(StandardCharsets.UTF_8), requestToken.getBytes(StandardCharsets.UTF_8))) {
                 LOGGER.info("Configuration reload triggered via token");
 
                 try (ACLContext ignored = ACL.as2(ACL.SYSTEM2)) {

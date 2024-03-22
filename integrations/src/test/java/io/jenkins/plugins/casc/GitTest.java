@@ -1,5 +1,7 @@
 package io.jenkins.plugins.casc;
 
+import static org.junit.Assert.assertEquals;
+
 import hudson.plugins.git.GitSCM;
 import hudson.plugins.git.browser.AssemblaWeb;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
@@ -18,8 +20,6 @@ import org.junit.rules.RuleChain;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.LoggerRule;
 
-import static org.junit.Assert.assertEquals;
-
 /**
  * Tests for Git plugin global configurations.
  */
@@ -29,8 +29,8 @@ public class GitTest {
     public LoggerRule logging = new LoggerRule();
 
     @Rule
-    public RuleChain chain= RuleChain
-            .outerRule(logging.record(Logger.getLogger(Attribute.class.getName()), Level.INFO).capture(2048))
+    public RuleChain chain = RuleChain.outerRule(logging.record(Logger.getLogger(Attribute.class.getName()), Level.INFO)
+                    .capture(2048))
             .around(j);
 
     @After
@@ -45,13 +45,13 @@ public class GitTest {
     @ConfiguredWithCode("GitTest.yml")
     public void checkAssemblaWebIsLoaded() {
         final Jenkins jenkins = Jenkins.get();
-        final GlobalLibraries libs =  jenkins.getExtensionList(GlobalConfiguration.class)
-                .get(GlobalLibraries.class);
+        final GlobalLibraries libs =
+                jenkins.getExtensionList(GlobalConfiguration.class).get(GlobalLibraries.class);
 
         LibraryConfiguration lib = libs.getLibraries().get(0);
         SCMRetriever retriever = (SCMRetriever) lib.getRetriever();
         GitSCM scm = (GitSCM) retriever.getScm();
-        AssemblaWeb browser = (AssemblaWeb)scm.getBrowser();
+        AssemblaWeb browser = (AssemblaWeb) scm.getBrowser();
         assertEquals("assembla.acmecorp.com", browser.getRepoUrl());
     }
 }

@@ -27,9 +27,8 @@ public class MercurialTest {
         MercurialInstallation mercurial = ((MercurialInstallation.DescriptorImpl) descriptor).getInstallations()[0];
         Assert.assertEquals("Mercurial 3", mercurial.getName());
         Assert.assertEquals("/mercurial", mercurial.getHome());
-        Assert.assertEquals("[defaults]\n" +
-                "clone = --uncompressed\n" +
-                "bundle = --type none", mercurial.getConfig());
+        Assert.assertEquals(
+                "[defaults]\n" + "clone = --uncompressed\n" + "bundle = --type none", mercurial.getConfig());
         Assert.assertEquals("INSTALLATION/bin/hg", mercurial.getExecutable());
         Assert.assertTrue(mercurial.isUseCaches());
         Assert.assertFalse(mercurial.getDebug());
@@ -43,6 +42,8 @@ public class MercurialTest {
         CommandInstaller installer = installSourceProperty.installers.get(CommandInstaller.class);
         Assert.assertEquals("mercurial", installer.getToolHome());
         Assert.assertEquals("SomeLabel", installer.getLabel());
-        Assert.assertEquals("[ -d mercurial ] || wget -q -O - http://www.archlinux.org/packages/extra/x86_64/mercurial/download/ | xzcat | tar xvf -", installer.getCommand());
+        Assert.assertEquals(
+                "[ -d mercurial ] || wget -q -O - http://www.archlinux.org/packages/extra/x86_64/mercurial/download/ | xzcat | tar xvf -",
+                installer.getCommand());
     }
 }

@@ -41,7 +41,11 @@ public class PrimitiveConfigurator implements Configurator {
     @NonNull
     @Override
     public Object configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
-        return Stapler.lookupConverter(target).convert(target, context.getSecretSourceResolver().resolve(config.asScalar().toString()));
+        return Stapler.lookupConverter(target)
+                .convert(
+                        target,
+                        context.getSecretSourceResolver()
+                                .resolve(config.asScalar().toString()));
     }
 
     @Override
@@ -53,7 +57,9 @@ public class PrimitiveConfigurator implements Configurator {
     @Override
     public CNode describe(Object instance, ConfigurationContext context) {
 
-        if (instance == null) return null;
+        if (instance == null) {
+            return null;
+        }
 
         if (instance instanceof Number) {
             return new Scalar((Number) instance);

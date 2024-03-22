@@ -1,5 +1,8 @@
 package io.jenkins.plugins.casc;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import com.cloudbees.plugins.credentials.SystemCredentialsProvider;
 import com.cloudbees.plugins.credentials.domains.Domain;
 import com.cloudbees.plugins.credentials.domains.DomainCredentials;
@@ -15,18 +18,15 @@ import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.rules.RuleChain;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 /**
  * @author <a href="osdomin@yahoo.es">osdomin</a>
  */
 public class GitLabConfigurationTest {
 
     @Rule
-    public RuleChain chain = RuleChain.outerRule(new EnvironmentVariables()
-        .set("BIND_TOKEN", "qwertyuiopasdfghjklzxcvbnm"))
-        .around(new JenkinsConfiguredWithReadmeRule());
+    public RuleChain chain = RuleChain.outerRule(
+                    new EnvironmentVariables().set("BIND_TOKEN", "qwertyuiopasdfghjklzxcvbnm"))
+            .around(new JenkinsConfiguredWithReadmeRule());
 
     @Test
     @ConfiguredWithReadme("gitlab/README.md")
@@ -37,18 +37,21 @@ public class GitLabConfigurationTest {
         final DomainCredentials gitLabCredential = domainCredentials.get(0);
         assertEquals(Domain.global(), gitLabCredential.getDomain());
         assertEquals(1, gitLabCredential.getCredentials().size());
-        final GitLabApiToken apiToken = (GitLabApiToken)gitLabCredential.getCredentials().get(0);
+        final GitLabApiToken apiToken =
+                (GitLabApiToken) gitLabCredential.getCredentials().get(0);
         assertEquals("gitlab_token", apiToken.getId());
         assertEquals("qwertyuiopasdfghjklzxcvbnm", apiToken.getApiToken().getPlainText());
         assertEquals("Gitlab Token", apiToken.getDescription());
     }
+
     @Test
     @ConfiguredWithReadme("gitlab/README.md")
     public void configure_gitlab_connection() {
         final Jenkins jenkins = Jenkins.get();
         final GitLabConnectionConfig gitLabConnections = jenkins.getDescriptorByType(GitLabConnectionConfig.class);
         assertEquals(1, gitLabConnections.getConnections().size());
-        final GitLabConnection gitLabConnection = gitLabConnections.getConnections().get(0);
+        final GitLabConnection gitLabConnection =
+                gitLabConnections.getConnections().get(0);
         assertEquals("gitlab_token", gitLabConnection.getApiTokenId());
         assertEquals("my_gitlab_server", gitLabConnection.getName());
         assertEquals("autodetect", gitLabConnection.getClientBuilderId());

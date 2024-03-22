@@ -33,7 +33,7 @@ x-ec2_anchor: &ec2_anchor
 jenkins:
   clouds:
     - amazonEC2:
-        cloudName: "ec2"
+        name: "ec2"
         instanceCapStr: 20
         # this shouldn't be needed, since without explicit creds this should already be used
         # but let's be explicit to avoid issues.

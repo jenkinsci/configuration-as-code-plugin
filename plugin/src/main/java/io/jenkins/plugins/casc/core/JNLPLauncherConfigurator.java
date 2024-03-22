@@ -29,8 +29,9 @@ public class JNLPLauncherConfigurator extends DataBoundConfigurator<JNLPLauncher
             // see https://issues.jenkins.io/browse/JENKINS-51603
             final CNode tunnel = config.get("tunnel");
             final CNode vmargs = config.get("vmargs");
-            return new JNLPLauncher(tunnel != null ? tunnel.asScalar().getValue() : null,
-                                    vmargs != null ? vmargs.asScalar().getValue() : null);
+            return new JNLPLauncher(
+                    tunnel != null ? tunnel.asScalar().getValue() : null,
+                    vmargs != null ? vmargs.asScalar().getValue() : null);
         }
     }
 }

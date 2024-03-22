@@ -7,6 +7,7 @@
     <artifactId>parent</artifactId>
     <version>${changelist}</version>
   </parent>
+
   <groupId>io.jenkins</groupId>
   <artifactId>configuration-as-code</artifactId>
   <version>${changelist}</version>
@@ -15,19 +16,6 @@
   <name>Configuration as Code Plugin</name>
   <description>Manage Jenkins configuration as code</description>
   <url>https://github.com/jenkinsci/configuration-as-code-plugin</url>
-
-  <properties>
-    <!-- Breaking changes log
-      In v1.14 we removed Job-DSL support and moved it to job-dsl-plugin. https://github.com/jenkinsci/job-dsl-plugin
-      In v1.18 we removed Credentials support and moved it to credentials-plugin. https://github.com/jenkinsci/credentials-plugin
-      In v1.18 we also removed Role strategy support and moved it to role-strategy-plugin. https://github.com/jenkinsci/role-strategy-plugin
-      In v1.25 we added SECURITY-1446 and SECURITY-1290 which are considered as breaking changes. Others also contain a risk of regressions.
-      In v1.28 we removed vault secret resolver and moved it to the hashicorp-vault-plugin. https://github.com/jenkinsci/hashicorp-vault-plugin
-    -->
-    <hpi.compatibleSinceVersion>1.28</hpi.compatibleSinceVersion>
-    <hpi.pluginChangelogUrl>https://github.com/jenkinsci/configuration-as-code-plugin/releases</hpi.pluginChangelogUrl>
-    <hpi.pluginLogoUrl>https://raw.githubusercontent.com/jenkinsci/configuration-as-code-plugin/master/plugin/src/main/webapp/img/logo-head.svg</hpi.pluginLogoUrl>
-  </properties>
 
   <developers>
     <developer>
@@ -44,28 +32,39 @@
     </developer>
   </developers>
 
+  <scm>
+    <connection>scm:git:https://github.com/jenkinsci/configuration-as-code-plugin.git</connection>
+    <developerConnection>scm:git:git@github.com:jenkinsci/configuration-as-code-plugin.git</developerConnection>
+    <tag>${scmTag}</tag>
+    <url>https://github.com/jenkinsci/configuration-as-code-plugin</url>
+  </scm>
+
+  <properties>
+    <!-- Breaking changes log
+      In v1.14 we removed Job-DSL support and moved it to job-dsl-plugin. https://github.com/jenkinsci/job-dsl-plugin
+      In v1.18 we removed Credentials support and moved it to credentials-plugin. https://github.com/jenkinsci/credentials-plugin
+      In v1.18 we also removed Role strategy support and moved it to role-strategy-plugin. https://github.com/jenkinsci/role-strategy-plugin
+      In v1.25 we added SECURITY-1446 and SECURITY-1290 which are considered as breaking changes. Others also contain a risk of regressions.
+      In v1.28 we removed vault secret resolver and moved it to the hashicorp-vault-plugin. https://github.com/jenkinsci/hashicorp-vault-plugin
+    -->
+    <hpi.compatibleSinceVersion>1.28</hpi.compatibleSinceVersion>
+    <hpi.pluginChangelogUrl>https://github.com/jenkinsci/configuration-as-code-plugin/releases</hpi.pluginChangelogUrl>
+    <hpi.pluginLogoUrl>https://raw.githubusercontent.com/jenkinsci/configuration-as-code-plugin/master/plugin/src/main/webapp/img/logo-head.svg</hpi.pluginLogoUrl>
+  </properties>
+
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.319.x</artifactId>
+        <artifactId>bom-2.414.x</artifactId>
         <version>${plugin-bom.version}</version>
-        <scope>import</scope>
         <type>pom</type>
+        <scope>import</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
 
   <dependencies>
-    <dependency>
-      <groupId>io.jenkins.plugins</groupId>
-      <artifactId>caffeine-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.json</groupId>
-      <artifactId>json</artifactId>
-      <version>20220320</version>
-    </dependency>
     <dependency>
       <groupId>com.google.code.findbugs</groupId>
       <artifactId>jsr305</artifactId>
@@ -73,20 +72,29 @@
     </dependency>
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
+      <artifactId>caffeine-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>commons-text-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>json-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>prism-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.jenkins.plugins</groupId>
       <artifactId>snakeyaml-api</artifactId>
     </dependency>
-
     <dependency>
       <groupId>io.vavr</groupId>
       <artifactId>vavr</artifactId>
       <version>0.10.4</version>
     </dependency>
-
-    <dependency>
-      <groupId>io.jenkins.plugins</groupId>
-      <artifactId>commons-text-api</artifactId>
-    </dependency>
-
     <dependency>
       <groupId>com.github.stefanbirkner</groupId>
       <artifactId>system-rules</artifactId>
@@ -105,10 +113,4 @@
       </plugin>
     </plugins>
   </build>
-  <scm>
-    <connection>scm:git:https://github.com/jenkinsci/configuration-as-code-plugin.git</connection>
-    <developerConnection>scm:git:git@github.com:jenkinsci/configuration-as-code-plugin.git</developerConnection>
-    <url>https://github.com/jenkinsci/configuration-as-code-plugin</url>
-    <tag>${scmTag}</tag>
-  </scm>
 </project>

@@ -13,7 +13,6 @@ import jenkins.model.Jenkins;
  * <p>
  * Variable references are meant to hide secrets from configuration files.
  */
-
 public abstract class SecretSource implements ExtensionPoint {
 
     public void init() {
@@ -42,7 +41,6 @@ public abstract class SecretSource implements ExtensionPoint {
     public abstract Optional<String> reveal(String secret) throws IOException;
 
     public static List<SecretSource> all() {
-        return new ArrayList<>(
-            Jenkins.get().getExtensionList(SecretSource.class));
+        return new ArrayList<>(Jenkins.get().getExtensionList(SecretSource.class));
     }
 }

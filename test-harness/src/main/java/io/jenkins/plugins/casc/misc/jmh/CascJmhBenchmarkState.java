@@ -45,8 +45,9 @@ public abstract class CascJmhBenchmarkState extends JmhBenchmarkState {
             throw new IllegalStateException("The enclosing class must be annotated with @JmhBenchmark");
         }
 
-        String config = Objects.requireNonNull(getEnclosingClass().getResource(getResourcePath()),
-                "Unable to find YAML config file").toExternalForm();
+        String config = Objects.requireNonNull(
+                        getEnclosingClass().getResource(getResourcePath()), "Unable to find YAML config file")
+                .toExternalForm();
         try {
             ConfigurationAsCode.get().configure(config);
         } catch (ConfiguratorException e) {

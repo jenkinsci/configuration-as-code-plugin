@@ -30,7 +30,7 @@ public class ConfigurableConfigurator<T extends Configurable> implements Configu
 
     @NonNull
     @Override
-    public Set<Attribute<T,?>> describe() {
+    public Set<Attribute<T, ?>> describe() {
         return Collections.emptySet();
     }
 
@@ -41,8 +41,12 @@ public class ConfigurableConfigurator<T extends Configurable> implements Configu
             final T instance = target.getDeclaredConstructor().newInstance();
             instance.configure(config);
             return instance;
-        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-            throw new ConfiguratorException("Cannot instantiate Configurable "+target+" with default constructor", e);
+        } catch (InstantiationException
+                | IllegalAccessException
+                | NoSuchMethodException
+                | InvocationTargetException e) {
+            throw new ConfiguratorException(
+                    "Cannot instantiate Configurable " + target + " with default constructor", e);
         }
     }
 
@@ -52,8 +56,12 @@ public class ConfigurableConfigurator<T extends Configurable> implements Configu
             final T instance = target.getDeclaredConstructor().newInstance();
             instance.check(config);
             return instance;
-        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-            throw new ConfiguratorException("Cannot instantiate Configurable "+target+" with default constructor", e);
+        } catch (InstantiationException
+                | IllegalAccessException
+                | NoSuchMethodException
+                | InvocationTargetException e) {
+            throw new ConfiguratorException(
+                    "Cannot instantiate Configurable " + target + " with default constructor", e);
         }
     }
 

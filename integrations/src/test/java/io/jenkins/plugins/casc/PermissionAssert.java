@@ -21,15 +21,14 @@
 
 package io.jenkins.plugins.casc;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+
 import hudson.model.User;
 import hudson.security.ACL;
 import hudson.security.ACLContext;
 import hudson.security.AccessControlled;
 import hudson.security.Permission;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-
 
 /**
  * Provides asserts for {@link hudson.security.Permission} checks.
@@ -37,38 +36,44 @@ import static org.hamcrest.Matchers.equalTo;
  */
 public class PermissionAssert {
 
-    public static void assertHasPermission(User user, final Permission permission, final AccessControlled ... items) {
+    public static void assertHasPermission(User user, final Permission permission, final AccessControlled... items) {
         for (AccessControlled item : items) {
             assertPermission(user, item, permission);
         }
     }
 
-    public static void assertHasPermission(User user, final AccessControlled item, final Permission ... permissions) {
+    public static void assertHasPermission(User user, final AccessControlled item, final Permission... permissions) {
         for (Permission permission : permissions) {
             assertPermission(user, item, permission);
         }
     }
 
-    public static void assertHasNoPermission(User user, final Permission permission, final AccessControlled ... items) {
+    public static void assertHasNoPermission(User user, final Permission permission, final AccessControlled... items) {
         for (AccessControlled item : items) {
             assertNoPermission(user, item, permission);
         }
     }
 
-    public static void assertHasNoPermission(User user, final AccessControlled item, final Permission ... permissions) {
+    public static void assertHasNoPermission(User user, final AccessControlled item, final Permission... permissions) {
         for (Permission permission : permissions) {
             assertNoPermission(user, item, permission);
         }
     }
 
     private static void assertPermission(User user, final AccessControlled item, final Permission p) {
-        assertThat("User '" + user + "' has no " + p.getId() + " permission for " + item + ", but it should according to security settings",
-                hasPermission(user, item, p), equalTo(true));
+        assertThat(
+                "User '" + user + "' has no " + p.getId() + " permission for " + item
+                        + ", but it should according to security settings",
+                hasPermission(user, item, p),
+                equalTo(true));
     }
 
     private static void assertNoPermission(User user, final AccessControlled item, final Permission p) {
-        assertThat("User '" + user + "' has the " + p.getId() + " permission for " + item + ", but it should not according to security settings",
-                hasPermission(user, item, p), equalTo(false));
+        assertThat(
+                "User '" + user + "' has the " + p.getId() + " permission for " + item
+                        + ", but it should not according to security settings",
+                hasPermission(user, item, p),
+                equalTo(false));
     }
 
     private static boolean hasPermission(User user, final AccessControlled item, final Permission p) {

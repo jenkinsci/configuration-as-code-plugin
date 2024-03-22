@@ -1,14 +1,14 @@
 package io.jenkins.plugins.casc;
 
-import java.util.Set;
-import org.junit.Rule;
-import org.junit.Test;
-import org.jvnet.hudson.test.JenkinsRule;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThrows;
+
+import java.util.Set;
+import org.junit.Rule;
+import org.junit.Test;
+import org.jvnet.hudson.test.JenkinsRule;
 
 public class UnknownRootElementTest {
     @Rule
@@ -16,18 +16,20 @@ public class UnknownRootElementTest {
 
     @Test
     public void oneUnknown() {
-        assertThrows("No configurator for the following root elements alice",
-            ConfiguratorException.class,
-            () -> ConfigurationAsCode.get()
-                .configure(getClass().getResource("unknown1.yml").toExternalForm()));
+        assertThrows(
+                "No configurator for the following root elements alice",
+                ConfiguratorException.class,
+                () -> ConfigurationAsCode.get()
+                        .configure(getClass().getResource("unknown1.yml").toExternalForm()));
     }
 
     @Test
     public void twoUnknown() {
-        assertThrows("No configurator for the following root elements bob, alice",
-            ConfiguratorException.class,
-            () -> ConfigurationAsCode.get()
-                .configure(getClass().getResource("unknown2.yml").toExternalForm()));
+        assertThrows(
+                "No configurator for the following root elements bob, alice",
+                ConfiguratorException.class,
+                () -> ConfigurationAsCode.get()
+                        .configure(getClass().getResource("unknown2.yml").toExternalForm()));
     }
 
     @Test

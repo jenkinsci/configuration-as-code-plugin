@@ -76,17 +76,15 @@ public class ExtraFieldUtils extends org.apache.commons.lang.reflect.FieldUtils 
         // incase there is a public supersuperclass field hidden by a private/package
         // superclass field.
         Field match = null;
-        for (Iterator intf = ClassUtils.getAllInterfaces(cls).iterator(); intf
-                .hasNext();) {
+        for (Iterator intf = ClassUtils.getAllInterfaces(cls).iterator(); intf.hasNext(); ) {
             try {
                 Field test = ((Class) intf.next()).getField(fieldName);
                 if (match != null) {
-                    throw new IllegalArgumentException(
-                            "Reference to field "
-                                    + fieldName
-                                    + " is ambiguous relative to "
-                                    + cls
-                                    + "; a matching field exists on two or more implemented interfaces.");
+                    throw new IllegalArgumentException("Reference to field "
+                            + fieldName
+                            + " is ambiguous relative to "
+                            + cls
+                            + "; a matching field exists on two or more implemented interfaces.");
                 }
                 match = test;
             } catch (NoSuchFieldException ex) {
@@ -95,5 +93,4 @@ public class ExtraFieldUtils extends org.apache.commons.lang.reflect.FieldUtils 
         }
         return match;
     }
-
 }

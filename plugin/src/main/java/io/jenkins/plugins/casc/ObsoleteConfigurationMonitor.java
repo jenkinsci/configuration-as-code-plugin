@@ -2,12 +2,10 @@ package io.jenkins.plugins.casc;
 
 import hudson.Extension;
 import hudson.model.AdministrativeMonitor;
-import hudson.util.VersionNumber;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Source;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import jenkins.model.Jenkins;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
@@ -28,7 +26,6 @@ public class ObsoleteConfigurationMonitor extends AdministrativeMonitor {
     public List<Error> getErrors() {
         return errors;
     }
-
 
     public void reset() {
         errors.clear();
@@ -53,10 +50,6 @@ public class ObsoleteConfigurationMonitor extends AdministrativeMonitor {
     }
 
     public String getCss() {
-        final VersionNumber version = Jenkins.getVersion();
-        if (version == null || version.isNewerThan(new VersionNumber("2.103"))) {
-            return "alert alert-warning";
-        }
-        return "warning";
+        return "alert alert-warning";
     }
 }
