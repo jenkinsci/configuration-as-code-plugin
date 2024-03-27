@@ -254,16 +254,6 @@ You can find some examples here
 1. [kubernetes-plugin](https://github.com/jenkinsci/kubernetes-plugin/blob/master/src/test/resources/org/csanchez/jenkins/plugins/kubernetes/casc/configuration-as-code.yaml)
 2. [azure-cosmosdb-plugin](https://github.com/jenkinsci/azure-cosmosdb-plugin/blob/main/src/test/resources/io/jenkins/plugins/azurecosmosdb/configuration-as-code.yml)
 
-Some general advice for creating the `configuration-as-code.yml` are:-
-
-1. **Identify Settings** : Decide what settings you need.
-2. **Learn YAML Syntax** : Understand YAML, the file format.
-3. **Create YAML File** : Make a new `configuration-as-code.yml` file.
-4. **Define Settings** : Write down your settings using YAML.
-5. **Include Plugin-Specifics** : Add any plugin-specific settings.
-6. **Check Validity** : Make sure your YAML is correct.
-7. **Adjust as Needed** : Modify the YAML based on feedback or changes.
-
 ### Backward compatibility test
 
 About the latter, in case you need to introduce some breaking changes, you can define a backward compatibility test case:
