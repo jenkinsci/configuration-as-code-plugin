@@ -218,12 +218,6 @@ Add the Configuration as Code plugin as a test dependency in your pom.xml:
 </dependency>
 ```
 
-#### Configuration-as-code.yml
-
-##### **Location of configuration-as-code.yml:**
-
-The `configuration-as-code.yml` file should be located within the test resources directory (`src/test/resources`) of your project repository. Specifically, it should be placed in the same directory where your test classes reside.
-
 ### Configuration test
 
 Add a new test case to load a reference configuration YAML file designed to set configurable properties of your plugin:
@@ -250,6 +244,25 @@ public class ConfigurationAsCodeTest {
 
 Doing so, you will confirm JCasC is able to introspect your plugin and build the expected configuration data model, but also detect
 some changes made to your plugin break this configuration model.
+
+**Location of configuration-as-code.yml:**
+
+The `configuration-as-code.yml` file should be located within the test resources directory (`src/test/resources`) of your project repository. Specifically, it should be placed in the same directory where your test classes reside.
+
+You can find some examples here
+
+1. [kubernetes-plugin](https://github.com/jenkinsci/kubernetes-plugin/blob/master/src/test/resources/org/csanchez/jenkins/plugins/kubernetes/casc/configuration-as-code.yaml)
+2. [azure-cosmosdb-plugin](https://github.com/jenkinsci/azure-cosmosdb-plugin/blob/main/src/test/resources/io/jenkins/plugins/azurecosmosdb/configuration-as-code.yml)
+
+Some general advice for creating the `configuration-as-code.yml` are:-
+
+1. **Identify Settings** : Decide what settings you need.
+2. **Learn YAML Syntax** : Understand YAML, the file format.
+3. **Create YAML File** : Make a new `configuration-as-code.yml` file.
+4. **Define Settings** : Write down your settings using YAML.
+5. **Include Plugin-Specifics** : Add any plugin-specific settings.
+6. **Check Validity** : Make sure your YAML is correct.
+7. **Adjust as Needed** : Modify the YAML based on feedback or changes.
 
 ### Backward compatibility test
 
