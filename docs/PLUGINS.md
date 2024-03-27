@@ -222,33 +222,7 @@ Add the Configuration as Code plugin as a test dependency in your pom.xml:
 
 ##### **Location of configuration-as-code.yml:**
 
-By default, the YAML file for the CasC configuration is located in $JENKINS_HOME/jenkins.yaml. The location and name of the file being used is displayed on the Configuration as Code UI page. You can specify a different file to view by typing the full pathname into the Path or URL field.
-
-You can specify a different location or a different file name for the creation of the JCasC YAML file by doing either of the following:
-
-* Populate the `CASC_JENKINS_CONFIG` environment variable to point to a comma-separated list that defines where configuration files are located.
-* Use the `casc.jenkins.config` Java property to control the file name and location. This is useful when installing Jenkins via a package management tool. Most package management systems support configuration files that are retained across upgrades. It is best to not modify a file installed by a package manager because it could be overwritten by an update.
-  On Linux systems, you can run `systemctl edit jenkins` and add the following:
-
-  ```
-  [Service]
-  Environment="JAVA_OPTS=-Dcasc.jenkins.config=/jenkins/casc_configs"
-  ```
-
-The file location and name can be specified as any of the following:
-
-* Path to a folder containing a set of config files such as `/var/jenkins_home/casc_configs`.
-* A full path to a single file such as `/var/jenkins_home/casc_configs/jenkins.yaml`.
-* A URL pointing to a file served on the web such as `<a href="https://acme.org/jenkins.yaml" class="bare">https://acme.org/jenkins.yaml</a>`.
-
-The value of the `CASC_JENKINS_CONFIG` variable is unpacked according to the following rules:
-
-* If an element of `CASC_JENKINS_CONFIG` points to a folder, the plugin recursively traverses the folder to find file(s) with the .yml, .yaml, .YAML, or .YML suffix.
-* It excludes hidden files or files that contain a hidden folder (such as/ `jenkins/casc_configs/.dir1/config.yaml`) in **any part** of the full path.
-* It follows symbolic links for both files and directories.
-* The order of traversal does not matter to the final outcome because all configuration files that are discovered MUST be supplementary. If a file attempts to overwrite configuration values from another file, it creates a conflict and raises a `ConfiguratorException`.
-
-For more inforomation you can checkout [here](https://www.jenkins.io/doc/book/managing/casc/#configuration-as-code).
+The `configuration-as-code.yml` file should be located within the test resources directory (`src/test/resources`) of your project repository. Specifically, it should be placed in the same directory where your test classes reside.
 
 ### Configuration test
 
