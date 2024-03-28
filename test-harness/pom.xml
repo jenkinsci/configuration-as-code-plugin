@@ -86,6 +86,29 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>display-info</id>
+            <configuration>
+              <rules>
+                <bannedDependencies>
+                  <includes combine.children="append">
+                    <include>org.jenkins-ci.main:jenkins-test-harness</include>
+                  </includes>
+                </bannedDependencies>
+                <requireUpperBoundDeps>
+                  <excludes combine.children="append">
+                    <exclude>org.json:json</exclude>
+                  </excludes>
+                </requireUpperBoundDeps>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.jenkins-ci.tools</groupId>
         <artifactId>maven-hpi-plugin</artifactId>
         <extensions>true</extensions>
