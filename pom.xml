@@ -42,7 +42,7 @@
     <jenkins.version>2.414.3</jenkins.version>
     <tagNameFormat>configuration-as-code-@{project.version}</tagNameFormat>
     <useBeta>true</useBeta>
-    <plugin-bom.version>2928.ved44ea_84e034</plugin-bom.version>
+    <plugin-bom.version>2950.va_633b_f42f759</plugin-bom.version>
     <spotless.check.skip>false</spotless.check.skip>
   </properties>
 
