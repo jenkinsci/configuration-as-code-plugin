@@ -304,7 +304,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>msbuild</artifactId>
-      <version>1.31</version>
+      <version>1.32</version>
       <scope>test</scope>
     </dependency>
     <dependency>
