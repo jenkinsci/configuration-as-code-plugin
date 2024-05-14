@@ -33,7 +33,7 @@ public class DockerSecretSource extends SecretSource {
             return Optional.empty();
         }
         final File file = new File(secrets, secret);
-        if (file.exists()) {
+        if (file.isFile()) {
             return Optional.of(
                     FileUtils.readFileToString(file, StandardCharsets.UTF_8).trim());
         }
