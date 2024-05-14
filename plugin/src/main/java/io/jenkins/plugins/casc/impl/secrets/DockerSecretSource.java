@@ -36,6 +36,8 @@ public class DockerSecretSource extends SecretSource {
         if (file.isFile()) {
             return Optional.of(
                     FileUtils.readFileToString(file, StandardCharsets.UTF_8).trim());
+        } else if (file.exists()) {
+            throw new IOException("Cannot load non-file " + file);
         }
         return Optional.empty();
     }
