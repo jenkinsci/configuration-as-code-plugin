@@ -56,7 +56,7 @@
     <dependencies>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.414.x</artifactId>
+        <artifactId>bom-2.426.x</artifactId>
         <version>${plugin-bom.version}</version>
         <type>pom</type>
         <scope>import</scope>
@@ -65,11 +65,6 @@
   </dependencyManagement>
 
   <dependencies>
-    <dependency>
-      <groupId>com.google.code.findbugs</groupId>
-      <artifactId>jsr305</artifactId>
-      <version>3.0.2</version>
-    </dependency>
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>caffeine-api</artifactId>
