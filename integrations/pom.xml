@@ -13,16 +13,14 @@
   <properties>
     <!-- no need to be deployed during release, this is a test-only module -->
     <maven.deploy.skip>true</maven.deploy.skip>
-    <!-- I give up, too much effort to maintain enforcer here, should probably try clear out all enforcer only deps and see if it works -->
-    <enforcer.skip>true</enforcer.skip>
-    <jenkins.version>2.440.2</jenkins.version>
+    <jenkins.version>2.452.1</jenkins.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.440.x</artifactId>
+        <artifactId>bom-2.452.x</artifactId>
         <version>${plugin-bom.version}</version>
         <type>pom</type>
         <scope>import</scope>
@@ -107,13 +105,6 @@
       <groupId>org.jenkins-ci.main</groupId>
       <artifactId>maven-plugin</artifactId>
       <scope>test</scope>
-      <exclusions>
-        <!-- Provided by Jenkins core -->
-        <exclusion>
-          <groupId>javax.annotation</groupId>
-          <artifactId>javax.annotation-api</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.modules</groupId>
@@ -135,41 +126,12 @@
       <artifactId>artifactory</artifactId>
       <version>4.0.6</version>
       <scope>test</scope>
-      <exclusions>
-        <!-- RequireUpperBoundDeps with apache-httpcomponents-client-4-api plugin -->
-        <exclusion>
-          <groupId>org.apache.httpcomponents</groupId>
-          <artifactId>httpclient</artifactId>
-        </exclusion>
-        <!-- RequireUpperBoundDeps with pipeline-groovy-lib plugin -->
-        <exclusion>
-          <groupId>org.apache.ivy</groupId>
-          <artifactId>ivy</artifactId>
-        </exclusion>
-        <!-- Provided by bouncycastle-api-plugin -->
-        <exclusion>
-          <groupId>org.bouncycastle</groupId>
-          <artifactId>bcpkix-jdk15on</artifactId>
-        </exclusion>
-        <exclusion>
-          <!-- Found Banned Dependency: org.sonatype.sisu:sisu-guice:jar:no_aop:3.2.5 -->
-          <groupId>org.jfrog.buildinfo</groupId>
-          <artifactId>build-info-extractor-maven3</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>azure-keyvault</artifactId>
       <version>251.vcfe31c013dc7</version>
       <scope>test</scope>
-      <exclusions>
-        <!-- RequireUpperBoundDeps with docker-plugin -->
-        <exclusion>
-          <groupId>com.azure</groupId>
-          <artifactId>azure-core-http-netty</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
@@ -288,13 +250,6 @@
       <artifactId>mesos</artifactId>
       <version>1.0.0</version>
       <scope>test</scope>
-      <exclusions>
-        <!-- RequireUpperBoundDeps with sonar plugin -->
-        <exclusion>
-          <groupId>com.google.protobuf</groupId>
-          <artifactId>protobuf-java</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
@@ -362,13 +317,6 @@
       <artifactId>terraform</artifactId>
       <version>1.0.10</version>
       <scope>test</scope>
-      <exclusions>
-        <!-- Exclude Banned Dependency -->
-        <exclusion>
-          <groupId>javax.servlet</groupId>
-          <artifactId>servlet-api</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
@@ -385,18 +333,6 @@
       <artifactId>statistics-gatherer</artifactId>
       <version>2.0.3</version>
       <scope>test</scope>
-      <exclusions>
-        <!-- Provided by aws-java-sdk-sns plugin -->
-        <exclusion>
-          <groupId>com.amazonaws</groupId>
-          <artifactId>aws-java-sdk-sns</artifactId>
-        </exclusion>
-        <!-- RequireUpperBoundDeps with apache-httpcomponents-client-4-api plugin -->
-        <exclusion>
-          <groupId>org.apache.httpcomponents</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
   </dependencies>
 
