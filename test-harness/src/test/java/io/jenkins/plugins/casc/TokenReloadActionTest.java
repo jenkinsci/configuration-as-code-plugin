@@ -11,11 +11,12 @@ import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.Response;
+import javax.servlet.http.HttpServletResponse;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,45 +45,12 @@ public class TokenReloadActionTest {
     @Rule
     public RuleChain chain = RuleChain.outerRule(environment).around(j);
 
-    private ServletResponseSpy response;
-
-    private static class ServletResponseSpy extends Response {
-        private int error = 200;
-
-        public ServletResponseSpy() {
-            super(null, null);
-        }
-
-        @Override
-        public void sendError(int sc) {
-            error = sc;
-        }
-
-        @Override
-        public int getStatus() {
-            return error;
-        }
-    }
-
-    private static class RequestStub extends Request {
-        private final String authorization;
-
-        public RequestStub(String authorization) {
-            super(null, null);
-            this.authorization = authorization;
-        }
-
-        @Override
-        public String getParameter(String name) {
-            if (TokenReloadAction.RELOAD_TOKEN_QUERY_PARAMETER.equals(name)) {
-                return authorization;
-            }
-            return super.getHeader(name);
-        }
-    }
+    private HttpServletResponse response;
 
     private RequestImpl newRequest(String authorization) {
-        return new RequestImpl(null, new RequestStub(authorization), Collections.emptyList(), null);
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put(TokenReloadAction.RELOAD_TOKEN_QUERY_PARAMETER, authorization);
+        return new RequestImpl(null, new MockHttpServletRequest(parameters), Collections.emptyList(), null);
     }
 
     private boolean configWasReloaded() {
@@ -116,7 +84,7 @@ public class TokenReloadActionTest {
     @Before
     public void setUp() {
         tokenReloadAction = new TokenReloadAction();
-        response = new ServletResponseSpy();
+        response = new MockHttpServletResponse();
         loggerRule.record(TokenReloadAction.class, Level.ALL);
         loggerRule.capture(3);
         lastTimeLoaded = ConfigurationAsCode.get().getLastTimeLoaded();
