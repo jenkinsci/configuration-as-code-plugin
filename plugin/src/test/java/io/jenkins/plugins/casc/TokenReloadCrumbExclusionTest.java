@@ -4,7 +4,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.eclipse.jetty.server.Request;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.RestoreSystemProperties;
@@ -14,22 +13,13 @@ public class TokenReloadCrumbExclusionTest {
     @Rule
     public final RestoreSystemProperties restoreSystemProperties = new RestoreSystemProperties();
 
-    private Request newRequestWithPath(String hello) {
-        return new Request(null, null) {
-            @Override
-            public String getPathInfo() {
-                return hello;
-            }
-        };
-    }
-
     @Test
     public void crumbExclusionIsDisabledByDefault() throws Exception {
         System.clearProperty("casc.reload.token");
 
         TokenReloadCrumbExclusion crumbExclusion = new TokenReloadCrumbExclusion();
 
-        assertFalse(crumbExclusion.process(newRequestWithPath("/reload-configuration-as-code/"), null, null));
+        assertFalse(crumbExclusion.process(new MockHttpServletRequest("/reload-configuration-as-code/"), null, null));
     }
 
     @Test
@@ -38,7 +28,7 @@ public class TokenReloadCrumbExclusionTest {
 
         TokenReloadCrumbExclusion crumbExclusion = new TokenReloadCrumbExclusion();
 
-        assertFalse(crumbExclusion.process(newRequestWithPath("/reload-configuration-as-code/2"), null, null));
+        assertFalse(crumbExclusion.process(new MockHttpServletRequest("/reload-configuration-as-code/2"), null, null));
     }
 
     @Test
@@ -49,7 +39,7 @@ public class TokenReloadCrumbExclusionTest {
 
         AtomicBoolean callProcessed = new AtomicBoolean(false);
         assertTrue(crumbExclusion.process(
-                newRequestWithPath("/reload-configuration-as-code/"),
+                new MockHttpServletRequest("/reload-configuration-as-code/"),
                 null,
                 (request, response) -> callProcessed.set(true)));
 

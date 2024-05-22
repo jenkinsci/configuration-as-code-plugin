@@ -2,13 +2,13 @@ package io.jenkins.plugins.casc.yaml;
 
 import static org.junit.Assert.assertEquals;
 
+import io.jenkins.plugins.casc.MockHttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import javax.servlet.http.HttpServletRequest;
-import org.eclipse.jetty.server.Request;
 import org.junit.Test;
 
 public class YamlSourceTest {
@@ -44,12 +44,7 @@ public class YamlSourceTest {
 
     @Test
     public void shouldHaveInformativeToStringForRequestSource() {
-        Request request = new Request(null, null) {
-            @Override
-            public String getPathInfo() {
-                return "/configuration-as-code/check";
-            }
-        };
+        HttpServletRequest request = new MockHttpServletRequest("/configuration-as-code/check");
         YamlSource<HttpServletRequest> yamlSource = YamlSource.of(request);
         assertEquals("YamlSource: /configuration-as-code/check", yamlSource.toString());
     }
