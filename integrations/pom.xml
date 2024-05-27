@@ -161,7 +161,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>ec2</artifactId>
-      <version>1648.vf3d852e00486</version>
+      <version>1688.v8c07e01d657f</version>
       <scope>test</scope>
     </dependency>
     <dependency>
