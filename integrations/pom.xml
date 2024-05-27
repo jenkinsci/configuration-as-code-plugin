@@ -61,7 +61,7 @@
     <dependency>
       <groupId>io.jenkins.docker</groupId>
       <artifactId>docker-plugin</artifactId>
-      <version>1.6</version>
+      <version>1.6.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
