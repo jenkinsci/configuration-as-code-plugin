@@ -124,7 +124,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>artifactory</artifactId>
-      <version>4.0.6</version>
+      <version>4.0.7</version>
       <scope>test</scope>
     </dependency>
     <dependency>
