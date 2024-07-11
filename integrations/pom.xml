@@ -13,7 +13,7 @@
   <properties>
     <!-- no need to be deployed during release, this is a test-only module -->
     <maven.deploy.skip>true</maven.deploy.skip>
-    <jenkins.version>2.452.2</jenkins.version>
+    <jenkins.version>2.452.3</jenkins.version>
   </properties>
 
   <dependencyManagement>
