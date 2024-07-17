@@ -24,7 +24,7 @@ jenkins:
               - "Overall/Read"
               - "Job/Read"
             entries:
-              - user: "authenticated"
+              - group: "authenticated"
         items:
           - name: "FolderA"
             description: "Jobs in Folder A, but not the folder itself"
