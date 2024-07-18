@@ -68,6 +68,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
@@ -204,7 +205,10 @@ public class ConfigurationAsCode extends ManagementLink {
         }
         request.setAttribute("invalidAttribute", cause.getInvalidAttribute());
         request.setAttribute("validAttributes", cause.getValidAttributes());
-        request.getView(ConfigurationAsCode.class, "error.jelly").forward(request, response);
+        RequestDispatcher view = request.getView(ConfigurationAsCode.class, "error.jelly");
+        if (view != null) {
+            view.forward(request, response);
+        }
     }
 
     @RequirePOST
