@@ -194,7 +194,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>github-oauth</artifactId>
-      <version>597.ve0c3480fcb_d0</version>
+      <version>611.v70d151e60ec4</version>
       <scope>test</scope>
     </dependency>
     <dependency>
