@@ -1,0 +1,84 @@
+.configurator {
+  margin-top: 30px;
+}
+
+.configurator__name {
+  font-size: 1.5em;
+}
+
+.configurator-pointer {
+  font-size: 0.5em;
+  color: #454545;
+  font-weight: 100;
+}
+
+.root-configurator-pointer {
+  font-size: 0.5em;
+  color: #7f5200;
+  font-weight: 100;
+}
+
+.configurator-attributes {
+  display: flex;
+  flex-direction: column;
+}
+
+.configurator-attribute {
+  display: flex;
+  flex-grow: 1;
+  margin-left: 25px;
+  border-left: 1px solid #ccc;
+  line-height: 24px;
+}
+
+.configurator-attribute__name {
+  display: flex;
+  flex-direction: column;
+  flex-basis: 30%;
+  min-height: 30px;
+  padding-top: 5px;
+}
+
+.attribute-name {
+  display:flex;
+}
+
+.attribute-name:before {
+  content: '';
+  display: block;
+  margin-right: 10px;
+  border-top: 1px solid #ccc;
+  width: 10px;
+  margin-top: 12px;
+}
+
+
+.attribute-name:after {
+  content: '';
+  display: block;
+  margin-left: 10px;
+  border-top: 1px dashed #ccc;
+  flex: 1;
+  margin-top: 12px;
+}
+
+.configurator-attribute__details {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 5px;
+}
+
+.attribute-type {
+  color: #454545;
+}
+
+.attribute-type__list {
+  color: #999;
+  margin-right: 5px;
+}
+
+.attribute-type__class {
+  font-family: Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+  font-size: 0.8em;
+}

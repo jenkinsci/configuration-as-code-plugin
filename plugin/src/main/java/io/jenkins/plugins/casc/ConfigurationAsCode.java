@@ -265,9 +265,9 @@ public class ConfigurationAsCode extends ManagementLink {
 
     @POST
     @Restricted(NoExternalUse.class)
-    public FormValidation doCheckNewSource(@QueryParameter String newSource) {
+    public FormValidation doCheckNewSource(@QueryParameter String value) {
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
-        String normalizedSource = Util.fixEmptyAndTrim(newSource);
+        String normalizedSource = Util.fixEmptyAndTrim(value);
         if (normalizedSource == null) {
             return FormValidation.ok(); // empty, do nothing
         }
