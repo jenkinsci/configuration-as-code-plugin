@@ -159,7 +159,7 @@ public abstract class RoundTripAbstractTest {
         // Call the check url
         JenkinsRule.WebClient client = r.j.createWebClient();
         WebRequest request = new WebRequest(client.createCrumbedUrl("configuration-as-code/checkNewSource"), POST);
-        NameValuePair param = new NameValuePair("newSource", f.toURI().toURL().toExternalForm());
+        NameValuePair param = new NameValuePair("value", f.toURI().toURL().toExternalForm());
         request.setRequestParameters(Collections.singletonList(param));
         WebResponse response = client.loadWebResponse(request);
         assertEquals("Failed to POST to " + request.getUrl().toString(), 200, response.getStatusCode());
