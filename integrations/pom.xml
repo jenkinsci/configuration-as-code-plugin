@@ -221,7 +221,6 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>job-dsl</artifactId>
-      <version>1.89</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -271,7 +270,6 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>nodejs</artifactId>
-      <version>1.6.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
