@@ -4,7 +4,7 @@ The plugin supports exporting existing configurations as YAML.
 This can be achieved with the following options:
 
 * Accessing the `http://[your_jenkins_url]/configuration-as-code/` URL as a Jenkins administrators and pressing `Download Configuration`
-* Running the following in a Groovy script:
+* Running the following in a Groovy script (not recommended, uses internal APIs):
 
       import io.jenkins.plugins.casc.ConfigurationAsCode
       def stream = new ByteArrayOutputStream()
