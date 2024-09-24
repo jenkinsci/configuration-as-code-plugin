@@ -1,7 +1,15 @@
 # Exporting configurations
 
 The plugin supports exporting existing configurations as YAML.
-This is a feature available to the Jenkins administrators under the `http://[your_jenkins_url]/configuration-as-code/` URL.
+This can be achieved with the following options:
+
+* Accessing the `http://[your_jenkins_url]/configuration-as-code/` URL as a Jenkins administrators and pressing `Download Configuration`
+* Running the following in a Groovy script (not recommended, uses internal APIs):
+
+      import io.jenkins.plugins.casc.ConfigurationAsCode
+      def stream = new ByteArrayOutputStream()
+      ConfigurationAsCode.get().export(stream)
+      println stream.toString()
 
 Export feature is **NOT** intended to offer a directly usable jenkins.yaml configuration. 
 It can be used for inspiration writing your own production-ready YAML, but be aware that export can be partial, 
