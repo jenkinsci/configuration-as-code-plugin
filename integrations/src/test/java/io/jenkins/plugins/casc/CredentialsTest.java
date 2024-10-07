@@ -37,7 +37,7 @@ public class CredentialsTest {
 
     @ConfiguredWithCode("GlobalCredentials.yml")
     @Test
-    public void testGlobalScopedCredentials() {
+    public void testGlobalScopedCredentials() throws Exception {
         List<StandardUsernamePasswordCredentials> creds = CredentialsProvider.lookupCredentials(
                 StandardUsernamePasswordCredentials.class, Jenkins.getInstanceOrNull(), null, Collections.emptyList());
         assertThat(creds.size(), is(1));
@@ -60,7 +60,7 @@ public class CredentialsTest {
 
     @ConfiguredWithCode("CredentialsWithDomain.yml")
     @Test
-    public void testDomainScopedCredentials() {
+    public void testDomainScopedCredentials() throws Exception {
         List<StandardUsernamePasswordCredentials> creds = CredentialsProvider.lookupCredentials(
                 StandardUsernamePasswordCredentials.class, Jenkins.getInstanceOrNull(), null, Collections.emptyList());
         assertThat(creds.size(), is(1));
@@ -149,7 +149,7 @@ public class CredentialsTest {
 
     @Test
     @Issue("SECURITY-1404")
-    public void checkUsernamePasswordIsSecret() {
+    public void checkUsernamePasswordIsSecret() throws Exception {
         Attribute a = getFromDatabound(UsernamePasswordCredentialsImpl.class, "password");
         assertTrue(
                 "Attribute 'password' should be secret",
