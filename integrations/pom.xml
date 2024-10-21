@@ -73,7 +73,7 @@
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>artifact-manager-s3</artifactId>
-      <version>871.v72f7f642a_245</version>
+      <version>878.v84f6f8f9dce7</version>
       <scope>test</scope>
     </dependency>
     <dependency>
