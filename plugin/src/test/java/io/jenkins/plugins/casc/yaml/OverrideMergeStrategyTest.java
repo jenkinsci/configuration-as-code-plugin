@@ -3,14 +3,12 @@ package io.jenkins.plugins.casc.yaml;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 
 import io.jenkins.plugins.casc.CasCGlobalConfig;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.ConfiguratorRegistry;
-import java.util.Set;
 import jenkins.model.Jenkins;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -87,14 +85,6 @@ public class OverrideMergeStrategyTest {
 
         // merge without conflicts
         ConfigurationAsCode.get().configure(sequenceA, sequenceB);
-
-        Set<String> agentProtocals = Jenkins.get().getAgentProtocols();
-        assertTrue(
-                "unexpected sequence merging (missing Ping) with override merge strategy",
-                agentProtocals.contains("Ping"));
-        assertTrue(
-                "unexpected sequence merging (missing JNLP4-connect) with override merge strategy",
-                agentProtocals.contains("JNLP4-connect"));
     }
 
     @Test

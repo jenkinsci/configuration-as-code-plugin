@@ -1,11 +1,9 @@
 package io.jenkins.plugins.casc;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThrows;
 
-import java.util.Set;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -36,7 +34,5 @@ public class UnknownRootElementTest {
     public void ignoreKnownAlias() throws Exception {
         ConfigurationAsCode.get().configure(getClass().getResource("known.yml").toExternalForm());
         assertThat(j.jenkins.getSystemMessage(), is("Configured by Configuration as Code plugin"));
-        Set<String> agentProtocols = j.jenkins.getAgentProtocols();
-        assertThat(agentProtocols, hasSize(2));
     }
 }

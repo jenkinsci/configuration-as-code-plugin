@@ -5,5 +5,3 @@ jenkins:
         env:
           - key: VARIABLE1
             value: foo
-  agentProtocols:
-    - "JNLP4-connect"
