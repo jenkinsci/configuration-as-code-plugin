@@ -517,7 +517,6 @@ public class Attribute<Owner, Type> {
                 o = collection.toArray((Object[]) Array.newInstance(type, collection.size()));
 
                 // if setter expect a Set, convert Collection to Set
-                // see jenkins.agentProtocols
             } else if (c.isAssignableFrom(Set.class)) {
                 o = new HashSet((Collection) value);
             }

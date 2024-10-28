@@ -73,8 +73,6 @@ jenkins:
               workDirPath: "/tmp"
 
   slaveAgentPort: 50000
-  agentProtocols:
-    - "jnlp2"
 
 tool:
   git:

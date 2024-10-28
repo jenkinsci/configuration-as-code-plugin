@@ -57,12 +57,6 @@
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>jackson2-api</artifactId>
     </dependency>
-    <!-- Needed for AgentProtocolsTest -->
-    <dependency>
-      <groupId>org.jenkins-ci.modules</groupId>
-      <artifactId>instance-identity</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <build>

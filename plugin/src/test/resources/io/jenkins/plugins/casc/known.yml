@@ -4,6 +4,3 @@ x-alias:
 
 jenkins:
   <<: *message
-  agentProtocols:
-    - JNLP4-connect
-    - Ping
