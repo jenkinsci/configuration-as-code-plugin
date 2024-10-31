@@ -1,0 +1,56 @@
+scms:
+  github:
+    kind: github
+    spec:
+      user: '{{ .github.user }}'
+      email: '{{ .github.email }}'
+      owner: '{{ .github.owner }}'
+      repository: '{{ .github.repository }}'
+      branch: '{{ .github.branch }}'
+      username: '{{ .github.username }}'
+      token: '{{ requiredEnv .github.token }}'
+sources:
+  jenkins:
+    name: Get Last jenkins Weekly Version
+    kind: jenkins
+    spec:
+      release: stable
+      github:
+        token: '{{ requiredEnv .github.token }}'
+        username: '{{ .github.username }}'
+  current-jenkins:
+    name: Get Current jenkins Version
+    kind: shell
+    spec:
+      command: pwsh -NoProfile -File {{ requiredEnv "GITHUB_WORKSPACE" }}/updatecli/current-jenkins.ps1 -PomPath integrations/pom.xml
+conditions:
+  jenkins:
+    name: Test if Jenkins stable published
+    kind: maven
+    sourceid: jenkins
+    spec:
+      url: repo.jenkins-ci.org
+      repository: releases
+      groupId: org.jenkins-ci.main
+      artifactId: jenkins-war
+targets:
+  jenkins:
+    name: Update Jenkins version
+    sourceid: jenkins
+    scmid: github
+    kind: shell
+    spec:
+      command: pwsh -NoProfile -File {{ requiredEnv "GITHUB_WORKSPACE" }}/updatecli/update-jenkins.ps1 -PomPath integrations/pom.xml -NewVersion
+pullrequests:
+  jenkins:
+    title: Bump jenkins.version from {{ source "current-jenkins" }} to {{ source "jenkins" }}
+    kind: github
+    scmid: github
+    targets:
+    - jenkins
+    spec:
+      labels:
+      - dependencies
+      automerge: true
+      mergemethod: squash
+      usetitleforautomerge: true
