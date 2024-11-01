@@ -1,11 +1,11 @@
 package io.jenkins.plugins.casc;
 
-import java.io.PrintWriter;
-import java.util.Collection;
-import java.util.Locale;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.PrintWriter;
+import java.util.Collection;
+import java.util.Locale;
 
 public class MockHttpServletResponse implements HttpServletResponse {
 
