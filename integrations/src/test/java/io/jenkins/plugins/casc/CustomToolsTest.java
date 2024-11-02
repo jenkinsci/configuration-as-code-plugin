@@ -1,5 +1,8 @@
 package io.jenkins.plugins.casc;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import com.cloudbees.jenkins.plugins.customtools.CustomTool;
 import com.cloudbees.jenkins.plugins.customtools.CustomTool.DescriptorImpl;
 import hudson.tools.CommandInstaller;
@@ -11,9 +14,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
@@ -22,7 +22,9 @@ public class CustomToolsTest {
     @Rule
     public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 
-    @Test @Issue("#97") @Ignore
+    @Test
+    @Issue("#97")
+    @Ignore
     @ConfiguredWithCode(value = "CustomToolsTest.yml")
     public void configure_custom_tools() {
         DescriptorImpl descriptor = (DescriptorImpl) j.jenkins.getDescriptorOrDie(CustomTool.class);

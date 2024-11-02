@@ -5,13 +5,13 @@ import hudson.Extension;
 import hudson.model.UnprotectedRootAction;
 import hudson.security.ACL;
 import hudson.security.ACLContext;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.logging.Logger;
-import javax.servlet.http.HttpServletRequest;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.StaplerRequest2;
+import org.kohsuke.stapler.StaplerResponse2;
 import org.kohsuke.stapler.interceptor.RequirePOST;
 
 @Extension
@@ -42,7 +42,7 @@ public class TokenReloadAction implements UnprotectedRootAction {
     }
 
     @RequirePOST
-    public void doIndex(StaplerRequest request, StaplerResponse response) throws IOException {
+    public void doIndex(StaplerRequest2 request, StaplerResponse2 response) throws IOException {
         String token = getReloadToken();
 
         if (token == null || token.isEmpty()) {
@@ -51,8 +51,9 @@ public class TokenReloadAction implements UnprotectedRootAction {
         } else {
             String requestToken = getRequestToken(request);
 
-            if (requestToken != null && MessageDigest.isEqual(token.getBytes(StandardCharsets.UTF_8), requestToken.getBytes(
-                StandardCharsets.UTF_8))) {
+            if (requestToken != null
+                    && MessageDigest.isEqual(
+                            token.getBytes(StandardCharsets.UTF_8), requestToken.getBytes(StandardCharsets.UTF_8))) {
                 LOGGER.info("Configuration reload triggered via token");
 
                 try (ACLContext ignored = ACL.as2(ACL.SYSTEM2)) {

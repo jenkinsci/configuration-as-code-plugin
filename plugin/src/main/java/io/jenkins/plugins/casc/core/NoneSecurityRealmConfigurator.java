@@ -51,7 +51,7 @@ public class NoneSecurityRealmConfigurator implements Configurator<SecurityRealm
 
     @NonNull
     @Override
-    public Set<Attribute<SecurityRealm,?>> describe() {
+    public Set<Attribute<SecurityRealm, ?>> describe() {
         return Collections.emptySet();
     }
 }

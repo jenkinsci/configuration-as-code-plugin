@@ -1,5 +1,8 @@
 package io.jenkins.plugins.casc;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import jenkins.model.GlobalConfiguration;
@@ -7,9 +10,6 @@ import org.jenkinsci.plugin.gitea.servers.GiteaServer;
 import org.jenkinsci.plugin.gitea.servers.GiteaServers;
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class GiteaServerTest {
 

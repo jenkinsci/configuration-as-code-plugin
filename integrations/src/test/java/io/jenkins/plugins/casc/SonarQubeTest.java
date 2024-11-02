@@ -1,5 +1,12 @@
 package io.jenkins.plugins.casc;
 
+import static io.jenkins.plugins.casc.misc.Util.convertYamlFileToJson;
+import static io.jenkins.plugins.casc.misc.Util.validateSchema;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import hudson.plugins.sonar.SonarGlobalConfiguration;
 import hudson.plugins.sonar.SonarInstallation;
 import hudson.plugins.sonar.model.TriggersConfig;
@@ -9,13 +16,6 @@ import jenkins.model.GlobalConfiguration;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-
-import static io.jenkins.plugins.casc.misc.Util.convertYamlFileToJson;
-import static io.jenkins.plugins.casc.misc.Util.validateSchema;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -45,16 +45,12 @@ public class SonarQubeTest {
 
     @Test
     public void validJsonSchema() throws Exception {
-        assertThat(
-            validateSchema(convertYamlFileToJson(this, "sonarSchema.yml")),
-            empty());
+        assertThat(validateSchema(convertYamlFileToJson(this, "sonarSchema.yml")), empty());
     }
 
     @Test
     @Ignore
     public void validFullJsonSchema() throws Exception {
-        assertThat(
-            validateSchema(convertYamlFileToJson(this, "sonarSchemaFull.yml")),
-            empty());
+        assertThat(validateSchema(convertYamlFileToJson(this, "sonarSchemaFull.yml")), empty());
     }
 }

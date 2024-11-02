@@ -47,7 +47,7 @@ master:
       # over SSH to reapply config when changes to the ConfigScripts are detected.  The admin user (or account you specify in
       # Master.AdminUser) will have a random SSH private key (RSA 4096) assigned unless you specify OwnSshKey: true.  This will be saved to a k8s secret.
       enabled: true
-      image: shadwell/k8s-sidecar:0.0.2
+      image: shadwell/k8s-sidecar:0.0.7
       imagePullPolicy: IfNotPresent
       resources:
       #   limits:

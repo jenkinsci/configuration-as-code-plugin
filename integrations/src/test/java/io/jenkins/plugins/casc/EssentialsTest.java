@@ -1,5 +1,11 @@
 package io.jenkins.plugins.casc;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import hudson.ExtensionList;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
@@ -8,12 +14,6 @@ import jenkins.metrics.api.MetricsAccessKey;
 import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class EssentialsTest {
     @Rule
@@ -25,7 +25,8 @@ public class EssentialsTest {
         final Jenkins jenkins = Jenkins.get();
         assertEquals("Welcome to Jenkins Essentials!", jenkins.getSystemMessage());
 
-        final ExtensionList<MetricsAccessKey.DescriptorImpl> metricsDescriptors = ExtensionList.lookup(MetricsAccessKey.DescriptorImpl.class);
+        final ExtensionList<MetricsAccessKey.DescriptorImpl> metricsDescriptors =
+                ExtensionList.lookup(MetricsAccessKey.DescriptorImpl.class);
         assertNotNull(metricsDescriptors);
         assertThat(metricsDescriptors, hasSize(1));
 
@@ -44,6 +45,6 @@ public class EssentialsTest {
         assertThat(accessKey.isCanMetrics(), is(false));
         assertThat(accessKey.getOrigins(), is("*"));
 
-        //metricsDescriptor.g
+        // metricsDescriptor.g
     }
 }

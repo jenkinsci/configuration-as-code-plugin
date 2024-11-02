@@ -1,5 +1,11 @@
 package io.jenkins.plugins.casc;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertEquals;
+
 import hudson.security.csrf.CrumbIssuer;
 import hudson.security.csrf.CrumbIssuerDescriptor;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
@@ -13,24 +19,24 @@ import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.rules.RuleChain;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.emptyOrNullString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertEquals;
-
-
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 public class JenkinsConfigTest {
 
-
     @Rule
-    public RuleChain chain = RuleChain.outerRule( new EnvironmentVariables()
-            .set("CASC_JENKINS_CONFIG", String.format("%s,%s", getClass().getResource("JenkinsConfigTest.yml").toExternalForm(), getClass().getResource("folder/jenkins2.yml").toExternalForm())))
+    public RuleChain chain = RuleChain.outerRule(new EnvironmentVariables()
+                    .set(
+                            "CASC_JENKINS_CONFIG",
+                            String.format(
+                                    "%s,%s",
+                                    getClass()
+                                            .getResource("JenkinsConfigTest.yml")
+                                            .toExternalForm(),
+                                    getClass()
+                                            .getResource("folder/jenkins2.yml")
+                                            .toExternalForm())))
             .around(new JenkinsConfiguredWithCodeRule());
-
 
     @Test
     public void loadFromCASC_JENKINS_CONFIG() {
@@ -38,7 +44,6 @@ public class JenkinsConfigTest {
         assertEquals("configuration as code - JenkinsConfigTest", j.getSystemMessage());
         assertEquals(10, j.getQuietPeriod());
     }
-
 
     @Test
     public void shouldExportEvenOnError() throws Exception {
@@ -50,16 +55,13 @@ public class JenkinsConfigTest {
         assertThat(s, is(not(emptyOrNullString())));
     }
 
-
     // This class is broken : no getter for property "foo"
     @Symbol("broken")
     public static class BrokenCrumbIssuer extends CrumbIssuer {
 
         @SuppressWarnings("unused")
         @DataBoundConstructor
-        public BrokenCrumbIssuer(String foo) {
-
-        }
+        public BrokenCrumbIssuer(String foo) {}
 
         @Override
         protected String issueCrumb(ServletRequest request, String salt) {

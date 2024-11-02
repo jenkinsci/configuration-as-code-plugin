@@ -1,7 +1,10 @@
 package io.jenkins.plugins.casc;
 
-import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
-import com.gargoylesoftware.htmlunit.WebRequest;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.htmlunit.HttpMethod.POST;
+import static org.junit.Assert.assertEquals;
+
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.yaml.YamlSource;
 import io.jenkins.plugins.casc.yaml.YamlUtils;
@@ -11,13 +14,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
 import jenkins.model.Jenkins;
+import org.htmlunit.FailingHttpStatusCodeException;
+import org.htmlunit.WebRequest;
 import org.junit.Rule;
 import org.junit.Test;
-
-import static com.gargoylesoftware.htmlunit.HttpMethod.POST;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
 
 public class YamlReaderTest {
 
@@ -31,7 +31,8 @@ public class YamlReaderTest {
 
     @Test
     public void folder() throws Exception {
-        String p = Paths.get(getClass().getResource("./folder").toURI()).toFile().getAbsolutePath();
+        String p =
+                Paths.get(getClass().getResource("./folder").toURI()).toFile().getAbsolutePath();
         ConfigurationAsCode.get().configure(p);
         Jenkins jenkins = Jenkins.get();
         assertEquals("configuration as code - JenkinsConfigTestFolder", jenkins.getSystemMessage());
@@ -43,14 +44,12 @@ public class YamlReaderTest {
         j.jenkins.setCrumbIssuer(null);
 
         URL apiURL = new URL(MessageFormat.format(
-            "{0}configuration-as-code/apply",
-            j.getURL().toString()));
-        WebRequest request =
-            new WebRequest(apiURL, POST);
+                "{0}configuration-as-code/apply", j.getURL().toString()));
+        WebRequest request = new WebRequest(apiURL, POST);
         request.setCharset(StandardCharsets.UTF_8);
         request.setRequestBody("jenkins:\n"
-            + "  systemMessage: \"configuration as code - JenkinsConfigTestHttpRequest\"\n"
-            + "  quietPeriod: 10");
+                + "  systemMessage: \"configuration as code - JenkinsConfigTestHttpRequest\"\n"
+                + "  quietPeriod: 10");
         int response = j.createWebClient().getPage(request).getWebResponse().getStatusCode();
         assertThat(response, is(200));
         Jenkins jenkins = Jenkins.get();
@@ -63,14 +62,12 @@ public class YamlReaderTest {
         j.jenkins.setCrumbIssuer(null);
 
         URL apiURL = new URL(MessageFormat.format(
-            "{0}configuration-as-code/check",
-            j.getURL().toString()));
-        WebRequest request =
-            new WebRequest(apiURL, POST);
+                "{0}configuration-as-code/check", j.getURL().toString()));
+        WebRequest request = new WebRequest(apiURL, POST);
         request.setCharset(StandardCharsets.UTF_8);
         request.setRequestBody("jenkins:\n"
-            + "  systemMessage: \"configuration as code - JenkinsConfigTestHttpRequest\"\n"
-            + "  quietPeriod: 10");
+                + "  systemMessage: \"configuration as code - JenkinsConfigTestHttpRequest\"\n"
+                + "  quietPeriod: 10");
         int response = j.createWebClient().getPage(request).getWebResponse().getStatusCode();
         assertThat(response, is(200));
     }
@@ -80,13 +77,10 @@ public class YamlReaderTest {
         j.jenkins.setCrumbIssuer(null);
 
         URL apiURL = new URL(MessageFormat.format(
-            "{0}configuration-as-code/check",
-            j.getURL().toString()));
-        WebRequest request =
-            new WebRequest(apiURL, POST);
+                "{0}configuration-as-code/check", j.getURL().toString()));
+        WebRequest request = new WebRequest(apiURL, POST);
         request.setCharset(StandardCharsets.UTF_8);
-        request.setRequestBody("jenkins:\n"
-            + "  systemMessage: {}");
+        request.setRequestBody("jenkins:\n" + "  systemMessage: {}");
         j.createWebClient().getPage(request);
     }
 }

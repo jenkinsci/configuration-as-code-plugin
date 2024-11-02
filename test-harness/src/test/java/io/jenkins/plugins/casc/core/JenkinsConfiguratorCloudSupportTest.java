@@ -1,5 +1,13 @@
 package io.jenkins.plugins.casc.core;
 
+import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
+import static io.jenkins.plugins.casc.misc.Util.toYamlString;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import hudson.Extension;
 import hudson.model.Descriptor;
 import hudson.model.Node;
@@ -18,15 +26,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.PretendSlave;
 
-import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
-import static io.jenkins.plugins.casc.misc.Util.toYamlString;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-
 public class JenkinsConfiguratorCloudSupportTest {
 
     @Rule
@@ -43,7 +42,10 @@ public class JenkinsConfiguratorCloudSupportTest {
         final Node slave = new StaticPretendSlave();
         j.jenkins.addNode(slave);
 
-        ConfigurationAsCode.get().configure(this.getClass().getResource("JenkinsConfiguratorCloudSupportTest.yml").toString());
+        ConfigurationAsCode.get()
+                .configure(this.getClass()
+                        .getResource("JenkinsConfiguratorCloudSupportTest.yml")
+                        .toString());
         assertEquals("Base nodes not found", 2, j.jenkins.getNodes().size());
     }
 
@@ -52,7 +54,10 @@ public class JenkinsConfiguratorCloudSupportTest {
         final Node slave = new Cloud1PretendSlave();
         j.jenkins.addNode(slave);
 
-        ConfigurationAsCode.get().configure(this.getClass().getResource("JenkinsConfiguratorCloudSupportTest.yml").toString());
+        ConfigurationAsCode.get()
+                .configure(this.getClass()
+                        .getResource("JenkinsConfiguratorCloudSupportTest.yml")
+                        .toString());
         assertEquals("Cloud nodes not found", 3, j.jenkins.getNodes().size());
         assertNotNull("Slave 1", j.jenkins.getNode("agent1"));
         assertNotNull("Slave 1", j.jenkins.getNode("agent2"));
@@ -64,7 +69,10 @@ public class JenkinsConfiguratorCloudSupportTest {
         final Node slave = new Cloud2PretendSlave();
         j.jenkins.addNode(slave);
 
-        ConfigurationAsCode.get().configure(this.getClass().getResource("JenkinsConfiguratorCloudSupportTest.yml").toString());
+        ConfigurationAsCode.get()
+                .configure(this.getClass()
+                        .getResource("JenkinsConfiguratorCloudSupportTest.yml")
+                        .toString());
         assertEquals("Cloud nodes not found", 3, j.jenkins.getNodes().size());
         assertNotNull("Slave 1", j.jenkins.getNode("agent1"));
         assertNotNull("Slave 1", j.jenkins.getNode("agent2"));
@@ -76,7 +84,10 @@ public class JenkinsConfiguratorCloudSupportTest {
         final Node slave = new Cloud3PretendSlave();
         j.jenkins.addNode(slave);
 
-        ConfigurationAsCode.get().configure(this.getClass().getResource("JenkinsConfiguratorCloudSupportTest.yml").toString());
+        ConfigurationAsCode.get()
+                .configure(this.getClass()
+                        .getResource("JenkinsConfiguratorCloudSupportTest.yml")
+                        .toString());
         assertEquals("Cloud nodes not found", 3, j.jenkins.getNodes().size());
         assertNotNull("Slave 1", j.jenkins.getNode("agent1"));
         assertNotNull("Slave 1", j.jenkins.getNode("agent2"));

@@ -21,7 +21,7 @@ public class OverrideMergeStrategy implements MergeStrategy {
         if (root.getNodeId() != node.getNodeId()) {
             // means one of those yaml file doesn't conform to JCasC schema
             throw new ConfiguratorException(
-                String.format("Found incompatible configuration elements %s %s", source, node.getStartMark()));
+                    String.format("Found incompatible configuration elements %s %s", source, node.getStartMark()));
         }
 
         switch (root.getNodeId()) {
@@ -34,7 +34,7 @@ public class OverrideMergeStrategy implements MergeStrategy {
                 MappingNode map = (MappingNode) root;
                 MappingNode map2 = (MappingNode) node;
                 // merge common entries
-                for (int i = 0; i < map2.getValue().size();) {
+                for (int i = 0; i < map2.getValue().size(); ) {
                     NodeTuple t2 = map2.getValue().get(i);
                     boolean found = false;
                     for (NodeTuple tuple : map.getValue()) {
@@ -43,8 +43,7 @@ public class OverrideMergeStrategy implements MergeStrategy {
                         final Node key2 = t2.getKeyNode();
                         if (key.getNodeId() == NodeId.scalar) {
                             // We dont support merge for more complex cases (yet)
-                            if (((ScalarNode) key).getValue()
-                                .equals(((ScalarNode) key2).getValue())) {
+                            if (((ScalarNode) key).getValue().equals(((ScalarNode) key2).getValue())) {
                                 try {
                                     merge(tuple.getValueNode(), t2.getValueNode(), source);
                                 } catch (ConfiguratorConflictException e) {
@@ -55,12 +54,11 @@ public class OverrideMergeStrategy implements MergeStrategy {
                                 break;
                             }
                         } else {
-                            throw new ConfiguratorException(
-                                String.format("Found non-mergeable configuration keys %s %s)", source,
-                                    node.getEndMark()));
+                            throw new ConfiguratorException(String.format(
+                                    "Found non-mergeable configuration keys %s %s)", source, node.getEndMark()));
                         }
                     }
-                    if ( !found ) {
+                    if (!found) {
                         ++i;
                     }
                 }
@@ -69,8 +67,7 @@ public class OverrideMergeStrategy implements MergeStrategy {
                 return;
             default:
                 throw new ConfiguratorConflictException(
-                    String.format("Found conflicting configuration at %s %s", source,
-                        node.getStartMark()));
+                        String.format("Found conflicting configuration at %s %s", source, node.getStartMark()));
         }
     }
 

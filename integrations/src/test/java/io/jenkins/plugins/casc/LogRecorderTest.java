@@ -1,5 +1,11 @@
 package io.jenkins.plugins.casc;
 
+import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
+import static io.jenkins.plugins.casc.misc.Util.toStringFromYamlFile;
+import static io.jenkins.plugins.casc.misc.Util.toYamlString;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import hudson.logging.LogRecorder;
 import hudson.logging.LogRecorder.Target;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
@@ -9,12 +15,6 @@ import java.util.List;
 import java.util.logging.Level;
 import org.junit.ClassRule;
 import org.junit.Test;
-
-import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
-import static io.jenkins.plugins.casc.misc.Util.toStringFromYamlFile;
-import static io.jenkins.plugins.casc.misc.Util.toYamlString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 public class LogRecorderTest {
 

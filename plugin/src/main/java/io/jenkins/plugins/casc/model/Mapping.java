@@ -6,7 +6,6 @@ import java.util.HashMap;
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-
 public final class Mapping extends HashMap<String, CNode> implements CNode {
 
     public static final Mapping EMPTY = new Mapping();
@@ -30,7 +29,6 @@ public final class Mapping extends HashMap<String, CNode> implements CNode {
         return this;
     }
 
-
     public void put(String key, String value) {
         super.put(key, new Scalar(value));
     }
@@ -44,11 +42,15 @@ public final class Mapping extends HashMap<String, CNode> implements CNode {
     }
 
     public void putIfNotNull(String key, CNode node) {
-        if (node != null) super.put(key, node);
+        if (node != null) {
+            super.put(key, node);
+        }
     }
 
     public void putIfNotEmpty(String key, Sequence seq) {
-        if (!seq.isEmpty()) super.put(key, seq);
+        if (!seq.isEmpty()) {
+            super.put(key, seq);
+        }
     }
 
     public String getScalarValue(String key) throws ConfiguratorException {

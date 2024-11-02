@@ -26,7 +26,6 @@ public class ExportConfigurationCommand extends CLICommand {
             return -1;
         }
 
-
         ConfigurationAsCode.get().export(stdout);
         return 0;
     }

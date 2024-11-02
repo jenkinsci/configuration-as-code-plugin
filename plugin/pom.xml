@@ -7,6 +7,7 @@
     <artifactId>parent</artifactId>
     <version>${changelist}</version>
   </parent>
+
   <groupId>io.jenkins</groupId>
   <artifactId>configuration-as-code</artifactId>
   <version>${changelist}</version>
@@ -15,6 +16,13 @@
   <name>Configuration as Code Plugin</name>
   <description>Manage Jenkins configuration as code</description>
   <url>https://github.com/jenkinsci/configuration-as-code-plugin</url>
+
+  <scm>
+    <connection>scm:git:https://github.com/jenkinsci/configuration-as-code-plugin.git</connection>
+    <developerConnection>scm:git:git@github.com:jenkinsci/configuration-as-code-plugin.git</developerConnection>
+    <tag>${scmTag}</tag>
+    <url>https://github.com/jenkinsci/configuration-as-code-plugin</url>
+  </scm>
 
   <properties>
     <!-- Breaking changes log
@@ -33,45 +41,48 @@
     <dependencies>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.319.x</artifactId>
+        <artifactId>bom-${jenkins.baseline}.x</artifactId>
         <version>${plugin-bom.version}</version>
-        <scope>import</scope>
         <type>pom</type>
+        <scope>import</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
 
   <dependencies>
     <dependency>
-      <groupId>io.jenkins.plugins</groupId>
-      <artifactId>caffeine-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.json</groupId>
-      <artifactId>json</artifactId>
-      <version>20220320</version>
-    </dependency>
-    <dependency>
+      <!-- Dependency is needed for plugins with DataBoundConstructors that use JSR-305 Nonnull annotation -->
+      <!-- See the tests inside the plugin that confirm those annotations are honored -->
+      <!-- https://github.com/jenkinsci/configuration-as-code-plugin/issues/2491 caused by removing it -->
       <groupId>com.google.code.findbugs</groupId>
       <artifactId>jsr305</artifactId>
       <version>3.0.2</version>
     </dependency>
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
-      <artifactId>snakeyaml-api</artifactId>
+      <artifactId>caffeine-api</artifactId>
     </dependency>
-
-    <dependency>
-      <groupId>io.vavr</groupId>
-      <artifactId>vavr</artifactId>
-      <version>0.10.4</version>
-    </dependency>
-
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>commons-text-api</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>json-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>prism-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>snakeyaml-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.vavr</groupId>
+      <artifactId>vavr</artifactId>
+      <version>0.10.5</version>
+    </dependency>
     <dependency>
       <groupId>com.github.stefanbirkner</groupId>
       <artifactId>system-rules</artifactId>
@@ -90,10 +101,4 @@
       </plugin>
     </plugins>
   </build>
-  <scm>
-    <connection>scm:git:https://github.com/jenkinsci/configuration-as-code-plugin.git</connection>
-    <developerConnection>scm:git:git@github.com:jenkinsci/configuration-as-code-plugin.git</developerConnection>
-    <url>https://github.com/jenkinsci/configuration-as-code-plugin</url>
-    <tag>${scmTag}</tag>
-  </scm>
 </project>

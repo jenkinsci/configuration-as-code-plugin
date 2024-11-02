@@ -32,7 +32,7 @@ public class EnumConfigurator<T extends Enum<T>> implements Configurator<T> {
 
     @NonNull
     @Override
-    public Set<Attribute<T,?>> describe() {
+    public Set<Attribute<T, ?>> describe() {
         return Collections.EMPTY_SET;
     }
 
@@ -52,5 +52,4 @@ public class EnumConfigurator<T extends Enum<T>> implements Configurator<T> {
     public CNode describe(T instance, ConfigurationContext context) throws Exception {
         return new Scalar(instance.name());
     }
-
 }

@@ -1,5 +1,8 @@
 package io.jenkins.plugins.casc;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import hudson.util.Secret;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -12,9 +15,6 @@ import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.LoggerRule;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 @For(Attribute.class)
 public class AttributeTest {
 
@@ -23,7 +23,8 @@ public class AttributeTest {
 
     @Before
     public void tearUp() {
-        logging.record(Logger.getLogger(Attribute.class.getName()), Level.FINEST).capture(2048);
+        logging.record(Logger.getLogger(Attribute.class.getName()), Level.FINEST)
+                .capture(2048);
     }
 
     @After
@@ -71,13 +72,13 @@ public class AttributeTest {
 
     public static void assertFieldIsSecret(Class<?> clazz, String fieldName) {
         String displayName = clazz != null ? (clazz.getName() + "#" + fieldName) : fieldName;
-        assertTrue("Field is not secret: " + displayName,
-                Attribute.calculateIfSecret(clazz, fieldName));
+        assertTrue("Field is not secret: " + displayName, Attribute.calculateIfSecret(clazz, fieldName));
     }
 
     public static void assertFieldIsNotSecret(Class<?> clazz, String fieldName) {
         String displayName = clazz != null ? (clazz.getName() + "#" + fieldName) : fieldName;
-        assertFalse("Field is a secret while it should not be considered as one: " + displayName,
+        assertFalse(
+                "Field is a secret while it should not be considered as one: " + displayName,
                 Attribute.calculateIfSecret(clazz, fieldName));
     }
 

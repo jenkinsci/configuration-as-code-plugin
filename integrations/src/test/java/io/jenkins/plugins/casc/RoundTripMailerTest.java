@@ -1,11 +1,11 @@
 package io.jenkins.plugins.casc;
 
+import static org.junit.Assert.assertEquals;
+
 import hudson.tasks.Mailer;
 import io.jenkins.plugins.casc.misc.RoundTripAbstractTest;
 import jenkins.model.Jenkins;
 import org.jvnet.hudson.test.RestartableJenkinsRule;
-
-import static org.junit.Assert.assertEquals;
 
 public class RoundTripMailerTest extends RoundTripAbstractTest {
     @Override

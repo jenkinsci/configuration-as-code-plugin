@@ -30,8 +30,6 @@ jenkins:
                     - diskRefId: "localdisk"
                       nodeMountPoint: "/tmp/localdisk"
   slaveAgentPort: 50000
-  agentProtocols:
-    - "jnlp2"
 
 unclassified:
   exwsGlobalConfigurationDiskPools:

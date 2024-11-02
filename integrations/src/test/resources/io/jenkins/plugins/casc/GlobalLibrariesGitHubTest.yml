@@ -17,4 +17,4 @@ unclassified:
                       strategyId: 2
                   - gitHubForkDiscovery:
                       strategyId: 3
-                      trust: "trustPermission"
+                      trust: "gitHubTrustPermissions"

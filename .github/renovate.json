@@ -1,0 +1,37 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":semanticCommitsDisabled",
+    "schedule:earlyMondays"
+  ],
+  "automerge": true,
+  "labels": [
+    "dependencies"
+  ],
+  "packageRules": [
+    {
+      "allowedVersions": "/^[0-9]+\\.[0-9]+\\.[0-9]+$/",
+      "registryUrls": [
+        "https://repo.jenkins-ci.org/public/"
+      ],
+      "matchPackageNames": [
+        "/org.jenkins-ci.main:jenkins-war/"
+      ]
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": [
+        "integrations/pom.xml"
+      ],
+      "matchStrings": [
+        "<jenkins.version>(?<currentValue>.*?)</jenkins.version>"
+      ],
+      "depNameTemplate": "org.jenkins-ci.main:jenkins-war",
+      "datasourceTemplate": "maven"
+    }
+  ],
+  "rebaseWhen": "conflicted"
+}

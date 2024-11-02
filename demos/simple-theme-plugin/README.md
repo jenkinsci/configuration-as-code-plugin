@@ -5,8 +5,8 @@ Basic configuration of the [Simple Theme plugin](https://plugins.jenkins.io/simp
 ## sample configuration
 
 ```yaml
-unclassified:
-  simple-theme-plugin:
+appearance:
+  simpleTheme:
     elements:
       - cssUrl:
           url: "https://example.bogus/test.css"

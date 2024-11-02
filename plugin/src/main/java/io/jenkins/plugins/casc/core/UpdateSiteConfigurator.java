@@ -1,5 +1,7 @@
 package io.jenkins.plugins.casc.core;
 
+import static io.jenkins.plugins.casc.Attribute.noop;
+
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.model.UpdateSite;
@@ -13,9 +15,6 @@ import java.util.HashSet;
 import java.util.Set;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
-
-import static io.jenkins.plugins.casc.Attribute.noop;
-
 
 /**
  * TODO would  not be required if UpdateSite had a DataBoundConstructor
@@ -40,12 +39,11 @@ public class UpdateSiteConfigurator extends BaseConfigurator<UpdateSite> {
     public Set<Attribute<UpdateSite, ?>> describe() {
         // setters are marked as noop, a new instance needs to be created.
         return new HashSet<>(Arrays.asList(
-            new Attribute<UpdateSite, String>("id", String.class)
-                .getter(UpdateSite::getId)
-                .setter( noop() ),
-            new Attribute<UpdateSite, String>("url", String.class)
-                .getter(UpdateSite::getUrl)
-                .setter( noop() )
-        ));
+                new Attribute<UpdateSite, String>("id", String.class)
+                        .getter(UpdateSite::getId)
+                        .setter(noop()),
+                new Attribute<UpdateSite, String>("url", String.class)
+                        .getter(UpdateSite::getUrl)
+                        .setter(noop())));
     }
 }

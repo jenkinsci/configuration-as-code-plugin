@@ -1,5 +1,11 @@
 package io.jenkins.plugins.casc;
 
+import static io.jenkins.plugins.casc.misc.Util.convertYamlFileToJson;
+import static io.jenkins.plugins.casc.misc.Util.validateSchema;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.junit.Assert.assertNotNull;
+
 import hudson.ExtensionList;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
@@ -9,22 +15,14 @@ import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.rules.RuleChain;
 
-import static io.jenkins.plugins.casc.misc.Util.convertYamlFileToJson;
-import static io.jenkins.plugins.casc.misc.Util.validateSchema;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.junit.Assert.assertNotNull;
-
-
 /**
  * @author v1v (Victor Martinez)
  */
 public class SlackTest {
 
     @Rule
-    public RuleChain chain = RuleChain.outerRule(new EnvironmentVariables()
-        .set("SLACK_TOKEN", "ADMIN123"))
-        .around(new JenkinsConfiguredWithReadmeRule());
+    public RuleChain chain = RuleChain.outerRule(new EnvironmentVariables().set("SLACK_TOKEN", "ADMIN123"))
+            .around(new JenkinsConfiguredWithReadmeRule());
 
     @Test
     @ConfiguredWithReadme("slack/README.md")
@@ -37,8 +35,6 @@ public class SlackTest {
 
     @Test
     public void validJsonSchema() throws Exception {
-        assertThat(
-            validateSchema(convertYamlFileToJson(this, "slackSchema.yml")),
-            empty());
+        assertThat(validateSchema(convertYamlFileToJson(this, "slackSchema.yml")), empty());
     }
 }

@@ -1,5 +1,9 @@
 package io.jenkins.plugins.casc;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertEquals;
+
 import hudson.plugins.jira.JiraGlobalConfiguration;
 import hudson.plugins.jira.JiraSite;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
@@ -8,10 +12,6 @@ import java.util.List;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -32,5 +32,4 @@ public class JiraTest {
         assertEquals("http://jira.codehaus.org/", sites.get(0).getUrl().toString());
         assertEquals("http://issues.jenkins.io/", sites.get(1).getUrl().toString());
     }
-
 }

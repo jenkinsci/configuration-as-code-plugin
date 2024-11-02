@@ -24,6 +24,7 @@ jenkins:
         size: 500
         ttl: 600
       startTls: true
+      requireTLS: true
       internalUsersDatabase:
         jenkinsInternalUser: "jenkins"
 ```

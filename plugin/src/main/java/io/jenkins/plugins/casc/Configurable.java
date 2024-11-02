@@ -14,5 +14,4 @@ public interface Configurable {
     void check(CNode node) throws ConfiguratorException;
 
     CNode describe() throws Exception;
-
 }

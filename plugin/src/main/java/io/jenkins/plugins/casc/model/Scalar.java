@@ -6,7 +6,6 @@ import java.util.stream.IntStream;
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-
 public final class Scalar implements CNode, CharSequence {
 
     private static final String SECRET_VALUE_STRING = "****";
@@ -18,7 +17,13 @@ public final class Scalar implements CNode, CharSequence {
     private boolean sensitive;
     private boolean encrypted;
 
-    public enum Format { STRING, MULTILINESTRING, BOOLEAN, NUMBER, FLOATING }
+    public enum Format {
+        STRING,
+        MULTILINESTRING,
+        BOOLEAN,
+        NUMBER,
+        FLOATING
+    }
 
     public Scalar(String value, Source source) {
         this(value);

@@ -1,5 +1,10 @@
 package io.jenkins.plugins.casc;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import hudson.model.Node.Mode;
 import hudson.model.Slave;
 import hudson.plugins.sshslaves.SSHLauncher;
@@ -8,11 +13,6 @@ import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class BuildAgentsTest {
 
@@ -24,19 +24,21 @@ public class BuildAgentsTest {
     public void configure_build_agents() {
         assertThat(j.getInstance().getComputers().length, is(3));
 
-        Slave slave = (Slave)j.getInstance().getNode("utility-node");
+        Slave slave = (Slave) j.getInstance().getNode("utility-node");
         assertThat(slave.getRemoteFS(), is("/home/user1"));
-        JNLPLauncher jnlpLauncher = ((JNLPLauncher)slave.getLauncher());
+        JNLPLauncher jnlpLauncher = ((JNLPLauncher) slave.getLauncher());
         assertThat(jnlpLauncher.getWorkDirSettings().getWorkDirPath(), is("/tmp"));
-        assertThat(jnlpLauncher.getWorkDirSettings().getInternalDir(), is("remoting"));
+        assertThat(jnlpLauncher.getWorkDirSettings().getInternalDir(), is("remoting2"));
         assertTrue(jnlpLauncher.getWorkDirSettings().isDisabled());
         assertFalse(jnlpLauncher.getWorkDirSettings().isFailIfWorkDirIsMissing());
+        assertTrue(jnlpLauncher.isWebSocket());
+        assertThat(jnlpLauncher.tunnel, is("some.proxy"));
 
         assertThat(j.getInstance().getNode("utility-node-2").getNumExecutors(), is(4));
         assertThat(j.getInstance().getNode("utility-node-2").getMode(), is(Mode.NORMAL));
-        slave = (Slave)j.getInstance().getNode("utility-node-2");
+        slave = (Slave) j.getInstance().getNode("utility-node-2");
         assertThat(slave.getRemoteFS(), is("/home/user2"));
-        SSHLauncher launcher = ((SSHLauncher)slave.getLauncher());
+        SSHLauncher launcher = ((SSHLauncher) slave.getLauncher());
         assertThat(launcher.getHost(), is("192.168.1.1"));
         assertThat(launcher.getPort(), is(22));
         assertThat(launcher.getCredentialsId(), is("test"));

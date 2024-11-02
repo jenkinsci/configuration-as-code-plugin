@@ -1,17 +1,22 @@
 package io.jenkins.plugins.casc;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import io.jenkins.plugins.casc.misc.Env;
 import io.jenkins.plugins.casc.misc.EnvVarsRule;
 import io.jenkins.plugins.casc.misc.Envs;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.Response;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -20,10 +25,6 @@ import org.junit.rules.RuleChain;
 import org.jvnet.hudson.test.LoggerRule;
 import org.kohsuke.stapler.RequestImpl;
 import org.kohsuke.stapler.ResponseImpl;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class TokenReloadActionTest {
 
@@ -42,49 +43,14 @@ public class TokenReloadActionTest {
     public EnvVarsRule environment = new EnvVarsRule();
 
     @Rule
-    public RuleChain chain = RuleChain
-        .outerRule(environment)
-        .around(j);
+    public RuleChain chain = RuleChain.outerRule(environment).around(j);
 
-    private ServletResponseSpy response;
-
-    private static class ServletResponseSpy extends Response {
-        private int error = 200;
-
-        public ServletResponseSpy() {
-            super(null, null);
-        }
-
-        @Override
-        public void sendError(int sc) {
-            error = sc;
-        }
-
-
-        @Override
-        public int getStatus() {
-            return error;
-        }
-    }
-
-    private static class RequestStub extends Request {
-        private final String authorization;
-
-        public RequestStub(String authorization) {
-            super(null, null);
-            this.authorization = authorization;
-        }
-
-        @Override
-        public String getParameter(String name) {
-            if (TokenReloadAction.RELOAD_TOKEN_QUERY_PARAMETER.equals(name)) {
-                return authorization;
-            }
-            return super.getHeader(name);        }
-    }
+    private HttpServletResponse response;
 
     private RequestImpl newRequest(String authorization) {
-        return new RequestImpl(null, new RequestStub(authorization), Collections.emptyList(), null);
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put(TokenReloadAction.RELOAD_TOKEN_QUERY_PARAMETER, authorization);
+        return new RequestImpl(null, new MockHttpServletRequest(parameters), Collections.emptyList(), null);
     }
 
     private boolean configWasReloaded() {
@@ -109,14 +75,16 @@ public class TokenReloadActionTest {
 
         List<LogRecord> messages = loggerRule.getRecords();
         assertEquals(1, messages.size());
-        assertEquals("Invalid token received, not reloading configuration", messages.get(0).getMessage());
+        assertEquals(
+                "Invalid token received, not reloading configuration",
+                messages.get(0).getMessage());
         assertEquals(Level.WARNING, messages.get(0).getLevel());
     }
 
     @Before
     public void setUp() {
         tokenReloadAction = new TokenReloadAction();
-        response = new ServletResponseSpy();
+        response = new MockHttpServletResponse();
         loggerRule.record(TokenReloadAction.class, Level.ALL);
         loggerRule.capture(3);
         lastTimeLoaded = ConfigurationAsCode.get().getLastTimeLoaded();
@@ -133,7 +101,8 @@ public class TokenReloadActionTest {
 
         List<LogRecord> messages = loggerRule.getRecords();
         assertEquals(1, messages.size());
-        assertEquals("Configuration reload via token is not enabled", messages.get(0).getMessage());
+        assertEquals(
+                "Configuration reload via token is not enabled", messages.get(0).getMessage());
         assertEquals(Level.WARNING, messages.get(0).getLevel());
         assertFalse(configWasReloaded());
     }
@@ -158,9 +127,7 @@ public class TokenReloadActionTest {
     }
 
     @Test
-    @Envs({
-        @Env(name = "CASC_RELOAD_TOKEN", value = "someSecretValue")
-    })
+    @Envs({@Env(name = "CASC_RELOAD_TOKEN", value = "someSecretValue")})
     public void reloadReturnsOkWhenCalledWithValidTokenSetByEnvVar() throws IOException {
         tokenReloadAction.doIndex(newRequest("someSecretValue"), new ResponseImpl(null, response));
 
@@ -168,9 +135,7 @@ public class TokenReloadActionTest {
     }
 
     @Test
-    @Envs({
-        @Env(name = "CASC_RELOAD_TOKEN", value = "someSecretValue")
-    })
+    @Envs({@Env(name = "CASC_RELOAD_TOKEN", value = "someSecretValue")})
     public void reloadShouldNotUseTokenFromPropertyIfEnvVarIsSet() throws IOException {
         System.setProperty("casc.reload.token", "otherSecretValue");
 
@@ -180,9 +145,7 @@ public class TokenReloadActionTest {
     }
 
     @Test
-    @Envs({
-        @Env(name = "CASC_RELOAD_TOKEN", value = "")
-    })
+    @Envs({@Env(name = "CASC_RELOAD_TOKEN", value = "")})
     public void reloadShouldUsePropertyAsTokenIfEnvVarIsEmpty() throws IOException {
         System.setProperty("casc.reload.token", "someSecretValue");
 

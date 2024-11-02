@@ -1,5 +1,11 @@
 package io.jenkins.plugins.casc;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.junit.Assert.assertTrue;
+
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import java.util.List;
@@ -11,24 +17,18 @@ import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.rules.RuleChain;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.junit.Assert.assertTrue;
-
 public class ArtifactoryTest {
 
     @Rule
-    public RuleChain chain = RuleChain.outerRule(new EnvironmentVariables()
-        .set("ARTIFACTORY_PASSWORD", "password123"))
-        .around(new JenkinsConfiguredWithReadmeRule());
+    public RuleChain chain = RuleChain.outerRule(new EnvironmentVariables().set("ARTIFACTORY_PASSWORD", "password123"))
+            .around(new JenkinsConfiguredWithReadmeRule());
 
     @Test
     @ConfiguredWithReadme(value = "artifactory/README.md")
     public void configure_artifactory() {
         final Jenkins jenkins = Jenkins.get();
-        final ArtifactoryBuilder.DescriptorImpl descriptor = (ArtifactoryBuilder.DescriptorImpl) jenkins.getDescriptor(ArtifactoryBuilder.class);
+        final ArtifactoryBuilder.DescriptorImpl descriptor =
+                (ArtifactoryBuilder.DescriptorImpl) jenkins.getDescriptor(ArtifactoryBuilder.class);
         assertTrue(descriptor.getUseCredentialsPlugin());
 
         final List<JFrogPlatformInstance> jfrogInstances = descriptor.getJfrogInstances();
@@ -39,7 +39,12 @@ public class ArtifactoryTest {
         assertThat(jfrogInstances.get(0).getDistributionUrl(), is(equalTo("http://acme.com/distribution")));
         assertThat(jfrogInstances.get(0).getDeployerCredentialsConfig().getCredentialsId(), is(equalTo("artifactory")));
         assertThat(jfrogInstances.get(0).getResolverCredentialsConfig().getUsername(), is(equalTo("artifactory_user")));
-        assertThat(jfrogInstances.get(0).getResolverCredentialsConfig().getPassword().getPlainText(), is(equalTo("password123")));
-
+        assertThat(
+                jfrogInstances
+                        .get(0)
+                        .getResolverCredentialsConfig()
+                        .getPassword()
+                        .getPlainText(),
+                is(equalTo("password123")));
     }
 }

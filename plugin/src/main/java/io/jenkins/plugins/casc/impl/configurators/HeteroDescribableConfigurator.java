@@ -1,5 +1,8 @@
 package io.jenkins.plugins.casc.impl.configurators;
 
+import static io.jenkins.plugins.casc.model.CNode.Type.MAPPING;
+import static io.vavr.API.unchecked;
+
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.DescriptorExtensionList;
@@ -11,6 +14,7 @@ import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.Configurator;
 import io.jenkins.plugins.casc.ObsoleteConfigurationMonitor;
+import io.jenkins.plugins.casc.UnknownAttributesException;
 import io.jenkins.plugins.casc.impl.attributes.DescribableAttribute;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
@@ -30,13 +34,11 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import jenkins.model.Jenkins;
 import org.jenkinsci.Symbol;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
-
-import static io.jenkins.plugins.casc.model.CNode.Type.MAPPING;
-import static io.vavr.API.unchecked;
 
 /**
  * {@link Configurator} that works with {@link Describable} subtype as a {@link #target}.
@@ -72,19 +74,19 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
     @Override
     public List<Configurator<T>> getConfigurators(ConfigurationContext context) {
         return getDescriptors()
-            .flatMap(d -> lookupConfigurator(context, descriptorClass(d)))
-            .append(this)
-            .toJavaList();
+                .flatMap(d -> lookupConfigurator(context, descriptorClass(d)))
+                .append(this)
+                .toJavaList();
     }
 
     @NonNull
     @Override
     public T configure(CNode config, ConfigurationContext context) {
-        return preConfigure(config).apply((shortName, subConfig) ->
-            lookupDescriptor(shortName, config)
-                .map(descriptor -> forceLookupConfigurator(context, descriptor))
-                .map(configurator -> doConfigure(context, configurator, subConfig.getOrNull())))
-            .getOrNull();
+        return preConfigure(config)
+                .apply((shortName, subConfig) -> lookupDescriptor(shortName, config)
+                        .map(descriptor -> forceLookupConfigurator(context, descriptor))
+                        .map(configurator -> doConfigure(context, configurator, subConfig.getOrNull())))
+                .getOrNull();
     }
 
     @Override
@@ -102,7 +104,7 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
     @Override
     public CNode describe(T instance, ConfigurationContext context) {
         Predicate<CNode> isScalar = node -> node.getType().equals(MAPPING)
-            && unchecked(node::asMapping).apply().size() == 0;
+                && unchecked(node::asMapping).apply().size() == 0;
         return lookupConfigurator(context, instance.getClass())
                 .map(configurator -> convertToNode(context, configurator, instance))
                 .filter(Objects::nonNull)
@@ -114,7 +116,8 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
                         mapping.put(preferredSymbol(instance.getDescriptor()), node);
                         return mapping;
                     }
-                }).getOrNull();
+                })
+                .getOrNull();
     }
 
     @SuppressWarnings("unused")
@@ -143,26 +146,33 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
      * Then we go through all the descriptors and find ones compliant with the target.
      * @return Stream of descriptors which match the target
      */
-     private Stream<Descriptor<T>> getDescriptors() {
+    private Stream<Descriptor<T>> getDescriptors() {
         DescriptorExtensionList<T, Descriptor<T>> descriptorList = Jenkins.get().getDescriptorList(target);
         if (!descriptorList.isEmpty()) { // fast fetch for root objects
             return Stream.ofAll(descriptorList);
         }
 
-        LOGGER.log(Level.FINEST, "getDescriptors(): Cannot find descriptors for {0}." +
-                "Will try parent classes to find proper extension points", target);
+        LOGGER.log(
+                Level.FINEST,
+                "getDescriptors(): Cannot find descriptors for {0}."
+                        + "Will try parent classes to find proper extension points",
+                target);
         DescriptorExtensionList parentDescriptorClassList = descriptorList;
         Class<?> effectiveTarget = target.getSuperclass();
         while (parentDescriptorClassList.isEmpty() && effectiveTarget != null && effectiveTarget != Object.class) {
             final Class<Describable> match;
-            LOGGER.log(Level.FINEST, "getDescriptors() for {0}: Trying parent class {1}",
-                    new Object[] {target, effectiveTarget});
+            LOGGER.log(Level.FINEST, "getDescriptors() for {0}: Trying parent class {1}", new Object[] {
+                target, effectiveTarget
+            });
             try {
-                match = (Class<Describable>)effectiveTarget;
+                match = (Class<Describable>) effectiveTarget;
             } catch (Exception ex) {
                 if (LOGGER.isLoggable(Level.FINEST)) {
-                    LOGGER.log(Level.FINEST,
-                            String.format("getDescriptors() for %s: Class %s is not describable, interrupting search", target, effectiveTarget),
+                    LOGGER.log(
+                            Level.FINEST,
+                            String.format(
+                                    "getDescriptors() for %s: Class %s is not describable, interrupting search",
+                                    target, effectiveTarget),
                             ex);
                 }
                 break;
@@ -181,13 +191,18 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
             Descriptor<T> d = iterator.next();
             try {
                 descriptorsWithProperType.add(d);
-                LOGGER.log(Level.FINEST, "getDescriptors() for {0}: Accepting {1} as a suitable descriptor",
+                LOGGER.log(
+                        Level.FINEST,
+                        "getDescriptors() for {0}: Accepting {1} as a suitable descriptor",
                         new Object[] {target, d});
             } catch (ClassCastException ex) {
                 // ignored
                 if (LOGGER.isLoggable(Level.FINEST)) {
-                    LOGGER.log(Level.FINEST,
-                            String.format("getDescriptors() for %s: Ignoring %s, because it is not a proper describable type", target, d),
+                    LOGGER.log(
+                            Level.FINEST,
+                            String.format(
+                                    "getDescriptors() for %s: Ignoring %s, because it is not a proper describable type",
+                                    target, d),
                             ex);
                 }
             }
@@ -201,14 +216,26 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
     }
 
     private Option<Descriptor<T>> lookupDescriptor(String symbol, CNode config) {
-        return getDescriptors()
-                .filter(descriptor -> findByPreferredSymbol(descriptor, symbol) || findBySymbols(descriptor, symbol, config))
+        Stream<Descriptor<T>> descriptors = getDescriptors();
+        return descriptors
+                .filter(descriptor ->
+                        findByPreferredSymbol(descriptor, symbol) || findBySymbols(descriptor, symbol, config))
                 .map(descriptor -> Tuple.of(preferredSymbol(descriptor), descriptor))
                 .foldLeft(HashMap.empty(), this::handleDuplicateSymbols)
                 .values()
                 .headOption()
                 .orElse(() -> {
-                    throw new IllegalArgumentException("No " + target.getName() + " implementation found for " + symbol);
+                    List<String> availableImplementations = descriptors
+                            .toJavaStream()
+                            .map(d -> DescribableAttribute.getPreferredSymbol(d, getImplementedAPI(), target))
+                            .collect(Collectors.toList());
+
+                    throw new UnknownAttributesException(
+                            this,
+                            "No implementation found for:",
+                            "No " + target.getName() + " implementation found for " + symbol,
+                            symbol,
+                            availableImplementations);
                 });
     }
 
@@ -220,9 +247,13 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
         return getSymbols(descriptor)
                 .find(actual -> actual.equalsIgnoreCase(symbol))
                 .map(actual -> {
-                    ObsoleteConfigurationMonitor.get().record(node, "'" + symbol + "' is obsolete, please use '" + preferredSymbol(descriptor) + "'");
+                    ObsoleteConfigurationMonitor.get()
+                            .record(
+                                    node,
+                                    "'" + symbol + "' is obsolete, please use '" + preferredSymbol(descriptor) + "'");
                     return descriptorClass(descriptor);
-                }).isDefined();
+                })
+                .isDefined();
     }
 
     private Stream<String> getSymbols(Descriptor<T> descriptor) {
@@ -233,9 +264,12 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
         return DescribableAttribute.getPreferredSymbol(descriptor, target, target);
     }
 
-    private HashMap<String, Descriptor<T>> handleDuplicateSymbols(HashMap<String, Descriptor<T>> r, Tuple2<String, Descriptor<T>> t) {
+    private HashMap<String, Descriptor<T>> handleDuplicateSymbols(
+            HashMap<String, Descriptor<T>> r, Tuple2<String, Descriptor<T>> t) {
         if (r.containsKey(t._1)) {
-            String message = String.format("Found multiple implementations for symbol = %s: [%s, %s]. Please report to plugin maintainer.", t._1, r.get(t._1).get(), t._2);
+            String message = String.format(
+                    "Found multiple implementations for symbol = %s: [%s, %s]. Please report to plugin maintainer.",
+                    t._1, r.get(t._1).get(), t._2);
             LOGGER.warning(message);
             return r;
         } else {

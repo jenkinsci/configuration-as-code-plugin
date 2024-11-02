@@ -1,8 +1,12 @@
 package io.jenkins.plugins.casc.misc;
 
-import com.gargoylesoftware.htmlunit.WebRequest;
-import com.gargoylesoftware.htmlunit.WebResponse;
-import com.gargoylesoftware.htmlunit.util.NameValuePair;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.htmlunit.HttpMethod.POST;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfiguratorException;
 import java.io.File;
@@ -13,19 +17,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.logging.Level;
 import org.apache.commons.io.IOUtils;
+import org.htmlunit.WebRequest;
+import org.htmlunit.WebResponse;
+import org.htmlunit.util.NameValuePair;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.LoggerRule;
 import org.jvnet.hudson.test.RestartableJenkinsRule;
-
-import static com.gargoylesoftware.htmlunit.HttpMethod.POST;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Base test to check a complete test of each plugin configuration. What it makes:
@@ -134,13 +134,12 @@ public abstract class RoundTripAbstractTest {
     }
 
     private String getResourceContent(String resourcePath) throws IOException {
-        return IOUtils.toString(getClass().getResourceAsStream(resourcePath),
-            StandardCharsets.UTF_8);
+        return IOUtils.toString(getClass().getResourceAsStream(resourcePath), StandardCharsets.UTF_8);
     }
 
     private void writeToFile(String text, String path) throws FileNotFoundException {
         File file = new File(path);
-        try(PrintWriter out = new PrintWriter(file)) {
+        try (PrintWriter out = new PrintWriter(file)) {
             out.print(text);
         }
     }
@@ -193,6 +192,8 @@ public abstract class RoundTripAbstractTest {
     }
 
     private void assertLogAsExpected(String uniqueText) {
-        assertTrue("The log should have '" + uniqueText + "'", logging.getMessages().stream().anyMatch(m -> m.contains(uniqueText)));
+        assertTrue(
+                "The log should have '" + uniqueText + "'",
+                logging.getMessages().stream().anyMatch(m -> m.contains(uniqueText)));
     }
 }

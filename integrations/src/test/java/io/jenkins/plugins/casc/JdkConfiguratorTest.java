@@ -1,5 +1,12 @@
 package io.jenkins.plugins.casc;
 
+import static io.jenkins.plugins.casc.misc.Util.getToolRoot;
+import static io.jenkins.plugins.casc.misc.Util.toStringFromYamlFile;
+import static io.jenkins.plugins.casc.misc.Util.toYamlString;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
+
 import hudson.ExtensionList;
 import hudson.model.JDK;
 import hudson.tools.InstallSourceProperty;
@@ -9,13 +16,6 @@ import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import io.jenkins.plugins.casc.model.CNode;
 import org.junit.ClassRule;
 import org.junit.Test;
-
-import static io.jenkins.plugins.casc.misc.Util.getToolRoot;
-import static io.jenkins.plugins.casc.misc.Util.toStringFromYamlFile;
-import static io.jenkins.plugins.casc.misc.Util.toYamlString;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author <a href="mailto:vektory79@gmail.com">Viktor Verbitsky</a>
