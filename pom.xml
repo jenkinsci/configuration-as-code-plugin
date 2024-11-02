@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>4.53</version>
+    <version>4.46</version>
     <relativePath />
   </parent>
   <groupId>io.jenkins.configuration-as-code</groupId>
@@ -21,10 +21,10 @@
   <properties>
     <changelist>999999-SNAPSHOT</changelist>
     <gitHubRepo>jenkinsci/configuration-as-code-plugin</gitHubRepo>
-    <jenkins.version>2.361.4</jenkins.version>
+    <jenkins.version>2.319.3</jenkins.version>
     <tagNameFormat>configuration-as-code-@{project.version}</tagNameFormat>
     <useBeta>true</useBeta>
-    <plugin-bom.version>1766.v0b_f2a_f7d0b_1d</plugin-bom.version>
+    <plugin-bom.version>1643.v1cffef51df73</plugin-bom.version>
   </properties>
 
   <name>Configuration as Code Parent</name>
