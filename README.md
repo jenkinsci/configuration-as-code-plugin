@@ -7,7 +7,7 @@
 [![Jenkins Plugin Installs](https://img.shields.io/jenkins/plugin/i/configuration-as-code.svg?color=blue)](https://plugins.jenkins.io/configuration-as-code)
 [![Gitter](https://badges.gitter.im/jenkinsci/configuration-as-code-plugin.svg)](https://gitter.im/jenkinsci/configuration-as-code-plugin)
 
-<img src="plugin/src/main/webapp/img/logo-head.svg" width="192">
+<img src="images/logo-head.svg" width="192">
 
 
 - [Introduction](#introduction)

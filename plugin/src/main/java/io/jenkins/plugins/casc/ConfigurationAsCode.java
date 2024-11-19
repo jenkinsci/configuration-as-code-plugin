@@ -123,7 +123,7 @@ public class ConfigurationAsCode extends ManagementLink {
     @CheckForNull
     @Override
     public String getIconFileName() {
-        return "/plugin/configuration-as-code/img/logo-head.svg";
+        return "symbol-logo plugin-configuration-as-code";
     }
 
     @CheckForNull
