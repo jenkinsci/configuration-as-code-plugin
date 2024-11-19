@@ -34,7 +34,7 @@
     -->
     <hpi.compatibleSinceVersion>1.28</hpi.compatibleSinceVersion>
     <hpi.pluginChangelogUrl>https://github.com/jenkinsci/configuration-as-code-plugin/releases</hpi.pluginChangelogUrl>
-    <hpi.pluginLogoUrl>https://raw.githubusercontent.com/jenkinsci/configuration-as-code-plugin/master/plugin/src/main/webapp/img/logo-head.svg</hpi.pluginLogoUrl>
+    <hpi.pluginLogoUrl>https://raw.githubusercontent.com/jenkinsci/configuration-as-code-plugin/master/plugin/src/main/resources/images/symbols/logo.svg</hpi.pluginLogoUrl>
   </properties>
 
   <dependencyManagement>
