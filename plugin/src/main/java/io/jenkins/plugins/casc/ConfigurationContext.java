@@ -45,13 +45,19 @@ public class ConfigurationContext implements ConfiguratorRegistry {
     private transient SecretSourceResolver secretSourceResolver;
 
     public ConfigurationContext(ConfiguratorRegistry registry) {
+        this(registry, null);
+    }
+
+    public ConfigurationContext(ConfiguratorRegistry registry, String mergeStrategy) {
         this.registry = registry;
         String prop = getPropertyOrEnv(CASC_YAML_MAX_ALIASES_ENV, CASC_YAML_MAX_ALIASES_PROPERTY);
         yamlMaxAliasesForCollections = NumberUtils.toInt(prop, 50);
         prop = getPropertyOrEnv(CASC_YAML_CODE_POINT_LIMIT_ENV, CASC_YAML_CODE_POINT_LIMIT_PROPERTY);
         yamlCodePointLimit = NumberUtils.toInt(prop, 3) * 1024 * 1024;
         secretSourceResolver = new SecretSourceResolver(this);
-        mergeStrategy = getPropertyOrEnv(CASC_MERGE_STRATEGY_ENV, CASC_MERGE_STRATEGY_PROPERTY);
+        this.mergeStrategy = mergeStrategy != null
+                ? mergeStrategy
+                : getPropertyOrEnv(CASC_MERGE_STRATEGY_ENV, CASC_MERGE_STRATEGY_PROPERTY);
     }
 
     private String getPropertyOrEnv(String envKey, String proKey) {

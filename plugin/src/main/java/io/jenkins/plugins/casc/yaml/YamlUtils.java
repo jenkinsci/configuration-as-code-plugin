@@ -35,6 +35,7 @@ public final class YamlUtils {
     public static Node merge(List<YamlSource> sources, ConfigurationContext context) throws ConfiguratorException {
         Node root = null;
         MergeStrategy mergeStrategy = MergeStrategyFactory.getMergeStrategyOrDefault(context.getMergeStrategy());
+        LOGGER.info("Merge strategy: " + mergeStrategy.getName());
         for (YamlSource<?> source : sources) {
             try (Reader reader = reader(source)) {
                 final Node node = read(source, reader, context);
