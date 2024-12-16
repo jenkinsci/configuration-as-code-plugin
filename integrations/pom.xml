@@ -280,7 +280,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>sbt</artifactId>
-      <version>81.vb_82499046630</version>
+      <version>87.v455263c57692</version>
       <scope>test</scope>
     </dependency>
     <dependency>
