@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 import com.amazonaws.services.ec2.model.InstanceType;
 import hudson.model.labels.LabelAtom;
 import hudson.plugins.ec2.AMITypeData;
-import hudson.plugins.ec2.AmazonEC2Cloud;
+import hudson.plugins.ec2.EC2Cloud;
 import hudson.plugins.ec2.SlaveTemplate;
 import hudson.plugins.ec2.UnixData;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
@@ -31,7 +31,7 @@ public class EC2CloudTest {
     @Test
     @ConfiguredWithReadme("ec2/README.md")
     public void configure_ec2_cloud() {
-        final AmazonEC2Cloud ec2Cloud = (AmazonEC2Cloud) Jenkins.get().getCloud("ec2");
+        final EC2Cloud ec2Cloud = (EC2Cloud) Jenkins.get().getCloud("ec2");
         assertNotNull(ec2Cloud);
 
         assertTrue(ec2Cloud.isUseInstanceProfileForCredentials());
