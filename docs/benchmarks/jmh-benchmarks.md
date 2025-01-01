@@ -14,16 +14,19 @@ Just like regular JMH benchmarks using `JmhBenchmarkState`, you need to have a `
 ```java
 @JmhBenchmark
 public class MyBenchmark {
+    // Extends CascJmhBenchmarkState to enable Configuration-as-Code for setup
     public static class MyState extends CascJmhBenchmarkState {
+         // Method to specify the path of the YAML configuration file
         @Nonnull
         @Override
         protected String getResourcePath() {
             return "config.yaml";
         }
-    
+        // Method to specify the enclosing class of this state
         @Nonnull
         @Override
         protected Class<?> getEnclosingClass() {
+        // Returns the enclosing class (MyBenchmark in this case)
             return MyBenchmark.class;
         }
     }
