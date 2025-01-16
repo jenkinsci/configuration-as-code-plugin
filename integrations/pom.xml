@@ -73,7 +73,6 @@
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>artifact-manager-s3</artifactId>
-      <version>894.v29efa_d1a_6383</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -161,7 +160,6 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>ec2</artifactId>
-      <version>1795.v4b_7fcc52595d</version>
       <scope>test</scope>
     </dependency>
     <dependency>
