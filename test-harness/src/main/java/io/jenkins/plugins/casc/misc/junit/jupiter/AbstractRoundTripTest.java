@@ -33,18 +33,30 @@ import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
 /**
+ * Base test to check a complete test of each plugin configuration.
+ * <p>
+ * What it does:
+ * <ol>
+ *  <li>Configure the instance with the {@link #configResource()} implemented.</li>
+ *  <li>Check it was configured correctly.</li>
+ *  <li>Check the configuration is valid via Web UI.</li>
+ *  <li>Apply the configuration via Web UI.</li>
+ *  <li>Write the configuration to $JENKINS_HOME/jenkins.yaml.</li>
+ *  <li>Restart Jenkins.</li>
+ *  <li>Check the {@link #stringInLogExpected()} is set during the restart.</li>
+ *  <li>Check it is still configured correctly after the restart</li>
+ * </ol>
+ * <p>
+ * All the plugin author needs to do is override the methods providing:
+ * <ol>
+ *  <li>The resource with the yaml configuration of the plugin in case they use their own name for the file.</li>
+ *  <li>A way to validate the configuration is established.</li>
+ *  <li>A string that should be present in the logs (casc logger) that guarantees the config is loaded. Usually a weird text configured.</li>
+ * </ol>
+ * <p>
  * This is the JUnit5 equivalent of {@link io.jenkins.plugins.casc.misc.RoundTripAbstractTest}
  *
- * Base test to check a complete test of each plugin configuration. What it makes: 1. Configure the
- * instance with the {@link #configResource()} implemented. 2. Check it was configured correctly. 3.
- * Check the configuration is valid via Web UI. 4. Apply the configuration via Web UI. 5. Write the
- * configuration to $JENKINS_HOME/jenkins.yaml. 6. Restart Jenkins. 7. Check the
- * {@link #stringInLogExpected()} is set during the restart.
- *
- * All the plugin author needs to do is override the methods providing: 1. The resource with the
- * yaml configuration of the plugin in case they use their own name for the file. 2. A way to
- * validate the configuration is established. 3. A string that should be present in the logs (casc
- * logger) that guarantees the config is loaded. Usually a weird text configured.
+ * @see io.jenkins.plugins.casc.misc.RoundTripAbstractTest
  */
 @WithJenkins
 public abstract class AbstractRoundTripTest {
