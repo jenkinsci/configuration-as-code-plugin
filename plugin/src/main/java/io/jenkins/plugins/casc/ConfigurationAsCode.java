@@ -33,6 +33,10 @@ import io.jenkins.plugins.casc.yaml.YamlSource;
 import io.jenkins.plugins.casc.yaml.YamlUtils;
 import io.jenkins.plugins.prism.PrismConfiguration;
 import jakarta.inject.Inject;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -68,10 +72,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
 import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONArray;
@@ -81,8 +81,8 @@ import org.apache.commons.lang.StringUtils;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.StaplerRequest2;
+import org.kohsuke.stapler.StaplerResponse2;
 import org.kohsuke.stapler.interceptor.RequirePOST;
 import org.kohsuke.stapler.lang.Klass;
 import org.kohsuke.stapler.verb.POST;
@@ -167,7 +167,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
     @RequirePOST
     @Restricted(NoExternalUse.class)
-    public void doReload(StaplerRequest request, StaplerResponse response) throws Exception {
+    public void doReload(StaplerRequest2 request, StaplerResponse2 response) throws Exception {
         if (!Jenkins.get().hasPermission(Jenkins.MANAGE)) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
@@ -193,7 +193,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
     @Restricted(NoExternalUse.class)
     public static void handleExceptionOnReloading(
-            StaplerRequest request, StaplerResponse response, ConfiguratorException cause)
+            StaplerRequest2 request, StaplerResponse2 response, ConfiguratorException cause)
             throws ServletException, IOException {
         Configurator<?> configurator = cause.getConfigurator();
         request.setAttribute("errorMessage", cause.getErrorMessage());
@@ -213,7 +213,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
     @RequirePOST
     @Restricted(NoExternalUse.class)
-    public void doReplace(StaplerRequest request, StaplerResponse response) throws Exception {
+    public void doReplace(StaplerRequest2 request, StaplerResponse2 response) throws Exception {
         if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
@@ -421,7 +421,7 @@ public class ConfigurationAsCode extends ManagementLink {
         final String cascDirectory = "/WEB-INF/" + DEFAULT_JENKINS_YAML_PATH + ".d/";
         List<String> res = new ArrayList<>();
 
-        final ServletContext servletContext = Jenkins.get().servletContext;
+        final ServletContext servletContext = Jenkins.get().getServletContext();
         try {
             URL bundled = servletContext.getResource(cascFile);
             if (bundled != null) {
@@ -452,7 +452,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
     @RequirePOST
     @Restricted(NoExternalUse.class)
-    public void doCheck(StaplerRequest req, StaplerResponse res) throws Exception {
+    public void doCheck(StaplerRequest2 req, StaplerResponse2 res) throws Exception {
 
         if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
@@ -470,7 +470,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
     @RequirePOST
     @Restricted(NoExternalUse.class)
-    public void doApply(StaplerRequest req, StaplerResponse res) throws Exception {
+    public void doApply(StaplerRequest2 req, StaplerResponse2 res) throws Exception {
 
         if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
@@ -485,7 +485,7 @@ public class ConfigurationAsCode extends ManagementLink {
      */
     @RequirePOST
     @Restricted(NoExternalUse.class)
-    public void doExport(StaplerRequest req, StaplerResponse res) throws Exception {
+    public void doExport(StaplerRequest2 req, StaplerResponse2 res) throws Exception {
         if (!Jenkins.get().hasPermission(Jenkins.SYSTEM_READ)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
@@ -501,7 +501,7 @@ public class ConfigurationAsCode extends ManagementLink {
      * @throws Exception
      */
     @Restricted(NoExternalUse.class)
-    public void doSchema(StaplerRequest req, StaplerResponse res) throws Exception {
+    public void doSchema(StaplerRequest2 req, StaplerResponse2 res) throws Exception {
         if (!Jenkins.get().hasPermission(Jenkins.SYSTEM_READ)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
@@ -513,7 +513,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
     @RequirePOST
     @Restricted(NoExternalUse.class)
-    public void doViewExport(StaplerRequest req, StaplerResponse res) throws Exception {
+    public void doViewExport(StaplerRequest2 req, StaplerResponse2 res) throws Exception {
         if (!Jenkins.get().hasPermission(Jenkins.SYSTEM_READ)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
@@ -532,7 +532,7 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     @Restricted(NoExternalUse.class)
-    public void doReference(StaplerRequest req, StaplerResponse res) throws Exception {
+    public void doReference(StaplerRequest2 req, StaplerResponse2 res) throws Exception {
         if (!Jenkins.get().hasPermission(Jenkins.SYSTEM_READ)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
