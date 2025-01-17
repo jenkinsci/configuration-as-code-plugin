@@ -24,7 +24,7 @@ is attached to a Descriptors.
 
 ### Rule 1: don't write code for data-binding
 
-Check implementation of `Descriptor#configure(StaplerRequest,JSONObject)` in your descriptors.
+Check implementation of `Descriptor#configure(StaplerRequest2,JSONObject)` in your descriptors.
 This one should **not** use any of the `JSONObject.get*()` methods to set value for an internal
 field. Prefer exposing JavaBean setter methods, and use `req.bindJSON(this,JSONObject)` to rely
 on introspection-friendly data-binding.
@@ -35,7 +35,7 @@ to do anyway, as it makes their intent more clear.
 sample:
 
 ```java
-public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
+public boolean configure(StaplerRequest2 req, JSONObject json) throws FormException {
     smtpHost = nullify(json.getString("smtpHost"));
     replyToAddress = json.getString("replyToAddress");
     ...
@@ -47,7 +47,7 @@ public boolean configure(StaplerRequest req, JSONObject json) throws FormExcepti
 to be replaced by:
 
 ```java
-public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
+public boolean configure(StaplerRequest2 req, JSONObject json) throws FormException {
     try (BulkChange bc = new BulkChange(this)) {
         req.bindJSON(this, json);
         bc.commit();
@@ -102,7 +102,7 @@ sample:
 private String username;
 private Secret password;
 
-public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
+public boolean configure(StaplerRequest2 req, JSONObject json) throws FormException {
     if(json.has("useAuth")) {
         JSONObject auth = json.getJSONObject("useAuth");
         username = nullify(auth.getString("username"));

@@ -45,7 +45,7 @@ public static final class DescriptorImpl extends Descriptor<Foo> {
    /** optional password */
    private Secret password;
 
-   public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
+   public boolean configure(StaplerRequest2 req, JSONObject json) throws FormException {
        charset = json.getString("charset");
        if (json.has("usePassword")) {
            password = Secret.fromString(nullify(auth.getString("password")));
@@ -170,7 +170,7 @@ Rewrite `Descriptor#configure()` implementation to rely on `request.bindJson(thi
 default values as a `Descriptor` is a mutable object, i.e. data-binding won't reset values if they are not present in the JSON payload.
 
 ```java
-        public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
+        public boolean configure(StaplerRequest2 req, JSONObject json) throws FormException {
             // reset optional authentication to default before data-binding
             this.authentication = null;
             req.bindJSON(this, json);

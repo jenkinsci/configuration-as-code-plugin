@@ -3,12 +3,12 @@ package io.jenkins.plugins.casc.yaml;
 import static org.junit.Assert.assertEquals;
 
 import io.jenkins.plugins.casc.MockHttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import javax.servlet.http.HttpServletRequest;
 import org.junit.Test;
 
 public class YamlSourceTest {
