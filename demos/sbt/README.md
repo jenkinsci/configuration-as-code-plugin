@@ -6,7 +6,7 @@ Basic configuration of the [Sbt plugin](https://plugins.jenkins.io/sbt)
 
 ```yaml
 tool:
-  sbtInstallation:
+  sbt:
     installations:
       - name: sbt
         home: "/usr/bin/sbt"
