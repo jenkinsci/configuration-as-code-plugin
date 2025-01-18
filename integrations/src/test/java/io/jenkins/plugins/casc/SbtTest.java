@@ -48,7 +48,7 @@ public class SbtTest {
     public void export_sbt_tool() throws Exception {
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         ConfigurationContext context = new ConfigurationContext(registry);
-        CNode yourAttribute = getToolRoot(context).get("sbtInstallation");
+        CNode yourAttribute = getToolRoot(context).get("sbt");
 
         String exported = toYamlString(yourAttribute);
 

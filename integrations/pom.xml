@@ -192,7 +192,6 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>github-oauth</artifactId>
-      <version>597.ve0c3480fcb_d0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -256,7 +255,6 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>msbuild</artifactId>
-      <version>1.35</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -278,7 +276,6 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>sbt</artifactId>
-      <version>81.vb_82499046630</version>
       <scope>test</scope>
     </dependency>
     <dependency>
