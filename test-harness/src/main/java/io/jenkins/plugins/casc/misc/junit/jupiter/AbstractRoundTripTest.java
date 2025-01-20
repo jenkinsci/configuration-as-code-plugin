@@ -15,14 +15,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 import org.apache.commons.io.IOUtils;
 import org.htmlunit.WebRequest;
 import org.htmlunit.WebResponse;
@@ -30,6 +24,7 @@ import org.htmlunit.util.NameValuePair;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.LogRecorder;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
 /**
@@ -127,27 +122,14 @@ public abstract class AbstractRoundTripTest {
 
         // Start recording the logs just before restarting, to avoid capture the previous startup. We're look there
         // if the "magic token" is there
-        List<String> messages = new ArrayList<>();
-        Logger logger = Logger.getLogger("io.jenkins.plugins.casc");
-        logger.addHandler(new ConsoleHandler() {
-            @Override
-            public void publish(LogRecord record) {
-                super.publish(record);
+        try (LogRecorder recorder =
+                new LogRecorder().record("io.jenkins.plugins.casc", Level.FINER).capture(2048)) {
+            // Restart the testing instance
+            r.restart();
 
-                String message = new SimpleFormatter().formatMessage(record);
-                Throwable x = record.getThrown();
-                synchronized (messages) {
-                    messages.add(message == null && x != null ? x.toString() : message);
-                }
-            }
-        });
-        logger.setLevel(Level.ALL);
-
-        // Restart the testing instance
-        r.restart();
-
-        // Verify the log shows it's configured
-        assertLogAsExpected(messages, stringInLogExpected());
+            // Verify the log shows it's configured
+            assertLogAsExpected(recorder, stringInLogExpected());
+        }
 
         // Verify the configuration set at home/jenkins.yaml is loaded
         assertConfiguredAsExpected(r, resourceContent);
@@ -221,7 +203,9 @@ public abstract class AbstractRoundTripTest {
         assertThat(res, containsString(f.toURI().toURL().toExternalForm()));
     }
 
-    private void assertLogAsExpected(List<String> messages, String uniqueText) {
-        assertTrue(messages.stream().anyMatch(m -> m.contains(uniqueText)), "The log should have '" + uniqueText + "'");
+    private void assertLogAsExpected(LogRecorder recorder, String uniqueText) {
+        assertTrue(
+                recorder.getMessages().stream().anyMatch(m -> m.contains(uniqueText)),
+                "The log should have '" + uniqueText + "'");
     }
 }
