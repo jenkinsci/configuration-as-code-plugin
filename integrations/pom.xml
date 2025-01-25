@@ -67,7 +67,6 @@
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>adoptopenjdk</artifactId>
-      <version>1.5</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -181,7 +180,6 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>gitea</artifactId>
-      <version>220.v4618c82a_40fb_</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -238,7 +236,6 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>mercurial</artifactId>
-      <version>1260.vdfb_723cdcc81</version>
       <scope>test</scope>
     </dependency>
     <dependency>
