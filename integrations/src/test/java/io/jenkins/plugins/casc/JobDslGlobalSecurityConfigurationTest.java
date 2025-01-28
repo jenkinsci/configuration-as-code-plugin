@@ -2,38 +2,52 @@ package io.jenkins.plugins.casc;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import javaposse.jobdsl.plugin.GlobalJobDslSecurityConfiguration;
 import jenkins.model.GlobalConfiguration;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runners.model.Statement;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.Issue;
-import org.jvnet.hudson.test.RestartableJenkinsRule;
+import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
 /**
  * Created by odavid on 23/12/2017.
  */
-public class JobDslGlobalSecurityConfigurationTest {
-
-    @Rule
-    public RestartableJenkinsRule j = new RestartableJenkinsRule();
+@WithJenkins
+class JobDslGlobalSecurityConfigurationTest {
 
     @Test
-    public void test_global_dsl_security_can_be_applied() {
-        j.addStep(validateGlobalDSLSecurity);
+    void test_global_dsl_security_can_be_applied(@SuppressWarnings("unused") JenkinsRule j) {
+        GlobalJobDslSecurityConfiguration dslSecurity = getGlobalJobDslSecurityConfiguration();
+        dslSecurity.setUseScriptSecurity(true);
+
+        assertThat("ScriptSecurity", dslSecurity.isUseScriptSecurity(), is(true));
+        configure();
+        assertThat("ScriptSecurity", dslSecurity.isUseScriptSecurity(), is(false));
     }
 
     @Test
     @Issue("#253")
-    public void test_global_dsl_security_can_be_reapplied_after_restart() {
-        j.addStep(validateGlobalDSLSecurity);
-        j.addStep(validateGlobalDSLSecurityAfterRestart, true);
+    void test_global_dsl_security_can_be_reapplied_after_restart(JenkinsRule j) throws Throwable {
+        GlobalJobDslSecurityConfiguration dslSecurity = getGlobalJobDslSecurityConfiguration();
+        dslSecurity.setUseScriptSecurity(true);
+
+        assertThat("ScriptSecurity", dslSecurity.isUseScriptSecurity(), is(true));
+        configure();
+        assertThat("ScriptSecurity", dslSecurity.isUseScriptSecurity(), is(false));
+
+        j.restart();
+
+        dslSecurity = getGlobalJobDslSecurityConfiguration();
+
+        assertThat("ScriptSecurity", dslSecurity.isUseScriptSecurity(), is(false));
+        configure();
+        assertThat("ScriptSecurity", dslSecurity.isUseScriptSecurity(), is(false));
     }
 
     private GlobalJobDslSecurityConfiguration getGlobalJobDslSecurityConfiguration() {
-        final GlobalJobDslSecurityConfiguration dslSecurity =
+        GlobalJobDslSecurityConfiguration dslSecurity =
                 GlobalConfiguration.all().get(GlobalJobDslSecurityConfiguration.class);
         assertNotNull(dslSecurity);
         return dslSecurity;
@@ -45,34 +59,4 @@ public class JobDslGlobalSecurityConfigurationTest {
                         .getResource("JobDslGlobalSecurityConfigurationTest.yml")
                         .toExternalForm());
     }
-
-    private Statement validateGlobalDSLSecurity = new Statement() {
-
-        @Override
-        public void evaluate() throws Throwable {
-            final GlobalJobDslSecurityConfiguration dslSecurity = getGlobalJobDslSecurityConfiguration();
-
-            dslSecurity.setUseScriptSecurity(true);
-            assertThat("ScriptSecurity", dslSecurity.isUseScriptSecurity(), is(true));
-
-            configure();
-
-            assertThat("ScriptSecurity", dslSecurity.isUseScriptSecurity(), is(false));
-        }
-    };
-
-    private Statement validateGlobalDSLSecurityAfterRestart = new Statement() {
-
-        @Override
-        public void evaluate() throws Throwable {
-            final GlobalJobDslSecurityConfiguration dslSecurity = getGlobalJobDslSecurityConfiguration();
-
-            // step 1 configuration still applies
-            assertThat("ScriptSecurity", dslSecurity.isUseScriptSecurity(), is(false));
-
-            configure();
-
-            assertThat("ScriptSecurity", dslSecurity.isUseScriptSecurity(), is(false));
-        }
-    };
 }

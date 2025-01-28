@@ -44,7 +44,9 @@ import org.jvnet.hudson.test.RestartableJenkinsRule;
  *    text configured.
  *
  * @since 1.20
+ * @deprecated Consider migrating to JUnit5 and use {@link io.jenkins.plugins.casc.misc.junit.jupiter.AbstractRoundTripTest} instead.
  */
+@Deprecated
 public abstract class RoundTripAbstractTest {
     @Rule
     public RestartableJenkinsRule r = new RestartableJenkinsRule();

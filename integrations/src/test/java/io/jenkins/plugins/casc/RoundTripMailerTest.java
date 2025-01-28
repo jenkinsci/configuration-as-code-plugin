@@ -1,15 +1,17 @@
 package io.jenkins.plugins.casc;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import hudson.tasks.Mailer;
-import io.jenkins.plugins.casc.misc.RoundTripAbstractTest;
+import io.jenkins.plugins.casc.misc.junit.jupiter.AbstractRoundTripTest;
 import jenkins.model.Jenkins;
-import org.jvnet.hudson.test.RestartableJenkinsRule;
+import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
-public class RoundTripMailerTest extends RoundTripAbstractTest {
+@WithJenkins
+class RoundTripMailerTest extends AbstractRoundTripTest {
     @Override
-    protected void assertConfiguredAsExpected(RestartableJenkinsRule j, String configContent) {
+    protected void assertConfiguredAsExpected(JenkinsRule j, String configContent) {
         final Jenkins jenkins = Jenkins.get();
         final Mailer.DescriptorImpl descriptor = (Mailer.DescriptorImpl) jenkins.getDescriptor(Mailer.class);
         assertEquals("4441", descriptor.getSmtpPort());
