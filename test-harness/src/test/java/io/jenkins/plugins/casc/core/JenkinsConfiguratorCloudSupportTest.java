@@ -5,8 +5,8 @@ import static io.jenkins.plugins.casc.misc.Util.toYamlString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import hudson.Extension;
 import hudson.model.Descriptor;
@@ -20,25 +20,23 @@ import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.ConfiguratorRegistry;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
 import io.jenkins.plugins.casc.model.CNode;
 import java.io.IOException;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.PretendSlave;
 
-public class JenkinsConfiguratorCloudSupportTest {
-
-    @Rule
-    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+@WithJenkinsConfiguredWithCode
+class JenkinsConfiguratorCloudSupportTest {
 
     @Test
     @ConfiguredWithCode("JenkinsConfiguratorCloudSupportTest.yml")
-    public void should_have_nodes_configured() {
-        assertEquals("Base nodes not found", 2, j.jenkins.getNodes().size());
+    void should_have_nodes_configured(JenkinsConfiguredWithCodeRule j) {
+        assertEquals(2, j.jenkins.getNodes().size(), "Base nodes not found");
     }
 
     @Test
-    public void should_remove_normal_nodes_configured_after_reload() throws Exception {
+    void should_remove_normal_nodes_configured_after_reload(JenkinsConfiguredWithCodeRule j) throws Exception {
         final Node slave = new StaticPretendSlave();
         j.jenkins.addNode(slave);
 
@@ -46,11 +44,12 @@ public class JenkinsConfiguratorCloudSupportTest {
                 .configure(this.getClass()
                         .getResource("JenkinsConfiguratorCloudSupportTest.yml")
                         .toString());
-        assertEquals("Base nodes not found", 2, j.jenkins.getNodes().size());
+        assertEquals(2, j.jenkins.getNodes().size(), "Base nodes not found");
     }
 
     @Test
-    public void should_keep_cloud_no_instantiable_nodes_configured_after_reload() throws Exception {
+    void should_keep_cloud_no_instantiable_nodes_configured_after_reload(JenkinsConfiguredWithCodeRule j)
+            throws Exception {
         final Node slave = new Cloud1PretendSlave();
         j.jenkins.addNode(slave);
 
@@ -58,14 +57,14 @@ public class JenkinsConfiguratorCloudSupportTest {
                 .configure(this.getClass()
                         .getResource("JenkinsConfiguratorCloudSupportTest.yml")
                         .toString());
-        assertEquals("Cloud nodes not found", 3, j.jenkins.getNodes().size());
-        assertNotNull("Slave 1", j.jenkins.getNode("agent1"));
-        assertNotNull("Slave 1", j.jenkins.getNode("agent2"));
-        assertNotNull("Slave cloud", j.jenkins.getNode("testCloud"));
+        assertEquals(3, j.jenkins.getNodes().size(), "Cloud nodes not found");
+        assertNotNull(j.jenkins.getNode("agent1"), "Slave 1");
+        assertNotNull(j.jenkins.getNode("agent2"), "Slave 1");
+        assertNotNull(j.jenkins.getNode("testCloud"), "Slave cloud");
     }
 
     @Test
-    public void should_keep_cloud_ephemeral_nodes_configured_after_reload() throws Exception {
+    void should_keep_cloud_ephemeral_nodes_configured_after_reload(JenkinsConfiguredWithCodeRule j) throws Exception {
         final Node slave = new Cloud2PretendSlave();
         j.jenkins.addNode(slave);
 
@@ -73,14 +72,15 @@ public class JenkinsConfiguratorCloudSupportTest {
                 .configure(this.getClass()
                         .getResource("JenkinsConfiguratorCloudSupportTest.yml")
                         .toString());
-        assertEquals("Cloud nodes not found", 3, j.jenkins.getNodes().size());
-        assertNotNull("Slave 1", j.jenkins.getNode("agent1"));
-        assertNotNull("Slave 1", j.jenkins.getNode("agent2"));
-        assertNotNull("Slave cloud", j.jenkins.getNode("testCloud"));
+        assertEquals(3, j.jenkins.getNodes().size(), "Cloud nodes not found");
+        assertNotNull(j.jenkins.getNode("agent1"), "Slave 1");
+        assertNotNull(j.jenkins.getNode("agent2"), "Slave 1");
+        assertNotNull(j.jenkins.getNode("testCloud"), "Slave cloud");
     }
 
     @Test
-    public void should_keep_cloud_abstractCloudSlave_nodes_configured_after_reload() throws Exception {
+    void should_keep_cloud_abstractCloudSlave_nodes_configured_after_reload(JenkinsConfiguredWithCodeRule j)
+            throws Exception {
         final Node slave = new Cloud3PretendSlave();
         j.jenkins.addNode(slave);
 
@@ -88,15 +88,15 @@ public class JenkinsConfiguratorCloudSupportTest {
                 .configure(this.getClass()
                         .getResource("JenkinsConfiguratorCloudSupportTest.yml")
                         .toString());
-        assertEquals("Cloud nodes not found", 3, j.jenkins.getNodes().size());
-        assertNotNull("Slave 1", j.jenkins.getNode("agent1"));
-        assertNotNull("Slave 1", j.jenkins.getNode("agent2"));
-        assertNotNull("Slave cloud", j.jenkins.getNode("testCloud"));
+        assertEquals(3, j.jenkins.getNodes().size(), "Cloud nodes not found");
+        assertNotNull(j.jenkins.getNode("agent1"), "Slave 1");
+        assertNotNull(j.jenkins.getNode("agent2"), "Slave 1");
+        assertNotNull(j.jenkins.getNode("testCloud"), "Slave cloud");
     }
 
     @Test
     @ConfiguredWithCode("JenkinsConfiguratorCloudSupportTest.yml")
-    public void should_export_only_static_nodes() throws Exception {
+    void should_export_only_static_nodes(JenkinsConfiguredWithCodeRule j) throws Exception {
         j.jenkins.addNode(new Cloud1PretendSlave());
 
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();

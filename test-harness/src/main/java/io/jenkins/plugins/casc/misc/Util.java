@@ -37,6 +37,7 @@ import org.everit.json.schema.ValidationException;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.jvnet.hudson.test.LogRecorder;
 import org.jvnet.hudson.test.LoggerRule;
 import org.yaml.snakeyaml.nodes.Node;
 
@@ -208,12 +209,34 @@ public class Util {
     }
 
     /**
+     * Checks whether {@link LogRecorder} has not recorded the message.
+     * @param logging Logger rule
+     * @param unexpectedText Text to check
+     */
+    public static void assertNotInLog(LogRecorder logging, String unexpectedText) {
+        assertFalse(
+                "The log should not contain '" + unexpectedText + "'",
+                logging.getMessages().stream().anyMatch(m -> m.contains(unexpectedText)));
+    }
+
+    /**
      * Checks whether {@link LoggerRule} has recorded the message.
      * @param logging Logger rule
      * @param expectedText Text to check
      * @since 1.25
      */
     public static void assertLogContains(LoggerRule logging, String expectedText) {
+        assertTrue(
+                "The log should contain '" + expectedText + "'",
+                logging.getMessages().stream().anyMatch(m -> m.contains(expectedText)));
+    }
+
+    /**
+     * Checks whether {@link LogRecorder} has recorded the message.
+     * @param logging Logger rule
+     * @param expectedText Text to check
+     */
+    public static void assertLogContains(LogRecorder logging, String expectedText) {
         assertTrue(
                 "The log should contain '" + expectedText + "'",
                 logging.getMessages().stream().anyMatch(m -> m.contains(expectedText)));

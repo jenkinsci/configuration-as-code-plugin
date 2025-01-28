@@ -21,27 +21,25 @@ import hudson.model.User;
 import hudson.security.AuthorizationStrategy;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
 import io.jenkins.plugins.casc.model.CNode;
 import java.util.Map;
 import java.util.Set;
 import jenkins.model.Jenkins;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.Issue;
 
 /**
  * @author Oleg Nenashev
  * @since 1.0
  */
-public class RoleStrategyTest {
-
-    @Rule
-    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+@WithJenkinsConfiguredWithCode
+class RoleStrategyTest {
 
     @Test
     @Issue("Issue #48")
     @ConfiguredWithCode("RoleStrategy1.yml")
-    public void shouldReadRolesCorrectly() throws Exception {
+    void shouldReadRolesCorrectly(JenkinsConfiguredWithCodeRule j) throws Exception {
         j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
         User admin = User.getById("admin", false);
         User user1 = User.getById("user1", false);
@@ -95,7 +93,7 @@ public class RoleStrategyTest {
 
     @Test
     @ConfiguredWithCode("RoleStrategy1.yml")
-    public void shouldExportRolesCorrect() throws Exception {
+    void shouldExportRolesCorrect(JenkinsConfiguredWithCodeRule j) throws Exception {
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         ConfigurationContext context = new ConfigurationContext(registry);
         CNode yourAttribute = getJenkinsRoot(context).get("authorizationStrategy");
@@ -109,7 +107,7 @@ public class RoleStrategyTest {
     @Test
     @Issue("Issue #214")
     @ConfiguredWithCode("RoleStrategy2.yml")
-    public void shouldHandleNullItemsAndAgentsCorrectly() {
+    void shouldHandleNullItemsAndAgentsCorrectly(JenkinsConfiguredWithCodeRule j) {
         AuthorizationStrategy s = j.jenkins.getAuthorizationStrategy();
         assertThat(
                 "Authorization Strategy has been read incorrectly",

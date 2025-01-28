@@ -8,21 +8,19 @@ import static org.hamcrest.core.Is.is;
 
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
 import io.jenkins.plugins.casc.model.CNode;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-public class LDAPSecurityRealmTest {
-
-    @Rule
-    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+@WithJenkinsConfiguredWithCode
+class LDAPSecurityRealmTest {
 
     @Test
     @ConfiguredWithCode("LDAPSecurityRealmTestNoSecret.yml")
-    public void export_ldap_no_secret() throws Exception {
+    void export_ldap_no_secret(JenkinsConfiguredWithCodeRule j) throws Exception {
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         ConfigurationContext context = new ConfigurationContext(registry);
         CNode yourAttribute =

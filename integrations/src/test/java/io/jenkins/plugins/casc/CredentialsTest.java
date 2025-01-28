@@ -4,9 +4,10 @@ import static java.util.Objects.requireNonNull;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNot.not;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
@@ -20,24 +21,22 @@ import hudson.util.Secret;
 import io.jenkins.plugins.casc.impl.configurators.DataBoundConfigurator;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import jenkins.model.Jenkins;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.Issue;
 
-public class CredentialsTest {
-
-    @Rule
-    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+@WithJenkinsConfiguredWithCode
+class CredentialsTest {
 
     @ConfiguredWithCode("GlobalCredentials.yml")
     @Test
-    public void testGlobalScopedCredentials() throws Exception {
+    void testGlobalScopedCredentials(JenkinsConfiguredWithCodeRule j) throws Exception {
         List<StandardUsernamePasswordCredentials> creds = CredentialsProvider.lookupCredentials(
                 StandardUsernamePasswordCredentials.class, Jenkins.getInstanceOrNull(), null, Collections.emptyList());
         assertThat(creds.size(), is(1));
@@ -60,7 +59,7 @@ public class CredentialsTest {
 
     @ConfiguredWithCode("CredentialsWithDomain.yml")
     @Test
-    public void testDomainScopedCredentials() throws Exception {
+    void testDomainScopedCredentials(JenkinsConfiguredWithCodeRule j) throws Exception {
         List<StandardUsernamePasswordCredentials> creds = CredentialsProvider.lookupCredentials(
                 StandardUsernamePasswordCredentials.class, Jenkins.getInstanceOrNull(), null, Collections.emptyList());
         assertThat(creds.size(), is(1));
@@ -71,7 +70,7 @@ public class CredentialsTest {
 
     @Test
     @ConfiguredWithCode("GlobalCredentials.yml")
-    public void testExportFileCredentials() throws Exception {
+    void testExportFileCredentials(JenkinsConfiguredWithCodeRule j) throws Exception {
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         ConfigurationContext context = new ConfigurationContext(registry);
         CredentialsRootConfigurator root = ExtensionList.lookupSingleton(CredentialsRootConfigurator.class);
@@ -101,7 +100,7 @@ public class CredentialsTest {
 
     @ConfiguredWithCode("GlobalCredentials.yml")
     @Test
-    public void testExportSSHCredentials() throws Exception {
+    void testExportSSHCredentials(JenkinsConfiguredWithCodeRule j) throws Exception {
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         ConfigurationContext context = new ConfigurationContext(registry);
         CredentialsRootConfigurator root = ExtensionList.lookupSingleton(CredentialsRootConfigurator.class);
@@ -149,11 +148,11 @@ public class CredentialsTest {
 
     @Test
     @Issue("SECURITY-1404")
-    public void checkUsernamePasswordIsSecret() throws Exception {
+    void checkUsernamePasswordIsSecret(JenkinsConfiguredWithCodeRule j) throws Exception {
         Attribute a = getFromDatabound(UsernamePasswordCredentialsImpl.class, "password");
         assertTrue(
-                "Attribute 'password' should be secret",
-                a.isSecret(new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL, "1", "2", "3", "4")));
+                a.isSecret(new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL, "1", "2", "3", "4")),
+                "Attribute 'password' should be secret");
     }
 
     @NonNull
@@ -165,6 +164,6 @@ public class CredentialsTest {
                 return a;
             }
         }
-        throw new AssertionError("Cannot find databound attribute " + attributeName + " in " + clazz);
+        return fail("Cannot find databound attribute " + attributeName + " in " + clazz);
     }
 }

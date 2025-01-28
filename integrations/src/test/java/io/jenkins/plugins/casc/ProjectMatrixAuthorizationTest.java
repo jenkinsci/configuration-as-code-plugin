@@ -1,31 +1,29 @@
 package io.jenkins.plugins.casc;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import hudson.security.ProjectMatrixAuthorizationStrategy;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
 import java.util.ArrayList;
 import java.util.List;
 import jenkins.model.Jenkins;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Created by mads on 2/22/18.
  */
-public class ProjectMatrixAuthorizationTest {
-
-    @Rule
-    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+@WithJenkinsConfiguredWithCode
+class ProjectMatrixAuthorizationTest {
 
     @Test
     @ConfiguredWithCode("ProjectMatrixStrategy.yml")
-    public void checkCorrectlyConfiguredPermissions() {
+    void checkCorrectlyConfiguredPermissions(JenkinsConfiguredWithCodeRule j) {
         assertEquals(
-                "The configured instance must use the Global Matrix Authentication Strategy",
                 ProjectMatrixAuthorizationStrategy.class,
-                Jenkins.get().getAuthorizationStrategy().getClass());
+                Jenkins.get().getAuthorizationStrategy().getClass(),
+                "The configured instance must use the Global Matrix Authentication Strategy");
         ProjectMatrixAuthorizationStrategy gms =
                 (ProjectMatrixAuthorizationStrategy) Jenkins.get().getAuthorizationStrategy();
 

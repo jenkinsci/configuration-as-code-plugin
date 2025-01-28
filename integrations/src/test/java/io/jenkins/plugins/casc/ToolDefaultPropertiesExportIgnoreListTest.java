@@ -8,20 +8,18 @@ import static org.hamcrest.core.Is.is;
 
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
 import io.jenkins.plugins.casc.model.CNode;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.Issue;
 
-public class ToolDefaultPropertiesExportIgnoreListTest {
-
-    @Rule
-    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+@WithJenkinsConfiguredWithCode
+class ToolDefaultPropertiesExportIgnoreListTest {
 
     @Test
     @Issue("JENKINS-57122")
     @ConfiguredWithCode("ToolDefaultPropertiesExportIgnoreList.yml")
-    public void export_tool_configuration() throws Exception {
+    void export_tool_configuration(JenkinsConfiguredWithCodeRule j) throws Exception {
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         ConfigurationContext context = new ConfigurationContext(registry);
         CNode yourAttribute = getToolRoot(context);

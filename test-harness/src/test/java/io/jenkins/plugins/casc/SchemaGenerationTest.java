@@ -7,50 +7,48 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
-import org.junit.Rule;
-import org.junit.Test;
+import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
+import org.junit.jupiter.api.Test;
 
-public class SchemaGenerationTest {
-
-    @Rule
-    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+@WithJenkinsConfiguredWithCode
+class SchemaGenerationTest {
 
     @Test
-    public void validSchemaShouldSucceed() throws Exception {
+    void validSchemaShouldSucceed(JenkinsConfiguredWithCodeRule j) throws Exception {
         assertThat(validateSchema(convertYamlFileToJson(this, "validSchemaConfig.yml")), empty());
     }
 
     @Test
-    public void invalidSchemaShouldNotSucceed() throws Exception {
+    void invalidSchemaShouldNotSucceed(JenkinsConfiguredWithCodeRule j) throws Exception {
         assertThat(
                 validateSchema(convertYamlFileToJson(this, "invalidSchemaConfig.yml")),
                 contains("#/jenkins/numExecutors: expected type: Integer, found: String"));
     }
 
     @Test
-    public void rejectsInvalidBaseConfigurator() throws Exception {
+    void rejectsInvalidBaseConfigurator(JenkinsConfiguredWithCodeRule j) throws Exception {
         assertThat(
                 validateSchema(convertYamlFileToJson(this, "invalidBaseConfig.yml")),
                 contains("#: extraneous key [invalidBaseConfigurator] is not permitted"));
     }
 
     @Test
-    public void validJenkinsBaseConfigurator() throws Exception {
+    void validJenkinsBaseConfigurator(JenkinsConfiguredWithCodeRule j) throws Exception {
         assertThat(validateSchema(convertYamlFileToJson(this, "validJenkinsBaseConfig.yml")), empty());
     }
 
     @Test
-    public void symbolResolutionForJenkinsBaseConfigurator() throws Exception {
+    void symbolResolutionForJenkinsBaseConfigurator(JenkinsConfiguredWithCodeRule j) throws Exception {
         assertThat(validateSchema(convertYamlFileToJson(this, "validJenkinsBaseConfigWithSymbol.yml")), empty());
     }
 
     @Test
-    public void validSelfConfigurator() throws Exception {
+    void validSelfConfigurator(JenkinsConfiguredWithCodeRule j) throws Exception {
         assertThat(validateSchema(convertYamlFileToJson(this, "validSelfConfig.yml")), empty());
     }
 
     @Test
-    public void attributesNotFlattenedToTopLevel() throws Exception {
+    void attributesNotFlattenedToTopLevel(JenkinsConfiguredWithCodeRule j) throws Exception {
         assertThat(
                 validateSchema(convertYamlFileToJson(this, "attributesNotFlattenedToTop.yml")),
                 contains("#/tool: extraneous key [acceptLicense] is not permitted"));

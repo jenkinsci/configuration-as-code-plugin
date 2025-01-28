@@ -1,10 +1,11 @@
 package io.jenkins.plugins.casc;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
 import java.util.List;
 import jenkins.branch.OrganizationFolder;
 import jenkins.scm.api.trait.SCMTrait;
@@ -16,17 +17,14 @@ import org.jenkinsci.plugin.gitea.OriginPullRequestDiscoveryTrait;
 import org.jenkinsci.plugin.gitea.SSHCheckoutTrait;
 import org.jenkinsci.plugin.gitea.TagDiscoveryTrait;
 import org.jenkinsci.plugin.gitea.WebhookRegistrationTrait;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class GiteaOrganisationFolderTest {
-
-    @Rule
-    public JenkinsConfiguredWithCodeRule r = new JenkinsConfiguredWithCodeRule();
+@WithJenkinsConfiguredWithCode
+class GiteaOrganisationFolderTest {
 
     @Test
     @ConfiguredWithCode("SeedJobTest_withGiteaOrganisation.yml")
-    public void configure_gitea_organisation_folder_seed_job() {
+    void configure_gitea_organisation_folder_seed_job(JenkinsConfiguredWithCodeRule r) {
         OrganizationFolder folder = (OrganizationFolder) r.jenkins.getItem("Gitea Organization Folder");
         assertNotNull(folder);
 

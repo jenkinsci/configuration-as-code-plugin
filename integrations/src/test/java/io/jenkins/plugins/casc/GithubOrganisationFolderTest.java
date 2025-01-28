@@ -1,32 +1,32 @@
 package io.jenkins.plugins.casc;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import hudson.model.TopLevelItem;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
 import jenkins.branch.OrganizationFolder;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.github_branch_source.GitHubSCMNavigator;
-import org.junit.Rule;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-public class GithubOrganisationFolderTest {
+@WithJenkinsConfiguredWithCode
+class GithubOrganisationFolderTest {
 
-    @Rule
-    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
-
-    // @Test
-    // Fails as Items do override submit() with manual data-binding implementation
+    @Test
+    @Disabled("Fails as Items do override submit() with manual data-binding implementation")
     @ConfiguredWithCode("GithubOrganisationFolderTest.yml")
-    public void configure_github_organisation_folder_seed_job() {
+    void configure_github_organisation_folder_seed_job(JenkinsConfiguredWithCodeRule j) {
         final TopLevelItem job = Jenkins.get().getItem("ndeloof");
         assertNotNull(job);
-        assertTrue(job instanceof OrganizationFolder);
+        assertInstanceOf(OrganizationFolder.class, job);
         OrganizationFolder folder = (OrganizationFolder) job;
         assertEquals(1, folder.getNavigators().size());
         final GitHubSCMNavigator github = folder.getNavigators().get(GitHubSCMNavigator.class);

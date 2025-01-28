@@ -11,17 +11,17 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 @WithJenkinsConfiguredWithCode
-public class JenkinsConfiguredWithCodeRuleClassRuleTest {
+class JenkinsConfiguredWithCodeRuleClassRuleTest {
     @ConfiguredWithCode("admin.yml")
     public static JenkinsConfiguredWithCodeRule j;
 
     @BeforeAll
-    public static void beforeAll() {
+    static void beforeAll() {
         assertNotNull(j);
     }
 
     @Test
-    public void user_created() {
+    void user_created() {
         User admin = User.get("admin", false, Collections.emptyMap());
         assertNotNull(admin);
     }

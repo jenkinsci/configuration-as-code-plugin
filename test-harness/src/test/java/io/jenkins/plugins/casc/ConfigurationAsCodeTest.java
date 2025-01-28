@@ -10,14 +10,17 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.htmlunit.HttpMethod.POST;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import hudson.Functions;
 import hudson.util.FormValidation;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Source;
 import io.jenkins.plugins.casc.yaml.YamlSource;
@@ -36,89 +39,76 @@ import org.htmlunit.WebResponse;
 import org.htmlunit.html.HtmlForm;
 import org.htmlunit.html.HtmlInput;
 import org.htmlunit.html.HtmlPage;
-import org.junit.Assume;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule.WebClient;
 
-public class ConfigurationAsCodeTest {
+@WithJenkinsConfiguredWithCode
+class ConfigurationAsCodeTest {
 
-    @Rule
-    public TemporaryFolder tempFolder = new TemporaryFolder();
-
-    @Rule
-    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+    @TempDir
+    public File tempFolder;
 
     @Test
-    public void init_test_from_accepted_sources() throws Exception {
+    void init_test_from_accepted_sources(JenkinsConfiguredWithCodeRule j) throws Exception {
         ConfigurationAsCode casc = new ConfigurationAsCode();
 
-        File exactFile = tempFolder.newFile("jenkins_1.yaml"); // expected
+        File exactFile = newFile(tempFolder, "jenkins_1.yaml"); // expected
 
-        tempFolder.newFile("jenkins_2.YAML"); // expected, alternate extension
-        tempFolder.newFile("jenkins_3.YML"); // expected, alternate extension
-        tempFolder.newFile("jenkins_4.yml"); // expected, alternate extension
+        newFile(tempFolder, "jenkins_2.YAML"); // expected, alternate extension
+        newFile(tempFolder, "jenkins_3.YML"); // expected, alternate extension
+        newFile(tempFolder, "jenkins_4.yml"); // expected, alternate extension
 
         // should be picked up
         Path target = Paths.get("jenkins.tmp");
-        Path newLink = Paths.get(tempFolder.getRoot().getAbsolutePath(), "jenkins_5.yaml");
+        Path newLink = Paths.get(tempFolder.getAbsolutePath(), "jenkins_5.yaml");
 
         try {
             Files.createSymbolicLink(newLink, target);
         } catch (IOException e) {
             // often fails on windows due to non admin users not having symlink permission by default, see:
             // https://stackoverflow.com/questions/23217460/how-to-create-soft-symbolic-link-using-java-nio-files/24353758#24353758
-            Assume.assumeFalse(Functions.isWindows());
+            assumeFalse(Functions.isWindows());
             throw e;
         }
 
         // should *NOT* be picked up
-        tempFolder.newFolder("folder.yaml");
+        newFolder(tempFolder, "folder.yaml");
 
         // Replicate a k8s ConfigMap mount :
         // lrwxrwxrwx    1 root     root          19 Oct 15 16:43 jenkins_6.yaml -> ..data/jenkins_6.yaml
         // lrwxrwxrwx    1 root     root          31 Oct 29 16:29 ..data -> ..2018_10_29_16_29_08.094515936
         // drwxr-xr-x    2 root     root        4.0K Oct 29 16:29 ..2018_10_29_16_29_08.094515936
 
-        final File timestamp = tempFolder.newFolder("..2018_10_29_16_29_08.094515936");
+        final File timestamp = newFolder(tempFolder, "..2018_10_29_16_29_08.094515936");
         new File(timestamp, "jenkins_6.yaml").createNewFile();
-        final Path data = Paths.get(tempFolder.getRoot().getAbsolutePath(), "..data");
+        final Path data = Paths.get(tempFolder.getAbsolutePath(), "..data");
         Files.createSymbolicLink(data, timestamp.toPath());
         Files.createSymbolicLink(
-                Paths.get(tempFolder.getRoot().getAbsolutePath(), "jenkins_6.yaml"), data.resolve("jenkins_6.yaml"));
+                Paths.get(tempFolder.getAbsolutePath(), "jenkins_6.yaml"), data.resolve("jenkins_6.yaml"));
 
         // Create a symbolic linked folder with 1 configuration file
-        final File folderLinkTarget = tempFolder.newFolder("..2019_11_26_16_29_08.094515937");
+        final File folderLinkTarget = newFolder(tempFolder, "..2019_11_26_16_29_08.094515937");
         new File(folderLinkTarget, "jenkins_7.yaml").createNewFile();
-        Files.createSymbolicLink(
-                Paths.get(tempFolder.getRoot().getAbsolutePath(), "linked_folder"), folderLinkTarget.toPath());
+        Files.createSymbolicLink(Paths.get(tempFolder.getAbsolutePath(), "linked_folder"), folderLinkTarget.toPath());
 
         assertThat(casc.configs(exactFile.getAbsolutePath()), hasSize(1));
-        final List<Path> foo = casc.configs(tempFolder.getRoot().getAbsolutePath());
-        assertThat(
-                "failed to find 7 configs in "
-                        + Arrays.toString(tempFolder.getRoot().list()),
-                foo,
-                hasSize(7));
+        final List<Path> foo = casc.configs(tempFolder.getAbsolutePath());
+        assertThat("failed to find 7 configs in " + Arrays.toString(tempFolder.list()), foo, hasSize(7));
     }
 
     @Test
-    public void test_ordered_config_loading() throws Exception {
+    void test_ordered_config_loading(JenkinsConfiguredWithCodeRule j) throws Exception {
         ConfigurationAsCode casc = new ConfigurationAsCode();
 
-        tempFolder.newFile("0.yaml");
-        tempFolder.newFile("1.yaml");
-        tempFolder.newFile("a.yaml");
-        tempFolder.newFile("z.yaml");
+        newFile(tempFolder, "0.yaml");
+        newFile(tempFolder, "1.yaml");
+        newFile(tempFolder, "a.yaml");
+        newFile(tempFolder, "z.yaml");
 
-        final List<Path> foo = casc.configs(tempFolder.getRoot().getAbsolutePath());
-        assertThat(
-                "failed to find 4 configs in "
-                        + Arrays.toString(tempFolder.getRoot().list()),
-                foo,
-                hasSize(4));
+        final List<Path> foo = casc.configs(tempFolder.getAbsolutePath());
+        assertThat("failed to find 4 configs in " + Arrays.toString(tempFolder.list()), foo, hasSize(4));
         assertTrue(foo.get(0).endsWith("0.yaml"));
         assertTrue(foo.get(1).endsWith("1.yaml"));
         assertTrue(foo.get(2).endsWith("a.yaml"));
@@ -126,10 +116,10 @@ public class ConfigurationAsCodeTest {
     }
 
     @Test
-    public void test_loads_single_file_from_hidden_folder() throws Exception {
+    void test_loads_single_file_from_hidden_folder(JenkinsConfiguredWithCodeRule j) throws Exception {
         ConfigurationAsCode casc = ConfigurationAsCode.get();
 
-        File hiddenFolder = tempFolder.newFolder(".nested");
+        File hiddenFolder = newFolder(tempFolder, ".nested");
         File singleFile = new File(hiddenFolder, "jenkins.yml");
         try (InputStream configStream = getClass().getResourceAsStream("JenkinsConfigTest.yml")) {
             Files.copy(configStream, singleFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -145,25 +135,25 @@ public class ConfigurationAsCodeTest {
     @ConfiguredWithCode(
             value = {"merge1.yml", "merge3.yml"},
             expected = ConfiguratorException.class)
-    public void test_loads_multi_files() {
+    void test_loads_multi_files(JenkinsConfiguredWithCodeRule j) {
         ConfigurationAsCode casc = ConfigurationAsCode.get();
 
         List<String> sources = casc.getSources();
         assertNotNull(sources);
-        assertEquals(sources.size(), 2);
+        assertEquals(2, sources.size());
     }
 
-    @Test(expected = ConfiguratorException.class)
-    public void shouldReportMissingFileOnNotFoundConfig() throws ConfiguratorException {
+    @Test
+    void shouldReportMissingFileOnNotFoundConfig() {
         ConfigurationAsCode casc = new ConfigurationAsCode();
-        casc.configure("some");
+        assertThrows(ConfiguratorException.class, () -> casc.configure("some"));
     }
 
     @Test
     @ConfiguredWithCode(
             value = {"merge1.yml", "merge3.yml"},
             expected = ConfiguratorException.class)
-    public void shouldMergeYamlConfig() {
+    void shouldMergeYamlConfig(JenkinsConfiguredWithCodeRule j) {
         assertEquals("Configured by Configuration as Code plugin", j.jenkins.getSystemMessage());
         assertEquals(0, j.jenkins.getNumExecutors());
         assertNotNull(j.jenkins.getNode("agent1"));
@@ -174,23 +164,23 @@ public class ConfigurationAsCodeTest {
     @ConfiguredWithCode(
             value = {"merge1.yml", "merge2.yml"},
             expected = ConfiguratorException.class)
-    public void shouldReportConfigurationConflict() {
+    void shouldReportConfigurationConflict(JenkinsConfiguredWithCodeRule j) {
         // expected to throw Configurator Exception
         // nodes should be empty due to conflict
         assertThat(j.jenkins.getNodes(), is(empty()));
     }
 
     @Test
-    public void doCheckNewSource_should_trim_input() {
+    void doCheckNewSource_should_trim_input(JenkinsConfiguredWithCodeRule j) {
         ConfigurationAsCode casc = ConfigurationAsCode.get();
 
         String configUri = getClass().getResource("merge3.yml").toExternalForm();
 
-        assertEquals(casc.doCheckNewSource("  " + configUri + "  ").kind, FormValidation.Kind.OK);
+        assertEquals(FormValidation.Kind.OK, casc.doCheckNewSource("  " + configUri + "  ").kind);
     }
 
     @Test
-    public void doCheckNewSource_should_support_multiple_sources() {
+    void doCheckNewSource_should_support_multiple_sources(JenkinsConfiguredWithCodeRule j) {
         ConfigurationAsCode casc = ConfigurationAsCode.get();
 
         String configUri = String.format(
@@ -198,12 +188,12 @@ public class ConfigurationAsCodeTest {
                 getClass().getResource("JenkinsConfigTest.yml").toExternalForm(),
                 getClass().getResource("folder/jenkins2.yml").toExternalForm());
 
-        assertEquals(casc.doCheckNewSource(configUri).kind, FormValidation.Kind.OK);
+        assertEquals(FormValidation.Kind.OK, casc.doCheckNewSource(configUri).kind);
     }
 
     @Test
     @Issue("Issue #653")
-    public void checkWith_should_pass_against_valid_input() throws Exception {
+    void checkWith_should_pass_against_valid_input(JenkinsConfiguredWithCodeRule j) throws Exception {
         String rawConf = getClass().getResource("JenkinsConfigTest.yml").toExternalForm();
         YamlSource input = YamlSource.of(rawConf);
         Map<Source, String> actual = ConfigurationAsCode.get().checkWith(input);
@@ -213,7 +203,8 @@ public class ConfigurationAsCodeTest {
     @Test
     @Issue("Issue #653")
     @ConfiguredWithCode("aNonEmpty.yml")
-    public void checkWith_should_pass_against_input_which_has_same_entries_with_initial_config() throws Exception {
+    void checkWith_should_pass_against_input_which_has_same_entries_with_initial_config(JenkinsConfiguredWithCodeRule j)
+            throws Exception {
         String rawConf = getClass().getResource("JenkinsConfigTest.yml").toExternalForm();
         YamlSource input = YamlSource.of(rawConf);
         Map<Source, String> actual = ConfigurationAsCode.get().checkWith(input);
@@ -221,7 +212,7 @@ public class ConfigurationAsCodeTest {
     }
 
     @Test
-    public void doReplace_should_trim_input() throws Exception {
+    void doReplace_should_trim_input(JenkinsConfiguredWithCodeRule j) throws Exception {
         HtmlPage page = j.createWebClient().goTo("configuration-as-code");
         j.assertGoodStatus(page);
 
@@ -236,7 +227,7 @@ public class ConfigurationAsCodeTest {
     }
 
     @Test
-    public void doReplace_should_support_multiple_sources() throws Exception {
+    void doReplace_should_support_multiple_sources(JenkinsConfiguredWithCodeRule j) throws Exception {
         HtmlPage page = j.createWebClient().goTo("configuration-as-code");
         j.assertGoodStatus(page);
 
@@ -256,7 +247,7 @@ public class ConfigurationAsCodeTest {
 
     @Test
     @ConfiguredWithCode("admin.yml")
-    public void doViewExport_should_require_authentication() throws Exception {
+    void doViewExport_should_require_authentication(JenkinsConfiguredWithCodeRule j) throws Exception {
         WebClient client = j.createWebClient();
         WebRequest request = new WebRequest(client.createCrumbedUrl("configuration-as-code/viewExport"), POST);
         WebResponse response = client.loadWebResponse(request);
@@ -269,7 +260,7 @@ public class ConfigurationAsCodeTest {
 
     @Test
     @Issue("Issue #739")
-    public void preferEnvOverGlobalConfigForConfigPath() throws Exception {
+    void preferEnvOverGlobalConfigForConfigPath(JenkinsConfiguredWithCodeRule j) throws Exception {
         String firstConfig = getClass().getResource("JenkinsConfigTest.yml").toExternalForm();
         String secondConfig = getClass().getResource("merge3.yml").toExternalForm();
         CasCGlobalConfig descriptor = (CasCGlobalConfig) j.jenkins.getDescriptor(CasCGlobalConfig.class);
@@ -283,22 +274,23 @@ public class ConfigurationAsCodeTest {
         System.clearProperty(CASC_JENKINS_CONFIG_PROPERTY);
     }
 
+    // file names matter for order!
     @Test
-    @ConfiguredWithCode(value = {"aNonEmpty.yml", "empty.yml"}) // file names matter for order!
-    public void test_non_first_yaml_file_empty() {
+    @ConfiguredWithCode(value = {"aNonEmpty.yml", "empty.yml"})
+    void test_non_first_yaml_file_empty(JenkinsConfiguredWithCodeRule j) {
         assertEquals("Configured by Configuration as Code plugin", j.jenkins.getSystemMessage());
     }
 
     @Test
     @Issue("Issue #914")
-    public void isSupportedURI_should_not_throw_on_invalid_uri() {
+    void isSupportedURI_should_not_throw_on_invalid_uri() {
         // for example, a Windows path is not a valid URI
         assertThat(ConfigurationAsCode.isSupportedURI("C:\\jenkins\\casc"), is(false));
     }
 
     @Test
     @ConfiguredWithCode("multi-line1.yml")
-    public void multiline_literal_stays_literal_in_export() throws Exception {
+    void multiline_literal_stays_literal_in_export(JenkinsConfiguredWithCodeRule j) throws Exception {
         assertEquals(
                 "Welcome to our build server.\n\n" + "This Jenkins is 100% configured and managed 'as code'.\n",
                 j.jenkins.getSystemMessage());
@@ -315,7 +307,7 @@ public class ConfigurationAsCodeTest {
 
     @Test
     @ConfiguredWithCode("multi-line2.yml")
-    public void string_to_literal_in_export() throws Exception {
+    void string_to_literal_in_export(JenkinsConfiguredWithCodeRule j) throws Exception {
         assertEquals(
                 "Welcome to our build server.\n\n" + "This Jenkins is 100% configured and managed 'as code'.\n",
                 j.jenkins.getSystemMessage());
@@ -331,7 +323,7 @@ public class ConfigurationAsCodeTest {
     }
 
     @Test
-    public void testHtmlDocStringRetrieval() throws Exception {
+    void testHtmlDocStringRetrieval(JenkinsConfiguredWithCodeRule j) throws Exception {
         String expectedDocString = "<div>\n"
                 + "  If checked, this will allow users who are not authenticated to access Jenkins\n  in a read-only mode.\n"
                 + "</div>\n";
@@ -341,8 +333,25 @@ public class ConfigurationAsCodeTest {
     }
 
     @Test
-    public void configurationCategory() {
+    void configurationCategory(JenkinsConfiguredWithCodeRule j) {
         ConfigurationAsCode configurationAsCode = ConfigurationAsCode.get();
         assertThat(configurationAsCode.getCategoryName(), is("CONFIGURATION"));
+    }
+
+    private static File newFolder(File root, String... subDirs) throws IOException {
+        String subFolder = String.join("/", subDirs);
+        File result = new File(root, subFolder);
+        if (!result.mkdirs()) {
+            throw new IOException("Couldn't create folders " + result);
+        }
+        return result;
+    }
+
+    private static File newFile(File root, String fileName) throws IOException {
+        File result = new File(root, fileName);
+        if (!result.createNewFile()) {
+            throw new IOException("Couldn't create file " + result);
+        }
+        return result;
     }
 }
