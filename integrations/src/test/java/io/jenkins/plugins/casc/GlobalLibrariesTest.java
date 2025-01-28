@@ -2,10 +2,11 @@ package io.jenkins.plugins.casc;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
 import org.jenkinsci.plugins.github_branch_source.BranchDiscoveryTrait;
 import org.jenkinsci.plugins.github_branch_source.ForkPullRequestDiscoveryTrait;
 import org.jenkinsci.plugins.github_branch_source.ForkPullRequestDiscoveryTrait.TrustPermission;
@@ -14,22 +15,19 @@ import org.jenkinsci.plugins.github_branch_source.OriginPullRequestDiscoveryTrai
 import org.jenkinsci.plugins.workflow.libs.GlobalLibraries;
 import org.jenkinsci.plugins.workflow.libs.LibraryConfiguration;
 import org.jenkinsci.plugins.workflow.libs.SCMSourceRetriever;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.Issue;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-public class GlobalLibrariesTest {
-
-    @Rule
-    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+@WithJenkinsConfiguredWithCode
+class GlobalLibrariesTest {
 
     @Issue("JENKINS-57557")
     @Test
     @ConfiguredWithCode("GlobalLibrariesGitHubTest.yml")
-    public void configure_global_library_using_github() {
+    void configure_global_library_using_github(JenkinsConfiguredWithCodeRule j) {
         assertEquals(1, GlobalLibraries.get().getLibraries().size());
         final LibraryConfiguration library =
                 GlobalLibraries.get().getLibraries().get(0);

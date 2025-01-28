@@ -9,20 +9,19 @@ import hudson.model.Descriptor;
 import io.jenkins.plugins.casc.ConfiguratorRegistry;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
 import java.util.Objects;
 import jenkins.model.GlobalConfiguration;
 import org.jenkinsci.Symbol;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
-public class DuplicateKeyDescribableConfiguratorTest {
-    @Rule
-    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+@WithJenkinsConfiguredWithCode
+class DuplicateKeyDescribableConfiguratorTest {
 
     @Test
-    public void implementors_shouldNotThrowException() {
+    void implementors_shouldNotThrowException(JenkinsConfiguredWithCodeRule j) {
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         HeteroDescribableConfigurator configurator =
                 Objects.requireNonNull((HeteroDescribableConfigurator) registry.lookup(FooBar.class));
@@ -32,7 +31,7 @@ public class DuplicateKeyDescribableConfiguratorTest {
 
     @Test
     @ConfiguredWithCode("DuplicateKeyDescribableConfigure.yml")
-    public void configure_shouldNotThrowException() {
+    void configure_shouldNotThrowException(JenkinsConfiguredWithCodeRule j) {
         FooBarGlobalConfiguration descriptor =
                 (FooBarGlobalConfiguration) j.jenkins.getDescriptor(FooBarGlobalConfiguration.class);
         FooBarOne instance = (FooBarOne) Objects.requireNonNull(descriptor).fooBar;

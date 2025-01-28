@@ -1,6 +1,6 @@
 package io.jenkins.plugins.casc.yaml;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.jenkins.plugins.casc.MockHttpServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,12 +9,12 @@ import java.io.File;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class YamlSourceTest {
+class YamlSourceTest {
 
     @Test
-    public void shouldHaveInformativeToStringForUrlSource() {
+    void shouldHaveInformativeToStringForUrlSource() {
         // given
         String testUrl = "http://example.com/foo/bar";
         // and
@@ -24,7 +24,7 @@ public class YamlSourceTest {
     }
 
     @Test
-    public void shouldUseToStringOfSourceInToStringForInputStream() {
+    void shouldUseToStringOfSourceInToStringForInputStream() {
         // given
         InputStream testInputStream = new ByteArrayInputStream("IS content".getBytes(StandardCharsets.UTF_8));
         String testInputStreamToString = testInputStream.toString();
@@ -35,7 +35,7 @@ public class YamlSourceTest {
     }
 
     @Test
-    public void shouldHaveInformativeToStringForPathSource() {
+    void shouldHaveInformativeToStringForPathSource() {
         Path path = new File("./test").toPath();
         String testPathToString = path.toString();
         YamlSource<Path> yamlSource = YamlSource.of(path);
@@ -43,7 +43,7 @@ public class YamlSourceTest {
     }
 
     @Test
-    public void shouldHaveInformativeToStringForRequestSource() {
+    void shouldHaveInformativeToStringForRequestSource() {
         HttpServletRequest request = new MockHttpServletRequest("/configuration-as-code/check");
         YamlSource<HttpServletRequest> yamlSource = YamlSource.of(request);
         assertEquals("YamlSource: /configuration-as-code/check", yamlSource.toString());

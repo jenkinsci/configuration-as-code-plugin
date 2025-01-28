@@ -1,11 +1,12 @@
 package io.jenkins.plugins.casc;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import hudson.plugins.git.GitSCM;
 import hudson.plugins.git.browser.AssemblaWeb;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jenkins.model.GlobalConfiguration;
@@ -13,28 +14,23 @@ import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.workflow.libs.GlobalLibraries;
 import org.jenkinsci.plugins.workflow.libs.LibraryConfiguration;
 import org.jenkinsci.plugins.workflow.libs.SCMRetriever;
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.RuleChain;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.Issue;
-import org.jvnet.hudson.test.LoggerRule;
+import org.jvnet.hudson.test.LogRecorder;
 
 /**
  * Tests for Git plugin global configurations.
  */
-public class GitTest {
+@WithJenkinsConfiguredWithCode
+class GitTest {
 
-    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
-    public LoggerRule logging = new LoggerRule();
+    private final LogRecorder logging = new LogRecorder()
+            .record(Logger.getLogger(Attribute.class.getName()), Level.INFO)
+            .capture(2048);
 
-    @Rule
-    public RuleChain chain = RuleChain.outerRule(logging.record(Logger.getLogger(Attribute.class.getName()), Level.INFO)
-                    .capture(2048))
-            .around(j);
-
-    @After
-    public void dumpLogs() {
+    @AfterEach
+    void dumpLogs() {
         for (String message : logging.getMessages()) {
             System.out.println(message);
         }
@@ -43,7 +39,7 @@ public class GitTest {
     @Test
     @Issue("JENKINS-57604")
     @ConfiguredWithCode("GitTest.yml")
-    public void checkAssemblaWebIsLoaded() {
+    void checkAssemblaWebIsLoaded(JenkinsConfiguredWithCodeRule j) {
         final Jenkins jenkins = Jenkins.get();
         final GlobalLibraries libs =
                 jenkins.getExtensionList(GlobalConfiguration.class).get(GlobalLibraries.class);

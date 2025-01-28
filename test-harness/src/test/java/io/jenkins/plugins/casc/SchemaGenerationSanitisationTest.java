@@ -2,19 +2,17 @@ package io.jenkins.plugins.casc;
 
 import static io.jenkins.plugins.casc.SchemaGeneration.removeHtmlTags;
 import static io.jenkins.plugins.casc.SchemaGeneration.retrieveDocStringFromAttribute;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
-import org.junit.Rule;
-import org.junit.Test;
+import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
+import org.junit.jupiter.api.Test;
 
-public class SchemaGenerationSanitisationTest {
-
-    @Rule
-    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+@WithJenkinsConfiguredWithCode
+class SchemaGenerationSanitisationTest {
 
     @Test
-    public void testRetrieveDocStringFromAttribute() {
+    void testRetrieveDocStringFromAttribute(JenkinsConfiguredWithCodeRule j) {
         String expectedDocString =
                 "If checked, this will allow users who are not authenticated to access Jenkins\n  in a read-only mode.";
         String actualDocString = retrieveDocStringFromAttribute(
@@ -23,7 +21,7 @@ public class SchemaGenerationSanitisationTest {
     }
 
     @Test
-    public void testRemoveHtmlTagRegex() {
+    void testRemoveHtmlTagRegex(JenkinsConfiguredWithCodeRule j) {
         String htmlTagString =
                 "<div> If checked, this will allow users who are not authenticated to access Jenkins in a read-only mode.</div>";
         String expectedString =
