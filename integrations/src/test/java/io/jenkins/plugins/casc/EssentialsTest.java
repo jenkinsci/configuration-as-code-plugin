@@ -3,25 +3,24 @@ package io.jenkins.plugins.casc;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import hudson.ExtensionList;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
 import java.util.List;
 import jenkins.metrics.api.MetricsAccessKey;
 import jenkins.model.Jenkins;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class EssentialsTest {
-    @Rule
-    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+@WithJenkinsConfiguredWithCode
+class EssentialsTest {
 
     @Test
     @ConfiguredWithCode("EssentialsTest.yml")
-    public void essentialsTest() {
+    void essentialsTest(JenkinsConfiguredWithCodeRule j) {
         final Jenkins jenkins = Jenkins.get();
         assertEquals("Welcome to Jenkins Essentials!", jenkins.getSystemMessage());
 

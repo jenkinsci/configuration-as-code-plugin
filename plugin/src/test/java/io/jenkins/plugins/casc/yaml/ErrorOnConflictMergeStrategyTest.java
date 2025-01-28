@@ -1,22 +1,20 @@
 package io.jenkins.plugins.casc.yaml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfiguratorException;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
-public class ErrorOnConflictMergeStrategyTest {
-
-    @Rule
-    public JenkinsRule j = new JenkinsRule();
+@WithJenkins
+class ErrorOnConflictMergeStrategyTest {
 
     @Test
-    public void merge() throws ConfiguratorException {
+    void merge(JenkinsRule j) throws ConfiguratorException {
         String normalSource = getClass().getResource("normal.yml").toExternalForm();
         String overwriteSource = getClass().getResource("overwrite.yml").toExternalForm();
         String conflictsSource = getClass().getResource("conflicts.yml").toExternalForm();
@@ -25,23 +23,25 @@ public class ErrorOnConflictMergeStrategyTest {
         ConfigurationAsCode.get().configure(normalSource, overwriteSource);
 
         // merge with conflicts
-        assertThrows("Merging two conflict config files", ConfiguratorException.class, () -> ConfigurationAsCode.get()
-                .configure(normalSource, conflictsSource));
+        assertThrows(
+                ConfiguratorException.class,
+                () -> ConfigurationAsCode.get().configure(normalSource, conflictsSource),
+                "Merging two conflict config files");
     }
 
     @Test
-    public void incompatible() throws ConfiguratorException {
+    void incompatible(JenkinsRule j) throws ConfiguratorException {
         String normalSource = getClass().getResource("normal.yml").toExternalForm();
         String incompatibleSource = getClass().getResource("incompatible.yml").toExternalForm();
 
         assertThrows(
-                "Incompatible config files merging process",
                 ConfiguratorException.class,
-                () -> ConfigurationAsCode.get().configure(normalSource, incompatibleSource));
+                () -> ConfigurationAsCode.get().configure(normalSource, incompatibleSource),
+                "Incompatible config files merging process");
     }
 
     @Test
-    public void hasCorrectDefaultName() {
+    void hasCorrectDefaultName(JenkinsRule j) {
         MergeStrategy strategy = MergeStrategyFactory.getMergeStrategyOrDefault(null);
         assertNotNull(strategy);
         assertEquals(MergeStrategy.DEFAULT_STRATEGY, strategy.getName());

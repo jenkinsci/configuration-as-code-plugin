@@ -1,8 +1,8 @@
 package io.jenkins.plugins.casc.yaml;
 
 import static org.htmlunit.HttpMethod.GET;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
 import java.net.URL;
@@ -10,17 +10,15 @@ import java.text.MessageFormat;
 import net.sf.json.JSONObject;
 import org.htmlunit.WebRequest;
 import org.htmlunit.WebResponse;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
-public class MergeStrategyActionTest {
-
-    @Rule
-    public JenkinsRule j = new JenkinsRule();
+@WithJenkins
+class MergeStrategyActionTest {
 
     @Test
-    public void test() throws IOException {
+    void test(JenkinsRule j) throws IOException {
         URL apiURL =
                 new URL(MessageFormat.format("{0}cascMergeStrategy", j.getURL().toString()));
         WebRequest request = new WebRequest(apiURL, GET);
@@ -29,8 +27,8 @@ public class MergeStrategyActionTest {
         String strategies = response.getContentAsString();
 
         JSONObject strategiesJSON = JSONObject.fromObject(strategies);
-        assertEquals("The request should be ok", "ok", strategiesJSON.getString("status"));
-        assertNotNull("Should have data field", strategiesJSON.getJSONArray("data"));
+        assertEquals("ok", strategiesJSON.getString("status"), "The request should be ok");
+        assertNotNull(strategiesJSON.getJSONArray("data"), "Should have data field");
         for (Object item : strategiesJSON.getJSONArray("data")) {
             String name = JSONObject.fromObject(item).getString("name");
             assertEquals(

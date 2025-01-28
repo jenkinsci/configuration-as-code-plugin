@@ -1,15 +1,15 @@
 package io.jenkins.plugins.casc.model;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class MappingTest {
+class MappingTest {
 
     @Test
-    public void empty() {
+    void empty() {
         Mapping mapping = new Mapping();
         String aKey = "aKey";
         mapping.put(aKey, (CNode) null);
@@ -19,7 +19,7 @@ public class MappingTest {
     }
 
     @Test
-    public void notEmpty() throws Exception {
+    void notEmpty() throws Exception {
         Mapping mapping = new Mapping();
         String aKey = "aKey";
         String aValue = "aValue";

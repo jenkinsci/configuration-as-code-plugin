@@ -1,29 +1,27 @@
 package io.jenkins.plugins.casc;
 
 import static java.lang.String.format;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import hudson.model.Node;
 import hudson.util.VersionNumber;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
 import java.util.List;
 import jenkins.model.Jenkins;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-public class BackwardCompatibilityTest {
-
-    @Rule
-    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+@WithJenkinsConfiguredWithCode
+class BackwardCompatibilityTest {
 
     @Test
     @ConfiguredWithCode("BackwardCompatibilityTest.yml")
-    public void should_accept_legacy_symbols_on_descriptors() {
+    void should_accept_legacy_symbols_on_descriptors(JenkinsConfiguredWithCodeRule j) {
 
         final List<Node> nodes = j.jenkins.getNodes();
         System.out.println(nodes);
