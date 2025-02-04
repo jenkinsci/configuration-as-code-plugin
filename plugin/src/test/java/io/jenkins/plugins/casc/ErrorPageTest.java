@@ -3,36 +3,37 @@ package io.jenkins.plugins.casc;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import org.htmlunit.html.HtmlForm;
 import org.htmlunit.html.HtmlPage;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.JenkinsRule.WebClient;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
-public class ErrorPageTest {
+@WithJenkins
+class ErrorPageTest {
 
-    @ClassRule
-    public static JenkinsRule r = new JenkinsRule();
+    private JenkinsRule r;
 
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
+    @TempDir
+    public File folder;
 
     private Path cascFile;
 
-    @Before
-    public void setup() throws IOException {
-        cascFile = folder.newFile("jenkins.yaml").toPath();
+    @BeforeEach
+    void setup(JenkinsRule r) throws IOException {
+        this.r = r;
+        cascFile = File.createTempFile("jenkins.yaml", null, folder).toPath();
     }
 
     @Test
-    public void reloadSimple() throws Exception {
+    void reloadSimple() throws Exception {
         Files.write(cascFile, "jenkins:\n  systemMessage2: Hello World\n".getBytes());
 
         String pageContent = reloadConfiguration();
@@ -56,7 +57,7 @@ public class ErrorPageTest {
     }
 
     @Test
-    public void noConfigurator() throws Exception {
+    void noConfigurator() throws Exception {
         Files.write(cascFile, "invalid:\n  systemMessage2: Hello World\n".getBytes());
 
         String pageContent = reloadConfiguration();
@@ -65,7 +66,7 @@ public class ErrorPageTest {
     }
 
     @Test
-    public void noImplementationFoundForSymbol() throws Exception {
+    void noImplementationFoundForSymbol() throws Exception {
         String content = "jenkins:\n" + "  securityRealm:\n" + "    unknown:\n" + "      username: \"world\"\n";
 
         Files.write(cascFile, content.getBytes());

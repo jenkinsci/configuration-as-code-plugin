@@ -7,23 +7,21 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
 import jenkins.model.GlobalConfiguration;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-public class DescriptorConfiguratorTest {
-
-    @Rule
-    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+@WithJenkinsConfiguredWithCode
+class DescriptorConfiguratorTest {
 
     @Test
     @ConfiguredWithCode("DescriptorConfiguratorTest_camelCase.yml")
-    public void configurator_shouldConfigureItselfWhenUsingCamelCase() {
+    void configurator_shouldConfigureItselfWhenUsingCamelCase(JenkinsConfiguredWithCodeRule j) {
         FooBar descriptor = (FooBar) j.jenkins.getDescriptorOrDie(FooBar.class);
         assertThat(descriptor.getFoo(), equalTo("foo"));
         assertThat(descriptor.getBar(), equalTo("bar"));
@@ -31,7 +29,7 @@ public class DescriptorConfiguratorTest {
 
     @Test
     @ConfiguredWithCode("DescriptorConfiguratorTest_lowerCase.yml")
-    public void configurator_shouldConfigureItselfWhenUsingLoweCase() {
+    void configurator_shouldConfigureItselfWhenUsingLoweCase(JenkinsConfiguredWithCodeRule j) {
         FooBar descriptor = (FooBar) j.jenkins.getDescriptorOrDie(FooBar.class);
         assertThat(descriptor.getFoo(), equalTo("foo"));
         assertThat(descriptor.getBar(), equalTo("bar"));
@@ -39,7 +37,7 @@ public class DescriptorConfiguratorTest {
 
     @Test
     @ConfiguredWithCode("DescriptorConfiguratorTest_camelCase.yml")
-    public void configurator_shouldResolveFloatAndDoubleValues() {
+    void configurator_shouldResolveFloatAndDoubleValues(JenkinsConfiguredWithCodeRule j) {
         FooBar descriptor = (FooBar) j.jenkins.getDescriptorOrDie(FooBar.class);
         assertThat(descriptor.getBaz(), equalTo(1.0));
         assertThat(descriptor.getFlt(), equalTo(1000f));

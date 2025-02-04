@@ -1,7 +1,7 @@
 package io.jenkins.plugins.casc;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.cloudbees.jenkins.plugins.customtools.CustomTool;
 import com.cloudbees.jenkins.plugins.customtools.CustomTool.DescriptorImpl;
@@ -9,24 +9,22 @@ import hudson.tools.CommandInstaller;
 import hudson.tools.InstallSourceProperty;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
+import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.Issue;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-public class CustomToolsTest {
-
-    @Rule
-    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+@WithJenkinsConfiguredWithCode
+class CustomToolsTest {
 
     @Test
     @Issue("#97")
-    @Ignore
+    @Disabled
     @ConfiguredWithCode(value = "CustomToolsTest.yml")
-    public void configure_custom_tools() {
+    void configure_custom_tools(JenkinsConfiguredWithCodeRule j) {
         DescriptorImpl descriptor = (DescriptorImpl) j.jenkins.getDescriptorOrDie(CustomTool.class);
         assertEquals(1, descriptor.getInstallations().length);
         final CustomTool customTool = descriptor.getInstallations()[0];

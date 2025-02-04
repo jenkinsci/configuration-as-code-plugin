@@ -3,10 +3,10 @@ package io.jenkins.plugins.casc.core;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.EnvVars;
@@ -22,14 +22,14 @@ import hudson.util.DescribableList;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.Objects;
 import jenkins.model.Jenkins;
 import org.apache.commons.io.FileUtils;
 import org.jenkinsci.Symbol;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.TestExtension;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -37,24 +37,22 @@ import org.kohsuke.stapler.DataBoundConstructor;
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-public class JenkinsConfiguratorTest {
-
-    @Rule
-    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+@WithJenkinsConfiguredWithCode
+class JenkinsConfiguratorTest {
 
     @Test
     @ConfiguredWithCode("Primitives.yml")
-    public void jenkins_primitive_attributes() {
+    void jenkins_primitive_attributes(JenkinsConfiguredWithCodeRule j) {
         final Jenkins jenkins = Jenkins.get();
         assertEquals(6666, jenkins.getSlaveAgentPort());
     }
 
     @Test
     @ConfiguredWithCode("HeteroDescribable.yml")
-    public void jenkins_abstract_describable_attributes() {
+    void jenkins_abstract_describable_attributes(JenkinsConfiguredWithCodeRule j) {
         final Jenkins jenkins = Jenkins.get();
-        assertTrue(jenkins.getSecurityRealm() instanceof HudsonPrivateSecurityRealm);
-        assertTrue(jenkins.getAuthorizationStrategy() instanceof FullControlOnceLoggedInAuthorizationStrategy);
+        assertInstanceOf(HudsonPrivateSecurityRealm.class, jenkins.getSecurityRealm());
+        assertInstanceOf(FullControlOnceLoggedInAuthorizationStrategy.class, jenkins.getAuthorizationStrategy());
         assertFalse(((FullControlOnceLoggedInAuthorizationStrategy) jenkins.getAuthorizationStrategy())
                 .isAllowAnonymousRead());
     }
@@ -62,7 +60,7 @@ public class JenkinsConfiguratorTest {
     @Test
     @Issue("Issue #173")
     @ConfiguredWithCode("SetEnvironmentVariable.yml")
-    public void shouldSetEnvironmentVariable() throws Exception {
+    void shouldSetEnvironmentVariable(JenkinsConfiguredWithCodeRule j) throws Exception {
         final DescribableList<NodeProperty<?>, NodePropertyDescriptor> properties =
                 Jenkins.get().getNodeProperties();
         EnvVars env = new EnvVars();
@@ -74,7 +72,7 @@ public class JenkinsConfiguratorTest {
 
     @Test
     @ConfiguredWithCode("ConfigureLabels.yml")
-    public void shouldExportLabelAtoms() throws Exception {
+    void shouldExportLabelAtoms(JenkinsConfiguredWithCodeRule j) throws Exception {
         Objects.requireNonNull(Jenkins.get().getLabelAtom("label1"))
                 .getProperties()
                 .add(new TestProperty(1));
@@ -93,7 +91,7 @@ public class JenkinsConfiguratorTest {
 
     @Test
     @ConfiguredWithCode("ConfigureLabels.yml")
-    public void shouldImportLabelAtoms() {
+    void shouldImportLabelAtoms(JenkinsConfiguredWithCodeRule j) {
         LabelAtom label1 = Jenkins.get().getLabelAtom("label1");
         assertNotNull(label1);
         assertThat(label1.getProperties(), hasSize(2));
