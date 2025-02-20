@@ -5,7 +5,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey;
 import com.cloudbees.plugins.credentials.Credentials;
@@ -13,30 +13,26 @@ import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import jenkins.model.Jenkins;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.RuleChain;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.Issue;
-import org.jvnet.hudson.test.LoggerRule;
+import org.jvnet.hudson.test.LogRecorder;
 import org.jvnet.hudson.test.TestExtension;
 
 /**
  * Integration tests for the SSH Credentials Plugin.
  */
-public class SSHCredentialsTest {
+@WithJenkinsConfiguredWithCode
+class SSHCredentialsTest {
 
-    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
-    public LoggerRule logging = new LoggerRule();
-
-    @Rule
-    public RuleChain chain = RuleChain.outerRule(logging.record("io.jenkins.plugins.casc.Attribute", Level.INFO)
-                    .capture(2048))
-            .around(j);
+    private final LogRecorder logging = new LogRecorder()
+            .record("io.jenkins.plugins.casc.Attribute", Level.INFO)
+            .capture(2048);
 
     private static final String CREDENTIALS_PASSWORD = "password-of-userid";
     private static final String PRIVATE_KEY = "sp0ds9d+skkfjf";
@@ -44,7 +40,7 @@ public class SSHCredentialsTest {
     @Test
     @ConfiguredWithCode("SSHCredentialsTest.yml")
     @Issue("SECURITY-1279")
-    public void shouldNotExportOrLogCredentials() throws Exception {
+    void shouldNotExportOrLogCredentials(JenkinsConfiguredWithCodeRule j) throws Exception {
         StandardUsernamePasswordCredentials creds = getCredentials(StandardUsernamePasswordCredentials.class);
         assertEquals(CREDENTIALS_PASSWORD, creds.getPassword().getPlainText());
         assertNotInLog(logging, CREDENTIALS_PASSWORD);
@@ -69,7 +65,7 @@ public class SSHCredentialsTest {
     @Test
     @ConfiguredWithCode("SSHCredentialsTest_Multiline_Key.yml")
     @Issue("https://github.com/jenkinsci/configuration-as-code-plugin/issues/1189")
-    public void shouldSupportMultilineCertificates() {
+    void shouldSupportMultilineCertificates(JenkinsConfiguredWithCodeRule j) {
         BasicSSHUserPrivateKey certKey = getCredentials(BasicSSHUserPrivateKey.class);
         assertThat(
                 "Private key roundtrip failed",
@@ -80,7 +76,7 @@ public class SSHCredentialsTest {
     @Test
     @ConfiguredWithCode("SSHCredentialsTest_Singleline_Key.yml")
     @Issue("https://github.com/jenkinsci/configuration-as-code-plugin/issues/1189")
-    public void shouldSupportSinglelineBase64Certificates() {
+    void shouldSupportSinglelineBase64Certificates(JenkinsConfiguredWithCodeRule j) {
         BasicSSHUserPrivateKey certKey = getCredentials(BasicSSHUserPrivateKey.class);
         assertThat(
                 "Private key roundtrip failed",
@@ -91,7 +87,7 @@ public class SSHCredentialsTest {
     private <T extends Credentials> T getCredentials(Class<T> clazz) {
         List<T> creds = CredentialsProvider.lookupCredentials(
                 clazz, Jenkins.getInstanceOrNull(), null, Collections.emptyList());
-        assertEquals("There should be only one credential", 1, creds.size());
+        assertEquals(1, creds.size(), "There should be only one credential");
         return creds.get(0);
     }
 

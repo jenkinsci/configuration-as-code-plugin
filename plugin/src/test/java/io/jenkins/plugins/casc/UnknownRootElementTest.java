@@ -2,36 +2,35 @@ package io.jenkins.plugins.casc;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
-public class UnknownRootElementTest {
-    @Rule
-    public JenkinsRule j = new JenkinsRule();
+@WithJenkins
+class UnknownRootElementTest {
 
     @Test
-    public void oneUnknown() {
+    void oneUnknown(JenkinsRule j) {
         assertThrows(
-                "No configurator for the following root elements alice",
                 ConfiguratorException.class,
                 () -> ConfigurationAsCode.get()
-                        .configure(getClass().getResource("unknown1.yml").toExternalForm()));
+                        .configure(getClass().getResource("unknown1.yml").toExternalForm()),
+                "No configurator for the following root elements alice");
     }
 
     @Test
-    public void twoUnknown() {
+    void twoUnknown(JenkinsRule j) {
         assertThrows(
-                "No configurator for the following root elements bob, alice",
                 ConfiguratorException.class,
                 () -> ConfigurationAsCode.get()
-                        .configure(getClass().getResource("unknown2.yml").toExternalForm()));
+                        .configure(getClass().getResource("unknown2.yml").toExternalForm()),
+                "No configurator for the following root elements bob, alice");
     }
 
     @Test
-    public void ignoreKnownAlias() throws Exception {
+    void ignoreKnownAlias(JenkinsRule j) throws Exception {
         ConfigurationAsCode.get().configure(getClass().getResource("known.yml").toExternalForm());
         assertThat(j.jenkins.getSystemMessage(), is("Configured by Configuration as Code plugin"));
     }

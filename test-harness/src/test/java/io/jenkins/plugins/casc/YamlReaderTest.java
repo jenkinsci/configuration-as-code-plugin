@@ -3,9 +3,11 @@ package io.jenkins.plugins.casc;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.htmlunit.HttpMethod.POST;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
 import io.jenkins.plugins.casc.yaml.YamlSource;
 import io.jenkins.plugins.casc.yaml.YamlUtils;
 import java.io.IOException;
@@ -16,21 +18,18 @@ import java.text.MessageFormat;
 import jenkins.model.Jenkins;
 import org.htmlunit.FailingHttpStatusCodeException;
 import org.htmlunit.WebRequest;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class YamlReaderTest {
+@WithJenkinsConfiguredWithCode
+class YamlReaderTest {
 
-    @Rule
-    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
-
-    @Test(expected = IOException.class)
-    public void unknownReader() throws IOException {
-        YamlUtils.reader(new YamlSource<>(new StringBuilder()));
+    @Test
+    void unknownReader(JenkinsConfiguredWithCodeRule j) {
+        assertThrows(IOException.class, () -> YamlUtils.reader(new YamlSource<>(new StringBuilder())));
     }
 
     @Test
-    public void folder() throws Exception {
+    void folder(JenkinsConfiguredWithCodeRule j) throws Exception {
         String p =
                 Paths.get(getClass().getResource("./folder").toURI()).toFile().getAbsolutePath();
         ConfigurationAsCode.get().configure(p);
@@ -40,7 +39,7 @@ public class YamlReaderTest {
     }
 
     @Test
-    public void httpDoApply() throws Exception {
+    void httpDoApply(JenkinsConfiguredWithCodeRule j) throws Exception {
         j.jenkins.setCrumbIssuer(null);
 
         URL apiURL = new URL(MessageFormat.format(
@@ -58,7 +57,7 @@ public class YamlReaderTest {
     }
 
     @Test
-    public void httpDoCheck() throws Exception {
+    void httpDoCheck(JenkinsConfiguredWithCodeRule j) throws Exception {
         j.jenkins.setCrumbIssuer(null);
 
         URL apiURL = new URL(MessageFormat.format(
@@ -72,15 +71,15 @@ public class YamlReaderTest {
         assertThat(response, is(200));
     }
 
-    @Test(expected = FailingHttpStatusCodeException.class)
-    public void httpDoCheckFailure() throws Exception {
+    @Test
+    void httpDoCheckFailure(JenkinsConfiguredWithCodeRule j) throws Exception {
         j.jenkins.setCrumbIssuer(null);
-
         URL apiURL = new URL(MessageFormat.format(
                 "{0}configuration-as-code/check", j.getURL().toString()));
         WebRequest request = new WebRequest(apiURL, POST);
         request.setCharset(StandardCharsets.UTF_8);
         request.setRequestBody("jenkins:\n" + "  systemMessage: {}");
-        j.createWebClient().getPage(request);
+        assertThrows(
+                FailingHttpStatusCodeException.class, () -> j.createWebClient().getPage(request));
     }
 }

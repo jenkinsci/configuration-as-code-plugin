@@ -9,20 +9,18 @@ import hudson.model.User;
 import io.jenkins.plugins.casc.UnknownAttributesException;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
-import org.junit.Rule;
-import org.junit.Test;
+import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
+import org.junit.jupiter.api.Test;
 
-public class MissingConfiguratorTest {
-
-    @Rule
-    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+@WithJenkinsConfiguredWithCode
+class MissingConfiguratorTest {
 
     @ConfiguredWithCode(
             value = "MissingConfiguratorTest.yml",
             expected = UnknownAttributesException.class,
             message = "No hudson.security.AuthorizationStrategy implementation found for globalMatrix")
     @Test
-    public void testThrowsSuggestion() {
+    void testThrowsSuggestion(JenkinsConfiguredWithCodeRule j) {
         // The conditions for this test can be false in PCT runs
         assumeThat(j.jenkins.getPlugin("matrix-auth"), nullValue());
         // No config check needed, should fail with IllegalArgumentException

@@ -1,23 +1,22 @@
 package io.jenkins.plugins.casc.core;
 
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import hudson.security.AuthorizationStrategy;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
-import org.junit.Rule;
-import org.junit.Test;
+import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Kohsuke Kawaguchi
  */
-public class UnsecuredAuthorizationStrategyConfiguratorTest {
-    @Rule
-    public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+@WithJenkinsConfiguredWithCode
+class UnsecuredAuthorizationStrategyConfiguratorTest {
 
     @Test
     @ConfiguredWithCode("UnsecuredAuthorizationStrategyConfiguratorTest.yml")
-    public void unsecured() {
+    void unsecured(JenkinsConfiguredWithCodeRule j) {
         assertSame(AuthorizationStrategy.UNSECURED, j.jenkins.getAuthorizationStrategy());
     }
 }

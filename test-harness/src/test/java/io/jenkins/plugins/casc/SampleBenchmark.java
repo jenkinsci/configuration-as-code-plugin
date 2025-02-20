@@ -1,6 +1,6 @@
 package io.jenkins.plugins.casc;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import io.jenkins.plugins.casc.misc.jmh.CascJmhBenchmarkState;

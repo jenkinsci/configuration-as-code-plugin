@@ -11,28 +11,26 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import jenkins.model.Jenkins;
 import org.htmlunit.html.HtmlPage;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.JenkinsRule.WebClient;
 import org.jvnet.hudson.test.MockAuthorizationStrategy;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
-public class PermissionsTest {
+@WithJenkins
+class PermissionsTest {
 
     private static final String RELATIVE_PATH_MANAGE_PAGE = "manage";
     private static final String RELATIVE_PATH_CASC_PAGE = "configuration-as-code";
 
-    @Rule
-    public JenkinsRule j = new JenkinsRule();
-
     @Test
-    public void checkPermissionsForReader() throws Exception {
+    void checkPermissionsForReader(JenkinsRule j) throws Exception {
         final String READER = "reader";
         j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
         j.jenkins.setAuthorizationStrategy(
@@ -46,7 +44,7 @@ public class PermissionsTest {
     }
 
     @Test
-    public void checkPermissionsForSystemReader() throws Exception {
+    void checkPermissionsForSystemReader(JenkinsRule j) throws Exception {
         final String SYSTEM_READER = "systemReader";
         j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
         j.jenkins.setAuthorizationStrategy(new MockAuthorizationStrategy()
@@ -71,7 +69,7 @@ public class PermissionsTest {
     }
 
     @Test
-    public void checkPermissionsForManager() throws Exception {
+    void checkPermissionsForManager(JenkinsRule j) throws Exception {
         final String MANAGER = "manager";
         j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
         j.jenkins.setAuthorizationStrategy(new MockAuthorizationStrategy()
@@ -93,7 +91,7 @@ public class PermissionsTest {
     }
 
     @Test
-    public void checkPermissionsForAdmin() throws Exception {
+    void checkPermissionsForAdmin(JenkinsRule j) throws Exception {
         final String ADMIN = "admin";
         j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
         j.jenkins.setAuthorizationStrategy(new MockAuthorizationStrategy()

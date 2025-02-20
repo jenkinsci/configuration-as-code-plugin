@@ -1,6 +1,7 @@
 package io.jenkins.plugins.casc.misc.junit.jupiter;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
+import hudson.security.ACL;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -22,6 +23,9 @@ class JUnit5JenkinsConfiguredWithCodeRule extends JenkinsConfiguredWithCodeRule 
 
     @Override
     public void recipe() throws Exception {
+        // so that test code has all the access to the system
+        ACL.as2(ACL.SYSTEM2);
+
         final JenkinsRecipe recipe = this.testDescription.getAnnotation(JenkinsRecipe.class);
         if (recipe == null) {
             return;
