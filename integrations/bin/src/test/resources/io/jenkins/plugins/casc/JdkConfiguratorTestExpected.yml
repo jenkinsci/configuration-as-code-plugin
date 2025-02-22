@@ -1,0 +1,8 @@
+installations:
+- home: "/jdk"
+  name: "jdk11"
+  properties:
+  - installSource:
+      installers:
+      - adoptOpenJdkInstaller:
+          id: "jdk-11.0.14+9"

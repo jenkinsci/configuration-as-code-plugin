@@ -1,0 +1,17 @@
+unclassified:
+  globalLibraries:
+    libraries:
+      - defaultVersion: "1.2.3"
+        name: "Test Git Lib"
+        retriever:
+          legacySCM:
+            scm:
+              git:
+                branches:
+                  - name: "*/myprodbranch"
+                browser:
+                  # Reproduces JENKINS-57604
+                  assemblaWeb:
+                    repoUrl: "assembla.acmecorp.com"
+                buildChooser: "default"
+                gitTool: "Default"

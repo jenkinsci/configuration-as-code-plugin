@@ -1,0 +1,4 @@
+dockerLabel: "label-casc"
+registry:
+  credentialsId: "credId"
+  url: "my.docker.endpoint"

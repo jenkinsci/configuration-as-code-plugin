@@ -1,0 +1,8 @@
+installations:
+- home: "/maven3"
+  name: "maven3"
+  properties:
+  - installSource:
+      installers:
+      - maven:
+          id: "3.8.4"
