@@ -459,29 +459,47 @@ public class ConfigurationAsCode extends ManagementLink {
         }
 
         res.setContentType("application/json");
-        final JSONArray issues = new JSONArray();
+
         try {
             final Map<Source, String> validationIssues = checkWith(YamlSource.of(req));
+
+            // Create JSON array for response
+            JSONArray response = new JSONArray();
+
+            // If there are validation issues, add them to the response array
             validationIssues.entrySet().stream()
-                    .map(e ->
-                            new JSONObject().accumulate("line", e.getKey().line).accumulate("warning", e.getValue()))
-                    .forEach(issues::add);
+                    .map(e -> new JSONObject()
+                            .accumulate("line", e.getKey() != null ? e.getKey().line : -1)
+                            .accumulate("message", e.getValue()))
+                    .forEach(response::add);
+
+            // Write the response - will be empty array for valid YAML
+            response.write(res.getWriter());
+
         } catch (ConfiguratorException e) {
-            // Convert exceptions to JSON format
-            JSONObject error = new JSONObject().accumulate("line", -1).accumulate("error", e.getMessage());
-            issues.add(error);
+            // Return 400 Bad Request for configuration errors
+            res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+            JSONArray errors = new JSONArray();
+            errors.add(new JSONObject().accumulate("line", -1).accumulate("message", e.getMessage()));
+
+            errors.write(res.getWriter());
+
         } catch (Exception e) {
-            // Handle any other exceptions
-            JSONObject error = new JSONObject()
+            // Return 400 Bad Request for all other errors
+            res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+            JSONArray errors = new JSONArray();
+            errors.add(new JSONObject()
                     .accumulate("line", -1)
                     .accumulate(
-                            "error",
+                            "message",
                             e.getMessage() != null
                                     ? e.getMessage()
-                                    : e.getClass().getName());
-            issues.add(error);
+                                    : e.getClass().getName()));
+
+            errors.write(res.getWriter());
         }
-        issues.write(res.getWriter());
     }
 
     @RequirePOST
