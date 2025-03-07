@@ -453,19 +453,35 @@ public class ConfigurationAsCode extends ManagementLink {
     @RequirePOST
     @Restricted(NoExternalUse.class)
     public void doCheck(StaplerRequest2 req, StaplerResponse2 res) throws Exception {
-
         if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
 
-        final Map<Source, String> issues = checkWith(YamlSource.of(req));
         res.setContentType("application/json");
-        final JSONArray warnings = new JSONArray();
-        issues.entrySet().stream()
-                .map(e -> new JSONObject().accumulate("line", e.getKey().line).accumulate("warning", e.getValue()))
-                .forEach(warnings::add);
-        warnings.write(res.getWriter());
+        final JSONArray issues = new JSONArray();
+        try {
+            final Map<Source, String> validationIssues = checkWith(YamlSource.of(req));
+            validationIssues.entrySet().stream()
+                    .map(e ->
+                            new JSONObject().accumulate("line", e.getKey().line).accumulate("warning", e.getValue()))
+                    .forEach(issues::add);
+        } catch (ConfiguratorException e) {
+            // Convert exceptions to JSON format
+            JSONObject error = new JSONObject().accumulate("line", -1).accumulate("error", e.getMessage());
+            issues.add(error);
+        } catch (Exception e) {
+            // Handle any other exceptions
+            JSONObject error = new JSONObject()
+                    .accumulate("line", -1)
+                    .accumulate(
+                            "error",
+                            e.getMessage() != null
+                                    ? e.getMessage()
+                                    : e.getClass().getName());
+            issues.add(error);
+        }
+        issues.write(res.getWriter());
     }
 
     @RequirePOST
