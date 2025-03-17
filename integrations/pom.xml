@@ -210,7 +210,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>jira</artifactId>
-      <version>3.13</version>
+      <version>3.14</version>
       <scope>test</scope>
     </dependency>
     <dependency>
