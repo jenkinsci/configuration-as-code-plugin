@@ -4,3 +4,5 @@ jenkins:
         env:
           - key: FOO
             value: BAR
+          - key: FOO2
+            value: ""
