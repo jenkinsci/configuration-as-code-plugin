@@ -6,3 +6,4 @@ jenkins:
             value: BAR
           - key: FOO2
             value: ""
+          - key: FOO3

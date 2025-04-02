@@ -15,7 +15,9 @@ import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
 import io.jenkins.plugins.casc.model.CNode;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import jenkins.model.Jenkins;
 import org.junit.jupiter.api.Test;
@@ -33,11 +35,20 @@ class GlobalNodePropertiesTest {
         Set<Map.Entry<String, String>> entries = ((EnvironmentVariablesNodeProperty) nodeProperties.get(0))
                 .getEnvVars()
                 .entrySet();
-        assertEquals(1, entries.size());
+        assertEquals(3, entries.size());
 
-        Map.Entry<String, String> envVar = entries.iterator().next();
+        Iterator<Entry<String, String>> iterator = entries.iterator();
+        Map.Entry<String, String> envVar = iterator.next();
         assertEquals("FOO", envVar.getKey());
         assertEquals("BAR", envVar.getValue());
+
+        envVar = iterator.next();
+        assertEquals("FOO2", envVar.getKey());
+        assertEquals("", envVar.getValue());
+
+        envVar = iterator.next();
+        assertEquals("FOO3", envVar.getKey());
+        assertEquals("", envVar.getValue());
     }
 
     @Test

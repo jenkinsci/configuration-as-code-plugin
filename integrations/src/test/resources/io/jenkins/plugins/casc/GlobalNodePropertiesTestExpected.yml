@@ -2,3 +2,5 @@
     env:
     - key: "FOO"
       value: "BAR"
+    - key: "FOO2"
+    - key: "FOO3"
