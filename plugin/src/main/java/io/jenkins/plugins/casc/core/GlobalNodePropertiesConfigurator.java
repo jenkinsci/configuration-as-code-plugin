@@ -1,6 +1,5 @@
 package io.jenkins.plugins.casc.core;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.slaves.EnvironmentVariablesNodeProperty;
@@ -12,7 +11,6 @@ import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.impl.attributes.MultivaluedAttribute;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
-import io.jenkins.plugins.casc.model.Sequence;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -54,20 +52,6 @@ public class GlobalNodePropertiesConfigurator extends BaseConfigurator<Environme
         Mapping mapping = c.asMapping();
         List<Entry> variables = getVarsAsList(mapping);
         return new EnvironmentVariablesNodeProperty(variables);
-    }
-
-    @CheckForNull
-    public CNode describe(EnvironmentVariablesNodeProperty instance, ConfigurationContext context) throws Exception {
-        Mapping mapping = new Mapping();
-        for (Attribute attribute : getAttributes()) {
-            CNode value = attribute.describe(instance, context);
-            if (value != null) {
-                Sequence values = new Sequence();
-                value.asSequence().stream().forEach(values::add);
-                mapping.put(attribute.getName(), values);
-            }
-        }
-        return mapping;
     }
 
     private List<Entry> getVarsAsList(Mapping m) {
