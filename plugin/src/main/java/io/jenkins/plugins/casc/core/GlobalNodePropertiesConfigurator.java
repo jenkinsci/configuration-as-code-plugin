@@ -4,45 +4,29 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.slaves.EnvironmentVariablesNodeProperty;
 import hudson.slaves.EnvironmentVariablesNodeProperty.Entry;
-import io.jenkins.plugins.casc.Attribute;
-import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.ConfiguratorException;
-import io.jenkins.plugins.casc.impl.attributes.MultivaluedAttribute;
+import io.jenkins.plugins.casc.impl.configurators.DataBoundConfigurator;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Extension
-public class GlobalNodePropertiesConfigurator extends BaseConfigurator<EnvironmentVariablesNodeProperty> {
+public class GlobalNodePropertiesConfigurator extends DataBoundConfigurator<EnvironmentVariablesNodeProperty> {
+
+    public GlobalNodePropertiesConfigurator() {
+        this(EnvironmentVariablesNodeProperty.class);
+    }
+
+    public GlobalNodePropertiesConfigurator(Class<?> clazz) {
+        super(EnvironmentVariablesNodeProperty.class);
+    }
 
     @NonNull
     @Override
     public String getName() {
         return "globalNodeProperties";
-    }
-
-    @Override
-    protected EnvironmentVariablesNodeProperty instance(Mapping mapping, ConfigurationContext context)
-            throws ConfiguratorException {
-        List<Entry> vars = getVarsAsList(mapping);
-        return new EnvironmentVariablesNodeProperty(vars);
-    }
-
-    @Override
-    public Class<EnvironmentVariablesNodeProperty> getTarget() {
-        return EnvironmentVariablesNodeProperty.class;
-    }
-
-    @NonNull
-    @Override
-    public Set<Attribute<EnvironmentVariablesNodeProperty, ?>> describe() {
-        Set<Attribute<EnvironmentVariablesNodeProperty, ?>> attrs = super.describe();
-        attrs.add(new MultivaluedAttribute<EnvironmentVariablesNodeProperty, EnvironmentVariablesNodeProperty.Entry>(
-                "env", Entry.class));
-        return attrs;
     }
 
     @NonNull
