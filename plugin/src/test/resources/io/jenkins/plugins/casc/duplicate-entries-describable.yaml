@@ -1,0 +1,6 @@
+unclassified:
+  testComponent:
+    serverConfiguration:
+      # Two conflicting entries for a single-valued Describable
+      manual: {}
+      wellKnown: {} 
