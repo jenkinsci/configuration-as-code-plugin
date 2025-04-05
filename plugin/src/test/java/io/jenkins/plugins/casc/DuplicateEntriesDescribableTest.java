@@ -1,6 +1,7 @@
 package io.jenkins.plugins.casc;
 
 import hudson.ExtensionPoint;
+import hudson.ExtensionList;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
@@ -21,20 +22,38 @@ import static org.junit.Assert.assertThrows;
 
 public class DuplicateEntriesDescribableTest {
 
+    private static final Logger LOGGER = Logger.getLogger(DuplicateEntriesDescribableTest.class.getName());
+    
     @Rule
     public JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 
     @Test
-    @ConfiguredWithCode("duplicate-entries-describable.yaml")
+    @ConfiguredWithCode("/io/jenkins/plugins/casc/duplicate-entries-describable.yaml")
     public void shouldWarnOnDuplicateEntries() throws Exception {
         // This test verifies that we get a warning for duplicate entries in a single-valued Describable
-        TestComponent component = j.jenkins.getExtensionList(TestComponent.class).get(0);
+        LOGGER.info("Looking up TestComponent extensions");
+        ExtensionList<TestComponent> components = j.jenkins.getExtensionList(TestComponent.class);
+        LOGGER.info("Found " + components.size() + " TestComponent extensions");
+        
+        // If no components found, the test will fail with a clear error message
+        if (components.isEmpty()) {
+            throw new AssertionError("No TestComponent extensions found. Test setup may be incorrect.");
+        }
+        
+        TestComponent component = components.get(0);
         
         // We should still get a configuration, but a warning should be logged
         // Since we can't easily check logged warnings in tests, we at least verify
         // that the component was configured with one of the options
-        assertThat(component.getServerConfig().toString(), 
-                  containsString("TestServerConfig")); // This just verifies we got some server config
+        TestServerConfig config = component.getServerConfig();
+        LOGGER.info("Server config: " + (config != null ? config.toString() : "null"));
+        
+        // Make sure we got a configuration and it's not null
+        if (config == null) {
+            throw new AssertionError("Server configuration is null. The configuration was not applied correctly.");
+        }
+        
+        assertThat(config.toString(), containsString("TestServerConfig"));
     }
 
     @Test
@@ -48,8 +67,15 @@ public class DuplicateEntriesDescribableTest {
         serverConfigMapping.put("manual", Mapping.EMPTY);
         serverConfigMapping.put("wellKnown", Mapping.EMPTY);
         
+        // Component mapping needs to match the YAML structure
         Mapping componentMapping = new Mapping();
         componentMapping.put("serverConfiguration", serverConfigMapping);
+        
+        // Create the full mapping structure with unclassified section
+        Mapping fullMapping = new Mapping();
+        Mapping unclassified = new Mapping();
+        unclassified.put("duplicateEntriesDescribableTest$testComponent", componentMapping);
+        fullMapping.put("unclassified", unclassified);
         
         // This should throw an exception
         Configurator<TestComponent> configurator = 
@@ -57,7 +83,7 @@ public class DuplicateEntriesDescribableTest {
         
         ConfiguratorException exception = assertThrows(
             ConfiguratorException.class, 
-            () -> configurator.configure(componentMapping, context)
+            () -> ConfigurationAsCode.get().configureWith(fullMapping)
         );
         
         assertThat(exception.getMessage(), 
@@ -65,8 +91,13 @@ public class DuplicateEntriesDescribableTest {
     }
 
     // Test component with a single-valued Describable
+    @TestExtension
     public static class TestComponent implements ExtensionPoint {
         private TestServerConfig serverConfig;
+
+        public static TestComponent get() {
+            return ExtensionList.lookup(TestComponent.class).get(0);
+        }
 
         public TestServerConfig getServerConfiguration() {
             return serverConfig;
