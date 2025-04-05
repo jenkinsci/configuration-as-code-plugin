@@ -356,7 +356,7 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
                     int configurableEntries = 0;
                     for (String key : mapping.keySet()) {
                         CNode value = mapping.get(key);
-                        if (value != null && !(value instanceof Scalar && ((Scalar) value).isNull())) {
+                        if (value != null && !(value instanceof Scalar && (((Scalar) value).getValue() == null || ((Scalar) value).toString().isEmpty()))) {
                             configurableEntries++;
                         }
                     }
