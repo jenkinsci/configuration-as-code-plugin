@@ -10,11 +10,16 @@ import io.jenkins.plugins.casc.misc.Env;
 import io.jenkins.plugins.casc.misc.EnvVarsRule;
 import io.jenkins.plugins.casc.misc.Envs;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.model.CNode;
 import java.util.Map;
+import org.hamcrest.core.Is;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
+import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
+import static io.jenkins.plugins.casc.misc.Util.toStringFromYamlFile;
+import static io.jenkins.plugins.casc.misc.Util.toYamlString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
@@ -45,5 +50,21 @@ public class GlobalNodePropertiesWithEnvaVarsTest {
         ToolLocationNodeProperty toolLocations = nodeProperties.get(ToolLocationNodeProperty.class);
         assertThat(toolLocations.getLocations(), hasSize(1));
         assertThat(toolLocations.getLocations().get(0).getHome(), is("git-home"));
+    }
+
+    @Test
+    @ConfiguredWithCode("GlobalNodePropertiesWithEnvVarsTest.yml")
+    @Envs({
+        @Env(name = "VALUE_1", value = "BAR"),
+        @Env(name = "TEST_GIT_HOME", value = "git-home")
+    })
+    public void export() throws Exception {
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        ConfigurationContext context = new ConfigurationContext(registry);
+        CNode yourAttribute = getJenkinsRoot(context).get("globalNodeProperties");
+
+        String exported = toYamlString(yourAttribute);
+        String expected = toStringFromYamlFile(this, "GlobalNodePropertiesWithEnvVarsTestExpected.yml");
+        assertThat(exported, Is.is(expected));
     }
 }

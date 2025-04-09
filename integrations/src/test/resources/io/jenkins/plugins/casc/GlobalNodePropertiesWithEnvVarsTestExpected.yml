@@ -1,0 +1,9 @@
+- envVars:
+    env:
+    - key: "FOO"
+      value: "BAR"
+    - key: "FOO2"
+- toolLocation:
+    locations:
+    - home: "git-home"
+      key: "hudson.plugins.git.GitTool$DescriptorImpl@Default"
