@@ -50,7 +50,11 @@ public class GlobalNodePropertiesConfigurator extends DataBoundConfigurator<Envi
                                 pair.asMapping().get("key").asScalar().getValue();
                         final String value = pair.asMapping().get("value") == null
                                 ? ""
-                                : context.getSecretSourceResolver().resolve(pair.asMapping().get("value").asScalar().getValue());
+                                : context.getSecretSourceResolver()
+                                        .resolve(pair.asMapping()
+                                                .get("value")
+                                                .asScalar()
+                                                .getValue());
 
                         return new Entry(key, value);
                     })

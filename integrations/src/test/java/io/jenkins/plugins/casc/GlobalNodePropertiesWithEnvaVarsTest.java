@@ -1,5 +1,12 @@
 package io.jenkins.plugins.casc;
 
+import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
+import static io.jenkins.plugins.casc.misc.Util.toStringFromYamlFile;
+import static io.jenkins.plugins.casc.misc.Util.toYamlString;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+
 import hudson.slaves.EnvironmentVariablesNodeProperty;
 import hudson.slaves.NodeProperty;
 import hudson.slaves.NodePropertyDescriptor;
@@ -17,13 +24,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
-import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
-import static io.jenkins.plugins.casc.misc.Util.toStringFromYamlFile;
-import static io.jenkins.plugins.casc.misc.Util.toYamlString;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.hasSize;
-
 public class GlobalNodePropertiesWithEnvaVarsTest {
 
     private JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
@@ -33,15 +33,12 @@ public class GlobalNodePropertiesWithEnvaVarsTest {
 
     @Test
     @ConfiguredWithCode("GlobalNodePropertiesWithEnvVarsTest.yml")
-    @Envs({
-        @Env(name = "VALUE_1", value = "BAR"),
-        @Env(name = "TEST_GIT_HOME", value = "git-home")
-    })
+    @Envs({@Env(name = "VALUE_1", value = "BAR"), @Env(name = "TEST_GIT_HOME", value = "git-home")})
     public void configureWithEnvVarsTest() {
         DescribableList<NodeProperty<?>, NodePropertyDescriptor> nodeProperties = j.jenkins.getGlobalNodeProperties();
         Map<String, String> envVars = ((EnvironmentVariablesNodeProperty)
-            nodeProperties.get(EnvironmentVariablesNodeProperty.class))
-            .getEnvVars();
+                        nodeProperties.get(EnvironmentVariablesNodeProperty.class))
+                .getEnvVars();
 
         assertThat(envVars.size(), is(2));
         assertThat(envVars.get("FOO"), is("BAR"));
@@ -54,10 +51,7 @@ public class GlobalNodePropertiesWithEnvaVarsTest {
 
     @Test
     @ConfiguredWithCode("GlobalNodePropertiesWithEnvVarsTest.yml")
-    @Envs({
-        @Env(name = "VALUE_1", value = "BAR"),
-        @Env(name = "TEST_GIT_HOME", value = "git-home")
-    })
+    @Envs({@Env(name = "VALUE_1", value = "BAR"), @Env(name = "TEST_GIT_HOME", value = "git-home")})
     public void export() throws Exception {
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         ConfigurationContext context = new ConfigurationContext(registry);
