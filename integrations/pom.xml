@@ -61,7 +61,6 @@
     <dependency>
       <groupId>io.jenkins.docker</groupId>
       <artifactId>docker-plugin</artifactId>
-      <version>1274.vc0203fdf2e74</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -128,7 +127,6 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>azure-keyvault</artifactId>
-      <version>282.v43b_691a_13d19</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -283,7 +281,6 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>simple-theme-plugin</artifactId>
-      <version>202.v6367d3dea_73b_</version>
       <scope>test</scope>
     </dependency>
     <dependency>
