@@ -10,7 +10,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import com.amazonaws.services.ec2.model.InstanceType;
 import hudson.model.labels.LabelAtom;
 import hudson.plugins.ec2.AMITypeData;
 import hudson.plugins.ec2.EC2Cloud;
@@ -22,6 +21,7 @@ import java.util.List;
 import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
+import software.amazon.awssdk.services.ec2.model.InstanceType;
 
 public class EC2CloudTest {
 
@@ -48,7 +48,7 @@ public class EC2CloudTest {
         assertFalse(slaveTemplate.monitoring);
         assertFalse(slaveTemplate.stopOnTerminate);
         assertFalse(slaveTemplate.useEphemeralDevices);
-        assertThat(slaveTemplate.type, is(InstanceType.T2Small));
+        assertThat(slaveTemplate.type, is(InstanceType.T2_SMALL.toString()));
         assertThat(slaveTemplate.getAmi(), equalTo("ami-0c6bb742864ffa3f3"));
         assertThat(slaveTemplate.getLabelString(), containsString("Small"));
         assertThat(slaveTemplate.getLabelSet(), is(notNullValue()));
@@ -78,7 +78,7 @@ public class EC2CloudTest {
         assertFalse(slaveTemplate.monitoring);
         assertFalse(slaveTemplate.stopOnTerminate);
         assertFalse(slaveTemplate.useEphemeralDevices);
-        assertThat(slaveTemplate.type, is(InstanceType.T2Xlarge));
+        assertThat(slaveTemplate.type, is(InstanceType.T2_XLARGE.toString()));
         assertThat(slaveTemplate.getAmi(), equalTo("ami-0c6bb742864ffa3f3"));
         assertThat(slaveTemplate.getLabelString(), containsString("Large"));
         assertThat(slaveTemplate.getLabelSet(), is(notNullValue()));
