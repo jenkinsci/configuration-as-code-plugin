@@ -1,0 +1,49 @@
+package io.jenkins.plugins.casc;
+
+import hudson.slaves.EnvironmentVariablesNodeProperty;
+import hudson.slaves.NodeProperty;
+import hudson.slaves.NodePropertyDescriptor;
+import hudson.tools.ToolLocationNodeProperty;
+import hudson.util.DescribableList;
+import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
+import io.jenkins.plugins.casc.misc.Env;
+import io.jenkins.plugins.casc.misc.EnvVarsRule;
+import io.jenkins.plugins.casc.misc.Envs;
+import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import java.util.Map;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.RuleChain;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.hasSize;
+
+public class GlobalNodePropertiesWithEnvaVarsTest {
+
+    private JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
+
+    @Rule
+    public RuleChain chain = RuleChain.outerRule(new EnvVarsRule()).around(j);
+
+    @Test
+    @ConfiguredWithCode("GlobalNodePropertiesWithEnvVarsTest.yml")
+    @Envs({
+        @Env(name = "VALUE_1", value = "BAR"),
+        @Env(name = "TEST_GIT_HOME", value = "git-home")
+    })
+    public void configureWithEnvVarsTest() {
+        DescribableList<NodeProperty<?>, NodePropertyDescriptor> nodeProperties = j.jenkins.getGlobalNodeProperties();
+        Map<String, String> envVars = ((EnvironmentVariablesNodeProperty)
+            nodeProperties.get(EnvironmentVariablesNodeProperty.class))
+            .getEnvVars();
+
+        assertThat(envVars.size(), is(2));
+        assertThat(envVars.get("FOO"), is("BAR"));
+        assertThat(envVars.get("FOO2"), is(""));
+
+        ToolLocationNodeProperty toolLocations = nodeProperties.get(ToolLocationNodeProperty.class);
+        assertThat(toolLocations.getLocations(), hasSize(1));
+        assertThat(toolLocations.getLocations().get(0).getHome(), is("git-home"));
+    }
+}

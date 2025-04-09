@@ -34,11 +34,11 @@ public class GlobalNodePropertiesConfigurator extends DataBoundConfigurator<Envi
     public EnvironmentVariablesNodeProperty configure(CNode c, ConfigurationContext context)
             throws ConfiguratorException {
         Mapping mapping = c.asMapping();
-        List<Entry> variables = getVarsAsList(mapping);
+        List<Entry> variables = getVarsAsList(mapping, context);
         return new EnvironmentVariablesNodeProperty(variables);
     }
 
-    private List<Entry> getVarsAsList(Mapping m) {
+    private List<Entry> getVarsAsList(Mapping m, ConfigurationContext context) {
         List<Entry> result = new ArrayList<>();
         if (m.get("env") != null) {
             result = m.get("env").asSequence().stream()
@@ -50,7 +50,7 @@ public class GlobalNodePropertiesConfigurator extends DataBoundConfigurator<Envi
                                 pair.asMapping().get("key").asScalar().getValue();
                         final String value = pair.asMapping().get("value") == null
                                 ? ""
-                                : pair.asMapping().get("value").asScalar().getValue();
+                                : context.getSecretSourceResolver().resolve(pair.asMapping().get("value").asScalar().getValue());
 
                         return new Entry(key, value);
                     })
