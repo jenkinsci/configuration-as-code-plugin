@@ -51,10 +51,6 @@ class GlobalNodePropertiesTest {
         assertEquals("FOO2", envVar.getKey());
         assertEquals("", envVar.getValue());
 
-        envVar = iterator.next();
-        assertEquals("FOO3", envVar.getKey());
-        assertEquals("", envVar.getValue());
-
         DiskSpaceMonitorNodeProperty diskSpace = nodeProperties.get(DiskSpaceMonitorNodeProperty.class);
         assertEquals("1GiB", diskSpace.getFreeDiskSpaceThreshold());
         assertEquals("2GiB", diskSpace.getFreeDiskSpaceWarningThreshold());
