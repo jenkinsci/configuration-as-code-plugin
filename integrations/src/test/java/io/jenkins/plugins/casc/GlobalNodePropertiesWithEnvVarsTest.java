@@ -24,7 +24,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
-public class GlobalNodePropertiesWithEnvaVarsTest {
+public class GlobalNodePropertiesWithEnvVarsTest {
 
     private JenkinsConfiguredWithCodeRule j = new JenkinsConfiguredWithCodeRule();
 

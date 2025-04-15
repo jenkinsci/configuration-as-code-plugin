@@ -40,7 +40,7 @@ class GlobalNodePropertiesTest {
                         nodeProperties.get(EnvironmentVariablesNodeProperty.class))
                 .getEnvVars()
                 .entrySet();
-        assertEquals(3, envVars.size());
+        assertEquals(2, envVars.size());
 
         Iterator<Entry<String, String>> iterator = envVars.iterator();
         Map.Entry<String, String> envVar = iterator.next();

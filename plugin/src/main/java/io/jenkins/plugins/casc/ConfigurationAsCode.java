@@ -657,7 +657,7 @@ public class ConfigurationAsCode extends ManagementLink {
             default:
                 final Scalar scalar = config.asScalar();
                 final String value = scalar.getValue();
-                if (value == null || value.length() == 0) {
+                if (StringUtils.isBlank(value) && !scalar.isPrintableWhenEmpty()) {
                     return null;
                 }
 

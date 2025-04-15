@@ -16,6 +16,7 @@ public final class Scalar implements CNode, CharSequence {
     private Source source;
     private boolean sensitive;
     private boolean encrypted;
+    private boolean printableWhenEmpty = false;
 
     public enum Format {
         STRING,
@@ -164,6 +165,15 @@ public final class Scalar implements CNode, CharSequence {
     }
 
     @Override
+    public boolean isPrintableWhenEmpty() {
+        return printableWhenEmpty;
+    }
+
+    public void setPrintableWhenEmpty(boolean print) {
+        this.printableWhenEmpty = print;
+    }
+
+    @Override
     public CNode clone() {
         return new Scalar(this);
     }
@@ -175,5 +185,6 @@ public final class Scalar implements CNode, CharSequence {
         this.source = it.source;
         this.sensitive = it.sensitive;
         this.encrypted = it.encrypted;
+        this.printableWhenEmpty = it.printableWhenEmpty;
     }
 }

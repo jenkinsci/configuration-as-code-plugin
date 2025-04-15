@@ -3,6 +3,7 @@
     - key: "FOO"
       value: "BAR"
     - key: "FOO2"
+      value: ""
 - toolLocation:
     locations:
     - home: "git-home"

@@ -36,6 +36,14 @@ public interface CNode extends Cloneable {
     }
 
     /**
+     * Indicates if the field should be included when describing even if empty
+     * @return false by default
+     */
+    default boolean isPrintableWhenEmpty() {
+        return false;
+    }
+
+    /**
      * Indicate the source (file, line number) this specific configuration node comes from.
      * This is used to offer relevant diagnostic messages
      */

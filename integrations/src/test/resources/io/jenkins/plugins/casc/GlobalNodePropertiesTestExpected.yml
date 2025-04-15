@@ -8,7 +8,7 @@
     - key: "FOO"
       value: "BAR"
     - key: "FOO2"
-    - key: "FOO3"
+      value: ""
 - toolLocation:
     locations:
     - home: "/home/user/bin/git"
