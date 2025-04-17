@@ -1,0 +1,12 @@
+jenkins:
+  globalNodeProperties:
+    - envVars:
+        env:
+          - key: FOO
+            value: ${VALUE_1}
+          - key: FOO2
+            value: ${VALUE_2}
+    - toolLocation:
+        locations:
+          - home: "${TEST_GIT_HOME}"
+            key: "hudson.plugins.git.GitTool$DescriptorImpl@Default"
