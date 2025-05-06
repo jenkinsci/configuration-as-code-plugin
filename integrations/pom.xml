@@ -13,7 +13,7 @@
   <properties>
     <!-- no need to be deployed during release, this is a test-only module -->
     <maven.deploy.skip>true</maven.deploy.skip>
-    <jenkins.version>2.492.1</jenkins.version>
+    <jenkins.version>2.504.1</jenkins.version>
   </properties>
 
   <dependencyManagement>
@@ -61,7 +61,6 @@
     <dependency>
       <groupId>io.jenkins.docker</groupId>
       <artifactId>docker-plugin</artifactId>
-      <version>1.9.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -128,7 +127,6 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>azure-keyvault</artifactId>
-      <version>280.v166053ddda_42</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -210,7 +208,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>jira</artifactId>
-      <version>3.13</version>
+      <version>3.15</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -236,12 +234,6 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>mercurial</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>mesos</artifactId>
-      <version>1.0.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -283,7 +275,6 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>simple-theme-plugin</artifactId>
-      <version>202.v6367d3dea_73b_</version>
       <scope>test</scope>
     </dependency>
     <dependency>

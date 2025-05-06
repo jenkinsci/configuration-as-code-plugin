@@ -37,10 +37,10 @@ jenkins:
         region: "eu-central-1"
         templates:
           - description: "Auto configured EC2 Agent Small"
-            type: "T2Small"
+            type: "t2.small"
             labelString: "Small"
             <<: *ec2_anchor
           - description: "Auto configured EC2 Agent Large"
-            type: "T2Xlarge"
+            type: "t2.xlarge"
             labelString: "Large"
             <<: *ec2_anchor

@@ -453,19 +453,53 @@ public class ConfigurationAsCode extends ManagementLink {
     @RequirePOST
     @Restricted(NoExternalUse.class)
     public void doCheck(StaplerRequest2 req, StaplerResponse2 res) throws Exception {
-
         if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
 
-        final Map<Source, String> issues = checkWith(YamlSource.of(req));
         res.setContentType("application/json");
-        final JSONArray warnings = new JSONArray();
-        issues.entrySet().stream()
-                .map(e -> new JSONObject().accumulate("line", e.getKey().line).accumulate("warning", e.getValue()))
-                .forEach(warnings::add);
-        warnings.write(res.getWriter());
+
+        try {
+            final Map<Source, String> validationIssues = checkWith(YamlSource.of(req));
+
+            // Create JSON array for response
+            JSONArray response = new JSONArray();
+
+            // If there are validation issues, add them to the response array
+            validationIssues.entrySet().stream()
+                    .map(e -> new JSONObject()
+                            .accumulate("line", e.getKey() != null ? e.getKey().line : -1)
+                            .accumulate("message", e.getValue()))
+                    .forEach(response::add);
+
+            // Write the response - will be empty array for valid YAML
+            response.write(res.getWriter());
+
+        } catch (ConfiguratorException e) {
+            // Return 400 Bad Request for configuration errors
+            res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+            JSONArray errors = new JSONArray();
+            errors.add(new JSONObject().accumulate("line", -1).accumulate("message", e.getMessage()));
+
+            errors.write(res.getWriter());
+
+        } catch (Exception e) {
+            // Return 400 Bad Request for all other errors
+            res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+            JSONArray errors = new JSONArray();
+            errors.add(new JSONObject()
+                    .accumulate("line", -1)
+                    .accumulate(
+                            "message",
+                            e.getMessage() != null
+                                    ? e.getMessage()
+                                    : e.getClass().getName()));
+
+            errors.write(res.getWriter());
+        }
     }
 
     @RequirePOST
@@ -623,7 +657,7 @@ public class ConfigurationAsCode extends ManagementLink {
             default:
                 final Scalar scalar = config.asScalar();
                 final String value = scalar.getValue();
-                if (value == null || value.length() == 0) {
+                if (StringUtils.isBlank(value) && !scalar.isPrintableWhenEmpty()) {
                     return null;
                 }
 

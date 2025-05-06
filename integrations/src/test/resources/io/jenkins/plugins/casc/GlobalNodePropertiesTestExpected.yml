@@ -1,4 +1,15 @@
+- diskSpaceMonitor:
+    freeDiskSpaceThreshold: "1GiB"
+    freeDiskSpaceWarningThreshold: "2GiB"
+    freeTempSpaceThreshold: "1GiB"
+    freeTempSpaceWarningThreshold: "2GiB"
 - envVars:
     env:
     - key: "FOO"
       value: "BAR"
+    - key: "FOO2"
+      value: ""
+- toolLocation:
+    locations:
+    - home: "/home/user/bin/git"
+      key: "hudson.plugins.git.GitTool$DescriptorImpl@Default"

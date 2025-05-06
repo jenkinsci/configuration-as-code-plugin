@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>5.7</version>
+    <version>5.14</version>
     <relativePath />
   </parent>
 
@@ -71,7 +71,7 @@
             <dependency>
               <groupId>com.puppycrawl.tools</groupId>
               <artifactId>checkstyle</artifactId>
-              <version>10.21.2</version>
+              <version>10.23.1</version>
             </dependency>
           </dependencies>
         </plugin>
