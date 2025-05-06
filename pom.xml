@@ -39,11 +39,10 @@
   <properties>
     <changelist>999999-SNAPSHOT</changelist>
     <gitHubRepo>jenkinsci/configuration-as-code-plugin</gitHubRepo>
-    <jenkins.baseline>2.479</jenkins.baseline>
-    <jenkins.version>${jenkins.baseline}.3</jenkins.version>
+    <jenkins.baseline>2.504</jenkins.baseline>
+    <jenkins.version>${jenkins.baseline}.1</jenkins.version>
     <tagNameFormat>configuration-as-code-@{project.version}</tagNameFormat>
-    <useBeta>true</useBeta>
-    <plugin-bom.version>4628.v2b_234a_1a_20d0</plugin-bom.version>
+    <plugin-bom.version>4710.v016f0a_07e34d</plugin-bom.version>
     <spotless.check.skip>false</spotless.check.skip>
   </properties>
 
