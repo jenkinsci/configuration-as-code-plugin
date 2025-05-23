@@ -49,6 +49,12 @@
       <groupId>com.vladsch.flexmark</groupId>
       <artifactId>flexmark-all</artifactId>
       <version>0.64.8</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.jetbrains</groupId>
+          <artifactId>annotations</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>io.jenkins</groupId>
