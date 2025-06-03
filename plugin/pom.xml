@@ -56,7 +56,7 @@
       <!-- https://github.com/jenkinsci/configuration-as-code-plugin/issues/2491 caused by removing it -->
       <groupId>com.google.code.findbugs</groupId>
       <artifactId>jsr305</artifactId>
-      <version>3.0.2</version>
+      <version>3.0.1</version>
     </dependency>
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
