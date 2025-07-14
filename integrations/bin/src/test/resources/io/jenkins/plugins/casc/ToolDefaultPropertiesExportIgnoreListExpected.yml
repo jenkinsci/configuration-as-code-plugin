@@ -1,0 +1,11 @@
+git:
+  installations:
+  - home: "git"
+    name: "Default"
+jdk:
+  installations:
+  - home: "/jdk"
+    name: "default"
+mavenGlobalConfig:
+  globalSettingsProvider: "standard"
+  settingsProvider: "standard"

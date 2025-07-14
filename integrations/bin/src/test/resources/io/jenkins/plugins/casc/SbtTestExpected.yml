@@ -1,0 +1,8 @@
+installations:
+- home: "/usr/bin/sbt"
+  name: "sbt"
+  properties:
+  - installSource:
+      installers:
+      - sbtInstaller:
+          id: "1.2.8"
