@@ -28,7 +28,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import org.apache.commons.lang.StringUtils;
 import org.hamcrest.core.StringContains;
 
 /**
@@ -73,7 +72,8 @@ public class JenkinsConfiguredWithReadmeRule extends JenkinsConfiguredRule {
                 if (!configuredWithReadme.expected().isInstance(t)) {
                     throw new AssertionError("Unexpected exception ", t);
                 } else {
-                    if (!StringUtils.isBlank(configuredWithReadme.message())) {
+                    if (configuredWithReadme.message() != null
+                            && !configuredWithReadme.message().isBlank()) {
                         boolean match =
                                 new StringContains(false, configuredWithReadme.message()).matches(t.getMessage());
                         if (!match) {

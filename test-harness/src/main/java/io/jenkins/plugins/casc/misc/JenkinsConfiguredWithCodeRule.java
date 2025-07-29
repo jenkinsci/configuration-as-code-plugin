@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import org.apache.commons.lang.StringUtils;
 import org.hamcrest.core.StringContains;
 
 /**
@@ -49,7 +48,8 @@ public class JenkinsConfiguredWithCodeRule extends JenkinsConfiguredRule {
                 if (!configuredWithCode.expected().isInstance(t)) {
                     throw new AssertionError("Unexpected exception ", t);
                 } else {
-                    if (!StringUtils.isBlank(configuredWithCode.message())) {
+                    if (configuredWithCode.message() != null
+                            && !configuredWithCode.message().isBlank()) {
                         boolean match = new StringContains(false, configuredWithCode.message()).matches(t.getMessage());
                         if (!match) {
                             throw new AssertionError("Exception did not contain the expected string: "
