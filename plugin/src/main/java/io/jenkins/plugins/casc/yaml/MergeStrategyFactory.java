@@ -4,7 +4,7 @@ import hudson.ExtensionList;
 import java.util.Optional;
 import javax.annotation.Nonnull;
 import jenkins.model.Jenkins;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class MergeStrategyFactory {
     private static MergeStrategy getMergeStrategy(@Nonnull String name) {
