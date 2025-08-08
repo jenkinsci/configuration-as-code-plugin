@@ -13,14 +13,15 @@
   <properties>
     <!-- no need to be deployed during release, this is a test-only module -->
     <maven.deploy.skip>true</maven.deploy.skip>
-    <jenkins.version>2.516.1</jenkins.version>
+    <jenkins.baseline>2.516</jenkins.baseline>
+    <jenkins.version>${jenkins.baseline}.1</jenkins.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.479.x</artifactId>
+        <artifactId>bom-${jenkins.baseline}.x</artifactId>
         <version>${plugin-bom.version}</version>
         <type>pom</type>
         <scope>import</scope>
