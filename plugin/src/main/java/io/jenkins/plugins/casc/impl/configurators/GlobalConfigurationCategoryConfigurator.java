@@ -16,6 +16,7 @@ import io.jenkins.plugins.casc.RootElementConfigurator;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import io.jenkins.plugins.casc.model.Scalar;
+import io.jenkins.plugins.casc.model.Sequence;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -109,6 +110,11 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
         Jenkins.get().getExtensionList(Descriptor.class).stream()
                 .filter(this::filterDescriptors)
                 .forEach(d -> describe(d, mapping, context));
+        mapping.entrySet()
+                .removeIf(e -> e.getValue() instanceof Mapping m
+                        && m.keySet().equals(Set.of("installations"))
+                        && m.get("installations") instanceof Sequence s
+                        && s.isEmpty());
         return mapping;
     }
 

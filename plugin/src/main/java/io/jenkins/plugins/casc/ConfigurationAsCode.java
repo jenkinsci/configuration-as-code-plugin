@@ -632,9 +632,6 @@ public class ConfigurationAsCode extends ManagementLink {
                     }
                     tuples.add(new NodeTuple(new ScalarNode(Tag.STR, entry.getKey(), null, null, PLAIN), valueNode));
                 }
-                if (tuples.isEmpty()) {
-                    return null;
-                }
 
                 return new MappingNode(Tag.MAP, tuples, BLOCK);
 
