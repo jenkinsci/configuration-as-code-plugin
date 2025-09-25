@@ -272,3 +272,8 @@ Plugin developers wanting to support JCasC in their plugin should [check out our
 As configuration as code is demonstrated to be a highly requested topic in the Jenkins community, we have published
 [JEP 201](https://github.com/jenkinsci/jep/tree/master/jep/201) as a proposal to make this a standard component
 of the Jenkins project. The proposal was accepted. :tada:
+
+## Developer Guide
+
+For detailed information about recent changes made by developers, including configurations, adjustments, and guidelines for contributing to the project, please see the [Developer Changes README](docs\developer\README.md).
+
