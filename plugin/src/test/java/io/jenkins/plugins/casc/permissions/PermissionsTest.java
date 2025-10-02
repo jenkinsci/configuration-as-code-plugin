@@ -1,7 +1,6 @@
 package io.jenkins.plugins.casc.permissions;
 
 import static io.jenkins.plugins.casc.permissions.Action.APPLY_NEW_CONFIGURATION;
-import static io.jenkins.plugins.casc.permissions.Action.DOWNLOAD_CONFIGURATION;
 import static io.jenkins.plugins.casc.permissions.Action.RELOAD_EXISTING_CONFIGURATION;
 import static io.jenkins.plugins.casc.permissions.Action.VIEW_CONFIGURATION;
 import static java.lang.String.format;
@@ -62,7 +61,6 @@ class PermissionsTest {
                 SYSTEM_READER,
                 ImmutableMap.<Action, Boolean>builder()
                         .put(VIEW_CONFIGURATION, true)
-                        .put(DOWNLOAD_CONFIGURATION, true)
                         .put(APPLY_NEW_CONFIGURATION, false)
                         .put(RELOAD_EXISTING_CONFIGURATION, false)
                         .build());
@@ -106,7 +104,6 @@ class PermissionsTest {
                 ADMIN,
                 ImmutableMap.<Action, Boolean>builder()
                         .put(VIEW_CONFIGURATION, true)
-                        .put(DOWNLOAD_CONFIGURATION, true)
                         .put(APPLY_NEW_CONFIGURATION, true)
                         .put(RELOAD_EXISTING_CONFIGURATION, true)
                         .build());
