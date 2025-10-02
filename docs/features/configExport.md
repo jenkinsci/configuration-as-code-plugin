@@ -3,7 +3,7 @@
 The plugin supports exporting existing configurations as YAML.
 This can be achieved with the following options:
 
-* Accessing the `http://[your_jenkins_url]/configuration-as-code/` URL as a Jenkins administrators and pressing `Download Configuration`
+* Accessing the `http://[your_jenkins_url]/configuration-as-code/` URL as a Jenkins administrator, and clicking `Export configuration`
 * Running the following in a Groovy script (not recommended, uses internal APIs):
 
       import io.jenkins.plugins.casc.ConfigurationAsCode
@@ -11,9 +11,8 @@ This can be achieved with the following options:
       ConfigurationAsCode.get().export(stream)
       println stream.toString()
 
-Export feature is **NOT** intended to offer a directly usable jenkins.yaml configuration. 
-It can be used for inspiration writing your own production-ready YAML, but be aware that export can be partial, 
-or fail for some components.
+Export may not offer a directly usable jenkins.yaml configuration.
+It is normally better when you copy the relevant sections you need instead of the entire file.
 
 ## Security notice
 
@@ -21,14 +20,14 @@ Jenkins configuration may include various sensitive information,
 including, but not limited to, credentials, secrets, administrative information about the instance and user personal data.
 The Configuration-as-Code plugin tracks secrets and represents them safely in the exported YAMLs,
 but it cannot prevent secrets from being exported in all cases.
-Ultimately, it is a responsibility of Jenkins administrators to ensure that the generated YAML files
+Ultimately, it is the responsibility of Jenkins administrators to ensure that the generated YAML files
 do not include sensitive information.
 
 See more information about the masking logic below.
 
 ## Data to be exported
 
-Currently the plugin does not have a way to define which data should be exported.
+The plugin does not have a way to define which data should be exported.
 The following data is exported:
 
 * System configuration under the _Manage Jenkins_ link 
@@ -36,8 +35,9 @@ The following data is exported:
 * Agent configurations
 * Views
 * Credentials
+* Users - Only if using the security realm "Jenkins’ own user database"
 
-Jobs and users are NOT exported by the plugin.
+The plugin does NOT export Jobs.
 
 ## Secret masking
 

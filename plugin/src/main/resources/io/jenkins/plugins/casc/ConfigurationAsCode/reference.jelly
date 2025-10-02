@@ -1,37 +1,17 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler">
-  <st:contentType value="text/html;charset=UTF-8"/>
-  <j:new var="h" className="hudson.Functions"/>
-  <j:invoke on="${h}" method="initPageVariables">
-    <j:arg value="${context}"/>
-  </j:invoke>
-  <html><head>
-  <link href='https://jenkins.io/assets/bower/bootstrap/css/bootstrap.min.css' media='screen' rel='stylesheet'/>
-  <link href='https://jenkins.io/assets/bower/tether/css/tether.min.css' media='screen' rel='stylesheet'/>
-  <link href='https://jenkins.io/css/font-icons.css' media='screen' rel='stylesheet'/>
-  <link href='https://jenkins.io/css/jenkins.css' media='screen' rel='stylesheet'/>
-  <link href='https://jenkins.io/assets/bower/ionicons/css/ionicons.min.css' media='screen' rel='stylesheet'/>
-  <link href='https://jenkins.io/css/footer.css' media='screen' rel='stylesheet'/>
-  <link href='https://jenkins.io/css/font-awesome.min.css' media='screen' rel='stylesheet'/>
-  <link href='${rootURL}/plugin/configuration-as-code/css/reference.css' rel='stylesheet'/>
-  </head>
-
-  <body class='syntax'>
-  <div class='container'>
-  <div class='row body'>
-  <div class='section'>
-  <h2>${%Jenkins Configuration as Code Reference}</h2>
-
-  <div class='sect3'>
-  <j:set var="casc" value="${it}"/>
-  <j:forEach items="${it.configurators}" var="c">
-    <st:include page="documentation.jelly" it="${c}" optional="true"/>
-  </j:forEach>
-  </div>
-  </div>
-  </div>
-  </div>
-  </body>
-  </html>
+<j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout" xmlns:st="jelly:stapler">
+  <l:layout type="one-column" title="${%Reference}" permissions="${app.MANAGE_AND_SYSTEM_READ}">
+    <l:breadcrumb title="${%Reference}"/>
+    <l:main-panel>
+      <link href='${rootURL}/plugin/configuration-as-code/css/reference.css' rel='stylesheet'/>
+      <l:app-bar title="${%Reference}"/>
+      <div class='sect3'>
+        <j:set var="casc" value="${it}"/>
+        <j:forEach items="${it.configurators}" var="c">
+          <st:include page="documentation.jelly" it="${c}" optional="true"/>
+        </j:forEach>
+      </div>
+    </l:main-panel>
+  </l:layout>
 
 </j:jelly>
