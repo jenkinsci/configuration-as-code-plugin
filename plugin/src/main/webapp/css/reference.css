@@ -8,13 +8,13 @@
 
 .configurator-pointer {
   font-size: 0.5em;
-  color: #454545;
+  color: var(--text-color-secondary);
   font-weight: 100;
 }
 
 .root-configurator-pointer {
   font-size: 0.5em;
-  color: #7f5200;
+  color: var(--orange);
   font-weight: 100;
 }
 
@@ -27,7 +27,7 @@
   display: flex;
   flex-grow: 1;
   margin-left: 25px;
-  border-left: 1px solid #ccc;
+  border-left: var(--jenkins-border);
   line-height: 24px;
 }
 
@@ -70,7 +70,7 @@
 }
 
 .attribute-type {
-  color: #454545;
+  color: var(--text-color-secondary);
 }
 
 .attribute-type__list {
