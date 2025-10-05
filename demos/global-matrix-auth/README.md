@@ -1,6 +1,7 @@
 # matrix-auth-plugin
 
-Requires `matrix-auth` >= 3.0
+Requires `matrix-auth` >= 3.2
+> Starting from version 3.2 of the `matrix-auth` plugin, the JCasC syntax for configuring permissions has changed. The previous `permissions:` format is deprecated and replaced with a structured `entries:` format. While older configurations may still work with `deprecated: warn`, it is recommended to migrate to the new format.
 
 There are a couple of built-in authorizations to consider.
 
@@ -9,6 +10,30 @@ There are a couple of built-in authorizations to consider.
 
 ## sample-configuration (global matrix)
 
+Updated Configuration:
+```yaml
+jenkins:
+  authorizationStrategy:
+    globalMatrix:
+      entries:
+        - user:
+            name: "admin"
+            permissions:
+              - "Overall/Administer"
+        - user:
+            name: "anonymous"
+            permissions:
+              - "Overall/Read"
+        - group:
+            name: "authenticated"
+            permissions:
+              - "Overall/Administer"
+```
+Permissions must be defined **per line**, meaning each line must grant permission to only a single role, and only a single user or group of users.
+
+
+
+## Deprecated Configuration (Pre-3.2)
 ```yaml
 jenkins:
   authorizationStrategy:
@@ -18,10 +43,44 @@ jenkins:
         - "GROUP:Overall/Administer:authenticated"
         - "USER:Overall/Administer:admin"
 ```
-Permissions must be defined **per line**, meaning each line must grant permission to only a single role, and only a single user or group of users.
+
+
 
 ## sample-configuration (project based matrix)
 
+```yaml
+jenkins:
+  authorizationStrategy:
+    projectMatrix:
+      entries:
+        - group:
+            name: "authenticated"
+            permissions:
+              - "View/Delete"
+              - "View/Read"
+              - "View/Configure"
+              - "View/Create"
+              - "Job/Read"
+              - "Job/Build"
+              - "Job/Configure"
+              - "Job/Create"
+              - "Job/Delete"
+              - "Job/Discover"
+              - "Job/Move"
+              - "Job/Workspace"
+              - "Job/Cancel"
+              - "Run/Delete"
+              - "Run/Replay"
+              - "Run/Update"
+              - "SCM/Tag"
+              - "Overall/Administer"
+        - user:
+            name: "anonymous"
+            permissions:
+              - "Overall/Read"
+```
+
+## Deprecated Configuration for Project Matrix (Pre-3.2)
 ```yaml
 jenkins:
   authorizationStrategy:
