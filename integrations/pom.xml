@@ -300,11 +300,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.jvnet.hudson.plugins</groupId>
-      <artifactId>thinBackup</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>view-job-filters</artifactId>
       <scope>test</scope>
@@ -318,6 +313,11 @@
       <groupId>org.jenkins.plugins.statistics.gatherer</groupId>
       <artifactId>statistics-gatherer</artifactId>
       <version>2.0.3</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jvnet.hudson.plugins</groupId>
+      <artifactId>thinBackup</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
