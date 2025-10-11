@@ -6,7 +6,8 @@ Basic configuration of the [Amazon EC2 Plugin](https://plugins.jenkins.io/ec2)
 
 ```yaml
 x-ec2_anchor: &ec2_anchor
-  associatePublicIp: false
+  # associatePublicIp has been replaced by associatePublicIp. Valid values: https://github.com/jenkinsci/ec2-plugin/pull/1148
+  associatePublicIp: PRIVATE_IP
   connectBySSHProcess: false
   connectionStrategy: PRIVATE_IP
   deleteRootOnTermination: false
