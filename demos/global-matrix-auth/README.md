@@ -1,7 +1,6 @@
 # matrix-auth-plugin
 
 Requires `matrix-auth` >= 3.2
-> Starting from version 3.2 of the `matrix-auth` plugin, the JCasC syntax for configuring permissions has changed. The previous `permissions:` format is deprecated and replaced with a structured `entries:` format. While older configurations may still work with `deprecated: warn`, it is recommended to migrate to the new format.
 
 There are a couple of built-in authorizations to consider.
 
@@ -10,7 +9,6 @@ There are a couple of built-in authorizations to consider.
 
 ## sample-configuration (global matrix)
 
-Updated Configuration:
 ```yaml
 jenkins:
   authorizationStrategy:
@@ -27,23 +25,10 @@ jenkins:
         - group:
             name: "authenticated"
             permissions:
-              - "Overall/Administer"
+              - "Overall/Read"
+              - "Job/Build"
+              - "Job/Create"
 ```
-Permissions must be defined **per line**, meaning each line must grant permission to only a single role, and only a single user or group of users.
-
-
-
-## Deprecated Configuration (Pre-3.2)
-```yaml
-jenkins:
-  authorizationStrategy:
-    globalMatrix:
-      permissions:
-        - "USER:Overall/Read:anonymous"
-        - "GROUP:Overall/Administer:authenticated"
-        - "USER:Overall/Administer:admin"
-```
-
 
 
 ## sample-configuration (project based matrix)
@@ -78,33 +63,6 @@ jenkins:
             name: "anonymous"
             permissions:
               - "Overall/Read"
-```
-
-## Deprecated Configuration for Project Matrix (Pre-3.2)
-```yaml
-jenkins:
-  authorizationStrategy:
-    projectMatrix:
-      permissions:
-        - "View/Delete:authenticated"
-        - "View/Read:authenticated"
-        - "View/Configure:authenticated"
-        - "View/Create:authenticated"
-        - "Job/Read:authenticated"
-        - "Job/Build:authenticated"
-        - "Job/Configure:authenticated"
-        - "Job/Create:authenticated"
-        - "Job/Delete:authenticated"
-        - "Job/Discover:authenticated"
-        - "Job/Move:authenticated"
-        - "Job/Workspace:authenticated"
-        - "Job/Cancel:authenticated"
-        - "Run/Delete:authenticated"
-        - "Run/Replay:authenticated"
-        - "Run/Update:authenticated"
-        - "SCM/Tag:authenticated"
-        - "Overall/Read:anonymous"
-        - "Overall/Administer:authenticated"
 ```
 
 Some permissions depends on actual plugin-usage.  
