@@ -6,7 +6,7 @@ Basic configuration of the [Amazon EC2 Plugin](https://plugins.jenkins.io/ec2)
 
 ```yaml
 x-ec2_anchor: &ec2_anchor
-  associateIpStrategy: PRIVATE_IP
+  associateIPStrategy: PRIVATE_IP
   connectBySSHProcess: false
   connectionStrategy: PRIVATE_IP
   deleteRootOnTermination: false
