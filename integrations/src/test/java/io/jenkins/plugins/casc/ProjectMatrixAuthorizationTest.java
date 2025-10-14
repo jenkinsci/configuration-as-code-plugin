@@ -4,8 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import hudson.security.ProjectMatrixAuthorizationStrategy;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
-import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
-import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
 import java.util.ArrayList;
 import java.util.List;
 import jenkins.model.Jenkins;
@@ -14,12 +12,12 @@ import org.junit.jupiter.api.Test;
 /**
  * Created by mads on 2/22/18.
  */
-@WithJenkinsConfiguredWithCode
+@WithJenkinsConfiguredWithReadmeRule
 class ProjectMatrixAuthorizationTest {
 
     @Test
     @ConfiguredWithReadme("global-matrix-auth/README.md#2")
-    void checkCorrectlyConfiguredPermissions(JenkinsConfiguredWithReadmeRule j) {
+    void checkCorrectlyConfiguredPermissions() {
         assertEquals(
                 ProjectMatrixAuthorizationStrategy.class,
                 Jenkins.get().getAuthorizationStrategy().getClass(),
