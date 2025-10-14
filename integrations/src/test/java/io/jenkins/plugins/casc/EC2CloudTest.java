@@ -41,13 +41,13 @@ public class EC2CloudTest {
 
         SlaveTemplate slaveTemplate = templates.get(0);
         assertThat(slaveTemplate.getDisplayName(), containsString("Auto configured EC2 Agent Small"));
-        assertFalse(slaveTemplate.associateIPStrategy());
         assertFalse(slaveTemplate.isConnectBySSHProcess());
         assertFalse(slaveTemplate.deleteRootOnTermination);
         assertFalse(slaveTemplate.ebsOptimized);
         assertFalse(slaveTemplate.monitoring);
         assertFalse(slaveTemplate.stopOnTerminate);
         assertFalse(slaveTemplate.useEphemeralDevices);
+        assertThat(slaveTemplate.associateIPStrategy(), equalTo("PRIVATE_IP"));
         assertThat(slaveTemplate.type, is(InstanceType.T2_SMALL.toString()));
         assertThat(slaveTemplate.getAmi(), equalTo("ami-0c6bb742864ffa3f3"));
         assertThat(slaveTemplate.getLabelString(), containsString("Small"));
