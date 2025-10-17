@@ -69,7 +69,7 @@ unclassified:
         retriever:
           modernSCM:
             scm:
-              git:
+              gitSource:
                 remote: "https://github.com/jenkins-infra/pipeline-library.git"
 
   location:
