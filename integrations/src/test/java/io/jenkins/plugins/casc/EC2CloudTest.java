@@ -12,6 +12,7 @@ import static org.junit.Assert.assertTrue;
 
 import hudson.model.labels.LabelAtom;
 import hudson.plugins.ec2.AMITypeData;
+import hudson.plugins.ec2.AssociateIPStrategy;
 import hudson.plugins.ec2.EC2Cloud;
 import hudson.plugins.ec2.SlaveTemplate;
 import hudson.plugins.ec2.UnixData;
