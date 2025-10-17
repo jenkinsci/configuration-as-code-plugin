@@ -48,7 +48,7 @@ public class EC2CloudTest {
         assertFalse(slaveTemplate.monitoring);
         assertFalse(slaveTemplate.stopOnTerminate);
         assertFalse(slaveTemplate.useEphemeralDevices);
-        assertThat(slaveTemplate.associateIPStrategy(), equalTo("PRIVATE_IP"));
+        assertThat(slaveTemplate.getAssociateIPStrategy(), equalTo(AssociateIPStrategy.PRIVATE_IP));
         assertThat(slaveTemplate.type, is(InstanceType.T2_SMALL.toString()));
         assertThat(slaveTemplate.getAmi(), equalTo("ami-0c6bb742864ffa3f3"));
         assertThat(slaveTemplate.getLabelString(), containsString("Small"));
