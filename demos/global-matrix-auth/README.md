@@ -1,6 +1,6 @@
 # matrix-auth-plugin
 
-Requires `matrix-auth` >= 3.0
+Requires `matrix-auth` >= 3.2
 
 There are a couple of built-in authorizations to consider.
 
@@ -13,12 +13,23 @@ There are a couple of built-in authorizations to consider.
 jenkins:
   authorizationStrategy:
     globalMatrix:
-      permissions:
-        - "USER:Overall/Read:anonymous"
-        - "GROUP:Overall/Administer:authenticated"
-        - "USER:Overall/Administer:admin"
+      entries:
+        - user:
+            name: "admin"
+            permissions:
+              - "Overall/Administer"
+        - user:
+            name: "anonymous"
+            permissions:
+              - "Overall/Read"
+        - group:
+            name: "authenticated"
+            permissions:
+              - "Overall/Read"
+              - "Job/Build"
+              - "Job/Create"
 ```
-Permissions must be defined **per line**, meaning each line must grant permission to only a single role, and only a single user or group of users.
+
 
 ## sample-configuration (project based matrix)
 
@@ -26,26 +37,32 @@ Permissions must be defined **per line**, meaning each line must grant permissio
 jenkins:
   authorizationStrategy:
     projectMatrix:
-      permissions:
-        - "View/Delete:authenticated"
-        - "View/Read:authenticated"
-        - "View/Configure:authenticated"
-        - "View/Create:authenticated"
-        - "Job/Read:authenticated"
-        - "Job/Build:authenticated"
-        - "Job/Configure:authenticated"
-        - "Job/Create:authenticated"
-        - "Job/Delete:authenticated"
-        - "Job/Discover:authenticated"
-        - "Job/Move:authenticated"
-        - "Job/Workspace:authenticated"
-        - "Job/Cancel:authenticated"
-        - "Run/Delete:authenticated"
-        - "Run/Replay:authenticated"
-        - "Run/Update:authenticated"
-        - "SCM/Tag:authenticated"
-        - "Overall/Read:anonymous"
-        - "Overall/Administer:authenticated"
+      entries:
+        - group:
+            name: "authenticated"
+            permissions:
+              - "View/Delete"
+              - "View/Read"
+              - "View/Configure"
+              - "View/Create"
+              - "Job/Read"
+              - "Job/Build"
+              - "Job/Configure"
+              - "Job/Create"
+              - "Job/Delete"
+              - "Job/Discover"
+              - "Job/Move"
+              - "Job/Workspace"
+              - "Job/Cancel"
+              - "Run/Delete"
+              - "Run/Replay"
+              - "Run/Update"
+              - "SCM/Tag"
+              - "Overall/Administer"
+        - user:
+            name: "anonymous"
+            permissions:
+              - "Overall/Read"
 ```
 
 Some permissions depends on actual plugin-usage.  
