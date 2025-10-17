@@ -72,7 +72,7 @@ public class EC2CloudTest {
 
         slaveTemplate = templates.get(1);
         assertThat(slaveTemplate.getDisplayName(), containsString("Auto configured EC2 Agent Large"));
-        assertFalse(slaveTemplate.associateIPStrategy());
+        assertFalse(slaveTemplate.getAssociateIPStrategy());
         assertFalse(slaveTemplate.isConnectBySSHProcess());
         assertFalse(slaveTemplate.deleteRootOnTermination);
         assertFalse(slaveTemplate.ebsOptimized);
