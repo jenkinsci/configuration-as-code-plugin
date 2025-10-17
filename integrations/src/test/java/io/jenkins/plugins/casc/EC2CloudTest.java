@@ -12,6 +12,7 @@ import static org.junit.Assert.assertTrue;
 
 import hudson.model.labels.LabelAtom;
 import hudson.plugins.ec2.AMITypeData;
+import hudson.plugins.ec2.AssociateIPStrategy;
 import hudson.plugins.ec2.EC2Cloud;
 import hudson.plugins.ec2.SlaveTemplate;
 import hudson.plugins.ec2.UnixData;
@@ -41,13 +42,13 @@ public class EC2CloudTest {
 
         SlaveTemplate slaveTemplate = templates.get(0);
         assertThat(slaveTemplate.getDisplayName(), containsString("Auto configured EC2 Agent Small"));
-        assertFalse(slaveTemplate.getAssociatePublicIp());
         assertFalse(slaveTemplate.isConnectBySSHProcess());
         assertFalse(slaveTemplate.deleteRootOnTermination);
         assertFalse(slaveTemplate.ebsOptimized);
         assertFalse(slaveTemplate.monitoring);
         assertFalse(slaveTemplate.stopOnTerminate);
         assertFalse(slaveTemplate.useEphemeralDevices);
+        assertThat(slaveTemplate.getAssociateIPStrategy(), equalTo(AssociateIPStrategy.PRIVATE_IP));
         assertThat(slaveTemplate.type, is(InstanceType.T2_SMALL.toString()));
         assertThat(slaveTemplate.getAmi(), equalTo("ami-0c6bb742864ffa3f3"));
         assertThat(slaveTemplate.getLabelString(), containsString("Small"));
@@ -71,7 +72,7 @@ public class EC2CloudTest {
 
         slaveTemplate = templates.get(1);
         assertThat(slaveTemplate.getDisplayName(), containsString("Auto configured EC2 Agent Large"));
-        assertFalse(slaveTemplate.getAssociatePublicIp());
+        assertThat(slaveTemplate.getAssociateIPStrategy(), equalTo(AssociateIPStrategy.PRIVATE_IP));
         assertFalse(slaveTemplate.isConnectBySSHProcess());
         assertFalse(slaveTemplate.deleteRootOnTermination);
         assertFalse(slaveTemplate.ebsOptimized);
