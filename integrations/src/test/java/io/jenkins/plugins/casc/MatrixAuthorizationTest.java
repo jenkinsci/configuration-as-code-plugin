@@ -33,12 +33,10 @@ public class MatrixAuthorizationTest {
         GlobalMatrixAuthorizationStrategy gms =
                 (GlobalMatrixAuthorizationStrategy) Jenkins.get().getAuthorizationStrategy();
 
-        Set<PermissionEntry> adminPermission = gms.getGrantedPermissionEntries()
-            .get(Job.BUILD);
+        Set<PermissionEntry> adminPermission = gms.getGrantedPermissionEntries().get(Job.BUILD);
         assertEquals("authenticated", adminPermission.iterator().next().getSid());
 
-        Set<PermissionEntry> readPermission = gms.getGrantedPermissionEntries()
-            .get(Job.READ);
+        Set<PermissionEntry> readPermission = gms.getGrantedPermissionEntries().get(Job.READ);
         assertEquals("anonymous", readPermission.iterator().next().getSid());
     }
 
@@ -46,19 +44,17 @@ public class MatrixAuthorizationTest {
     @ConfiguredWithReadme("matrix-auth/README.md#1")
     public void checkProjectCorrectlyConfiguredPermissions() {
         Assertions.assertEquals(
-            ProjectMatrixAuthorizationStrategy.class,
-            Jenkins.get().getAuthorizationStrategy().getClass(),
-            "The configured instance must use the Global Matrix Authentication Strategy");
+                ProjectMatrixAuthorizationStrategy.class,
+                Jenkins.get().getAuthorizationStrategy().getClass(),
+                "The configured instance must use the Global Matrix Authentication Strategy");
         ProjectMatrixAuthorizationStrategy gms =
-            (ProjectMatrixAuthorizationStrategy) Jenkins.get().getAuthorizationStrategy();
+                (ProjectMatrixAuthorizationStrategy) Jenkins.get().getAuthorizationStrategy();
 
-        Set<PermissionEntry> adminPermission = gms.getGrantedPermissionEntries()
-            .get(Jenkins.ADMINISTER);
-        Assertions.assertEquals("authenticated", adminPermission.iterator().next().getSid());
+        Set<PermissionEntry> adminPermission = gms.getGrantedPermissionEntries().get(Jenkins.ADMINISTER);
+        Assertions.assertEquals(
+                "authenticated", adminPermission.iterator().next().getSid());
 
-        Set<PermissionEntry> readPermission = gms.getGrantedPermissionEntries()
-            .get(Jenkins.READ);
+        Set<PermissionEntry> readPermission = gms.getGrantedPermissionEntries().get(Jenkins.READ);
         Assertions.assertEquals("anonymous", readPermission.iterator().next().getSid());
     }
-
 }
