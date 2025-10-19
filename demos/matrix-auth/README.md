@@ -1,5 +1,7 @@
 # matrix-auth-plugin
 
+Configuration of the [Matrix Authorization Strategy plugin](https://plugins.jenkins.io/matrix-auth)
+
 There are a couple of built-in authorizations to consider.
 
 - **anonymous** - anyone who has not logged in.
