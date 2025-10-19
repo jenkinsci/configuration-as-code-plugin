@@ -14,7 +14,7 @@
     <!-- no need to be deployed during release, this is a test-only module -->
     <maven.deploy.skip>true</maven.deploy.skip>
     <jenkins.baseline>2.516</jenkins.baseline>
-    <jenkins.version>${jenkins.baseline}.1</jenkins.version>
+    <jenkins.version>${jenkins.baseline}.3</jenkins.version>
   </properties>
 
   <dependencyManagement>
