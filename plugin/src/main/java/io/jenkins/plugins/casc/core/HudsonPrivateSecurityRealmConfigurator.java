@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -96,7 +97,7 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
     private static User createAccount(HudsonPrivateSecurityRealm target, UserWithPassword user) throws IOException {
         User updatedUser;
         if (StringUtils.isNotBlank(user.password)) {
-            if (StringUtils.startsWith(user.password, HASHED_PASSWORD_PREFIX)) {
+            if (Strings.CS.startsWith(user.password, HASHED_PASSWORD_PREFIX)) {
                 updatedUser = target.createAccountWithHashedPassword(user.id, user.password);
             } else {
                 updatedUser = target.createAccount(user.id, user.password);
