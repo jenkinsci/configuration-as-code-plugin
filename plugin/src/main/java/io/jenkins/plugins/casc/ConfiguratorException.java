@@ -25,6 +25,7 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import io.jenkins.plugins.casc.model.CNode;
 import java.util.Collections;
 import java.util.List;
+import jenkins.model.Jenkins;
 
 /**
  * Exception type for {@link Configurator} issues.
@@ -100,7 +101,10 @@ public class ConfiguratorException extends RuntimeException {
     @Override
     public String getMessage() {
         if (configurator != null) {
-            return String.format("%s: %s", configurator.getName(), super.getMessage());
+            return String.format(
+                    "%s: %s",
+                    Jenkins.getInstanceOrNull() == null ? configurator.getClass() : configurator.getName(),
+                    super.getMessage());
         }
         return super.getMessage();
     }

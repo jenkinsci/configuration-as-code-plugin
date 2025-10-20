@@ -28,12 +28,15 @@ import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import io.jenkins.plugins.casc.model.Scalar;
 import io.jenkins.plugins.casc.model.Sequence;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.PostConstruct;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.Issue;
@@ -52,6 +55,9 @@ class DataBoundConfiguratorTest {
     private JenkinsRule j;
 
     private final LogRecorder logging = new LogRecorder();
+
+    /** captured exception to be printed after Jenkins is shut down */
+    private static Throwable savedConfiguratorException;
 
     @BeforeEach
     void tearUp(JenkinsRule j) {
@@ -164,6 +170,8 @@ class DataBoundConfiguratorTest {
                         .configure(config, new ConfigurationContext(registry)));
 
         assertThat(exception.getMessage(), is(expectedMessage));
+
+        savedConfiguratorException = exception;
     }
 
     @Test
@@ -249,6 +257,19 @@ class DataBoundConfiguratorTest {
                                 + " Constructor: public io.jenkins.plugins.casc.impl.configurators.DataBoundConfiguratorTest$Foo(java.lang.String,boolean,int).\n"
                                 + " Arguments: [java.lang.String, java.lang.Boolean, java.lang.Integer].\n"
                                 + " Expected Parameters: foo java.lang.String, bar boolean, qix int"));
+
+        savedConfiguratorException = e;
+    }
+
+    @AfterAll
+    static void checkConfiguratorExceptionCanBeReportedWithoutJenkins() {
+        if (savedConfiguratorException != null) {
+            StringWriter sw = new StringWriter();
+            try (PrintWriter pw = new PrintWriter(sw)) {
+                savedConfiguratorException.printStackTrace(pw);
+            }
+            savedConfiguratorException = null;
+        }
     }
 
     @Test
