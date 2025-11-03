@@ -42,7 +42,7 @@
     <jenkins.baseline>2.504</jenkins.baseline>
     <jenkins.version>${jenkins.baseline}.3</jenkins.version>
     <tagNameFormat>configuration-as-code-@{project.version}</tagNameFormat>
-    <plugin-bom.version>5601.v59f37270a_349</plugin-bom.version>
+    <plugin-bom.version>5622.vc9c3051619f5</plugin-bom.version>
     <spotless.check.skip>false</spotless.check.skip>
   </properties>
 
