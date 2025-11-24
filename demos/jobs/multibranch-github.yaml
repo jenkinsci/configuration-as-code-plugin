@@ -17,6 +17,8 @@ jobs:
           }
         }
         triggers {
-          periodic(5)
+          periodicFolderTrigger {
+            interval('5')
+          }
         }
       }
