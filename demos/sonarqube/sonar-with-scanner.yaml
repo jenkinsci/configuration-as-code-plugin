@@ -1,0 +1,31 @@
+---
+# SonarQube Plugin Configuration with Scanner Tool Installation
+
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+        - string:
+            scope: GLOBAL
+            id: "sonarqube-token"
+            secret: "${SONAR_TOKEN}"
+            description: "SonarQube Access Token"
+
+tool:
+  sonarRunnerInstallation:
+    installations:
+      - name: "SonarQube Scanner"
+        properties:
+          - installSource:
+              installers:
+                - sonarRunnerInstaller:
+                    id: "7.3.0.5189"
+
+unclassified:
+  sonarglobalconfiguration:
+    buildWrapperEnabled: true
+    installations:
+      - name: "sq1"
+        serverUrl: "http://sonarqube:9000"
+        credentialsId: "sonarqube-token"
+

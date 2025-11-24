@@ -17,6 +17,16 @@ credentials:
             secret: "secret value"
             description: "Sonar token"
 
+tool:
+  sonarRunnerInstallation:
+    installations:
+      - name: "SonarQube Scanner"
+        properties:
+          - installSource:
+              installers:
+                - sonarRunnerInstaller:
+                    id: "7.3.0.5189"
+
 unclassified:
   sonarglobalconfiguration:                  # mandatory
     buildWrapperEnabled: true
@@ -36,4 +46,6 @@ unclassified:
 
 ## notes
 
-You can add multiple installations.
+- You can add multiple SonarQube server installations
+- `tool:sonarRunnerInstallation` installs the SonarQube Scanner tool
+- The `id` in sonarRunnerInstaller refers to the scanner version to install
