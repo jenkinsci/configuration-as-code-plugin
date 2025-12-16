@@ -140,7 +140,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
     @Override
     public String getDescription() {
-        return "Reload your configuration or update configuration source";
+        return "Reload your configuration or update configuration source.";
     }
 
     /**

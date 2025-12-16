@@ -1,58 +1,89 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:st="jelly:stapler">
-  <l:layout type="one-column" title="${%Configuration as Code}" permissions="${app.MANAGE_AND_SYSTEM_READ}">
-  <l:main-panel>
-    <l:app-bar title="${%Configuration as Code}">
+<j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:t="/lib/hudson">
+  <l:settings-subpage permissions="${app.MANAGE_AND_SYSTEM_READ}" header="${null}">
+    <link href='${rootURL}/plugin/configuration-as-code/css/main.css' rel='stylesheet'/>
 
-      <f:form method="post" action="reload" name="reload">
-        <l:hasAdministerOrManage>
-          <f:submit icon="symbol-refresh" primary="false" name="reload"
-            value="${%Reload existing configuration}"/>
-        </l:hasAdministerOrManage>
-      </f:form>
+    <l:dialog title="${%Apply Configuration as Code file}" hash="new">
+      <l:isAdmin>
+        <f:form method="post" action="replace" name="replace">
+          <input type="hidden" name="${h.getCrumbRequestField()}" value="${h.getCrumb(request2)}" />
+          <f:entry title="${%Path or URL}" field="newSource" class="jenkins-form-item--small">
+            <f:textbox checkUrl="checkNewSource" checkDependsOn="newSource"/>
+          </f:entry>
+          <f:submit name="replace" value="${%Apply new configuration}" />
+        </f:form>
+      </l:isAdmin>
+    </l:dialog>
+
+    <l:app-bar title="${it.displayName}">
+      <j:if test="${!empty it.sources}">
+        <button class="jenkins-button jenkins-button--primary"
+          data-type="dialog-opener"
+          data-dialog-id="${dialogId}">
+          <l:icon src="symbol-add" />
+          Apply configuration
+        </button>
+      </j:if>
+
       <f:form method="post" action="viewExport" name="viewExport">
         <l:hasPermission permission="${app.SYSTEM_READ}">
-          <f:submit primary="false" name="viewExport" value="${%Export configuration}"/>
+          <button name="viewExport" class="jenkins-button">
+            ${%Export}
+          </button>
         </l:hasPermission>
       </f:form>
+
+      <j:if test="${!empty it.sources}">
+        <f:form method="post" action="reload" name="reload">
+          <l:hasAdministerOrManage>
+            <button name="reload" tooltip="${%Reload}" class="jenkins-button">
+              <l:icon src="symbol-refresh" />
+            </button>
+          </l:hasAdministerOrManage>
+        </f:form>
+      </j:if>
+
+      <!--        TODO - fix link-->
+      <t:help href="https://www.jenkins.io/redirect/log-recorders" />
     </l:app-bar>
+
+    <p class="jenkins-page-description">
+      ${it.description}
+    </p>
 
     <j:choose>
       <j:when test="${empty it.sources}">
-        <p>${%Controller has no configuration as code file set.}</p>
+        <l:notice icon="symbol-logo plugin-configuration-as-code"
+                  title="${%Controller has no configuration as code file set.}">
+          <button class="jenkins-button jenkins-button--primary"
+            data-type="dialog-opener"
+            data-dialog-id="${dialogId}">
+            Apply Configuration as Code file
+          </button>
+        </l:notice>
       </j:when>
       <j:otherwise>
-        ${%Configuration loaded from :}
-        <ul>
-          <j:forEach var="source" items="${it.sources}">
-            <li>${source}</li>
-          </j:forEach>
-        </ul>
+        <f:section title="${%Configurations}">
+          <p class="jenkins-section__description">
+            ${%Last time applied:} <i:formatDate value="${it.lastTimeLoaded}" type="both" dateStyle="medium" timeStyle="long" />
+          </p>
 
-        <p>${%Last time applied:} <i:formatDate value="${it.lastTimeLoaded}" type="both" dateStyle="medium" timeStyle="long"/></p>
-
+          <ul class="test">
+            <j:forEach var="source" items="${it.sources}">
+              <li>${source}</li>
+            </j:forEach>
+          </ul>
+        </f:section>
       </j:otherwise>
     </j:choose>
 
-    <l:isAdmin>
-      <f:form method="post" action="replace" name="replace">
-          <h2>${%Replace configuration source with:}</h2>
-          <f:entry title="${%Path or URL}" field="newSource" class="jenkins-form-item--small" >
-              <f:textbox checkUrl="checkNewSource" checkDependsOn="newSource"/>
-          </f:entry>
-          <f:block>
-            <f:submit name="replace" value="${%Apply new configuration}"/>
-          </f:block>
-      </f:form>
-    </l:isAdmin>
-
     <l:hasPermission permission="${app.SYSTEM_READ}">
-      <h2>${%Reference}</h2>
-      <dt>
-        <dl><a href="reference">${%Documentation}</a></dl>
-        <dl><a href="schema">${%JSON schema}</a></dl>
-      </dt>
+      <f:section title="${%Reference}">
+        <dt>
+          <dl><a href="reference">${%Documentation}</a></dl>
+          <dl><a href="schema">${%JSON schema}</a></dl>
+        </dt>
+      </f:section>
     </l:hasPermission>
-  </l:main-panel>
-  </l:layout>
+  </l:settings-subpage>
 </j:jelly>
