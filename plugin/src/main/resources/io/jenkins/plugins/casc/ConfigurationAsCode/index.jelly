@@ -1,8 +1,6 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:t="/lib/hudson">
   <l:settings-subpage permissions="${app.MANAGE_AND_SYSTEM_READ}" header="${null}">
-    <link href='${rootURL}/plugin/configuration-as-code/css/main.css' rel='stylesheet'/>
-
     <l:dialog title="${%Apply Configuration as Code file}" hash="new">
       <l:isAdmin>
         <f:form method="post" action="replace" name="replace">
@@ -68,9 +66,9 @@
             ${%Last time applied:} <i:formatDate value="${it.lastTimeLoaded}" type="both" dateStyle="medium" timeStyle="long" />
           </p>
 
-          <ul class="test">
+          <ul class="jenkins-instructions">
             <j:forEach var="source" items="${it.sources}">
-              <li>${source}</li>
+              <li style="font-family: var(--font-family-mono)">${source}</li>
             </j:forEach>
           </ul>
         </f:section>
