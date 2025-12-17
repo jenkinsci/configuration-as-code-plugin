@@ -8,18 +8,18 @@
           <f:entry title="${%Path or URL}" field="newSource" class="jenkins-form-item--small">
             <f:textbox checkUrl="checkNewSource" checkDependsOn="newSource"/>
           </f:entry>
-          <f:submit name="replace" value="${%Apply new configuration}" />
+          <f:submit name="replace" value="${%Apply configuration}" />
         </f:form>
       </l:isAdmin>
     </l:dialog>
 
     <l:app-bar title="${it.displayName}">
       <j:if test="${!empty it.sources}">
-        <button class="jenkins-button jenkins-button--primary"
+        <button class="jenkins-button"
           data-type="dialog-opener"
           data-dialog-id="${dialogId}">
           <l:icon src="symbol-add" />
-          Apply configuration
+          ${%Apply configuration}
         </button>
       </j:if>
 
@@ -35,7 +35,7 @@
         <f:form method="post" action="reload" name="reload">
           <l:hasAdministerOrManage>
             <button name="reload" tooltip="${%Reload configuration}" class="jenkins-button">
-              <l:icon src="symbol-reload" />
+              <l:icon src="symbol-refresh" />
             </button>
           </l:hasAdministerOrManage>
         </f:form>
@@ -50,10 +50,10 @@
       <j:when test="${empty it.sources}">
         <l:notice icon="symbol-logo plugin-configuration-as-code"
                   title="${%Controller has no configuration as code file set.}">
-          <button class="jenkins-button jenkins-button--primary"
+          <button class="jenkins-button"
             data-type="dialog-opener"
             data-dialog-id="${dialogId}">
-            Apply Configuration as Code file
+            ${%Apply configuration}
           </button>
         </l:notice>
       </j:when>
