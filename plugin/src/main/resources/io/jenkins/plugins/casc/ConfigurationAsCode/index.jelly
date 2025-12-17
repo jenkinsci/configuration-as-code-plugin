@@ -49,7 +49,7 @@
     <j:choose>
       <j:when test="${empty it.sources}">
         <l:notice icon="symbol-logo plugin-configuration-as-code"
-                  title="${%Controller has no configuration as code file set.}">
+                  title="${%Controller has no configuration as code file set}">
           <button class="jenkins-button"
             data-type="dialog-opener"
             data-dialog-id="${dialogId}">
