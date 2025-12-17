@@ -26,7 +26,7 @@
       <f:form method="post" action="viewExport" name="viewExport">
         <l:hasPermission permission="${app.SYSTEM_READ}">
           <button name="viewExport" class="jenkins-button">
-            ${%Export}
+            ${%Export configuration}
           </button>
         </l:hasPermission>
       </f:form>
@@ -34,15 +34,12 @@
       <j:if test="${!empty it.sources}">
         <f:form method="post" action="reload" name="reload">
           <l:hasAdministerOrManage>
-            <button name="reload" tooltip="${%Reload}" class="jenkins-button">
-              <l:icon src="symbol-refresh" />
+            <button name="reload" tooltip="${%Reload configuration}" class="jenkins-button">
+              <l:icon src="symbol-reload" />
             </button>
           </l:hasAdministerOrManage>
         </f:form>
       </j:if>
-
-      <!--        TODO - fix link-->
-      <t:help href="https://www.jenkins.io/redirect/log-recorders" />
     </l:app-bar>
 
     <p class="jenkins-page-description">
