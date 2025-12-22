@@ -42,6 +42,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -140,7 +141,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
     @Override
     public String getDescription() {
-        return "Reload your configuration or update configuration source";
+        return "Reload your configuration or update configuration source.";
     }
 
     /**
@@ -556,7 +557,23 @@ public class ConfigurationAsCode extends ManagementLink {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         export(out);
 
-        req.setAttribute("export", out.toString(StandardCharsets.UTF_8.name()));
+        req.setAttribute("viewExport", new ManagementLink() {
+            @Override
+            public String getIconFileName() {
+                return "";
+            }
+
+            // TODO - FIX - EXTREMELY HACKY - couldn't expose a public method for some reason
+            @Override
+            public String getUrlName() {
+                return out.toString(StandardCharsets.UTF_8);
+            }
+
+            @Override
+            public String getDisplayName() {
+                return "Export configuration";
+            }
+        });
         req.getView(this, "viewExport.jelly").forward(req, res);
     }
 
