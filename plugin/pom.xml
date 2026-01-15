@@ -35,7 +35,7 @@
     <hpi.compatibleSinceVersion>1.28</hpi.compatibleSinceVersion>
     <hpi.pluginChangelogUrl>https://github.com/jenkinsci/configuration-as-code-plugin/releases</hpi.pluginChangelogUrl>
     <hpi.pluginLogoUrl>https://raw.githubusercontent.com/jenkinsci/configuration-as-code-plugin/master/plugin/src/main/resources/images/symbols/logo.svg</hpi.pluginLogoUrl>
-    <hpi.bundledArtifacts>jspecify,jsr305,vavr,vavr-match</hpi.bundledArtifacts>
+    <hpi.bundledArtifacts>jsr305,vavr,vavr-match</hpi.bundledArtifacts>
     <hpi.strictBundledArtifacts>true</hpi.strictBundledArtifacts>
   </properties>
 
@@ -88,6 +88,12 @@
       <groupId>io.vavr</groupId>
       <artifactId>vavr</artifactId>
       <version>0.11.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.jspecify</groupId>
+          <artifactId>jspecify</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.github.stefanbirkner</groupId>
