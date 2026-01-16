@@ -2,6 +2,9 @@ package io.jenkins.plugins.casc.impl.configurators;
 
 import static io.jenkins.plugins.casc.model.CNode.Type.MAPPING;
 import static io.vavr.API.unchecked;
+import hudson.model.Computer;
+import hudson.model.Node;
+import hudson.slaves.OfflineCause;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -59,6 +62,10 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
 
     private static final Logger LOGGER = Logger.getLogger(HeteroDescribableConfigurator.class.getName());
 
+    // NEW: keys for Node offline handling via JCasC
+    private static final String KEY_TEMP_OFFLINE = "temporarilyOffline";
+    private static final String KEY_OFFLINE_MSG = "offlineCauseMessage";
+
     private final Class<T> target;
 
     public HeteroDescribableConfigurator(Class<T> clazz) {
@@ -82,11 +89,80 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
     @NonNull
     @Override
     public T configure(CNode config, ConfigurationContext context) {
-        return preConfigure(config)
-                .apply((shortName, subConfig) -> lookupDescriptor(shortName, config)
-                        .map(descriptor -> forceLookupConfigurator(context, descriptor))
-                        .map(configurator -> doConfigure(context, configurator, subConfig.getOrNull())))
-                .getOrNull();
+        // Split the hetero-describable mapping into (symbol, subConfig)
+        Tuple2<String, Option<CNode>> tuple = preConfigure(config);
+        String shortName = tuple._1;
+        Option<CNode> subConfigOpt = tuple._2;
+
+        // Find underlying configurator for the chosen subtype
+        Configurator<T> configurator = lookupDescriptor(shortName, config)
+                .map(d -> forceLookupConfigurator(context, d))
+                .getOrElseThrow(() -> new IllegalStateException("No configurator for " + shortName));
+
+        CNode subConfigNode = subConfigOpt.getOrNull();
+
+        // If this configurator is handling Nodes, peel off our custom keys before delegating,
+        // then apply them to the created Node afterward.
+        Boolean tempOffline = null;
+        String offlineMsg = null;
+
+        if (Node.class.isAssignableFrom(target) && subConfigNode != null && subConfigNode.getType().equals(MAPPING)) {
+            Mapping m = unchecked(subConfigNode::asMapping).apply();
+
+            // Extract and remove `temporarilyOffline`
+            CNode offlineFlagNode = m.remove(KEY_TEMP_OFFLINE);
+            if (offlineFlagNode != null) {
+                try {
+                    Scalar s = unchecked(offlineFlagNode::asScalar).apply();
+                    tempOffline = Boolean.parseBoolean(s.getValue());
+                } catch (Exception e) {
+                    LOGGER.log(Level.WARNING, "Invalid value for " + KEY_TEMP_OFFLINE + ", expected boolean", e);
+                }
+            }
+
+            // Extract and remove `offlineCauseMessage`
+            CNode offlineMsgNode = m.remove(KEY_OFFLINE_MSG);
+            if (offlineMsgNode != null) {
+                try {
+                    Scalar s = unchecked(offlineMsgNode::asScalar).apply();
+                    offlineMsg = s.getValue();
+                } catch (Exception e) {
+                    LOGGER.log(Level.WARNING, "Invalid value for " + KEY_OFFLINE_MSG + ", expected string", e);
+                }
+            }
+        }
+
+        // Delegate to the specific subtype configurator
+        T instance = unchecked(() -> configurator.configure(subConfigNode, context)).apply();
+
+        // Apply offline state if we are dealing with a Node
+        if (instance instanceof Node) {
+            Node n = (Node) instance;
+            try {
+                Computer c = n.toComputer(); // may be null at this point during early boot
+                if (c != null) {
+                    if (Boolean.TRUE.equals(tempOffline)) {
+                        String msg = (offlineMsg != null && !offlineMsg.isEmpty()) ? offlineMsg : "Configured via JCasC";
+                        c.setTemporarilyOffline(true, new OfflineCause.ByCLI(msg));
+                    } else if (Boolean.FALSE.equals(tempOffline)) {
+                        c.setTemporarilyOffline(false, null);
+                    }
+                    // If only a message is given and node is already temp-offline, update the cause
+                    if (offlineMsg != null && c.isTemporarilyOffline()) {
+                        c.setOfflineCause(new OfflineCause.ByCLI(offlineMsg));
+                    }
+                } else {
+                    // Computer not yet initialized; nothing else we can do without adding listeners (no new files allowed)
+                    if (tempOffline != null || offlineMsg != null) {
+                        LOGGER.log(Level.FINE, "Computer not available yet for node {0}; offline flags will not be applied now.", n.getNodeName());
+                    }
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.WARNING, "Failed to apply offline state for node " + n.getNodeName(), e);
+            }
+        }
+
+        return instance;
     }
 
     @Override
@@ -97,6 +173,7 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
     @NonNull
     @Override
     public Set<Attribute<T, ?>> describe() {
+        // No statically-declared attributes here; we intercept in configure() instead.
         return Collections.emptySet();
     }
 
@@ -105,15 +182,34 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
     public CNode describe(T instance, ConfigurationContext context) {
         Predicate<CNode> isScalar = node -> node.getType().equals(MAPPING)
                 && unchecked(node::asMapping).apply().size() == 0;
+
         return lookupConfigurator(context, instance.getClass())
                 .map(configurator -> convertToNode(context, configurator, instance))
                 .filter(Objects::nonNull)
                 .map(node -> {
+                    // If the underlying node config is a mapping, and this is a Node instance,
+                    // augment the exported YAML with temporarilyOffline/offlineCauseMessage when applicable.
+                    if (instance instanceof Node && node.getType().equals(MAPPING)) {
+                        Node n = (Node) instance;
+                        try {
+                            Computer c = n.toComputer();
+                            if (c != null && c.isTemporarilyOffline()) {
+                                Mapping sub = unchecked(node::asMapping).apply();
+                                sub.put(KEY_TEMP_OFFLINE, new Scalar("true"));
+                                if (c.getOfflineCause() != null) {
+                                    sub.put(KEY_OFFLINE_MSG, new Scalar(c.getOfflineCause().toString()));
+                                }
+                            }
+                        } catch (Exception e) {
+                            LOGGER.log(Level.FINE, "Ignoring error while exporting offline state for node " + n.getNodeName(), e);
+                        }
+                    }
+
                     if (isScalar.test(node)) {
-                        return new Scalar(preferredSymbol(instance.getDescriptor()));
+                        return new Scalar(preferredSymbol(((Describable<?>) instance).getDescriptor()));
                     } else {
                         final Mapping mapping = new Mapping();
-                        mapping.put(preferredSymbol(instance.getDescriptor()), node);
+                        mapping.put(preferredSymbol(((Describable<?>) instance).getDescriptor()), node);
                         return mapping;
                     }
                 })
