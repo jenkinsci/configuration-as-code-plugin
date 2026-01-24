@@ -53,7 +53,7 @@
           <button class="jenkins-button"
             data-type="dialog-opener"
             data-dialog-id="${dialogId}">
-            ${%Apply configuration}
+            ${%Setup configuration}
           </button>
         </l:notice>
       </j:when>
