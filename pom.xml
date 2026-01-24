@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>5.28</version>
+    <version>6.2116.v7501b_67dc517</version>
     <relativePath />
   </parent>
 
@@ -42,7 +42,7 @@
     <jenkins.baseline>2.504</jenkins.baseline>
     <jenkins.version>2.542-rc37822.b_14a_5941318e</jenkins.version>
     <tagNameFormat>configuration-as-code-@{project.version}</tagNameFormat>
-    <plugin-bom.version>5750.vec44cb_c78352</plugin-bom.version>
+    <plugin-bom.version>5933.vcf06f7b_5d1a_2</plugin-bom.version>
     <spotless.check.skip>false</spotless.check.skip>
   </properties>
 
@@ -71,7 +71,7 @@
             <dependency>
               <groupId>com.puppycrawl.tools</groupId>
               <artifactId>checkstyle</artifactId>
-              <version>12.3.0</version>
+              <version>13.0.0</version>
             </dependency>
           </dependencies>
         </plugin>
