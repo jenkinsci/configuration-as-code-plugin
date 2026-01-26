@@ -305,7 +305,7 @@ public class ConfigurationAsCode extends ManagementLink {
                         .accumulate(
                                 "line",
                                 Optional.ofNullable(e.getKey())
-                                        .map(it -> it.line)
+                                        .map(it -> it.line())
                                         .orElse(-1))
                         .accumulate(severity, e.getValue()))
                 .forEach(problems::add);
@@ -469,7 +469,7 @@ public class ConfigurationAsCode extends ManagementLink {
             // If there are validation issues, add them to the response array
             validationIssues.entrySet().stream()
                     .map(e -> new JSONObject()
-                            .accumulate("line", e.getKey() != null ? e.getKey().line : -1)
+                            .accumulate("line", e.getKey() != null ? e.getKey().line() : -1)
                             .accumulate("message", e.getValue()))
                     .forEach(response::add);
 
