@@ -371,8 +371,8 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
                     String childMessage = ex.getErrorMessage();
 
                     String message = StringUtils.isNotBlank(childMessage)
-                        ? "Failed to configure '" + attribute.getName() + "': " + childMessage
-                        : "Failed to configure attribute '" + attribute.getName() + "'";
+                            ? "Failed to configure '" + attribute.getName() + "': " + childMessage
+                            : "Failed to configure attribute '" + attribute.getName() + "'";
 
                     throw ConfiguratorException.from(sub, configurator, attribute.getName(), message, ex.getCause());
                 } catch (Exception ex) {
