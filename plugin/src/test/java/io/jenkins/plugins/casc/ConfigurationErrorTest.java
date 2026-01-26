@@ -1,47 +1,45 @@
 package io.jenkins.plugins.casc;
 
 import io.jenkins.plugins.casc.yaml.YamlSource;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.JenkinsExtension;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.fail;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class ConfigurationErrorTest {
+@ExtendWith(JenkinsExtension.class)
+class ConfigurationErrorTest {
 
-    @Rule
-    public JenkinsRule j = new JenkinsRule();
-
-    @Rule
-    public TemporaryFolder tempFolder = new TemporaryFolder();
+    @TempDir
+    Path tempDir;
 
     @Test
-    public void shouldReportLineNumberAndAttributeForTypeMismatch() throws Exception {
-        String yaml = "jenkins:\n" +
-            "  systemMessage: [\"Wrong Type\"]";
+    @SuppressWarnings("unused")
+    void shouldReportLineNumberAndAttributeForTypeMismatch(JenkinsRule j) throws Exception {
+        String yaml =
+            "jenkins:\n" +
+                "  systemMessage: [\"Wrong Type\"]";
 
-        File configFile = tempFolder.newFile("bad-config.yaml");
+        File configFile = tempDir.resolve("bad-config.yaml").toFile();
         Files.writeString(configFile.toPath(), yaml);
 
         YamlSource<String> source = YamlSource.of(configFile.toURI().toString());
 
-        try {
-            ConfigurationAsCode.get().configureWith(source);
-            fail("Should have thrown ConfiguratorException");
-        } catch (ConfiguratorException e) {
-            assertThat("Path should contain 'systemMessage'", e.getPath(),
-                equalTo("systemMessage"));
-            assertThat("Source should not be null", e.getSource(), notNullValue());
-            assertThat("Error message should contain line 2", e.getSource().toString(),
-                containsString("2"));
-        }
+        ConfiguratorException ex = assertThrows(
+            ConfiguratorException.class,
+            () -> ConfigurationAsCode.get().configureWith(source)
+        );
+
+        assertThat(ex.getPath(), equalTo("systemMessage"));
+        assertThat(ex.getSource(), notNullValue());
+        assertThat(ex.getSource().toString(), containsString("2"));
     }
 }

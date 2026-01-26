@@ -306,7 +306,7 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
             throws ConfiguratorException {
         final Set<Attribute<T, ?>> attributes = describe();
         List<Attribute<T, ?>> sortedAttributes =
-            attributes.stream().sorted(Configurator.extensionOrdinalSort()).collect(Collectors.toList());
+                attributes.stream().sorted(Configurator.extensionOrdinalSort()).collect(Collectors.toList());
         for (Attribute<T, ?> attribute : sortedAttributes) {
 
             final String name = attribute.getName();
