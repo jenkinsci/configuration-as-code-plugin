@@ -305,7 +305,7 @@ public class ConfigurationAsCode extends ManagementLink {
                         .accumulate(
                                 "line",
                                 Optional.ofNullable(e.getKey())
-                                        .map(it -> it.line())
+                                        .map(Source::line)
                                         .orElse(-1))
                         .accumulate(severity, e.getValue()))
                 .forEach(problems::add);
