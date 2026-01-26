@@ -10,8 +10,8 @@ public final class Scalar implements CNode, CharSequence {
 
     private static final String SECRET_VALUE_STRING = "****";
 
-    private String value;
-    private Format format;
+    private final String value;
+    private final Format format;
     private boolean raw;
     private Source source;
     private boolean sensitive;
@@ -174,8 +174,12 @@ public final class Scalar implements CNode, CharSequence {
     }
 
     @Override
-    public CNode clone() {
-        return new Scalar(this);
+    public Scalar clone() {
+        try {
+            return (Scalar) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError(e);
+        }
     }
 
     private Scalar(Scalar it) {

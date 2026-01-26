@@ -37,7 +37,8 @@ public final class Sequence extends ArrayList<CNode> implements CNode {
 
     @Override
     public Sequence clone() {
-        final Sequence clone = new Sequence();
+        Sequence clone = (Sequence) super.clone();
+        clone.clear();
         stream().map(CNode::clone).forEach(clone::add);
         return clone;
     }
