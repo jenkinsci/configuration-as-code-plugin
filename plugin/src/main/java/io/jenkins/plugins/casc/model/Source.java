@@ -17,5 +17,4 @@ public record Source(String file, int line) implements Serializable {
     public String toString() {
         return (file != null ? file + ":" : "line ") + line;
     }
-
 }

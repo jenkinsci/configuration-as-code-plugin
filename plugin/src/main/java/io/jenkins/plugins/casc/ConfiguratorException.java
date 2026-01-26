@@ -70,27 +70,22 @@ public class ConfiguratorException extends RuntimeException {
 
     public static ConfiguratorException from(CNode node, String message) {
         return new ConfiguratorException(
-                null, message, null, Collections.emptyList(), null, node != null ?
-            node.getSource() : null, null);
+                null, message, null, Collections.emptyList(), null, node != null ? node.getSource() : null, null);
     }
 
     public static ConfiguratorException from(CNode node, String message, Throwable cause) {
         return new ConfiguratorException(
-                null, message, null, Collections.emptyList(), cause, node != null ?
-            node.getSource() : null, null);
+                null, message, null, Collections.emptyList(), cause, node != null ? node.getSource() : null, null);
     }
 
-    public static ConfiguratorException from(CNode node, Configurator configurator, String path,
-        String message, Throwable cause) {
+    public static ConfiguratorException from(
+            CNode node, Configurator configurator, String path, String message, Throwable cause) {
         Source source = node != null ? node.getSource() : null;
         if (source == null && cause instanceof ConfiguratorException) {
             source = ((ConfiguratorException) cause).getSource();
         }
 
-        return new ConfiguratorException(
-            configurator, message, null, Collections.emptyList(), cause,
-            source, path
-        );
+        return new ConfiguratorException(configurator, message, null, Collections.emptyList(), cause, source, path);
     }
 
     public ConfiguratorException(@CheckForNull String message) {
@@ -101,20 +96,21 @@ public class ConfiguratorException extends RuntimeException {
         this(null, message, null, Collections.emptyList(), cause, null, null);
     }
 
-    public ConfiguratorException(@CheckForNull Configurator configurator,
-        @CheckForNull String message) {
+    public ConfiguratorException(@CheckForNull Configurator configurator, @CheckForNull String message) {
         this(configurator, message, null, Collections.emptyList(), null, null, null);
     }
 
     public ConfiguratorException(
-            @CheckForNull Configurator configurator, @CheckForNull String message, @CheckForNull
-        Throwable cause) {
+            @CheckForNull Configurator configurator, @CheckForNull String message, @CheckForNull Throwable cause) {
         this(configurator, message, null, Collections.emptyList(), cause, null, null);
     }
 
     public ConfiguratorException(
-            @CheckForNull Configurator configurator, @CheckForNull String message,
-            String invalidAttribute, List<String> validAttributes, @CheckForNull Throwable cause) {
+            @CheckForNull Configurator configurator,
+            @CheckForNull String message,
+            String invalidAttribute,
+            List<String> validAttributes,
+            @CheckForNull Throwable cause) {
         this(configurator, message, invalidAttribute, validAttributes, cause, null, null);
     }
 
@@ -150,9 +146,9 @@ public class ConfiguratorException extends RuntimeException {
     public String getMessage() {
         final String base = (configurator != null)
                 ? String.format(
-                    "%s: %s",
-                    Jenkins.getInstanceOrNull() == null ? configurator.getClass() : configurator.getName(),
-                    super.getMessage())
+                        "%s: %s",
+                        Jenkins.getInstanceOrNull() == null ? configurator.getClass() : configurator.getName(),
+                        super.getMessage())
                 : super.getMessage();
 
         if (source == null && path == null) {
