@@ -3,8 +3,8 @@ package io.jenkins.plugins.casc.model;
 import io.jenkins.plugins.casc.ConfiguratorException;
 
 /**
- * A configuration Node in YAML tree.
- * (We didn't use <em>Node</em> as class name to avoid collision with commonly used Jenkins class hudson.model.Node
+ * A configuration Node in yaml tree.
+ * (We didn't used <em>Node</em> as class name to avoid collision with commonly used Jenkins class hudson.model.Node
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 public interface CNode extends Cloneable {
@@ -18,15 +18,15 @@ public interface CNode extends Cloneable {
     Type getType();
 
     default Mapping asMapping() throws ConfiguratorException {
-        throw ConfiguratorException.from(this, "Item isn't a Mapping");
+        throw new ConfiguratorException("Item isn't a Mapping");
     }
 
     default Sequence asSequence() throws ConfiguratorException {
-        throw ConfiguratorException.from(this, "Item isn't a Sequence");
+        throw new ConfiguratorException("Item isn't a Sequence");
     }
 
     default Scalar asScalar() throws ConfiguratorException {
-        throw ConfiguratorException.from(this, "Item isn't a Scalar");
+        throw new ConfiguratorException("Item isn't a Scalar");
     }
 
     /** @deprecated sensitive data are identified based on target attribute being a ${@link hudson.util.Secret} */

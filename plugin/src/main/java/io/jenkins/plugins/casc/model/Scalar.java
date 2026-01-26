@@ -101,10 +101,12 @@ public final class Scalar implements CNode, CharSequence {
      * Sets the sensitive flag.
      * It indicates that the scalar represents a sensitive argument (secret or other restricted data).
      * @param sensitive value to set
+     * @return Object instance
      * @since 1.25
      */
-    public void sensitive(boolean sensitive) {
+    public Scalar sensitive(boolean sensitive) {
         this.sensitive = sensitive;
+        return this;
     }
 
     /**

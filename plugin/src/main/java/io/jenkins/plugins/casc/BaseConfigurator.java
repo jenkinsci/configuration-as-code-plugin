@@ -90,7 +90,7 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
                 // Not an accessor, ignore
                 continue;
             } else {
-                type = TypePair.ofParameter(method);
+                type = TypePair.ofParameter(method, 0);
             }
 
             final String s = methodName.substring(3);
@@ -107,7 +107,7 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
             LOGGER.log(Level.FINER, "Processing {0} property", name);
 
             if (Map.class.isAssignableFrom(type.rawType)) {
-                // YAML has support for Maps, but as nobody seem to like them we agreed not to support them
+                // yaml has support for Maps, but as nobody seem to like them we agreed not to support them
                 LOGGER.log(Level.FINER, "{0} is a Map<?,?>. We decided not to support Maps.", name);
                 continue;
             }
@@ -123,7 +123,8 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
                 attribute.restrictions(r.value());
             }
 
-            Attribute<T, ?> prevAttribute = attributes.get(name);
+            Attribute prevAttribute = attributes.get(name);
+            // Replace the method if it have more concretized type
             if (prevAttribute == null || prevAttribute.type.isAssignableFrom(attribute.type)) {
                 attributes.put(name, attribute);
             }
@@ -187,7 +188,7 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
     }
 
     /**
-     * Introspect the actual component type of collection|array {@link Type}.
+     * Introspect the actual component type of a collection|array {@link Type}.
      */
     private Class getComponentType(TypePair type) {
         Class c = null;
@@ -208,12 +209,15 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
             t = superclass;
         }
 
-        if (t instanceof GenericArrayType at) {
+        if (t instanceof GenericArrayType) {
             // t is a parameterized array: <Foo>[]
+            GenericArrayType at = (GenericArrayType) t;
             t = at.getGenericComponentType();
         }
-        while (t instanceof ParameterizedType pt) {
+        while (t instanceof ParameterizedType) {
             // t is parameterized `Some<Foo>`
+            ParameterizedType pt = (ParameterizedType) t;
+
             t = pt.getActualTypeArguments()[0];
             if (t instanceof WildcardType) {
                 // pt is Some<? extends Foo>
@@ -233,10 +237,11 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
                 // t is declared as parameterized t
                 // unfortunately, java reflection doesn't allow to get the actual parameter t
                 // so, if superclass it parameterized, we assume parameter t match
-                // i.e. target is Foo extends AbstractFoo<Bar> with
+                // i.e target is Foo extends AbstractFoo<Bar> with
                 // public abstract class AbstractFoo<T> { void setBar(T bar) }
                 final Type superclass = getTarget().getGenericSuperclass();
-                if (superclass instanceof ParameterizedType psc) {
+                if (superclass instanceof ParameterizedType) {
+                    final ParameterizedType psc = (ParameterizedType) superclass;
                     t = psc.getActualTypeArguments()[0];
                 } else {
                     c = (Class) ((TypeVariable) t).getBounds()[0];
@@ -272,7 +277,7 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
                 configure(mapping, instance, false, context);
                 bc.commit();
             } catch (IOException e) {
-                throw ConfiguratorException.from(c, "Failed to save " + instance, e);
+                throw new ConfiguratorException("Failed to save " + instance, e);
             }
         } else {
             configure(mapping, instance, false, context);
@@ -301,7 +306,7 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
             throws ConfiguratorException {
         final Set<Attribute<T, ?>> attributes = describe();
         List<Attribute<T, ?>> sortedAttributes =
-                attributes.stream().sorted(Configurator.extensionOrdinalSort()).toList();
+            attributes.stream().sorted(Configurator.extensionOrdinalSort()).collect(Collectors.toList());
         for (Attribute<T, ?> attribute : sortedAttributes) {
 
             final String name = attribute.getName();
@@ -443,9 +448,9 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
             return new TypePair(method.getGenericReturnType(), method.getReturnType());
         }
 
-        static TypePair ofParameter(Method method) {
-            assert method.getParameterCount() > 0;
-            return new TypePair(method.getGenericParameterTypes()[0], method.getParameterTypes()[0]);
+        static TypePair ofParameter(Method method, int index) {
+            assert method.getParameterCount() > index;
+            return new TypePair(method.getGenericParameterTypes()[index], method.getParameterTypes()[index]);
         }
 
         public static TypePair of(Parameter parameter) {

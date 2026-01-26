@@ -94,7 +94,7 @@ public class ConfiguratorException extends RuntimeException {
     }
 
     public ConfiguratorException(@CheckForNull String message) {
-        this(null, message, null, Collections.emptyList(), null, null, null);
+        this(null, message, null, Collections.emptyList(), null);
     }
 
     public ConfiguratorException(@CheckForNull String message, @CheckForNull Throwable cause) {
@@ -152,7 +152,7 @@ public class ConfiguratorException extends RuntimeException {
                 ? String.format(
                     "%s: %s",
                     Jenkins.getInstanceOrNull() == null ? configurator.getClass() : configurator.getName(),
-                        super.getMessage())
+                    super.getMessage())
                 : super.getMessage();
 
         if (source == null && path == null) {
