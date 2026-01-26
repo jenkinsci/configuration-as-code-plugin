@@ -365,6 +365,9 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
                         ((Attribute) attribute).setValue(instance, valueToSet);
                     }
                 } catch (ConfiguratorException ex) {
+                    if (ex instanceof UnknownAttributesException) {
+                        throw ex;
+                    }
                     throw ConfiguratorException.from(
                             sub,
                             configurator,
