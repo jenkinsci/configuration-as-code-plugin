@@ -31,7 +31,7 @@ public class CheckConfigurationCommand extends CLICommand {
 
         final Map<Source, String> issues = ConfigurationAsCode.get().checkWith(YamlSource.of(stdin));
         for (Map.Entry<Source, String> entry : issues.entrySet()) {
-            stderr.printf("warning: line %d %s", entry.getKey().line, entry.getValue());
+            stderr.printf("warning: line %d %s", entry.getKey().line(), entry.getValue());
         }
         return 0;
     }

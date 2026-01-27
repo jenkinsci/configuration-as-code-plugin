@@ -349,24 +349,39 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
                 final Configurator configurator = context.lookupOrFail(k);
 
                 final Object valueToSet;
-                if (attribute.isMultiple()) {
-                    List<Object> values = new ArrayList<>();
-                    for (CNode o : sub.asSequence()) {
-                        Object value = dryrun ? configurator.check(o, context) : configurator.configure(o, context);
-                        values.add(value);
+                try {
+                    if (attribute.isMultiple()) {
+                        List<Object> values = new ArrayList<>();
+                        for (CNode o : sub.asSequence()) {
+                            Object value = dryrun ? configurator.check(o, context) : configurator.configure(o, context);
+                            values.add(value);
+                        }
+                        valueToSet = values;
+                    } else {
+                        valueToSet = dryrun ? configurator.check(sub, context) : configurator.configure(sub, context);
                     }
-                    valueToSet = values;
-                } else {
-                    valueToSet = dryrun ? configurator.check(sub, context) : configurator.configure(sub, context);
-                }
 
-                if (!dryrun) {
-                    try {
-                        ((Attribute) attribute)
-                                .setValue(instance, valueToSet); // require type erasure to set Object vs ?
-                    } catch (Exception ex) {
-                        throw new ConfiguratorException(configurator, "Failed to set attribute " + attribute, ex);
+                    if (!dryrun) {
+                        ((Attribute) attribute).setValue(instance, valueToSet);
                     }
+                } catch (ConfiguratorException ex) {
+                    if (ex instanceof UnknownAttributesException) {
+                        throw ex;
+                    }
+                    String childMessage = ex.getErrorMessage();
+
+                    String message = StringUtils.isNotBlank(childMessage)
+                            ? "Failed to configure '" + attribute.getName() + "': " + childMessage
+                            : "Failed to configure attribute '" + attribute.getName() + "'";
+
+                    throw ConfiguratorException.from(sub, configurator, attribute.getName(), message, ex.getCause());
+                } catch (Exception ex) {
+                    throw ConfiguratorException.from(
+                            sub,
+                            this,
+                            attribute.getName(),
+                            "Failed to set attribute '" + attribute.getName() + "'",
+                            ex);
                 }
             }
         }

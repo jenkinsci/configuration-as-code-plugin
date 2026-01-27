@@ -18,15 +18,15 @@ public interface CNode extends Cloneable {
     Type getType();
 
     default Mapping asMapping() throws ConfiguratorException {
-        throw new ConfiguratorException("Item isn't a Mapping");
+        throw new ConfiguratorException("Item isn't a Mapping" + getSourceLocation());
     }
 
     default Sequence asSequence() throws ConfiguratorException {
-        throw new ConfiguratorException("Item isn't a Sequence");
+        throw new ConfiguratorException("Item isn't a Sequence" + getSourceLocation());
     }
 
     default Scalar asScalar() throws ConfiguratorException {
-        throw new ConfiguratorException("Item isn't a Scalar");
+        throw new ConfiguratorException("Item isn't a Scalar" + getSourceLocation());
     }
 
     /** @deprecated sensitive data are identified based on target attribute being a ${@link hudson.util.Secret} */
@@ -48,6 +48,11 @@ public interface CNode extends Cloneable {
      * This is used to offer relevant diagnostic messages
      */
     Source getSource();
+
+    default String getSourceLocation() {
+        Source s = getSource();
+        return s != null ? " " + s : "";
+    }
 
     CNode clone();
 }
