@@ -1,7 +1,6 @@
 jenkins:
   disableRememberMe: false
   markupFormatter: "plainText"
-  myViewsTabBar: "standard"
   primaryView:
     all:
       name: "all"
