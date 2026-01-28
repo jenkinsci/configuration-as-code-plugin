@@ -98,7 +98,9 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
             if (exclusions.contains(name)) {
                 continue;
             }
-
+            if (name.equals("descriptor")) {
+                continue;
+            }
             if (!hasGetter(target, s)) {
                 // Looks like a property but no actual getter method we can use to read value
                 continue;
