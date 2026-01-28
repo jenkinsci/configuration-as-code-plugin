@@ -36,6 +36,8 @@ import java.util.List;
 import java.util.Map;
 import org.htmlunit.WebRequest;
 import org.htmlunit.WebResponse;
+import org.htmlunit.html.HtmlButton;
+import org.htmlunit.html.HtmlElementUtil;
 import org.htmlunit.html.HtmlForm;
 import org.htmlunit.html.HtmlInput;
 import org.htmlunit.html.HtmlPage;
@@ -216,6 +218,9 @@ class ConfigurationAsCodeTest {
         HtmlPage page = j.createWebClient().goTo("configuration-as-code");
         j.assertGoodStatus(page);
 
+        HtmlButton button = (HtmlButton) page.getElementById("btn-open-apply-configuration");
+        HtmlElementUtil.click(button);
+
         HtmlForm form = page.getFormByName("replace");
         HtmlInput input = form.getInputByName("_.newSource");
         String configUri = getClass().getResource("merge3.yml").toExternalForm();
@@ -230,6 +235,9 @@ class ConfigurationAsCodeTest {
     void doReplace_should_support_multiple_sources(JenkinsConfiguredWithCodeRule j) throws Exception {
         HtmlPage page = j.createWebClient().goTo("configuration-as-code");
         j.assertGoodStatus(page);
+
+        HtmlButton button = (HtmlButton) page.getElementById("btn-open-apply-configuration");
+        HtmlElementUtil.click(button);
 
         HtmlForm form = page.getFormByName("replace");
         HtmlInput input = form.getInputByName("_.newSource");

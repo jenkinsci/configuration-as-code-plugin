@@ -1,17 +1,18 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout" xmlns:st="jelly:stapler" xmlns:p="/prism"
   xmlns:f="/lib/form">
-  <l:layout type="one-column" title="${%Exported configuration}">
-    <l:breadcrumb title="${%Exported configuration}" />
-  <l:main-panel>
+  <j:set var="header">
+    <l:view>
+      <l:app-bar title="${viewExport.displayName}">
+        <f:form method="post" action="export" name="export">
+          <f:submit icon="symbol-download" primary="false" name="export" value="${%Download}"/>
+        </f:form>
+      </l:app-bar>
+    </l:view>
+  </j:set>
+
+  <l:settings-subpage includeBreadcrumb="true" header="${header}" managementLink="${viewExport}" noDefer="true">
     <st:adjunct includes="io.jenkins.plugins.casc.assets.viewExport" />
-
-    <l:app-bar title="${%Exported configuration}">
-      <f:form method="post" action="export" name="export">
-        <f:submit icon="symbol-download" primary="false" name="export" value="${%Download}"/>
-      </f:form>
-    </l:app-bar>
-
 
     <div class="jenkins-alert jenkins-alert-info">
       ${%exportWarning}
@@ -19,8 +20,7 @@
 
     <p:prism configuration="${it.prismConfiguration}" />
     <pre>
-      <code class="language-yaml">${export}</code>
+      <code class="language-yaml">${viewExport.urlName}</code>
     </pre>
-  </l:main-panel>
-  </l:layout>
+  </l:settings-subpage>
 </j:jelly>

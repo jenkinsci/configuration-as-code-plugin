@@ -1,7 +1,6 @@
 package io.jenkins.plugins.casc.permissions;
 
 import static io.jenkins.plugins.casc.permissions.Action.APPLY_NEW_CONFIGURATION;
-import static io.jenkins.plugins.casc.permissions.Action.RELOAD_EXISTING_CONFIGURATION;
 import static io.jenkins.plugins.casc.permissions.Action.VIEW_CONFIGURATION;
 import static java.lang.String.format;
 import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
@@ -62,7 +61,6 @@ class PermissionsTest {
                 ImmutableMap.<Action, Boolean>builder()
                         .put(VIEW_CONFIGURATION, true)
                         .put(APPLY_NEW_CONFIGURATION, false)
-                        .put(RELOAD_EXISTING_CONFIGURATION, false)
                         .build());
     }
 
@@ -81,11 +79,7 @@ class PermissionsTest {
         JenkinsRule.WebClient webClient = j.createWebClient().withThrowExceptionOnFailingStatusCode(false);
 
         assertUserPermissions(
-                webClient,
-                MANAGER,
-                ImmutableMap.<Action, Boolean>builder()
-                        .put(RELOAD_EXISTING_CONFIGURATION, true)
-                        .build());
+                webClient, MANAGER, ImmutableMap.<Action, Boolean>builder().build());
     }
 
     @Test
@@ -105,7 +99,6 @@ class PermissionsTest {
                 ImmutableMap.<Action, Boolean>builder()
                         .put(VIEW_CONFIGURATION, true)
                         .put(APPLY_NEW_CONFIGURATION, true)
-                        .put(RELOAD_EXISTING_CONFIGURATION, true)
                         .build());
     }
 

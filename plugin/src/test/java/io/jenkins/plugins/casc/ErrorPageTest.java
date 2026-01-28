@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import org.htmlunit.html.HtmlButton;
+import org.htmlunit.html.HtmlElementUtil;
 import org.htmlunit.html.HtmlForm;
 import org.htmlunit.html.HtmlPage;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,7 +49,10 @@ class ErrorPageTest {
             System.setProperty(ConfigurationAsCode.CASC_JENKINS_CONFIG_PROPERTY, cascFile.toString());
 
             HtmlPage htmlPage = webClient.goTo("manage/configuration-as-code/");
-            HtmlForm reload = htmlPage.getFormByName("reload");
+            HtmlButton button = (HtmlButton) htmlPage.getElementById("btn-open-apply-configuration");
+            HtmlElementUtil.click(button);
+
+            HtmlForm reload = htmlPage.getFormByName("replace");
             HtmlPage submit = r.submit(reload);
 
             return submit.asNormalizedText();
@@ -67,7 +72,12 @@ class ErrorPageTest {
 
     @Test
     void noImplementationFoundForSymbol() throws Exception {
-        String content = "jenkins:\n" + "  securityRealm:\n" + "    unknown:\n" + "      username: \"world\"\n";
+        String content = """
+            jenkins:
+              securityRealm:
+                unknown:
+                  username: "world"
+            """;
 
         Files.write(cascFile, content.getBytes());
 
