@@ -1,24 +1,25 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:t="/lib/hudson">
+<j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout" xmlns:f="/lib/form" xmlns:i="jelly:fmt"
+  xmlns:t="/lib/hudson">
   <l:settings-subpage permissions="${app.MANAGE_AND_SYSTEM_READ}" header="${null}">
     <l:dialog title="${%Apply Configuration as Code file}" hash="new">
       <l:isAdmin>
         <f:form method="post" action="replace" name="replace">
-          <input type="hidden" name="${h.getCrumbRequestField()}" value="${h.getCrumb(request2)}" />
+          <input type="hidden" name="${h.getCrumbRequestField()}" value="${h.getCrumb(request2)}"/>
           <f:entry title="${%Path or URL}" field="newSource" class="jenkins-form-item--small">
             <f:textbox checkUrl="checkNewSource" checkDependsOn="newSource"/>
           </f:entry>
-          <f:submit name="replace" value="${%Apply configuration}" />
+          <f:submit name="replace" value="${%Apply configuration}"/>
         </f:form>
       </l:isAdmin>
     </l:dialog>
 
     <l:app-bar title="${it.displayName}">
       <j:if test="${!empty it.sources}">
-        <button class="jenkins-button"
+        <button id="btn-open-apply-configuration" class="jenkins-button"
           data-type="dialog-opener"
           data-dialog-id="${dialogId}">
-          <l:icon src="symbol-add" />
+          <l:icon src="symbol-add"/>
           ${%Apply configuration}
         </button>
       </j:if>
@@ -35,7 +36,7 @@
         <f:form method="post" action="reload" name="reload">
           <l:hasAdministerOrManage>
             <button name="reload" tooltip="${%Reload configuration}" class="jenkins-button">
-              <l:icon src="symbol-refresh" />
+              <l:icon src="symbol-refresh"/>
             </button>
           </l:hasAdministerOrManage>
         </f:form>
@@ -49,18 +50,22 @@
     <j:choose>
       <j:when test="${empty it.sources}">
         <l:notice icon="symbol-logo plugin-configuration-as-code"
-                  title="${%Controller has no configuration as code file set}">
-          <button class="jenkins-button"
-            data-type="dialog-opener"
-            data-dialog-id="${dialogId}">
-            ${%Setup configuration}
-          </button>
+          title="${%Controller has no configuration as code file set}">
+          <l:isAdmin>
+            <button id="btn-open-apply-configuration" class="jenkins-button"
+              data-type="dialog-opener"
+              data-dialog-id="${dialogId}">
+              ${%Setup configuration}
+            </button>
+          </l:isAdmin>
         </l:notice>
       </j:when>
       <j:otherwise>
         <f:section title="${%Configurations}">
           <p class="jenkins-section__description">
-            ${%Last time applied:} <i:formatDate value="${it.lastTimeLoaded}" type="both" dateStyle="medium" timeStyle="long" />
+            ${%Last time applied:}
+            <i:formatDate value="${it.lastTimeLoaded}" type="both" dateStyle="medium"
+              timeStyle="long"/>
           </p>
 
           <ul class="jenkins-instructions">
@@ -75,8 +80,12 @@
     <l:hasPermission permission="${app.SYSTEM_READ}">
       <f:section title="${%Reference}">
         <dt>
-          <dl><a href="reference">${%Documentation}</a></dl>
-          <dl><a href="schema">${%JSON schema}</a></dl>
+          <dl>
+            <a href="reference">${%Documentation}</a>
+          </dl>
+          <dl>
+            <a href="schema">${%JSON schema}</a>
+          </dl>
         </dt>
       </f:section>
     </l:hasPermission>

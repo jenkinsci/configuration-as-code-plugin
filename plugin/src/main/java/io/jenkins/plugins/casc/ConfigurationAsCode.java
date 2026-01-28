@@ -42,7 +42,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -219,38 +218,51 @@ public class ConfigurationAsCode extends ManagementLink {
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
-        String newSource = request.getParameter("_.newSource");
-        String normalizedSource = Util.fixEmptyAndTrim(newSource);
-        List<String> candidateSources = new ArrayList<>();
-        for (String candidateSource : inputToCandidateSources(normalizedSource)) {
-            File file = new File(candidateSource);
-            if (file.exists() || ConfigurationAsCode.isSupportedURI(candidateSource)) {
-                candidateSources.add(candidateSource);
-            } else {
-                LOGGER.log(Level.WARNING, "Source {0} could not be applied", candidateSource);
-                // todo: show message in UI
-            }
-        }
-        if (!candidateSources.isEmpty()) {
-            List<YamlSource> candidates = getConfigFromSources(candidateSources);
-            if (canApplyFrom(candidates)) {
-                sources = candidateSources;
-                configureWith(getConfigFromSources(getSources()));
-                CasCGlobalConfig config = GlobalConfiguration.all().get(CasCGlobalConfig.class);
-                if (config != null) {
-                    config.setConfigurationPath(normalizedSource);
-                    config.save();
+        try {
+            String newSource = request.getParameter("_.newSource");
+            String normalizedSource = Util.fixEmptyAndTrim(newSource);
+            List<String> candidateSources = new ArrayList<>();
+            for (String candidateSource : inputToCandidateSources(normalizedSource)) {
+                File file = new File(candidateSource);
+                if (file.exists() || ConfigurationAsCode.isSupportedURI(candidateSource)) {
+                    candidateSources.add(candidateSource);
+                } else {
+                    LOGGER.log(Level.WARNING, "Source {0} could not be applied", candidateSource);
+                    // todo: show message in UI
                 }
-                LOGGER.log(Level.FINE, "Replace configuration with: " + normalizedSource);
-            } else {
-                LOGGER.log(Level.WARNING, "Provided sources could not be applied");
-                // todo: show message in UI
             }
-        } else {
-            LOGGER.log(Level.FINE, "No such source exists, applying default");
-            // May be do nothing instead?
-            configure();
+            if (!candidateSources.isEmpty()) {
+                List<YamlSource> candidates = getConfigFromSources(candidateSources);
+                if (canApplyFrom(candidates)) {
+                    sources = candidateSources;
+                    configureWith(getConfigFromSources(getSources()));
+                    CasCGlobalConfig config = GlobalConfiguration.all().get(CasCGlobalConfig.class);
+                    if (config != null) {
+                        config.setConfigurationPath(normalizedSource);
+                        config.save();
+                    }
+                    LOGGER.log(Level.FINE, "Replace configuration with: " + normalizedSource);
+                } else {
+                    LOGGER.log(Level.WARNING, "Provided sources could not be applied");
+                    // todo: show message in UI
+                }
+            } else {
+                LOGGER.log(Level.FINE, "No such source exists, applying default");
+                // May be do nothing instead?
+                configure();
+            }
+        } catch (ConfiguratorException e) {
+            LOGGER.log(Level.SEVERE, "Failed to reload configuration", e);
+
+            Throwable throwableCause = e.getCause();
+            if (throwableCause instanceof ConfiguratorException cause) {
+                handleExceptionOnReloading(request, response, cause);
+            } else {
+                handleExceptionOnReloading(request, response, e);
+            }
+            return;
         }
+
         response.sendRedirect("");
     }
 
