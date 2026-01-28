@@ -140,7 +140,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
     @Override
     public String getDescription() {
-        return "Reload your configuration or update configuration source";
+        return "Reload your configuration or update configuration source.";
     }
 
     /**
@@ -218,38 +218,51 @@ public class ConfigurationAsCode extends ManagementLink {
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
-        String newSource = request.getParameter("_.newSource");
-        String normalizedSource = Util.fixEmptyAndTrim(newSource);
-        List<String> candidateSources = new ArrayList<>();
-        for (String candidateSource : inputToCandidateSources(normalizedSource)) {
-            File file = new File(candidateSource);
-            if (file.exists() || ConfigurationAsCode.isSupportedURI(candidateSource)) {
-                candidateSources.add(candidateSource);
-            } else {
-                LOGGER.log(Level.WARNING, "Source {0} could not be applied", candidateSource);
-                // todo: show message in UI
-            }
-        }
-        if (!candidateSources.isEmpty()) {
-            List<YamlSource> candidates = getConfigFromSources(candidateSources);
-            if (canApplyFrom(candidates)) {
-                sources = candidateSources;
-                configureWith(getConfigFromSources(getSources()));
-                CasCGlobalConfig config = GlobalConfiguration.all().get(CasCGlobalConfig.class);
-                if (config != null) {
-                    config.setConfigurationPath(normalizedSource);
-                    config.save();
+        try {
+            String newSource = request.getParameter("_.newSource");
+            String normalizedSource = Util.fixEmptyAndTrim(newSource);
+            List<String> candidateSources = new ArrayList<>();
+            for (String candidateSource : inputToCandidateSources(normalizedSource)) {
+                File file = new File(candidateSource);
+                if (file.exists() || ConfigurationAsCode.isSupportedURI(candidateSource)) {
+                    candidateSources.add(candidateSource);
+                } else {
+                    LOGGER.log(Level.WARNING, "Source {0} could not be applied", candidateSource);
+                    // todo: show message in UI
                 }
-                LOGGER.log(Level.FINE, "Replace configuration with: " + normalizedSource);
-            } else {
-                LOGGER.log(Level.WARNING, "Provided sources could not be applied");
-                // todo: show message in UI
             }
-        } else {
-            LOGGER.log(Level.FINE, "No such source exists, applying default");
-            // May be do nothing instead?
-            configure();
+            if (!candidateSources.isEmpty()) {
+                List<YamlSource> candidates = getConfigFromSources(candidateSources);
+                if (canApplyFrom(candidates)) {
+                    sources = candidateSources;
+                    configureWith(getConfigFromSources(getSources()));
+                    CasCGlobalConfig config = GlobalConfiguration.all().get(CasCGlobalConfig.class);
+                    if (config != null) {
+                        config.setConfigurationPath(normalizedSource);
+                        config.save();
+                    }
+                    LOGGER.log(Level.FINE, "Replace configuration with: " + normalizedSource);
+                } else {
+                    LOGGER.log(Level.WARNING, "Provided sources could not be applied");
+                    // todo: show message in UI
+                }
+            } else {
+                LOGGER.log(Level.FINE, "No such source exists, applying default");
+                // May be do nothing instead?
+                configure();
+            }
+        } catch (ConfiguratorException e) {
+            LOGGER.log(Level.SEVERE, "Failed to reload configuration", e);
+
+            Throwable throwableCause = e.getCause();
+            if (throwableCause instanceof ConfiguratorException cause) {
+                handleExceptionOnReloading(request, response, cause);
+            } else {
+                handleExceptionOnReloading(request, response, e);
+            }
+            return;
         }
+
         response.sendRedirect("");
     }
 
@@ -556,7 +569,23 @@ public class ConfigurationAsCode extends ManagementLink {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         export(out);
 
-        req.setAttribute("export", out.toString(StandardCharsets.UTF_8.name()));
+        req.setAttribute("viewExport", new ManagementLink() {
+            @Override
+            public String getIconFileName() {
+                return "";
+            }
+
+            // TODO - FIX - EXTREMELY HACKY - couldn't expose a public method for some reason
+            @Override
+            public String getUrlName() {
+                return out.toString(StandardCharsets.UTF_8);
+            }
+
+            @Override
+            public String getDisplayName() {
+                return "Export configuration";
+            }
+        });
         req.getView(this, "viewExport.jelly").forward(req, res);
     }
 
