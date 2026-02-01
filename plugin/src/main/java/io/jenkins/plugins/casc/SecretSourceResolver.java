@@ -201,23 +201,18 @@ public class SecretSourceResolver {
 
         @Override
         public String lookup(@NonNull final String key) {
-            if (StringUtils.isBlank(key)) {
-                return "";
-            }
 
             final String value = key.trim();
 
-            if (value.startsWith("-----BEGIN ")) {
-                return value;
+            if (value.isEmpty()) {
+                return "";
             }
 
-            String compact = value.replaceAll("\\s+", "");
-
             try {
-                return new String(Base64.getDecoder().decode(compact), StandardCharsets.UTF_8);
+                return new String(Base64.getDecoder().decode(value), StandardCharsets.UTF_8);
             } catch (IllegalArgumentException e) {
                 try {
-                    return new String(Base64.getUrlDecoder().decode(compact), StandardCharsets.UTF_8);
+                    return new String(Base64.getUrlDecoder().decode(value), StandardCharsets.UTF_8);
                 } catch (IllegalArgumentException e2) {
                     LOGGER.log(
                             Level.WARNING,
