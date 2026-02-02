@@ -883,8 +883,16 @@ public class ConfigurationAsCode extends ManagementLink {
         monitor.reset();
         context.clearListeners();
         context.addListener(monitor::record);
+
+        // Enter JCasC context to enable post-processing fixes for items created during configuration
+        // This is used by BranchSourceCredentialFixer to fix credential initialization issues
+        // See https://github.com/jenkinsci/configuration-as-code-plugin/issues/2753
+        io.jenkins.plugins.casc.core.BranchSourceCredentialFixer.enterCascContext();
         try (ACLContext acl = ACL.as2(ACL.SYSTEM2)) {
             invokeWith(entries, (configurator, config) -> configurator.configure(config, context));
+        } finally {
+            // Always exit the JCasC context, even if configuration fails
+            io.jenkins.plugins.casc.core.BranchSourceCredentialFixer.exitCascContext();
         }
     }
 
