@@ -10,6 +10,7 @@ import hudson.model.Describable;
 import hudson.model.Descriptor;
 import hudson.security.HudsonPrivateSecurityRealm;
 import hudson.security.SecurityRealm;
+import hudson.tools.ToolInstaller;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.Configurator;
@@ -225,11 +226,30 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
                 .values()
                 .headOption()
                 .orElse(() -> {
+                    if (descriptors.isEmpty()) {
+                        String msg = String.format(
+                                "No descriptors registered for %s. "
+                                        + "The plugin providing this extension point might be missing or failed to load.",
+                                target.getName());
+
+                        if (ToolInstaller.class.isAssignableFrom(target)) {
+                            LOGGER.warning(msg);
+                            return Option.none();
+                        }
+                    }
+
                     List<String> availableImplementations = descriptors
                             .toJavaStream()
-                            .map(d -> DescribableAttribute.getPreferredSymbol(d, getImplementedAPI(), target))
+                            .map(d -> DescribableAttribute.getPreferredSymbol(d, target, target))
                             .collect(Collectors.toList());
 
+                    if (ToolInstaller.class.isAssignableFrom(target)) {
+                        String msg = String.format(
+                                "No %s implementation found for '%s'. Configuration will be skipped. Available: %s",
+                                target.getSimpleName(), symbol, availableImplementations);
+                        LOGGER.warning(msg);
+                        return Option.none();
+                    }
                     throw new UnknownAttributesException(
                             this,
                             "No implementation found for:",
