@@ -31,6 +31,19 @@ jenkins:
               - "Job/Create"
 ```
 
+### Important note about Job/Create permission
+
+The `Job/Create` permission allows a user to start the job creation process.
+However, it does not allow saving or modifying the job configuration.
+
+If `Job/Create` is granted without `Job/Configure`:
+- The user can click **New Item**
+- An authorization error may appear when saving
+- The job may still appear in the dashboard
+- This is expected Jenkins behavior
+
+To allow users to fully create and configure jobs, both
+`Job/Create` and `Job/Configure` should be granted.
 
 ## sample-configuration (project based matrix)
 
