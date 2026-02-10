@@ -29,7 +29,7 @@ jenkins:
         numExecutors: 4
         remoteFS: "/home/user2"
         launcher:
-          SSHLauncher:
+          ssh:
             host: "192.168.1.1"
             port: 22
             credentialsId: test
