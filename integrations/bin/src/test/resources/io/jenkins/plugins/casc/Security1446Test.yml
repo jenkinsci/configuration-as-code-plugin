@@ -1,0 +1,15 @@
+credentials:
+  system:
+    domainCredentials:
+    - credentials:
+        - string:
+            description: "path = ^${PATH}"
+            id: "system secret escaped"
+            scope: SYSTEM
+            secret: "{AQAAABAAAAAQwDmo12BE6995SezdXe1Y9ewaoYR6KgzX46VjtoPDqE0=}"
+        - usernamePassword:
+            description: "path = ^${PATH}"
+            id: "global user-passw escaped"
+            password: "{AQAAABAAAAAQpNs2vtahkRGcR5vzanaIb4UJkCyeNGdP23/X3+Tl1Ic=}"
+            scope: GLOBAL
+            username: "java-home = ^${JAVA_HOME}"
