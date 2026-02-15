@@ -4,7 +4,7 @@
 
 ## Reporting plugin compatibility issues
 
-See [COMPATIBILITY](./COMPATIBILITY.md)
+See [compatibility](./compatibility.md)
 
 ## Why should you contribute
 
