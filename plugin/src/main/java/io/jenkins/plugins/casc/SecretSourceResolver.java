@@ -201,7 +201,27 @@ public class SecretSourceResolver {
 
         @Override
         public String lookup(@NonNull final String key) {
-            return new String(Base64.getDecoder().decode(key.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
+
+            final String value = key.trim();
+
+            if (value.isEmpty()) {
+                return "";
+            }
+
+            try {
+                return new String(Base64.getDecoder().decode(value), StandardCharsets.UTF_8);
+            } catch (IllegalArgumentException e) {
+                try {
+                    return new String(Base64.getUrlDecoder().decode(value), StandardCharsets.UTF_8);
+                } catch (IllegalArgumentException e2) {
+                    LOGGER.log(
+                            Level.WARNING,
+                            "Configuration import: Failed to decode base64 secret. "
+                                    + "The value might not be resolved yet or is invalid base64. Defaulting to empty string.",
+                            e2);
+                    return "";
+                }
+            }
         }
     }
 
