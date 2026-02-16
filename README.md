@@ -260,12 +260,16 @@ Most plugins should be supported out-of-the-box or maybe require some minimal ch
 
 ## Adding JCasC support to a plugin
 
-Plugin developers wanting to support JCasC in their plugin should [check out our how-to guide](docs/PLUGINS.md).
+Plugin developers wanting to support JCasC in their plugin should [check out our how-to guide](docs/developer/plugins.md).
 
 ## Configuration-as-Code extension plugins
 
 - [configuration-as-code-groovy-plugin](https://github.com/jenkinsci/configuration-as-code-groovy-plugin)\
   Allows specifying groovy code that should run on during configuration.
+
+## Developer Documentation
+
+See the [Developer Guide](docs/developer/README.md).
 
 ## Jenkins Enhancement Proposal
 
