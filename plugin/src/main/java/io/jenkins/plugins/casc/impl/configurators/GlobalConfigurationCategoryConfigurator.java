@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import jenkins.model.GlobalConfigurationCategory;
 import jenkins.model.Jenkins;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.jenkinsci.Symbol;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
@@ -59,9 +59,9 @@ public class GlobalConfigurationCategoryConfigurator extends BaseConfigurator<Gl
         }
 
         String name = c.getSimpleName();
-        name = StringUtils.remove(name, "Global");
-        name = StringUtils.remove(name, "Configuration");
-        name = StringUtils.remove(name, "Category");
+        name = Strings.CS.remove(name, "Global");
+        name = Strings.CS.remove(name, "Configuration");
+        name = Strings.CS.remove(name, "Category");
         return singletonList(name.toLowerCase());
     }
 
