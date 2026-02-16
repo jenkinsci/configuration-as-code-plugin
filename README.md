@@ -269,7 +269,7 @@ Plugin developers wanting to support JCasC in their plugin should [check out our
 
 ## Developer Documentation
 
-Developer and contributor documentation is available in the [Developer Guide](docs/developer/README.md).
+See the [Developer Guide](docs/developer/README.md).
 
 ## Jenkins Enhancement Proposal
 
