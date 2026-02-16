@@ -5,7 +5,7 @@ API, but still require plugins to respect some contract, aka "_convention over e
 This documentation is here to explain plugin maintainers those conventions and provide guidance
 on expected design.
 
-![JCasC is coming](../images/BraceYourselves.jpg)
+![JCasC is coming](../../images/BraceYourselves.jpg)
 
 ## Overview
 
