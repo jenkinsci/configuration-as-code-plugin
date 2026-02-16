@@ -11,6 +11,7 @@ import io.jenkins.plugins.casc.impl.attributes.DescribableListAttribute;
 import io.jenkins.plugins.casc.impl.attributes.PersistedListAttribute;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
+import io.jenkins.plugins.casc.model.Scalar;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
@@ -347,6 +348,29 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
 
                 final Class k = attribute.getType();
                 final Configurator configurator = context.lookupOrFail(k);
+
+                // Check for duplicate entries in Describables
+                if (attribute instanceof DescribableAttribute && !attribute.isMultiple() && sub instanceof Mapping) {
+                    Mapping mapping = sub.asMapping();
+                    // Count the number of entries that might be conflicting configurations
+                    int configurableEntries = 0;
+                    for (String key : mapping.keySet()) {
+                        CNode value = mapping.get(key);
+                        if (value != null && !(value instanceof Scalar && (((Scalar) value).getValue() == null || ((Scalar) value).toString().isEmpty()))) {
+                            configurableEntries++;
+                        }
+                    }
+                    
+                    if (configurableEntries > 1) {
+                        String message = String.format("Multiple configurations found for single-valued Describable '%s'. Conflicting entries: %s. Only one can be used.",
+                                attribute.getName(), String.join(", ", mapping.keySet()));
+                        context.warning(sub, message);
+                        if (context.getUnknown() == ConfigurationContext.Unknown.reject) {
+                            throw new ConfiguratorException(this, message);
+                        }
+                        LOGGER.warning(message);
+                    }
+                }
 
                 final Object valueToSet;
                 try {
