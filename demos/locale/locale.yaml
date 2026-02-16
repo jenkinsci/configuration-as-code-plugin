@@ -1,0 +1,9 @@
+---
+# Locale Plugin Configuration
+# Forces Jenkins UI to English and ignores browser language preferences
+
+appearance:
+  locale:
+    systemLocale: "en"
+    ignoreAcceptLanguage: true
+
