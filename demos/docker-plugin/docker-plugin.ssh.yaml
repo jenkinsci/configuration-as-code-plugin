@@ -1,0 +1,20 @@
+# demos/docker-plugin/docker-plugin-ssh.yaml
+jenkins:
+  clouds:
+    - docker:
+        name: "my-docker-cloud"
+        dockerHost:
+          uri: "unix:///var/run/docker.sock"
+        templates:
+          - labelString: "worker1-agent"
+            dockerTemplateBase:
+              image: "jenkins/ssh-agent:latest-jdk17"
+              mounts:
+                - "type=tmpfs,destination=/run"
+                - "type=bind,source=/var/run/docker.sock,destination=/var/run/docker.sock"
+
+            remoteFs: "/home/jenkins/agent"
+            connector:
+              sshConnector:
+                sshKeyCredentialsId: "my-ssh-key-id"
+                javaPath: "/opt/java/openjdk/bin/java"
