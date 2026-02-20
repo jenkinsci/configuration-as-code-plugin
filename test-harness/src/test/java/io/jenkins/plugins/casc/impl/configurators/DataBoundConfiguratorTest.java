@@ -30,12 +30,16 @@ import io.jenkins.plugins.casc.model.Scalar;
 import io.jenkins.plugins.casc.model.Sequence;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.PostConstruct;
+import org.apache.commons.beanutils.ConversionException;
+import org.apache.commons.beanutils.Converter;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -425,5 +429,80 @@ class DataBoundConfiguratorTest {
         public ArrayConstructor(Foo[] anArray) {
             this.anArray = anArray;
         }
+    }
+
+    @SuppressWarnings("ClassCanBeRecord")
+    public static class CustomItem {
+        private final String value;
+
+        @DataBoundConstructor
+        public CustomItem(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        @SuppressWarnings("unused")
+        public static class StaplerConverterImpl implements Converter {
+            @SuppressWarnings("unchecked")
+            @Override
+            public <T> T convert(Class<T> type, Object value) {
+                if (type == String.class && value instanceof CustomItem) {
+                    return (T) ("converted-" + ((CustomItem) value).getValue());
+                }
+                if (type == CustomItem.class && value instanceof String) {
+                    return (T) new CustomItem(((String) value).replace("converted-", ""));
+                }
+                if (type.isInstance(value)) {
+                    return (T) value;
+                }
+                throw new ConversionException(
+                        "Unsupported conversion from " + value.getClass().getName() + " to " + type.getName());
+            }
+        }
+    }
+
+    @SuppressWarnings("ClassCanBeRecord")
+    public static class CustomItemListHolder {
+        private final List<CustomItem> items;
+
+        @DataBoundConstructor
+        public CustomItemListHolder(List<CustomItem> items) {
+            this.items = items;
+        }
+
+        @SuppressWarnings("unused")
+        public List<CustomItem> getItems() {
+            return items;
+        }
+    }
+
+    @Test
+    @Issue("https://github.com/jenkinsci/configuration-as-code-plugin/issues/2346")
+    void exportWithCustomConverterIteratesOverList() throws Exception {
+        List<CustomItem> list = Arrays.asList(new CustomItem("A"), new CustomItem("B"));
+        CustomItemListHolder holder = new CustomItemListHolder(list);
+
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        final Configurator<Object> c = registry.lookupOrFail(CustomItemListHolder.class);
+        final ConfigurationContext context = new ConfigurationContext(registry);
+
+        CNode node = c.describe(holder, context);
+
+        assertNotNull(node);
+        assertInstanceOf(Mapping.class, node);
+        Mapping map = (Mapping) node;
+
+        Sequence items = map.get("items").asSequence();
+
+        assertEquals(2, items.size());
+
+        Mapping first = items.get(0).asMapping();
+        Mapping second = items.get(1).asMapping();
+
+        assertEquals("A", first.get("value").toString());
+        assertEquals("B", second.get("value").toString());
     }
 }

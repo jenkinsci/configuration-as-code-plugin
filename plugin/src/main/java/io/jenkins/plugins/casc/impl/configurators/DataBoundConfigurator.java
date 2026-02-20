@@ -11,6 +11,7 @@ import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.impl.attributes.DescribableAttribute;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -301,8 +302,52 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
             if (a != null) {
                 Object value = a.getValue(instance);
                 if (value != null) {
-                    Object converted = Stapler.CONVERT_UTILS.convert(value, a.getType());
-                    if (converted instanceof Collection || p.getType().isArray() || !a.isMultiple()) {
+                    Object converted;
+                    Class<?> targetType = a.getType();
+
+                    boolean targetIsCollectionOrArray =
+                            Collection.class.isAssignableFrom(targetType) || targetType.isArray();
+
+                    if (!targetIsCollectionOrArray
+                            && (value instanceof Collection || value.getClass().isArray())) {
+
+                        Iterable<?> iterable;
+                        if (value instanceof Collection) {
+                            iterable = (Collection<?>) value;
+                        } else {
+                            int length = Array.getLength(value);
+                            List<Object> list = new ArrayList<>(length);
+                            for (int j = 0; j < length; j++) {
+                                list.add(Array.get(value, j));
+                            }
+                            iterable = list;
+                        }
+
+                        List<Object> convertedList = new ArrayList<>();
+                        for (Object item : iterable) {
+                            if (item != null) {
+                                convertedList.add(Stapler.CONVERT_UTILS.convert(item, targetType));
+                            } else {
+                                convertedList.add(null);
+                            }
+                        }
+                        converted = convertedList;
+
+                    } else {
+                        converted = Stapler.CONVERT_UTILS.convert(value, targetType);
+                    }
+                    if (p.getType().isArray() && converted instanceof Collection<?> col) {
+                        Class<?> component = p.getType().getComponentType();
+                        Object array = Array.newInstance(component, col.size());
+                        int idx = 0;
+                        for (Object o : col) {
+                            Array.set(array, idx++, o);
+                        }
+                        args[i] = array;
+
+                    } else if (Set.class.isAssignableFrom(p.getType()) && converted instanceof Collection) {
+                        args[i] = new HashSet<>((Collection<?>) converted);
+                    } else if (converted instanceof Collection || !a.isMultiple()) {
                         args[i] = converted;
                     } else if (Set.class.isAssignableFrom(p.getType())) {
                         args[i] = Collections.singleton(converted);
