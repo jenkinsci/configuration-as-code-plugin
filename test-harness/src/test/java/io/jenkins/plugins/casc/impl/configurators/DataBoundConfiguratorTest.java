@@ -600,4 +600,59 @@ class DataBoundConfiguratorTest {
         String yaml = Util.toYamlString(node);
         assertTrue(yaml.contains("A"), "The valid item 'A' should be present in the exported YAML");
     }
+
+    @Test
+    void configureIteratesOverList() {
+        Mapping config = new Mapping();
+        Sequence items = new Sequence();
+
+        Mapping itemA = new Mapping();
+        itemA.put("value", "A");
+        items.add(itemA);
+
+        Mapping itemB = new Mapping();
+        itemB.put("value", "B");
+        items.add(itemB);
+
+        config.put("items", items);
+
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        CustomItemListHolder configured = (CustomItemListHolder) registry.lookupOrFail(CustomItemListHolder.class)
+            .configure(config, new ConfigurationContext(registry));
+
+        assertNotNull(configured);
+        assertEquals(2, configured.getItems().size());
+        assertEquals("A", configured.getItems().get(0).getValue());
+        assertEquals("B", configured.getItems().get(1).getValue());
+    }
+
+    @Test
+    void configureConvertsListToSet() {
+        Mapping config = new Mapping();
+        Sequence items = new Sequence();
+
+        Mapping itemA = new Mapping();
+        itemA.put("value", "A");
+        items.add(itemA);
+
+        Mapping itemB = new Mapping();
+        itemB.put("value", "B");
+        items.add(itemB);
+
+        config.put("items", items);
+
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        CustomItemSetHolder configured =
+            (CustomItemSetHolder) registry.lookupOrFail(CustomItemSetHolder.class)
+                .configure(config, new ConfigurationContext(registry));
+
+        assertNotNull(configured);
+        assertEquals(2, configured.getItems().size());
+        assertNotNull(configured.getItems());
+
+        assertTrue(
+            configured.getItems().stream().anyMatch(i -> "A".equals(i.getValue())));
+        assertTrue(
+            configured.getItems().stream().anyMatch(i -> "B".equals(i.getValue())));
+    }
 }
