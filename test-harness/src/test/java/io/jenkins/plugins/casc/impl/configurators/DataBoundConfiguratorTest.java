@@ -617,8 +617,8 @@ class DataBoundConfiguratorTest {
         config.put("items", items);
 
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
-        CustomItemListHolder configured = (CustomItemListHolder) registry.lookupOrFail(CustomItemListHolder.class)
-            .configure(config, new ConfigurationContext(registry));
+        CustomItemListHolder configured = (CustomItemListHolder)
+                registry.lookupOrFail(CustomItemListHolder.class).configure(config, new ConfigurationContext(registry));
 
         assertNotNull(configured);
         assertEquals(2, configured.getItems().size());
@@ -642,17 +642,14 @@ class DataBoundConfiguratorTest {
         config.put("items", items);
 
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
-        CustomItemSetHolder configured =
-            (CustomItemSetHolder) registry.lookupOrFail(CustomItemSetHolder.class)
-                .configure(config, new ConfigurationContext(registry));
+        CustomItemSetHolder configured = (CustomItemSetHolder)
+                registry.lookupOrFail(CustomItemSetHolder.class).configure(config, new ConfigurationContext(registry));
 
         assertNotNull(configured);
         assertEquals(2, configured.getItems().size());
         assertNotNull(configured.getItems());
 
-        assertTrue(
-            configured.getItems().stream().anyMatch(i -> "A".equals(i.getValue())));
-        assertTrue(
-            configured.getItems().stream().anyMatch(i -> "B".equals(i.getValue())));
+        assertTrue(configured.getItems().stream().anyMatch(i -> "A".equals(i.getValue())));
+        assertTrue(configured.getItems().stream().anyMatch(i -> "B".equals(i.getValue())));
     }
 }
