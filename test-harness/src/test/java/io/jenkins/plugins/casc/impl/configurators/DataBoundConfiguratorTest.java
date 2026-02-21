@@ -33,6 +33,7 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -495,14 +496,108 @@ class DataBoundConfiguratorTest {
         assertInstanceOf(Mapping.class, node);
         Mapping map = (Mapping) node;
 
-        Sequence items = map.get("items").asSequence();
+        assertEquals(
+                "- value: \"A\"\n- value: \"B\"",
+                Util.toYamlString(map.get("items")).trim());
+    }
 
-        assertEquals(2, items.size());
+    @SuppressWarnings("ClassCanBeRecord")
+    public static class CustomItemSetHolder {
+        private final Set<CustomItem> items;
 
-        Mapping first = items.get(0).asMapping();
-        Mapping second = items.get(1).asMapping();
+        @DataBoundConstructor
+        public CustomItemSetHolder(Set<CustomItem> items) {
+            this.items = items;
+        }
 
-        assertEquals("A", first.get("value").toString());
-        assertEquals("B", second.get("value").toString());
+        @SuppressWarnings("unused")
+        public Set<CustomItem> getItems() {
+            return items;
+        }
+    }
+
+    @Test
+    void exportWithCustomConverterIteratesOverSet() throws Exception {
+        Set<CustomItem> set = new HashSet<>();
+        set.add(new CustomItem("A"));
+        set.add(new CustomItem("B"));
+
+        CustomItemSetHolder holder = new CustomItemSetHolder(set);
+
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        Configurator<Object> c = registry.lookupOrFail(CustomItemSetHolder.class);
+
+        CNode node = c.describe(holder, new ConfigurationContext(registry));
+        Mapping map = (Mapping) node;
+
+        String yaml =
+                Util.toYamlString(Objects.requireNonNull(map).get("items")).trim();
+
+        assertTrue(yaml.contains("value: \"A\""));
+        assertTrue(yaml.contains("value: \"B\""));
+    }
+
+    @SuppressWarnings("ClassCanBeRecord")
+    public static class CustomItemArrayHolder {
+        private final CustomItem[] items;
+
+        @DataBoundConstructor
+        public CustomItemArrayHolder(CustomItem[] items) {
+            this.items = items;
+        }
+
+        @SuppressWarnings("unused")
+        public CustomItem[] getItems() {
+            return items;
+        }
+    }
+
+    @Test
+    void exportWithCustomConverterIteratesOverArray() throws Exception {
+        CustomItem[] array = {new CustomItem("A"), new CustomItem("B")};
+
+        CustomItemArrayHolder holder = new CustomItemArrayHolder(array);
+
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        Configurator<Object> c = registry.lookupOrFail(CustomItemArrayHolder.class);
+
+        CNode node = c.describe(holder, new ConfigurationContext(registry));
+        Mapping map = (Mapping) node;
+
+        assertEquals(
+                "- value: \"A\"\n- value: \"B\"",
+                Util.toYamlString(Objects.requireNonNull(map).get("items")).trim());
+    }
+
+    @Test
+    void exportWithSingleElementList() throws Exception {
+        CustomItemListHolder holder = new CustomItemListHolder(List.of(new CustomItem("A")));
+
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        Configurator<Object> c = registry.lookupOrFail(CustomItemListHolder.class);
+
+        CNode node = c.describe(holder, new ConfigurationContext(registry));
+        Mapping map = (Mapping) node;
+
+        assertEquals(
+                "- value: \"A\"",
+                Util.toYamlString(Objects.requireNonNull(map).get("items")).trim());
+    }
+
+    @Test
+    void exportWithCustomConverterIteratesOverListWithNull() throws Exception {
+        List<CustomItem> list = Arrays.asList(new CustomItem("A"), null);
+        CustomItemListHolder holder = new CustomItemListHolder(list);
+
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        Configurator<Object> c = registry.lookupOrFail(CustomItemListHolder.class);
+
+        CNode node = c.describe(holder, new ConfigurationContext(registry));
+
+        assertNotNull(node, "Node should not be null");
+        assertInstanceOf(Mapping.class, node, "Node should be exported as a Mapping");
+
+        String yaml = Util.toYamlString(node);
+        assertTrue(yaml.contains("A"), "The valid item 'A' should be present in the exported YAML");
     }
 }
