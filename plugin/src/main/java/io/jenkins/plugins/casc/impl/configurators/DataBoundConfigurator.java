@@ -11,6 +11,7 @@ import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.impl.attributes.DescribableAttribute;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -301,8 +302,40 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
             if (a != null) {
                 Object value = a.getValue(instance);
                 if (value != null) {
-                    Object converted = Stapler.CONVERT_UTILS.convert(value, a.getType());
-                    if (converted instanceof Collection || p.getType().isArray() || !a.isMultiple()) {
+                    Class<?> targetType = a.getType();
+                    Object converted;
+
+                    if (a.isMultiple() && value instanceof Collection) {
+                        List<Object> list = new ArrayList<>();
+                        for (Object o : (Collection<?>) value) {
+                            list.add(Stapler.CONVERT_UTILS.convert(o, targetType));
+                        }
+                        converted = list;
+                    } else if (a.isMultiple() && value.getClass().isArray()) {
+                        List<Object> list = new ArrayList<>();
+                        int len = Array.getLength(value);
+                        for (int j = 0; j < len; j++) {
+                            list.add(Stapler.CONVERT_UTILS.convert(Array.get(value, j), targetType));
+                        }
+                        converted = list;
+                    } else {
+                        converted = Stapler.CONVERT_UTILS.convert(value, targetType);
+                    }
+
+                    if (p.getType().isArray() && converted instanceof Collection<?> col) {
+                        Class<?> component = p.getType().getComponentType();
+                        Object array = Array.newInstance(component, col.size());
+                        int idx = 0;
+                        for (Object o : col) {
+                            Array.set(array, idx++, o);
+                        }
+                        args[i] = array;
+
+                    } else if (Set.class.isAssignableFrom(p.getType()) && converted instanceof Collection) {
+                        args[i] = new HashSet<>((Collection<?>) converted);
+                    } else if (converted instanceof Collection
+                            || (converted != null && converted.getClass().isArray())
+                            || !a.isMultiple()) {
                         args[i] = converted;
                     } else if (Set.class.isAssignableFrom(p.getType())) {
                         args[i] = Collections.singleton(converted);
