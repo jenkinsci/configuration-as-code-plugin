@@ -303,8 +303,24 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
                 Object value = a.getValue(instance);
                 if (value != null) {
                     Class<?> targetType = a.getType();
+                    Object converted;
 
-                    Object converted = Stapler.CONVERT_UTILS.convert(value, targetType);
+                    if (a.isMultiple() && value instanceof Collection) {
+                        List<Object> list = new ArrayList<>();
+                        for (Object o : (Collection<?>) value) {
+                            list.add(Stapler.CONVERT_UTILS.convert(o, targetType));
+                        }
+                        converted = list;
+                    } else if (a.isMultiple() && value.getClass().isArray()) {
+                        List<Object> list = new ArrayList<>();
+                        int len = Array.getLength(value);
+                        for (int j = 0; j < len; j++) {
+                            list.add(Stapler.CONVERT_UTILS.convert(Array.get(value, j), targetType));
+                        }
+                        converted = list;
+                    } else {
+                        converted = Stapler.CONVERT_UTILS.convert(value, targetType);
+                    }
 
                     if (p.getType().isArray() && converted instanceof Collection<?> col) {
                         Class<?> component = p.getType().getComponentType();

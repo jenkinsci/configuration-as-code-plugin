@@ -699,4 +699,35 @@ class DataBoundConfiguratorTest {
             CONVERT_UTILS.deregister(StaplerOnlyItem.class);
         }
     }
+
+    public static class ArrayMismatch {
+        private final String[] items;
+
+        @DataBoundConstructor
+        public ArrayMismatch(String[] items) {
+            this.items = items;
+        }
+
+        @SuppressWarnings("unused")
+        public List<String> getItems() {
+            return items == null ? null : Arrays.asList(items);
+        }
+    }
+
+    @Test
+    public void describe_shouldHandleArrayConstructorWithListGetter() throws Exception {
+        DataBoundConfigurator<ArrayMismatch> configurator = new DataBoundConfigurator<>(ArrayMismatch.class);
+        ArrayMismatch instance = new ArrayMismatch(new String[] {"value1", "value2"});
+
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        ConfigurationContext context = new ConfigurationContext(registry);
+
+        CNode node = configurator.describe(instance, context);
+
+        assertNotNull(node);
+        assertInstanceOf(Mapping.class, node);
+        Mapping mapping = (Mapping) node;
+        assertTrue(mapping.containsKey("items"));
+        assertEquals(2, mapping.get("items").asSequence().size());
+    }
 }
