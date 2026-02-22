@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.kohsuke.stapler.Stapler.CONVERT_UTILS;
 
 import hudson.util.Secret;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
@@ -39,6 +40,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.PostConstruct;
+import org.apache.commons.beanutils.Converter;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -628,5 +630,71 @@ class DataBoundConfiguratorTest {
 
         assertTrue(configured.getItems().stream().anyMatch(i -> "A".equals(i.getValue())));
         assertTrue(configured.getItems().stream().anyMatch(i -> "B".equals(i.getValue())));
+    }
+
+    @SuppressWarnings("ClassCanBeRecord")
+    public static class StaplerOnlyItem {
+        private final String value;
+
+        public StaplerOnlyItem(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
+    @SuppressWarnings("ClassCanBeRecord")
+    public static class StaplerOnlyItemListHolder {
+        private final List<StaplerOnlyItem> items;
+
+        @DataBoundConstructor
+        public StaplerOnlyItemListHolder(List<StaplerOnlyItem> items) {
+            this.items = items;
+        }
+
+        public List<StaplerOnlyItem> getItems() {
+            return items;
+        }
+    }
+
+    public static class StaplerOnlyItemConverter implements Converter {
+        @Override
+        public <T> T convert(Class<T> type, Object value) {
+            assertFalse(value instanceof List, "Converter must be called per item, not per list");
+            if (value == null) return null;
+
+            return type.cast(new StaplerOnlyItem("converted-by-stapler-" + value));
+        }
+    }
+
+    @Test
+    void shouldConvertListItemsUsingStaplerConverter() {
+        CONVERT_UTILS.register(new StaplerOnlyItemConverter(), StaplerOnlyItem.class);
+
+        try {
+            Mapping config = new Mapping();
+            Sequence items = new Sequence();
+
+            items.add(new Scalar("ItemA"));
+            items.add(new Scalar("ItemB"));
+            config.put("items", items);
+
+            ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+            StaplerOnlyItemListHolder configured =
+                    (StaplerOnlyItemListHolder) registry.lookupOrFail(StaplerOnlyItemListHolder.class)
+                            .configure(config, new ConfigurationContext(registry));
+
+            assertNotNull(configured);
+            assertEquals(2, configured.getItems().size());
+            assertEquals(
+                    "converted-by-stapler-ItemA", configured.getItems().get(0).getValue());
+            assertEquals(
+                    "converted-by-stapler-ItemB", configured.getItems().get(1).getValue());
+
+        } finally {
+            CONVERT_UTILS.deregister(StaplerOnlyItem.class);
+        }
     }
 }
