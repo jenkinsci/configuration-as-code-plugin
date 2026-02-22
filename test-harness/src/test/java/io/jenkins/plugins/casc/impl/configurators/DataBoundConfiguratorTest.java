@@ -663,7 +663,9 @@ class DataBoundConfiguratorTest {
         @Override
         public <T> T convert(Class<T> type, Object value) {
             assertFalse(value instanceof List, "Converter must be called per item, not per list");
-            if (value == null) return null;
+            if (value == null) {
+                return null;
+            }
 
             return type.cast(new StaplerOnlyItem("converted-by-stapler-" + value));
         }
