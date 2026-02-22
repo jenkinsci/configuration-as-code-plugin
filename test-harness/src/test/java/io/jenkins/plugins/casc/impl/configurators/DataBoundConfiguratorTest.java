@@ -453,7 +453,6 @@ class DataBoundConfiguratorTest {
             this.items = items;
         }
 
-        @SuppressWarnings("unused")
         public List<CustomItem> getItems() {
             return items;
         }
@@ -489,7 +488,6 @@ class DataBoundConfiguratorTest {
             this.items = items;
         }
 
-        @SuppressWarnings("unused")
         public Set<CustomItem> getItems() {
             return items;
         }
