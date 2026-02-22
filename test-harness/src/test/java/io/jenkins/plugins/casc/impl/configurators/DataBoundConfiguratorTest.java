@@ -32,6 +32,7 @@ import io.jenkins.plugins.casc.model.Sequence;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -50,6 +51,7 @@ import org.jvnet.hudson.test.LogRecorder;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
+import org.kohsuke.stapler.Stapler;
 
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -728,6 +730,125 @@ class DataBoundConfiguratorTest {
         assertInstanceOf(Mapping.class, node);
         Mapping mapping = (Mapping) node;
         assertTrue(mapping.containsKey("items"));
+        assertEquals(2, mapping.get("items").asSequence().size());
+    }
+
+    @SuppressWarnings("ClassCanBeRecord")
+    public static class ListGetterMultiCtor {
+        private final List<StaplerOnlyItem> items;
+
+        @DataBoundConstructor
+        public ListGetterMultiCtor(List<StaplerOnlyItem> items) {
+            this.items = items;
+        }
+
+        @SuppressWarnings("unused")
+        public List<StaplerOnlyItem> getItems() {
+            return items;
+        }
+    }
+
+    @Test
+    void describe_iteratesCollectionAndConvertsEachItem() throws Exception {
+        Stapler.CONVERT_UTILS.register(new StaplerOnlyItemConverter(), StaplerOnlyItem.class);
+        try {
+            ListGetterMultiCtor obj = new ListGetterMultiCtor(Collections.singletonList(new StaplerOnlyItem("A")));
+
+            ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+            CNode node =
+                    registry.lookupOrFail(ListGetterMultiCtor.class).describe(obj, new ConfigurationContext(registry));
+
+            assertNotNull(node);
+        } finally {
+            Stapler.CONVERT_UTILS.deregister(StaplerOnlyItem.class);
+        }
+    }
+
+    @SuppressWarnings("ClassCanBeRecord")
+    public static class ArrayGetterMultiCtor {
+        private final StaplerOnlyItem[] items;
+
+        @DataBoundConstructor
+        public ArrayGetterMultiCtor(StaplerOnlyItem[] items) {
+            this.items = items;
+        }
+
+        @SuppressWarnings("unused")
+        public StaplerOnlyItem[] getItems() {
+            return items;
+        }
+    }
+
+    @Test
+    void describe_iteratesArrayAndConvertsEachItem() throws Exception {
+        Stapler.CONVERT_UTILS.register(new StaplerOnlyItemConverter(), StaplerOnlyItem.class);
+        try {
+            StaplerOnlyItem[] array = new StaplerOnlyItem[] {new StaplerOnlyItem("A")};
+            ArrayGetterMultiCtor obj = new ArrayGetterMultiCtor(array);
+
+            ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+            CNode node =
+                    registry.lookupOrFail(ArrayGetterMultiCtor.class).describe(obj, new ConfigurationContext(registry));
+
+            assertNotNull(node);
+        } finally {
+            Stapler.CONVERT_UTILS.deregister(StaplerOnlyItem.class);
+        }
+    }
+
+    public static class ListGetterArrayCtor {
+        private final String[] items;
+
+        @DataBoundConstructor
+        public ListGetterArrayCtor(String[] items) {
+            this.items = items;
+        }
+
+        @SuppressWarnings("unused")
+        public List<String> getItems() {
+            return Arrays.asList(items);
+        }
+    }
+
+    @Test
+    void describe_convertsCollectionToArrayForConstructor() throws Exception {
+        ListGetterArrayCtor obj = new ListGetterArrayCtor(new String[] {"A", "B"});
+
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        CNode node = registry.lookupOrFail(ListGetterArrayCtor.class).describe(obj, new ConfigurationContext(registry));
+
+        assertNotNull(node);
+        assertInstanceOf(Mapping.class, node);
+
+        Mapping mapping = (Mapping) node;
+        assertEquals(2, mapping.get("items").asSequence().size());
+    }
+
+    public static class ListGetterSetCtor {
+
+        @DataBoundConstructor
+        @SuppressWarnings("unused")
+        public ListGetterSetCtor(Set<String> items) {
+            // intentionally unused: required to exercise Set to Collection conversion
+        }
+
+        @SuppressWarnings("unused")
+        public List<String> getItems() {
+            return List.of("A", "B");
+        }
+    }
+
+    @Test
+    void describe_convertsCollectionToSetForConstructor() throws Exception {
+        ListGetterSetCtor obj = new ListGetterSetCtor(Set.of("A", "B"));
+
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        CNode node = registry.lookupOrFail(ListGetterSetCtor.class).describe(obj, new ConfigurationContext(registry));
+
+        assertNotNull(node);
+        assertInstanceOf(Mapping.class, node);
+
+        Mapping mapping = (Mapping) node;
         assertEquals(2, mapping.get("items").asSequence().size());
     }
 }
