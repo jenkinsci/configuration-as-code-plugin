@@ -32,6 +32,7 @@ import io.jenkins.plugins.casc.model.Sequence;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -844,6 +845,131 @@ class DataBoundConfiguratorTest {
 
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         CNode node = registry.lookupOrFail(ListGetterSetCtor.class).describe(obj, new ConfigurationContext(registry));
+
+        assertNotNull(node);
+        assertInstanceOf(Mapping.class, node);
+
+        Mapping mapping = (Mapping) node;
+        assertEquals(2, mapping.get("items").asSequence().size());
+    }
+
+    @SuppressWarnings("ClassCanBeRecord")
+    public static class CollectionCtorCollectionGetter {
+        private final List<StaplerOnlyItem> items;
+
+        @DataBoundConstructor
+        public CollectionCtorCollectionGetter(List<StaplerOnlyItem> items) {
+            this.items = items;
+        }
+
+        @SuppressWarnings("unused")
+        public List<StaplerOnlyItem> getItems() {
+            return items;
+        }
+    }
+
+    @Test
+    void describe_convertsCollectionWhenCtorIsMultiple() throws Exception {
+        Stapler.CONVERT_UTILS.register(new StaplerOnlyItemConverter(), StaplerOnlyItem.class);
+        try {
+            CollectionCtorCollectionGetter obj = new CollectionCtorCollectionGetter(List.of(new StaplerOnlyItem("A")));
+
+            ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+            CNode node = registry.lookupOrFail(CollectionCtorCollectionGetter.class)
+                    .describe(obj, new ConfigurationContext(registry));
+
+            assertNotNull(node);
+        } finally {
+            Stapler.CONVERT_UTILS.deregister(StaplerOnlyItem.class);
+        }
+    }
+
+    @SuppressWarnings("ClassCanBeRecord")
+    public static class CollectionCtorArrayGetter {
+        private final List<StaplerOnlyItem> items;
+
+        @DataBoundConstructor
+        public CollectionCtorArrayGetter(List<StaplerOnlyItem> items) {
+            this.items = items;
+        }
+
+        @SuppressWarnings("unused")
+        public StaplerOnlyItem[] getItems() {
+            return items.toArray(new StaplerOnlyItem[0]);
+        }
+    }
+
+    @Test
+    void describe_convertsArrayValueWhenCtorIsCollection() throws Exception {
+        Stapler.CONVERT_UTILS.register(new StaplerOnlyItemConverter(), StaplerOnlyItem.class);
+        try {
+            CollectionCtorArrayGetter obj = new CollectionCtorArrayGetter(List.of(new StaplerOnlyItem("A")));
+
+            ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+            CNode node = registry.lookupOrFail(CollectionCtorArrayGetter.class)
+                    .describe(obj, new ConfigurationContext(registry));
+
+            assertNotNull(node);
+
+            Mapping mapping = (Mapping) node;
+            assertEquals(1, mapping.get("items").asSequence().size());
+        } finally {
+            Stapler.CONVERT_UTILS.deregister(StaplerOnlyItem.class);
+        }
+    }
+
+    @SuppressWarnings("ClassCanBeRecord")
+    public static class ArrayCtorCollectionGetter {
+        private final String[] items;
+
+        @DataBoundConstructor
+        public ArrayCtorCollectionGetter(String[] items) {
+            this.items = items;
+        }
+
+        @SuppressWarnings("unused")
+        public List<String> getItems() {
+            return Arrays.asList(items);
+        }
+    }
+
+    @Test
+    void describe_convertsCollectionToArrayWhenCtorIsArray() throws Exception {
+        ArrayCtorCollectionGetter obj = new ArrayCtorCollectionGetter(new String[] {"A", "B"});
+
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        CNode node = registry.lookupOrFail(ArrayCtorCollectionGetter.class)
+                .describe(obj, new ConfigurationContext(registry));
+
+        assertNotNull(node);
+        assertInstanceOf(Mapping.class, node);
+
+        Mapping mapping = (Mapping) node;
+        assertEquals(2, mapping.get("items").asSequence().size());
+    }
+
+    @SuppressWarnings("ClassCanBeRecord")
+    public static class SetCtorListGetter {
+        @SuppressWarnings({"unused", "FieldCanBeLocal"})
+        private final Set<String> items;
+
+        @DataBoundConstructor
+        public SetCtorListGetter(Set<String> items) {
+            this.items = items;
+        }
+
+        @SuppressWarnings("unused")
+        public Collection<String> getItems() {
+            return Arrays.asList("A", "B");
+        }
+    }
+
+    @Test
+    void describe_convertsCollectionToHashSetWhenCtorIsSet() throws Exception {
+        SetCtorListGetter obj = new SetCtorListGetter(Set.of("ignored"));
+
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        CNode node = registry.lookupOrFail(SetCtorListGetter.class).describe(obj, new ConfigurationContext(registry));
 
         assertNotNull(node);
         assertInstanceOf(Mapping.class, node);
