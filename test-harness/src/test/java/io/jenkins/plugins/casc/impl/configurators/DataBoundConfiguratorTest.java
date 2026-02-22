@@ -39,8 +39,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.PostConstruct;
-import org.apache.commons.beanutils.ConversionException;
-import org.apache.commons.beanutils.Converter;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -443,25 +441,6 @@ class DataBoundConfiguratorTest {
 
         public String getValue() {
             return value;
-        }
-
-        @SuppressWarnings("unused")
-        public static class StaplerConverterImpl implements Converter {
-            @SuppressWarnings("unchecked")
-            @Override
-            public <T> T convert(Class<T> type, Object value) {
-                if (type == String.class && value instanceof CustomItem) {
-                    return (T) ("converted-" + ((CustomItem) value).getValue());
-                }
-                if (type == CustomItem.class && value instanceof String) {
-                    return (T) new CustomItem(((String) value).replace("converted-", ""));
-                }
-                if (type.isInstance(value)) {
-                    return (T) value;
-                }
-                throw new ConversionException(
-                        "Unsupported conversion from " + value.getClass().getName() + " to " + type.getName());
-            }
         }
     }
 
