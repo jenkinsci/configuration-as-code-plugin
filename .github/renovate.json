@@ -19,8 +19,8 @@
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": [
-        "integrations/pom.xml"
+      "managerFilePatterns": [
+        "/integrations/pom.xml/"
       ],
       "matchStrings": [
         "<jenkins.version>(?<currentValue>.*?)</jenkins.version>"
