@@ -43,7 +43,7 @@
     <!-- TODO change back to baseline once next bom version is out -->
     <jenkins.version>2.541.1</jenkins.version>
     <tagNameFormat>configuration-as-code-@{project.version}</tagNameFormat>
-    <plugin-bom.version>6077.v303e2d08985d</plugin-bom.version>
+    <plugin-bom.version>6098.v29a_dff8a_0c19</plugin-bom.version>
     <spotless.check.skip>false</spotless.check.skip>
   </properties>
 
