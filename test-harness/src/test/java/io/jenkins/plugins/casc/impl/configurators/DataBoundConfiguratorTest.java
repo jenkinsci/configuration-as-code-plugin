@@ -20,6 +20,10 @@ import io.jenkins.plugins.casc.Configurator;
 import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.ConfiguratorRegistry;
 import io.jenkins.plugins.casc.impl.configurators.nonnull.ClassParametersAreNonnullByDefault;
+import io.jenkins.plugins.casc.impl.configurators.nonnull.JakartaNonnullListParameterConstructor;
+import io.jenkins.plugins.casc.impl.configurators.nonnull.JakartaNonnullParameterConstructor;
+import io.jenkins.plugins.casc.impl.configurators.nonnull.JakartaNonnullRequiredParameterConstructor;
+import io.jenkins.plugins.casc.impl.configurators.nonnull.JakartaNullableParameterConstructor;
 import io.jenkins.plugins.casc.impl.configurators.nonnull.NonnullParameterConstructor;
 import io.jenkins.plugins.casc.impl.configurators.nonnull.nonnullparampackage.PackageParametersAreNonnullByDefault;
 import io.jenkins.plugins.casc.impl.configurators.nonnull.nonnullparampackage.PackageParametersNonNullCheckForNull;
@@ -181,6 +185,51 @@ class DataBoundConfiguratorTest {
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         final PackageParametersNonNullCheckForNull configured =
                 (PackageParametersNonNullCheckForNull) registry.lookupOrFail(PackageParametersNonNullCheckForNull.class)
+                        .configure(config, new ConfigurationContext(registry));
+        assertNull(configured.getSecret());
+    }
+
+    @Test
+    void jakartaNonnullConstructorParameter() throws Exception {
+        Mapping config = new Mapping();
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        final JakartaNonnullParameterConstructor configured =
+                (JakartaNonnullParameterConstructor) registry.lookupOrFail(JakartaNonnullParameterConstructor.class)
+                        .configure(config, new ConfigurationContext(registry));
+        assertEquals(0, configured.getStrings().size());
+    }
+
+    @Test
+    void jakartaNonnullListConstructorParameter() throws Exception {
+        Mapping config = new Mapping();
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        final JakartaNonnullListParameterConstructor configured = (JakartaNonnullListParameterConstructor)
+                registry.lookupOrFail(JakartaNonnullListParameterConstructor.class)
+                        .configure(config, new ConfigurationContext(registry));
+        assertTrue(configured.getStrings().isEmpty());
+    }
+
+    @Test
+    void jakartaNonnullRequiredParameter() {
+        Mapping config = new Mapping();
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+
+        ConfiguratorException exception = assertThrows(ConfiguratorException.class, () -> registry.lookupOrFail(
+                        JakartaNonnullRequiredParameterConstructor.class)
+                .configure(config, new ConfigurationContext(registry)));
+
+        assertThat(
+                exception.getMessage(),
+                is(
+                        "string is required to configure class io.jenkins.plugins.casc.impl.configurators.nonnull.JakartaNonnullRequiredParameterConstructor"));
+    }
+
+    @Test
+    void jakartaNullableConstructorParameter() throws Exception {
+        Mapping config = new Mapping();
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        final JakartaNullableParameterConstructor configured =
+                (JakartaNullableParameterConstructor) registry.lookupOrFail(JakartaNullableParameterConstructor.class)
                         .configure(config, new ConfigurationContext(registry));
         assertNull(configured.getSecret());
     }

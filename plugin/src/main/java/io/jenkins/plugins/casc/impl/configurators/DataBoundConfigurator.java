@@ -1,5 +1,6 @@
 package io.jenkins.plugins.casc.impl.configurators;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Descriptor;
 import hudson.util.Secret;
@@ -11,6 +12,8 @@ import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.impl.attributes.DescribableAttribute;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -25,10 +28,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
-import javax.annotation.PostConstruct;
 import jenkins.model.Jenkins;
 import org.kohsuke.stapler.ClassDescriptor;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -36,7 +35,7 @@ import org.kohsuke.stapler.Stapler;
 
 /**
  * A generic {@link Configurator} to configure components with a {@link org.kohsuke.stapler.DataBoundConstructor}.
- * Intended to replicate Stapler's request-to-instance lifecycle, including {@link PostConstruct} init methods.
+ * Intended to replicate Stapler's request-to-instance lifecycle, including PostConstruct init methods.
  * Will rely on <a href="https://github.com/jenkinsci/jep/tree/master/jep/205">JEP-205</a> once implemented
  *
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
@@ -44,6 +43,25 @@ import org.kohsuke.stapler.Stapler;
 public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
 
     private static final Logger LOGGER = Logger.getLogger(DataBoundConfigurator.class.getName());
+
+    // Avoid compile-time dependencies
+    private static final Set<String> NONNULL_ANNOTATIONS =
+            Set.of("jakarta.annotation.Nonnull", "javax.annotation.Nonnull");
+    private static final Set<String> NULLABLE_ANNOTATIONS =
+            Set.of("jakarta.annotation.Nullable", "javax.annotation.CheckForNull");
+    private static final Set<String> PARAMETERS_ARE_NONNULL_ANNOTATIONS =
+            Set.of("javax.annotation.ParametersAreNonnullByDefault");
+    private static final Set<String> POST_CONSTRUCT_ANNOTATIONS =
+            Set.of("jakarta.annotation.PostConstruct", "javax.annotation.PostConstruct");
+
+    private static boolean hasAnnotation(AnnotatedElement element, Set<String> annotationNames) {
+        for (Annotation ann : element.getAnnotations()) {
+            if (annotationNames.contains(ann.annotationType().getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     private final Class<T> target;
 
@@ -81,7 +99,7 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
         T object = super.configure(c, context);
 
         for (Method method : target.getMethods()) {
-            if (method.getParameterCount() == 0 && method.getAnnotation(PostConstruct.class) != null) {
+            if (method.getParameterCount() == 0 && hasAnnotation(method, POST_CONSTRUCT_ANNOTATIONS)) {
                 try {
                     method.invoke(object, null);
                 } catch (IllegalAccessException | InvocationTargetException e) {
@@ -115,11 +133,11 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
 
                 Class<?> clazz = constructor.getDeclaringClass();
                 if (value == null
-                        && (parameters[i].isAnnotationPresent(Nonnull.class)
-                                || constructor.isAnnotationPresent(ParametersAreNonnullByDefault.class)
-                                || clazz.isAnnotationPresent(ParametersAreNonnullByDefault.class)
-                                || clazz.getPackage().isAnnotationPresent(ParametersAreNonnullByDefault.class)
-                                        && !parameters[i].isAnnotationPresent(CheckForNull.class))) {
+                        && (hasAnnotation(parameters[i], NONNULL_ANNOTATIONS)
+                                || hasAnnotation(constructor, PARAMETERS_ARE_NONNULL_ANNOTATIONS)
+                                || hasAnnotation(clazz, PARAMETERS_ARE_NONNULL_ANNOTATIONS)
+                                || hasAnnotation(clazz.getPackage(), PARAMETERS_ARE_NONNULL_ANNOTATIONS)
+                                        && !hasAnnotation(parameters[i], NULLABLE_ANNOTATIONS))) {
 
                     if (Set.class.isAssignableFrom(t)) {
                         LOGGER.log(
