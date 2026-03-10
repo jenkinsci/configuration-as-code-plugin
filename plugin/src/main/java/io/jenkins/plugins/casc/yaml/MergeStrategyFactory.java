@@ -1,13 +1,13 @@
 package io.jenkins.plugins.casc.yaml;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.ExtensionList;
 import java.util.Optional;
-import javax.annotation.Nonnull;
 import jenkins.model.Jenkins;
 import org.apache.commons.lang3.StringUtils;
 
 public class MergeStrategyFactory {
-    private static MergeStrategy getMergeStrategy(@Nonnull String name) {
+    private static MergeStrategy getMergeStrategy(@NonNull String name) {
         ExtensionList<MergeStrategy> mergeStrategyList = Jenkins.get().getExtensionList(MergeStrategy.class);
         Optional<MergeStrategy> opt = mergeStrategyList.stream()
                 .filter(strategy -> strategy.getName().equals(name))

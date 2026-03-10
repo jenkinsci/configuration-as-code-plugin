@@ -1,11 +1,11 @@
 package io.jenkins.plugins.casc.yaml;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.model.Api;
 import hudson.model.UnprotectedRootAction;
 import hudson.util.HttpResponses;
-import javax.annotation.CheckForNull;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONArray;
 import org.jenkinsci.Symbol;
