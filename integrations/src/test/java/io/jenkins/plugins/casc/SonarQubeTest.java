@@ -5,11 +5,14 @@ import static io.jenkins.plugins.casc.misc.Util.validateSchema;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import hudson.plugins.sonar.SonarGlobalConfiguration;
 import hudson.plugins.sonar.SonarInstallation;
+import hudson.plugins.sonar.SonarRunnerInstallation;
 import hudson.plugins.sonar.model.TriggersConfig;
+import hudson.tools.InstallSourceProperty;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import jenkins.model.GlobalConfiguration;
@@ -41,6 +44,20 @@ public class SonarQubeTest {
         assertTrue(triggers.isSkipScmCause());
         assertTrue(triggers.isSkipUpstreamCause());
         assertEquals("envVar", triggers.getEnvVar());
+        
+        // Test SonarQube Scanner tool installation
+        final SonarRunnerInstallation.DescriptorImpl descriptor = 
+            j.jenkins.getDescriptorByType(SonarRunnerInstallation.DescriptorImpl.class);
+        assertNotNull("SonarRunnerInstallation descriptor should not be null", descriptor);
+        final SonarRunnerInstallation[] installations = descriptor.getInstallations();
+        assertEquals("Should have one SonarQube Scanner installation", 1, installations.length);
+        assertEquals("SonarQube Scanner", installations[0].getName());
+        
+        // Verify installer is configured
+        final InstallSourceProperty installSourceProperty = installations[0].getProperties()
+            .get(InstallSourceProperty.class);
+        assertNotNull("InstallSourceProperty should be configured", installSourceProperty);
+        assertEquals("Should have one installer configured", 1, installSourceProperty.installers.size());
     }
 
     @Test
