@@ -1,0 +1,7 @@
+jenkins:
+  systemMessage: "Jenkins configured with Locale plugin via JCasC"
+
+unclassified:
+  locale:
+    systemLocale: "en_US"
+    ignoreAcceptLanguage: true
