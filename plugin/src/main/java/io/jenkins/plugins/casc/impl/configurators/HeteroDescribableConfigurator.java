@@ -82,7 +82,7 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
     @NonNull
     @Override
     public T configure(CNode config, ConfigurationContext context) {
-        return preConfigure(config)
+        return preConfigure(config, context)
                 .apply((shortName, subConfig) -> lookupDescriptor(shortName, config)
                         .map(descriptor -> forceLookupConfigurator(context, descriptor))
                         .map(configurator -> doConfigure(context, configurator, subConfig.getOrNull())))
@@ -277,10 +277,10 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
         }
     }
 
-    private Tuple2<String, Option<CNode>> preConfigure(CNode config) {
+    private Tuple2<String, Option<CNode>> preConfigure(CNode config, ConfigurationContext context) {
         switch (config.getType()) {
             case SCALAR:
-                return configureScalar(config);
+                return configureScalar(config, context);
             case MAPPING:
                 return configureMapping(config);
             default:
@@ -292,9 +292,10 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
         throw new IllegalArgumentException("Unexpected configuration type " + config);
     }
 
-    private Tuple2<String, Option<CNode>> configureScalar(CNode config) {
+    private Tuple2<String, Option<CNode>> configureScalar(CNode config, ConfigurationContext context) {
         Scalar scalar = unchecked(config::asScalar).apply();
-        return Tuple.of(scalar.getValue(), Option.none());
+        String resolvedValue = context.getSecretSourceResolver().resolve(scalar.getValue());
+        return Tuple.of(resolvedValue, Option.none());
     }
 
     private Tuple2<String, Option<CNode>> configureMapping(CNode config) {
