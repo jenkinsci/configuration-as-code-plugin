@@ -7,7 +7,7 @@
   "automerge": true,
   "packageRules": [
     {
-      "allowedVersions": "/^[0-9]+\\.[0-9]+\\.[0-9]+$/",
+      "allowedVersions": "/^[0-9]+\.[0-9]+\.[0-9]+$/",
       "registryUrls": [
         "https://repo.jenkins-ci.org/public/"
       ],
@@ -19,8 +19,8 @@
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": [
-        "integrations/pom.xml"
+      "managerFilePatterns": [
+        "/integrations/pom.xml/"
       ],
       "matchStrings": [
         "<jenkins.version>(?<currentValue>.*?)</jenkins.version>"
