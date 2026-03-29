@@ -6,6 +6,8 @@ import io.jenkins.plugins.casc.impl.configurators.DescriptorConfigurator;
 import io.jenkins.plugins.casc.impl.configurators.GlobalConfigurationCategoryConfigurator;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import jenkins.model.GlobalConfigurationCategory;
 import jenkins.model.Jenkins;
 
@@ -15,6 +17,8 @@ import jenkins.model.Jenkins;
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
 public interface RootElementConfigurator<T> extends Configurator<T> {
+
+    Logger LOGGER = Logger.getLogger(RootElementConfigurator.class.getName());
 
     static List<RootElementConfigurator> all() {
         final Jenkins jenkins = Jenkins.get();
@@ -26,10 +30,20 @@ public interface RootElementConfigurator<T> extends Configurator<T> {
         }
 
         for (ManagementLink link : ManagementLink.all()) {
-            final String name = link.getUrlName();
-            final Descriptor descriptor = Jenkins.get().getDescriptor(name);
-            if (descriptor != null) {
-                configurators.add(new DescriptorConfigurator(descriptor));
+            try {
+                final String name = link.getUrlName();
+                if (name != null && !name.isEmpty()) {
+                    final Descriptor descriptor = Jenkins.get().getDescriptor(name);
+                    if (descriptor != null) {
+                        configurators.add(new DescriptorConfigurator(descriptor));
+                    }
+                }
+            } catch (Exception | LinkageError e) {
+                LOGGER.log(
+                        Level.WARNING,
+                        "Failed to load configuration for ManagementLink: "
+                                + link.getClass().getName() + ". Skipping.",
+                        e);
             }
         }
 
