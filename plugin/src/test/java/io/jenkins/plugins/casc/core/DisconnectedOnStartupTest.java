@@ -68,4 +68,53 @@ public class DisconnectedOnStartupTest {
 
         assertThat(computer.getOfflineCause() instanceof JCasCOfflineCause, is(false));
     }
+
+    @Test
+    public void should_reconnect_node_when_property_disabled_after_being_enabled() {
+        String yamlEnabled = Objects.requireNonNull(getClass().getResource("disconnectedOnStartup.yml"))
+                .toExternalForm();
+
+        ConfigurationAsCode.get().configure(yamlEnabled);
+
+        Node node = Jenkins.get().getNode("test-node-enabled");
+        assertNotNull(node);
+
+        Computer computer = node.toComputer();
+        assertNotNull(computer);
+
+        assertThat(computer.getOfflineCause(), instanceOf(JCasCOfflineCause.class));
+
+        String yamlToggled = Objects.requireNonNull(getClass().getResource("disconnectedOnStartupToggle.yml"))
+                .toExternalForm();
+
+        ConfigurationAsCode.get().configure(yamlToggled);
+
+        Computer updatedComputer = Objects.requireNonNull(Jenkins.get().getNode("test-node-enabled"))
+                .toComputer();
+        assertNotNull(updatedComputer);
+
+        assertThat(updatedComputer.getOfflineCause() instanceof JCasCOfflineCause, is(false));
+
+        assertThat(updatedComputer.isConnecting(), is(false));
+    }
+
+    @Test
+    public void should_prevent_launch_when_disconnected_on_startup_enabled() throws Exception {
+        String yaml = Objects.requireNonNull(getClass().getResource("disconnectedOnStartup.yml"))
+                .toExternalForm();
+
+        ConfigurationAsCode.get().configure(yaml);
+
+        Node node = Jenkins.get().getNode("test-node-enabled");
+        assertNotNull(node);
+
+        Computer computer = node.toComputer();
+        assertNotNull(computer);
+
+        computer.connect(false);
+
+        j.waitUntilNoActivity();
+
+        assertThat(computer.getOfflineCause(), instanceOf(JCasCOfflineCause.class));
+    }
 }
