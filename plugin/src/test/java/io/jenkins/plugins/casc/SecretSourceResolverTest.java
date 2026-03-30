@@ -445,10 +445,10 @@ public class SecretSourceResolverTest {
     }
 
     @Test
-    public void trimLookup_onlyRemovesNewlines() {
+    public void trimLookup_removesTrailingWhitespace() {
         assertThat(SecretSourceResolver.TrimLookup.INSTANCE.lookup("value\n"), equalTo("value"));
         assertThat(SecretSourceResolver.TrimLookup.INSTANCE.lookup("value\r\n"), equalTo("value"));
-        assertThat(SecretSourceResolver.TrimLookup.INSTANCE.lookup("  value  \n"), equalTo("  value  "));
+        assertThat(SecretSourceResolver.TrimLookup.INSTANCE.lookup("  value  \n"), equalTo("  value"));
     }
 
     @Test
@@ -470,12 +470,12 @@ public class SecretSourceResolverTest {
     }
 
     @Test
-    public void resolve_trimPreservesSpaces() {
+    public void resolve_trimRemovesTrailingSpacesButPreservesLeading() {
         environment.set("FOO", "  my_secret_pass  \n");
-        assertThat(resolve("${trim:${FOO}}"), equalTo("  my_secret_pass  "));
+        assertThat(resolve("${trim:${FOO}}"), equalTo("  my_secret_pass"));
 
         environment.set("BAR", "\tmy_secret_pass\t\r\n");
-        assertThat(resolve("${trim:${BAR}}"), equalTo("\tmy_secret_pass\t"));
+        assertThat(resolve("${trim:${BAR}}"), equalTo("\tmy_secret_pass"));
     }
 
     @Test
@@ -517,8 +517,8 @@ public class SecretSourceResolverTest {
     }
 
     @Test
-    public void resolve_trimWithSpacesOnly_noChange() {
+    public void resolve_trimWithSpacesOnly_becomesEmpty() {
         environment.set("FOO", "   ");
-        assertThat(resolve("${trim:${FOO}}"), equalTo("   "));
+        assertThat(resolve("${trim:${FOO}}"), equalTo(""));
     }
 }

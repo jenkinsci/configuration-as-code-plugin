@@ -258,7 +258,7 @@ public class SecretSourceResolver {
 
         @Override
         public String lookup(@NonNull final String key) {
-            return StringUtils.stripEnd(key, "\r\n");
+            return StringUtils.stripEnd(key, null);
         }
     }
 }
