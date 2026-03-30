@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
-import org.apache.commons.text.TextStringBuilder;
 import org.apache.commons.text.lookup.StringLookup;
 import org.json.JSONObject;
 import org.kohsuke.accmod.Restricted;
@@ -40,7 +39,7 @@ public class SecretSourceResolver {
 
     public SecretSourceResolver(ConfigurationContext configurationContext) {
         // TODO update to use Map.of in JDK11+
-        Map<String, org.apache.commons.text.lookup.StringLookup> map = new HashMap<>(8);
+        Map<String, org.apache.commons.text.lookup.StringLookup> map = new HashMap<>(16);
         map.put("base64", Base64Lookup.INSTANCE);
         map.put("fileBase64", FileBase64Lookup.INSTANCE);
         map.put("readFileBase64", FileBase64Lookup.INSTANCE);
@@ -49,6 +48,7 @@ public class SecretSourceResolver {
         map.put("sysProp", SystemPropertyLookup.INSTANCE);
         map.put("decodeBase64", DecodeBase64Lookup.INSTANCE);
         map.put("json", JsonLookup.INSTANCE);
+        map.put("trim", TrimLookup.INSTANCE);
         map = Collections.unmodifiableMap(map);
 
         substitutor = new StringSubstitutor(new FixedInterpolatorStringLookup(
@@ -106,10 +106,9 @@ public class SecretSourceResolver {
         if (StringUtils.isBlank(toInterpolate) || !toInterpolate.contains(enclosedBy)) {
             return toInterpolate;
         }
-        final TextStringBuilder buf = new TextStringBuilder(toInterpolate);
-        substitutor.replaceIn(buf);
-        nullSubstitutor.replaceIn(buf);
-        return buf.toString();
+        String result = substitutor.replace(toInterpolate);
+        result = nullSubstitutor.replace(result);
+        return result;
     }
 
     static class UnresolvedLookup implements StringLookup {
@@ -248,6 +247,18 @@ public class SecretSourceResolver {
                 return "";
             }
             return output;
+        }
+    }
+
+    static class TrimLookup implements StringLookup {
+
+        static final TrimLookup INSTANCE = new TrimLookup();
+
+        private TrimLookup() {}
+
+        @Override
+        public String lookup(@NonNull final String key) {
+            return StringUtils.stripEnd(key, null);
         }
     }
 }
