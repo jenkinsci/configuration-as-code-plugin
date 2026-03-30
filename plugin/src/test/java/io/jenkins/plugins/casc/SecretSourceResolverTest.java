@@ -443,4 +443,82 @@ public class SecretSourceResolverTest {
         String encoded = context.getSecretSourceResolver().encode(toEncode);
         assertThat(encoded, equalTo(expected));
     }
+
+    @Test
+    public void trimLookup_onlyRemovesNewlines() {
+        assertThat(SecretSourceResolver.TrimLookup.INSTANCE.lookup("value\n"), equalTo("value"));
+        assertThat(SecretSourceResolver.TrimLookup.INSTANCE.lookup("value\r\n"), equalTo("value"));
+        assertThat(SecretSourceResolver.TrimLookup.INSTANCE.lookup("  value  \n"), equalTo("  value  "));
+    }
+
+    @Test
+    public void resolve_trimRemovesTrailingNewlines() {
+        environment.set("FOO", "my_secret_pass\n");
+        assertThat(resolve("${trim:${FOO}}"), equalTo("my_secret_pass"));
+
+        environment.set("BAR", "my_secret_pass\r\n");
+        assertThat(resolve("${trim:${BAR}}"), equalTo("my_secret_pass"));
+
+        environment.set("BAZ", "my_secret_pass\n\n\n");
+        assertThat(resolve("${trim:${BAZ}}"), equalTo("my_secret_pass"));
+    }
+
+    @Test
+    public void resolve_trimNoNewline_noChange() {
+        environment.set("FOO", "my_secret_pass");
+        assertThat(resolve("${trim:${FOO}}"), equalTo("my_secret_pass"));
+    }
+
+    @Test
+    public void resolve_trimPreservesSpaces() {
+        environment.set("FOO", "  my_secret_pass  \n");
+        assertThat(resolve("${trim:${FOO}}"), equalTo("  my_secret_pass  "));
+
+        environment.set("BAR", "\tmy_secret_pass\t\r\n");
+        assertThat(resolve("${trim:${BAR}}"), equalTo("\tmy_secret_pass\t"));
+    }
+
+    @Test
+    public void resolve_trimNestedReadFile() throws Exception {
+        Path tempSecretFile = Files.createTempFile("casc-secret", ".txt");
+        tempSecretFile.toFile().deleteOnExit();
+
+        Files.writeString(tempSecretFile, "super_secret_ssh_key\n");
+        String inputPath = tempSecretFile.toAbsolutePath().toString();
+
+        String rawOutput = resolve("${readFile:" + inputPath + "}");
+        assertTrue("Raw output should contain the problematic trailing newline", rawOutput.endsWith("\n"));
+        assertThat(rawOutput, equalTo("super_secret_ssh_key\n"));
+
+        String trimmedOutput = resolve("${trim:${readFile:" + inputPath + "}}");
+        assertThat(trimmedOutput, equalTo("super_secret_ssh_key"));
+    }
+
+    @Test
+    public void resolve_readFilePreservesTrailingNewline() throws Exception {
+        Path tempFile = Files.createTempFile("casc-secret-baseline", ".txt");
+        tempFile.toFile().deleteOnExit();
+
+        Files.writeString(tempFile, "secret\n");
+
+        String output = resolve("${readFile:" + tempFile.toAbsolutePath() + "}");
+        assertThat(output, equalTo("secret\n"));
+    }
+
+    @Test
+    public void resolve_trimEmptyString() {
+        assertThat(resolve("${trim:}"), equalTo(""));
+    }
+
+    @Test
+    public void resolve_trimOnlyNewlines() {
+        environment.set("FOO", "\n\n");
+        assertThat(resolve("${trim:${FOO}}"), equalTo(""));
+    }
+
+    @Test
+    public void resolve_trimWithSpacesOnly_noChange() {
+        environment.set("FOO", "   ");
+        assertThat(resolve("${trim:${FOO}}"), equalTo("   "));
+    }
 }
