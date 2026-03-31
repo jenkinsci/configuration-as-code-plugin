@@ -1,9 +1,12 @@
 package io.jenkins.plugins.casc.core;
 
+import static hudson.util.StreamTaskListener.fromStdout;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import hudson.model.Computer;
 import hudson.model.Node;
@@ -70,7 +73,7 @@ public class DisconnectedOnStartupTest {
     }
 
     @Test
-    public void should_reconnect_node_when_property_disabled_after_being_enabled() {
+    public void should_reconnect_node_when_property_disabled_after_being_enabled() throws Exception {
         String yamlEnabled = Objects.requireNonNull(getClass().getResource("disconnectedOnStartup.yml"))
                 .toExternalForm();
 
@@ -84,6 +87,8 @@ public class DisconnectedOnStartupTest {
 
         assertThat(computer.getOfflineCause(), instanceOf(JCasCOfflineCause.class));
 
+        j.waitUntilNoActivity();
+
         String yamlToggled = Objects.requireNonNull(getClass().getResource("disconnectedOnStartupToggle.yml"))
                 .toExternalForm();
 
@@ -92,6 +97,8 @@ public class DisconnectedOnStartupTest {
         Computer updatedComputer = Objects.requireNonNull(Jenkins.get().getNode("test-node-enabled"))
                 .toComputer();
         assertNotNull(updatedComputer);
+
+        j.waitUntilNoActivity();
 
         assertThat(updatedComputer.getOfflineCause() instanceof JCasCOfflineCause, is(false));
 
@@ -116,5 +123,21 @@ public class DisconnectedOnStartupTest {
         j.waitUntilNoActivity();
 
         assertThat(computer.getOfflineCause(), instanceOf(JCasCOfflineCause.class));
+    }
+
+    @Test
+    public void should_safely_ignore_computer_with_null_node() throws Exception {
+        Node tempNode = j.createSlave("temp-node", "label", null);
+        Computer computer = tempNode.toComputer();
+        assertNotNull(computer);
+
+        Jenkins.get().removeNode(tempNode);
+        assertNull("Node should be null after removal", computer.getNode());
+
+        DisconnectedOnStartupListener listener = new DisconnectedOnStartupListener();
+
+        listener.preLaunch(computer, fromStdout());
+
+        assertTrue("Listener safely ignored the null node", true);
     }
 }
