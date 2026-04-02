@@ -115,10 +115,22 @@ public class SecretSourceResolver {
 
         static final UnresolvedLookup INSTANCE = new UnresolvedLookup();
 
+        private static final String STRICT_MODE_ENV = "CASC_STRICT_SECRET_RESOLUTION";
+        private static final String STRICT_MODE_PROP = "casc.strict.secret.resolution";
+
         private UnresolvedLookup() {}
 
         @Override
         public String lookup(String key) {
+            boolean isStrict =
+                    Boolean.parseBoolean(System.getProperty(STRICT_MODE_PROP, System.getenv(STRICT_MODE_ENV)));
+
+            if (isStrict) {
+                throw new IllegalStateException(String.format(
+                        "Strict secret resolution enforced: Unable to resolve variable '%s'. Aborting configuration reload.",
+                        key));
+            }
+
             LOGGER.log(
                     Level.WARNING,
                     String.format(

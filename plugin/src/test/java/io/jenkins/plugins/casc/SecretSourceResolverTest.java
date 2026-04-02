@@ -4,6 +4,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import io.jenkins.plugins.casc.SecretSourceResolver.Base64Lookup;
@@ -520,5 +521,63 @@ public class SecretSourceResolverTest {
     public void resolve_trimWithSpacesOnly_becomesEmpty() {
         environment.set("FOO", "   ");
         assertThat(resolve("${trim:${FOO}}"), equalTo(""));
+    }
+
+    @Test
+    public void resolve_strictModeEnvVar_throwsExceptionOnMissingVar() {
+        environment.set("CASC_STRICT_SECRET_RESOLUTION", "true");
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            resolve("${MISSING_SECRET_VAR}");
+        });
+
+        assertThat(exception.getMessage(), containsString("MISSING_SECRET_VAR"));
+    }
+
+    @Test
+    public void resolve_strictModeSysProp_throwsExceptionOnMissingVar() {
+        System.setProperty("casc.strict.secret.resolution", "true");
+        try {
+            IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+                resolve("${ANOTHER_MISSING_VAR}");
+            });
+
+            assertThat(exception.getMessage(), containsString("Strict secret resolution enforced"));
+            assertThat(exception.getMessage(), containsString("ANOTHER_MISSING_VAR"));
+        } finally {
+            System.clearProperty("casc.strict.secret.resolution");
+        }
+    }
+
+    @Test
+    public void resolve_strictMode_ignoresExceptionIfDefaultProvided() {
+        environment.set("CASC_STRICT_SECRET_RESOLUTION", "true");
+
+        String output = resolve("${MISSING_SECRET_VAR:-my_fallback_value}");
+
+        assertThat(output, equalTo("my_fallback_value"));
+    }
+
+    @Test
+    public void resolve_strictModeSetToFalse_defaultsToEmptyString() {
+        environment.set("CASC_STRICT_SECRET_RESOLUTION", "false");
+
+        String output = resolve("${MISSING_SECRET_VAR}");
+
+        assertThat(output, equalTo(""));
+        assertTrue(logContains("Configuration import: Found unresolved variable 'MISSING_SECRET_VAR'"));
+    }
+
+    @Test
+    public void resolve_strictMode_multipleVariables_oneMissing_shouldFail() {
+        environment.set("CASC_STRICT_SECRET_RESOLUTION", "true");
+        environment.set("FOO", "hello");
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            resolve("${FOO}:${MISSING}");
+        });
+
+        assertThat(exception.getMessage(), containsString("Strict secret resolution enforced"));
+        assertThat(exception.getMessage(), containsString("MISSING"));
     }
 }
