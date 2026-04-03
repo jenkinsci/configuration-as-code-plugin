@@ -126,9 +126,8 @@ public class SecretSourceResolver {
                     Boolean.parseBoolean(System.getProperty(STRICT_MODE_PROP, System.getenv(STRICT_MODE_ENV)));
 
             if (isStrict) {
-                throw new IllegalStateException(String.format(
-                        "Unable to resolve variable '%s'. Aborting configuration reload.",
-                        key));
+                throw new IllegalStateException(
+                        String.format("Unable to resolve variable '%s'. Aborting configuration reload.", key));
             }
 
             LOGGER.log(
