@@ -127,7 +127,7 @@ public class SecretSourceResolver {
 
             if (isStrict) {
                 throw new IllegalStateException(String.format(
-                        "Strict secret resolution enforced: Unable to resolve variable '%s'. Aborting configuration reload.",
+                        "Unable to resolve variable '%s'. Aborting configuration reload.",
                         key));
             }
 
