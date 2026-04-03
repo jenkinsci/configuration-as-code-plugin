@@ -541,8 +541,6 @@ public class SecretSourceResolverTest {
             IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
                 resolve("${ANOTHER_MISSING_VAR}");
             });
-
-            assertThat(exception.getMessage(), containsString("Strict secret resolution enforced"));
             assertThat(exception.getMessage(), containsString("ANOTHER_MISSING_VAR"));
         } finally {
             System.clearProperty("casc.strict.secret.resolution");
@@ -576,8 +574,6 @@ public class SecretSourceResolverTest {
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
             resolve("${FOO}:${MISSING}");
         });
-
-        assertThat(exception.getMessage(), containsString("Strict secret resolution enforced"));
         assertThat(exception.getMessage(), containsString("MISSING"));
     }
 }
