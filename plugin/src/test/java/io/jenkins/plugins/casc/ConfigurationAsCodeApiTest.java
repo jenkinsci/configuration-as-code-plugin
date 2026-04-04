@@ -339,9 +339,9 @@ public class ConfigurationAsCodeApiTest {
 
         j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
         j.jenkins.setAuthorizationStrategy(new MockAuthorizationStrategy()
-            .grant(Jenkins.ADMINISTER)
-            .everywhere()
-            .to("admin"));
+                .grant(Jenkins.ADMINISTER)
+                .everywhere()
+                .to("admin"));
 
         WebClient wc = j.createWebClient();
 
