@@ -108,6 +108,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
     public static final String CASC_JENKINS_CONFIG_PROPERTY = "casc.jenkins.config";
     public static final String CASC_JENKINS_CONFIG_ENV = "CASC_JENKINS_CONFIG";
+    public static final String CASC_ALLOW_HTTP_POST_CONFIG = "casc.allow.http.post.config";
     public static final String DEFAULT_JENKINS_YAML_PATH = "jenkins.yaml";
     public static final String YAML_FILES_PATTERN = "glob:**.{yml,yaml,YAML,YML}";
 
@@ -984,5 +985,51 @@ public class ConfigurationAsCode extends ManagementLink {
                 .split("at io.jenkins.plugins.casc.ConfigurationAsCode.export")[0]
                 .replaceAll("\t", "  ");
         return s.substring(0, s.lastIndexOf(")") + 1);
+    }
+
+    @RequirePOST
+    @Restricted(NoExternalUse.class)
+    @SuppressWarnings("unused")
+    public void doConfigure(StaplerRequest2 req, StaplerResponse2 res) throws Exception {
+
+        if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
+            res.sendError(HttpServletResponse.SC_FORBIDDEN, "Requires ADMINISTER permission");
+            return;
+        }
+
+        boolean isAllowed = Boolean.parseBoolean(System.getProperty(CASC_ALLOW_HTTP_POST_CONFIG, "false"));
+        if (!isAllowed) {
+            res.sendError(
+                    HttpServletResponse.SC_FORBIDDEN,
+                    "Raw YAML POST configuration is disabled for security. Enable with -D" + CASC_ALLOW_HTTP_POST_CONFIG
+                            + "=true");
+            return;
+        }
+
+        if (req.getContentLength() <= 0) {
+            res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            res.setContentType("application/json; charset=utf-8");
+            JSONArray errors = new JSONArray();
+            errors.add(new JSONObject().accumulate("line", -1).accumulate("message", "Request body cannot be empty."));
+            res.getWriter().print(errors);
+            return;
+        }
+
+        try {
+            configureWith(YamlSource.of(req));
+            res.setStatus(HttpServletResponse.SC_OK);
+            res.setContentType("text/plain; charset=utf-8");
+            res.getWriter().print("Configuration successfully applied.");
+
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Failed to apply configuration from POST payload", e);
+            res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            res.setContentType("application/json; charset=utf-8");
+
+            JSONArray errors = new JSONArray();
+            errors.add(new JSONObject().accumulate("line", -1).accumulate("message", e.getMessage()));
+
+            res.getWriter().print(errors);
+        }
     }
 }
