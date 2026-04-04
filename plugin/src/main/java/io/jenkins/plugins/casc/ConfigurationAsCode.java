@@ -1010,7 +1010,10 @@ public class ConfigurationAsCode extends ManagementLink {
             res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             res.setContentType("application/json; charset=utf-8");
             JSONArray errors = new JSONArray();
-            errors.add(new JSONObject().accumulate("line", -1).accumulate("message", "Request body cannot be empty."));
+            JSONObject error = new JSONObject();
+            error.put("line", -1);
+            error.put("message", "Request body cannot be empty.");
+            errors.add(error);
             res.getWriter().print(errors);
             return;
         }
