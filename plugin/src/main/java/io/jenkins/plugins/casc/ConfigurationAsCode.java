@@ -1027,7 +1027,10 @@ public class ConfigurationAsCode extends ManagementLink {
             res.setContentType("application/json; charset=utf-8");
 
             JSONArray errors = new JSONArray();
-            errors.add(new JSONObject().accumulate("line", -1).accumulate("message", e.getMessage()));
+            JSONObject error = new JSONObject();
+            error.put("line", -1);
+            error.put("message", e.getMessage());
+            errors.add(error);
 
             res.getWriter().print(errors);
         }
