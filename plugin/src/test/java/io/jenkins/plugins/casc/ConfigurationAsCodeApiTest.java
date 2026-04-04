@@ -41,9 +41,16 @@ public class ConfigurationAsCodeApiTest {
         request.setAdditionalHeader("Content-Type", "application/yaml");
         request.setRequestBody("jenkins:\n  systemMessage: 'Testing'");
 
+        var crumbIssuer = j.jenkins.getCrumbIssuer();
+        if (crumbIssuer != null) {
+            request.setAdditionalHeader(
+                    crumbIssuer.getCrumbRequestField(), crumbIssuer.getCrumb((ServletRequest) null));
+        }
+
         WebResponse response = wc.getPage(request).getWebResponse();
 
         assertEquals(403, response.getStatusCode());
+        assertTrue(response.getContentAsString().contains("disabled for security"));
     }
 
     @Test
