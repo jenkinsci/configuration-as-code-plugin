@@ -33,7 +33,9 @@ $ curl -X POST -G -d @/path/to/secret/file "JENKINS_URL/reload-configuration-as-
 
   **Example Usage:**
   ```sh
-  $ curl -X POST -u admin:YOUR_API_TOKEN --data-binary @jenkins.yaml "JENKINS_URL/configuration-as-code/configure"
+  $ curl -X POST -u admin:YOUR_API_TOKEN \
+    --data-binary @jenkins.yaml \
+    "JENKINS_URL/configuration-as-code/configure"
   
 ```shell
 $ java -jar jenkins-cli.jar -s ${JENKINS_URL} help
