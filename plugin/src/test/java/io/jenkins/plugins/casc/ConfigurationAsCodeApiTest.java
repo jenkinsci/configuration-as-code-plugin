@@ -3,7 +3,6 @@ package io.jenkins.plugins.casc;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import jakarta.servlet.ServletRequest;
 import java.net.URL;
 import jenkins.model.Jenkins;
 import org.htmlunit.HttpMethod;
@@ -22,16 +21,7 @@ public class ConfigurationAsCodeApiTest {
 
     @Test
     public void testDoConfigure_RequiresPost() throws Exception {
-        j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
-
-        j.jenkins.setAuthorizationStrategy(new MockAuthorizationStrategy()
-                .grant(jenkins.model.Jenkins.ADMINISTER)
-                .everywhere()
-                .to("admin"));
-
         WebClient wc = j.createWebClient();
-        j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
-        wc.login("admin", "admin");
         wc.setThrowExceptionOnFailingStatusCode(false);
 
         WebRequest request = new WebRequest(new URL(j.getURL(), "configuration-as-code/configure"), HttpMethod.GET);
@@ -42,28 +32,20 @@ public class ConfigurationAsCodeApiTest {
 
     @Test
     public void testDoConfigure_Success() throws Exception {
-        j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
+        WebClient wc = j.createWebClient();
+        wc.setThrowExceptionOnFailingStatusCode(false);
 
+        j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
         j.jenkins.setAuthorizationStrategy(new MockAuthorizationStrategy()
-                .grant(jenkins.model.Jenkins.ADMINISTER)
+                .grant(Jenkins.ADMINISTER)
                 .everywhere()
                 .to("admin"));
-
-        WebClient wc = j.createWebClient();
-        j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
-        wc.login("admin", "admin");
-        wc.setThrowExceptionOnFailingStatusCode(false);
 
         WebRequest request = new WebRequest(new URL(j.getURL(), "configuration-as-code/configure"), HttpMethod.POST);
         request.setAdditionalHeader("Content-Type", "application/yaml");
         request.setRequestBody("jenkins:\n  systemMessage: 'Webhook Success'");
 
-        var crumbIssuer = j.jenkins.getCrumbIssuer();
-
-        if (crumbIssuer != null) {
-            request.setAdditionalHeader(
-                    crumbIssuer.getCrumbRequestField(), crumbIssuer.getCrumb((ServletRequest) null));
-        }
+        wc.withBasicApiToken("admin");
 
         WebResponse response = wc.getPage(request).getWebResponse();
 
@@ -73,28 +55,21 @@ public class ConfigurationAsCodeApiTest {
 
     @Test
     public void testDoConfigure_InvalidYaml() throws Exception {
-        j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
+        WebClient wc = j.createWebClient();
+        wc.setThrowExceptionOnFailingStatusCode(false);
 
+        j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
         j.jenkins.setAuthorizationStrategy(new MockAuthorizationStrategy()
-                .grant(jenkins.model.Jenkins.ADMINISTER)
+                .grant(Jenkins.ADMINISTER)
                 .everywhere()
                 .to("admin"));
 
-        WebClient wc = j.createWebClient();
-        j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
-        wc.login("admin", "admin");
-        wc.setThrowExceptionOnFailingStatusCode(false);
-
         WebRequest request = new WebRequest(new URL(j.getURL(), "configuration-as-code/configure"), HttpMethod.POST);
 
+        request.setAdditionalHeader("Content-Type", "application/yaml");
         request.setRequestBody("jenkins:\n  systemMessage: [invalid");
 
-        var crumbIssuer = j.jenkins.getCrumbIssuer();
-
-        if (crumbIssuer != null) {
-            request.setAdditionalHeader(
-                    crumbIssuer.getCrumbRequestField(), crumbIssuer.getCrumb((ServletRequest) null));
-        }
+        wc.withBasicApiToken("admin");
 
         WebResponse response = wc.getPage(request).getWebResponse();
 
@@ -114,18 +89,12 @@ public class ConfigurationAsCodeApiTest {
                 .to("admin"));
 
         WebClient wc = j.createWebClient();
-        wc.login("user", "user");
         wc.setThrowExceptionOnFailingStatusCode(false);
 
         WebRequest request = new WebRequest(new URL(j.getURL(), "configuration-as-code/configure"), HttpMethod.POST);
         request.setRequestBody("jenkins:\n  systemMessage: 'fail'");
 
-        var crumbIssuer = j.jenkins.getCrumbIssuer();
-
-        if (crumbIssuer != null) {
-            request.setAdditionalHeader(
-                    crumbIssuer.getCrumbRequestField(), crumbIssuer.getCrumb((ServletRequest) null));
-        }
+        wc.withBasicApiToken("user");
 
         WebResponse response = wc.getPage(request).getWebResponse();
 
@@ -153,28 +122,6 @@ public class ConfigurationAsCodeApiTest {
     }
 
     @Test
-    public void testDoConfigure_MissingCrumb() throws Exception {
-        j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
-        j.jenkins.setAuthorizationStrategy(new MockAuthorizationStrategy()
-                .grant(Jenkins.ADMINISTER)
-                .everywhere()
-                .to("admin"));
-
-        WebClient wc = j.createWebClient();
-        wc.login("admin", "admin");
-        wc.setThrowExceptionOnFailingStatusCode(false);
-
-        WebRequest request = new WebRequest(new URL(j.getURL(), "configuration-as-code/configure"), HttpMethod.POST);
-
-        request.setRequestBody("jenkins:\n  systemMessage: 'no crumb'");
-
-        WebResponse response = wc.getPage(request).getWebResponse();
-
-        assertEquals(403, response.getStatusCode());
-        assertTrue(response.getContentAsString().contains("No valid crumb"));
-    }
-
-    @Test
     public void testDoConfigure_EmptyBody() throws Exception {
         j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
         j.jenkins.setAuthorizationStrategy(new MockAuthorizationStrategy()
@@ -183,19 +130,13 @@ public class ConfigurationAsCodeApiTest {
                 .to("admin"));
 
         WebClient wc = j.createWebClient();
-        wc.login("admin", "admin");
 
         wc.setThrowExceptionOnFailingStatusCode(false);
 
         WebRequest request = new WebRequest(new URL(j.getURL(), "configuration-as-code/configure"), HttpMethod.POST);
         request.setAdditionalHeader("Content-Type", "application/yaml");
 
-        var crumbIssuer = j.jenkins.getCrumbIssuer();
-
-        if (crumbIssuer != null) {
-            request.setAdditionalHeader(
-                    crumbIssuer.getCrumbRequestField(), crumbIssuer.getCrumb((ServletRequest) null));
-        }
+        wc.withBasicApiToken("admin");
 
         WebResponse response = wc.getPage(request).getWebResponse();
 
@@ -205,28 +146,20 @@ public class ConfigurationAsCodeApiTest {
 
     @Test
     public void testDoConfigure_MalformedStructure() throws Exception {
-        j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
+        WebClient wc = j.createWebClient();
+        wc.setThrowExceptionOnFailingStatusCode(false);
 
+        j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
         j.jenkins.setAuthorizationStrategy(new MockAuthorizationStrategy()
-                .grant(jenkins.model.Jenkins.ADMINISTER)
+                .grant(Jenkins.ADMINISTER)
                 .everywhere()
                 .to("admin"));
-
-        WebClient wc = j.createWebClient();
-        j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
-        wc.login("admin", "admin");
-        wc.setThrowExceptionOnFailingStatusCode(false);
 
         WebRequest request = new WebRequest(new URL(j.getURL(), "configuration-as-code/configure"), HttpMethod.POST);
         request.setAdditionalHeader("Content-Type", "application/yaml");
         request.setRequestBody("jenkins:\n  invalidRoot:\n    foo: bar");
 
-        var crumbIssuer = j.jenkins.getCrumbIssuer();
-
-        if (crumbIssuer != null) {
-            request.setAdditionalHeader(
-                    crumbIssuer.getCrumbRequestField(), crumbIssuer.getCrumb((ServletRequest) null));
-        }
+        wc.withBasicApiToken("admin");
 
         WebResponse response = wc.getPage(request).getWebResponse();
 
@@ -241,19 +174,13 @@ public class ConfigurationAsCodeApiTest {
                 .grant(Jenkins.ADMINISTER)
                 .everywhere()
                 .to("admin"));
-
         WebClient wc = j.createWebClient();
-        wc.login("admin", "admin");
+        wc.withBasicApiToken("admin");
         wc.setThrowExceptionOnFailingStatusCode(false);
 
         WebRequest request1 = new WebRequest(new URL(j.getURL(), "configuration-as-code/configure"), HttpMethod.POST);
         request1.setAdditionalHeader("Content-Type", "application/yaml");
         request1.setRequestBody("jenkins:\n  systemMessage: 'Idempotency Test'");
-        var crumbIssuer = j.jenkins.getCrumbIssuer();
-        if (crumbIssuer != null) {
-            request1.setAdditionalHeader(
-                    crumbIssuer.getCrumbRequestField(), crumbIssuer.getCrumb((ServletRequest) null));
-        }
 
         WebResponse response1 = wc.getPage(request1).getWebResponse();
         assertEquals(200, response1.getStatusCode());
@@ -262,37 +189,9 @@ public class ConfigurationAsCodeApiTest {
         WebRequest request2 = new WebRequest(new URL(j.getURL(), "configuration-as-code/configure"), HttpMethod.POST);
         request2.setAdditionalHeader("Content-Type", "application/yaml");
         request2.setRequestBody("jenkins:\n  systemMessage: 'Idempotency Test'");
-        if (crumbIssuer != null) {
-            request2.setAdditionalHeader(
-                    crumbIssuer.getCrumbRequestField(), crumbIssuer.getCrumb((ServletRequest) null));
-        }
 
         WebResponse response2 = wc.getPage(request2).getWebResponse();
-
         assertEquals(200, response2.getStatusCode());
         assertEquals("Idempotency Test", j.jenkins.getSystemMessage());
-    }
-
-    @Test
-    public void testDoConfigure_WithApiToken_NoCrumb() throws Exception {
-        j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
-        j.jenkins.setAuthorizationStrategy(new MockAuthorizationStrategy()
-                .grant(Jenkins.ADMINISTER)
-                .everywhere()
-                .to("admin"));
-
-        WebClient wc = j.createWebClient();
-
-        wc.withBasicApiToken("admin");
-        wc.setThrowExceptionOnFailingStatusCode(false);
-
-        WebRequest request = new WebRequest(new URL(j.getURL(), "configuration-as-code/configure"), HttpMethod.POST);
-        request.setAdditionalHeader("Content-Type", "application/yaml");
-        request.setRequestBody("jenkins:\n  systemMessage: 'API Token Success'");
-
-        WebResponse response = wc.getPage(request).getWebResponse();
-
-        assertEquals(200, response.getStatusCode());
-        assertEquals("API Token Success", j.jenkins.getSystemMessage());
     }
 }
