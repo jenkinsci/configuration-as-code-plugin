@@ -79,15 +79,6 @@ public class ConfigurationAsCodeApiTest {
 
     @Test
     public void testDoConfigure_NonAdminForbidden() throws Exception {
-        j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
-        j.jenkins.setAuthorizationStrategy(new MockAuthorizationStrategy()
-                .grant(Jenkins.READ)
-                .everywhere()
-                .to("user")
-                .grant(jenkins.model.Jenkins.ADMINISTER)
-                .everywhere()
-                .to("admin"));
-
         WebClient wc = j.createWebClient();
         wc.setThrowExceptionOnFailingStatusCode(false);
 
@@ -104,7 +95,7 @@ public class ConfigurationAsCodeApiTest {
     @Test
     public void testDoConfigure_Unauthenticated() throws Exception {
         j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
-        j.jenkins.setAuthorizationStrategy(new org.jvnet.hudson.test.MockAuthorizationStrategy()
+        j.jenkins.setAuthorizationStrategy(new MockAuthorizationStrategy()
                 .grant(Jenkins.READ)
                 .everywhere()
                 .toEveryone());
