@@ -89,8 +89,7 @@ public class ConfigurationAsCodeApiTest {
         try (JenkinsRule.WebClient wc = j.createWebClient().withBasicApiToken("user")) {
             wc.setThrowExceptionOnFailingStatusCode(false);
 
-            WebRequest request = webRequest(HttpMethod.POST);
-            request.setRequestBody("jenkins:\n  systemMessage: 'fail'");
+            WebRequest request = yamlPost("jenkins:\n  systemMessage: 'fail'");
 
             WebResponse response = wc.getPage(request).getWebResponse();
             assertThat(response.getStatusCode(), is(403));
@@ -106,8 +105,7 @@ public class ConfigurationAsCodeApiTest {
         try (JenkinsRule.WebClient wc = j.createWebClient()) {
             wc.setThrowExceptionOnFailingStatusCode(false);
 
-            WebRequest request = webRequest(HttpMethod.POST);
-            request.setRequestBody("jenkins:\n  systemMessage: 'anonymous bypass attempt'");
+            WebRequest request = yamlPost("jenkins:\n  systemMessage: 'anonymous bypass attempt'");
 
             WebResponse response = wc.getPage(request).getWebResponse();
             assertThat(response.getStatusCode(), is(403));
