@@ -997,15 +997,6 @@ public class ConfigurationAsCode extends ManagementLink {
             return;
         }
 
-        boolean isAllowed = Boolean.parseBoolean(System.getProperty(CASC_ALLOW_HTTP_POST_CONFIG, "false"));
-        if (!isAllowed) {
-            res.sendError(
-                    HttpServletResponse.SC_FORBIDDEN,
-                    "Raw YAML POST configuration is disabled for security. Enable with -D" + CASC_ALLOW_HTTP_POST_CONFIG
-                            + "=true");
-            return;
-        }
-
         if (req.getContentLength() <= 0) {
             res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             res.setContentType("application/json; charset=utf-8");

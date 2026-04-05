@@ -9,7 +9,6 @@ import jenkins.model.Jenkins;
 import org.htmlunit.HttpMethod;
 import org.htmlunit.WebRequest;
 import org.htmlunit.WebResponse;
-import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -22,41 +21,7 @@ public class ConfigurationAsCodeApiTest {
     public JenkinsRule j = new JenkinsRule();
 
     @Test
-    public void testDoConfigure_DisabledByDefault() throws Exception {
-        System.clearProperty(ConfigurationAsCode.CASC_ALLOW_HTTP_POST_CONFIG);
-
-        j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
-
-        j.jenkins.setAuthorizationStrategy(new MockAuthorizationStrategy()
-                .grant(jenkins.model.Jenkins.ADMINISTER)
-                .everywhere()
-                .to("admin"));
-
-        WebClient wc = j.createWebClient();
-        j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
-        wc.login("admin", "admin");
-        wc.setThrowExceptionOnFailingStatusCode(false);
-
-        WebRequest request = new WebRequest(new URL(j.getURL(), "configuration-as-code/configure"), HttpMethod.POST);
-        request.setAdditionalHeader("Content-Type", "application/yaml");
-        request.setRequestBody("jenkins:\n  systemMessage: 'Testing'");
-
-        var crumbIssuer = j.jenkins.getCrumbIssuer();
-        if (crumbIssuer != null) {
-            request.setAdditionalHeader(
-                    crumbIssuer.getCrumbRequestField(), crumbIssuer.getCrumb((ServletRequest) null));
-        }
-
-        WebResponse response = wc.getPage(request).getWebResponse();
-
-        assertEquals(403, response.getStatusCode());
-        assertTrue(response.getContentAsString().contains("disabled for security"));
-    }
-
-    @Test
     public void testDoConfigure_RequiresPost() throws Exception {
-        System.setProperty(ConfigurationAsCode.CASC_ALLOW_HTTP_POST_CONFIG, "true");
-
         j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
 
         j.jenkins.setAuthorizationStrategy(new MockAuthorizationStrategy()
@@ -73,14 +38,10 @@ public class ConfigurationAsCodeApiTest {
         WebResponse response = wc.getPage(request).getWebResponse();
 
         assertTrue(response.getStatusCode() == 404 || response.getStatusCode() == 405);
-
-        System.clearProperty(ConfigurationAsCode.CASC_ALLOW_HTTP_POST_CONFIG);
     }
 
     @Test
     public void testDoConfigure_Success() throws Exception {
-        System.setProperty(ConfigurationAsCode.CASC_ALLOW_HTTP_POST_CONFIG, "true");
-
         j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
 
         j.jenkins.setAuthorizationStrategy(new MockAuthorizationStrategy()
@@ -108,14 +69,10 @@ public class ConfigurationAsCodeApiTest {
 
         assertEquals(200, response.getStatusCode());
         assertEquals("Webhook Success", j.jenkins.getSystemMessage());
-
-        System.clearProperty(ConfigurationAsCode.CASC_ALLOW_HTTP_POST_CONFIG);
     }
 
     @Test
     public void testDoConfigure_InvalidYaml() throws Exception {
-        System.setProperty(ConfigurationAsCode.CASC_ALLOW_HTTP_POST_CONFIG, "true");
-
         j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
 
         j.jenkins.setAuthorizationStrategy(new MockAuthorizationStrategy()
@@ -143,14 +100,10 @@ public class ConfigurationAsCodeApiTest {
 
         assertEquals(400, response.getStatusCode());
         assertTrue(response.getContentAsString().contains("message"));
-
-        System.clearProperty(ConfigurationAsCode.CASC_ALLOW_HTTP_POST_CONFIG);
     }
 
     @Test
     public void testDoConfigure_NonAdminForbidden() throws Exception {
-        System.setProperty(ConfigurationAsCode.CASC_ALLOW_HTTP_POST_CONFIG, "true");
-
         j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
         j.jenkins.setAuthorizationStrategy(new MockAuthorizationStrategy()
                 .grant(Jenkins.READ)
@@ -177,14 +130,10 @@ public class ConfigurationAsCodeApiTest {
         WebResponse response = wc.getPage(request).getWebResponse();
 
         assertEquals(403, response.getStatusCode());
-
-        System.clearProperty(ConfigurationAsCode.CASC_ALLOW_HTTP_POST_CONFIG);
     }
 
     @Test
     public void testDoConfigure_Unauthenticated() throws Exception {
-        System.setProperty(ConfigurationAsCode.CASC_ALLOW_HTTP_POST_CONFIG, "true");
-
         j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
         j.jenkins.setAuthorizationStrategy(new org.jvnet.hudson.test.MockAuthorizationStrategy()
                 .grant(Jenkins.READ)
@@ -201,14 +150,10 @@ public class ConfigurationAsCodeApiTest {
         WebResponse response = wc.getPage(request).getWebResponse();
 
         assertEquals(403, response.getStatusCode());
-
-        System.clearProperty(ConfigurationAsCode.CASC_ALLOW_HTTP_POST_CONFIG);
     }
 
     @Test
     public void testDoConfigure_MissingCrumb() throws Exception {
-        System.setProperty(ConfigurationAsCode.CASC_ALLOW_HTTP_POST_CONFIG, "true");
-
         j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
         j.jenkins.setAuthorizationStrategy(new MockAuthorizationStrategy()
                 .grant(Jenkins.ADMINISTER)
@@ -227,14 +172,10 @@ public class ConfigurationAsCodeApiTest {
 
         assertEquals(403, response.getStatusCode());
         assertTrue(response.getContentAsString().contains("No valid crumb"));
-
-        System.clearProperty(ConfigurationAsCode.CASC_ALLOW_HTTP_POST_CONFIG);
     }
 
     @Test
     public void testDoConfigure_EmptyBody() throws Exception {
-        System.setProperty(ConfigurationAsCode.CASC_ALLOW_HTTP_POST_CONFIG, "true");
-
         j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
         j.jenkins.setAuthorizationStrategy(new MockAuthorizationStrategy()
                 .grant(Jenkins.ADMINISTER)
@@ -262,14 +203,8 @@ public class ConfigurationAsCodeApiTest {
         assertTrue(response.getContentAsString().contains("message"));
     }
 
-    @After
-    public void tearDown() {
-        System.clearProperty(ConfigurationAsCode.CASC_ALLOW_HTTP_POST_CONFIG);
-    }
-
     @Test
     public void testDoConfigure_MalformedStructure() throws Exception {
-        System.setProperty(ConfigurationAsCode.CASC_ALLOW_HTTP_POST_CONFIG, "true");
         j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
 
         j.jenkins.setAuthorizationStrategy(new MockAuthorizationStrategy()
@@ -301,8 +236,6 @@ public class ConfigurationAsCodeApiTest {
 
     @Test
     public void testDoConfigure_ValidYaml_NoChanges() throws Exception {
-        System.setProperty(ConfigurationAsCode.CASC_ALLOW_HTTP_POST_CONFIG, "true");
-
         j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
         j.jenkins.setAuthorizationStrategy(new MockAuthorizationStrategy()
                 .grant(Jenkins.ADMINISTER)
@@ -342,8 +275,6 @@ public class ConfigurationAsCodeApiTest {
 
     @Test
     public void testDoConfigure_WithApiToken_NoCrumb() throws Exception {
-        System.setProperty(ConfigurationAsCode.CASC_ALLOW_HTTP_POST_CONFIG, "true");
-
         j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
         j.jenkins.setAuthorizationStrategy(new MockAuthorizationStrategy()
                 .grant(Jenkins.ADMINISTER)
@@ -363,7 +294,5 @@ public class ConfigurationAsCodeApiTest {
 
         assertEquals(200, response.getStatusCode());
         assertEquals("API Token Success", j.jenkins.getSystemMessage());
-
-        System.clearProperty(ConfigurationAsCode.CASC_ALLOW_HTTP_POST_CONFIG);
     }
 }
