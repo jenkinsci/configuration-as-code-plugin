@@ -95,10 +95,8 @@ public class ConfigurationAsCodeApiTest {
     @Test
     public void testDoConfigure_Unauthenticated() throws Exception {
         j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
-        j.jenkins.setAuthorizationStrategy(new MockAuthorizationStrategy()
-                .grant(Jenkins.READ)
-                .everywhere()
-                .toEveryone());
+        j.jenkins.setAuthorizationStrategy(
+                new MockAuthorizationStrategy().grant(Jenkins.READ).everywhere().toEveryone());
 
         WebClient wc = j.createWebClient();
         wc.setThrowExceptionOnFailingStatusCode(false);
