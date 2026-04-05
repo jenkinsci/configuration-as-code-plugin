@@ -985,4 +985,47 @@ public class ConfigurationAsCode extends ManagementLink {
                 .replaceAll("\t", "  ");
         return s.substring(0, s.lastIndexOf(")") + 1);
     }
+
+    @RequirePOST
+    @Restricted(NoExternalUse.class)
+    @SuppressWarnings("unused")
+    public void doConfigure(StaplerRequest2 req, StaplerResponse2 res) throws Exception {
+
+        if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
+            res.sendError(HttpServletResponse.SC_FORBIDDEN, "Requires ADMINISTER permission");
+            return;
+        }
+
+        if (req.getContentLength() <= 0) {
+            res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            res.setContentType("application/json; charset=utf-8");
+            JSONArray errors = new JSONArray();
+            JSONObject error = new JSONObject();
+            error.put("line", -1);
+            error.put("message", "Request body cannot be empty.");
+            errors.add(error);
+            res.getWriter().print(errors);
+            return;
+        }
+
+        try {
+            configureWith(YamlSource.of(req));
+            res.setStatus(HttpServletResponse.SC_OK);
+            res.setContentType("text/plain; charset=utf-8");
+            res.getWriter().print("Configuration successfully applied.");
+
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Failed to apply configuration from POST payload", e);
+            res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            res.setContentType("application/json; charset=utf-8");
+
+            JSONArray errors = new JSONArray();
+            JSONObject error = new JSONObject();
+            error.put("line", -1);
+            error.put("message", e.getMessage());
+            errors.add(error);
+
+            res.getWriter().print(errors);
+        }
+    }
 }
