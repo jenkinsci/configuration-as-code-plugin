@@ -26,7 +26,7 @@ $ curl -X POST -G -d @/path/to/secret/file "JENKINS_URL/reload-configuration-as-
   This Jenkins CLI command is only present when the plugin `configuration-as-code` is installed, and reported in the help message:
 
 - via http POST to `JENKINS_URL/configuration-as-code/configure`
-  This endpoint allows you to send raw YAML directly in the HTTP POST body.
+  This endpoint allows you to send your configuration as code directly in the HTTP POST body.
 
   To use this endpoint, you must:
     - Authenticate the request using the username and API token of a user with `Administer` permissions.
