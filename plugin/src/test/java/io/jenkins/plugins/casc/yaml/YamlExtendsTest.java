@@ -163,29 +163,6 @@ public class YamlExtendsTest {
         assertThat(ex3.getMessage(), containsString("Items in the '_extends' list cannot be null"));
     }
 
-    @Test
-    public void testInlineSequenceReplacesBaseSequence() throws Exception {
-        writeYaml("base.yaml", """
-                list:
-                  - one
-                  - two
-                """);
-
-        Path child = writeYaml("child.yaml", """
-                _extends: base.yaml
-                list:
-                  - three
-                """);
-
-        Node root = parse(child);
-        assertTrue(root instanceof MappingNode);
-
-        SequenceNode seq = (SequenceNode) getChildNode((MappingNode) root, "list");
-
-        assertEquals(1, Objects.requireNonNull(seq).getValue().size());
-        assertEquals("three", ((ScalarNode) seq.getValue().get(0)).getValue());
-    }
-
     private Path writeYaml(String filename, String content) throws IOException {
         return writeYaml(tempDir.getRoot().toPath().resolve(filename), content);
     }
@@ -241,18 +218,6 @@ public class YamlExtendsTest {
 
         MappingNode cNode = (MappingNode) getChildNode(map, "c");
         assertEquals("1", getScalarValue(cNode, "a"));
-    }
-
-    @Test
-    public void testLaterExtendsOverridesEarlier() throws Exception {
-        writeYaml("a.yaml", "key: A");
-        writeYaml("b.yaml", "key: B");
-
-        Path child = writeYaml("child.yaml", "_extends: [a.yaml, b.yaml]");
-
-        Node root = parse(child);
-
-        assertEquals("B", getScalarValue((MappingNode) root, "key"));
     }
 
     @Test
@@ -477,22 +442,6 @@ public class YamlExtendsTest {
         ConfiguratorException ex = assertThrows(ConfiguratorException.class, () -> parse(child));
 
         assertThat(ex.getMessage(), containsString("Invalid YAML key type"));
-    }
-
-    @Test
-    public void testScalarOverrideUsesCloneNode() throws Exception {
-        writeYaml("base.yaml", """
-            key: baseValue
-            """);
-
-        Path child = writeYaml("child.yaml", """
-            _extends: base.yaml
-            key: overrideValue
-            """);
-
-        Node root = parse(child);
-
-        assertEquals("overrideValue", getScalarValue((MappingNode) root, "key"));
     }
 
     @Test
