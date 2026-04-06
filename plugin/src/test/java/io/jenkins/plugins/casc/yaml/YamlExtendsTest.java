@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
@@ -26,9 +27,11 @@ import org.junit.rules.TemporaryFolder;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
+import org.yaml.snakeyaml.nodes.NodeId;
 import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.ScalarNode;
 import org.yaml.snakeyaml.nodes.SequenceNode;
+import org.yaml.snakeyaml.nodes.Tag;
 
 public class YamlExtendsTest {
 
@@ -505,16 +508,20 @@ public class YamlExtendsTest {
     }
 
     @Test
-    public void testCloneNodeFallbackBranch() throws Exception {
-        Path file = writeYaml("complex.yaml", """
-            root:
-              - &a { key: value }
-              - *a
-            """);
+    public void testCloneNodeWithUnknownNodeTypeTriggersFallback() throws Exception {
+        Node customNode = new Node(new Tag("!custom"), null, null) {
+            @Override
+            public NodeId getNodeId() {
+                return NodeId.anchor;
+            }
+        };
 
-        Node root = parse(file);
+        Method cloneNodeMethod = YamlUtils.class.getDeclaredMethod("cloneNode", Node.class);
+        cloneNodeMethod.setAccessible(true);
 
-        assertNotNull(root);
+        Node result = (Node) cloneNodeMethod.invoke(null, customNode);
+
+        assertSame("Fallback branch should return the original node instance", customNode, result);
     }
 
     @Test
@@ -525,5 +532,80 @@ public class YamlExtendsTest {
             YamlSource<String> source = YamlSource.of(bad);
             YamlUtils.merge(Collections.singletonList(source), context);
         });
+    }
+
+    @Test
+    public void testInvalidBaseUriThrowsException() throws Exception {
+        YamlSource<String> source = YamlSource.of("ht!tp://invalid uri");
+
+        Method resolveMethod =
+                YamlUtils.class.getDeclaredMethod("resolveRelativeSource", YamlSource.class, String.class);
+        resolveMethod.setAccessible(true);
+
+        InvocationTargetException ex = assertThrows(
+                InvocationTargetException.class, () -> resolveMethod.invoke(null, source, "dummy-path.yaml"));
+
+        Throwable actualException = ex.getCause();
+        assertTrue(actualException instanceof ConfiguratorException);
+
+        assertThat(actualException.getMessage(), containsString("Invalid base URI to resolve against"));
+    }
+
+    @Test
+    public void testScalarOverrideUsesCloneNode() throws Exception {
+        writeYaml("base.yaml", """
+            key: baseValue
+            """);
+
+        Path child = writeYaml("child.yaml", """
+            _extends: base.yaml
+            key: overrideValue
+            """);
+
+        Node root = parse(child);
+
+        assertEquals("overrideValue", getScalarValue((MappingNode) root, "key"));
+    }
+
+    @Test
+    public void testExtendsEmptyFileCallsCloneNodeWithNull() throws Exception {
+        writeYaml("empty.yaml", "");
+
+        Path child = writeYaml("child.yaml", """
+            _extends: empty.yaml
+            key: value
+            """);
+
+        Node root = parse(child);
+
+        assertTrue(root instanceof MappingNode);
+        assertEquals("value", getScalarValue((MappingNode) root, "key"));
+    }
+
+    @Test
+    public void testGetCanonicalIdWithNonExistentPathTriggersFallback() throws Exception {
+        Path missingPath = tempDir.getRoot().toPath().resolve("does_not_exist.yaml");
+        YamlSource<Path> source = YamlSource.of(missingPath);
+
+        Method getCanonicalIdMethod = YamlUtils.class.getDeclaredMethod("getCanonicalId", YamlSource.class);
+        getCanonicalIdMethod.setAccessible(true);
+
+        String result = (String) getCanonicalIdMethod.invoke(null, source);
+
+        String expectedFallback = missingPath.toAbsolutePath().normalize().toString();
+        assertEquals(expectedFallback, result);
+    }
+
+    @Test
+    public void testGetCanonicalIdWithInvalidUriTriggersFallback() throws Exception {
+        String invalidUri = "ht!tp://invalid uri with spaces^";
+        YamlSource<String> source = YamlSource.of(invalidUri);
+
+        Method getCanonicalIdMethod = YamlUtils.class.getDeclaredMethod("getCanonicalId", YamlSource.class);
+        getCanonicalIdMethod.setAccessible(true);
+
+        String result = (String) getCanonicalIdMethod.invoke(null, source);
+
+        assertEquals(invalidUri, result);
     }
 }
