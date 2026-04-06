@@ -3,6 +3,7 @@ package io.jenkins.plugins.casc.yaml;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
@@ -11,6 +12,8 @@ import io.jenkins.plugins.casc.ConfiguratorException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -308,5 +311,270 @@ public class YamlExtendsTest {
         }
 
         throw new AssertionError("Expected ConfiguratorException but got: " + ex);
+    }
+
+    @Test
+    public void testExtendsListWithNonScalarItemThrowsException() throws Exception {
+        writeYaml("base.yaml", "a: 1");
+
+        Path child = writeYaml("child.yaml", """
+            _extends:
+              - base.yaml
+              - key: value
+            """);
+
+        ConfiguratorException ex = expectConfiguratorException(() -> parse(child));
+
+        assertThat(ex.getMessage(), containsString("Invalid item in '_extends'"));
+    }
+
+    @Test
+    public void testExtendsWithInvalidTypeThrowsException() throws Exception {
+        Path child = writeYaml("child.yaml", """
+            _extends:
+              key: value
+            """);
+
+        ConfiguratorException ex = expectConfiguratorException(() -> parse(child));
+
+        assertThat(ex.getMessage(), containsString("Invalid value for '_extends' key"));
+    }
+
+    @Test
+    public void testExtendsWithUnreadableFileThrowsException() throws Exception {
+        Path dir = tempDir.newFolder("not_a_file").toPath();
+
+        Path child = writeYaml("child.yaml", "_extends: " + dir.getFileName().toString());
+
+        ConfiguratorException ex = expectConfiguratorException(() -> parse(child));
+
+        assertThat(ex.getMessage(), containsString("Failed to read extended config"));
+    }
+
+    @Test
+    public void testMappingWithoutExtendsButWithNestedChangesReturnsNewMapNode() throws Exception {
+        Path yaml = writeYaml("simple.yaml", """
+            jenkins:
+              systemMessage: "hello"
+            """);
+
+        Node root = parse(yaml);
+
+        assertTrue(root instanceof MappingNode);
+        MappingNode map = (MappingNode) root;
+
+        MappingNode jenkins = (MappingNode) getChildNode(map, "jenkins");
+        assertEquals("hello", getScalarValue(jenkins, "systemMessage"));
+    }
+
+    @Test
+    public void testSequenceNodeWithExtendsTriggersHasChanges() throws Exception {
+        writeYaml("base.yaml", """
+            key: baseValue
+            """);
+
+        Path child = writeYaml("child.yaml", """
+            list:
+              - _extends: base.yaml
+            """);
+
+        Node root = parse(child);
+        assertTrue(root instanceof MappingNode);
+
+        SequenceNode list = (SequenceNode) getChildNode((MappingNode) root, "list");
+
+        MappingNode item = (MappingNode) list.getValue().get(0);
+        assertEquals("baseValue", getScalarValue(item, "key"));
+    }
+
+    @Test
+    public void testExtendsWithFileUri() throws Exception {
+        Path base = writeYaml("base.yaml", """
+            key: uriValue
+            """);
+
+        String uriPath = base.toUri().toString();
+
+        Path child = writeYaml("child.yaml", "_extends: " + uriPath);
+
+        Node root = parse(child);
+
+        assertTrue(root instanceof MappingNode);
+        assertEquals("uriValue", getScalarValue((MappingNode) root, "key"));
+    }
+
+    @Test
+    public void testExtendsWithHttpUriFormat() {
+        String fakeUri = "https://example.com/config.yaml";
+
+        ConfiguratorException ex =
+                assertThrows(ConfiguratorException.class, () -> parse(writeYaml("child.yaml", "_extends: " + fakeUri)));
+
+        assertThat(ex.getMessage(), containsString("Failed to read extended config"));
+    }
+
+    @Test
+    public void testExtendsWithNonExistentFileThrowsException() throws Exception {
+        Path child = writeYaml("child.yaml", """
+            _extends: missing.yaml
+            key: value
+            """);
+
+        ConfiguratorException ex = assertThrows(ConfiguratorException.class, () -> parse(child));
+
+        assertThat(ex.getMessage(), containsString("Extended configuration file does not exist"));
+    }
+
+    @Test
+    public void testExtendsWithStringSourceUri() throws Exception {
+        writeYaml("base.yaml", "key: baseValue");
+
+        Path childFile = writeYaml("child.yaml", """
+            _extends: base.yaml
+            """);
+
+        String childUri = childFile.toUri().toString();
+
+        YamlSource<String> source = YamlSource.of(childUri);
+
+        Node root = YamlUtils.merge(Collections.singletonList(source), context);
+
+        assertEquals("baseValue", getScalarValue((MappingNode) root, "key"));
+    }
+
+    @Test
+    public void testUnsupportedSourceTypeThrowsException() throws Exception {
+        Object unsupported = new Object();
+        YamlSource<Object> source = new YamlSource<>(unsupported);
+
+        Method resolveMethod =
+                YamlUtils.class.getDeclaredMethod("resolveRelativeSource", YamlSource.class, String.class);
+        resolveMethod.setAccessible(true);
+
+        InvocationTargetException ex = assertThrows(
+                InvocationTargetException.class, () -> resolveMethod.invoke(null, source, "dummy-path.yaml"));
+
+        Throwable actualException = ex.getCause();
+        assertTrue(actualException instanceof ConfiguratorException);
+
+        assertThat(
+                actualException.getMessage(),
+                containsString("Cannot resolve relative path 'dummy-path.yaml' for source type: Object"));
+    }
+
+    @Test
+    public void testInvalidYamlKeyTypeThrowsException() throws Exception {
+        writeYaml("base.yaml", """
+            validKey: value
+            """);
+
+        Path child = writeYaml("child.yaml", """
+            _extends: base.yaml
+            ? [a, b]
+            : value
+            """);
+
+        ConfiguratorException ex = assertThrows(ConfiguratorException.class, () -> parse(child));
+
+        assertThat(ex.getMessage(), containsString("Invalid YAML key type"));
+    }
+
+    @Test
+    public void testScalarOverrideUsesCloneNode() throws Exception {
+        writeYaml("base.yaml", """
+            key: baseValue
+            """);
+
+        Path child = writeYaml("child.yaml", """
+            _extends: base.yaml
+            key: overrideValue
+            """);
+
+        Node root = parse(child);
+
+        assertEquals("overrideValue", getScalarValue((MappingNode) root, "key"));
+    }
+
+    @Test
+    public void testSequenceOverrideUsesCloneNode() throws Exception {
+        writeYaml("base.yaml", """
+            list:
+              - one
+              - two
+            """);
+
+        Path child = writeYaml("child.yaml", """
+            _extends: base.yaml
+            list:
+              - three
+              - four
+            """);
+
+        Node root = parse(child);
+
+        SequenceNode seq = (SequenceNode) getChildNode((MappingNode) root, "list");
+
+        assertEquals(2, seq.getValue().size());
+        assertEquals("three", ((ScalarNode) seq.getValue().get(0)).getValue());
+    }
+
+    @Test
+    public void testCloneNodeWithNullValue() throws Exception {
+        writeYaml("base.yaml", """
+            key: value
+            """);
+
+        Path child = writeYaml("child.yaml", """
+            _extends: base.yaml
+            key:
+            """);
+
+        Node root = parse(child);
+
+        MappingNode map = (MappingNode) root;
+
+        Node valueNode = getChildNode(map, "key");
+
+        assertTrue(valueNode == null || valueNode instanceof ScalarNode);
+    }
+
+    @Test
+    public void testCloneNodeWithAliasReturnsOriginalNode() throws Exception {
+        Path file = writeYaml("alias.yaml", """
+            base: &anchor
+              key: value
+            copy: *anchor
+            """);
+
+        Node root = parse(file);
+
+        MappingNode map = (MappingNode) root;
+
+        Node copyNode = getChildNode(map, "copy");
+
+        assertNotNull(copyNode);
+    }
+
+    @Test
+    public void testCloneNodeFallbackBranch() throws Exception {
+        Path file = writeYaml("complex.yaml", """
+            root:
+              - &a { key: value }
+              - *a
+            """);
+
+        Node root = parse(file);
+
+        assertNotNull(root);
+    }
+
+    @Test
+    public void testInvalidUriFallbackBranch() {
+        String bad = "ht!tp://invalid uri";
+
+        assertThrows(Exception.class, () -> {
+            YamlSource<String> source = YamlSource.of(bad);
+            YamlUtils.merge(Collections.singletonList(source), context);
+        });
     }
 }

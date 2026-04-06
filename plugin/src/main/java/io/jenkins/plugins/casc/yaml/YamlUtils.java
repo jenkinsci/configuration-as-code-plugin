@@ -243,7 +243,7 @@ public final class YamlUtils {
 
                         try (Reader parentReader = reader(parentSource)) {
                             parentNode = read(parentSource, parentReader, context);
-                        } catch (IOException e) {
+                        } catch (IOException | YAMLException e) {
                             throw new ConfiguratorException("Failed to read extended config: " + path, e);
                         }
 
