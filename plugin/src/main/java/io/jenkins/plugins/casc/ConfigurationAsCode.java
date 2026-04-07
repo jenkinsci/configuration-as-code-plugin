@@ -1063,6 +1063,7 @@ public class ConfigurationAsCode extends ManagementLink {
 
     @RequirePOST
     @Restricted(NoExternalUse.class)
+    @SuppressWarnings("unused")
     public void doDownloadLastAppliedConfiguration(StaplerRequest2 req, StaplerResponse2 res) throws Exception {
         if (!Jenkins.get().hasPermission(Jenkins.SYSTEM_READ)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN, "Requires ADMINISTER permission");
