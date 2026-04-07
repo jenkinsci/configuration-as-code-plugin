@@ -53,6 +53,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -110,6 +111,7 @@ public class ConfigurationAsCode extends ManagementLink {
     public static final String CASC_JENKINS_CONFIG_ENV = "CASC_JENKINS_CONFIG";
     public static final String DEFAULT_JENKINS_YAML_PATH = "jenkins.yaml";
     public static final String YAML_FILES_PATTERN = "glob:**.{yml,yaml,YAML,YML}";
+    public static final String LAST_APPLIED_CONFIG_FILE = "casc_last_applied.yaml";
 
     private static final Logger LOGGER = Logger.getLogger(ConfigurationAsCode.class.getName());
 
@@ -726,7 +728,6 @@ public class ConfigurationAsCode extends ManagementLink {
         }
         sources = Collections.unmodifiableList(new ArrayList<>(configParameters));
         configureWith(configs);
-        lastTimeLoaded = System.currentTimeMillis();
     }
 
     public static boolean isSupportedURI(String configurationParameter) {
@@ -754,7 +755,6 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     private void configureWith(List<YamlSource> sources) throws ConfiguratorException {
-        lastTimeLoaded = System.currentTimeMillis();
         ConfigurationContext context = new ConfigurationContext(registry);
         configureWith(YamlUtils.loadFrom(sources, context), context);
     }
@@ -885,6 +885,12 @@ public class ConfigurationAsCode extends ManagementLink {
         context.addListener(monitor::record);
         try (ACLContext acl = ACL.as2(ACL.SYSTEM2)) {
             invokeWith(entries, (configurator, config) -> configurator.configure(config, context));
+        }
+        lastTimeLoaded = System.currentTimeMillis();
+        try {
+            saveLastAppliedConfiguration();
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Failed to save last applied configuration", e);
         }
     }
 
@@ -1027,5 +1033,50 @@ public class ConfigurationAsCode extends ManagementLink {
 
             res.getWriter().print(errors);
         }
+    }
+
+    private void saveLastAppliedConfiguration() throws IOException {
+        Path targetFile = Paths.get(Jenkins.get().getRootDir().getPath(), LAST_APPLIED_CONFIG_FILE);
+        Path tempFile = Files.createTempFile(Jenkins.get().getRootDir().toPath(), "casc-last-applied", ".tmp");
+
+        try {
+            try (OutputStream out = Files.newOutputStream(tempFile)) {
+                export(out);
+            }
+
+            Files.move(tempFile, targetFile, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+
+            LOGGER.log(Level.FINE, "Saved last applied configuration to {0}", targetFile);
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Failed to save last applied configuration", e);
+            try {
+                Files.deleteIfExists(tempFile);
+            } catch (IOException ignored) {
+            }
+        }
+    }
+
+    public boolean isLastAppliedConfigurationAvailable() {
+        Path file = Paths.get(Jenkins.get().getRootDir().getPath(), LAST_APPLIED_CONFIG_FILE);
+        return Files.exists(file);
+    }
+
+    @RequirePOST
+    @Restricted(NoExternalUse.class)
+    public void doDownloadLastAppliedConfiguration(StaplerRequest2 req, StaplerResponse2 res) throws Exception {
+        if (!Jenkins.get().hasPermission(Jenkins.SYSTEM_READ)) {
+            res.sendError(HttpServletResponse.SC_FORBIDDEN, "Requires ADMINISTER permission");
+            return;
+        }
+
+        Path file = Paths.get(Jenkins.get().getRootDir().getPath(), LAST_APPLIED_CONFIG_FILE);
+        if (!Files.exists(file)) {
+            res.sendError(HttpServletResponse.SC_NOT_FOUND, "No last applied configuration found.");
+            return;
+        }
+
+        res.setContentType("application/x-yaml; charset=utf-8");
+        res.addHeader("Content-Disposition", "attachment; filename=" + LAST_APPLIED_CONFIG_FILE);
+        Files.copy(file, res.getOutputStream());
     }
 }

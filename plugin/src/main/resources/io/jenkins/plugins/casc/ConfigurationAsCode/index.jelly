@@ -32,6 +32,16 @@
         </l:hasPermission>
       </f:form>
 
+      <j:if test="${it.lastAppliedConfigurationAvailable}">
+        <f:form method="post" action="downloadLastAppliedConfiguration" name="downloadLastAppliedConfiguration">
+          <l:hasPermission permission="${app.SYSTEM_READ}">
+            <button name="downloadLastApplied" class="jenkins-button">
+              ${%Download last applied config}
+            </button>
+          </l:hasPermission>
+        </f:form>
+      </j:if>
+
       <j:if test="${!empty it.sources}">
         <f:form method="post" action="reload" name="reload">
           <l:hasAdministerOrManage>
