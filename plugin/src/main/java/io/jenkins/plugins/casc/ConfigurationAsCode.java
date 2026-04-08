@@ -754,9 +754,9 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     private void configureWith(List<YamlSource> sources) throws ConfiguratorException {
-        lastTimeLoaded = System.currentTimeMillis();
         ConfigurationContext context = new ConfigurationContext(registry);
         configureWith(YamlUtils.loadFrom(sources, context), context);
+        lastTimeLoaded = System.currentTimeMillis();
     }
 
     @Restricted(NoExternalUse.class)
@@ -886,6 +886,7 @@ public class ConfigurationAsCode extends ManagementLink {
         try (ACLContext acl = ACL.as2(ACL.SYSTEM2)) {
             invokeWith(entries, (configurator, config) -> configurator.configure(config, context));
         }
+        CasCReloadListener.fire();
     }
 
     public Map<Source, String> checkWith(Mapping entries, ConfigurationContext context) throws ConfiguratorException {

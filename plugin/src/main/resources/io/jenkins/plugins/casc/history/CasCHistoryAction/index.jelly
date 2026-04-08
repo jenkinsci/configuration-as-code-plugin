@@ -1,0 +1,39 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout">
+  <l:layout title="CasC Configuration History" permission="${app.ADMINISTER}">
+
+    <l:main-panel>
+      <h1>CasC Configuration History</h1>
+      <p>  Browse the history of CasC changes and view the resulting configuration snapshots</p>
+
+      <table class="jenkins-table sortable">
+        <thead>
+          <tr>
+            <th class="jenkins-table__cell--tight">Timestamp</th>
+            <th>User</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <j:forEach var="entry" items="${it.historyEntries}">
+            <tr>
+              <td>${entry.formattedTimestamp}</td>
+              <td>${entry.user()}</td>
+              <td>
+                <a href="view?timestamp=${entry.timestamp()}"
+                  class="jenkins-button jenkins-button--tertiary">
+                  View YAML
+                </a>
+              </td>
+            </tr>
+          </j:forEach>
+        </tbody>
+      </table>
+
+      <j:if test="${empty(it.historyEntries)}">
+        <p class="jenkins-!-margin-top-3">No history found. Try reloading your configuration first!</p>
+      </j:if>
+
+    </l:main-panel>
+  </l:layout>
+</j:jelly>
