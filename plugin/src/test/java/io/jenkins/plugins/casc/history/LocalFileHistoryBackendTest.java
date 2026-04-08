@@ -12,7 +12,9 @@ import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.WriteListener;
 import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.lang.reflect.Proxy;
+import java.nio.channels.FileLock;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -664,5 +666,56 @@ public class LocalFileHistoryBackendTest {
         }
 
         assertEquals("Content type should match", "text/plain;charset=UTF-8", capturedContentType[0]);
+    }
+
+    @Test
+    public void testCleanupOldHistoryHandlesDeletionFailureGracefully() throws Exception {
+        File baseHistoryDir = new File(j.jenkins.getRootDir(), "casc-history");
+        hudson.Util.deleteRecursive(baseHistoryDir);
+        assertTrue("Setup failed: could not create base directory", baseHistoryDir.mkdirs());
+
+        for (int i = 10; i <= 59; i++) {
+            File dummyDir = new File(baseHistoryDir, "2000-01-01_12-00-" + i);
+            assertTrue(dummyDir.mkdirs());
+        }
+
+        File targetedDir = new File(baseHistoryDir, "2000-01-01_12-00-10");
+
+        File stubbornFile = new File(targetedDir, "stubborn.txt");
+        Files.writeString(stubbornFile.toPath(), "You shall not pass!");
+
+        RandomAccessFile raf = null;
+        FileLock lock = null;
+
+        try {
+            raf = new RandomAccessFile(stubbornFile, "rw");
+            lock = raf.getChannel().lock();
+
+            if (!targetedDir.setReadable(false, false) || !targetedDir.setWritable(false, false)) {
+                System.out.println("Note: OS ignored permission strip. Relying on FileLock instead.");
+            }
+
+            LocalFileHistoryBackend backend = new LocalFileHistoryBackend();
+            backend.save("dummy-yaml", "admin");
+
+            assertTrue(
+                    "Target directory should still exist, proving the catch block was executed", targetedDir.exists());
+
+        } finally {
+            if (lock != null) {
+                lock.release();
+            }
+            if (raf != null) {
+                raf.close();
+            }
+
+            if (!targetedDir.setReadable(true, false)
+                    || !targetedDir.setWritable(true, false)
+                    || !stubbornFile.setWritable(true, false)) {
+                System.err.println("WARNING: Failed to fully restore permissions during teardown!");
+            }
+
+            hudson.Util.deleteRecursive(baseHistoryDir);
+        }
     }
 }
