@@ -18,6 +18,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import jenkins.model.Jenkins;
 import org.kohsuke.stapler.StaplerRequest2;
 import org.kohsuke.stapler.StaplerResponse2;
+import org.kohsuke.stapler.verb.GET;
 import org.springframework.lang.NonNull;
 import org.w3c.dom.Document;
 
@@ -90,6 +91,7 @@ public class CasCHistoryAction extends ManagementLink {
         }
     }
 
+    @GET
     @SuppressWarnings("unused")
     public void doView(StaplerRequest2 req, StaplerResponse2 res) throws IOException {
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
