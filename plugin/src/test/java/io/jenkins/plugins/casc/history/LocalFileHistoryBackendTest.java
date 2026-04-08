@@ -4,11 +4,18 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
+import io.jenkins.plugins.casc.CasCReloadListener;
 import io.jenkins.plugins.casc.history.CasCHistoryAction.HistoryEntry;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.WriteListener;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Proxy;
 import java.nio.file.Files;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -20,6 +27,9 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.TestExtension;
+import org.kohsuke.stapler.StaplerRequest2;
+import org.kohsuke.stapler.StaplerResponse2;
 
 public class LocalFileHistoryBackendTest {
 
@@ -28,6 +38,7 @@ public class LocalFileHistoryBackendTest {
 
     @Test
     public void testSaveCreatesFilesAndMetadataCorrectly() throws Exception {
+        Thread.sleep(2000);
         File baseHistoryDir = new File(j.jenkins.getRootDir(), "casc-history");
         hudson.Util.deleteRecursive(baseHistoryDir);
 
@@ -58,6 +69,7 @@ public class LocalFileHistoryBackendTest {
 
     @Test
     public void testHistoryRetentionPolicyDeletesOldestEntries() throws Exception {
+        Thread.sleep(2000);
         File baseHistoryDir = new File(j.jenkins.getRootDir(), "casc-history");
         hudson.Util.deleteRecursive(baseHistoryDir);
         assertTrue("Failed to create base history directory", baseHistoryDir.mkdirs() || baseHistoryDir.exists());
@@ -114,6 +126,7 @@ public class LocalFileHistoryBackendTest {
 
     @Test
     public void testSaveHandlesTimestampCollisionsCorrectly() throws Exception {
+        Thread.sleep(2000);
         File baseHistoryDir = new File(j.jenkins.getRootDir(), "casc-history");
         hudson.Util.deleteRecursive(baseHistoryDir);
         assertTrue(baseHistoryDir.mkdirs() || baseHistoryDir.exists());
@@ -200,6 +213,7 @@ public class LocalFileHistoryBackendTest {
 
     @Test
     public void testConcurrentSavesDoNotCorruptDataOrThrowExceptions() throws Exception {
+        Thread.sleep(2000);
         File baseDir = new File(j.jenkins.getRootDir(), "casc-history");
         hudson.Util.deleteRecursive(baseDir);
 
@@ -235,5 +249,420 @@ public class LocalFileHistoryBackendTest {
                 "Should have successfully created all 20 history entries without overwriting each other",
                 threadCount,
                 dirs.length);
+    }
+
+    @Test
+    public void testReloadListenerExceptionDoesNotBreakOthers() {
+        GoodListener.called = false;
+        BadListener.shouldThrow = true;
+
+        try {
+            CasCReloadListener.fire();
+
+            assertTrue("Other listeners should still execute even if one throws an exception", GoodListener.called);
+        } finally {
+            BadListener.shouldThrow = false;
+        }
+    }
+
+    @TestExtension
+    public static class BadListener implements CasCReloadListener {
+        static boolean shouldThrow = false;
+
+        @Override
+        public void onConfigurationReloaded() {
+            if (shouldThrow) {
+                throw new RuntimeException("Boom!");
+            }
+        }
+    }
+
+    @TestExtension
+    public static class GoodListener implements CasCReloadListener {
+        static boolean called = false;
+
+        @Override
+        public void onConfigurationReloaded() {
+            called = true;
+        }
+    }
+
+    @Test
+    public void testSaveThrowsExceptionWhenDirectoryCreationFails() throws Exception {
+        File jenkinsRoot = j.jenkins.getRootDir();
+        File baseHistoryDir = new File(jenkinsRoot, "casc-history");
+
+        hudson.Util.deleteRecursive(baseHistoryDir);
+
+        boolean locked = jenkinsRoot.setWritable(false, false);
+
+        assumeTrue("Test requires the OS to support setting directories to read-only", locked);
+
+        try {
+            LocalFileHistoryBackend backend = new LocalFileHistoryBackend();
+
+            backend.save("dummy yaml", "admin");
+
+            Assert.fail("Should have thrown an IOException because the directory couldn't be created!");
+        } catch (IOException e) {
+            assertTrue(
+                    "Message should match the exception in the code",
+                    e.getMessage().contains("Failed to create base history directory"));
+        } finally {
+            if (!jenkinsRoot.setWritable(true, false)) {
+                System.err.println("WARNING: Failed to restore writable state to Jenkins root directory!");
+            }
+        }
+    }
+
+    @Test
+    public void testSaveThrowsExceptionWhenSpecificDirectoryCreationFails() throws Exception {
+        File baseHistoryDir = new File(j.jenkins.getRootDir(), "casc-history");
+
+        hudson.Util.deleteRecursive(baseHistoryDir);
+        assertTrue("Setup failed: could not create base directory", baseHistoryDir.mkdirs());
+
+        boolean locked = baseHistoryDir.setWritable(false, false);
+        assumeTrue("Test requires the OS to support setting directories to read-only", locked);
+
+        try {
+            LocalFileHistoryBackend backend = new LocalFileHistoryBackend();
+
+            backend.save("dummy yaml", "admin");
+
+            Assert.fail("Should have thrown an IOException because the specific directory couldn't be created!");
+        } catch (IOException e) {
+            assertTrue(
+                    "Message should match the specific directory exception in the code. Actual message: "
+                            + e.getMessage(),
+                    e.getMessage().contains("Failed to create specific history directory"));
+        } finally {
+            if (!baseHistoryDir.setWritable(true, false)) {
+                System.err.println("WARNING: Failed to restore writable state to base history directory!");
+            }
+        }
+    }
+
+    @Test
+    public void testExceptionLoggedWhenOldDirectoryCannotBeDeleted() throws Exception {
+        Thread.sleep(2000);
+
+        File baseHistoryDir = new File(j.jenkins.getRootDir(), "casc-history");
+        hudson.Util.deleteRecursive(baseHistoryDir);
+        assertTrue(baseHistoryDir.mkdirs() || baseHistoryDir.exists());
+
+        LocalFileHistoryBackend backend = new LocalFileHistoryBackend();
+
+        for (int i = 10; i <= 64; i++) {
+            File dummyDir = new File(baseHistoryDir, "2026-01-01_12-00-" + i);
+            assertTrue(dummyDir.mkdirs());
+            Files.writeString(new File(dummyDir, "dummy.txt").toPath(), "test data");
+        }
+
+        File probeDir = new File(baseHistoryDir, "probe-dir");
+        assertTrue(probeDir.mkdirs());
+        Files.writeString(new File(probeDir, "probe.txt").toPath(), "probe data");
+        assumeTrue("OS must support locking directories", probeDir.setWritable(false, false));
+
+        boolean osRespectsLocks;
+        try {
+            hudson.Util.deleteRecursive(probeDir);
+            osRespectsLocks = probeDir.exists();
+        } catch (IOException e) {
+            osRespectsLocks = true;
+        }
+
+        assumeTrue("OS ignores directory locks, gracefully skipping test", osRespectsLocks);
+
+        File oldestDir = new File(baseHistoryDir, "2026-01-01_12-00-10");
+
+        boolean locked = oldestDir.setWritable(false, false);
+        assumeTrue("Test requires the OS to support setting directories to read-only", locked);
+
+        try {
+            backend.save("dummy yaml", "admin");
+            assertTrue("Oldest directory should still exist because deletion was blocked", oldestDir.exists());
+        } finally {
+            if (!oldestDir.setWritable(true, false)) {
+                System.err.println("WARNING: Failed to restore writable state to the oldest directory!");
+            }
+        }
+    }
+
+    @Test
+    public void testGetHistoryEntriesHandlesCorruptXmlGracefully() throws Exception {
+        File baseHistoryDir = new File(j.jenkins.getRootDir(), "casc-history");
+        hudson.Util.deleteRecursive(baseHistoryDir);
+        assertTrue(baseHistoryDir.mkdirs() || baseHistoryDir.exists());
+
+        String timestamp = "2026-01-01_12-00-00";
+        File specificHistoryDir = new File(baseHistoryDir, timestamp);
+        assertTrue(specificHistoryDir.mkdirs());
+
+        File xmlFile = new File(specificHistoryDir, "history.xml");
+        Files.writeString(xmlFile.toPath(), "<history><user>admin</use");
+
+        File yamlFile = new File(specificHistoryDir, "jenkins.yaml");
+        Files.writeString(yamlFile.toPath(), "jenkins:\n  systemMessage: 'test'");
+
+        CasCHistoryAction action = new CasCHistoryAction();
+        List<HistoryEntry> entries = action.getHistoryEntries();
+
+        assertEquals("Should have exactly 1 entry", 1, entries.size());
+        assertEquals("Timestamp should match", timestamp, entries.get(0).timestamp());
+        assertEquals(
+                "User should fallback to Unknown User when XML is unreadable",
+                "Unknown User",
+                entries.get(0).user());
+    }
+
+    @Test
+    public void testHistoryEntryFormattedTimestamp() {
+        HistoryEntry entry = new HistoryEntry("2026-04-09_14-30-05", "admin");
+
+        LocalDateTime dt =
+                LocalDateTime.parse("2026-04-09_14-30-05", DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"));
+        String expected = dt.format(DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm:ss"));
+
+        assertEquals("Timestamp should be formatted correctly", expected, entry.getFormattedTimestamp());
+    }
+
+    @Test
+    public void testDoViewReturns400WhenTimestampIsMissing() throws Exception {
+        CasCHistoryAction action = new CasCHistoryAction();
+
+        StaplerRequest2 req = (StaplerRequest2) java.lang.reflect.Proxy.newProxyInstance(
+                StaplerRequest2.class.getClassLoader(), new Class[] {StaplerRequest2.class}, (proxy, method, args) -> {
+                    if (method.getDeclaringClass() == Object.class) {
+                        switch (method.getName()) {
+                            case "equals" -> {
+                                return proxy == args[0];
+                            }
+                            case "hashCode" -> {
+                                return System.identityHashCode(proxy);
+                            }
+                            case "toString" -> {
+                                return "MockRequest";
+                            }
+                        }
+                    }
+                    return null;
+                });
+
+        int[] capturedErrorCode = new int[1];
+
+        StaplerResponse2 res = (StaplerResponse2) Proxy.newProxyInstance(
+                StaplerResponse2.class.getClassLoader(),
+                new Class[] {StaplerResponse2.class},
+                (proxy, method, args) -> {
+                    if (method.getDeclaringClass() == Object.class) {
+                        switch (method.getName()) {
+                            case "equals" -> {
+                                return proxy == args[0];
+                            }
+                            case "hashCode" -> {
+                                return System.identityHashCode(proxy);
+                            }
+                            case "toString" -> {
+                                return "MockResponse";
+                            }
+                        }
+                    }
+                    if ("sendError".equals(method.getName())) {
+                        capturedErrorCode[0] = (int) args[0];
+                    }
+                    return null;
+                });
+
+        action.doView(req, res);
+        assertEquals("Should return 400 Bad Request", 400, capturedErrorCode[0]);
+    }
+
+    @Test
+    public void testDoViewReturns400WhenTimestampIsInvalid() throws Exception {
+        CasCHistoryAction action = new CasCHistoryAction();
+
+        StaplerRequest2 req = (StaplerRequest2) Proxy.newProxyInstance(
+                StaplerRequest2.class.getClassLoader(), new Class[] {StaplerRequest2.class}, (proxy, method, args) -> {
+                    if (method.getDeclaringClass() == Object.class) {
+                        switch (method.getName()) {
+                            case "equals" -> {
+                                return proxy == args[0];
+                            }
+                            case "hashCode" -> {
+                                return System.identityHashCode(proxy);
+                            }
+                            case "toString" -> {
+                                return "MockRequest";
+                            }
+                        }
+                    }
+                    if ("getParameter".equals(method.getName())) {
+                        return "../../etc/passwd";
+                    }
+                    return null;
+                });
+
+        int[] capturedErrorCode = new int[1];
+        StaplerResponse2 res = (StaplerResponse2) Proxy.newProxyInstance(
+                StaplerResponse2.class.getClassLoader(),
+                new Class[] {StaplerResponse2.class},
+                (proxy, method, args) -> {
+                    if (method.getDeclaringClass() == Object.class) {
+                        switch (method.getName()) {
+                            case "equals" -> {
+                                return proxy == args[0];
+                            }
+                            case "hashCode" -> {
+                                return System.identityHashCode(proxy);
+                            }
+                            case "toString" -> {
+                                return "MockResponse";
+                            }
+                        }
+                    }
+                    if ("sendError".equals(method.getName())) {
+                        capturedErrorCode[0] = (int) args[0];
+                    }
+                    return null;
+                });
+
+        action.doView(req, res);
+        assertEquals("Should return 400 Bad Request", 400, capturedErrorCode[0]);
+    }
+
+    @Test
+    public void testDoViewReturns404WhenRecordDoesNotExist() throws Exception {
+        CasCHistoryAction action = new CasCHistoryAction();
+
+        StaplerRequest2 req = (StaplerRequest2) Proxy.newProxyInstance(
+                StaplerRequest2.class.getClassLoader(),
+                new Class[] {org.kohsuke.stapler.StaplerRequest2.class},
+                (proxy, method, args) -> {
+                    if (method.getDeclaringClass() == Object.class) {
+                        switch (method.getName()) {
+                            case "equals" -> {
+                                return proxy == args[0];
+                            }
+                            case "hashCode" -> {
+                                return System.identityHashCode(proxy);
+                            }
+                            case "toString" -> {
+                                return "MockRequest";
+                            }
+                        }
+                    }
+                    if ("getParameter".equals(method.getName())) {
+                        return "2026-01-01_12-00-00";
+                    }
+                    return null;
+                });
+
+        int[] capturedErrorCode = new int[1];
+        StaplerResponse2 res = (StaplerResponse2) Proxy.newProxyInstance(
+                StaplerResponse2.class.getClassLoader(),
+                new Class[] {StaplerResponse2.class},
+                (proxy, method, args) -> {
+                    if (method.getDeclaringClass() == Object.class) {
+                        switch (method.getName()) {
+                            case "equals" -> {
+                                return proxy == args[0];
+                            }
+                            case "hashCode" -> {
+                                return System.identityHashCode(proxy);
+                            }
+                            case "toString" -> {
+                                return "MockResponse";
+                            }
+                        }
+                    }
+                    if ("sendError".equals(method.getName())) {
+                        capturedErrorCode[0] = (int) args[0];
+                    }
+                    return null;
+                });
+
+        action.doView(req, res);
+        assertEquals("Should return 404 Not Found", 404, capturedErrorCode[0]);
+    }
+
+    @Test
+    public void testDoViewSuccessfullyReturnsYamlContent() throws Exception {
+        File baseHistoryDir = new File(j.jenkins.getRootDir(), "casc-history");
+        hudson.Util.deleteRecursive(baseHistoryDir);
+
+        String timestamp = "2026-01-01_12-00-00";
+        File specificDir = new File(baseHistoryDir, timestamp);
+        assertTrue(specificDir.mkdirs());
+        File yamlFile = new File(specificDir, "jenkins.yaml");
+        Files.writeString(yamlFile.toPath(), "jenkins:\n  systemMessage: 'Testing'");
+
+        CasCHistoryAction action = new CasCHistoryAction();
+
+        StaplerRequest2 req = (StaplerRequest2) java.lang.reflect.Proxy.newProxyInstance(
+                StaplerRequest2.class.getClassLoader(), new Class[] {StaplerRequest2.class}, (proxy, method, args) -> {
+                    if (method.getDeclaringClass() == Object.class) {
+                        switch (method.getName()) {
+                            case "equals" -> {
+                                return proxy == args[0];
+                            }
+                            case "hashCode" -> {
+                                return System.identityHashCode(proxy);
+                            }
+                            case "toString" -> {
+                                return "MockRequest";
+                            }
+                        }
+                    }
+                    if ("getParameter".equals(method.getName())) {
+                        return timestamp;
+                    }
+                    return null;
+                });
+
+        String[] capturedContentType = new String[1];
+
+        try (ServletOutputStream dummyStream = new ServletOutputStream() {
+            @Override
+            public boolean isReady() {
+                return true;
+            }
+
+            @Override
+            public void setWriteListener(WriteListener writeListener) {}
+
+            @Override
+            public void write(int b) {}
+        }) {
+            StaplerResponse2 res = (StaplerResponse2) Proxy.newProxyInstance(
+                    StaplerResponse2.class.getClassLoader(),
+                    new Class[] {StaplerResponse2.class},
+                    (proxy, method, args) -> {
+                        if (method.getDeclaringClass() == Object.class) {
+                            switch (method.getName()) {
+                                case "equals" -> {
+                                    return proxy == args[0];
+                                }
+                                case "hashCode" -> {
+                                    return System.identityHashCode(proxy);
+                                }
+                                case "toString" -> {
+                                    return "MockResponse";
+                                }
+                            }
+                        }
+                        if ("setContentType".equals(method.getName())) {
+                            capturedContentType[0] = (String) args[0];
+                        }
+                        if ("getOutputStream".equals(method.getName())) {
+                            return dummyStream;
+                        }
+                        return null;
+                    });
+
+            action.doView(req, res);
+        }
+
+        assertEquals("Content type should match", "text/plain;charset=UTF-8", capturedContentType[0]);
     }
 }
