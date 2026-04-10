@@ -145,7 +145,9 @@ public class CredentialsReadmeTest {
                 assertThat(keyStoreSource.getUploadedKeystore().getPlainData(), is(secretBytes.getPlainData()));
                 assertThat(cert.getKeyStore().containsAlias("test"), is(true));
                 assertThat(cert.getKeyStore().getCertificate("test").getType(), is("X.509"));
-                assertThat(CredentialsNameProvider.name(cert), is("CN=Test, OU=Jenkins, O=JCasC, L=Delhi, ST=Delhi, C=IN (my secret cert)"));
+                assertThat(
+                        CredentialsNameProvider.name(cert),
+                        is("CN=Test, OU=Jenkins, O=JCasC, L=Delhi, ST=Delhi, C=IN (my secret cert)"));
                 assertThat(cert.getScope(), is(CredentialsScope.GLOBAL));
             }
         }
