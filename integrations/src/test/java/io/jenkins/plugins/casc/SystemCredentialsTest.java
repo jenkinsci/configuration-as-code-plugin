@@ -24,6 +24,8 @@ import io.jenkins.plugins.casc.model.CNode;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.KeyStore;
+import java.security.cert.X509Certificate;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -91,11 +93,18 @@ public class SystemCredentialsTest {
         byte[] actualBytes = keyStoreSource.getUploadedKeystore().getPlainData();
         assertThat("The bytes in Jenkins should be identical to the source file", actualBytes, equalTo(expectedBytes));
 
-        Enumeration<String> aliases = certImpl.getKeyStore().aliases();
+        KeyStore keyStore = certImpl.getKeyStore();
+        Enumeration<String> aliases = keyStore.aliases();
         assertThat("Keystore should not be empty", aliases.hasMoreElements(), equalTo(true));
 
-        String firstAlias = aliases.nextElement();
-        assertThat("Alias should contain a valid key", certImpl.getKeyStore().isKeyEntry(firstAlias), equalTo(true));
+        String alias = aliases.nextElement();
+        X509Certificate certificate = (X509Certificate) keyStore.getCertificate(alias);
+        assertThat(certificate, notNullValue());
+
+        String subject = certificate.getSubjectX500Principal().getName();
+        assertThat(subject, containsString("CN=Test"));
+
+        assertThat(certificate.getType(), equalTo("X.509"));
 
         List<BasicSSHUserPrivateKey> sshPrivateKeys = CredentialsProvider.lookupCredentials(
                 BasicSSHUserPrivateKey.class, jenkins, ACL.SYSTEM, Collections.emptyList());
