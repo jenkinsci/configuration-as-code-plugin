@@ -56,7 +56,7 @@ public class CredentialsReadmeTest {
             + "PWLXZZQYqsfWIQwvXTEdAkEA2bziyReYAb9fi17alcvwZXGzyyMY8WOGns8NZKcq\n"
             + "INF8D3PDpcCyOvQI/TS3qHYmGyWdHiKCWsgBqE6kyjqpNQ==\n"
             + "-----END RSA PRIVATE KEY-----\n";
-    public static final String PASSWORD = "password";
+    public static final String PASSWORD = "123456";
     public static final String TEXT = "text";
     public static final String ACCESS_KEY = "access-key";
     public static final String SECRET_ACCESS_KEY = "secret-access-key";
@@ -143,12 +143,11 @@ public class CredentialsReadmeTest {
                         SecretBytes.fromString(Base64.getEncoder().encodeToString(fileContent));
                 UploadedKeyStoreSource keyStoreSource = (UploadedKeyStoreSource) cert.getKeyStoreSource();
                 assertThat(keyStoreSource.getUploadedKeystore().getPlainData(), is(secretBytes.getPlainData()));
-                assertThat(cert.getKeyStore().containsAlias("1"), is(true));
-                assertThat(cert.getKeyStore().getCertificate("1").getType(), is("X.509"));
+                assertThat(cert.getKeyStore().containsAlias("test"), is(true));
+                assertThat(cert.getKeyStore().getCertificate("test").getType(), is("X.509"));
                 assertThat(
                         CredentialsNameProvider.name(cert),
-                        is(
-                                "EMAILADDRESS=me@myhost.mydomain, CN=pkcs12, O=Fort-Funston, L=SanFrancisco, ST=CA, C=US (my secret cert)"));
+                        is("CN=Test, OU=Jenkins, O=JCasC, L=Delhi, ST=Delhi, C=IN (my secret cert)"));
                 assertThat(cert.getScope(), is(CredentialsScope.GLOBAL));
             }
         }
