@@ -22,7 +22,6 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -76,35 +75,90 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
         }
 
         final Class<T> target = getTarget();
+        Map<String, TypePair> getterCache = new HashMap<>();
+        Map<String, List<Method>> methodsByProperty = new HashMap<>();
         // Resolve the methods and merging overrides to more concretized signatures
         // because the methods can to have been overridden with concretized type
-        // TODO: Overloaded setters with different types can corrupt this logic
         for (Method method : target.getMethods()) {
             final String methodName = method.getName();
-            TypePair type;
             if (method.getParameterCount() == 0
                     && methodName.startsWith("get")
                     && PersistedList.class.isAssignableFrom(method.getReturnType())) {
-                type = TypePair.ofReturnType(method);
-            } else if (method.getParameterCount() != 1 || !methodName.startsWith("set")) {
-                // Not an accessor, ignore
+
+                String propertySuffix = methodName.substring(3);
+                final String name = StringUtils.uncapitalize(propertySuffix);
+
+                if (exclusions.contains(name)) {
+                    continue;
+                }
+
+                TypePair type = TypePair.ofReturnType(method);
+                @SuppressWarnings("unchecked")
+                Attribute<T, ?> attribute = (Attribute<T, ?>) createAttribute(name, type);
+
+                if (attribute != null) {
+                    attribute.deprecated(method.getAnnotation(Deprecated.class) != null);
+                    final Restricted r = method.getAnnotation(Restricted.class);
+                    if (r != null) {
+                        attribute.restrictions(r.value());
+                    }
+                    attributes.putIfAbsent(name, attribute);
+                }
                 continue;
-            } else {
-                type = TypePair.ofParameter(method, 0);
             }
 
-            final String s = methodName.substring(3);
-            final String name = StringUtils.uncapitalize(s);
-            if (exclusions.contains(name)) {
+            if (method.getParameterCount() == 1 && methodName.startsWith("set")) {
+                String propertySuffix = methodName.substring(3);
+                final String name = StringUtils.uncapitalize(propertySuffix);
+
+                if (exclusions.contains(name)) {
+                    continue;
+                }
+                methodsByProperty
+                        .computeIfAbsent(propertySuffix, k -> new ArrayList<>())
+                        .add(method);
+            }
+        }
+
+        for (Map.Entry<String, List<Method>> entry : methodsByProperty.entrySet()) {
+            final String propertySuffix = entry.getKey();
+            final String name = StringUtils.uncapitalize(propertySuffix);
+            final List<Method> methods = entry.getValue();
+
+            TypePair getterType = getterCache.computeIfAbsent(propertySuffix, prop -> {
+                Method g = findGetter(target, prop);
+                return g != null ? TypePair.ofReturnType(g) : null;
+            });
+
+            if (getterType == null) {
+                LOGGER.log(Level.FINER, "Ignoring property {0}: no compatible getter found", name);
                 continue;
             }
 
-            if (!hasGetter(target, s)) {
-                // Looks like a property but no actual getter method we can use to read value
+            final Class<?> rawType = getterType.rawType;
+
+            List<Method> validSetters = methods.stream()
+                    .filter(m -> {
+                        Class<?> paramType = m.getParameterCount() == 0 ? m.getReturnType() : m.getParameterTypes()[0];
+                        return paramType.equals(rawType)
+                                || rawType.isAssignableFrom(paramType)
+                                || paramType.isAssignableFrom(rawType);
+                    })
+                    .toList();
+
+            if (validSetters.isEmpty()) {
+                LOGGER.log(
+                        Level.FINER,
+                        "Ignoring property {0}: Setters exist, but none are compatible with getter type {1}",
+                        new Object[] {name, getterType.rawType.getName()});
                 continue;
             }
 
             LOGGER.log(Level.FINER, "Processing {0} property", name);
+
+            Method bestMethod = resolveBestSetter(validSetters, getterType.rawType);
+
+            TypePair type = TypePair.ofParameter(bestMethod, 0);
 
             if (Map.class.isAssignableFrom(type.rawType)) {
                 // yaml has support for Maps, but as nobody seem to like them we agreed not to support them
@@ -112,21 +166,28 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
                 continue;
             }
 
-            Attribute attribute = createAttribute(name, type);
+            @SuppressWarnings("unchecked")
+            Attribute<T, ?> attribute = (Attribute<T, ?>) createAttribute(name, type);
             if (attribute == null) {
                 continue;
             }
 
-            attribute.deprecated(method.getAnnotation(Deprecated.class) != null);
-            final Restricted r = method.getAnnotation(Restricted.class);
+            attribute.deprecated(bestMethod.getAnnotation(Deprecated.class) != null);
+            final Restricted r = bestMethod.getAnnotation(Restricted.class);
             if (r != null) {
                 attribute.restrictions(r.value());
             }
 
-            Attribute prevAttribute = attributes.get(name);
-            // Replace the method if it have more concretized type
-            if (prevAttribute == null || prevAttribute.type.isAssignableFrom(attribute.type)) {
+            Attribute<T, ?> prevAttribute = attributes.get(name);
+            if (prevAttribute == null) {
                 attributes.put(name, attribute);
+            } else {
+                Class<?> prevType = prevAttribute.type;
+                Class<?> currentType = attribute.type;
+
+                if (prevType.isAssignableFrom(currentType)) {
+                    attributes.put(name, attribute);
+                }
             }
         }
 
@@ -136,14 +197,25 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
     /**
      * Check if target class has a Getter method for property s
      */
-    private boolean hasGetter(Class<T> c, String s) {
-        List<String> candidates = Arrays.asList("get" + s, "is" + s);
+    private Method findGetter(Class<T> c, String s) {
+        String getMethod = "get" + s;
+        String isMethod = "is" + s;
+
         for (Method m : c.getMethods()) {
-            if (m.getParameterCount() == 0 && candidates.contains(m.getName())) {
-                return true;
+            if (m.getParameterCount() == 0) {
+                if (m.getName().equals(getMethod)) {
+                    return m;
+                }
+
+                if (m.getName().equals(isMethod)) {
+                    Class<?> returnType = m.getReturnType();
+                    if (returnType == boolean.class || returnType == Boolean.class) {
+                        return m;
+                    }
+                }
             }
         }
-        return false;
+        return null;
     }
 
     /**
@@ -439,9 +511,9 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
         /**
          * Erasure of {@link #type}
          */
-        final Class rawType;
+        final Class<?> rawType;
 
-        public TypePair(Type type, Class rawType) {
+        public TypePair(Type type, Class<?> rawType) {
             this.rawType = rawType;
             this.type = type;
         }
@@ -475,5 +547,74 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
     @Override
     public int hashCode() {
         return getTarget().hashCode();
+    }
+
+    private Method resolveBestSetter(List<Method> methods, Class<?> getterRawType) {
+        if (methods.size() == 1) {
+            return methods.get(0);
+        }
+
+        if (LOGGER.isLoggable(Level.FINE)) {
+            String methodNames = methods.stream()
+                    .map(m -> m.getParameterCount() > 0 ? m.getParameterTypes()[0].getSimpleName() : "No-Args")
+                    .collect(Collectors.joining(", "));
+            LOGGER.log(Level.FINE, "Multiple setters found for getter type {0}. Candidates: [{1}]", new Object[] {
+                getterRawType.getSimpleName(), methodNames
+            });
+        }
+
+        for (Method m : methods) {
+            Class<?> currentType = m.getParameterTypes()[0];
+            if (currentType.equals(getterRawType)) {
+                return m;
+            }
+        }
+
+        Method best = null;
+        Class<?> bestType = null;
+
+        for (Method m : methods) {
+            Class<?> currentType = m.getParameterTypes()[0];
+
+            if (best == null) {
+                best = m;
+                bestType = currentType;
+                continue;
+            }
+
+            if (bestType.isAssignableFrom(currentType)) {
+                best = m;
+                bestType = currentType;
+                continue;
+            } else if (currentType.isAssignableFrom(bestType)) {
+                continue;
+            }
+
+            boolean currentCompatible = getterRawType.isAssignableFrom(currentType);
+            boolean bestCompatible = getterRawType.isAssignableFrom(bestType);
+
+            if (currentCompatible && !bestCompatible) {
+                best = m;
+                bestType = currentType;
+            } else if (currentCompatible == bestCompatible) {
+                if (!currentType.isInterface() && bestType.isInterface()) {
+                    best = m;
+                    bestType = currentType;
+                } else if (!currentType.isInterface() || bestType.isInterface()) {
+                    String previousBestName = bestType.getName();
+                    if (currentType.getName().compareTo(bestType.getName()) < 0) {
+                        best = m;
+                        bestType = currentType;
+                    }
+                    LOGGER.log(
+                            Level.FINER,
+                            "Ambiguous setters for property type {0}: {1} vs {2}. Deterministically chose {3}",
+                            new Object[] {
+                                getterRawType.getName(), previousBestName, currentType.getName(), bestType.getName()
+                            });
+                }
+            }
+        }
+        return best;
     }
 }
