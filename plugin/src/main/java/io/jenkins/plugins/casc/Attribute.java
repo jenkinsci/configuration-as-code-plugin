@@ -19,9 +19,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -48,9 +50,12 @@ public class Attribute<Owner, Type> {
         // Nop
     };
 
-    // TODO: Concurrent cache?
-    // private static final HashMap<Class, Boolean> SECRET_ATTRIBUTE_CACHE =
-    //        new HashMap<>();
+    private static final ClassValue<Map<String, Boolean>> SECRET_ATTRIBUTE_CACHE = new ClassValue<>() {
+        @Override
+        protected Map<String, Boolean> computeValue(@NonNull Class<?> type) {
+            return new ConcurrentHashMap<>();
+        }
+    };
 
     protected final String name;
     protected final Class type;
@@ -398,7 +403,6 @@ public class Attribute<Owner, Type> {
         return ExtraFieldUtils.getFieldNoForce(clazz, fieldName);
     }
 
-    // TODO: consider Boolean and third condition
     /**
      * This is a method which tries to guess whether an attribute is {@link Secret}.
      * @param targetClass Class of the target object. {@code null} if unknown
@@ -416,48 +420,50 @@ public class Attribute<Owner, Type> {
         }
 
         if (targetClass == null) {
-            LOGGER.log(
-                    Level.FINER,
-                    "Attribute {0} is assumed to be non-secret, because there is no class instance in the call. "
-                            + "This call is used only for fast-fetch caching, and the result may be adjusted later",
-                    new Object[] {fieldName});
             return false; // All methods below require a known target class
         }
 
-        // TODO: Cache decisions?
+        return SECRET_ATTRIBUTE_CACHE.get(targetClass).computeIfAbsent(fieldName, key -> {
+            Method m = locateGetter(targetClass, fieldName);
+            if (m != null && m.getReturnType() == Secret.class) {
+                LOGGER.log(
+                        Level.FINER,
+                        "Attribute {0}#{1} is secret, because there is a getter {2} which returns a Secret type",
+                        new Object[] {targetClass.getName(), fieldName, m});
+                return true;
+            }
 
-        Method m = locateGetter(targetClass, fieldName);
-        if (m != null && m.getReturnType() == Secret.class) {
-            LOGGER.log(
-                    Level.FINER,
-                    "Attribute {0}#{1} is secret, because there is a getter {2} which returns a Secret type",
-                    new Object[] {targetClass.getName(), fieldName, m});
-            return true;
-        }
+            Field f = locatePublicField(targetClass, fieldName);
+            if (f != null && f.getType() == Secret.class) {
+                LOGGER.log(
+                        Level.FINER,
+                        "Attribute {0}#{1} is secret, because there is a public field {2} which has a Secret type",
+                        new Object[] {targetClass.getName(), fieldName, f});
+                return true;
+            }
 
-        Field f = locatePublicField(targetClass, fieldName);
-        if (f != null && f.getType() == Secret.class) {
-            LOGGER.log(
-                    Level.FINER,
-                    "Attribute {0}#{1} is secret, because there is a public field {2} which has a Secret type",
-                    new Object[] {targetClass.getName(), fieldName, f});
-            return true;
-        }
+            f = locatePrivateFieldInHierarchy(targetClass, fieldName);
+            if (f != null && f.getType() == Secret.class) {
+                LOGGER.log(
+                        Level.FINER,
+                        "Attribute {0}#{1} is secret, because there is a private field {2} which has a Secret type",
+                        new Object[] {targetClass.getName(), fieldName, f});
+                return true;
+            }
 
-        f = locatePrivateFieldInHierarchy(targetClass, fieldName);
-        if (f != null && f.getType() == Secret.class) {
-            LOGGER.log(
-                    Level.FINER,
-                    "Attribute {0}#{1} is secret, because there is a private field {2} which has a Secret type",
-                    new Object[] {targetClass.getName(), fieldName, f});
-            return true;
-        }
+            if (hasSecretSetter(targetClass, fieldName)) {
+                LOGGER.log(
+                        Level.FINER,
+                        "Attribute {0}#{1} is secret, because there is a setter which takes a Secret type",
+                        new Object[] {targetClass.getName(), fieldName});
+                return true;
+            }
 
-        // TODO(oleg_nenashev): Consider setters? Gonna be more interesting since there might be many of them
-        LOGGER.log(Level.FINER, "Attribute {0}#{1} is not a secret, because all checks have passed", new Object[] {
-            targetClass.getName(), fieldName
+            LOGGER.log(Level.FINER, "Attribute {0}#{1} is not a secret, because all checks have passed", new Object[] {
+                targetClass.getName(), fieldName
+            });
+            return false;
         });
-        return false;
     }
 
     private Type _getValue(Owner target) throws ConfiguratorException {
@@ -544,5 +550,17 @@ public class Attribute<Owner, Type> {
 
     public static <T, V> Setter<T, V> noop() {
         return NOOP;
+    }
+
+    private static boolean hasSecretSetter(Class<?> clazz, @NonNull String fieldName) {
+        final String setterName = "set" + StringUtils.capitalize(fieldName);
+        for (Method method : clazz.getMethods()) {
+            if (method.getName().equals(setterName) && method.getParameterCount() == 1) {
+                if (method.getParameterTypes()[0] == Secret.class) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
