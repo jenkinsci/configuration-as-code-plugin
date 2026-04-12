@@ -587,15 +587,12 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
                 boolean currentMatch = (getterRawType != null && getterRawType.isAssignableFrom(currentType));
                 boolean bestMatch = (getterRawType != null && getterRawType.isAssignableFrom(bestType));
 
-                if (currentMatch && !bestMatch) {
+                if (currentMatch == bestMatch
+                        && ((!currentType.isInterface() && bestType.isInterface())
+                                || (currentType.getName().compareTo(bestType.getName()) < 0))) {
+
                     best = m;
                     bestType = currentType;
-                } else if (currentMatch == bestMatch) {
-                    if ((!currentType.isInterface() && bestType.isInterface())
-                            || (currentType.getName().compareTo(bestType.getName()) < 0)) {
-                        best = m;
-                        bestType = currentType;
-                    }
                 }
             }
         }
@@ -605,9 +602,6 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
     private boolean isSameType(Class<?> a, Class<?> b) {
         if (a == b) {
             return true;
-        }
-        if (a == null || b == null) {
-            return false;
         }
         if (a.isPrimitive() && !b.isPrimitive()) {
             return isWrapper(b, a);
