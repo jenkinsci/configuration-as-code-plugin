@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import io.jenkins.plugins.casc.model.Mapping;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -375,5 +376,22 @@ public class BaseConfiguratorTest {
         Set<Attribute<NoGetterTarget, ?>> attributes = configurator.describe();
 
         assertTrue("Properties without valid getters should yield no attributes", attributes.isEmpty());
+    }
+
+    @Test
+    public void testResolveBestSetterBranchCoverage() throws Exception {
+        DummyConfigurator configurator = new DummyConfigurator();
+
+        Method resolveMethod = BaseConfigurator.class.getDeclaredMethod("resolveBestSetter", List.class, Class.class);
+        resolveMethod.setAccessible(true);
+
+        Method setObj = DummyTarget.class.getMethod("setPet", Object.class);
+        Method setAnimal = DummyTarget.class.getMethod("setPet", Animal.class);
+
+        List<Method> orderedMethods = Arrays.asList(setObj, setAnimal);
+
+        Method best = (Method) resolveMethod.invoke(configurator, orderedMethods, null);
+
+        assertEquals("Should upgrade bestType and resolve to the more specific Animal setter", setAnimal, best);
     }
 }
