@@ -1,10 +1,13 @@
 package io.jenkins.plugins.casc;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import hudson.util.PersistedList;
 import io.jenkins.plugins.casc.model.Mapping;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -13,6 +16,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.Test;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.Beta;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 public class BaseConfiguratorTest {
 
@@ -200,6 +206,18 @@ public class BaseConfiguratorTest {
         public void getVoidEdgeCase() {}
 
         public void setVoidEdgeCase(String val) {}
+
+        @Restricted(NoExternalUse.class)
+        public PersistedList<String> getRestrictedList() {
+            return null;
+        }
+
+        public String getRestrictedSetter() {
+            return null;
+        }
+
+        @Restricted(Beta.class)
+        public void setRestrictedSetter(String val) {}
     }
 
     public static class DummyConfigurator extends BaseConfigurator<DummyTarget> {
@@ -251,7 +269,7 @@ public class BaseConfiguratorTest {
         Map<String, Class<?>> resolvedAttributes =
                 attributes.stream().collect(Collectors.toMap(Attribute::getName, attr -> (Class<?>) attr.getType()));
 
-        assertEquals("Should discover exactly 20 configurable properties", 20, resolvedAttributes.size());
+        assertEquals("Should discover exactly 22 configurable properties", 22, resolvedAttributes.size());
 
         assertEquals("Standard setter should resolve to String", String.class, resolvedAttributes.get("standard"));
 
@@ -321,6 +339,22 @@ public class BaseConfiguratorTest {
                 .orElseThrow(() -> new AssertionError("items attribute not found"));
         assertTrue("items attribute should be marked as multiple", itemsAttr.isMultiple());
 
+        Attribute<DummyTarget, ?> restrictedListAttr = attributes.stream()
+                .filter(a -> a.getName().equals("restrictedList"))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("restrictedList attribute not found"));
+        assertTrue(
+                "restrictedList attribute should contain NoExternalUse restriction",
+                Arrays.asList(restrictedListAttr.getRestrictions()).contains(NoExternalUse.class));
+
+        Attribute<DummyTarget, ?> restrictedSetterAttr = attributes.stream()
+                .filter(a -> a.getName().equals("restrictedSetter"))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("restrictedSetter attribute not found"));
+        assertTrue(
+                "restrictedSetter attribute should contain Beta restriction",
+                Arrays.asList(restrictedSetterAttr.getRestrictions()).contains(Beta.class));
+
         assertEquals(
                 Set.of(
                         "standard",
@@ -342,7 +376,9 @@ public class BaseConfiguratorTest {
                         "primitiveByte",
                         "primitiveChar",
                         "primitiveShort",
-                        "voidEdgeCase"),
+                        "voidEdgeCase",
+                        "restrictedList",
+                        "restrictedSetter"),
                 resolvedAttributes.keySet());
     }
 
@@ -375,22 +411,19 @@ public class BaseConfiguratorTest {
 
         Set<Attribute<NoGetterTarget, ?>> attributes = configurator.describe();
 
-        assertTrue("Properties without valid getters should yield no attributes", attributes.isEmpty());
+        assertThat("Properties without valid getters should yield no attributes", attributes, empty());
     }
 
     @Test
     public void testResolveBestSetterBranchCoverage() throws Exception {
         DummyConfigurator configurator = new DummyConfigurator();
 
-        Method resolveMethod = BaseConfigurator.class.getDeclaredMethod("resolveBestSetter", List.class, Class.class);
-        resolveMethod.setAccessible(true);
-
         Method setObj = DummyTarget.class.getMethod("setPet", Object.class);
         Method setAnimal = DummyTarget.class.getMethod("setPet", Animal.class);
 
         List<Method> orderedMethods = Arrays.asList(setObj, setAnimal);
 
-        Method best = (Method) resolveMethod.invoke(configurator, orderedMethods, null);
+        Method best = configurator.resolveBestSetter(orderedMethods, null);
 
         assertEquals("Should upgrade bestType and resolve to the more specific Animal setter", setAnimal, best);
     }

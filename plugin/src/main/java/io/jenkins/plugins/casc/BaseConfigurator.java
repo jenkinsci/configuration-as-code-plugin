@@ -39,6 +39,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.accmod.AccessRestriction;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.Beta;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.accmod.restrictions.None;
 
 /**
@@ -97,6 +98,10 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
 
                 if (attribute != null) {
                     attribute.deprecated(method.getAnnotation(Deprecated.class) != null);
+                    final Restricted r = method.getAnnotation(Restricted.class);
+                    if (r != null) {
+                        attribute.restrictions(r.value());
+                    }
                     attributes.putIfAbsent(name, attribute);
                 }
                 continue;
@@ -545,7 +550,8 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
         return getTarget().hashCode();
     }
 
-    private Method resolveBestSetter(List<Method> methods, Class<?> getterRawType) {
+    @Restricted(NoExternalUse.class)
+    Method resolveBestSetter(List<Method> methods, Class<?> getterRawType) {
         List<Method> realMethods =
                 methods.stream().filter(m -> !m.isBridge() && !m.isSynthetic()).collect(Collectors.toList());
         if (!realMethods.isEmpty()) {
@@ -589,7 +595,8 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
 
                 if (currentMatch == bestMatch
                         && ((!currentType.isInterface() && bestType.isInterface())
-                                || (currentType.getName().compareTo(bestType.getName()) < 0))) {
+                                || (currentType.isInterface() == bestType.isInterface()
+                                        && currentType.getName().compareTo(bestType.getName()) < 0))) {
 
                     best = m;
                     bestType = currentType;
