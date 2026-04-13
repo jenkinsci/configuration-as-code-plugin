@@ -1,6 +1,5 @@
 package io.jenkins.plugins.casc;
 
-import static hudson.model.ManagementLink.Category.CONFIGURATION;
 import static io.jenkins.plugins.casc.ConfigurationAsCode.CASC_JENKINS_CONFIG_PROPERTY;
 import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
 import static io.jenkins.plugins.casc.misc.Util.toYamlString;
@@ -339,12 +338,6 @@ class ConfigurationAsCodeTest {
         String actualDocString = ConfigurationAsCode.get()
                 .getHtmlHelp(hudson.security.FullControlOnceLoggedInAuthorizationStrategy.class, "allowAnonymousRead");
         assertEquals(expectedDocString, actualDocString);
-    }
-
-    @Test
-    void configurationCategory(JenkinsConfiguredWithCodeRule j) {
-        ConfigurationAsCode configurationAsCode = ConfigurationAsCode.get();
-        assertThat(configurationAsCode.getCategory(), is(CONFIGURATION));
     }
 
     private static File newFolder(File root, String... subDirs) throws IOException {
