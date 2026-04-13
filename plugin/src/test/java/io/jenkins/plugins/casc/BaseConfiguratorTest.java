@@ -11,9 +11,12 @@ import hudson.util.PersistedList;
 import io.jenkins.plugins.casc.model.Mapping;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 import org.junit.Test;
 import org.kohsuke.accmod.Restricted;
@@ -58,6 +61,8 @@ public class BaseConfiguratorTest {
     public static class DummyTarget {
 
         private String[] items;
+        private Set<String> stringSet;
+        private SortedSet<String> sortedStringSet;
 
         public String getStandard() {
             return null;
@@ -107,6 +112,22 @@ public class BaseConfiguratorTest {
 
         public void setItems(String[] items) {
             this.items = items;
+        }
+
+        public Set<String> getStringSet() {
+            return stringSet;
+        }
+
+        public void setStringSet(Set<String> stringSet) {
+            this.stringSet = stringSet;
+        }
+
+        public SortedSet<String> getSortedStringSet() {
+            return sortedStringSet;
+        }
+
+        public void setSortedStringSet(SortedSet<String> sortedStringSet) {
+            this.sortedStringSet = sortedStringSet;
         }
 
         public List<String> getArrayFallback() {
@@ -269,7 +290,7 @@ public class BaseConfiguratorTest {
         Map<String, Class<?>> resolvedAttributes =
                 attributes.stream().collect(Collectors.toMap(Attribute::getName, attr -> (Class<?>) attr.getType()));
 
-        assertEquals("Should discover exactly 22 configurable properties", 22, resolvedAttributes.size());
+        assertEquals("Should discover exactly 24 configurable properties", 24, resolvedAttributes.size());
 
         assertEquals("Standard setter should resolve to String", String.class, resolvedAttributes.get("standard"));
 
@@ -363,6 +384,8 @@ public class BaseConfiguratorTest {
                         "ambiguous",
                         "mismatchedToken",
                         "items",
+                        "stringSet",
+                        "sortedStringSet",
                         "arrayFallback",
                         "shapeSubtype",
                         "concreteWins",
@@ -403,6 +426,40 @@ public class BaseConfiguratorTest {
         assertNotNull("Array should have been set", result);
         assertEquals("Array should have the same size as the collection", 3, result.length);
         assertArrayEquals(new String[] {"foo", "bar", "baz"}, result);
+    }
+
+    @Test
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public void testCollectionToSetConversions() throws Exception {
+        DummyConfigurator configurator = new DummyConfigurator();
+        Set<Attribute<DummyTarget, ?>> attributes = configurator.describe();
+
+        Attribute<DummyTarget, ?> setAttr = attributes.stream()
+                .filter(a -> a.getName().equals("stringSet"))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("stringSet attribute not found"));
+
+        Attribute<DummyTarget, ?> sortedSetAttr = attributes.stream()
+                .filter(a -> a.getName().equals("sortedStringSet"))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("sortedStringSet attribute not found"));
+
+        DummyTarget target = new DummyTarget();
+
+        List<String> inputCollection = Arrays.asList("foo", "bar", "baz");
+
+        ((Attribute) setAttr).setValue(target, inputCollection);
+        ((Attribute) sortedSetAttr).setValue(target, inputCollection);
+
+        Set<String> setResult = target.getStringSet();
+        assertNotNull("Set should have been populated", setResult);
+        assertEquals("Set should be converted to LinkedHashSet", LinkedHashSet.class, setResult.getClass());
+        assertEquals("Set should have 3 items", 3, setResult.size());
+
+        SortedSet<String> sortedSetResult = target.getSortedStringSet();
+        assertNotNull("SortedSet should have been populated", sortedSetResult);
+        assertEquals("SortedSet should be converted to TreeSet", TreeSet.class, sortedSetResult.getClass());
+        assertEquals("SortedSet should have 3 items", 3, sortedSetResult.size());
     }
 
     @Test
