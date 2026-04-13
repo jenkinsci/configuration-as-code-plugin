@@ -226,7 +226,8 @@ public class ConfigurationAsCode extends ManagementLink {
                     candidateSources.add(candidateSource);
                 } else {
                     LOGGER.log(Level.WARNING, "Source {0} could not be applied", candidateSource);
-                    throw new ConfiguratorException("Source " + candidateSource + " could not be applied or does not exist.");
+                    throw new ConfiguratorException(
+                            "Source " + candidateSource + " could not be applied or does not exist.");
                 }
             }
             if (!candidateSources.isEmpty()) {
@@ -242,7 +243,8 @@ public class ConfigurationAsCode extends ManagementLink {
                     LOGGER.log(Level.FINE, "Replace configuration with: " + normalizedSource);
                 } else {
                     LOGGER.log(Level.WARNING, "Provided sources could not be applied");
-                    throw new ConfiguratorException("Provided sources could not be applied. Please check the syntax and validity of the provided configuration.");
+                    throw new ConfiguratorException(
+                            "Provided sources could not be applied. Please check the syntax and validity of the provided configuration.");
                 }
             } else {
                 LOGGER.log(Level.FINE, "No such source exists, applying default");
@@ -452,7 +454,10 @@ public class ConfigurationAsCode extends ManagementLink {
                     if (bundled != null && matcher.matches(new File(bundled.getPath()).toPath())) {
                         res.add(bundled.toString());
                     } else if (bundled != null) {
-                        LOGGER.log(Level.FINE, "Skipped bundled resource {0} as it does not match the YAML pattern.", bundled.getPath());
+                        LOGGER.log(
+                                Level.FINE,
+                                "Skipped bundled resource {0} as it does not match the YAML pattern.",
+                                bundled.getPath());
                     }
                 } catch (IOException e) {
                     LOGGER.log(Level.WARNING, "Failed to execute " + res, e);

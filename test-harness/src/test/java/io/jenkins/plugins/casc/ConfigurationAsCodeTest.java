@@ -343,7 +343,7 @@ class ConfigurationAsCodeTest {
     @Test
     void configurationCategory(JenkinsConfiguredWithCodeRule j) {
         ConfigurationAsCode configurationAsCode = ConfigurationAsCode.get();
-        assertThat(configurationAsCode.getCategoryName(), is("CONFIGURATION"));
+        assertThat(configurationAsCode.getCategory(), is("CONFIGURATION"));
     }
 
     private static File newFolder(File root, String... subDirs) throws IOException {

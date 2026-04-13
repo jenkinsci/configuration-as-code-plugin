@@ -5,10 +5,14 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 import jenkins.model.Jenkins;
 import org.htmlunit.HttpMethod;
 import org.htmlunit.WebRequest;
 import org.htmlunit.WebResponse;
+import org.htmlunit.util.NameValuePair;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -157,6 +161,28 @@ public class ConfigurationAsCodeApiTest {
                     .getWebResponse();
             assertThat(response2.getStatusCode(), is(200));
             assertThat(j.jenkins.getSystemMessage(), is("Idempotency Test"));
+        }
+    }
+
+    @Test
+    public void testDoReplace_ValidSource() throws Exception {
+        configureAdminSecurity();
+
+        Path configFile = Files.createTempFile("valid", ".yaml");
+        Files.writeString(configFile, "jenkins:\n  systemMessage: 'Hello Replace'");
+
+        try (JenkinsRule.WebClient wc = j.createWebClient().withBasicApiToken(ADMIN)) {
+            wc.setThrowExceptionOnFailingStatusCode(false);
+
+            WebRequest request =
+                    new WebRequest(new URL(j.getURL(), "manage/configuration-as-code/replace"), HttpMethod.POST);
+
+            request.setRequestParameters(List.of(new NameValuePair("_.newSource", configFile.toString())));
+
+            WebResponse response = wc.getPage(request).getWebResponse();
+
+            assertThat(response.getStatusCode(), is(200));
+            assertThat(j.jenkins.getSystemMessage(), is("Hello Replace"));
         }
     }
 }
