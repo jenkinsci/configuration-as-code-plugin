@@ -29,9 +29,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -169,14 +172,23 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
             rawAttribute.setter((targetInstance, value) -> {
                 Object finalValue = value;
 
-                if (value instanceof Collection<?> collection && finalType.rawType.isArray()) {
-                    Object array = newInstance(rawAttribute.getType(), collection.size());
-                    int i = 0;
-                    for (Object item : collection) {
-                        set(array, i++, item);
+                if (value instanceof Collection<?> collection) {
+                    if (finalType.rawType.isArray()) {
+                        Object array = newInstance(rawAttribute.getType(), collection.size());
+                        int i = 0;
+                        for (Object item : collection) {
+                            set(array, i++, item);
+                        }
+                        finalValue = array;
+
+                    } else if (SortedSet.class.isAssignableFrom(finalType.rawType)) {
+                        finalValue = new TreeSet<>(collection);
+
+                    } else if (Set.class.isAssignableFrom(finalType.rawType)) {
+                        finalValue = new LinkedHashSet<>(collection);
                     }
-                    finalValue = array;
                 }
+
                 bestMethod.invoke(targetInstance, finalValue);
             });
 
