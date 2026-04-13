@@ -1,5 +1,8 @@
 package io.jenkins.plugins.casc;
 
+import static java.lang.reflect.Array.newInstance;
+import static java.lang.reflect.Array.set;
+
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.BulkChange;
 import hudson.model.Describable;
@@ -22,7 +25,6 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -37,6 +39,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.accmod.AccessRestriction;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.Beta;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.accmod.restrictions.None;
 
 /**
@@ -76,35 +79,79 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
         }
 
         final Class<T> target = getTarget();
+        Map<String, List<Method>> methodsByProperty = new HashMap<>();
         // Resolve the methods and merging overrides to more concretized signatures
         // because the methods can to have been overridden with concretized type
-        // TODO: Overloaded setters with different types can corrupt this logic
         for (Method method : target.getMethods()) {
             final String methodName = method.getName();
-            TypePair type;
             if (method.getParameterCount() == 0
                     && methodName.startsWith("get")
                     && PersistedList.class.isAssignableFrom(method.getReturnType())) {
-                type = TypePair.ofReturnType(method);
-            } else if (method.getParameterCount() != 1 || !methodName.startsWith("set")) {
-                // Not an accessor, ignore
+                String name = StringUtils.uncapitalize(methodName.substring(3));
+                if (exclusions.contains(name)) {
+                    continue;
+                }
+
+                TypePair type = TypePair.ofReturnType(method);
+                @SuppressWarnings("unchecked")
+                Attribute<T, ?> attribute = (Attribute<T, ?>) createAttribute(name, type);
+
+                if (attribute != null) {
+                    attribute.deprecated(method.getAnnotation(Deprecated.class) != null);
+                    final Restricted r = method.getAnnotation(Restricted.class);
+                    if (r != null) {
+                        attribute.restrictions(r.value());
+                    }
+                    attributes.putIfAbsent(name, attribute);
+                }
                 continue;
-            } else {
-                type = TypePair.ofParameter(method, 0);
             }
 
-            final String s = methodName.substring(3);
-            final String name = StringUtils.uncapitalize(s);
-            if (exclusions.contains(name)) {
+            if (method.getParameterCount() == 1 && methodName.startsWith("set")) {
+                String propertySuffix = methodName.substring(3);
+                final String name = StringUtils.uncapitalize(propertySuffix);
+
+                if (exclusions.contains(name)) {
+                    continue;
+                }
+                methodsByProperty
+                        .computeIfAbsent(propertySuffix, k -> new ArrayList<>())
+                        .add(method);
+            }
+        }
+
+        for (Map.Entry<String, List<Method>> entry : methodsByProperty.entrySet()) {
+            final String propertySuffix = entry.getKey();
+            final String name = StringUtils.uncapitalize(propertySuffix);
+
+            Method g = findGetter(target, propertySuffix);
+
+            if (g == null) {
                 continue;
             }
 
-            if (!hasGetter(target, s)) {
-                // Looks like a property but no actual getter method we can use to read value
-                continue;
+            Class<?> getterRawType = g.getReturnType();
+
+            List<Method> candidateSetters = entry.getValue().stream()
+                    .filter(m -> {
+                        Class<?> paramType = m.getParameterTypes()[0];
+                        return isSameType(paramType, getterRawType)
+                                || getterRawType.isAssignableFrom(paramType)
+                                || paramType.isAssignableFrom(getterRawType);
+                    })
+                    .collect(Collectors.toList());
+
+            if (candidateSetters.isEmpty()) {
+                candidateSetters = entry.getValue();
             }
 
-            LOGGER.log(Level.FINER, "Processing {0} property", name);
+            Method bestMethod = resolveBestSetter(candidateSetters, getterRawType);
+            TypePair type = TypePair.ofParameter(bestMethod, 0);
+
+            TypePair getterType = TypePair.ofReturnType(g);
+            if (type.rawType.isAssignableFrom(getterType.rawType)) {
+                type = getterType;
+            }
 
             if (Map.class.isAssignableFrom(type.rawType)) {
                 // yaml has support for Maps, but as nobody seem to like them we agreed not to support them
@@ -112,21 +159,36 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
                 continue;
             }
 
-            Attribute attribute = createAttribute(name, type);
-            if (attribute == null) {
+            final TypePair finalType = type;
+
+            @SuppressWarnings("unchecked")
+            Attribute<T, Object> rawAttribute = (Attribute<T, Object>) createAttribute(name, type);
+            if (rawAttribute == null) {
                 continue;
             }
+            rawAttribute.setter((targetInstance, value) -> {
+                Object finalValue = value;
 
-            attribute.deprecated(method.getAnnotation(Deprecated.class) != null);
-            final Restricted r = method.getAnnotation(Restricted.class);
+                if (value instanceof Collection<?> collection && finalType.rawType.isArray()) {
+                    Object array = newInstance(rawAttribute.getType(), collection.size());
+                    int i = 0;
+                    for (Object item : collection) {
+                        set(array, i++, item);
+                    }
+                    finalValue = array;
+                }
+                bestMethod.invoke(targetInstance, finalValue);
+            });
+
+            rawAttribute.deprecated(bestMethod.getAnnotation(Deprecated.class) != null);
+            final Restricted r = bestMethod.getAnnotation(Restricted.class);
             if (r != null) {
-                attribute.restrictions(r.value());
+                rawAttribute.restrictions(r.value());
             }
 
-            Attribute prevAttribute = attributes.get(name);
-            // Replace the method if it have more concretized type
-            if (prevAttribute == null || prevAttribute.type.isAssignableFrom(attribute.type)) {
-                attributes.put(name, attribute);
+            Attribute<T, ?> prevAttribute = attributes.get(name);
+            if (prevAttribute == null || ((Class<?>) prevAttribute.type).isAssignableFrom(rawAttribute.type)) {
+                attributes.put(name, rawAttribute);
             }
         }
 
@@ -136,14 +198,25 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
     /**
      * Check if target class has a Getter method for property s
      */
-    private boolean hasGetter(Class<T> c, String s) {
-        List<String> candidates = Arrays.asList("get" + s, "is" + s);
+    private Method findGetter(Class<T> c, String s) {
+        String getMethod = "get" + s;
+        String isMethod = "is" + s;
+
         for (Method m : c.getMethods()) {
-            if (m.getParameterCount() == 0 && candidates.contains(m.getName())) {
-                return true;
+            if (m.getParameterCount() == 0) {
+                if (m.getName().equals(getMethod)) {
+                    return m;
+                }
+
+                if (m.getName().equals(isMethod)) {
+                    Class<?> returnType = m.getReturnType();
+                    if (returnType == boolean.class || returnType == Boolean.class) {
+                        return m;
+                    }
+                }
             }
         }
-        return false;
+        return null;
     }
 
     /**
@@ -439,9 +512,9 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
         /**
          * Erasure of {@link #type}
          */
-        final Class rawType;
+        final Class<?> rawType;
 
-        public TypePair(Type type, Class rawType) {
+        public TypePair(Type type, Class<?> rawType) {
             this.rawType = rawType;
             this.type = type;
         }
@@ -475,5 +548,102 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
     @Override
     public int hashCode() {
         return getTarget().hashCode();
+    }
+
+    @Restricted(NoExternalUse.class)
+    Method resolveBestSetter(List<Method> methods, Class<?> getterRawType) {
+        List<Method> realMethods =
+                methods.stream().filter(m -> !m.isBridge() && !m.isSynthetic()).collect(Collectors.toList());
+        if (!realMethods.isEmpty()) {
+            methods = realMethods;
+        }
+        if (methods.size() == 1) {
+            return methods.get(0);
+        }
+
+        if (getterRawType != null) {
+            for (Method m : methods) {
+                if (isSameType(m.getParameterTypes()[0], getterRawType)) {
+                    return m;
+                }
+            }
+        }
+        List<Method> arrayMethods =
+                methods.stream().filter(m -> m.getParameterTypes()[0].isArray()).collect(Collectors.toList());
+        if (!arrayMethods.isEmpty()) {
+            methods = arrayMethods;
+        }
+
+        Method best = null;
+        Class<?> bestType = null;
+
+        for (Method m : methods) {
+            Class<?> currentType = m.getParameterTypes()[0];
+
+            if (best == null) {
+                best = m;
+                bestType = currentType;
+                continue;
+            }
+
+            if (bestType.isAssignableFrom(currentType)) {
+                best = m;
+                bestType = currentType;
+            } else if (!currentType.isAssignableFrom(bestType)) {
+                boolean currentMatch = (getterRawType != null && getterRawType.isAssignableFrom(currentType));
+                boolean bestMatch = (getterRawType != null && getterRawType.isAssignableFrom(bestType));
+
+                if (currentMatch == bestMatch
+                        && ((!currentType.isInterface() && bestType.isInterface())
+                                || (currentType.isInterface() == bestType.isInterface()
+                                        && currentType.getName().compareTo(bestType.getName()) < 0))) {
+
+                    best = m;
+                    bestType = currentType;
+                }
+            }
+        }
+        return best;
+    }
+
+    private boolean isSameType(Class<?> a, Class<?> b) {
+        if (a == b) {
+            return true;
+        }
+        if (a.isPrimitive() && !b.isPrimitive()) {
+            return isWrapper(b, a);
+        }
+        if (b.isPrimitive() && !a.isPrimitive()) {
+            return isWrapper(a, b);
+        }
+        return false;
+    }
+
+    private boolean isWrapper(Class<?> wrapper, Class<?> primitive) {
+        if (primitive == int.class) {
+            return wrapper == Integer.class;
+        }
+        if (primitive == boolean.class) {
+            return wrapper == Boolean.class;
+        }
+        if (primitive == long.class) {
+            return wrapper == Long.class;
+        }
+        if (primitive == double.class) {
+            return wrapper == Double.class;
+        }
+        if (primitive == float.class) {
+            return wrapper == Float.class;
+        }
+        if (primitive == byte.class) {
+            return wrapper == Byte.class;
+        }
+        if (primitive == char.class) {
+            return wrapper == Character.class;
+        }
+        if (primitive == short.class) {
+            return wrapper == Short.class;
+        }
+        return false;
     }
 }
