@@ -143,12 +143,10 @@ public class ConfigurationAsCode extends ManagementLink {
         return "Reload your configuration or update configuration source.";
     }
 
-    /**
-     * Name of the category for this management link.
-     * TODO: Use getCategory when core requirement is greater or equal to 2.226
-     */
-    public @NonNull String getCategoryName() {
-        return "CONFIGURATION";
+    @NonNull
+    @Override
+    public Category getCategory() {
+        return Category.CONFIGURATION;
     }
 
     @NonNull
@@ -228,7 +226,7 @@ public class ConfigurationAsCode extends ManagementLink {
                     candidateSources.add(candidateSource);
                 } else {
                     LOGGER.log(Level.WARNING, "Source {0} could not be applied", candidateSource);
-                    // todo: show message in UI
+                    throw new ConfiguratorException("Source " + candidateSource + " could not be applied or does not exist.");
                 }
             }
             if (!candidateSources.isEmpty()) {
@@ -244,7 +242,7 @@ public class ConfigurationAsCode extends ManagementLink {
                     LOGGER.log(Level.FINE, "Replace configuration with: " + normalizedSource);
                 } else {
                     LOGGER.log(Level.WARNING, "Provided sources could not be applied");
-                    // todo: show message in UI
+                    throw new ConfiguratorException("Provided sources could not be applied. Please check the syntax and validity of the provided configuration.");
                 }
             } else {
                 LOGGER.log(Level.FINE, "No such source exists, applying default");
@@ -453,7 +451,9 @@ public class ConfigurationAsCode extends ManagementLink {
                     URL bundled = servletContext.getResource(cascItem);
                     if (bundled != null && matcher.matches(new File(bundled.getPath()).toPath())) {
                         res.add(bundled.toString());
-                    } // TODO: else do some handling?
+                    } else if (bundled != null) {
+                        LOGGER.log(Level.FINE, "Skipped bundled resource {0} as it does not match the YAML pattern.", bundled.getPath());
+                    }
                 } catch (IOException e) {
                     LOGGER.log(Level.WARNING, "Failed to execute " + res, e);
                 }
@@ -569,23 +569,7 @@ public class ConfigurationAsCode extends ManagementLink {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         export(out);
 
-        req.setAttribute("viewExport", new ManagementLink() {
-            @Override
-            public String getIconFileName() {
-                return "";
-            }
-
-            // TODO - FIX - EXTREMELY HACKY - couldn't expose a public method for some reason
-            @Override
-            public String getUrlName() {
-                return out.toString(StandardCharsets.UTF_8);
-            }
-
-            @Override
-            public String getDisplayName() {
-                return "Export configuration";
-            }
-        });
+        req.setAttribute("exportedYaml", out.toString(StandardCharsets.UTF_8));
         req.getView(this, "viewExport.jelly").forward(req, res);
     }
 
