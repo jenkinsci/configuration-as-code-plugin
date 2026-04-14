@@ -3,7 +3,7 @@
   xmlns:f="/lib/form">
   <j:set var="header">
     <l:view>
-      <l:app-bar title="${viewExport.displayName}">
+      <l:app-bar title="${%Export configuration}">
         <f:form method="post" action="export" name="export">
           <f:submit icon="symbol-download" primary="false" name="export" value="${%Download}"/>
         </f:form>
@@ -11,7 +11,7 @@
     </l:view>
   </j:set>
 
-  <l:settings-subpage includeBreadcrumb="true" header="${header}" managementLink="${viewExport}" noDefer="true">
+  <l:settings-subpage includeBreadcrumb="true" header="${header}" title="${%Export configuration}">
     <st:adjunct includes="io.jenkins.plugins.casc.assets.viewExport" />
 
     <div class="jenkins-alert jenkins-alert-info">
@@ -20,7 +20,7 @@
 
     <p:prism configuration="${it.prismConfiguration}" />
     <pre>
-      <code class="language-yaml">${viewExport.urlName}</code>
+      <code class="language-yaml">${exportedYaml}</code>
     </pre>
   </l:settings-subpage>
 </j:jelly>

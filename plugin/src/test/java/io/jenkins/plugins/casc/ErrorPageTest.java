@@ -1,5 +1,6 @@
 package io.jenkins.plugins.casc;
 
+import static jenkins.model.Jenkins.ADMINISTER;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.JenkinsRule.WebClient;
+import org.jvnet.hudson.test.MockAuthorizationStrategy;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
 @WithJenkins
@@ -86,5 +88,35 @@ class ErrorPageTest {
         assertThat(pageContent, containsString("securityRealm"));
         assertThat(pageContent, containsString("Attribute was:"));
         assertThat(pageContent, containsString("unknown"));
+    }
+
+    @Test
+    void replaceWithInvalidSource() throws Exception {
+        String pageContent = replaceConfiguration();
+
+        assertThat(
+                pageContent, containsString("Source non-existent-file.yaml could not be applied or does not exist."));
+    }
+
+    private String replaceConfiguration() throws Exception {
+        r.jenkins.setSecurityRealm(r.createDummySecurityRealm());
+        r.jenkins.setAuthorizationStrategy(
+                new MockAuthorizationStrategy().grant(ADMINISTER).everywhere().to("admin"));
+
+        try (WebClient webClient = r.createWebClient().withThrowExceptionOnFailingStatusCode(false)) {
+            webClient.login("admin", "admin");
+
+            HtmlPage htmlPage = webClient.goTo("manage/configuration-as-code/");
+
+            HtmlButton button = (HtmlButton) htmlPage.getElementById("btn-open-apply-configuration");
+            HtmlElementUtil.click(button);
+
+            HtmlForm replaceForm = htmlPage.getFormByName("replace");
+            replaceForm.getInputByName("_.newSource").setValue("non-existent-file.yaml");
+
+            HtmlPage submit = r.submit(replaceForm);
+
+            return submit.asNormalizedText();
+        }
     }
 }

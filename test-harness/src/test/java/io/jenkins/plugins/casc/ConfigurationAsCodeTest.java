@@ -340,12 +340,6 @@ class ConfigurationAsCodeTest {
         assertEquals(expectedDocString, actualDocString);
     }
 
-    @Test
-    void configurationCategory(JenkinsConfiguredWithCodeRule j) {
-        ConfigurationAsCode configurationAsCode = ConfigurationAsCode.get();
-        assertThat(configurationAsCode.getCategoryName(), is("CONFIGURATION"));
-    }
-
     private static File newFolder(File root, String... subDirs) throws IOException {
         String subFolder = String.join("/", subDirs);
         File result = new File(root, subFolder);
