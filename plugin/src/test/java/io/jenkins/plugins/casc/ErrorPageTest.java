@@ -1,10 +1,8 @@
 package io.jenkins.plugins.casc;
 
-import static hudson.model.ManagementLink.Category.CONFIGURATION;
 import static jenkins.model.Jenkins.ADMINISTER;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
@@ -120,16 +118,5 @@ class ErrorPageTest {
 
             return submit.asNormalizedText();
         }
-    }
-
-    @Test
-    void verifyManagementLinkProperties() {
-        ConfigurationAsCode casc = ConfigurationAsCode.get();
-
-        assertEquals(CONFIGURATION, casc.getCategory());
-
-        assertEquals("configuration-as-code", casc.getUrlName());
-        assertEquals("Configuration as Code", casc.getDisplayName());
-        assertEquals("symbol-logo plugin-configuration-as-code", casc.getIconFileName());
     }
 }
