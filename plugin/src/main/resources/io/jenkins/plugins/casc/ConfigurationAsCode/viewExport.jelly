@@ -11,7 +11,7 @@
     </l:view>
   </j:set>
 
-  <l:settings-subpage includeBreadcrumb="true" header="${header}">
+  <l:settings-subpage includeBreadcrumb="true" header="${header}" title="${%Export configuration}">
     <st:adjunct includes="io.jenkins.plugins.casc.assets.viewExport" />
 
     <div class="jenkins-alert jenkins-alert-info">
