@@ -10,8 +10,6 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
 import java.util.Base64;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,18 +36,25 @@ public class SecretSourceResolver {
     private final StringSubstitutor substitutor;
 
     public SecretSourceResolver(ConfigurationContext configurationContext) {
-        // TODO update to use Map.of in JDK11+
-        Map<String, org.apache.commons.text.lookup.StringLookup> map = new HashMap<>(16);
-        map.put("base64", Base64Lookup.INSTANCE);
-        map.put("fileBase64", FileBase64Lookup.INSTANCE);
-        map.put("readFileBase64", FileBase64Lookup.INSTANCE);
-        map.put("file", FileStringLookup.INSTANCE);
-        map.put("readFile", FileStringLookup.INSTANCE);
-        map.put("sysProp", SystemPropertyLookup.INSTANCE);
-        map.put("decodeBase64", DecodeBase64Lookup.INSTANCE);
-        map.put("json", JsonLookup.INSTANCE);
-        map.put("trim", TrimLookup.INSTANCE);
-        map = Collections.unmodifiableMap(map);
+        Map<String, StringLookup> map = Map.of(
+                "base64",
+                Base64Lookup.INSTANCE,
+                "fileBase64",
+                FileBase64Lookup.INSTANCE,
+                "readFileBase64",
+                FileBase64Lookup.INSTANCE,
+                "file",
+                FileStringLookup.INSTANCE,
+                "readFile",
+                FileStringLookup.INSTANCE,
+                "sysProp",
+                SystemPropertyLookup.INSTANCE,
+                "decodeBase64",
+                DecodeBase64Lookup.INSTANCE,
+                "json",
+                JsonLookup.INSTANCE,
+                "trim",
+                TrimLookup.INSTANCE);
 
         substitutor = new StringSubstitutor(new FixedInterpolatorStringLookup(
                         map, new ConfigurationContextStringLookup(configurationContext)))
