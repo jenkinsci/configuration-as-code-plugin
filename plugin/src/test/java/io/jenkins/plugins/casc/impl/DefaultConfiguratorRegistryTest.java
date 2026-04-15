@@ -31,7 +31,9 @@ public class DefaultConfiguratorRegistryTest {
 
     @SuppressWarnings("unused")
     public static class DummyTarget<T extends Builder> {
-        public List<?> rawList;
+        @SuppressWarnings("rawtypes")
+        public List rawList;
+
         public List<List<String>> nestedList;
         public List<? extends Builder> wildcardList;
         public List<T> typeVarList;
