@@ -99,8 +99,8 @@ public class DefaultConfiguratorRegistry implements ConfiguratorRegistry {
             Type collectionType = Types.getBaseClass(type, Collection.class);
             if (collectionType instanceof ParameterizedType pt) {
                 Type actualType = pt.getActualTypeArguments()[0];
-                if (actualType instanceof WildcardType) {
-                    actualType = ((WildcardType) actualType).getUpperBounds()[0];
+                if (actualType instanceof WildcardType wildcardType) {
+                    actualType = wildcardType.getUpperBounds()[0];
                 }
                 return internalLookup(actualType); // cache is not reëntrant
             }
