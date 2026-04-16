@@ -66,17 +66,22 @@ public class DescriptorConfigurator extends BaseConfigurator<Descriptor>
         return Optional.ofNullable(descriptor.getClass().getAnnotation(Symbol.class))
                 .map(s -> Arrays.asList(s.value()))
                 .orElseGet(() -> {
+                    String fallbackName = fromPascalCaseToCamelCase(
+                            unwrapAnonymous(descriptor.getKlass().toJavaClass()).getSimpleName());
+
                     Class<?> typeParam = extractDescriptorTypeParameter(descriptor.getClass());
+                    String derivedName = null;
 
-                    Class<?> targetClass = typeParam != null
-                            ? typeParam
-                            : descriptor.getKlass().toJavaClass();
-
-                    while (targetClass.isAnonymousClass()) {
-                        targetClass = targetClass.getSuperclass();
+                    if (typeParam != null) {
+                        Class<?> targetClass = unwrapAnonymous(typeParam);
+                        derivedName = fromPascalCaseToCamelCase(targetClass.getSimpleName());
                     }
 
-                    return singletonList(fromPascalCaseToCamelCase(targetClass.getSimpleName()));
+                    if (derivedName != null && !derivedName.equals(fallbackName)) {
+                        return Arrays.asList(fallbackName, derivedName);
+                    }
+
+                    return singletonList(fallbackName);
                 });
     }
 
@@ -111,10 +116,17 @@ public class DescriptorConfigurator extends BaseConfigurator<Descriptor>
 
     private static String fromPascalCaseToCamelCase(String s) {
         if (s == null || s.isEmpty()) {
-            return s != null ? s : "";
+            throw new IllegalStateException("Cannot derive configurator name from an empty class name");
         }
         StringBuilder sb = new StringBuilder(s);
         sb.setCharAt(0, Character.toLowerCase(s.charAt(0)));
         return sb.toString();
+    }
+
+    private Class<?> unwrapAnonymous(Class<?> clazz) {
+        while (clazz.isAnonymousClass()) {
+            clazz = clazz.getSuperclass();
+        }
+        return clazz;
     }
 }
