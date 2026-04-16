@@ -84,24 +84,24 @@ public class DescriptorConfigurator extends BaseConfigurator<Descriptor>
         while (clazz != null && clazz != Object.class) {
             Type genericSuperclass = clazz.getGenericSuperclass();
 
-            if (genericSuperclass instanceof ParameterizedType pt) {
-                Type rawType = pt.getRawType();
+            if (genericSuperclass instanceof ParameterizedType pt
+                    && pt.getRawType() instanceof Class<?> rawClass
+                    && Descriptor.class.isAssignableFrom(rawClass)) {
 
-                if (rawType instanceof Class && Descriptor.class.isAssignableFrom((Class<?>) rawType)) {
-                    Type[] args = pt.getActualTypeArguments();
+                Type[] args = pt.getActualTypeArguments();
+                if (args.length == 0) {
+                    return null;
+                }
 
-                    if (args.length > 0) {
-                        Type typeArg = args[0];
+                Type typeArg = args[0];
 
-                        if (typeArg instanceof Class) {
-                            return (Class<?>) typeArg;
-                        } else if (typeArg instanceof ParameterizedType) {
-                            Type nestedRawType = ((ParameterizedType) typeArg).getRawType();
-                            if (nestedRawType instanceof Class) {
-                                return (Class<?>) nestedRawType;
-                            }
-                        }
-                    }
+                if (typeArg instanceof Class<?> clazzArg) {
+                    return clazzArg;
+                }
+
+                if (typeArg instanceof ParameterizedType nestedPt
+                        && nestedPt.getRawType() instanceof Class<?> nestedClass) {
+                    return nestedClass;
                 }
             }
             clazz = clazz.getSuperclass();
