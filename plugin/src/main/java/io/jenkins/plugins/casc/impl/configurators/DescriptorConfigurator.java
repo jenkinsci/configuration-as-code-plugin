@@ -8,6 +8,8 @@ import io.jenkins.plugins.casc.BaseConfigurator;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.RootElementConfigurator;
 import io.jenkins.plugins.casc.model.Mapping;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -64,15 +66,53 @@ public class DescriptorConfigurator extends BaseConfigurator<Descriptor>
         return Optional.ofNullable(descriptor.getClass().getAnnotation(Symbol.class))
                 .map(s -> Arrays.asList(s.value()))
                 .orElseGet(() -> {
-                    /* TODO: extract Descriptor parameter type such that DescriptorImpl extends Descriptor<XX> returns XX.
-                     * Then, if `baseClass == fooXX` we get natural name `foo`.
-                     */
-                    return singletonList(fromPascalCaseToCamelCase(
-                            descriptor.getKlass().toJavaClass().getSimpleName()));
+                    Class<?> typeParam = extractDescriptorTypeParameter(descriptor.getClass());
+
+                    Class<?> targetClass = typeParam != null
+                            ? typeParam
+                            : descriptor.getKlass().toJavaClass();
+
+                    while (targetClass.isAnonymousClass()) {
+                        targetClass = targetClass.getSuperclass();
+                    }
+
+                    return singletonList(fromPascalCaseToCamelCase(targetClass.getSimpleName()));
                 });
     }
 
+    private Class<?> extractDescriptorTypeParameter(Class<?> clazz) {
+        while (clazz != null && clazz != Object.class) {
+            Type genericSuperclass = clazz.getGenericSuperclass();
+
+            if (genericSuperclass instanceof ParameterizedType pt) {
+                Type rawType = pt.getRawType();
+
+                if (rawType instanceof Class && Descriptor.class.isAssignableFrom((Class<?>) rawType)) {
+                    Type[] args = pt.getActualTypeArguments();
+
+                    if (args.length > 0) {
+                        Type typeArg = args[0];
+
+                        if (typeArg instanceof Class) {
+                            return (Class<?>) typeArg;
+                        } else if (typeArg instanceof ParameterizedType) {
+                            Type nestedRawType = ((ParameterizedType) typeArg).getRawType();
+                            if (nestedRawType instanceof Class) {
+                                return (Class<?>) nestedRawType;
+                            }
+                        }
+                    }
+                }
+            }
+            clazz = clazz.getSuperclass();
+        }
+        return null;
+    }
+
     private static String fromPascalCaseToCamelCase(String s) {
+        if (s == null || s.isEmpty()) {
+            return s != null ? s : "";
+        }
         StringBuilder sb = new StringBuilder(s);
         sb.setCharAt(0, Character.toLowerCase(s.charAt(0)));
         return sb.toString();
