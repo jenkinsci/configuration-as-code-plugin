@@ -94,19 +94,18 @@ public class DescriptorConfigurator extends BaseConfigurator<Descriptor>
                     && Descriptor.class.isAssignableFrom(rawClass)) {
 
                 Type[] args = pt.getActualTypeArguments();
-                if (args.length == 0) {
-                    return null;
-                }
 
-                Type typeArg = args[0];
+                if (args.length > 0) {
+                    Type typeArg = args[0];
 
-                if (typeArg instanceof Class<?> clazzArg) {
-                    return clazzArg;
-                }
+                    if (typeArg instanceof Class<?> clazzArg) {
+                        return clazzArg;
+                    }
 
-                if (typeArg instanceof ParameterizedType nestedPt
-                        && nestedPt.getRawType() instanceof Class<?> nestedClass) {
-                    return nestedClass;
+                    if (typeArg instanceof ParameterizedType nestedPt
+                            && nestedPt.getRawType() instanceof Class<?> nestedClass) {
+                        return nestedClass;
+                    }
                 }
             }
             clazz = clazz.getSuperclass();
@@ -115,9 +114,6 @@ public class DescriptorConfigurator extends BaseConfigurator<Descriptor>
     }
 
     private static String fromPascalCaseToCamelCase(String s) {
-        if (s == null || s.isEmpty()) {
-            throw new IllegalStateException("Cannot derive configurator name from an empty class name");
-        }
         StringBuilder sb = new StringBuilder(s);
         sb.setCharAt(0, Character.toLowerCase(s.charAt(0)));
         return sb.toString();
