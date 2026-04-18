@@ -7,8 +7,6 @@ import io.jenkins.plugins.casc.model.CNode;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import jenkins.model.GlobalConfiguration;
-import jenkins.model.Jenkins;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.kohsuke.stapler.Stapler;
 
@@ -62,13 +60,6 @@ public class ConfigurationContext implements ConfiguratorRegistry {
         this.mergeStrategy = mergeStrategy != null
                 ? mergeStrategy
                 : getPropertyOrEnv(CASC_MERGE_STRATEGY_ENV, CASC_MERGE_STRATEGY_PROPERTY);
-        Jenkins jenkins = Jenkins.getInstanceOrNull();
-        if (jenkins != null) {
-            CasCGlobalConfig config = GlobalConfiguration.all().get(CasCGlobalConfig.class);
-            if (config != null) {
-                this.strictExport = config.isStrictExport();
-            }
-        }
     }
 
     private String getPropertyOrEnv(String envKey, String proKey) {

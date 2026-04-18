@@ -598,6 +598,8 @@ public class ConfigurationAsCode extends ManagementLink {
         final List<NodeTuple> tuples = new ArrayList<>();
 
         final ConfigurationContext context = new ConfigurationContext(registry);
+        Optional.ofNullable(GlobalConfiguration.all().get(CasCGlobalConfig.class))
+                .ifPresent(c -> context.setStrictExport(c.isStrictExport()));
         for (RootElementConfigurator<?> root : RootElementConfigurator.all()) {
             final CNode config = describeRoot(root, context);
             final Node valueNode = toYaml(config);
