@@ -341,4 +341,49 @@ public class AttributeTest {
                 exception.getCause().getMessage(),
                 containsString("Intentional generic failure from dummy configurator"));
     }
+
+    @Test
+    @SuppressWarnings({"ExtractMethodRecommender", "unchecked"})
+    void describeRethrowsConfiguratorExceptionInStrictMode() throws Exception {
+
+        Configurator<?> dummyConfigurator = (Configurator<?>) newProxyInstance(
+                Configurator.class.getClassLoader(),
+                new Class<?>[] {Configurator.class},
+                (proxy, method, args) -> switch (method.getName()) {
+                    case "equals" -> args != null && args.length == 1 && proxy == args[0];
+                    case "hashCode" -> System.identityHashCode(proxy);
+                    case "toString" -> "DummyConfiguratorProxy";
+                    case "describe" -> throw new ConfiguratorException("Direct configurator failure");
+                    default -> null;
+                });
+
+        ConfiguratorRegistry dummyRegistry = new ConfiguratorRegistry() {
+            @Override
+            public RootElementConfigurator<?> lookupRootElement(String name) {
+                return null;
+            }
+
+            @Override
+            @NonNull
+            public <T> Configurator<T> lookupOrFail(Type type) {
+                return (Configurator<T>) dummyConfigurator;
+            }
+
+            @Override
+            public <T> Configurator<T> lookup(Type type) {
+                return (Configurator<T>) dummyConfigurator;
+            }
+        };
+
+        ConfigurationContext context = new ConfigurationContext(dummyRegistry);
+        context.setStrictExport(true);
+
+        Attribute<NonSecretField, String> attr = new Attribute<>("passwordPath", String.class);
+
+        NonSecretField instance = new NonSecretField("dummy");
+
+        ConfiguratorException ex = assertThrows(ConfiguratorException.class, () -> attr.describe(instance, context));
+
+        assertThat(ex.getMessage(), containsString("Direct configurator failure"));
+    }
 }
