@@ -1,8 +1,10 @@
 package io.jenkins.plugins.casc.misc;
 
+import io.jenkins.plugins.casc.CasCGlobalConfig;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
+import jenkins.model.GlobalConfiguration;
 import org.jvnet.hudson.test.JenkinsRule;
 
 public class JenkinsConfiguredRule extends JenkinsRule {
@@ -17,7 +19,20 @@ public class JenkinsConfiguredRule extends JenkinsRule {
     public String exportToString(boolean strict) throws Exception {
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        ConfigurationAsCode.get().export(out, strict);
+        CasCGlobalConfig config = GlobalConfiguration.all().get(CasCGlobalConfig.class);
+        boolean originalStrict = config != null && config.isStrictExport();
+
+        if (config != null) {
+            config.setStrictExport(strict);
+        }
+
+        try {
+            ConfigurationAsCode.get().export(out);
+        } finally {
+            if (config != null) {
+                config.setStrictExport(originalStrict);
+            }
+        }
 
         return out.toString(StandardCharsets.UTF_8);
     }

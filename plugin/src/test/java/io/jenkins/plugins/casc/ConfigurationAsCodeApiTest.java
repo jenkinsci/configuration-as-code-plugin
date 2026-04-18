@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
 import org.htmlunit.HttpMethod;
 import org.htmlunit.WebRequest;
@@ -193,9 +194,14 @@ public class ConfigurationAsCodeApiTest {
     public void testExportStrictMode_SuccessOnCleanJenkins() throws Exception {
         configureAdminSecurity();
 
+        CasCGlobalConfig config = GlobalConfiguration.all().get(CasCGlobalConfig.class);
+        if (config != null) {
+            config.setStrictExport(true);
+        }
+
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        ConfigurationAsCode.get().export(out, true);
+        ConfigurationAsCode.get().export(out);
 
         String exportedYaml = out.toString(StandardCharsets.UTF_8);
 

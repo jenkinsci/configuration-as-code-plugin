@@ -273,7 +273,7 @@ public class Attribute<Owner, Type> {
                 return seq;
             }
             return _describe(c, context, o, shouldBeMasked);
-        } catch (Exception | AssertionError e) {
+        } catch (Exception | /* Jenkins.getDescriptorOrDie */ AssertionError e) {
             if (context.isStrictExport()) {
                 if (e instanceof ConfiguratorException) {
                     throw (ConfiguratorException) e;

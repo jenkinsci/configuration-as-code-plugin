@@ -1,5 +1,8 @@
 package io.jenkins.plugins.casc;
 
+import static java.lang.reflect.Proxy.newProxyInstance;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -267,9 +270,10 @@ public class AttributeTest {
         CNode node = attr.describe(dummyInstance, context);
 
         assertInstanceOf(Scalar.class, node, "Should return a Scalar node on failure in non-strict mode");
-        assertTrue(
-                ((Scalar) node).getValue().contains("FAILED TO EXPORT"),
-                "Scalar should contain the fallback failure message");
+        assertThat(
+                "Scalar should contain the fallback failure message",
+                ((Scalar) node).getValue(),
+                containsString("FAILED TO EXPORT"));
 
         context.setStrictExport(true);
         ConfiguratorException exception = assertThrows(
@@ -279,8 +283,62 @@ public class AttributeTest {
                 },
                 "Should completely abort and throw ConfiguratorException in strict mode");
 
-        assertTrue(
-                exception.getMessage().contains("No configurator found"),
-                "Exception message should accurately reflect the missing configurator");
+        assertThat(exception.getMessage(), containsString("No configurator found"));
+    }
+
+    @Test
+    @SuppressWarnings({"ExtractMethodRecommender", "unchecked"})
+    void describeWrapsGenericExceptionsInStrictMode() throws Exception {
+
+        Configurator<?> dummyConfigurator = (Configurator<?>) newProxyInstance(
+                Configurator.class.getClassLoader(), new Class<?>[] {Configurator.class}, (proxy, method, args) -> {
+                    String methodName = method.getName();
+                    return switch (methodName) {
+                        case "equals" -> args != null && args.length == 1 && proxy == args[0];
+                        case "hashCode" -> System.identityHashCode(proxy);
+                        case "toString" -> "DummyConfiguratorProxy";
+                        case "describe" ->
+                            throw new IllegalStateException("Intentional generic failure from dummy configurator");
+                        default -> null;
+                    };
+                });
+
+        ConfiguratorRegistry dummyRegistry = new ConfiguratorRegistry() {
+            @Override
+            public RootElementConfigurator<?> lookupRootElement(String name) {
+                return null;
+            }
+
+            @Override
+            @NonNull
+            public <T> Configurator<T> lookupOrFail(Type type) {
+                return (Configurator<T>) dummyConfigurator;
+            }
+
+            @Override
+            public <T> Configurator<T> lookup(Type type) {
+                return (Configurator<T>) dummyConfigurator;
+            }
+        };
+
+        ConfigurationContext context = new ConfigurationContext(dummyRegistry);
+        context.setStrictExport(true);
+
+        Attribute<NonSecretField, String> attr = new Attribute<>("passwordPath", String.class);
+        NonSecretField dummyInstance = new NonSecretField("my-dummy-path");
+
+        ConfiguratorException exception = assertThrows(
+                ConfiguratorException.class,
+                () -> {
+                    attr.describe(dummyInstance, context);
+                },
+                "Should wrap generic exception into a ConfiguratorException in strict mode");
+
+        assertThat(
+                exception.getMessage(),
+                containsString("Failed to export io.jenkins.plugins.casc.AttributeTest$NonSecretField#passwordPath"));
+        assertThat(
+                exception.getCause().getMessage(),
+                containsString("Intentional generic failure from dummy configurator"));
     }
 }
