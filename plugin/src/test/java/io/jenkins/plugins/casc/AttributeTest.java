@@ -1,9 +1,15 @@
 package io.jenkins.plugins.casc;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.util.Secret;
+import io.jenkins.plugins.casc.model.CNode;
+import io.jenkins.plugins.casc.model.Scalar;
+import java.lang.reflect.Type;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.junit.jupiter.api.AfterEach;
@@ -229,5 +235,52 @@ public class AttributeTest {
         boolean secondUnknown = Attribute.calculateIfSecret(null, "someField");
         assertFalse(firstUnknown);
         assertFalse(secondUnknown, "Subsequent calls should return the same fallback FALSE result");
+    }
+
+    @Test
+    @SuppressWarnings("ExtractMethodRecommender")
+    void describeHandlesMissingConfiguratorCorrectly() throws Exception {
+        ConfiguratorRegistry dummyRegistry = new ConfiguratorRegistry() {
+            @Override
+            public RootElementConfigurator<?> lookupRootElement(String name) {
+                return null;
+            }
+
+            @Override
+            @NonNull
+            public <T> Configurator<T> lookupOrFail(Type type) throws ConfiguratorException {
+                throw new ConfiguratorException("Not found");
+            }
+
+            @Override
+            public <T> Configurator<T> lookup(Type type) {
+                return null;
+            }
+        };
+
+        ConfigurationContext context = new ConfigurationContext(dummyRegistry);
+
+        Attribute<NonSecretField, String> attr = new Attribute<>("passwordPath", String.class);
+        NonSecretField dummyInstance = new NonSecretField("my-dummy-path");
+
+        context.setStrictExport(false);
+        CNode node = attr.describe(dummyInstance, context);
+
+        assertInstanceOf(Scalar.class, node, "Should return a Scalar node on failure in non-strict mode");
+        assertTrue(
+                ((Scalar) node).getValue().contains("FAILED TO EXPORT"),
+                "Scalar should contain the fallback failure message");
+
+        context.setStrictExport(true);
+        ConfiguratorException exception = assertThrows(
+                ConfiguratorException.class,
+                () -> {
+                    attr.describe(dummyInstance, context);
+                },
+                "Should completely abort and throw ConfiguratorException in strict mode");
+
+        assertTrue(
+                exception.getMessage().contains("No configurator found"),
+                "Exception message should accurately reflect the missing configurator");
     }
 }

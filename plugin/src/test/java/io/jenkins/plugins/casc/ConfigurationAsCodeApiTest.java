@@ -3,8 +3,11 @@ package io.jenkins.plugins.casc;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertFalse;
 
+import java.io.ByteArrayOutputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -184,5 +187,19 @@ public class ConfigurationAsCodeApiTest {
             assertThat(response.getStatusCode(), is(200));
             assertThat(j.jenkins.getSystemMessage(), is("Hello Replace"));
         }
+    }
+
+    @Test
+    public void testExportStrictMode_SuccessOnCleanJenkins() throws Exception {
+        configureAdminSecurity();
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        ConfigurationAsCode.get().export(out, true);
+
+        String exportedYaml = out.toString(StandardCharsets.UTF_8);
+
+        assertThat(exportedYaml, containsString("jenkins:"));
+        assertFalse(exportedYaml.contains("FAILED TO EXPORT"));
     }
 }

@@ -595,10 +595,15 @@ public class ConfigurationAsCode extends ManagementLink {
 
     @Restricted(NoExternalUse.class)
     public void export(OutputStream out) throws Exception {
+        export(out, false);
+    }
 
+    @Restricted(NoExternalUse.class)
+    public void export(OutputStream out, boolean strict) throws Exception {
         final List<NodeTuple> tuples = new ArrayList<>();
 
         final ConfigurationContext context = new ConfigurationContext(registry);
+        context.setStrictExport(strict);
         for (RootElementConfigurator root : RootElementConfigurator.all()) {
             final CNode config = root.describe(root.getTargetComponent(context), context);
             final Node valueNode = toYaml(config);

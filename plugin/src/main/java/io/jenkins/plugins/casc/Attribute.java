@@ -241,8 +241,16 @@ public class Attribute<Owner, Type> {
     public CNode describe(Owner instance, ConfigurationContext context) throws ConfiguratorException {
         final Configurator c = context.lookup(type);
         if (c == null) {
-            return new Scalar("FAILED TO EXPORT\n" + instance.getClass().getName() + "#" + name
-                    + ": No configurator found for type " + type);
+            String errorMessage = "FAILED TO EXPORT\n" + instance.getClass().getName() + "#" + name
+                    + ": No configurator found for type " + type;
+
+            // --- NEW STRICT MODE CHECK FOR MISSING CONFIGURATOR ---
+            if (context.isStrictExport()) {
+                throw new ConfiguratorException(errorMessage);
+            }
+            // ------------------------------------------------------
+
+            return new Scalar(errorMessage);
         }
         try {
             Object o = getValue(instance);
@@ -267,7 +275,14 @@ public class Attribute<Owner, Type> {
                 return seq;
             }
             return _describe(c, context, o, shouldBeMasked);
-        } catch (Exception | /* Jenkins.getDescriptorOrDie */ AssertionError e) {
+        } catch (Exception | AssertionError e) {
+            if (context.isStrictExport()) {
+                if (e instanceof ConfiguratorException) {
+                    throw (ConfiguratorException) e;
+                }
+                throw new ConfiguratorException(
+                        "Failed to export " + instance.getClass().getName() + "#" + name, e);
+            }
             // Don't fail the whole export, prefer logging this error
             LOGGER.log(Level.WARNING, "Failed to export", e);
             return new Scalar(
