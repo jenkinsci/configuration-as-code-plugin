@@ -244,11 +244,9 @@ public class Attribute<Owner, Type> {
             String errorMessage = "FAILED TO EXPORT\n" + instance.getClass().getName() + "#" + name
                     + ": No configurator found for type " + type;
 
-            // --- NEW STRICT MODE CHECK FOR MISSING CONFIGURATOR ---
             if (context.isStrictExport()) {
                 throw new ConfiguratorException(errorMessage);
             }
-            // ------------------------------------------------------
 
             return new Scalar(errorMessage);
         }
