@@ -21,9 +21,13 @@ import io.jenkins.plugins.casc.RootElementConfigurator;
 import io.jenkins.plugins.casc.impl.attributes.MultivaluedAttribute;
 import io.jenkins.plugins.casc.model.Mapping;
 import io.vavr.control.Try;
+import hudson.model.Computer;
+import hudson.slaves.OfflineCause;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -71,14 +75,35 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
                         .filter(node -> !isCloudNode(node))
                         .collect(Collectors.toList()))
                 .setter((jenkins, configuredNodes) -> {
-                    List<String> configuredNodesNames =
-                            configuredNodes.stream().map(Node::getNodeName).collect(Collectors.toList());
+                    Set<String> configuredNodeNames =
+                            configuredNodes.stream().map(Node::getNodeName).collect(Collectors.toSet());
+
+                    // Capture temporarily offline state before replacing nodes so it survives reload.
+                    // Jenkins core may reset Computer state when setNode() is called with a new instance.
+                    Map<String, OfflineCause> previousOfflineCauses = new HashMap<>();
+                    for (Node node : jenkins.getNodes()) {
+                        if (configuredNodeNames.contains(node.getNodeName())) {
+                            Computer computer = node.toComputer();
+                            if (computer != null && computer.isTemporarilyOffline()) {
+                                previousOfflineCauses.put(node.getNodeName(), computer.getOfflineCause());
+                            }
+                        }
+                    }
+
                     List<Node> nodesToKeep = jenkins.getNodes().stream()
-                            .filter(node -> !configuredNodesNames.contains(node.getNodeName()))
+                            .filter(node -> !configuredNodeNames.contains(node.getNodeName()))
                             .filter(this::isCloudNode)
                             .collect(Collectors.toList());
                     nodesToKeep.addAll(configuredNodes);
                     jenkins.setNodes(nodesToKeep);
+
+                    // Restore temporarily offline state for nodes that were offline before the reload.
+                    previousOfflineCauses.forEach((name, cause) -> {
+                        Computer computer = jenkins.getComputer(name);
+                        if (computer != null) {
+                            computer.setTemporarilyOffline(true, cause);
+                        }
+                    });
                 }));
 
         // Add updateCenter, all legwork will be done by a configurator

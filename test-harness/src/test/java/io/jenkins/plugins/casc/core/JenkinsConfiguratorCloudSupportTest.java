@@ -7,14 +7,17 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import hudson.Extension;
+import hudson.model.Computer;
 import hudson.model.Descriptor;
 import hudson.model.Node;
 import hudson.model.TaskListener;
 import hudson.slaves.AbstractCloudComputer;
 import hudson.slaves.AbstractCloudSlave;
 import hudson.slaves.EphemeralNode;
+import hudson.slaves.OfflineCause;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.ConfiguratorRegistry;
@@ -92,6 +95,26 @@ class JenkinsConfiguratorCloudSupportTest {
         assertNotNull(j.jenkins.getNode("agent1"), "Slave 1");
         assertNotNull(j.jenkins.getNode("agent2"), "Slave 1");
         assertNotNull(j.jenkins.getNode("testCloud"), "Slave cloud");
+    }
+
+    @Test
+    @ConfiguredWithCode("JenkinsConfiguratorCloudSupportTest.yml")
+    void should_preserve_offline_state_after_reload(JenkinsConfiguredWithCodeRule j) throws Exception {
+        Node agent1 = j.jenkins.getNode("agent1");
+        assertNotNull(agent1, "agent1 should exist before reload");
+        Computer computer = agent1.toComputer();
+        assertNotNull(computer, "agent1 computer should exist");
+        computer.setTemporarilyOffline(true, new OfflineCause.UserCause(null, "maintenance"));
+        assertTrue(computer.isTemporarilyOffline(), "agent1 should be offline before reload");
+
+        ConfigurationAsCode.get()
+                .configure(this.getClass()
+                        .getResource("JenkinsConfiguratorCloudSupportTest.yml")
+                        .toString());
+
+        Computer reloadedComputer = j.jenkins.getComputer("agent1");
+        assertNotNull(reloadedComputer, "agent1 computer should exist after reload");
+        assertTrue(reloadedComputer.isTemporarilyOffline(), "agent1 should remain offline after config reload");
     }
 
     @Test
