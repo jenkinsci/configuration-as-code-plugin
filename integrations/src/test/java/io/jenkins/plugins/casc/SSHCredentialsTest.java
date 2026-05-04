@@ -118,4 +118,15 @@ class SSHCredentialsTest {
             return Optional.empty();
         }
     }
+
+    @Test
+    @ConfiguredWithCode("SSHCredentialsTest_Recursive_Key.yml")
+    @Issue("https://github.com/jenkinsci/configuration-as-code-plugin/issues/2488")
+    void shouldSupportRecursiveBase64Certificates(JenkinsConfiguredWithCodeRule j) {
+        BasicSSHUserPrivateKey certKey = getCredentials(BasicSSHUserPrivateKey.class);
+        assertThat(
+                "Private key roundtrip failed",
+                certKey.getPrivateKeys().get(0).trim().replace("\r\n", "\n"),
+                equalTo(MySSHKeySecretSource.PRIVATE_SSH_KEY));
+    }
 }
