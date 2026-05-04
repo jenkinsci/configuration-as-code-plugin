@@ -595,12 +595,13 @@ public class ConfigurationAsCode extends ManagementLink {
 
     @Restricted(NoExternalUse.class)
     public void export(OutputStream out) throws Exception {
-
         final List<NodeTuple> tuples = new ArrayList<>();
 
         final ConfigurationContext context = new ConfigurationContext(registry);
-        for (RootElementConfigurator root : RootElementConfigurator.all()) {
-            final CNode config = root.describe(root.getTargetComponent(context), context);
+        Optional.ofNullable(GlobalConfiguration.all().get(CasCGlobalConfig.class))
+                .ifPresent(c -> context.setStrictExport(c.isStrictExport()));
+        for (RootElementConfigurator<?> root : RootElementConfigurator.all()) {
+            final CNode config = describeRoot(root, context);
             final Node valueNode = toYaml(config);
             if (valueNode == null) {
                 continue;
@@ -614,6 +615,11 @@ public class ConfigurationAsCode extends ManagementLink {
         } catch (IOException e) {
             throw new YAMLException(e);
         }
+    }
+
+    private <T> CNode describeRoot(RootElementConfigurator<T> root, ConfigurationContext context) throws Exception {
+        T component = root.getTargetComponent(context);
+        return root.describe(component, context);
     }
 
     @Restricted(NoExternalUse.class) // for testing only
