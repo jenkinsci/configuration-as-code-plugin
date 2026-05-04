@@ -5,6 +5,7 @@ import static io.jenkins.plugins.casc.Attribute.noop;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.ProxyConfiguration;
+import hudson.model.Computer;
 import hudson.model.ComputerSet;
 import hudson.model.Descriptor;
 import hudson.model.Node;
@@ -13,6 +14,7 @@ import hudson.model.labels.LabelAtom;
 import hudson.node_monitors.NodeMonitor;
 import hudson.slaves.AbstractCloudSlave;
 import hudson.slaves.EphemeralNode;
+import hudson.slaves.OfflineCause;
 import hudson.util.DescribableList;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.BaseConfigurator;
@@ -21,8 +23,6 @@ import io.jenkins.plugins.casc.RootElementConfigurator;
 import io.jenkins.plugins.casc.impl.attributes.MultivaluedAttribute;
 import io.jenkins.plugins.casc.model.Mapping;
 import io.vavr.control.Try;
-import hudson.model.Computer;
-import hudson.slaves.OfflineCause;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -78,7 +78,7 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
                     Set<String> configuredNodeNames =
                             configuredNodes.stream().map(Node::getNodeName).collect(Collectors.toSet());
 
-                    // Capture temporarily offline state before replacing nodes so it survives reload.
+                    // Capture offline state before replacing nodes so it survives reload.
                     // Jenkins core may reset Computer state when setNode() is called with a new instance.
                     Map<String, OfflineCause> previousOfflineCauses = new HashMap<>();
                     for (Node node : jenkins.getNodes()) {
@@ -97,7 +97,7 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
                     nodesToKeep.addAll(configuredNodes);
                     jenkins.setNodes(nodesToKeep);
 
-                    // Restore temporarily offline state for nodes that were offline before the reload.
+                    // Restore offline state for nodes that were offline before the reload.
                     previousOfflineCauses.forEach((name, cause) -> {
                         Computer computer = jenkins.getComputer(name);
                         if (computer != null) {
