@@ -14,7 +14,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
  * every node that is <em>not</em> listed in the YAML. Nodes created dynamically at runtime (e.g.
  * by aquarium-gateway) are not in the YAML and would normally be deleted.
  *
- * <p>Attaching this property to a node signals {@link JenkinsConfigurator#isCloudNode} to treat it
+ * <p>Attaching this property to a node signals {@link JenkinsConfigurator#shouldKeepNode} to treat it
  * like a cloud-provisioned node and skip it during reconciliation, so the node survives reloads
  * without needing to implement {@link hudson.slaves.EphemeralNode} or extend
  * {@link hudson.slaves.AbstractCloudSlave}.

@@ -69,14 +69,14 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
         // Override "nodes" getter so we don't export Nodes registered by Cloud plugins
         Attribute.<Jenkins, List<Node>>get(attributes, "nodes").ifPresent(attribute -> attribute
                 .getter(jenkins -> jenkins.getNodes().stream()
-                        .filter(node -> !isCloudNode(node))
+                        .filter(node -> !shouldKeepNode(node))
                         .collect(Collectors.toList()))
                 .setter((jenkins, configuredNodes) -> {
                     List<String> configuredNodesNames =
                             configuredNodes.stream().map(Node::getNodeName).collect(Collectors.toList());
                     List<Node> nodesToKeep = jenkins.getNodes().stream()
                             .filter(node -> !configuredNodesNames.contains(node.getNodeName()))
-                            .filter(this::isCloudNode)
+                            .filter(this::shouldKeepNode)
                             .collect(Collectors.toList());
                     nodesToKeep.addAll(configuredNodes);
                     jenkins.setNodes(nodesToKeep);
@@ -138,7 +138,7 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
         return null;
     }
 
-    private boolean isCloudNode(Node node) {
+    private boolean shouldKeepNode(Node node) {
         boolean instantiable =
                 Try.of(() -> node.getDescriptor().isInstantiable()).getOrElse(true);
         final boolean cloudSlave = node instanceof AbstractCloudSlave;
