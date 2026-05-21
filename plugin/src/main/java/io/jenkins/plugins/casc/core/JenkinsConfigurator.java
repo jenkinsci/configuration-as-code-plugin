@@ -75,7 +75,6 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
                             configuredNodes.stream().map(Node::getNodeName).collect(Collectors.toList());
                     List<Node> nodesToKeep = jenkins.getNodes().stream()
                             .filter(node -> !configuredNodesNames.contains(node.getNodeName()))
-                            .filter(this::isCloudNode)
                             .collect(Collectors.toList());
                     nodesToKeep.addAll(configuredNodes);
                     jenkins.setNodes(nodesToKeep);

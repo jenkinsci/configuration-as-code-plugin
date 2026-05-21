@@ -36,7 +36,7 @@ class JenkinsConfiguratorCloudSupportTest {
     }
 
     @Test
-    void should_remove_normal_nodes_configured_after_reload(JenkinsConfiguredWithCodeRule j) throws Exception {
+    void should_preserve_non_yaml_nodes_on_reload(JenkinsConfiguredWithCodeRule j) throws Exception {
         final Node slave = new StaticPretendSlave();
         j.jenkins.addNode(slave);
 
@@ -44,7 +44,10 @@ class JenkinsConfiguratorCloudSupportTest {
                 .configure(this.getClass()
                         .getResource("JenkinsConfiguratorCloudSupportTest.yml")
                         .toString());
-        assertEquals(2, j.jenkins.getNodes().size(), "Base nodes not found");
+        assertEquals(3, j.jenkins.getNodes().size(), "Non-YAML node should be preserved");
+        assertNotNull(j.jenkins.getNode("agent1"), "YAML node agent1");
+        assertNotNull(j.jenkins.getNode("agent2"), "YAML node agent2");
+        assertNotNull(j.jenkins.getNode("testCloud"), "Manually-added node");
     }
 
     @Test
