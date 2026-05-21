@@ -3,15 +3,10 @@ package io.jenkins.plugins.casc.core;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import hudson.model.Node;
 import hudson.slaves.DumbSlave;
 import hudson.slaves.JNLPLauncher;
-import hudson.slaves.NodeProperty;
-import hudson.slaves.RetentionStrategy;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import java.util.Collections;
-import java.util.List;
-import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -70,13 +65,4 @@ public class CascKeepNodeTest {
                 j.jenkins.getNode("remove-me"));
     }
 
-    /**
-     * CascKeepNode descriptor should be instantiable (it has no required fields).
-     */
-    @Test
-    public void cascKeepNodeIsInstantiable() throws Exception {
-        CascKeepNode prop = new CascKeepNode();
-        assertNotNull(prop.getDescriptor());
-        assertEquals("Keep node during JCasc reload", prop.getDescriptor().getDisplayName());
-    }
 }

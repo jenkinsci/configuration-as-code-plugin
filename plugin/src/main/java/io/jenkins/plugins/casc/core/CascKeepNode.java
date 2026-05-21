@@ -30,7 +30,7 @@ public class CascKeepNode extends NodeProperty<Node> {
         @NonNull
         @Override
         public String getDisplayName() {
-            return "Keep node during JCasc reload";
+            return "Keep node during Configuration as Code reload";
         }
     }
 }

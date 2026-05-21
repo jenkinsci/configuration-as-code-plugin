@@ -1,1 +1,2 @@
-jenkins: {}
+jenkins:
+  nodes: []
