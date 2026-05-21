@@ -25,10 +25,7 @@ public class CascKeepNodeTest {
      */
     @Test
     public void nodeWithCascKeepNodePropertySurvivesReload() throws Exception {
-        DumbSlave node = new DumbSlave(
-                "keep-me",
-                "/tmp/workspace",
-                new JNLPLauncher(true));
+        DumbSlave node = new DumbSlave("keep-me", "/tmp/workspace", new JNLPLauncher(true));
         node.setNodeProperties(Collections.singletonList(new CascKeepNode()));
         j.jenkins.addNode(node);
 
@@ -36,8 +33,8 @@ public class CascKeepNodeTest {
 
         // Reload from an empty config — no nodes: block, so reconcile would normally
         // delete every node not listed in the YAML.
-        ConfigurationAsCode.get().configure(
-                getClass().getResource("empty-casc.yaml").toExternalForm());
+        ConfigurationAsCode.get()
+                .configure(getClass().getResource("empty-casc.yaml").toExternalForm());
 
         assertNotNull("Node should survive reload because it has CascKeepNode", j.jenkins.getNode("keep-me"));
     }
@@ -48,21 +45,15 @@ public class CascKeepNodeTest {
      */
     @Test
     public void nodeWithoutCascKeepNodeIsRemovedOnReload() throws Exception {
-        DumbSlave node = new DumbSlave(
-                "remove-me",
-                "/tmp/workspace",
-                new JNLPLauncher(true));
+        DumbSlave node = new DumbSlave("remove-me", "/tmp/workspace", new JNLPLauncher(true));
         j.jenkins.addNode(node);
 
         assertNotNull("Node should exist before reload", j.jenkins.getNode("remove-me"));
 
-        ConfigurationAsCode.get().configure(
-                getClass().getResource("empty-casc.yaml").toExternalForm());
+        ConfigurationAsCode.get()
+                .configure(getClass().getResource("empty-casc.yaml").toExternalForm());
 
         assertEquals(
-                "Plain node without CascKeepNode should be deleted on reload",
-                null,
-                j.jenkins.getNode("remove-me"));
+                "Plain node without CascKeepNode should be deleted on reload", null, j.jenkins.getNode("remove-me"));
     }
-
 }

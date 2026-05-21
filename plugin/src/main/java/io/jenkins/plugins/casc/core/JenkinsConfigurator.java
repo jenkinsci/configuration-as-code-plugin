@@ -13,7 +13,6 @@ import hudson.model.labels.LabelAtom;
 import hudson.node_monitors.NodeMonitor;
 import hudson.slaves.AbstractCloudSlave;
 import hudson.slaves.EphemeralNode;
-import hudson.slaves.NodeProperty;
 import hudson.util.DescribableList;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.BaseConfigurator;
