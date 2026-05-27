@@ -1,9 +1,7 @@
 package io.jenkins.plugins.casc;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
-import hudson.Functions;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,9 +29,6 @@ class CascJmhBenchmarkStateTest {
 
     @Test
     void testJmhBenchmarks() throws Exception {
-        assumeFalse(
-                Functions.isWindows() && System.getenv("CI") != null,
-                "TODO Cannot run program C:\\openjdk-11\\bin\\java.exe: CreateProcess error=206, The filename or extension is too long");
         // number of iterations is kept to a minimum just to verify that the benchmarks work without spending extra
         // time during builds.
         ChainedOptionsBuilder optionsBuilder = new OptionsBuilder()
@@ -44,7 +39,11 @@ class CascJmhBenchmarkStateTest {
                 .shouldFailOnError(true)
                 .result(reportPath)
                 .timeUnit(TimeUnit.MICROSECONDS)
-                .resultFormat(ResultFormatType.JSON);
+                .resultFormat(ResultFormatType.JSON)
+                .jvmArgsAppend(
+                        "-Djmh.separateClasspathJAR=true",
+                        "-Djava.io.tmpdir=" + Paths.get("target").toAbsolutePath());
+
         new BenchmarkFinder(getClass()).findBenchmarks(optionsBuilder);
         new Runner(optionsBuilder.build()).run();
 
