@@ -11,6 +11,7 @@ import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
 import org.junit.jupiter.api.Test;
 
 @WithJenkinsConfiguredWithCode
+@SuppressWarnings("unused")
 class SchemaGenerationTest {
 
     @Test
@@ -52,6 +53,14 @@ class SchemaGenerationTest {
         assertThat(
                 validateSchema(convertYamlFileToJson(this, "attributesNotFlattenedToTop.yml")),
                 contains("#/tool: extraneous key [acceptLicense] is not permitted"));
+    }
+
+    @Test
+    void rejectsObsoleteOrUnknownAttributesInHeteroDescribable(JenkinsConfiguredWithCodeRule j) throws Exception {
+        assertThat(
+                validateSchema(convertYamlFileToJson(this, "invalidHeteroConfig.yml")),
+                contains(
+                        "#/jenkins/crumbIssuer/standard: extraneous key [someCompletelyFakeProperty] is not permitted"));
     }
 
     //    For testing manually
