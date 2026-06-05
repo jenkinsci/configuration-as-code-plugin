@@ -205,7 +205,6 @@ public class SchemaGeneration {
         Optional<String> description = getDescription(attribute, baseConfigurator);
         switch (attribute.type.getName()) {
             case "java.lang.String":
-            case "hudson.Secret":
             case "hudson.util.Secret":
                 attributeType.put("type", "string");
                 description.ifPresent(desc -> attributeType.put("description", desc));
