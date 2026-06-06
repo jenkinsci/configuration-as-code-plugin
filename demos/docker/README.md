@@ -33,6 +33,16 @@ jenkins:
             instanceCapStr: "10"
             retentionStrategy:
               idleMinutes: 1
+          - labelString: "worker1-agent"
+            dockerTemplateBase:
+              image: "jenkins/ssh-agent:latest-jdk17"
+            remoteFs: "/home/jenkins/agent"
+            connector:
+              ssh:
+                port: 22
+                sshKeyStrategy:
+                  injectSSHKey:
+                    user: "root"
 ```
 
 ## implementation note

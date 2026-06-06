@@ -10,6 +10,7 @@ import com.nirima.jenkins.plugins.docker.DockerTemplate;
 import com.nirima.jenkins.plugins.docker.strategy.DockerOnceRetentionStrategy;
 import hudson.model.Label;
 import io.jenkins.docker.connector.DockerComputerAttachConnector;
+import io.jenkins.docker.connector.DockerComputerSSHConnector;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import org.junit.Rule;
@@ -49,6 +50,19 @@ public class DockerCloudTest {
                 "hello=world\nfoo=bar");
         assertTrue(template.getRetentionStrategy() instanceof DockerOnceRetentionStrategy);
         assertEquals(1, ((DockerOnceRetentionStrategy) template.getRetentionStrategy()).getIdleMinutes());
+        final DockerTemplate sshTemplate = docker.getTemplate("jenkins/ssh-agent:latest-jdk17");
+        assertNotNull(sshTemplate);
+        assertEquals("worker1-agent", sshTemplate.getLabelString());
+        assertEquals("/home/jenkins/agent", sshTemplate.getRemoteFs());
+        assertTrue(sshTemplate.getConnector() instanceof DockerComputerSSHConnector);
+
+        DockerComputerSSHConnector sshConnector = (DockerComputerSSHConnector) sshTemplate.getConnector();
+        assertEquals(22, sshConnector.getPort());
+        assertTrue(sshConnector.getSshKeyStrategy() instanceof DockerComputerSSHConnector.InjectSSHKey);
+
+        DockerComputerSSHConnector.InjectSSHKey injectStrategy =
+                (DockerComputerSSHConnector.InjectSSHKey) sshConnector.getSshKeyStrategy();
+        assertEquals("root", injectStrategy.getUser());
     }
 
     @Test
@@ -76,6 +90,9 @@ public class DockerCloudTest {
                 },
                 "hello=world\nfoo=bar");
 
+        DockerTemplate sshTemplate = docker.getTemplate(Label.get("worker1-agent"));
+        assertNotNull(sshTemplate);
+        assertTrue(sshTemplate.getConnector() instanceof DockerComputerSSHConnector);
         ConfigurationAsCode.get()
                 .configure(getClass().getResource("DockerCloudTest2.yml").toExternalForm());
 
