@@ -32,6 +32,12 @@ unclassified:
           skipScmCause: true
           skipUpstreamCause: true
           envVar: "envVar"
+
+tool:
+  sonarRunnerInstallation:
+    installations:
+      - name: "SonarScanner"
+        home: "/opt/sonar-scanner"
 ```
 
 ## notes
