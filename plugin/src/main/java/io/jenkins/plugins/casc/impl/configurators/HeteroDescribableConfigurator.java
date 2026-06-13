@@ -301,7 +301,9 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
     private Tuple2<String, Option<CNode>> configureMapping(CNode config) {
         Mapping mapping = unchecked(config::asMapping).apply();
         if (mapping.size() != 1) {
-            throw new IllegalArgumentException("Single entry map expected to configure a " + target.getName());
+            String keys = String.join(", ", mapping.keySet());
+            throw new IllegalArgumentException("Single entry map expected to configure a " + target.getName()
+                    + " but found multiple entries: [" + keys + "]");
         } else {
             Map.Entry<String, CNode> next = mapping.entrySet().iterator().next();
             return Tuple.of(next.getKey(), Option.some(next.getValue()));

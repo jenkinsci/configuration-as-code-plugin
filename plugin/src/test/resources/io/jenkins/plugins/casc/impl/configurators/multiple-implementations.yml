@@ -1,0 +1,6 @@
+jenkins:
+  securityRealm:
+    dummyOic:
+      serverConfiguration:
+        wellKnown: {}
+        manual: {}
