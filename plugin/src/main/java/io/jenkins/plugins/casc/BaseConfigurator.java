@@ -259,7 +259,9 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
         if (!c.isPrimitive() && !c.isEnum() && Modifier.isAbstract(c.getModifiers())) {
             if (!Describable.class.isAssignableFrom(c)) {
                 // Not a Describable, so we don't know how to detect concrete implementation type
-                LOGGER.warning("Can't handle " + getTarget() + "#" + name + ": type is abstract but not Describable.");
+                LOGGER.log(
+                        Level.FINE,
+                        "Can't handle " + getTarget() + "#" + name + ": type is abstract but not Describable.");
                 return null;
             }
             attribute = new DescribableAttribute(name, c);
