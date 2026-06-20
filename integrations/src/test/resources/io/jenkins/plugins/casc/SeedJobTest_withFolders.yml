@@ -1,0 +1,12 @@
+jobs:
+  - script: |
+      folder('Non-Production-CAF')
+      folder('Non-Production-CAF/bootstrap')
+      pipelineJob('Non-Production-CAF/bootstrap/bootstrap-levels-nprd') {
+          definition {
+              cps {
+                  script("pipeline { agent any; stages { stage('Test') { steps { echo 'Automated success' } } } }")
+                  sandbox()
+              }
+          }
+      }

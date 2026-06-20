@@ -14,7 +14,7 @@ The Job DSL plugin uses groovy syntax for its job configuration DSL, so a mix of
 
 [gitea.yaml](gitea.yaml) file is an example of a configuration file with Jenkins and an Organization Folder Job Type with automatic branch discovering in Gitea. It requires [Branch API plugin](https://github.com/jenkinsci/branch-api-plugin) and [Gitea plugin](https://github.com/jenkinsci/gitea-plugin) to be able to run this demo. `$GITEA_URL` is a system environment variable that needs to be defined before Jenkins is started.
 
-[pipeline.yaml](pipeline.yaml) file is an example of configuring a folder and a declarative pipeline job within that folder.
+[pipeline.yaml](pipeline.yaml) file is an example of configuring a folder and a declarative pipeline job within that folder using Job DSL path-based job names.
 
 [multibranch-github.yaml](multibranch-github.yaml) file is an example of a multibranch pipeline job configured with GitHub as branch source, an orphaned item strategy and periodic scan triggers of 5 mins.
 

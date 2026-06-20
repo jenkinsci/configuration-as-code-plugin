@@ -56,6 +56,16 @@ public class SeedJobTest {
     }
 
     @Test
+    @ConfiguredWithCode("SeedJobTest_withFolders.yml")
+    public void configure_jobs_in_folders() {
+        final Jenkins jenkins = Jenkins.get();
+
+        assertNotNull(jenkins.getItem("Non-Production-CAF"));
+        assertNotNull(jenkins.getItemByFullName("Non-Production-CAF/bootstrap"));
+        assertNotNull(jenkins.getItemByFullName("Non-Production-CAF/bootstrap/bootstrap-levels-nprd"));
+    }
+
+    @Test
     @ConfiguredWithCode("SeedJobTest_withSecurityConfig.yml")
     @Envs(@Env(name = "SEED_JOB_FOLDER_FILE_PATH", value = "."))
     public void configure_seed_job_with_security_config() throws Exception {
