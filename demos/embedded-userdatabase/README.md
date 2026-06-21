@@ -31,7 +31,8 @@ jenkins:
         - id: "admin"
           name: "Admin"
           description: "Superwoman"
-          password: "somethingsecret"
+          # Use trim when reading secrets from files that may contain trailing newlines
+          password: "${trim:${readFile:/run/secrets/admin_password}}"
           properties:
             - mailer:
                 emailAddress: "admin3@example.com"
