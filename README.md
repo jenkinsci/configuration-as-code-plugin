@@ -95,7 +95,7 @@ credentials:
                   privateKey: ${SSH_PRIVATE_KEY}
 ```
 
-> **Note:** JCasC treats `${VAR}` as a variable interpolation expression across all configuration blocks. If you need a literal `${...}` string (such as in inline shell scripts or agent tools like `${WORKSPACE}`), you must escape it as `^${VAR}` to prevent JCasC from replacing it. For more details, see [Handling Secrets](./docs/features/secrets.adoc).
+> **Note:** JCasC treats `${VAR}` as a variable interpolation expression across all configuration blocks. If you need a literal `${...}` string, you must escape it as `^${VAR}` to prevent JCasC from replacing it. For more details, see [Handling Secrets](./docs/features/secrets.adoc).
 
 Additionally, we want to have a well-documented syntax file and tooling to assist in writing and testing,
 so end users have full guidance in using this toolset and do not have to search for examples on the Internet.
