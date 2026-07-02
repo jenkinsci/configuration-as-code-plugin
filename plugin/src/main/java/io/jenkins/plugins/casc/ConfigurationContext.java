@@ -44,6 +44,8 @@ public class ConfigurationContext implements ConfiguratorRegistry {
 
     private transient SecretSourceResolver secretSourceResolver;
 
+    private boolean strictExport = false;
+
     public ConfigurationContext(ConfiguratorRegistry registry) {
         this(registry, null);
     }
@@ -124,6 +126,14 @@ public class ConfigurationContext implements ConfiguratorRegistry {
 
     public int getYamlCodePointLimit() {
         return yamlCodePointLimit;
+    }
+
+    public boolean isStrictExport() {
+        return strictExport;
+    }
+
+    public void setStrictExport(boolean strictExport) {
+        this.strictExport = strictExport;
     }
 
     // --- delegate methods for ConfigurationContext

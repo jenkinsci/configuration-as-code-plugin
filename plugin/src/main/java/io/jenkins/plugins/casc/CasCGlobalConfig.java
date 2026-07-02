@@ -15,6 +15,7 @@ import org.kohsuke.stapler.StaplerRequest2;
 public class CasCGlobalConfig extends GlobalConfiguration {
 
     private String configurationPath;
+    private boolean strictExport = false;
 
     @DataBoundConstructor
     public CasCGlobalConfig(String configurationPath) {
@@ -38,6 +39,15 @@ public class CasCGlobalConfig extends GlobalConfiguration {
     @DataBoundSetter
     public void setConfigurationPath(String configurationPath) {
         this.configurationPath = configurationPath;
+    }
+
+    public boolean isStrictExport() {
+        return strictExport;
+    }
+
+    @DataBoundSetter
+    public void setStrictExport(boolean strictExport) {
+        this.strictExport = strictExport;
     }
 
     @Override
