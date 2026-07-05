@@ -24,6 +24,7 @@ public class ConfigurationAsCodeApiTest {
     public JenkinsRule j = new JenkinsRule();
 
     private static final String ENDPOINT = "configuration-as-code/configure";
+    private static final String SCHEMA_ENDPOINT = "manage/configuration-as-code/schema";
     private static final String YAML_CONTENT_TYPE = "application/yaml";
     private static final String ADMIN = "admin";
 
@@ -183,6 +184,62 @@ public class ConfigurationAsCodeApiTest {
 
             assertThat(response.getStatusCode(), is(200));
             assertThat(j.jenkins.getSystemMessage(), is("Hello Replace"));
+        }
+    }
+
+    @Test
+    public void testDoSchema_DefaultIsProtected() throws Exception {
+        j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
+        j.jenkins.setAuthorizationStrategy(
+                new MockAuthorizationStrategy().grant(Jenkins.READ).everywhere().toEveryone());
+
+        try (JenkinsRule.WebClient wc = j.createWebClient()) {
+            wc.setThrowExceptionOnFailingStatusCode(false);
+
+            WebRequest request = new WebRequest(new URL(j.getURL(), SCHEMA_ENDPOINT), HttpMethod.GET);
+            WebResponse response = wc.getPage(request).getWebResponse();
+
+            assertThat(response.getStatusCode(), is(403));
+        }
+    }
+
+    @Test
+    public void testDoSchema_AuthorizedUserCanAccess() throws Exception {
+        configureAdminSecurity();
+
+        try (JenkinsRule.WebClient wc = j.createWebClient().withBasicApiToken(ADMIN)) {
+            wc.setThrowExceptionOnFailingStatusCode(false);
+
+            WebRequest request = new WebRequest(new URL(j.getURL(), SCHEMA_ENDPOINT), HttpMethod.GET);
+            WebResponse response = wc.getPage(request).getWebResponse();
+
+            assertThat(response.getStatusCode(), is(200));
+            assertThat(response.getContentType(), is("application/json"));
+        }
+    }
+
+    @Test
+    public void testDoSchema_AnonymousAccessWhenPropertyEnabled() throws Exception {
+        j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
+        j.jenkins.setAuthorizationStrategy(
+                new MockAuthorizationStrategy().grant(Jenkins.READ).everywhere().toEveryone());
+
+        String propertyName = "io.jenkins.plugins.casc.allowAnonymousSchema";
+
+        try {
+            System.setProperty(propertyName, "true");
+
+            try (JenkinsRule.WebClient wc = j.createWebClient()) {
+                wc.setThrowExceptionOnFailingStatusCode(false);
+
+                WebRequest request = new WebRequest(new URL(j.getURL(), SCHEMA_ENDPOINT), HttpMethod.GET);
+                WebResponse response = wc.getPage(request).getWebResponse();
+
+                assertThat(response.getStatusCode(), is(200));
+                assertThat(response.getContentType(), is("application/json"));
+            }
+        } finally {
+            System.clearProperty(propertyName);
         }
     }
 }

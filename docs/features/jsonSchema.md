@@ -27,6 +27,13 @@ http://json-schema.org/draft-07/schema#
 === How to use
 
 * The schema will be available at /configuration-as-code/schema
+* By default, the endpoint requires `SYSTEM_READ` permission.
+* To allow anonymous access, start Jenkins with the following Java system property:
+
+  ```
+  -Dio.jenkins.plugins.casc.allowAnonymousSchema=true
+  ```
+
 * Users can use various online JSON validators to check against their YAML/json.
 
 === Progress

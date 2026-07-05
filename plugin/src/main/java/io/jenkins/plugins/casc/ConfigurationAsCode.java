@@ -110,6 +110,7 @@ public class ConfigurationAsCode extends ManagementLink {
     public static final String CASC_JENKINS_CONFIG_ENV = "CASC_JENKINS_CONFIG";
     public static final String DEFAULT_JENKINS_YAML_PATH = "jenkins.yaml";
     public static final String YAML_FILES_PATTERN = "glob:**.{yml,yaml,YAML,YML}";
+    private static final String ALLOW_ANONYMOUS_SCHEMA_PROPERTY = "io.jenkins.plugins.casc.allowAnonymousSchema";
 
     private static final Logger LOGGER = Logger.getLogger(ConfigurationAsCode.class.getName());
 
@@ -554,7 +555,8 @@ public class ConfigurationAsCode extends ManagementLink {
      */
     @Restricted(NoExternalUse.class)
     public void doSchema(StaplerRequest2 req, StaplerResponse2 res) throws Exception {
-        if (!Jenkins.get().hasPermission(Jenkins.SYSTEM_READ)) {
+        boolean allowAnonymous = Boolean.getBoolean(ALLOW_ANONYMOUS_SCHEMA_PROPERTY);
+        if (!allowAnonymous && !Jenkins.get().hasPermission(Jenkins.SYSTEM_READ)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
