@@ -15,6 +15,7 @@ import org.htmlunit.WebResponse;
 import org.htmlunit.util.NameValuePair;
 import org.junit.Rule;
 import org.junit.Test;
+import org.jvnet.hudson.test.FlagRule;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.MockAuthorizationStrategy;
 
@@ -22,6 +23,10 @@ public class ConfigurationAsCodeApiTest {
 
     @Rule
     public JenkinsRule j = new JenkinsRule();
+
+    @Rule
+    public final FlagRule<String> anonymousSchemaFlag =
+            FlagRule.systemProperty(ConfigurationAsCode.ALLOW_ANONYMOUS_SCHEMA_PROPERTY);
 
     private static final String ENDPOINT = "configuration-as-code/configure";
     private static final String SCHEMA_ENDPOINT = "manage/configuration-as-code/schema";
@@ -224,22 +229,16 @@ public class ConfigurationAsCodeApiTest {
         j.jenkins.setAuthorizationStrategy(
                 new MockAuthorizationStrategy().grant(Jenkins.READ).everywhere().toEveryone());
 
-        String propertyName = "io.jenkins.plugins.casc.allowAnonymousSchema";
+        System.setProperty(ConfigurationAsCode.ALLOW_ANONYMOUS_SCHEMA_PROPERTY, "true");
 
-        try {
-            System.setProperty(propertyName, "true");
+        try (JenkinsRule.WebClient wc = j.createWebClient()) {
+            wc.setThrowExceptionOnFailingStatusCode(false);
 
-            try (JenkinsRule.WebClient wc = j.createWebClient()) {
-                wc.setThrowExceptionOnFailingStatusCode(false);
+            WebRequest request = new WebRequest(new URL(j.getURL(), SCHEMA_ENDPOINT), HttpMethod.GET);
+            WebResponse response = wc.getPage(request).getWebResponse();
 
-                WebRequest request = new WebRequest(new URL(j.getURL(), SCHEMA_ENDPOINT), HttpMethod.GET);
-                WebResponse response = wc.getPage(request).getWebResponse();
-
-                assertThat(response.getStatusCode(), is(200));
-                assertThat(response.getContentType(), is("application/json"));
-            }
-        } finally {
-            System.clearProperty(propertyName);
+            assertThat(response.getStatusCode(), is(200));
+            assertThat(response.getContentType(), is("application/json"));
         }
     }
 }

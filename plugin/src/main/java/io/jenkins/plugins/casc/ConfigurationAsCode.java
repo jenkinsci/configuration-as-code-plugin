@@ -110,7 +110,7 @@ public class ConfigurationAsCode extends ManagementLink {
     public static final String CASC_JENKINS_CONFIG_ENV = "CASC_JENKINS_CONFIG";
     public static final String DEFAULT_JENKINS_YAML_PATH = "jenkins.yaml";
     public static final String YAML_FILES_PATTERN = "glob:**.{yml,yaml,YAML,YML}";
-    private static final String ALLOW_ANONYMOUS_SCHEMA_PROPERTY = "io.jenkins.plugins.casc.allowAnonymousSchema";
+    public static final String ALLOW_ANONYMOUS_SCHEMA_PROPERTY = "io.jenkins.plugins.casc.allowAnonymousSchema";
 
     private static final Logger LOGGER = Logger.getLogger(ConfigurationAsCode.class.getName());
 
