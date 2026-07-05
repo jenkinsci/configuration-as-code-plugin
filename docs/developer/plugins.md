@@ -254,6 +254,13 @@ You can find some examples here
 1. [kubernetes-plugin](https://github.com/jenkinsci/kubernetes-plugin/blob/master/src/test/resources/org/csanchez/jenkins/plugins/kubernetes/casc/configuration-as-code.yaml)
 2. [azure-cosmosdb-plugin](https://github.com/jenkinsci/azure-cosmosdb-plugin/blob/main/src/test/resources/io/jenkins/plugins/azurecosmosdb/configuration-as-code.yml)
 
+#### How to create the YAML file
+
+You can build your test configuration file using one of two approaches:
+
+* **Export from a running Jenkins instance:** Configure your plugin's global properties using the standard UI and save. Navigate to **Manage Jenkins** > **Configuration as Code** and click the **Export configuration** button. On the resulting page, you can view or **Download** the generated YAML. Copy the specific sections relevant to your plugin into your test file.
+* **Author manually:** To determine the supported JCasC keys and structure for your plugin, refer to the Configuration as Code reference by clicking Documentation on the Configuration as Code page or by visiting `<JENKINS_URL>/configuration-as-code/reference`.
+
 ### Backward compatibility test
 
 About the latter, in case you need to introduce some breaking changes, you can define a backward compatibility test case:
