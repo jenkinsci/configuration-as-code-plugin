@@ -50,6 +50,9 @@ credentials:
                 directEntry:
                   privateKey: "${SSH_PRIVATE_KEY}"
           # Another option passing via a file via ${readFile:/path/to/file}
+          # Use `readFile` because `privateKey` expects the raw PEM contents.
+          # Do not use `readFileBase64`, which returns Base64-encoded file contents and
+          # will cause the SSH private key to be rejected.
           - basicSSHUserPrivateKey:
               scope: SYSTEM
               id: ssh_with_passphrase_provided_via_file
