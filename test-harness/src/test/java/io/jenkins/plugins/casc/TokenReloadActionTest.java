@@ -13,8 +13,7 @@ import io.jenkins.plugins.casc.misc.Envs;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -24,11 +23,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import org.htmlunit.HttpMethod;
+import org.htmlunit.WebRequest;
+import org.htmlunit.WebResponse;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.RestoreSystemProperties;
 import org.junit.rules.RuleChain;
+import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.LoggerRule;
 import org.kohsuke.stapler.RequestImpl;
 import org.kohsuke.stapler.ResponseImpl;
@@ -167,70 +170,34 @@ public class TokenReloadActionTest {
     }
 
     @Test
-    public void reloadReturnsInternalServerErrorAndJsonOnFailure() throws IOException {
+    public void reloadReturnsInternalServerErrorAndJsonOnFailure() throws Exception {
+        String oldToken = System.getProperty("casc.reload.token");
+        String oldConfig = System.getProperty("casc.jenkins.config");
+
         System.setProperty("casc.reload.token", "someSecretValue");
-
-        StringWriter stringWriter = new java.io.StringWriter();
-        PrintWriter printWriter = new PrintWriter(stringWriter);
-
-        response = new MockHttpServletResponse() {
-            private String contentType;
-            private String characterEncoding;
-            private int status;
-
-            @Override
-            public PrintWriter getWriter() {
-                return printWriter;
-            }
-
-            @Override
-            public void setContentType(String type) {
-                this.contentType = type;
-            }
-
-            @Override
-            public String getContentType() {
-                return this.contentType;
-            }
-
-            @Override
-            public void setCharacterEncoding(String charset) {
-                this.characterEncoding = charset;
-            }
-
-            @Override
-            public String getCharacterEncoding() {
-                return this.characterEncoding;
-            }
-
-            @Override
-            public void setStatus(int sc) {
-                this.status = sc;
-            }
-
-            @Override
-            public int getStatus() {
-                return this.status;
-            }
-        };
 
         Path tempFile = createTempFile("invalid-casc-config", ".yaml");
         write(tempFile, asList("unclassified:", "  this_fake_property_forces_a_configurator_exception: true"));
         System.setProperty("casc.jenkins.config", tempFile.toAbsolutePath().toString());
 
         try {
-            tokenReloadAction.doIndex(newRequest("someSecretValue"), new ResponseImpl(null, response));
+            JenkinsRule.WebClient wc = j.createWebClient();
+            wc.getOptions().setThrowExceptionOnFailingStatusCode(false);
 
-            assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, response.getStatus());
+            URL url = new URL(j.getURL(), "reload-configuration-as-code/?casc-reload-token=someSecretValue");
+            WebRequest request = new WebRequest(url, HttpMethod.POST);
+            WebResponse response = wc.getPage(request).getWebResponse();
 
+            assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, response.getStatusCode());
             assertEquals("application/json", response.getContentType());
 
-            String body = stringWriter.toString();
-            assertTrue("Response body should contain error status key", body.contains("\"status\""));
-            assertTrue("Response body should indicate an error state", body.contains("\"error\""));
+            String body = response.getContentAsString();
             assertTrue(
                     "Response body should contain the failure contextual message",
                     body.contains("Failed to reload configuration"));
+            assertTrue(
+                    "Response body should expose the specific invalid YAML property",
+                    body.contains("this_fake_property_forces_a_configurator_exception"));
 
             List<LogRecord> messages = loggerRule.getRecords();
             boolean hasSevereLog = messages.stream()
@@ -242,6 +209,17 @@ public class TokenReloadActionTest {
 
         } finally {
             Files.deleteIfExists(tempFile);
+            if (oldToken != null) {
+                System.setProperty("casc.reload.token", oldToken);
+            } else {
+                System.clearProperty("casc.reload.token");
+            }
+
+            if (oldConfig != null) {
+                System.setProperty("casc.jenkins.config", oldConfig);
+            } else {
+                System.clearProperty("casc.jenkins.config");
+            }
         }
     }
 }
