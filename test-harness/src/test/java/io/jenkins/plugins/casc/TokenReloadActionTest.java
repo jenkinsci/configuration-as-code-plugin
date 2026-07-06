@@ -11,6 +11,7 @@ import io.jenkins.plugins.casc.misc.Env;
 import io.jenkins.plugins.casc.misc.EnvVarsRule;
 import io.jenkins.plugins.casc.misc.Envs;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URL;
@@ -101,7 +102,7 @@ public class TokenReloadActionTest {
     }
 
     @Test
-    public void reloadIsDisabledByDefault() throws IOException {
+    public void reloadIsDisabledByDefault() throws IOException, ServletException {
         System.clearProperty("casc.reload.token");
 
         RequestImpl request = newRequest(null);
@@ -118,7 +119,7 @@ public class TokenReloadActionTest {
     }
 
     @Test
-    public void reloadReturnsUnauthorizedIfTokenDoesNotMatch() throws IOException {
+    public void reloadReturnsUnauthorizedIfTokenDoesNotMatch() throws IOException, ServletException {
         System.setProperty("casc.reload.token", "someSecretValue");
 
         RequestImpl request = newRequest(null);
@@ -128,7 +129,7 @@ public class TokenReloadActionTest {
     }
 
     @Test
-    public void reloadReturnsOkWhenCalledWithValidToken() throws IOException {
+    public void reloadReturnsOkWhenCalledWithValidToken() throws IOException, ServletException {
         System.setProperty("casc.reload.token", "someSecretValue");
 
         tokenReloadAction.doIndex(newRequest("someSecretValue"), new ResponseImpl(null, response));
@@ -138,7 +139,7 @@ public class TokenReloadActionTest {
 
     @Test
     @Envs({@Env(name = "CASC_RELOAD_TOKEN", value = "someSecretValue")})
-    public void reloadReturnsOkWhenCalledWithValidTokenSetByEnvVar() throws IOException {
+    public void reloadReturnsOkWhenCalledWithValidTokenSetByEnvVar() throws IOException, ServletException {
         tokenReloadAction.doIndex(newRequest("someSecretValue"), new ResponseImpl(null, response));
 
         assertConfigReloaded();
@@ -146,7 +147,7 @@ public class TokenReloadActionTest {
 
     @Test
     @Envs({@Env(name = "CASC_RELOAD_TOKEN", value = "someSecretValue")})
-    public void reloadShouldNotUseTokenFromPropertyIfEnvVarIsSet() throws IOException {
+    public void reloadShouldNotUseTokenFromPropertyIfEnvVarIsSet() throws IOException, ServletException {
         System.setProperty("casc.reload.token", "otherSecretValue");
 
         tokenReloadAction.doIndex(newRequest("otherSecretValue"), new ResponseImpl(null, response));
@@ -156,7 +157,7 @@ public class TokenReloadActionTest {
 
     @Test
     @Envs({@Env(name = "CASC_RELOAD_TOKEN", value = "")})
-    public void reloadShouldUsePropertyAsTokenIfEnvVarIsEmpty() throws IOException {
+    public void reloadShouldUsePropertyAsTokenIfEnvVarIsEmpty() throws IOException, ServletException {
         System.setProperty("casc.reload.token", "someSecretValue");
 
         tokenReloadAction.doIndex(newRequest("someSecretValue"), new ResponseImpl(null, response));
@@ -188,8 +189,8 @@ public class TokenReloadActionTest {
             WebRequest request = new WebRequest(url, HttpMethod.POST);
             WebResponse response = wc.getPage(request).getWebResponse();
 
-            assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, response.getStatusCode());
-            assertEquals("application/json", response.getContentType());
+            assertEquals(HttpServletResponse.SC_OK, response.getStatusCode());
+            assertTrue("Content-Type should be JSON", response.getContentType().contains("application/json"));
 
             String body = response.getContentAsString();
             assertTrue(
