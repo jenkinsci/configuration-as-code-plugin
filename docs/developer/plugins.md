@@ -254,7 +254,13 @@ You can find some examples here
 1. [kubernetes-plugin](https://github.com/jenkinsci/kubernetes-plugin/blob/master/src/test/resources/org/csanchez/jenkins/plugins/kubernetes/casc/configuration-as-code.yaml)
 2. [azure-cosmosdb-plugin](https://github.com/jenkinsci/azure-cosmosdb-plugin/blob/main/src/test/resources/io/jenkins/plugins/azurecosmosdb/configuration-as-code.yml)
 
-#### How to create the YAML file
+#### Location and creation of the YAML file
+
+Place `configuration-as-code.yml` under your plugin's `src/test/resources` directory, alongside your test package, so it can be located by `@ConfiguredWithCode(...)`.
+
+You can find some examples here:
+1. [kubernetes-plugin](https://github.com/jenkinsci/kubernetes-plugin/blob/master/src/test/resources/org/csanchez/jenkins/plugins/kubernetes/casc/configuration-as-code.yaml)
+2. [azure-cosmosdb-plugin](https://github.com/jenkinsci/azure-cosmosdb-plugin/blob/main/src/test/resources/io/jenkins/plugins/azurecosmosdb/configuration-as-code.yml)
 
 You can build your test configuration file using one of two approaches:
 
