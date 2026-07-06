@@ -1,15 +1,19 @@
 package io.jenkins.plugins.casc;
 
+import static java.util.logging.Level.SEVERE;
+
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import hudson.Extension;
 import hudson.model.UnprotectedRootAction;
 import hudson.security.ACL;
 import hudson.security.ACLContext;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.logging.Logger;
+import net.sf.json.JSONObject;
 import org.kohsuke.stapler.StaplerRequest2;
 import org.kohsuke.stapler.StaplerResponse2;
 import org.kohsuke.stapler.interceptor.RequirePOST;
@@ -56,8 +60,24 @@ public class TokenReloadAction implements UnprotectedRootAction {
                             token.getBytes(StandardCharsets.UTF_8), requestToken.getBytes(StandardCharsets.UTF_8))) {
                 LOGGER.info("Configuration reload triggered via token");
 
-                try (ACLContext ignored = ACL.as2(ACL.SYSTEM2)) {
-                    ConfigurationAsCode.get().configure();
+                try {
+                    try (ACLContext ignored = ACL.as2(ACL.SYSTEM2)) {
+                        ConfigurationAsCode.get().configure();
+                    }
+                } catch (ConfiguratorException e) {
+                    LOGGER.log(SEVERE, "Failed to reload Jenkins Configuration as Code via token", e);
+
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+                    JSONObject errorJson = new JSONObject();
+                    errorJson.put("status", "error");
+
+                    String message = e.getMessage() != null ? e.getMessage() : "Unknown configuration error";
+                    errorJson.put("message", "Failed to reload configuration: " + message);
+
+                    response.getWriter().write(errorJson.toString());
                 }
             } else {
                 response.sendError(401);

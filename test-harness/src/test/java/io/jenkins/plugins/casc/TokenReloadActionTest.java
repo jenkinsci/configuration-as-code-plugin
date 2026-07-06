@@ -1,5 +1,8 @@
 package io.jenkins.plugins.casc;
 
+import static java.nio.file.Files.createTempFile;
+import static java.nio.file.Files.write;
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -10,6 +13,10 @@ import io.jenkins.plugins.casc.misc.Envs;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -45,7 +52,7 @@ public class TokenReloadActionTest {
     @Rule
     public RuleChain chain = RuleChain.outerRule(environment).around(j);
 
-    private HttpServletResponse response;
+    private MockHttpServletResponse response;
 
     private RequestImpl newRequest(String authorization) {
         Map<String, String> parameters = new HashMap<>();
@@ -157,5 +164,84 @@ public class TokenReloadActionTest {
     @Test
     public void displayName() {
         assertEquals("Reload Configuration as Code", tokenReloadAction.getDisplayName());
+    }
+
+    @Test
+    public void reloadReturnsInternalServerErrorAndJsonOnFailure() throws IOException {
+        System.setProperty("casc.reload.token", "someSecretValue");
+
+        StringWriter stringWriter = new java.io.StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+
+        response = new MockHttpServletResponse() {
+            private String contentType;
+            private String characterEncoding;
+            private int status;
+
+            @Override
+            public PrintWriter getWriter() {
+                return printWriter;
+            }
+
+            @Override
+            public void setContentType(String type) {
+                this.contentType = type;
+            }
+
+            @Override
+            public String getContentType() {
+                return this.contentType;
+            }
+
+            @Override
+            public void setCharacterEncoding(String charset) {
+                this.characterEncoding = charset;
+            }
+
+            @Override
+            public String getCharacterEncoding() {
+                return this.characterEncoding;
+            }
+
+            @Override
+            public void setStatus(int sc) {
+                this.status = sc;
+            }
+
+            @Override
+            public int getStatus() {
+                return this.status;
+            }
+        };
+
+        Path tempFile = createTempFile("invalid-casc-config", ".yaml");
+        write(tempFile, asList("unclassified:", "  this_fake_property_forces_a_configurator_exception: true"));
+        System.setProperty("casc.jenkins.config", tempFile.toAbsolutePath().toString());
+
+        try {
+            tokenReloadAction.doIndex(newRequest("someSecretValue"), new ResponseImpl(null, response));
+
+            assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, response.getStatus());
+
+            assertEquals("application/json", response.getContentType());
+
+            String body = stringWriter.toString();
+            assertTrue("Response body should contain error status key", body.contains("\"status\""));
+            assertTrue("Response body should indicate an error state", body.contains("\"error\""));
+            assertTrue(
+                    "Response body should contain the failure contextual message",
+                    body.contains("Failed to reload configuration"));
+
+            List<LogRecord> messages = loggerRule.getRecords();
+            boolean hasSevereLog = messages.stream()
+                    .anyMatch(record -> record.getLevel() == Level.SEVERE
+                            && record.getMessage()
+                                    .contains("Failed to reload Jenkins Configuration as Code via token"));
+
+            assertTrue("Expected a SEVERE log message regarding reload failure", hasSevereLog);
+
+        } finally {
+            Files.deleteIfExists(tempFile);
+        }
     }
 }
