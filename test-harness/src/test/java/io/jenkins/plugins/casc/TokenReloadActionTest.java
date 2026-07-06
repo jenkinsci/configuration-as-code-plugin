@@ -55,7 +55,7 @@ public class TokenReloadActionTest {
     @Rule
     public RuleChain chain = RuleChain.outerRule(environment).around(j);
 
-    private MockHttpServletResponse response;
+    private HttpServletResponse response;
 
     private RequestImpl newRequest(String authorization) {
         Map<String, String> parameters = new HashMap<>();
