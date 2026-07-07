@@ -2,6 +2,7 @@ package io.jenkins.plugins.casc.fetcher;
 
 import hudson.Extension;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
@@ -24,7 +25,7 @@ public class LocalFileSystemFetcher implements CasCConfigFetcher {
         if (location == null) {
             return false;
         }
-        if (location.startsWith("file://")) {
+        if (location.startsWith("file:")) {
             return true;
         }
         try {
@@ -36,11 +37,19 @@ public class LocalFileSystemFetcher implements CasCConfigFetcher {
 
     @Override
     public FetchResult fetch(String location, FetchCredentials credentials) throws IOException {
-        String sanitizedPath = location.startsWith("file://") ? location.substring(7) : location;
-        final Path root = Paths.get(sanitizedPath);
+        final Path root;
+        if (location.startsWith("file:")) {
+            try {
+                root = Paths.get(URI.create(location));
+            } catch (IllegalArgumentException e) {
+                throw new IOException("Invalid file URI format: " + location, e);
+            }
+        } else {
+            root = Paths.get(location);
+        }
 
         if (!Files.exists(root)) {
-            throw new IOException("Invalid configuration: '" + sanitizedPath + "' isn't a valid path.");
+            throw new IOException("Invalid configuration: '" + root + "' isn't a valid path.");
         }
 
         if (Files.isRegularFile(root) && Files.isReadable(root)) {

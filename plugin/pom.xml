@@ -10,6 +10,7 @@
 
   <groupId>io.jenkins</groupId>
   <artifactId>configuration-as-code</artifactId>
+  <version>${changelist}</version>
   <packaging>hpi</packaging>
 
   <name>Configuration as Code Plugin</name>
@@ -85,21 +86,6 @@
           <artifactId>jspecify</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>credentials</artifactId>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>plain-credentials</artifactId>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>ssh-credentials</artifactId>
-      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>com.github.stefanbirkner</groupId>

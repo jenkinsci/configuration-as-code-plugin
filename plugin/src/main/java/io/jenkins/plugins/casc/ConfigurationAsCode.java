@@ -745,11 +745,9 @@ public class ConfigurationAsCode extends ManagementLink {
     @Restricted(NoExternalUse.class)
     @SuppressWarnings("rawtypes")
     public void configureWith(YamlSource source) throws ConfiguratorException {
-        try (FetchContext context = getStandardConfigSources()) {
-            final List<YamlSource> resolvedSources = context.getSources();
-            resolvedSources.add(source);
-            configureWith(resolvedSources);
-        }
+        List<YamlSource> sources = new ArrayList<>();
+        sources.add(source);
+        configureWith(sources);
     }
 
     private void configureWith(List<YamlSource> sources) throws ConfiguratorException {

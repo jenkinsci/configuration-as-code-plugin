@@ -146,7 +146,7 @@ class ConfigurationAsCodeTest {
     }
 
     @Test
-    void shouldReportMissingFileOnNotFoundConfig() {
+    void shouldReportMissingFileOnNotFoundConfig(JenkinsConfiguredWithCodeRule j) {
         ConfigurationAsCode casc = new ConfigurationAsCode();
         assertThrows(ConfiguratorException.class, () -> casc.configure("some"));
     }
@@ -291,7 +291,7 @@ class ConfigurationAsCodeTest {
 
     @Test
     @Issue("Issue #914")
-    void isSupportedURI_should_not_throw_on_invalid_uri() {
+    void isSupportedURI_should_not_throw_on_invalid_uri(JenkinsConfiguredWithCodeRule j) {
         // for example, a Windows path is not a valid URI
         assertThat(ConfigurationAsCode.isSupportedURI("C:\\jenkins\\casc"), is(false));
     }
