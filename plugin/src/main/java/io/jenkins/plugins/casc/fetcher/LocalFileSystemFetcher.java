@@ -53,7 +53,9 @@ public class LocalFileSystemFetcher implements CasCConfigFetcher {
         }
 
         if (Files.isRegularFile(root) && Files.isReadable(root)) {
-            ResolvedYaml resolved = new ResolvedYaml(root.getFileName().toString(), () -> Files.newInputStream(root));
+            Path fileNamePath = root.getFileName();
+            String fileName = fileNamePath != null ? fileNamePath.toString() : root.toString();
+            ResolvedYaml resolved = new ResolvedYaml(fileName, () -> Files.newInputStream(root));
             return new FetchResult(Collections.singletonList(resolved), (AutoCloseable) null);
         }
 
