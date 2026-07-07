@@ -34,7 +34,9 @@ public final class FetchResult implements AutoCloseable {
     @Override
     public void close() throws IOException {
         for (AutoCloseable resource : resourcesToClose) {
-            if (resource == null) continue;
+            if (resource == null) {
+                continue;
+            }
             try {
                 resource.close();
             } catch (Exception e) {
@@ -43,7 +45,9 @@ public final class FetchResult implements AutoCloseable {
         }
 
         for (Path tempDirectory : pathsToDelete) {
-            if (tempDirectory == null || !Files.exists(tempDirectory)) continue;
+            if (tempDirectory == null || !Files.exists(tempDirectory)) {
+                continue;
+            }
 
             try (var stream = Files.walk(tempDirectory)) {
                 List<Path> paths =

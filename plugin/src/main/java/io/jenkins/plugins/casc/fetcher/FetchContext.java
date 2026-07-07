@@ -17,7 +17,9 @@ public final class FetchContext implements AutoCloseable {
     private final List<YamlSource> yamlSources = new ArrayList<>();
 
     public void add(FetchResult result) {
-        if (result == null) return;
+        if (result == null) {
+            return;
+        }
 
         this.results.add(result);
         List<ResolvedYaml> items = new ArrayList<>(result.items());
