@@ -1,5 +1,6 @@
 package io.jenkins.plugins.casc.fetcher;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -9,7 +10,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
-import java.nio.charset.StandardCharsets;
+import java.net.URI;
 import java.util.stream.Collectors;
 import org.junit.Test;
 
@@ -27,7 +28,7 @@ public class DefaultHttpFetcherTest {
 
     @Test(expected = IOException.class)
     public void testFetchThrowsOnInvalidUrl() throws Exception {
-        fetcher.fetch("http://::invalid-url::", null);
+        fetcher.fetch("http://example.com/invalid path with spaces", null);
     }
 
     @Test
@@ -42,7 +43,7 @@ public class DefaultHttpFetcherTest {
     public void testActualHttpFetchIntegration() throws Exception {
         HttpServer server = HttpServer.create(new InetSocketAddress(0), 0);
         server.createContext("/casc.yaml", exchange -> {
-            byte[] response = "jenkins:\n  systemMessage: 'Hello HTTP'".getBytes(StandardCharsets.UTF_8);
+            byte[] response = "jenkins:\n  systemMessage: 'Hello HTTP'".getBytes(UTF_8);
             exchange.sendResponseHeaders(200, response.length);
             exchange.getResponseBody().write(response);
             exchange.close();
@@ -60,7 +61,7 @@ public class DefaultHttpFetcherTest {
 
             assertEquals("casc.yaml", yaml.relativePath());
 
-            String content = new BufferedReader(new InputStreamReader(yaml.open(), StandardCharsets.UTF_8))
+            String content = new BufferedReader(new InputStreamReader(yaml.open(), UTF_8))
                     .lines()
                     .collect(Collectors.joining("\n"));
 
@@ -71,9 +72,36 @@ public class DefaultHttpFetcherTest {
         }
     }
 
+    @Test
+    public void testFetchWithEmptyFileNameUsesDefault() throws Exception {
+        HttpServer server = HttpServer.create(new InetSocketAddress(0), 0);
+        server.createContext("/", exchange -> {
+            byte[] response = "jenkins:\n  systemMessage: 'Fallback'".getBytes(UTF_8);
+            exchange.sendResponseHeaders(200, response.length);
+            exchange.getResponseBody().write(response);
+            exchange.close();
+        });
+        server.start();
+
+        try {
+            int port = server.getAddress().getPort();
+            String targetUrl = "http://localhost:" + port + "/";
+
+            FetchResult result = fetcher.fetch(targetUrl, null);
+
+            assertEquals(1, result.items().size());
+            ResolvedYaml yaml = result.items().get(0);
+
+            assertEquals("casc.yaml", yaml.relativePath());
+
+        } finally {
+            server.stop(0);
+        }
+    }
+
     private String extractFilename(String location) {
         try {
-            java.net.URI uri = new java.net.URI(location);
+            URI uri = new URI(location);
             String path = uri.getPath();
             if (path != null && path.contains("/")) {
                 String name = path.substring(path.lastIndexOf('/') + 1);

@@ -82,4 +82,28 @@ public class LocalFileSystemFetcherTest {
         assertEquals(1, items.size());
         assertEquals("prod/jenkins.yaml", items.get(0).relativePath());
     }
+
+    @Test
+    public void testResolvedYamlToString() {
+        ResolvedYaml yaml = new ResolvedYaml("my/test/config.yaml", () -> null);
+
+        assertEquals("ResolvedYaml{relativePath='my/test/config.yaml'}", yaml.toString());
+    }
+
+    @Test
+    public void testSupportsThrowsExceptionOnInvalidCharacters() {
+        assertFalse(
+                "Should safely catch exception and return false for strictly invalid path strings",
+                fetcher.supports("invalid\u0000path"));
+    }
+
+    @Test(expected = IOException.class)
+    public void testFetchThrowsOnInvalidFileUri() throws Exception {
+        fetcher.fetch("file:///invalid path with spaces.yaml", null);
+    }
+
+    @Test(expected = IOException.class)
+    public void testFetchThrowsOnNonExistentPath() throws Exception {
+        fetcher.fetch("/this/path/absolutely/does/not/exist/casc.yaml", null);
+    }
 }

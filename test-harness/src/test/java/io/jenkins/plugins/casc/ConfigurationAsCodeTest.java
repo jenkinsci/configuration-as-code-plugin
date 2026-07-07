@@ -340,6 +340,64 @@ class ConfigurationAsCodeTest {
         assertEquals(expectedDocString, actualDocString);
     }
 
+    @Test
+    void doCheckNewSource_should_catch_exceptions_on_invalid_yaml(JenkinsConfiguredWithCodeRule j) throws Exception {
+        File brokenYaml = newFile(tempFolder, "broken.yaml");
+        Files.write(brokenYaml.toPath(), "jenkins: \n\t- tabs: are: forbidden: in: yaml".getBytes());
+
+        ConfigurationAsCode casc = ConfigurationAsCode.get();
+
+        FormValidation validation = casc.doCheckNewSource(brokenYaml.getAbsolutePath());
+
+        assertEquals(FormValidation.Kind.ERROR, validation.kind);
+    }
+
+    @Test
+    void doCheckNewSource_should_return_error_for_invalid_config(JenkinsConfiguredWithCodeRule j) throws Exception {
+        File invalidConfig = newFile(tempFolder, "invalid.yaml");
+        Files.write(invalidConfig.toPath(), "jenkins:\n  definitelyNotARealProperty: true".getBytes());
+
+        ConfigurationAsCode casc = ConfigurationAsCode.get();
+
+        FormValidation validation = casc.doCheckNewSource(invalidConfig.getAbsolutePath());
+
+        assertEquals(FormValidation.Kind.ERROR, validation.kind);
+        assertTrue(
+                validation.getMessage().contains("definitelyNotARealProperty"),
+                "Error message should mention the invalid property");
+    }
+
+    @Test
+    void configure_should_wrap_ioexception_from_fetcher(JenkinsConfiguredWithCodeRule j) {
+        ConfigurationAsCode casc = ConfigurationAsCode.get();
+
+        ConfiguratorException ex = assertThrows(
+                ConfiguratorException.class,
+                () -> casc.configure("file:/this/path/definitely/does/not/exist_casc.yaml"));
+
+        assertTrue(
+                ex.getMessage().contains("Failed to fetch configuration from"),
+                "Exception message should come from the IOException catch block");
+    }
+
+    @Test
+    void configure_should_throw_when_source_is_not_supported(JenkinsConfiguredWithCodeRule j) {
+        ConfigurationAsCode casc = ConfigurationAsCode.get();
+
+        ConfiguratorException ex =
+                assertThrows(ConfiguratorException.class, () -> casc.configure("unsupported://protocol-scheme-test"));
+
+        assertTrue(
+                ex.getMessage().contains("is not supported by any registered configuration fetcher"),
+                "Exception message should indicate unsupported source protocol");
+    }
+
+    @Test
+    void isSupportedURI_should_return_true_for_supported_schemes(JenkinsConfiguredWithCodeRule j) {
+        boolean supported = ConfigurationAsCode.isSupportedURI("file:///any/valid/uri/format.yaml");
+        assertTrue(supported, "Should return true when a registered fetcher supports the URI string");
+    }
+
     private static File newFolder(File root, String... subDirs) throws IOException {
         String subFolder = String.join("/", subDirs);
         File result = new File(root, subFolder);

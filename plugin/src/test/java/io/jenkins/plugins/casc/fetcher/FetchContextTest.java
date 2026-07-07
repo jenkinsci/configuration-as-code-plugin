@@ -43,4 +43,32 @@ public class FetchContextTest {
         assertTrue("FetchContext must close the first FetchResult", result1Closed.get());
         assertTrue("FetchContext must close the second FetchResult", result2Closed.get());
     }
+
+    @Test
+    public void testAddNullResultIsIgnored() {
+        try (FetchContext context = new FetchContext()) {
+            context.add(null);
+            assertTrue(
+                    "Sources should remain empty when a null result is added",
+                    context.getSources().isEmpty());
+        }
+    }
+
+    @Test
+    public void testCloseHandlesIOExceptionAndContinues() {
+        AtomicBoolean secondResultClosed = new AtomicBoolean(false);
+
+        FetchResult failingResult = new FetchResult(null, () -> {
+            throw new java.io.IOException("Simulated cleanup failure");
+        });
+
+        FetchResult succeedingResult = new FetchResult(null, () -> secondResultClosed.set(true));
+
+        FetchContext context = new FetchContext();
+        context.add(failingResult);
+        context.add(succeedingResult);
+        context.close();
+
+        assertTrue("FetchContext must continue closing remaining results after an exception", secondResultClosed.get());
+    }
 }

@@ -4,9 +4,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.Test;
 
@@ -49,5 +51,48 @@ public class FetchResultTest {
         FetchResult result = new FetchResult(Collections.emptyList(), faultyResource);
 
         result.close();
+    }
+
+    @Test
+    public void testCloseIgnoresNullsInLists() throws Exception {
+        FetchResult result = new FetchResult(Collections.emptyList(), (AutoCloseable) null);
+
+        Field resourcesField = FetchResult.class.getDeclaredField("resourcesToClose");
+        resourcesField.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        List<AutoCloseable> resources = (List<AutoCloseable>) resourcesField.get(result);
+        resources.add(null);
+
+        Field pathsField = FetchResult.class.getDeclaredField("pathsToDelete");
+        pathsField.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        List<Path> paths = (List<Path>) pathsField.get(result);
+        paths.add(null);
+        result.close();
+    }
+
+    @Test
+    public void testCloseSkipsNonExistentDirectory() throws Exception {
+        Path tempDir = Files.createTempDirectory("casc-missing-");
+        FetchResult result = new FetchResult(Collections.emptyList(), tempDir);
+        Files.delete(tempDir);
+        result.close();
+    }
+
+    @Test(expected = IOException.class)
+    public void testCloseDirectoryCleanupThrowsException() throws Exception {
+        Path tempDir = Files.createTempDirectory("casc-fail-");
+        FetchResult result = new FetchResult(Collections.emptyList(), tempDir);
+
+        assertTrue(
+                "Failed to revoke read permissions on the test directory",
+                tempDir.toFile().setReadable(false));
+
+        try {
+            result.close();
+        } finally {
+            assertTrue("Failed to restore read permissions", tempDir.toFile().setReadable(true));
+            assertTrue("Failed to restore write permissions", tempDir.toFile().setWritable(true));
+        }
     }
 }
