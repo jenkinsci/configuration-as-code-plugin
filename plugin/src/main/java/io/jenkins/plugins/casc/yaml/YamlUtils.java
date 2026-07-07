@@ -5,6 +5,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.ConfiguratorException;
+import io.jenkins.plugins.casc.fetcher.ResolvedYaml;
 import io.jenkins.plugins.casc.model.Mapping;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -78,7 +79,9 @@ public final class YamlUtils {
 
     public static Reader reader(YamlSource<?> source) throws IOException {
         Object src = source.source;
-        if (src instanceof String) {
+        if (src instanceof ResolvedYaml) {
+            return new InputStreamReader(((ResolvedYaml) src).open(), UTF_8);
+        } else if (src instanceof String) {
             final URL url = URI.create((String) src).toURL();
             return new InputStreamReader(url.openStream(), UTF_8);
         } else if (src instanceof InputStream) {

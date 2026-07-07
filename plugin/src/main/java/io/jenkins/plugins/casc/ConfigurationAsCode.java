@@ -1,7 +1,7 @@
 package io.jenkins.plugins.casc;
 
 import static io.jenkins.plugins.casc.SchemaGeneration.writeJSONSchema;
-import static java.lang.String.format;
+import static io.jenkins.plugins.casc.fetcher.FetchCredentials.resolveAll;
 import static java.util.stream.Collectors.toList;
 import static org.yaml.snakeyaml.DumperOptions.FlowStyle.BLOCK;
 import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.DOUBLE_QUOTED;
@@ -22,6 +22,9 @@ import hudson.security.ACL;
 import hudson.security.ACLContext;
 import hudson.security.Permission;
 import hudson.util.FormValidation;
+import io.jenkins.plugins.casc.fetcher.CasCConfigFetcher;
+import io.jenkins.plugins.casc.fetcher.FetchContext;
+import io.jenkins.plugins.casc.fetcher.FetchCredentials;
 import io.jenkins.plugins.casc.impl.DefaultConfiguratorRegistry;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
@@ -43,8 +46,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
@@ -232,20 +233,23 @@ public class ConfigurationAsCode extends ManagementLink {
                 }
             }
             if (!candidateSources.isEmpty()) {
-                List<YamlSource> candidates = getConfigFromSources(candidateSources);
-                if (canApplyFrom(candidates)) {
-                    sources = candidateSources;
-                    configureWith(getConfigFromSources(getSources()));
-                    CasCGlobalConfig config = GlobalConfiguration.all().get(CasCGlobalConfig.class);
-                    if (config != null) {
-                        config.setConfigurationPath(normalizedSource);
-                        config.save();
+                try (FetchContext context = getConfigFromSources(candidateSources)) {
+                    if (canApplyFrom(context.getSources())) {
+                        sources = candidateSources;
+                        try (FetchContext applyContext = getConfigFromSources(getSources())) {
+                            configureWith(applyContext.getSources());
+                        }
+                        CasCGlobalConfig config = GlobalConfiguration.all().get(CasCGlobalConfig.class);
+                        if (config != null) {
+                            config.setConfigurationPath(normalizedSource);
+                            config.save();
+                        }
+                        LOGGER.log(Level.FINE, "Replace configuration with: " + normalizedSource);
+                    } else {
+                        LOGGER.log(Level.WARNING, "Provided sources could not be applied");
+                        throw new ConfiguratorException(
+                                "Provided sources could not be applied. Please check the syntax and validity of the provided configuration.");
                     }
-                    LOGGER.log(Level.FINE, "Replace configuration with: " + normalizedSource);
-                } else {
-                    LOGGER.log(Level.WARNING, "Provided sources could not be applied");
-                    throw new ConfiguratorException(
-                            "Provided sources could not be applied. Please check the syntax and validity of the provided configuration.");
                 }
             } else {
                 LOGGER.log(Level.FINE, "No such source exists, applying default");
@@ -294,9 +298,8 @@ public class ConfigurationAsCode extends ManagementLink {
             }
             candidateSources.add(candidateSource);
         }
-        try {
-            List<YamlSource> candidates = getConfigFromSources(candidateSources);
-            final Map<Source, String> issues = checkWith(candidates);
+        try (FetchContext context = getConfigFromSources(candidateSources)) {
+            final Map<Source, String> issues = checkWith(context.getSources());
             final JSONArray errors = collectProblems(issues, "error");
             if (!errors.isEmpty()) {
                 return FormValidation.error(errors.toString());
@@ -326,21 +329,31 @@ public class ConfigurationAsCode extends ManagementLink {
         return problems;
     }
 
-    private void appendSources(List<YamlSource> sources, String source) throws ConfiguratorException {
-        if (isSupportedURI(source)) {
-            sources.add(YamlSource.of(source));
-        } else {
-            sources.addAll(configs(source).stream().map(YamlSource::of).collect(toList()));
-        }
-    }
-
-    private List<YamlSource> getConfigFromSources(List<String> newSources) throws ConfiguratorException {
-        List<YamlSource> sources = new ArrayList<>();
+    private FetchContext getConfigFromSources(List<String> newSources) throws ConfiguratorException {
+        FetchContext context = new FetchContext();
+        FetchCredentials credentials = resolveAll();
 
         for (String p : newSources) {
-            appendSources(sources, p);
+            boolean fetched = false;
+
+            for (CasCConfigFetcher fetcher : Jenkins.get().getExtensionList(CasCConfigFetcher.class)) {
+                if (fetcher.supports(p)) {
+                    try {
+                        context.add(fetcher.fetch(p, credentials));
+                        fetched = true;
+                        break;
+                    } catch (IOException e) {
+                        throw new ConfiguratorException("Failed to fetch configuration from " + p, e);
+                    }
+                }
+            }
+
+            if (!fetched) {
+                throw new ConfiguratorException("Source '" + p
+                        + "' is not supported by any registered configuration fetcher or does not exist.");
+            }
         }
-        return sources;
+        return context;
     }
 
     /**
@@ -367,18 +380,16 @@ public class ConfigurationAsCode extends ManagementLink {
      * @throws ConfiguratorException Configuration error
      */
     public void configure() throws ConfiguratorException {
-        configureWith(getStandardConfigSources());
+        try (FetchContext context = getStandardConfigSources()) {
+            configureWith(context.getSources());
+        }
     }
 
-    private List<YamlSource> getStandardConfigSources() throws ConfiguratorException {
-        List<YamlSource> configs = new ArrayList<>();
-
+    private FetchContext getStandardConfigSources() throws ConfiguratorException {
         List<String> standardConfig = getStandardConfig();
-        for (String p : standardConfig) {
-            appendSources(configs, p);
-        }
+        FetchContext context = getConfigFromSources(standardConfig);
         sources = Collections.unmodifiableList(standardConfig);
-        return configs;
+        return context;
     }
 
     private List<String> getStandardConfig() {
@@ -710,38 +721,35 @@ public class ConfigurationAsCode extends ManagementLink {
 
     public void configure(Collection<String> configParameters) throws ConfiguratorException {
 
-        List<YamlSource> configs = new ArrayList<>();
+        List<String> newSources = new ArrayList<>(configParameters);
 
-        for (String p : configParameters) {
-            appendSources(configs, p);
+        try (FetchContext context = getConfigFromSources(newSources)) {
+            sources = Collections.unmodifiableList(newSources);
+            configureWith(context.getSources());
+            lastTimeLoaded = System.currentTimeMillis();
         }
-        sources = Collections.unmodifiableList(new ArrayList<>(configParameters));
-        configureWith(configs);
-        lastTimeLoaded = System.currentTimeMillis();
     }
 
     public static boolean isSupportedURI(String configurationParameter) {
         if (configurationParameter == null) {
             return false;
         }
-        final List<String> supportedProtocols = Arrays.asList("https", "http", "file");
-        URI uri;
-        try {
-            uri = new URI(configurationParameter);
-        } catch (URISyntaxException ex) {
-            return false;
+        for (CasCConfigFetcher fetcher : Jenkins.get().getExtensionList(CasCConfigFetcher.class)) {
+            if (fetcher.supports(configurationParameter)) {
+                return true;
+            }
         }
-        if (uri.getScheme() == null) {
-            return false;
-        }
-        return supportedProtocols.contains(uri.getScheme());
+        return false;
     }
 
     @Restricted(NoExternalUse.class)
+    @SuppressWarnings("rawtypes")
     public void configureWith(YamlSource source) throws ConfiguratorException {
-        final List<YamlSource> sources = getStandardConfigSources();
-        sources.add(source);
-        configureWith(sources);
+        try (FetchContext context = getStandardConfigSources()) {
+            final List<YamlSource> resolvedSources = context.getSources();
+            resolvedSources.add(source);
+            configureWith(resolvedSources);
+        }
     }
 
     private void configureWith(List<YamlSource> sources) throws ConfiguratorException {
