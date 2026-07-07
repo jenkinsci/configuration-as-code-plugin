@@ -46,7 +46,6 @@ public class YamlSource<T> {
         return new YamlSource<>(path, name);
     }
 
-    // --- ADDED: Factory method for lazy-evaluated ResolvedYaml ---
     public static YamlSource<ResolvedYaml> of(ResolvedYaml resolvedYaml) {
         return new YamlSource<>(resolvedYaml, resolvedYaml.relativePath());
     }
