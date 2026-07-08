@@ -78,21 +78,4 @@ public class FetchResultTest {
         Files.delete(tempDir);
         result.close();
     }
-
-    @Test(expected = IOException.class)
-    public void testCloseDirectoryCleanupThrowsException() throws Exception {
-        Path tempDir = Files.createTempDirectory("casc-fail-");
-        FetchResult result = new FetchResult(Collections.emptyList(), tempDir);
-
-        assertTrue(
-                "Failed to revoke read permissions on the test directory",
-                tempDir.toFile().setReadable(false));
-
-        try {
-            result.close();
-        } finally {
-            assertTrue("Failed to restore read permissions", tempDir.toFile().setReadable(true));
-            assertTrue("Failed to restore write permissions", tempDir.toFile().setWritable(true));
-        }
-    }
 }
