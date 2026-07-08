@@ -34,10 +34,13 @@ public class DefaultHttpFetcher implements CasCConfigFetcher {
         }
 
         URLConnection connection = uri.toURL().openConnection();
-        InputStream inputStream = connection.getInputStream();
+        byte[] yamlBytes;
+        try (InputStream inputStream = connection.getInputStream()) {
+            yamlBytes = inputStream.readAllBytes();
+        }
 
-        ResolvedYaml resolved = new ResolvedYaml(fileName, () -> inputStream);
+        ResolvedYaml resolved = new ResolvedYaml(fileName, () -> new java.io.ByteArrayInputStream(yamlBytes));
 
-        return new FetchResult(Collections.singletonList(resolved), inputStream);
+        return new FetchResult(Collections.singletonList(resolved), (AutoCloseable) null);
     }
 }
