@@ -308,10 +308,9 @@ public class ConfigurationAsCode extends ManagementLink {
             if (!warnings.isEmpty()) {
                 return FormValidation.warning(warnings.toString());
             }
-            return FormValidation.okWithMarkup("The configuration can be applied");
-        } catch (ConfiguratorException | IllegalArgumentException e) {
-            return FormValidation.error(
-                    e, e.getCause() == null ? e.getMessage() : e.getCause().getMessage());
+            return FormValidation.ok("Configuration is valid.");
+        } catch (Exception e) {
+            return FormValidation.error("Invalid configuration: " + e.getMessage());
         }
     }
 
