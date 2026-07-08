@@ -1,5 +1,7 @@
 package io.jenkins.plugins.casc.fetcher;
 
+import static java.util.Collections.unmodifiableList;
+
 import io.jenkins.plugins.casc.yaml.YamlSource;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,7 +35,7 @@ public final class FetchContext implements AutoCloseable {
 
     @SuppressWarnings("rawtypes")
     public List<YamlSource> getSources() {
-        return yamlSources;
+        return unmodifiableList(yamlSources);
     }
 
     @Override

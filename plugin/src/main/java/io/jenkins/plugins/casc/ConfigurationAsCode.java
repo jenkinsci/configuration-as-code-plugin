@@ -310,7 +310,14 @@ public class ConfigurationAsCode extends ManagementLink {
             }
             return FormValidation.ok("The configuration can be applied");
         } catch (Exception e) {
-            return FormValidation.error("Invalid configuration: " + e.getMessage());
+            String errorMessage = e.getMessage();
+            if (errorMessage == null && e.getCause() != null) {
+                errorMessage = e.getCause().getMessage();
+            }
+            if (errorMessage == null) {
+                errorMessage = "An unexpected " + e.getClass().getSimpleName() + " occurred.";
+            }
+            return FormValidation.error("Invalid configuration: " + errorMessage);
         }
     }
 

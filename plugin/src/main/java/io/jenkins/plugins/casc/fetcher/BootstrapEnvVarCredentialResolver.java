@@ -8,6 +8,9 @@ public final class BootstrapEnvVarCredentialResolver {
 
     @SuppressWarnings("unchecked")
     public <T extends FetchAuthData> T resolve(String credentialId, Class<T> type) {
+        if (credentialId == null || credentialId.isEmpty() || type == null) {
+            return null;
+        }
         if (type == FetchAuthData.Token.class) {
             String token = System.getenv(credentialId);
             if (token != null && !token.isEmpty()) {

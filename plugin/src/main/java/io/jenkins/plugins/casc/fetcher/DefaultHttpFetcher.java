@@ -1,11 +1,16 @@
 package io.jenkins.plugins.casc.fetcher;
 
+import static java.lang.Thread.currentThread;
+
 import hudson.Extension;
+import hudson.ProxyConfiguration;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLConnection;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.Collections;
 
 @Extension(ordinal = -100)
@@ -33,10 +38,26 @@ public class DefaultHttpFetcher implements CasCConfigFetcher {
             fileName = "casc.yaml";
         }
 
-        URLConnection connection = uri.toURL().openConnection();
+        HttpClient client = ProxyConfiguration.newHttpClient();
+
+        HttpRequest request = ProxyConfiguration.newHttpRequestBuilder(uri)
+                .GET()
+                .timeout(Duration.ofSeconds(30))
+                .build();
+
         byte[] yamlBytes;
-        try (InputStream inputStream = connection.getInputStream()) {
-            yamlBytes = inputStream.readAllBytes();
+        try {
+            HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
+
+            if (response.statusCode() < 200 || response.statusCode() >= 300) {
+                throw new IOException("Failed to fetch configuration from " + location + ". HTTP status code: "
+                        + response.statusCode());
+            }
+
+            yamlBytes = response.body();
+        } catch (InterruptedException e) {
+            currentThread().interrupt();
+            throw new IOException("Interrupted while fetching configuration from: " + location, e);
         }
 
         ResolvedYaml resolved = new ResolvedYaml(fileName, () -> new java.io.ByteArrayInputStream(yamlBytes));
