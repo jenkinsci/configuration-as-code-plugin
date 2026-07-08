@@ -308,7 +308,7 @@ public class ConfigurationAsCode extends ManagementLink {
             if (!warnings.isEmpty()) {
                 return FormValidation.warning(warnings.toString());
             }
-            return FormValidation.ok("Configuration is valid.");
+            return FormValidation.ok("The configuration can be applied");
         } catch (Exception e) {
             return FormValidation.error("Invalid configuration: " + e.getMessage());
         }

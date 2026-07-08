@@ -11,6 +11,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.htmlunit.HttpMethod.POST;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -18,6 +20,9 @@ import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import hudson.Functions;
 import hudson.util.FormValidation;
+import io.jenkins.plugins.casc.fetcher.CasCConfigFetcher;
+import io.jenkins.plugins.casc.fetcher.FetchCredentials;
+import io.jenkins.plugins.casc.fetcher.FetchResult;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
@@ -27,6 +32,8 @@ import io.jenkins.plugins.casc.yaml.YamlSource;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -45,6 +52,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule.WebClient;
+import org.jvnet.hudson.test.TestExtension;
 
 @WithJenkinsConfiguredWithCode
 class ConfigurationAsCodeTest {
@@ -393,9 +401,64 @@ class ConfigurationAsCodeTest {
     }
 
     @Test
-    void isSupportedURI_should_return_true_for_supported_schemes(JenkinsConfiguredWithCodeRule j) {
-        boolean supported = ConfigurationAsCode.isSupportedURI("file:///any/valid/uri/format.yaml");
-        assertTrue(supported, "Should return true when a registered fetcher supports the URI string");
+    void isSupportedURI_should_cover_all_branches(JenkinsConfiguredWithCodeRule j) {
+        assertFalse(ConfigurationAsCode.isSupportedURI(null), "Should return false for null input");
+
+        assertTrue(
+                ConfigurationAsCode.isSupportedURI("throw-io://test"),
+                "Should return true when our test fetcher claims support");
+
+        assertFalse(
+                ConfigurationAsCode.isSupportedURI("unsupported-scheme://test"),
+                "Should return false when no fetchers support the scheme");
+    }
+
+    @Test
+    void getConfigFromSources_should_throw_on_ioexception(JenkinsConfiguredWithCodeRule j) throws Exception {
+        ConfigurationAsCode casc = ConfigurationAsCode.get();
+
+        Method method = ConfigurationAsCode.class.getDeclaredMethod("getConfigFromSources", List.class);
+        method.setAccessible(true);
+
+        InvocationTargetException ex =
+                assertThrows(InvocationTargetException.class, () -> method.invoke(casc, List.of("throw-io://test")));
+
+        assertInstanceOf(ConfiguratorException.class, ex.getCause(), "Cause should be ConfiguratorException");
+        assertTrue(
+                ex.getCause().getMessage().contains("Failed to fetch configuration from"),
+                "Should cover the catch (IOException e) block");
+    }
+
+    @Test
+    void getConfigFromSources_should_throw_on_unsupported_source(JenkinsConfiguredWithCodeRule j) throws Exception {
+        ConfigurationAsCode casc = ConfigurationAsCode.get();
+
+        Method method = ConfigurationAsCode.class.getDeclaredMethod("getConfigFromSources", List.class);
+        method.setAccessible(true);
+
+        InvocationTargetException ex = assertThrows(
+                InvocationTargetException.class,
+                () -> method.invoke(casc, List.of("definitely-unsupported-scheme://test")));
+
+        assertInstanceOf(ConfiguratorException.class, ex.getCause(), "Cause should be ConfiguratorException");
+        assertTrue(
+                ex.getCause().getMessage().contains("is not supported by any registered configuration fetcher"),
+                "Should cover the if (!fetched) block");
+    }
+
+    @TestExtension
+    @SuppressWarnings("unused")
+    public static class ThrowOnFetchFetcher implements CasCConfigFetcher {
+
+        @Override
+        public boolean supports(String location) {
+            return "throw-io://test".equals(location);
+        }
+
+        @Override
+        public FetchResult fetch(String location, FetchCredentials credentials) throws IOException {
+            throw new IOException("Simulated fetch failure");
+        }
     }
 
     private static File newFolder(File root, String... subDirs) throws IOException {
