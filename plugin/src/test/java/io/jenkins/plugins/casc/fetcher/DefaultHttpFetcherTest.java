@@ -1,9 +1,13 @@
 package io.jenkins.plugins.casc.fetcher;
 
+import static java.lang.Thread.currentThread;
+import static java.lang.Thread.interrupted;
+import static java.lang.Thread.sleep;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import com.sun.net.httpserver.HttpServer;
 import java.io.BufferedReader;
@@ -95,6 +99,62 @@ public class DefaultHttpFetcherTest {
             assertEquals("casc.yaml", yaml.relativePath());
 
         } finally {
+            server.stop(0);
+        }
+    }
+
+    @Test
+    public void testFetchThrowsOnHttpError() throws Exception {
+        HttpServer server = HttpServer.create(new InetSocketAddress(0), 0);
+        server.createContext("/404", exchange -> {
+            exchange.sendResponseHeaders(404, -1);
+            exchange.close();
+        });
+        server.start();
+
+        try {
+            int port = server.getAddress().getPort();
+            String targetUrl = "http://localhost:" + port + "/404";
+
+            fetcher.fetch(targetUrl, null);
+            fail("Expected fetcher to throw IOException due to HTTP 404 status");
+        } catch (IOException e) {
+            assertTrue("Message should contain the HTTP status code", e.getMessage().contains("HTTP status code: 404"));
+        } finally {
+            server.stop(0);
+        }
+    }
+
+    @Test
+    public void testFetchThrowsOnInterruption() throws Exception {
+        HttpServer server = HttpServer.create(new InetSocketAddress(0), 0);
+        server.createContext("/slow", exchange -> {
+            try {
+                sleep(1000);
+            } catch (InterruptedException ignored) {
+            }
+            exchange.sendResponseHeaders(200, -1);
+            exchange.close();
+        });
+        server.start();
+
+        try {
+            int port = server.getAddress().getPort();
+            String targetUrl = "http://localhost:" + port + "/slow";
+
+            currentThread().interrupt();
+
+            fetcher.fetch(targetUrl, null);
+            fail("Expected fetcher to throw IOException due to thread interruption");
+        } catch (IOException e) {
+            assertTrue("Message should indicate the thread was interrupted",
+                e.getMessage().contains("Interrupted while fetching"));
+
+            assertTrue("Thread interrupt flag should be restored", currentThread().isInterrupted());
+        } finally {
+            @SuppressWarnings("unused")
+            boolean cleared = interrupted();
+
             server.stop(0);
         }
     }

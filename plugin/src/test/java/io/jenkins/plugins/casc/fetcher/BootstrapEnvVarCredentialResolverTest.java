@@ -17,6 +17,13 @@ public class BootstrapEnvVarCredentialResolverTest {
     private final BootstrapEnvVarCredentialResolver resolver = BootstrapEnvVarCredentialResolver.INSTANCE;
 
     @Test
+    public void testResolveWithInvalidInputsReturnsNull() {
+        assertNull(resolver.resolve(null, FetchAuthData.Token.class));
+        assertNull(resolver.resolve("", FetchAuthData.Token.class));
+        assertNull(resolver.resolve("VALID_ID", null));
+    }
+
+    @Test
     public void testMissingVariablesReturnNull() {
         assertNull(resolver.resolve("NON_EXISTENT_TOKEN", FetchAuthData.Token.class));
         assertNull(resolver.resolve("NON_EXISTENT_SSH", FetchAuthData.SshKey.class));
