@@ -119,7 +119,9 @@ public class DefaultHttpFetcherTest {
             fetcher.fetch(targetUrl, null);
             fail("Expected fetcher to throw IOException due to HTTP 404 status");
         } catch (IOException e) {
-            assertTrue("Message should contain the HTTP status code", e.getMessage().contains("HTTP status code: 404"));
+            assertTrue(
+                    "Message should contain the HTTP status code",
+                    e.getMessage().contains("HTTP status code: 404"));
         } finally {
             server.stop(0);
         }
@@ -147,10 +149,12 @@ public class DefaultHttpFetcherTest {
             fetcher.fetch(targetUrl, null);
             fail("Expected fetcher to throw IOException due to thread interruption");
         } catch (IOException e) {
-            assertTrue("Message should indicate the thread was interrupted",
-                e.getMessage().contains("Interrupted while fetching"));
+            assertTrue(
+                    "Message should indicate the thread was interrupted",
+                    e.getMessage().contains("Interrupted while fetching"));
 
-            assertTrue("Thread interrupt flag should be restored", currentThread().isInterrupted());
+            assertTrue(
+                    "Thread interrupt flag should be restored", currentThread().isInterrupted());
         } finally {
             @SuppressWarnings("unused")
             boolean cleared = interrupted();
