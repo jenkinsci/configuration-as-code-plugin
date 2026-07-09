@@ -2,6 +2,7 @@ package io.jenkins.plugins.casc;
 
 import static io.jenkins.plugins.casc.SchemaGeneration.writeJSONSchema;
 import static io.jenkins.plugins.casc.fetcher.FetchCredentials.resolveAll;
+import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 import static org.yaml.snakeyaml.DumperOptions.FlowStyle.BLOCK;
 import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.DOUBLE_QUOTED;
@@ -235,7 +236,7 @@ public class ConfigurationAsCode extends ManagementLink {
             if (!candidateSources.isEmpty()) {
                 try (FetchContext context = getConfigFromSources(candidateSources)) {
                     if (canApplyFrom(context.getSources())) {
-                        sources = candidateSources;
+                        sources = unmodifiableList(candidateSources);
                         try (FetchContext applyContext = getConfigFromSources(getSources())) {
                             configureWith(applyContext.getSources());
                         }
@@ -337,29 +338,40 @@ public class ConfigurationAsCode extends ManagementLink {
 
     private FetchContext getConfigFromSources(List<String> newSources) throws ConfiguratorException {
         FetchContext context = new FetchContext();
-        FetchCredentials credentials = resolveAll();
+        boolean success = false;
 
-        for (String p : newSources) {
-            boolean fetched = false;
+        try {
+            FetchCredentials credentials = resolveAll();
 
-            for (CasCConfigFetcher fetcher : Jenkins.get().getExtensionList(CasCConfigFetcher.class)) {
-                if (fetcher.supports(p)) {
-                    try {
-                        context.add(fetcher.fetch(p, credentials));
-                        fetched = true;
-                        break;
-                    } catch (IOException e) {
-                        throw new ConfiguratorException("Failed to fetch configuration from " + p, e);
+            for (String p : newSources) {
+                boolean fetched = false;
+
+                for (CasCConfigFetcher fetcher : Jenkins.get().getExtensionList(CasCConfigFetcher.class)) {
+                    if (fetcher.supports(p)) {
+                        try {
+                            context.add(fetcher.fetch(p, credentials));
+                            fetched = true;
+                            break;
+                        } catch (IOException e) {
+                            throw new ConfiguratorException("Failed to fetch configuration from " + p, e);
+                        }
                     }
+                }
+
+                if (!fetched) {
+                    throw new ConfiguratorException("Source '" + p
+                            + "' is not supported by any registered configuration fetcher or does not exist.");
                 }
             }
 
-            if (!fetched) {
-                throw new ConfiguratorException("Source '" + p
-                        + "' is not supported by any registered configuration fetcher or does not exist.");
+            success = true;
+            return context;
+
+        } finally {
+            if (!success) {
+                context.close();
             }
         }
-        return context;
     }
 
     /**
@@ -394,7 +406,7 @@ public class ConfigurationAsCode extends ManagementLink {
     private FetchContext getStandardConfigSources() throws ConfiguratorException {
         List<String> standardConfig = getStandardConfig();
         FetchContext context = getConfigFromSources(standardConfig);
-        sources = Collections.unmodifiableList(standardConfig);
+        sources = unmodifiableList(standardConfig);
         return context;
     }
 
@@ -730,7 +742,7 @@ public class ConfigurationAsCode extends ManagementLink {
         List<String> newSources = new ArrayList<>(configParameters);
 
         try (FetchContext context = getConfigFromSources(newSources)) {
-            sources = Collections.unmodifiableList(newSources);
+            sources = unmodifiableList(newSources);
             configureWith(context.getSources());
             lastTimeLoaded = System.currentTimeMillis();
         }
