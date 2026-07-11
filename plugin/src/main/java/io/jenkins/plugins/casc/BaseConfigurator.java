@@ -153,7 +153,22 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
 
             TypePair getterType = TypePair.ofReturnType(g);
             if (type.rawType.isAssignableFrom(getterType.rawType)) {
-                type = getterType;
+                Class<?> setterComponent = getComponentType(type);
+
+                boolean setterIsUntyped =
+                        setterComponent == null || setterComponent == Object.class || setterComponent == type.rawType;
+
+                if (setterIsUntyped) {
+                    Class<?> getterComponent = getComponentType(getterType);
+
+                    boolean getterIsTyped = getterComponent != null
+                            && getterComponent != Object.class
+                            && getterComponent != getterType.rawType;
+
+                    if (getterIsTyped) {
+                        type = new TypePair(getterType.type, type.rawType);
+                    }
+                }
             }
 
             if (Map.class.isAssignableFrom(type.rawType)) {
