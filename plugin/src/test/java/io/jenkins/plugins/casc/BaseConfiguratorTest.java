@@ -252,6 +252,13 @@ public class BaseConfiguratorTest {
         }
 
         public void setPriorityStrategies(List<? extends Animal> vals) {}
+
+        public List<Dog> getUntypedCollection() {
+            return null;
+        }
+
+        @SuppressWarnings("rawtypes")
+        public void setUntypedCollection(Collection val) {}
     }
 
     public static class DummyConfigurator extends BaseConfigurator<DummyTarget> {
@@ -303,7 +310,7 @@ public class BaseConfiguratorTest {
         Map<String, Class<?>> resolvedAttributes =
                 attributes.stream().collect(Collectors.toMap(Attribute::getName, attr -> (Class<?>) attr.getType()));
 
-        assertEquals("Should discover exactly 26 configurable properties", 26, resolvedAttributes.size());
+        assertEquals("Should discover exactly 27 configurable properties", 27, resolvedAttributes.size());
 
         assertEquals("Standard setter should resolve to String", String.class, resolvedAttributes.get("standard"));
 
@@ -368,6 +375,11 @@ public class BaseConfiguratorTest {
                 Animal.class,
                 resolvedAttributes.get("priorityStrategies"));
 
+        assertEquals(
+                "When setter is untyped but getter is typed, it should fallback to the getter's generic component type",
+                Dog.class,
+                resolvedAttributes.get("untypedCollection"));
+
         assertEquals(boolean.class, resolvedAttributes.get("primitiveBoolean"));
         assertEquals(long.class, resolvedAttributes.get("primitiveLong"));
         assertEquals(double.class, resolvedAttributes.get("primitiveDouble"));
@@ -426,7 +438,8 @@ public class BaseConfiguratorTest {
                         "restrictedList",
                         "restrictedSetter",
                         "collectionToList",
-                        "priorityStrategies"),
+                        "priorityStrategies",
+                        "untypedCollection"),
                 resolvedAttributes.keySet());
     }
 
