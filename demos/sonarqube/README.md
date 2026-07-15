@@ -32,7 +32,33 @@ unclassified:
           skipScmCause: true
           skipUpstreamCause: true
           envVar: "envVar"
+```
 
+## SonarScanner tool installation
+
+Jenkins can either install SonarScanner automatically on agents or use a scanner that is already installed on them.
+
+### Automatic installation
+
+When a pipeline requests this tool, Jenkins provisions the selected SonarScanner version on the agent where the analysis runs.
+
+```yaml
+tool:
+  sonarRunnerInstallation:
+    installations:
+      - name: "SonarScanner"
+        properties:
+          - installSource:
+              installers:
+                - sonarRunnerInstaller:
+                    id: "7.3.0.5189"
+```
+
+### Pre-installed scanner
+
+Use this option when SonarScanner is already available at the same path on every agent that runs the analysis. For Kubernetes agents, the scanner can be included in the relevant agent container image. Jenkins does not download SonarScanner when this option is used.
+
+```yaml
 tool:
   sonarRunnerInstallation:
     installations:
