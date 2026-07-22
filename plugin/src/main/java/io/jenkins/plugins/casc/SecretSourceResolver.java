@@ -8,12 +8,13 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.commons.text.lookup.StringLookup;
@@ -155,7 +156,7 @@ public class SecretSourceResolver {
         public String lookup(String key) {
             return context.getSecretSources().stream()
                     .map(source -> unchecked(() -> source.reveal(key)).apply())
-                    .flatMap(o -> o.map(Stream::of).orElseGet(Stream::empty))
+                    .flatMap(Optional::stream)
                     .findFirst()
                     .orElse(null);
         }
@@ -187,7 +188,10 @@ public class SecretSourceResolver {
         @Override
         public String lookup(@NonNull final String key) {
             try {
-                return new String(Files.readAllBytes(Paths.get(key)), StandardCharsets.UTF_8);
+                return Files.readString(Paths.get(key));
+            } catch (NoSuchFileException e) {
+                LOGGER.log(Level.FINE, String.format("Configuration import: File '%s' not found.", key));
+                return null;
             } catch (IOException | InvalidPathException e) {
                 LOGGER.log(
                         Level.WARNING,
@@ -229,6 +233,9 @@ public class SecretSourceResolver {
             try {
                 byte[] fileContent = Files.readAllBytes(Paths.get(key));
                 return Base64.getEncoder().encodeToString(fileContent);
+            } catch (NoSuchFileException e) {
+                LOGGER.log(Level.FINE, String.format("Configuration import: File '%s' not found.", key));
+                return null;
             } catch (IOException | InvalidPathException e) {
                 LOGGER.log(
                         Level.WARNING,

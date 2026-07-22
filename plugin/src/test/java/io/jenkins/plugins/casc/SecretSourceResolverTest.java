@@ -4,6 +4,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
@@ -326,8 +327,6 @@ public class SecretSourceResolverTest {
     @Test
     public void resolve_FileNotFound() {
         resolve("${readFile:./hello-world-not-found.txt}");
-        assertTrue(logContains(
-                "Configuration import: Error looking up file './hello-world-not-found.txt' with UTF-8 encoding."));
         assertTrue(
                 logContains("Configuration import: Found unresolved variable 'readFile:./hello-world-not-found.txt'."));
     }
@@ -335,7 +334,6 @@ public class SecretSourceResolverTest {
     @Test
     public void resolve_FileBase64NotFound() {
         resolve("${readFileBase64:./hello-world-not-found.txt}");
-        assertTrue(logContains("Configuration import: Error looking up file './hello-world-not-found.txt'."));
         assertTrue(logContains(
                 "Configuration import: Found unresolved variable 'readFileBase64:./hello-world-not-found.txt'."));
     }
@@ -575,5 +573,39 @@ public class SecretSourceResolverTest {
             resolve("${FOO}:${MISSING}");
         });
         assertThat(exception.getMessage(), containsString("MISSING"));
+    }
+
+    @Test
+    public void resolve_FileNotFoundWithFallback() {
+        String output = resolve("${readFile:./hello-world-not-found.txt:-fallback_value}");
+
+        assertThat(output, equalTo("fallback_value"));
+
+        assertFalse(
+                "Should not log error for missing file when using fallback",
+                logContains("Configuration import: Error looking up file './hello-world-not-found.txt'"));
+
+        assertFalse(
+                "Should not log unresolved variable warning",
+                logContains("Configuration import: Found unresolved variable 'readFile:./hello-world-not-found.txt'"));
+    }
+
+    @Test
+    public void resolve_FileBase64NotFoundWithFallback() {
+        String output = resolve("${readFileBase64:./hello-world-not-found.txt:-fallback_base64}");
+
+        assertThat(output, equalTo("fallback_base64"));
+
+        assertFalse(
+                "Should not log error for missing file when using fallback",
+                logContains("Configuration import: Error looking up file './hello-world-not-found.txt'"));
+    }
+
+    @Test
+    public void resolve_FileAliasNotFoundWithFallback() {
+        String output = resolve("${file:./hello-world-not-found.txt:-fallback}");
+
+        assertThat(output, equalTo("fallback"));
+        assertFalse(logContains("Configuration import: Error looking up file './hello-world-not-found.txt'"));
     }
 }
