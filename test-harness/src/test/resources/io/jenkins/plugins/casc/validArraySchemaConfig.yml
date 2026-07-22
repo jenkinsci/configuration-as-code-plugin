@@ -1,0 +1,4 @@
+jenkins:
+  agentProtocols:
+    - "JNLP4-connect"
+    - "Ping"
