@@ -75,9 +75,9 @@ https://plugins.jenkins.io/github-oauth/
 
 You can configure authorization based on GitHub users, organizations, or teams.
 
-- **username** - specific GitHub username (mapped as `user`).
-- **organization** - every user that belongs to a specific GitHub organization (mapped as `group`).
-- **organization*team** - specific GitHub team of a GitHub organization (mapped as `group`).
+- **username** - specific GitHub username.
+- **organization** - every user that belongs to a specific GitHub organization.
+- **organization*team** - specific GitHub team of a GitHub organization.
 
 ```yaml
 jenkins:
