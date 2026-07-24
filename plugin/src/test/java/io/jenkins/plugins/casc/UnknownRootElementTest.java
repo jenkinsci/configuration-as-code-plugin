@@ -19,7 +19,7 @@ class UnknownRootElementTest {
                 .configure(Objects.requireNonNull(getClass().getResource("unknown1.yml"))
                         .toExternalForm()));
 
-        assertThat(ex.getMessage(), containsString("No configurator found for the following root element(s): alice"));
+        assertThat(ex.getMessage(), containsString("No configurator found for the following root element: alice"));
     }
 
     @Test
@@ -29,7 +29,7 @@ class UnknownRootElementTest {
                         .toExternalForm()));
 
         assertThat(
-                ex.getMessage(), containsString("No configurator found for the following root element(s): bob, alice"));
+                ex.getMessage(), containsString("No configurator found for the following root elements: bob, alice"));
     }
 
     @Test

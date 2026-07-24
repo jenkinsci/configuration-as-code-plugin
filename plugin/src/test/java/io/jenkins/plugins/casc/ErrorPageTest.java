@@ -68,7 +68,7 @@ class ErrorPageTest {
         Files.write(cascFile, "invalid:\n  systemMessage2: Hello World\n".getBytes());
 
         String pageContent = reloadConfiguration();
-        assertThat(pageContent, containsString("No configurator found for the following root element(s):"));
+        assertThat(pageContent, containsString("No configurator found for the following root element:"));
         assertThat(pageContent, containsString("invalid"));
     }
 
