@@ -1,6 +1,9 @@
 package io.jenkins.plugins.casc;
 
+import static jenkins.model.Jenkins.ADMINISTER;
+import static jenkins.model.Jenkins.READ;
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import hudson.model.Job;
 import hudson.security.GlobalMatrixAuthorizationStrategy;
@@ -56,5 +59,29 @@ public class MatrixAuthorizationTest {
 
         Set<PermissionEntry> readPermission = gms.getGrantedPermissionEntries().get(Jenkins.READ);
         Assertions.assertEquals("anonymous", readPermission.iterator().next().getSid());
+    }
+
+    @Test
+    @ConfiguredWithReadme("matrix-auth/README.md#2")
+    public void checkGithubCorrectlyConfiguredPermissions() {
+        assertEquals(
+                "The configured instance must use the Global Matrix Authentication Strategy",
+                GlobalMatrixAuthorizationStrategy.class,
+                Jenkins.get().getAuthorizationStrategy().getClass());
+        GlobalMatrixAuthorizationStrategy gms =
+                (GlobalMatrixAuthorizationStrategy) Jenkins.get().getAuthorizationStrategy();
+
+        Set<PermissionEntry> adminPermission = gms.getGrantedPermissionEntries().get(ADMINISTER);
+        assertTrue(
+                adminPermission.contains(PermissionEntry.user("octocat")),
+                "octocat user should have Administer permission");
+
+        Set<PermissionEntry> readPermission = gms.getGrantedPermissionEntries().get(READ);
+        assertTrue(readPermission.contains(PermissionEntry.group("myorg")), "myorg group should have Read permission");
+
+        Set<PermissionEntry> buildPermission = gms.getGrantedPermissionEntries().get(Job.BUILD);
+        assertTrue(
+                buildPermission.contains(PermissionEntry.group("myorg*myteam")),
+                "myorg*myteam group should have Build permission");
     }
 }
