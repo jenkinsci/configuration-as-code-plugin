@@ -7,4 +7,3 @@ jenkins:
           apiTokens:
             - name: "test-token"
               token: "111234567890abcdef1234567890abcdef"
-

@@ -94,13 +94,13 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
                                                     name = (String) t.getClass()
                                                             .getField("name")
                                                             .get(t);
-                                                } catch (Exception e) {
+                                                } catch (ReflectiveOperationException e) {
                                                     name = (String) t.getClass()
                                                             .getMethod("getName")
                                                             .invoke(t);
                                                 }
                                                 return new ApiToken(name, Secret.fromString(MASKED_TOKEN_VALUE));
-                                            } catch (Exception e) {
+                                            } catch (ReflectiveOperationException e) {
                                                 return null;
                                             }
                                         })
@@ -108,7 +108,7 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
                                         .collect(Collectors.toList());
                                 user.setApiTokens(exportedTokens);
                             }
-                        } catch (Exception ignored) {
+                        } catch (ReflectiveOperationException ignored) {
                         }
                     }
                     return user;
@@ -168,7 +168,7 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
                                                 t.getClass().getField("name").get(t);
                                         tUuid = (String)
                                                 t.getClass().getField("uuid").get(t);
-                                    } catch (Exception ex) {
+                                    } catch (ReflectiveOperationException ex) {
                                         tName = (String) t.getClass()
                                                 .getMethod("getName")
                                                 .invoke(t);
@@ -189,7 +189,7 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
                     } else {
                         throw new IOException("ApiTokenStore does not expose addFixedNewToken(String, String)");
                     }
-                } catch (Exception e) {
+                } catch (ReflectiveOperationException e) {
                     throw new IOException("Failed to configure API tokens via reflection", e);
                 }
             }
