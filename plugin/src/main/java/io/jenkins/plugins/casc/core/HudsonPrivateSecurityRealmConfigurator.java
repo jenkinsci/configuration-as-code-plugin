@@ -12,10 +12,13 @@ import io.jenkins.plugins.casc.impl.attributes.MultivaluedAttribute;
 import io.jenkins.plugins.casc.impl.configurators.DataBoundConfigurator;
 import io.jenkins.plugins.casc.model.CNode;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import jenkins.security.ApiTokenProperty;
 import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
@@ -30,6 +33,7 @@ import org.kohsuke.stapler.DataBoundSetter;
 public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurator<HudsonPrivateSecurityRealm> {
     // matches HudsonPrivateSecurityRealm.JBCRYPT_HEADER
     private static final String HASHED_PASSWORD_PREFIX = "#jbcrypt:";
+    private static final String MASKED_TOKEN_VALUE = "****";
 
     public HudsonPrivateSecurityRealmConfigurator() {
         super(HudsonPrivateSecurityRealm.class);
@@ -74,6 +78,38 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
                             .collect(Collectors.toList());
                     user.setProperties(properties);
 
+                    ApiTokenProperty tokenProperty = u.getProperty(ApiTokenProperty.class);
+                    if (tokenProperty != null) {
+                        try {
+                            Method getTokenListMethod = ApiTokenProperty.class.getMethod("getTokenList");
+                            Collection<?> tokenList = (Collection<?>) getTokenListMethod.invoke(tokenProperty);
+
+                            if (tokenList != null && !tokenList.isEmpty()) {
+                                List<ApiToken> exportedTokens = tokenList.stream()
+                                        .map(t -> {
+                                            try {
+                                                String name;
+                                                try {
+                                                    name = (String) t.getClass()
+                                                            .getField("name")
+                                                            .get(t);
+                                                } catch (Exception e) {
+                                                    name = (String) t.getClass()
+                                                            .getMethod("getName")
+                                                            .invoke(t);
+                                                }
+                                                return new ApiToken(name, MASKED_TOKEN_VALUE);
+                                            } catch (Exception e) {
+                                                return null;
+                                            }
+                                        })
+                                        .filter(Objects::nonNull)
+                                        .collect(Collectors.toList());
+                                user.setApiTokens(exportedTokens);
+                            }
+                        } catch (Exception ignored) {
+                        }
+                    }
                     return user;
                 })
                 .collect(Collectors.toList());
@@ -90,13 +126,79 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
                     updatedUser.addProperty(property);
                 }
             }
+
+            if (user.getApiTokens() != null && !user.getApiTokens().isEmpty()) {
+                ApiTokenProperty tokenProperty = updatedUser.getProperty(ApiTokenProperty.class);
+                if (tokenProperty == null) {
+                    tokenProperty = new ApiTokenProperty();
+                    updatedUser.addProperty(tokenProperty);
+                }
+
+                try {
+                    Method getTokenListMethod = ApiTokenProperty.class.getMethod("getTokenList");
+                    Collection<?> tokenList = (Collection<?>) getTokenListMethod.invoke(tokenProperty);
+
+                    Method getTokenStoreMethod = ApiTokenProperty.class.getMethod("getTokenStore");
+                    Object tokenStore = getTokenStoreMethod.invoke(tokenProperty);
+
+                    Method revokeTokenMethod = null;
+                    Method addFixedNewTokenMethod = null;
+
+                    for (Method m : tokenStore.getClass().getMethods()) {
+                        if ("revokeToken".equals(m.getName()) && m.getParameterCount() == 1) {
+                            revokeTokenMethod = m;
+                        } else if ("addFixedNewToken".equals(m.getName()) && m.getParameterCount() == 2) {
+                            addFixedNewTokenMethod = m;
+                        }
+                    }
+
+                    if (addFixedNewTokenMethod != null) {
+                        for (ApiToken apiToken : user.getApiTokens()) {
+                            if (MASKED_TOKEN_VALUE.equals(apiToken.token())) {
+                                continue;
+                            }
+
+                            if (tokenList != null) {
+                                for (Object t : tokenList) {
+                                    String tName;
+                                    String tUuid;
+                                    try {
+                                        tName = (String)
+                                                t.getClass().getField("name").get(t);
+                                        tUuid = (String)
+                                                t.getClass().getField("uuid").get(t);
+                                    } catch (Exception ex) {
+                                        tName = (String) t.getClass()
+                                                .getMethod("getName")
+                                                .invoke(t);
+                                        tUuid = (String) t.getClass()
+                                                .getMethod("getUuid")
+                                                .invoke(t);
+                                    }
+
+                                    if (Objects.equals(tName, apiToken.name()) && revokeTokenMethod != null) {
+                                        revokeTokenMethod.invoke(tokenStore, tUuid);
+                                    }
+                                }
+                            }
+
+                            addFixedNewTokenMethod.invoke(tokenStore, apiToken.name(), apiToken.token());
+                        }
+                    } else {
+                        throw new IOException("ApiTokenStore does not expose addFixedNewToken(String, String)");
+                    }
+                } catch (Exception e) {
+                    throw new IOException("Failed to configure API tokens via reflection", e);
+                }
+            }
+            updatedUser.save();
         }
     }
 
     private static User createAccount(HudsonPrivateSecurityRealm target, UserWithPassword user) throws IOException {
         User updatedUser;
         if (StringUtils.isNotBlank(user.password)) {
-            if (StringUtils.startsWith(user.password, HASHED_PASSWORD_PREFIX)) {
+            if (user.password.startsWith(HASHED_PASSWORD_PREFIX)) {
                 updatedUser = target.createAccountWithHashedPassword(user.id, user.password);
             } else {
                 updatedUser = target.createAccount(user.id, user.password);
@@ -114,6 +216,7 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
         private String name;
         private String description;
         private List<UserProperty> properties;
+        private List<ApiToken> apiTokens;
 
         @DataBoundConstructor
         public UserWithPassword(String id, String password) {
@@ -151,5 +254,20 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
         public List<UserProperty> getProperties() {
             return properties;
         }
+
+        @DataBoundSetter
+        public void setApiTokens(List<ApiToken> apiTokens) {
+            this.apiTokens = apiTokens;
+        }
+
+        public List<ApiToken> getApiTokens() {
+            return apiTokens;
+        }
+    }
+
+    public record ApiToken(String name, String token) {
+
+        @DataBoundConstructor
+        public ApiToken {}
     }
 }

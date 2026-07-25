@@ -1,0 +1,9 @@
+jenkins:
+  securityRealm:
+    local:
+      users:
+        - id: "maskeduser"
+          password: "password123"
+          apiTokens:
+            - name: "masked-token"
+              token: "****"
