@@ -841,7 +841,12 @@ public class ConfigurationAsCode extends ManagementLink {
             });
 
             if (!unknownKeys.isEmpty()) {
-                throw new UnknownConfiguratorException(unknownKeys, "No configurator for the following root elements:");
+                String message = String.format(
+                        "No configurator found for the following root %s: %s. "
+                                + "This may indicate that the required plugin is not installed or failed to load. "
+                                + "Verify that the plugin is installed and check the Jenkins startup logs for plugin loading errors.",
+                        unknownKeys.size() > 1 ? "elements" : "element", String.join(", ", unknownKeys));
+                throw new UnknownConfiguratorException(unknownKeys, message);
             }
         }
     }
