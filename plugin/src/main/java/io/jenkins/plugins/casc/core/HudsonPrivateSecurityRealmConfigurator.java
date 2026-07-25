@@ -6,6 +6,7 @@ import hudson.Extension;
 import hudson.model.User;
 import hudson.model.UserProperty;
 import hudson.security.HudsonPrivateSecurityRealm;
+import hudson.util.Secret;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.impl.attributes.MultivaluedAttribute;
@@ -98,7 +99,7 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
                                                             .getMethod("getName")
                                                             .invoke(t);
                                                 }
-                                                return new ApiToken(name, MASKED_TOKEN_VALUE);
+                                                return new ApiToken(name, Secret.fromString(MASKED_TOKEN_VALUE));
                                             } catch (Exception e) {
                                                 return null;
                                             }
@@ -154,7 +155,7 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
 
                     if (addFixedNewTokenMethod != null) {
                         for (ApiToken apiToken : user.getApiTokens()) {
-                            if (MASKED_TOKEN_VALUE.equals(apiToken.token())) {
+                            if (MASKED_TOKEN_VALUE.equals(Secret.toString(apiToken.token()))) {
                                 continue;
                             }
 
@@ -182,7 +183,8 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
                                 }
                             }
 
-                            addFixedNewTokenMethod.invoke(tokenStore, apiToken.name(), apiToken.token());
+                            addFixedNewTokenMethod.invoke(
+                                    tokenStore, apiToken.name(), Secret.toString(apiToken.token()));
                         }
                     } else {
                         throw new IOException("ApiTokenStore does not expose addFixedNewToken(String, String)");
@@ -265,7 +267,7 @@ public class HudsonPrivateSecurityRealmConfigurator extends DataBoundConfigurato
         }
     }
 
-    public record ApiToken(String name, String token) {
+    public record ApiToken(String name, Secret token) {
 
         @DataBoundConstructor
         public ApiToken {}
