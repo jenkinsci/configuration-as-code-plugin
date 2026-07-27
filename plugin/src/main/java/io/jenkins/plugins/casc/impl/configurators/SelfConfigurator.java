@@ -51,6 +51,11 @@ public class SelfConfigurator extends BaseConfigurator<ConfigurationContext>
     @CheckForNull
     @Override
     public CNode describe(ConfigurationContext instance, ConfigurationContext context) throws Exception {
-        return compare(instance, new ConfigurationContext(null), context);
+        Mapping mapping = new Mapping();
+        mapping.put("version", instance.getVersion().value());
+        mapping.put("deprecated", instance.getDeprecated().name());
+        mapping.put("restricted", instance.getRestricted().name());
+        mapping.put("unknown", instance.getUnknown().name());
+        return mapping;
     }
 }

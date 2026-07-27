@@ -163,7 +163,7 @@ public class ConfigurationContext implements ConfiguratorRegistry {
 
     // Once we introduce some breaking change on the model inference mechanism, we will introduce `TWO` and so on
     // And this new mechanism will only get enabled when configuration file uses this version or later
-    enum Version {
+    public enum Version {
         ONE("1");
 
         private final String value;
@@ -202,7 +202,7 @@ public class ConfigurationContext implements ConfiguratorRegistry {
     /**
      * Policy regarding unknown attributes.
      */
-    enum Unknown {
+    public enum Unknown {
         reject,
         warn
     }
@@ -210,7 +210,7 @@ public class ConfigurationContext implements ConfiguratorRegistry {
     /**
      * Policy regarding {@link org.kohsuke.accmod.Restricted} attributes.
      */
-    enum Restriction {
+    public enum Restriction {
         reject,
         beta,
         warn
@@ -219,7 +219,7 @@ public class ConfigurationContext implements ConfiguratorRegistry {
     /**
      * Policy regarding {@link Deprecated} attributes.
      */
-    enum Deprecation {
+    public enum Deprecation {
         reject,
         warn
     }
