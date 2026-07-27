@@ -1,12 +1,13 @@
 package io.jenkins.plugins.casc.core;
 
+import static io.jenkins.plugins.casc.ConfigurationAsCode.get;
+import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import hudson.model.FreeStyleProject;
-import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.ItemConfigurator;
@@ -14,7 +15,6 @@ import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.model.CNode;
 import java.io.IOException;
-import java.util.Objects;
 import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,9 +39,8 @@ public class ItemsRootConfiguratorTest {
         FreeStyleProject p = j.createFreeStyleProject("my-dummy-job");
         p.setDescription("old description");
 
-        ConfigurationAsCode.get()
-                .configure(Objects.requireNonNull(getClass().getResource("ItemsRootConfiguratorTest.yml"))
-                        .toExternalForm());
+        get().configure(requireNonNull(getClass().getResource("ItemsRootConfiguratorTest.yml"))
+                .toExternalForm());
 
         assertEquals("Configured by JCasC items root configurator", p.getDescription());
     }
@@ -49,9 +48,8 @@ public class ItemsRootConfiguratorTest {
     @Test
     public void shouldFailOnUnknownType() {
         try {
-            ConfigurationAsCode.get()
-                    .configure(Objects.requireNonNull(getClass().getResource("ItemsRootConfiguratorTest_unknown.yml"))
-                            .toExternalForm());
+            get().configure(requireNonNull(getClass().getResource("ItemsRootConfiguratorTest_unknown.yml"))
+                    .toExternalForm());
             fail("Expected a ConfiguratorException to be thrown, but it succeeded.");
         } catch (ConfiguratorException e) {
             assertTrue(
@@ -63,10 +61,8 @@ public class ItemsRootConfiguratorTest {
     @Test
     public void shouldFailOnMissingName() {
         try {
-            ConfigurationAsCode.get()
-                    .configure(
-                            Objects.requireNonNull(getClass().getResource("ItemsRootConfiguratorTest_missingName.yml"))
-                                    .toExternalForm());
+            get().configure(requireNonNull(getClass().getResource("ItemsRootConfiguratorTest_missingName.yml"))
+                    .toExternalForm());
             fail("Expected a ConfiguratorException to be thrown, but it succeeded.");
         } catch (ConfiguratorException e) {
             assertTrue(
@@ -78,12 +74,24 @@ public class ItemsRootConfiguratorTest {
     @Test
     public void shouldFailOnMalformedYamlSequence() {
         try {
-            ConfigurationAsCode.get()
-                    .configure(Objects.requireNonNull(getClass().getResource("ItemsRootConfiguratorTest_malformed.yml"))
-                            .toExternalForm());
+            get().configure(requireNonNull(getClass().getResource("ItemsRootConfiguratorTest_malformed.yml"))
+                    .toExternalForm());
             fail("Expected an exception to be thrown due to malformed YAML (mapping instead of sequence).");
         } catch (ConfiguratorException | IllegalStateException e) {
             assertNotNull(e);
+        }
+    }
+
+    @Test
+    public void shouldFailOnEmptyName() {
+        try {
+            get().configure(requireNonNull(getClass().getResource("ItemsRootConfiguratorTest_emptyName.yml"))
+                    .toExternalForm());
+            fail("Expected a ConfiguratorException to be thrown for empty item name, but it succeeded.");
+        } catch (ConfiguratorException e) {
+            assertTrue(
+                    "Message did not match. Got: " + e.getMessage(),
+                    e.getMessage().contains("must have a non-empty 'name' attribute"));
         }
     }
 

@@ -13,6 +13,7 @@ import io.jenkins.plugins.casc.RootElementConfigurator;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import java.util.Collections;
+import java.util.Map.Entry;
 import java.util.Set;
 import jenkins.model.Jenkins;
 
@@ -38,23 +39,15 @@ public class ItemsRootConfigurator implements RootElementConfigurator<Jenkins> {
     @Override
     @NonNull
     public Jenkins configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
+        check(config, context);
         Jenkins jenkins = Jenkins.get();
 
         try (ACLContext ignored = ACL.as2(ACL.SYSTEM2)) {
             for (CNode itemNode : config.asSequence()) {
                 Mapping itemMapping = itemNode.asMapping();
-
-                if (itemMapping.size() != 1) {
-                    throw new ConfiguratorException("Each item must have exactly one type key (e.g., 'freestyle').");
-                }
-
-                String type = itemMapping.keySet().iterator().next();
-                Mapping properties = itemMapping.get(type).asMapping();
-
-                CNode nameNode = properties.get("name");
-                if (nameNode == null) {
-                    throw new ConfiguratorException("Item of type '" + type + "' is missing a 'name' attribute.");
-                }
+                Entry<String, CNode> entry = itemMapping.entrySet().iterator().next();
+                String type = entry.getKey();
+                Mapping properties = entry.getValue().asMapping();
 
                 String name = properties.getScalarValue("name");
 
@@ -81,6 +74,34 @@ public class ItemsRootConfigurator implements RootElementConfigurator<Jenkins> {
 
     @Override
     public Jenkins check(CNode config, ConfigurationContext context) throws ConfiguratorException {
+        for (CNode itemNode : config.asSequence()) {
+            Mapping itemMapping = itemNode.asMapping();
+
+            if (itemMapping.size() != 1) {
+                throw new ConfiguratorException("Each item must have exactly one type key.");
+            }
+
+            Entry<String, CNode> entry = itemMapping.entrySet().iterator().next();
+            String type = entry.getKey();
+            Mapping properties = entry.getValue().asMapping();
+
+            CNode nameNode = properties.get("name");
+            if (nameNode == null) {
+                throw new ConfiguratorException("Item of type '" + type + "' is missing a 'name' attribute.");
+            }
+
+            String name = nameNode.asScalar().getValue();
+
+            if (name == null || name.trim().isEmpty()) {
+                throw new ConfiguratorException("Item of type '" + type + "' must have a non-empty 'name' attribute.");
+            }
+
+            ItemConfigurator<?> configurator = findConfigurator(type);
+            if (configurator == null) {
+                throw new ConfiguratorException("No ItemConfigurator found for type: " + type);
+            }
+        }
+
         return Jenkins.get();
     }
 
