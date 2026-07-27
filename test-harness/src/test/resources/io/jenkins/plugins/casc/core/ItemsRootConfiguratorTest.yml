@@ -1,0 +1,4 @@
+items:
+  - dummy:
+      name: "my-dummy-job"
+      description: "Configured by JCasC items root configurator"
