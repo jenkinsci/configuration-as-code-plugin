@@ -134,4 +134,29 @@ public class ItemsRootConfiguratorTest {
             }
         }
     }
+
+    @Test
+    public void shouldReturnTargetComponent() {
+        ItemsRootConfigurator configurator = new ItemsRootConfigurator();
+        assertEquals(Jenkins.get(), configurator.getTargetComponent(null));
+    }
+
+    @Test
+    public void shouldReturnNullOnDescribe() {
+        ItemsRootConfigurator configurator = new ItemsRootConfigurator();
+        org.junit.Assert.assertNull(configurator.describe(Jenkins.get(), null));
+    }
+
+    @Test
+    public void shouldFailOnMultipleKeys() {
+        try {
+            get().configure(requireNonNull(getClass().getResource("ItemsRootConfiguratorTest_multipleKeys.yml"))
+                    .toExternalForm());
+            fail("Expected a ConfiguratorException to be thrown, but it succeeded.");
+        } catch (ConfiguratorException e) {
+            assertTrue(
+                    "Message did not match. Got: " + e.getMessage(),
+                    e.getMessage().contains("exactly one type key"));
+        }
+    }
 }

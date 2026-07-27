@@ -1,0 +1,5 @@
+items:
+  - freestyle:
+      name: "job-1"
+    pipeline:
+      name: "job-2"
