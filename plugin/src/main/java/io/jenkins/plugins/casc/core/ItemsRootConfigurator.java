@@ -86,7 +86,7 @@ public class ItemsRootConfigurator implements RootElementConfigurator<Jenkins> {
 
     @Override
     public CNode describe(Jenkins instance, ConfigurationContext context) {
-        return new Mapping();
+        return null;
     }
 
     @Override
