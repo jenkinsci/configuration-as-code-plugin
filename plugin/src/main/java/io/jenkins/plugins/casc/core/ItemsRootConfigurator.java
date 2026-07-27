@@ -12,10 +12,9 @@ import io.jenkins.plugins.casc.ItemConfigurator;
 import io.jenkins.plugins.casc.RootElementConfigurator;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
-import jenkins.model.Jenkins;
-
 import java.util.Collections;
 import java.util.Set;
+import jenkins.model.Jenkins;
 
 @Extension
 public class ItemsRootConfigurator implements RootElementConfigurator<Jenkins> {
