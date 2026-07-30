@@ -3,7 +3,9 @@ package io.jenkins.plugins.casc.core;
 import static io.jenkins.plugins.casc.ConfigurationAsCode.get;
 import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -14,6 +16,7 @@ import io.jenkins.plugins.casc.ItemConfigurator;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.model.CNode;
+import io.jenkins.plugins.casc.model.Mapping;
 import java.io.IOException;
 import jenkins.model.Jenkins;
 import org.junit.Rule;
@@ -30,8 +33,19 @@ public class ItemsRootConfiguratorTest {
     public void shouldDiscoverAndDelegateToItemConfigurator() {
         FreeStyleProject project = j.jenkins.getItemByFullName("my-dummy-job", FreeStyleProject.class);
 
-        assertNotNull("Job should have been created by the dummy configurator", project);
+        assertNotNull("Job should have been created by the configurator", project);
         assertEquals("Configured by JCasC items root configurator", project.getDescription());
+        assertFalse("Concurrent builds should be disabled via property", project.isConcurrentBuild());
+        assertEquals(
+                "Should have exactly 2 build steps",
+                2,
+                project.getBuildersList().size());
+        assertTrue(
+                "First builder should be a Shell step",
+                project.getBuildersList().get(0) instanceof hudson.tasks.Shell);
+        assertEquals(
+                "echo 'Hello from JCasC!'",
+                ((hudson.tasks.Shell) project.getBuildersList().get(0)).getCommand());
     }
 
     @Test
@@ -120,10 +134,37 @@ public class ItemsRootConfiguratorTest {
                     project = jenkins.createProject(FreeStyleProject.class, name);
                 }
 
-                CNode descNode = config.asMapping().get("description");
+                Mapping mapping = config.asMapping();
+
+                CNode descNode = mapping.get("description");
                 if (descNode != null) {
-                    String desc = config.asMapping().getScalarValue("description");
+                    String desc = mapping.getScalarValue("description");
                     project.setDescription(desc);
+                }
+
+                CNode propertiesNode = mapping.get("properties");
+                if (propertiesNode != null) {
+                    for (CNode propNode : propertiesNode.asSequence()) {
+                        Mapping propMapping = propNode.asMapping();
+
+                        if (propMapping.containsKey("disableConcurrentBuilds")) {
+                            project.setConcurrentBuild(false);
+                        }
+                    }
+                }
+
+                CNode buildersNode = mapping.get("builders");
+                if (buildersNode != null) {
+                    project.getBuildersList().clear();
+                    for (CNode builderNode : buildersNode.asSequence()) {
+                        io.jenkins.plugins.casc.model.Mapping builderMapping = builderNode.asMapping();
+
+                        if (builderMapping.containsKey("shell")) {
+                            String command =
+                                    builderMapping.get("shell").asMapping().getScalarValue("command");
+                            project.getBuildersList().add(new hudson.tasks.Shell(command));
+                        }
+                    }
                 }
 
                 project.save();
@@ -144,7 +185,7 @@ public class ItemsRootConfiguratorTest {
     @Test
     public void shouldReturnNullOnDescribe() {
         ItemsRootConfigurator configurator = new ItemsRootConfigurator();
-        org.junit.Assert.assertNull(configurator.describe(Jenkins.get(), null));
+        assertNull(configurator.describe(Jenkins.get(), null));
     }
 
     @Test
