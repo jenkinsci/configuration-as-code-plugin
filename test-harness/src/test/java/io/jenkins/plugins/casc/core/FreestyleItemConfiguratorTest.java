@@ -3,6 +3,7 @@ package io.jenkins.plugins.casc.core;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import hudson.model.FreeStyleProject;
 import hudson.model.ParametersDefinitionProperty;
@@ -12,10 +13,16 @@ import hudson.tasks.BatchFile;
 import hudson.tasks.LogRotator;
 import hudson.tasks.Shell;
 import hudson.triggers.TimerTrigger;
+import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
+import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collections;
 import java.util.Objects;
+import java.util.Set;
 import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
@@ -79,11 +86,13 @@ public class FreestyleItemConfiguratorTest {
                 job.getBuildersList().get(1) instanceof BatchFile);
         BatchFile batch = (BatchFile) job.getBuildersList().get(1);
         assertEquals("echo Windows", batch.getCommand());
+
         assertEquals(1, job.getPublishersList().size());
         assertTrue(
                 "Publisher should be ArtifactArchiver", job.getPublishersList().get(0) instanceof ArtifactArchiver);
         ArtifactArchiver archiver = (ArtifactArchiver) job.getPublishersList().get(0);
         assertEquals("*.jar", archiver.getArtifacts());
+
         assertEquals(1, job.getTriggers().size());
         assertTrue(
                 "Trigger should be a TimerTrigger (cron)",
@@ -126,5 +135,85 @@ public class FreestyleItemConfiguratorTest {
                 "Properties should not duplicate",
                 1,
                 paramProp.getParameterDefinitions().size());
+    }
+
+    @Test
+    public void shouldDescribeAttributesCorrectly() {
+        FreestyleItemConfigurator configurator = new FreestyleItemConfigurator();
+        Set<Attribute<FreeStyleProject, ?>> attributes = configurator.describe();
+
+        boolean foundBuildWrappers = attributes.stream().anyMatch(a -> "buildWrappers".equals(a.getName()));
+        assertTrue("Should have renamed buildWrappersList to buildWrappers", foundBuildWrappers);
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void shouldThrowExceptionOnInstance() {
+        new FreestyleItemConfigurator().instance(null, null);
+    }
+
+    @Test
+    public void shouldCatchAndWrapGeneralExceptionInConfigure() {
+        FreestyleItemConfigurator configurator = new FreestyleItemConfigurator();
+        try {
+            configurator.configure("error-job", null, null);
+            fail("Should have thrown ConfiguratorException");
+        } catch (ConfiguratorException e) {
+            assertTrue(e.getMessage().contains("Failed to configure freestyle job: error-job"));
+        }
+    }
+
+    @Test
+    public void shouldRethrowConfiguratorExceptionInConfigure() throws Exception {
+        String yaml = "items:\n  - freestyle:\n      name: bad-job\n      unknownProperty: 123";
+        Path tempFile = Files.createTempFile("bad-job", ".yaml");
+        tempFile.toFile().deleteOnExit();
+        Files.writeString(tempFile, yaml);
+
+        try {
+            ConfigurationAsCode.get().configure(tempFile.toUri().toString());
+            fail("Should have thrown ConfiguratorException for unknown property");
+        } catch (ConfiguratorException e) {
+            assertTrue(e.getMessage() != null || e.getCause() instanceof ConfiguratorException);
+        }
+    }
+
+    @Test
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public void shouldHandleExceptionsInSetters() throws Exception {
+        FreestyleItemConfigurator configurator = new FreestyleItemConfigurator();
+        Attribute propertiesAttr = configurator.describe().stream()
+                .filter(a -> "properties".equals(a.getName()))
+                .findFirst()
+                .orElse(null);
+        Attribute triggersAttr = configurator.describe().stream()
+                .filter(a -> "triggers".equals(a.getName()))
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull(propertiesAttr);
+        assertNotNull(triggersAttr);
+
+        FreeStyleProject job = j.jenkins.createProject(FreeStyleProject.class, "fail-job");
+
+        try {
+            propertiesAttr.setValue(job, Collections.singletonList(null));
+            fail("Expected IllegalStateException for properties setter");
+        } catch (IllegalStateException e) {
+            assertEquals("Failed to apply properties", e.getMessage());
+        }
+
+        try {
+            triggersAttr.setValue(job, Collections.singletonList(null));
+            fail("Expected IllegalStateException for triggers setter");
+        } catch (IllegalStateException e) {
+            assertEquals("Failed to apply triggers", e.getMessage());
+        }
+    }
+
+    @Test
+    public void shouldReturnCorrectNameAndTarget() {
+        FreestyleItemConfigurator configurator = new FreestyleItemConfigurator();
+        assertEquals("freestyle", configurator.getName());
+        assertEquals(FreeStyleProject.class, configurator.getTarget());
     }
 }

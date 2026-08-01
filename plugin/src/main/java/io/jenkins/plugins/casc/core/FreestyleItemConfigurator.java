@@ -49,6 +49,8 @@ public class FreestyleItemConfigurator extends BaseConfigurator<FreeStyleProject
                 case "buildWrappersList":
                     attribute.preferredName("buildWrappers");
                     break;
+                default:
+                    break;
             }
         }
 
