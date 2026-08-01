@@ -18,6 +18,8 @@ The Job DSL plugin uses groovy syntax for its job configuration DSL, so a mix of
 
 [multibranch-github.yaml](multibranch-github.yaml) file is an example of a multibranch pipeline job configured with GitHub as branch source, an orphaned item strategy and periodic scan triggers of 5 mins.
 
+[freestyle.yaml](freestyle.yaml) file is an example of configuring a standard Freestyle project natively through JCasC, **without** relying on the Job DSL plugin. It demonstrates how to configure primitive attributes alongside complex nested lists like `builders`, `publishers`, `buildWrappers`, `triggers`, and job `properties`.
+
 ## implementation note
 
 The main issue with the `jobs` declaration for now is the difference in the `Traits` declaration due to [JENKINS-45504](https://issues.jenkins.io/browse/JENKINS-45504). When this is resolved, the workaround using the `configure` part will no longer be needed and all traits will be declared under the organizations section.
