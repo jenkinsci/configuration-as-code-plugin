@@ -42,29 +42,31 @@ public class LocalFileSystemFetcherTest {
     }
 
     @Test
-    public void testFetchDirectoryIgnoresHiddenAndNonYaml() throws Exception {
+    public void testFetchDirectoryIgnoresNonYaml() throws Exception {
 
         File dir = tempFolder.newFolder("casc-configs");
         File valid1 = new File(dir, "a.yaml");
         File valid2 = new File(dir, "b.yml");
-        File hidden = new File(dir, ".secrets.yaml");
+        File previouslyHidden = new File(dir, ".secrets.yaml");
         File txtFile = new File(dir, "readme.txt");
 
         Files.write(valid1.toPath(), "jenkins:".getBytes());
         Files.write(valid2.toPath(), "unclassified:".getBytes());
-        Files.write(hidden.toPath(), "secret: 123".getBytes());
+        Files.write(previouslyHidden.toPath(), "secret: 123".getBytes());
         Files.write(txtFile.toPath(), "hello".getBytes());
 
         FetchResult result = fetcher.fetch(dir.getAbsolutePath(), null);
         List<ResolvedYaml> items = result.items();
 
-        assertEquals("Should only find a.yaml and b.yml", 2, items.size());
+        assertEquals("Should find a.yaml, b.yml, and .secrets.yaml", 3, items.size());
 
         boolean hasA = items.stream().anyMatch(i -> i.relativePath().equals("a.yaml"));
         boolean hasB = items.stream().anyMatch(i -> i.relativePath().equals("b.yml"));
+        boolean hasSecrets = items.stream().anyMatch(i -> i.relativePath().equals(".secrets.yaml"));
 
         assertTrue(hasA);
         assertTrue(hasB);
+        assertTrue(hasSecrets);
     }
 
     @Test

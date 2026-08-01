@@ -12,7 +12,6 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 @Extension(ordinal = -100)
@@ -63,7 +62,7 @@ public class LocalFileSystemFetcher implements CasCConfigFetcher {
         try (Stream<Path> stream = Files.find(
                 root,
                 Integer.MAX_VALUE,
-                (next, attrs) -> !attrs.isDirectory() && !isHidden(next) && matcher.matches(next),
+                (next, attrs) -> !attrs.isDirectory() && matcher.matches(next),
                 FileVisitOption.FOLLOW_LINKS)) {
 
             List<ResolvedYaml> items = stream.map(path -> {
@@ -74,10 +73,5 @@ public class LocalFileSystemFetcher implements CasCConfigFetcher {
 
             return new FetchResult(items, (AutoCloseable) null);
         }
-    }
-
-    private static boolean isHidden(Path path) {
-        return IntStream.range(0, path.getNameCount()).mapToObj(path::getName).anyMatch(subPath -> subPath.toString()
-                .startsWith("."));
     }
 }

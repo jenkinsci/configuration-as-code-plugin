@@ -1,24 +1,29 @@
 package io.jenkins.plugins.casc.fetcher;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.interrupted;
-import static java.lang.Thread.sleep;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
-import com.sun.net.httpserver.HttpServer;
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.InetSocketAddress;
-import java.net.URI;
 import java.util.stream.Collectors;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class DefaultHttpFetcherTest {
+
+    @Rule
+    public WireMockRule wireMockRule = new WireMockRule(0);
 
     private final DefaultHttpFetcher fetcher = new DefaultHttpFetcher();
 
@@ -36,119 +41,67 @@ public class DefaultHttpFetcherTest {
     }
 
     @Test
-    public void testFilenameExtraction() {
-        assertEquals("casc.yaml", extractFilename("http://example.com"));
-        assertEquals("casc.yaml", extractFilename("http://example.com/"));
-        assertEquals("jenkins.yaml", extractFilename("https://example.com/path/to/jenkins.yaml"));
-        assertEquals("config.yml", extractFilename("https://example.com/config.yml?token=123"));
-    }
-
-    @Test
     public void testActualHttpFetchIntegration() throws Exception {
-        HttpServer server = HttpServer.create(new InetSocketAddress(0), 0);
-        server.createContext("/casc.yaml", exchange -> {
-            byte[] response = "jenkins:\n  systemMessage: 'Hello HTTP'".getBytes(UTF_8);
-            exchange.sendResponseHeaders(200, response.length);
-            exchange.getResponseBody().write(response);
-            exchange.close();
-        });
-        server.start();
+        stubFor(get(urlEqualTo("/casc.yaml"))
+                .willReturn(aResponse().withStatus(200).withBody("jenkins:\n  systemMessage: 'Hello HTTP'")));
 
-        try {
-            int port = server.getAddress().getPort();
-            String targetUrl = "http://localhost:" + port + "/casc.yaml";
+        String targetUrl = wireMockRule.baseUrl() + "/casc.yaml";
+        FetchResult result = fetcher.fetch(targetUrl, null);
 
-            FetchResult result = fetcher.fetch(targetUrl, null);
+        assertEquals(1, result.items().size());
+        ResolvedYaml yaml = result.items().get(0);
 
-            assertEquals(1, result.items().size());
-            ResolvedYaml yaml = result.items().get(0);
+        assertEquals("casc.yaml", yaml.relativePath());
 
-            assertEquals("casc.yaml", yaml.relativePath());
+        String content = new BufferedReader(new InputStreamReader(yaml.open(), UTF_8))
+                .lines()
+                .collect(Collectors.joining("\n"));
 
-            String content = new BufferedReader(new InputStreamReader(yaml.open(), UTF_8))
-                    .lines()
-                    .collect(Collectors.joining("\n"));
-
-            assertEquals("jenkins:\n  systemMessage: 'Hello HTTP'", content);
-
-        } finally {
-            server.stop(0);
-        }
+        assertEquals("jenkins:\n  systemMessage: 'Hello HTTP'", content);
     }
 
     @Test
     public void testFetchWithEmptyFileNameUsesDefault() throws Exception {
-        HttpServer server = HttpServer.create(new InetSocketAddress(0), 0);
-        server.createContext("/", exchange -> {
-            byte[] response = "jenkins:\n  systemMessage: 'Fallback'".getBytes(UTF_8);
-            exchange.sendResponseHeaders(200, response.length);
-            exchange.getResponseBody().write(response);
-            exchange.close();
-        });
-        server.start();
+        stubFor(get(urlEqualTo("/"))
+                .willReturn(aResponse().withStatus(200).withBody("jenkins:\n  systemMessage: 'Fallback'")));
 
-        try {
-            int port = server.getAddress().getPort();
-            String targetUrl = "http://localhost:" + port + "/";
+        String targetUrl = wireMockRule.baseUrl() + "/";
+        FetchResult result = fetcher.fetch(targetUrl, null);
 
-            FetchResult result = fetcher.fetch(targetUrl, null);
+        assertEquals(1, result.items().size());
+        ResolvedYaml yaml = result.items().get(0);
 
-            assertEquals(1, result.items().size());
-            ResolvedYaml yaml = result.items().get(0);
-
-            assertEquals("casc.yaml", yaml.relativePath());
-
-        } finally {
-            server.stop(0);
-        }
+        assertEquals("casc.yaml", yaml.relativePath());
     }
 
     @Test
-    public void testFetchThrowsOnHttpError() throws Exception {
-        HttpServer server = HttpServer.create(new InetSocketAddress(0), 0);
-        server.createContext("/404", exchange -> {
-            exchange.sendResponseHeaders(404, -1);
-            exchange.close();
-        });
-        server.start();
+    public void testFetchThrowsOnHttpError() {
+        stubFor(get(urlEqualTo("/404")).willReturn(aResponse().withStatus(404)));
 
-        try {
-            int port = server.getAddress().getPort();
-            String targetUrl = "http://localhost:" + port + "/404";
+        String targetUrl = wireMockRule.baseUrl() + "/404";
 
-            fetcher.fetch(targetUrl, null);
-            fail("Expected fetcher to throw IOException due to HTTP 404 status");
-        } catch (IOException e) {
-            assertTrue(
-                    "Message should contain the HTTP status code",
-                    e.getMessage().contains("HTTP status code: 404"));
-        } finally {
-            server.stop(0);
-        }
+        IOException e = assertThrows(
+                "Expected fetcher to throw IOException due to HTTP 404 status",
+                IOException.class,
+                () -> fetcher.fetch(targetUrl, null));
+
+        assertTrue("Message should contain the HTTP status code", e.getMessage().contains("HTTP status code: 404"));
     }
 
     @Test
-    public void testFetchThrowsOnInterruption() throws Exception {
-        HttpServer server = HttpServer.create(new InetSocketAddress(0), 0);
-        server.createContext("/slow", exchange -> {
-            try {
-                sleep(1000);
-            } catch (InterruptedException ignored) {
-            }
-            exchange.sendResponseHeaders(200, -1);
-            exchange.close();
-        });
-        server.start();
+    public void testFetchThrowsOnInterruption() {
+        stubFor(get(urlEqualTo("/slow")).willReturn(aResponse().withStatus(200).withFixedDelay(1000)));
+
+        String targetUrl = wireMockRule.baseUrl() + "/slow";
+
+        currentThread().interrupt();
 
         try {
-            int port = server.getAddress().getPort();
-            String targetUrl = "http://localhost:" + port + "/slow";
+            IOException e = assertThrows(
+                    "Expected fetcher to throw IOException due to thread interruption",
+                    IOException.class,
+                    () -> fetcher.fetch(targetUrl, null));
 
-            currentThread().interrupt();
-
-            fetcher.fetch(targetUrl, null);
-            fail("Expected fetcher to throw IOException due to thread interruption");
-        } catch (IOException e) {
             assertTrue(
                     "Message should indicate the thread was interrupted",
                     e.getMessage().contains("Interrupted while fetching"));
@@ -158,22 +111,6 @@ public class DefaultHttpFetcherTest {
         } finally {
             @SuppressWarnings("unused")
             boolean cleared = interrupted();
-
-            server.stop(0);
-        }
-    }
-
-    private String extractFilename(String location) {
-        try {
-            URI uri = new URI(location);
-            String path = uri.getPath();
-            if (path != null && path.contains("/")) {
-                String name = path.substring(path.lastIndexOf('/') + 1);
-                return name.isEmpty() ? "casc.yaml" : name;
-            }
-            return "casc.yaml";
-        } catch (Exception e) {
-            return "casc.yaml";
         }
     }
 }

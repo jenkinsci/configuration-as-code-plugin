@@ -4,6 +4,7 @@ import static java.lang.Thread.currentThread;
 
 import hudson.Extension;
 import hudson.ProxyConfiguration;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -60,7 +61,7 @@ public class DefaultHttpFetcher implements CasCConfigFetcher {
             throw new IOException("Interrupted while fetching configuration from: " + location, e);
         }
 
-        ResolvedYaml resolved = new ResolvedYaml(fileName, () -> new java.io.ByteArrayInputStream(yamlBytes));
+        ResolvedYaml resolved = new ResolvedYaml(fileName, () -> new ByteArrayInputStream(yamlBytes));
 
         return new FetchResult(Collections.singletonList(resolved), (AutoCloseable) null);
     }
