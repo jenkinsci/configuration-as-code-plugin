@@ -10,7 +10,9 @@ import static org.junit.Assert.assertTrue;
 import hudson.plugins.sonar.SonarGlobalConfiguration;
 import hudson.plugins.sonar.SonarInstallation;
 import hudson.plugins.sonar.SonarRunnerInstallation;
+import hudson.plugins.sonar.SonarRunnerInstaller;
 import hudson.plugins.sonar.model.TriggersConfig;
+import hudson.tools.InstallSourceProperty;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
 import java.util.Objects;
@@ -28,8 +30,8 @@ public class SonarQubeTest {
     public JenkinsConfiguredWithReadmeRule j = new JenkinsConfiguredWithReadmeRule();
 
     @Test
-    @ConfiguredWithReadme("sonarqube/README.md")
-    public void configure_sonar_globalconfig() {
+    @ConfiguredWithReadme("sonarqube/README.md#0")
+    public void configure_sonar_global_config() {
 
         final SonarGlobalConfiguration configuration = GlobalConfiguration.all().get(SonarGlobalConfiguration.class);
         assertTrue(Objects.requireNonNull(configuration).isBuildWrapperEnabled());
@@ -46,8 +48,27 @@ public class SonarQubeTest {
     }
 
     @Test
-    @ConfiguredWithReadme("sonarqube/README.md")
-    public void configure_sonar_runner_installation() {
+    @ConfiguredWithReadme("sonarqube/README.md#1")
+    public void configure_automatic_sonar_runner_installation() {
+        SonarRunnerInstallation.DescriptorImpl descriptor =
+                j.jenkins.getDescriptorByType(SonarRunnerInstallation.DescriptorImpl.class);
+        SonarRunnerInstallation[] installations = descriptor.getInstallations();
+
+        assertEquals(1, installations.length);
+        SonarRunnerInstallation installation = installations[0];
+        assertEquals("SonarScanner", installation.getName());
+
+        InstallSourceProperty installSourceProperty =
+                installation.getProperties().get(InstallSourceProperty.class);
+        assertEquals(1, installSourceProperty.installers.size());
+
+        SonarRunnerInstaller installer = installSourceProperty.installers.get(SonarRunnerInstaller.class);
+        assertEquals("7.3.0.5189", installer.id);
+    }
+
+    @Test
+    @ConfiguredWithReadme("sonarqube/README.md#2")
+    public void configure_preinstalled_sonar_runner() {
         SonarRunnerInstallation.DescriptorImpl descriptor =
                 j.jenkins.getDescriptorByType(SonarRunnerInstallation.DescriptorImpl.class);
         SonarRunnerInstallation[] installations = descriptor.getInstallations();

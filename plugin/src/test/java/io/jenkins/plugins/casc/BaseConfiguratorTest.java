@@ -11,6 +11,7 @@ import hudson.util.PersistedList;
 import io.jenkins.plugins.casc.model.Mapping;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -239,6 +240,25 @@ public class BaseConfiguratorTest {
 
         @Restricted(Beta.class)
         public void setRestrictedSetter(String val) {}
+
+        public List<Dog> getCollectionToList() {
+            return null;
+        }
+
+        public void setCollectionToList(Collection<Animal> vals) {}
+
+        public List<Dog> getPriorityStrategies() {
+            return null;
+        }
+
+        public void setPriorityStrategies(List<? extends Animal> vals) {}
+
+        public List<Dog> getUntypedCollection() {
+            return null;
+        }
+
+        @SuppressWarnings("rawtypes")
+        public void setUntypedCollection(Collection val) {}
     }
 
     public static class DummyConfigurator extends BaseConfigurator<DummyTarget> {
@@ -290,7 +310,7 @@ public class BaseConfiguratorTest {
         Map<String, Class<?>> resolvedAttributes =
                 attributes.stream().collect(Collectors.toMap(Attribute::getName, attr -> (Class<?>) attr.getType()));
 
-        assertEquals("Should discover exactly 24 configurable properties", 24, resolvedAttributes.size());
+        assertEquals("Should discover exactly 27 configurable properties", 27, resolvedAttributes.size());
 
         assertEquals("Standard setter should resolve to String", String.class, resolvedAttributes.get("standard"));
 
@@ -344,6 +364,21 @@ public class BaseConfiguratorTest {
                 "Should map wrapper setter with primitive getter",
                 Integer.class,
                 resolvedAttributes.get("wrapperSetter"));
+
+        assertEquals(
+                "When setter takes Collection and getter returns List, the setter's type is used",
+                Animal.class,
+                resolvedAttributes.get("collectionToList"));
+
+        assertEquals(
+                "When setter and getter share the same raw type, the setter's generic signature is preserved",
+                Animal.class,
+                resolvedAttributes.get("priorityStrategies"));
+
+        assertEquals(
+                "When setter is untyped but getter is typed, it should fallback to the getter's generic component type",
+                Dog.class,
+                resolvedAttributes.get("untypedCollection"));
 
         assertEquals(boolean.class, resolvedAttributes.get("primitiveBoolean"));
         assertEquals(long.class, resolvedAttributes.get("primitiveLong"));
@@ -401,7 +436,10 @@ public class BaseConfiguratorTest {
                         "primitiveShort",
                         "voidEdgeCase",
                         "restrictedList",
-                        "restrictedSetter"),
+                        "restrictedSetter",
+                        "collectionToList",
+                        "priorityStrategies",
+                        "untypedCollection"),
                 resolvedAttributes.keySet());
     }
 

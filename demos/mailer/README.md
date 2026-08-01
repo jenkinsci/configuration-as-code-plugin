@@ -10,4 +10,7 @@ unclassified:
     replyToAddress: do-not-reply@acme.org
     smtpHost: smtp.acme.org
     smtpPort: 4441
+    authentication:
+      username: smtp_user
+      password: "${SMTP_PASSWORD}"
 ```

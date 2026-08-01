@@ -54,9 +54,11 @@ public class SchemaGeneration {
                     if (hetero.getTarget() != null) {
                         definitions.put(hetero.getTarget().getName(), heteroSchema);
                     }
-                } else if (configuratorObject instanceof Attribute) {
-                    Attribute attribute = (Attribute) configuratorObject;
-                    if (attribute.type.isEnum()) {
+                } else if (configuratorObject instanceof Attribute<?, ?> attribute) {
+                    if (attribute.multiple) {
+                        generateMultipleAttributeSchema(
+                                schemaConfiguratorObjects, attribute, context, null, definitions);
+                    } else if (attribute.type.isEnum()) {
                         generateEnumAttributeSchema(schemaConfiguratorObjects, attribute, null);
                     } else {
                         schemaConfiguratorObjects.put(
@@ -251,11 +253,16 @@ public class SchemaGeneration {
             JSONObject definitions) {
         Optional<String> description = getDescription(attribute, baseConfigurator);
 
-        if (attribute.type.getName().equals("java.lang.String")) {
-            JSONObject jsonObject = new JSONObject().put("type", "string");
-            description.ifPresent(desc -> jsonObject.put("description", desc));
-            attributeSchema.put(attribute.getName(), jsonObject);
+        JSONObject itemsSchema = new JSONObject();
 
+        if (attribute.type.getName().equals("java.lang.String")) {
+            itemsSchema.put("type", "string");
+        } else if (attribute.type.isEnum()) {
+            ArrayList<String> values = new ArrayList<>();
+            for (Object obj : attribute.type.getEnumConstants()) {
+                values.add(obj.toString());
+            }
+            itemsSchema.put("type", "string").put("enum", new JSONArray(values));
         } else {
             JSONObject properties = new JSONObject();
             Configurator<Object> lookup = context.lookup(attribute.getType());
@@ -266,18 +273,13 @@ public class SchemaGeneration {
                                 generateNonEnumAttributeObject(attr, baseConfigurator, context, definitions)));
             }
 
-            JSONObject attributeObject = new JSONObject()
-                    .put("type", "array")
-                    .put(
-                            "items",
-                            new JSONArray()
-                                    .put(new JSONObject()
-                                            .put("type", "object")
-                                            .put("properties", properties)
-                                            .put("additionalProperties", false)));
-            description.ifPresent(desc -> attributeObject.put("description", desc));
-            attributeSchema.put(attribute.getName(), attributeObject);
+            itemsSchema.put("type", "object").put("properties", properties).put("additionalProperties", false);
         }
+
+        JSONObject attributeObject = new JSONObject().put("type", "array").put("items", itemsSchema);
+
+        description.ifPresent(desc -> attributeObject.put("description", desc));
+        attributeSchema.put(attribute.getName(), attributeObject);
     }
 
     private static void generateEnumAttributeSchema(
