@@ -1,14 +1,12 @@
 package io.jenkins.plugins.casc.fetcher;
 
+import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.Test;
 
@@ -19,7 +17,7 @@ public class FetchResultTest {
         AtomicBoolean wasClosed = new AtomicBoolean(false);
         AutoCloseable mockResource = () -> wasClosed.set(true);
 
-        FetchResult result = new FetchResult(Collections.emptyList(), mockResource);
+        FetchResult result = new FetchResult(emptyList(), mockResource);
 
         result.close();
 
@@ -34,7 +32,7 @@ public class FetchResultTest {
 
         assertTrue(Files.exists(nestedFile));
 
-        FetchResult result = new FetchResult(Collections.emptyList(), tempDir);
+        FetchResult result = new FetchResult(emptyList(), tempDir);
 
         result.close();
 
@@ -48,33 +46,23 @@ public class FetchResultTest {
             throw new Exception("Simulated cleanup failure");
         };
 
-        FetchResult result = new FetchResult(Collections.emptyList(), faultyResource);
+        FetchResult result = new FetchResult(emptyList(), faultyResource);
 
         result.close();
     }
 
     @Test
-    public void testCloseIgnoresNullsInLists() throws Exception {
-        FetchResult result = new FetchResult(Collections.emptyList(), (AutoCloseable) null);
-
-        Field resourcesField = FetchResult.class.getDeclaredField("resourcesToClose");
-        resourcesField.setAccessible(true);
-        @SuppressWarnings("unchecked")
-        List<AutoCloseable> resources = (List<AutoCloseable>) resourcesField.get(result);
-        resources.add(null);
-
-        Field pathsField = FetchResult.class.getDeclaredField("pathsToDelete");
-        pathsField.setAccessible(true);
-        @SuppressWarnings("unchecked")
-        List<Path> paths = (List<Path>) pathsField.get(result);
-        paths.add(null);
-        result.close();
+    public void testCloseIgnoresNullConstructorArguments() throws Exception {
+        FetchResult nullResourceResult = new FetchResult(emptyList(), (AutoCloseable) null);
+        nullResourceResult.close();
+        FetchResult nullPathResult = new FetchResult(emptyList(), (Path) null);
+        nullPathResult.close();
     }
 
     @Test
     public void testCloseSkipsNonExistentDirectory() throws Exception {
         Path tempDir = Files.createTempDirectory("casc-missing-");
-        FetchResult result = new FetchResult(Collections.emptyList(), tempDir);
+        FetchResult result = new FetchResult(emptyList(), tempDir);
         Files.delete(tempDir);
         result.close();
     }

@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import io.jenkins.plugins.casc.fetcher.FetchAuthData.Token;
 import java.util.logging.Level;
 import org.junit.Rule;
 import org.junit.Test;
@@ -22,7 +23,7 @@ public class FetchCredentialsChainTest {
     @Test
     public void testProviderSuccessfullyResolvesCredential() {
         FetchCredentials credentials = FetchCredentials.resolveAll();
-        FetchAuthData.Token tokenAuth = credentials.get("dummy-id", FetchAuthData.Token.class);
+        Token tokenAuth = credentials.get("dummy-id", Token.class);
 
         assertNotNull(tokenAuth);
         assertEquals("dummy-token-value", tokenAuth.getToken());
@@ -31,7 +32,7 @@ public class FetchCredentialsChainTest {
     @Test
     public void testProviderExceptionIsIgnoredAndFallsBack() {
         FetchCredentials credentials = FetchCredentials.resolveAll();
-        FetchAuthData.Token tokenAuth = credentials.get("error-id", FetchAuthData.Token.class);
+        Token tokenAuth = credentials.get("error-id", Token.class);
 
         assertNull(tokenAuth);
     }
@@ -42,8 +43,8 @@ public class FetchCredentialsChainTest {
         @SuppressWarnings("unchecked")
         @Override
         public <T extends FetchAuthData> T getCredentials(String credentialId, Class<T> type) {
-            if ("dummy-id".equals(credentialId) && type == FetchAuthData.Token.class) {
-                return (T) (FetchAuthData.Token) () -> "dummy-token-value";
+            if ("dummy-id".equals(credentialId) && type == Token.class) {
+                return (T) (Token) () -> "dummy-token-value";
             }
             return null;
         }

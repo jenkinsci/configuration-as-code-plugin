@@ -5,6 +5,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assume.assumeTrue;
 
+import io.jenkins.plugins.casc.fetcher.FetchAuthData.SshKey;
+import io.jenkins.plugins.casc.fetcher.FetchAuthData.Token;
+import io.jenkins.plugins.casc.fetcher.FetchAuthData.UsernamePassword;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
@@ -18,20 +21,20 @@ public class BootstrapEnvVarCredentialResolverTest {
 
     @Test
     public void testResolveWithInvalidInputsReturnsNull() {
-        assertNull(resolver.resolve(null, FetchAuthData.Token.class));
-        assertNull(resolver.resolve("", FetchAuthData.Token.class));
+        assertNull(resolver.resolve(null, Token.class));
+        assertNull(resolver.resolve("", Token.class));
         assertNull(resolver.resolve("VALID_ID", null));
     }
 
     @Test
     public void testMissingVariablesReturnNull() {
-        assertNull(resolver.resolve("NON_EXISTENT_TOKEN", FetchAuthData.Token.class));
-        assertNull(resolver.resolve("NON_EXISTENT_SSH", FetchAuthData.SshKey.class));
+        assertNull(resolver.resolve("NON_EXISTENT_TOKEN", Token.class));
+        assertNull(resolver.resolve("NON_EXISTENT_SSH", SshKey.class));
     }
 
     @Test
     public void testUnsupportedTypeReturnsNull() {
-        FetchAuthData.UsernamePassword unsupported = resolver.resolve("SOME_ID", FetchAuthData.UsernamePassword.class);
+        UsernamePassword unsupported = resolver.resolve("SOME_ID", UsernamePassword.class);
         assertNull(unsupported);
     }
 
@@ -41,7 +44,7 @@ public class BootstrapEnvVarCredentialResolverTest {
 
         assumeTrue(expectedToken != null && !expectedToken.isEmpty());
 
-        FetchAuthData.Token tokenAuth = resolver.resolve("PATH", FetchAuthData.Token.class);
+        Token tokenAuth = resolver.resolve("PATH", FetchAuthData.Token.class);
 
         assertNotNull(tokenAuth);
         assertEquals(expectedToken, tokenAuth.getToken());
@@ -53,7 +56,7 @@ public class BootstrapEnvVarCredentialResolverTest {
         environment.set("MY_SSH_USERNAME", "custom-user");
         environment.set("MY_SSH_PASSPHRASE", "super-secret");
 
-        FetchAuthData.SshKey sshKey = resolver.resolve("MY_SSH", FetchAuthData.SshKey.class);
+        SshKey sshKey = resolver.resolve("MY_SSH", SshKey.class);
 
         assertNotNull(sshKey);
         assertEquals("dummy-key-data", sshKey.getPrivateKey());
@@ -65,7 +68,7 @@ public class BootstrapEnvVarCredentialResolverTest {
     public void testSshKeyResolutionWithDefaultUsername() {
         environment.set("DEFAULT_SSH_PRIVATE_KEY", "dummy-key-data-2");
 
-        FetchAuthData.SshKey sshKey = resolver.resolve("DEFAULT_SSH", FetchAuthData.SshKey.class);
+        SshKey sshKey = resolver.resolve("DEFAULT_SSH", SshKey.class);
 
         assertNotNull(sshKey);
         assertEquals("dummy-key-data-2", sshKey.getPrivateKey());

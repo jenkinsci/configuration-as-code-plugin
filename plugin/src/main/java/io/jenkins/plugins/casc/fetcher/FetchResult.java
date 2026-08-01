@@ -1,10 +1,13 @@
 package io.jenkins.plugins.casc.fetcher;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.reverseOrder;
+import static java.util.Collections.unmodifiableList;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public final class FetchResult implements AutoCloseable {
@@ -14,14 +17,14 @@ public final class FetchResult implements AutoCloseable {
     private final List<Path> pathsToDelete = new ArrayList<>();
 
     public FetchResult(List<ResolvedYaml> items, AutoCloseable resource) {
-        this.items = items != null ? Collections.unmodifiableList(items) : Collections.emptyList();
+        this.items = items != null ? unmodifiableList(items) : emptyList();
         if (resource != null) {
             this.resourcesToClose.add(resource);
         }
     }
 
     public FetchResult(List<ResolvedYaml> items, Path tempDirectory) {
-        this.items = items != null ? Collections.unmodifiableList(items) : Collections.emptyList();
+        this.items = items != null ? unmodifiableList(items) : emptyList();
         if (tempDirectory != null) {
             this.pathsToDelete.add(tempDirectory);
         }
@@ -34,9 +37,6 @@ public final class FetchResult implements AutoCloseable {
     @Override
     public void close() throws IOException {
         for (AutoCloseable resource : resourcesToClose) {
-            if (resource == null) {
-                continue;
-            }
             try {
                 resource.close();
             } catch (Exception e) {
@@ -45,13 +45,12 @@ public final class FetchResult implements AutoCloseable {
         }
 
         for (Path tempDirectory : pathsToDelete) {
-            if (tempDirectory == null || !Files.exists(tempDirectory)) {
+            if (!Files.exists(tempDirectory)) {
                 continue;
             }
 
             try (var stream = Files.walk(tempDirectory)) {
-                List<Path> paths =
-                        stream.sorted(java.util.Comparator.reverseOrder()).toList();
+                List<Path> paths = stream.sorted(reverseOrder()).toList();
                 for (Path p : paths) {
                     Files.delete(p);
                 }
