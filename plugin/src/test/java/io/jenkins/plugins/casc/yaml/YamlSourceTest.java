@@ -48,4 +48,18 @@ class YamlSourceTest {
         YamlSource<HttpServletRequest> yamlSource = YamlSource.of(request);
         assertEquals("YamlSource: /configuration-as-code/check", yamlSource.toString());
     }
+
+    @Test
+    void shouldHandleInputStreamWithName() {
+        InputStream testInputStream = new ByteArrayInputStream("IS content".getBytes(StandardCharsets.UTF_8));
+        YamlSource<InputStream> yamlSource = YamlSource.of(testInputStream, "my-custom-stream");
+        assertEquals("YamlSource: my-custom-stream", yamlSource.toString());
+    }
+
+    @Test
+    void shouldHandlePathWithName() {
+        Path path = new File("./test").toPath();
+        YamlSource<Path> yamlSource = YamlSource.of(path, "my-custom-path");
+        assertEquals("YamlSource: my-custom-path", yamlSource.toString());
+    }
 }

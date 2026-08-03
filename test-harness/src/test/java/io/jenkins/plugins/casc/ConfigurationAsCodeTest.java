@@ -11,6 +11,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.htmlunit.HttpMethod.POST;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -18,6 +20,9 @@ import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import hudson.Functions;
 import hudson.util.FormValidation;
+import io.jenkins.plugins.casc.fetcher.CasCConfigFetcher;
+import io.jenkins.plugins.casc.fetcher.FetchCredentials;
+import io.jenkins.plugins.casc.fetcher.FetchResult;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
@@ -27,6 +32,8 @@ import io.jenkins.plugins.casc.yaml.YamlSource;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -45,6 +52,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule.WebClient;
+import org.jvnet.hudson.test.TestExtension;
 
 @WithJenkinsConfiguredWithCode
 class ConfigurationAsCodeTest {
@@ -146,7 +154,7 @@ class ConfigurationAsCodeTest {
     }
 
     @Test
-    void shouldReportMissingFileOnNotFoundConfig() {
+    void shouldReportMissingFileOnNotFoundConfig(JenkinsConfiguredWithCodeRule j) {
         ConfigurationAsCode casc = new ConfigurationAsCode();
         assertThrows(ConfiguratorException.class, () -> casc.configure("some"));
     }
@@ -291,7 +299,7 @@ class ConfigurationAsCodeTest {
 
     @Test
     @Issue("Issue #914")
-    void isSupportedURI_should_not_throw_on_invalid_uri() {
+    void isSupportedURI_should_not_throw_on_invalid_uri(JenkinsConfiguredWithCodeRule j) {
         // for example, a Windows path is not a valid URI
         assertThat(ConfigurationAsCode.isSupportedURI("C:\\jenkins\\casc"), is(false));
     }
@@ -338,6 +346,119 @@ class ConfigurationAsCodeTest {
         String actualDocString = ConfigurationAsCode.get()
                 .getHtmlHelp(hudson.security.FullControlOnceLoggedInAuthorizationStrategy.class, "allowAnonymousRead");
         assertEquals(expectedDocString, actualDocString);
+    }
+
+    @Test
+    void doCheckNewSource_should_catch_exceptions_on_invalid_yaml(JenkinsConfiguredWithCodeRule j) throws Exception {
+        File brokenYaml = newFile(tempFolder, "broken.yaml");
+        Files.write(brokenYaml.toPath(), "jenkins: \n\t- tabs: are: forbidden: in: yaml".getBytes());
+
+        ConfigurationAsCode casc = ConfigurationAsCode.get();
+
+        FormValidation validation = casc.doCheckNewSource(brokenYaml.getAbsolutePath());
+
+        assertEquals(FormValidation.Kind.ERROR, validation.kind);
+    }
+
+    @Test
+    void doCheckNewSource_should_return_error_for_invalid_config(JenkinsConfiguredWithCodeRule j) throws Exception {
+        File invalidConfig = newFile(tempFolder, "invalid.yaml");
+        Files.write(invalidConfig.toPath(), "jenkins:\n  definitelyNotARealProperty: true".getBytes());
+
+        ConfigurationAsCode casc = ConfigurationAsCode.get();
+
+        FormValidation validation = casc.doCheckNewSource(invalidConfig.getAbsolutePath());
+
+        assertEquals(FormValidation.Kind.ERROR, validation.kind);
+        assertTrue(
+                validation.getMessage().contains("definitelyNotARealProperty"),
+                "Error message should mention the invalid property");
+    }
+
+    @Test
+    void configure_should_wrap_ioexception_from_fetcher(JenkinsConfiguredWithCodeRule j) {
+        ConfigurationAsCode casc = ConfigurationAsCode.get();
+
+        ConfiguratorException ex = assertThrows(
+                ConfiguratorException.class,
+                () -> casc.configure("file:/this/path/definitely/does/not/exist_casc.yaml"));
+
+        assertTrue(
+                ex.getMessage().contains("Failed to fetch configuration from"),
+                "Exception message should come from the IOException catch block");
+    }
+
+    @Test
+    void configure_should_throw_when_source_is_not_supported(JenkinsConfiguredWithCodeRule j) {
+        ConfigurationAsCode casc = ConfigurationAsCode.get();
+
+        ConfiguratorException ex =
+                assertThrows(ConfiguratorException.class, () -> casc.configure("unsupported://protocol-scheme-test"));
+
+        assertTrue(
+                ex.getMessage().contains("is not supported by any registered configuration fetcher"),
+                "Exception message should indicate unsupported source protocol");
+    }
+
+    @Test
+    void isSupportedURI_should_cover_all_branches(JenkinsConfiguredWithCodeRule j) {
+        assertFalse(ConfigurationAsCode.isSupportedURI(null), "Should return false for null input");
+
+        assertTrue(
+                ConfigurationAsCode.isSupportedURI("throw-io://test"),
+                "Should return true when our test fetcher claims support");
+
+        assertFalse(
+                ConfigurationAsCode.isSupportedURI("unsupported-scheme://test"),
+                "Should return false when no fetchers support the scheme");
+    }
+
+    @Test
+    void getConfigFromSources_should_throw_on_ioexception(JenkinsConfiguredWithCodeRule j) throws Exception {
+        ConfigurationAsCode casc = ConfigurationAsCode.get();
+
+        Method method = ConfigurationAsCode.class.getDeclaredMethod("getConfigFromSources", List.class);
+        method.setAccessible(true);
+
+        InvocationTargetException ex =
+                assertThrows(InvocationTargetException.class, () -> method.invoke(casc, List.of("throw-io://test")));
+
+        assertInstanceOf(ConfiguratorException.class, ex.getCause(), "Cause should be ConfiguratorException");
+        assertTrue(
+                ex.getCause().getMessage().contains("Failed to fetch configuration from"),
+                "Should cover the catch (IOException e) block");
+    }
+
+    @Test
+    void getConfigFromSources_should_throw_on_unsupported_source(JenkinsConfiguredWithCodeRule j) throws Exception {
+        ConfigurationAsCode casc = ConfigurationAsCode.get();
+
+        Method method = ConfigurationAsCode.class.getDeclaredMethod("getConfigFromSources", List.class);
+        method.setAccessible(true);
+
+        InvocationTargetException ex = assertThrows(
+                InvocationTargetException.class,
+                () -> method.invoke(casc, List.of("definitely-unsupported-scheme://test")));
+
+        assertInstanceOf(ConfiguratorException.class, ex.getCause(), "Cause should be ConfiguratorException");
+        assertTrue(
+                ex.getCause().getMessage().contains("is not supported by any registered configuration fetcher"),
+                "Should cover the if (!fetched) block");
+    }
+
+    @TestExtension
+    @SuppressWarnings("unused")
+    public static class ThrowOnFetchFetcher implements CasCConfigFetcher {
+
+        @Override
+        public boolean supports(String location) {
+            return "throw-io://test".equals(location);
+        }
+
+        @Override
+        public FetchResult fetch(String location, FetchCredentials credentials) throws IOException {
+            throw new IOException("Simulated fetch failure");
+        }
     }
 
     private static File newFolder(File root, String... subDirs) throws IOException {

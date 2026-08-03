@@ -110,25 +110,11 @@ First, start a Jenkins instance with the [Configuration as Code](https://plugins
 
 Second, the plugin looks for the `CASC_JENKINS_CONFIG` environment variable. The variable points to a comma-separated list of any of the following:
 
-- Path to a folder containing a set of config files. For example, `/var/jenkins_home/casc_configs`.
-- A full path to a single file. For example, `/var/jenkins_home/casc_configs/jenkins.yaml`.
-- A URL pointing to a file served on the web. For example, `https://acme.org/jenkins.yaml`.
+- Path to a local folder containing a set of config files. For example, `/var/jenkins_home/casc_configs`.
+- A full path or URI to a local file. For example, `/var/jenkins_home/casc_configs/jenkins.yaml` or `file:///var/jenkins_home/casc_configs/jenkins.yaml`.
+- An HTTP or HTTPS URL pointing to a remote file. For example, `https://acme.org/jenkins.yaml`.
 
-If an element of `CASC_JENKINS_CONFIG` points to a folder, the plugin will recursively traverse the folder to find file(s) with .yml,.yaml,.YAML,.YML suffix. It will exclude hidden files or files that contain a hidden folder in **any part** of the full path. It follows symbolic links for both files and directories.
-<details><summary>Exclusion examples</summary>
-
-`CASC_JENKINS_CONFIG=/jenkins/casc_configs`  
-:heavy_check_mark: `/jenkins/casc_configs/jenkins.yaml`  
-:heavy_check_mark: `/jenkins/casc_configs/dir1/config.yaml`  
-:x: `/jenkins/casc_configs/.dir1/config.yaml`  
-:x: `/jenkins/casc_configs/..dir2/config.yaml`  
-  
-`CASC_JENKINS_CONFIG=/jenkins/.configs/casc_configs` contains hidden folder `.config`  
-:x: `/jenkins/.configs/casc_configs/jenkins.yaml`  
-:x: `/jenkins/.configs/casc_configs/dir1/config.yaml`  
-:x: `/jenkins/.configs/casc_configs/.dir1/config.yaml`  
-:x: `/jenkins/.configs/casc_configs/..dir2/config.yaml`  
-</details>
+If an element of `CASC_JENKINS_CONFIG` points to a folder, the plugin will recursively traverse the folder to find file(s) with `.yml`, `.yaml`, `.YAML`, `.YML` suffix.
 
 All configuration files that are discovered MUST be supplementary. They cannot overwrite each other's configuration values. This creates a conflict and raises a `ConfiguratorException`. Thus, the order of traversal does not matter to the final outcome.
 

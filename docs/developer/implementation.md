@@ -103,3 +103,45 @@ As short term workaround, a custom `Configurator` glue-code implementation can b
 
 Initial secrets are handled by the concrete implementations of the [SecretSource](https://github.com/jenkinsci/configuration-as-code-plugin/blob/master/plugin/src/main/java/io/jenkins/plugins/casc/SecretSource.java). In order to implement a new
 secret source, subclass `SecretSource` by extending it, and mark the new class with the `@Extension` annotation.
+
+## Configuration Fetchers
+
+Configuration sources are resolved through the `CasCConfigFetcher`
+extension point.
+
+Each fetcher determines whether it supports a location by implementing
+`supports(String location)` and retrieves configuration by implementing
+`fetch(String location, FetchCredentials credentials)`.
+
+### Built-in Fetchers
+
+- **`LocalFileSystemFetcher`**: Handles local file paths and `file://` URIs. If given a directory path, it recursively traverses the tree to load all files ending in `.yaml` or `.yml`.
+- **`DefaultHttpFetcher`**: Handles remote HTTP and HTTPS URLs (`http://`, `https://`).
+
+### Custom Fetchers
+
+Plugin developers can create custom fetchers (for example, to load configurations directly from S3, Git, or Vault) by implementing `CasCConfigFetcher`:
+
+```java
+@Extension
+public class CustomConfigFetcher implements CasCConfigFetcher {
+
+    @Override
+    public boolean supports(String location) {
+        return location != null && location.startsWith("custom://");
+    }
+
+    @Override
+    public FetchResult fetch(String location, FetchCredentials credentials) throws IOException {
+        // Retrieve resources and return a FetchResult containing ResolvedYaml items
+    }
+}
+```
+
+### Credentials
+
+Fetchers receive a `FetchCredentials` instance which resolves authentication
+data through registered `FetchCredentialsProvider` extensions.
+
+Plugins can contribute credentials for custom configuration sources by
+implementing `FetchCredentialsProvider`.
