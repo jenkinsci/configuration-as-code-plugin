@@ -1,0 +1,11 @@
+items:
+  - dummy:
+      name: "my-dummy-job"
+      description: "Configured by JCasC items root configurator"
+      properties:
+        - disableConcurrentBuilds: {}
+      builders:
+        - shell:
+            command: "echo 'Hello from JCasC!'"
+        - shell:
+            command: "echo 'Second build step'"

@@ -1,0 +1,34 @@
+items:
+  - freestyle:
+      name: my-freestyle-full-job
+      displayName: My Freestyle Job
+      description: Configured via JCasC
+      concurrentBuild: true
+      quietPeriod: 50
+
+      buildDiscarder:
+        logRotator:
+          daysToKeepStr: "7"
+          numToKeepStr: "10"
+
+      builders:
+        - shell:
+            command: "echo Hello"
+        - batchFile:
+            command: "echo Windows"
+
+      publishers:
+        - archiveArtifacts:
+            artifacts: "*.jar"
+
+      triggers:
+        - cron:
+            spec: "* * * * *"
+
+      properties:
+        - parameters:
+            parameterDefinitions:
+              - string:
+                  name: "DEPLOY_ENV"
+                  defaultValue: "dev"
+                  description: "Target environment"

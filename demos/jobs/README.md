@@ -23,3 +23,44 @@ The Job DSL plugin uses groovy syntax for its job configuration DSL, so a mix of
 The main issue with the `jobs` declaration for now is the difference in the `Traits` declaration due to [JENKINS-45504](https://issues.jenkins.io/browse/JENKINS-45504). When this is resolved, the workaround using the `configure` part will no longer be needed and all traits will be declared under the organizations section.
 
 Job DSL only allows `periodic(int min)` for configuring a trigger for now. So to configure "1 day" for example, we need to use the `configure` workaround as shown in [bitbucket.yaml](bitbucket.yaml#L68)
+
+## Native Freestyle Job
+
+A standard Freestyle project can be configured natively through JCasC using the `items` root element, **without** relying on the Job DSL plugin. It demonstrates how to configure primitive attributes alongside complex nested lists like `builders`, `publishers`, `triggers`, and job `properties`.
+
+```yaml
+items:
+  - freestyle:
+      name: my-freestyle-full-job
+      displayName: My Freestyle Job
+      description: Configured via JCasC
+      concurrentBuild: true
+      quietPeriod: 50
+
+      buildDiscarder:
+        logRotator:
+          daysToKeepStr: "7"
+          numToKeepStr: "10"
+
+      builders:
+        - shell:
+            command: "echo Hello"
+        - batchFile:
+            command: "echo Windows"
+
+      publishers:
+        - archiveArtifacts:
+            artifacts: "*.jar"
+
+      triggers:
+        - cron:
+            spec: "* * * * *"
+
+      properties:
+        - parameters:
+            parameterDefinitions:
+              - string:
+                  name: "DEPLOY_ENV"
+                  defaultValue: "dev"
+                  description: "Target environment"
+```

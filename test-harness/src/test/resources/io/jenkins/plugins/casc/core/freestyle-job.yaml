@@ -1,0 +1,5 @@
+items:
+  - freestyle:
+      name: "my-freestyle-job"
+      displayName: "My Freestyle Job"
+      description: "Configured via JCasC"

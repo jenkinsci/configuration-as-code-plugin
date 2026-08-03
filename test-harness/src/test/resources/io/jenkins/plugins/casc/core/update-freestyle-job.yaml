@@ -1,0 +1,5 @@
+items:
+  - freestyle:
+      name: "existing-freestyle-job"
+      displayName: "Updated Freestyle Job"
+      description: "Updated via JCasC"
