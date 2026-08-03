@@ -1,0 +1,32 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout" xmlns:f="/lib/form" xmlns:st="jelly:stapler">
+  <l:layout title="Export - ${it.item.displayName}">
+
+    <st:include page="sidepanel.jelly" it="${it.item}"/>
+
+    <l:main-panel>
+      <h1>Export: ${it.item.displayName}</h1>
+
+      <p>
+        This is the Configuration as Code YAML representation of this item.
+      </p>
+
+      <f:section title="YAML Configuration">
+        <f:textarea value="${it.config}"
+          codemirror-mode="yaml"
+          codemirror-config="readOnly: true, lineNumbers: true" />
+      </f:section>
+
+      <div style="margin-top: 15px; display: flex; align-items: center;">
+
+        <l:copyButton text="${it.config}" message="Copied YAML to clipboard!" tooltip="Copy to Clipboard" />
+
+        <a href="downloadYaml" class="jenkins-button" style="margin-left: 20px; text-decoration: none;">
+          Download YAML
+        </a>
+
+      </div>
+
+    </l:main-panel>
+  </l:layout>
+</j:jelly>

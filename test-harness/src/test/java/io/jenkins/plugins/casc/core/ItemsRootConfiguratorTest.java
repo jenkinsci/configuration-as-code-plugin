@@ -1,6 +1,7 @@
 package io.jenkins.plugins.casc.core;
 
 import static io.jenkins.plugins.casc.ConfigurationAsCode.get;
+import static java.util.Collections.emptySet;
 import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -9,7 +10,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.FreeStyleProject;
+import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.ItemConfigurator;
@@ -18,6 +21,7 @@ import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import java.io.IOException;
+import java.util.Set;
 import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
@@ -114,7 +118,7 @@ public class ItemsRootConfiguratorTest {
     public static class DummyItemConfigurator implements ItemConfigurator<FreeStyleProject> {
 
         @Override
-        public String getName() {
+        public @NonNull String getName() {
             return "dummy";
         }
 
@@ -173,6 +177,28 @@ public class ItemsRootConfiguratorTest {
             } catch (IOException e) {
                 throw new ConfiguratorException("Failed to configure dummy job: " + name, e);
             }
+        }
+
+        @Override
+        public CNode describe(FreeStyleProject instance, ConfigurationContext context) {
+            return null;
+        }
+
+        @Override
+        @NonNull
+        public Set<Attribute<FreeStyleProject, ?>> describe() {
+            return emptySet();
+        }
+
+        @Override
+        @NonNull
+        public FreeStyleProject configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
+            throw new UnsupportedOperationException("DummyItemConfigurator requires a name to configure");
+        }
+
+        @Override
+        public FreeStyleProject check(CNode config, ConfigurationContext context) throws ConfiguratorException {
+            return null;
         }
     }
 
