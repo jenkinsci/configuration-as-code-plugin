@@ -5,6 +5,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import hudson.model.FreeStyleProject;
+import java.net.URL;
+import org.htmlunit.HttpMethod;
+import org.htmlunit.WebRequest;
+import org.htmlunit.WebResponse;
 import org.htmlunit.html.HtmlPage;
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,5 +49,21 @@ public class ExportItemActionTest {
         assertTrue("Page should contain the items root", pageText.contains("items:"));
         assertTrue("Page should contain the freestyle configurator type", pageText.contains("- freestyle:"));
         assertTrue("Page should contain the job name", pageText.contains("name: \"test-job\""));
+    }
+
+    @Test
+    public void testDownloadYamlEndpoint() throws Exception {
+        FreeStyleProject project = j.createFreeStyleProject("test-job");
+        JenkinsRule.WebClient client = j.createWebClient();
+
+        WebRequest request =
+                new WebRequest(new URL(j.getURL() + project.getUrl() + "jcasc-export/downloadYaml"), HttpMethod.POST);
+
+        client.addCrumb(request);
+
+        WebResponse response = client.getPage(request).getWebResponse();
+
+        assertEquals(200, response.getStatusCode());
+        assertTrue(response.getContentAsString().contains("name: \"test-job\""));
     }
 }

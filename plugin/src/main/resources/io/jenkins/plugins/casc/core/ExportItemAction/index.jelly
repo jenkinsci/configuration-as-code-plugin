@@ -21,9 +21,9 @@
 
         <l:copyButton text="${it.config}" message="Copied YAML to clipboard!" tooltip="Copy to Clipboard" />
 
-        <a href="downloadYaml" class="jenkins-button" style="margin-left: 20px; text-decoration: none;">
-          Download YAML
-        </a>
+        <f:form action="downloadYaml" method="post" style="display: inline-block; margin-left: 10px;">
+          <f:submit value="Download YAML" class="jenkins-button" />
+        </f:form>
 
       </div>
 

@@ -11,6 +11,7 @@ import java.io.StringWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.kohsuke.stapler.StaplerResponse2;
+import org.kohsuke.stapler.interceptor.RequirePOST;
 import org.yaml.snakeyaml.nodes.Node;
 
 @SuppressWarnings("ClassCanBeRecord")
@@ -70,8 +71,11 @@ public class ExportItemAction implements Action {
         return "# Could not generate JCasC configuration.";
     }
 
+    @RequirePOST
     @SuppressWarnings("unused")
     public void doDownloadYaml(StaplerResponse2 rsp) throws Exception {
+        item.checkPermission(TopLevelItem.CONFIGURE);
+
         String yamlConfig = getConfig();
 
         rsp.setContentType("application/x-yaml;charset=UTF-8");
