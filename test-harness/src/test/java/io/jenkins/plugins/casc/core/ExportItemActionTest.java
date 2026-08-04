@@ -24,7 +24,7 @@ public class ExportItemActionTest {
         FreeStyleProject project = j.createFreeStyleProject("test-export-job");
         ExportItemAction action = new ExportItemAction(project);
 
-        assertEquals("Export", action.getDisplayName());
+        assertEquals("Export Configuration", action.getDisplayName());
         assertEquals("jcasc-export", action.getUrlName());
         assertEquals(project, action.getItem());
 

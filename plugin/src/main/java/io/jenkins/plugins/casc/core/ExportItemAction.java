@@ -32,7 +32,7 @@ public class ExportItemAction implements Action {
 
     @Override
     public String getDisplayName() {
-        return "Export";
+        return "Export Configuration";
     }
 
     @Override
