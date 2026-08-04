@@ -25,7 +25,7 @@ public class ExportItemActionTest {
         ExportItemAction action = new ExportItemAction(project);
 
         assertEquals("Export Configuration", action.getDisplayName());
-        assertEquals("jcasc-export", action.getUrlName());
+        assertEquals("configuration-as-code-export", action.getUrlName());
         assertEquals(project, action.getItem());
 
         String yamlConfig = action.getConfig();
@@ -42,7 +42,7 @@ public class ExportItemActionTest {
 
         JenkinsRule.WebClient client = j.createWebClient();
 
-        HtmlPage page = client.goTo(project.getUrl() + "jcasc-export/");
+        HtmlPage page = client.goTo(project.getUrl() + "configuration-as-code-export/");
 
         String pageText = page.asNormalizedText();
 
@@ -56,8 +56,8 @@ public class ExportItemActionTest {
         FreeStyleProject project = j.createFreeStyleProject("test-job");
         JenkinsRule.WebClient client = j.createWebClient();
 
-        WebRequest request =
-                new WebRequest(new URL(j.getURL() + project.getUrl() + "jcasc-export/downloadYaml"), HttpMethod.POST);
+        WebRequest request = new WebRequest(
+                new URL(j.getURL() + project.getUrl() + "configuration-as-code-export/downloadYaml"), HttpMethod.POST);
 
         client.addCrumb(request);
 

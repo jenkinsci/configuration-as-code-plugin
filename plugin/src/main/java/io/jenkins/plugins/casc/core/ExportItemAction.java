@@ -37,10 +37,14 @@ public class ExportItemAction implements Action {
 
     @Override
     public String getUrlName() {
-        return "jcasc-export";
+        return "configuration-as-code-export";
     }
 
     public TopLevelItem getItem() {
+        return item;
+    }
+
+    public TopLevelItem getObject() {
         return item;
     }
 
