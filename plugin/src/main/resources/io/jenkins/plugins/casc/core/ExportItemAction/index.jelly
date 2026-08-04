@@ -5,27 +5,27 @@
     <st:include page="sidepanel.jelly" it="${it.item}"/>
 
     <l:main-panel>
-      <h1>Export: ${it.item.displayName}</h1>
+      <j:set var="yamlConfig" value="${it.config}" />
+
+      <l:app-bar title="Export: ${it.item.displayName}">
+        <l:copyButton ref="yaml-config" text="${yamlConfig}" message="Copied YAML to clipboard!" tooltip="Copy to Clipboard" />
+
+        <f:form action="downloadYaml" method="post" name="downloadForm">
+          <f:submit icon="symbol-download" primary="false" value="${%Download}"/>
+        </f:form>
+      </l:app-bar>
 
       <p>
         This is the Configuration as Code YAML representation of this item.
       </p>
 
       <f:section title="YAML Configuration">
-        <f:textarea value="${it.config}"
+        <f:textarea
+          id="yaml-config"
+          value="${yamlConfig}"
           codemirror-mode="yaml"
-          codemirror-config="readOnly: true, lineNumbers: true" />
+          codemirror-config="readOnly: true, lineNumbers: true"/>
       </f:section>
-
-      <div style="margin-top: 15px; display: flex; align-items: center;">
-
-        <l:copyButton text="${it.config}" message="Copied YAML to clipboard!" tooltip="Copy to Clipboard" />
-
-        <f:form action="downloadYaml" method="post" style="display: inline-block; margin-left: 10px;">
-          <f:submit value="Download YAML" class="jenkins-button" />
-        </f:form>
-
-      </div>
 
     </l:main-panel>
   </l:layout>

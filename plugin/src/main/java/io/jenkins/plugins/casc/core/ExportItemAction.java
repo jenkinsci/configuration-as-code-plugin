@@ -1,6 +1,7 @@
 package io.jenkins.plugins.casc.core;
 
 import hudson.model.Action;
+import hudson.model.Item;
 import hudson.model.TopLevelItem;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfigurationContext;
@@ -26,7 +27,7 @@ public class ExportItemAction implements Action {
 
     @Override
     public String getIconFileName() {
-        return item.hasPermission(TopLevelItem.CONFIGURE) ? "symbol-code" : null;
+        return item.hasPermission(Item.EXTENDED_READ) ? "symbol-document-text-outline plugin-ionicons-api" : null;
     }
 
     @Override
@@ -44,7 +45,7 @@ public class ExportItemAction implements Action {
     }
 
     public String getConfig() {
-        item.checkPermission(TopLevelItem.CONFIGURE);
+        item.checkPermission(Item.EXTENDED_READ);
 
         try {
             ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
@@ -65,7 +66,7 @@ public class ExportItemAction implements Action {
             }
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "Failed to export JCasC for item: " + item.getFullName(), e);
-            return "# Error exporting configuration: " + e.getMessage();
+            return "# Error exporting configuration.";
         }
 
         return "# Could not generate JCasC configuration.";
@@ -74,7 +75,7 @@ public class ExportItemAction implements Action {
     @RequirePOST
     @SuppressWarnings("unused")
     public void doDownloadYaml(StaplerResponse2 rsp) throws Exception {
-        item.checkPermission(TopLevelItem.CONFIGURE);
+        item.checkPermission(Item.EXTENDED_READ);
 
         String yamlConfig = getConfig();
 
