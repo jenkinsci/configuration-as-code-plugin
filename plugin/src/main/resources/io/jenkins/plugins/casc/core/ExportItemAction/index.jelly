@@ -12,7 +12,7 @@
       </f:form>
     </l:app-bar>
 
-    <p>
+    <p class="jenkins-page-description">
       This is the Configuration as Code YAML representation of this item.
     </p>
 
