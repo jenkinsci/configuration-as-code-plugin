@@ -37,6 +37,8 @@ public class FreestyleItemConfigurator extends BaseConfigurator<FreeStyleProject
     @SuppressWarnings({"unchecked", "rawtypes"})
     public Set<Attribute<FreeStyleProject, ?>> describe() {
         Set<Attribute<FreeStyleProject, ?>> attributes = super.describe();
+        attributes.removeIf(attribute -> attribute.getName().equals("displayNameOrNull"));
+        attributes.add(new Attribute<FreeStyleProject, String>("name", String.class).getter(FreeStyleProject::getName));
 
         for (Attribute<FreeStyleProject, ?> attribute : attributes) {
             switch (attribute.getName()) {

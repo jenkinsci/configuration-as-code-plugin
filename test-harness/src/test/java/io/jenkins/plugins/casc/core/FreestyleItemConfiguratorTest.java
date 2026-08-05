@@ -1,6 +1,7 @@
 package io.jenkins.plugins.casc.core;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -138,12 +139,26 @@ public class FreestyleItemConfiguratorTest {
     }
 
     @Test
-    public void shouldDescribeAttributesCorrectly() {
+    public void shouldDescribeAttributesCorrectly() throws Exception {
         FreestyleItemConfigurator configurator = new FreestyleItemConfigurator();
         Set<Attribute<FreeStyleProject, ?>> attributes = configurator.describe();
 
         boolean foundBuildWrappers = attributes.stream().anyMatch(a -> "buildWrappers".equals(a.getName()));
         assertTrue("Should have renamed buildWrappersList to buildWrappers", foundBuildWrappers);
+
+        boolean foundDisplayNameOrNull = attributes.stream().anyMatch(a -> "displayNameOrNull".equals(a.getName()));
+        assertFalse("Should have removed displayNameOrNull", foundDisplayNameOrNull);
+
+        Attribute<FreeStyleProject, ?> nameAttr = attributes.stream()
+                .filter(a -> "name".equals(a.getName()))
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull("Should have added 'name' attribute", nameAttr);
+
+        FreeStyleProject dummyProject = j.jenkins.createProject(FreeStyleProject.class, "dummy-project");
+        Object nameValue = nameAttr.getValue(dummyProject);
+        assertEquals("dummy-project", nameValue);
     }
 
     @Test(expected = UnsupportedOperationException.class)

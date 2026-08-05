@@ -1,0 +1,28 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout" xmlns:f="/lib/form">
+
+  <l:job-subpage>
+    <j:set var="yamlConfig" value="${it.config}" />
+
+    <l:app-bar title="Export: ${it.item.displayName}">
+      <l:copyButton ref="yaml-config" text="${yamlConfig}" message="Copied YAML to clipboard!" tooltip="Copy to Clipboard" />
+
+      <f:form action="downloadYaml" method="post" name="downloadForm">
+        <f:submit icon="symbol-download" primary="false" value="${%Download}"/>
+      </f:form>
+    </l:app-bar>
+
+    <p class="jenkins-page-description">
+      This is the Configuration as Code YAML representation of this item.
+    </p>
+
+    <f:section title="YAML Configuration">
+      <f:textarea
+        id="yaml-config"
+        value="${yamlConfig}"
+        codemirror-mode="yaml"
+        codemirror-config="readOnly: true, lineNumbers: true"/>
+    </f:section>
+  </l:job-subpage>
+
+</j:jelly>
