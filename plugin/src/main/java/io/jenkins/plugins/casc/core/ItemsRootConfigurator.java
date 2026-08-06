@@ -39,11 +39,12 @@ public class ItemsRootConfigurator implements RootElementConfigurator<Jenkins> {
     @Override
     @NonNull
     public Jenkins configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
-        check(config, context);
+        CNode interpolatedConfig = CNodeInterpolator.interpolate(config, context);
+        doCheck(interpolatedConfig);
         Jenkins jenkins = Jenkins.get();
 
         try (ACLContext ignored = ACL.as2(ACL.SYSTEM2)) {
-            for (CNode itemNode : config.asSequence()) {
+            for (CNode itemNode : interpolatedConfig.asSequence()) {
                 Mapping itemMapping = itemNode.asMapping();
                 Entry<String, CNode> entry = itemMapping.entrySet().iterator().next();
                 String type = entry.getKey();
@@ -74,7 +75,12 @@ public class ItemsRootConfigurator implements RootElementConfigurator<Jenkins> {
 
     @Override
     public Jenkins check(CNode config, ConfigurationContext context) throws ConfiguratorException {
-        for (CNode itemNode : config.asSequence()) {
+        CNode interpolatedConfig = CNodeInterpolator.interpolate(config, context);
+        return doCheck(interpolatedConfig);
+    }
+
+    private Jenkins doCheck(CNode interpolatedConfig) throws ConfiguratorException {
+        for (CNode itemNode : interpolatedConfig.asSequence()) {
             Mapping itemMapping = itemNode.asMapping();
 
             if (itemMapping.size() != 1) {
