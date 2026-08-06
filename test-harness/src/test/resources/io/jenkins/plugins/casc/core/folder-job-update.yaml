@@ -1,0 +1,6 @@
+items:
+  - folder:
+      name: existing-folder
+      displayName: Updated Folder
+      description: Updated via JCasC
+      

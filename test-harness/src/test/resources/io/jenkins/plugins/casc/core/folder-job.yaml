@@ -1,0 +1,5 @@
+items:
+  - folder:
+      name: my-folder
+      displayName: My Folder
+      description: Configured via JCasC
