@@ -31,7 +31,9 @@ public class CNodeInterpolator {
                 if (newMapping == null && originalChild != interpolatedChild) {
                     newMapping = new Mapping();
                     for (Map.Entry<String, CNode> previous : mapping.entrySet()) {
-                        if (previous.getKey().equals(key)) break;
+                        if (previous.getKey().equals(key)) {
+                            break;
+                        }
                         newMapping.put(previous.getKey(), previous.getValue());
                     }
                 }

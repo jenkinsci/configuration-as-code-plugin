@@ -137,6 +137,60 @@ public class CNodeInterpolatorTest {
         assertEquals("static_value", result.getScalarValue("static_sibling"));
     }
 
+    @Test
+    public void shouldBackfillMappingWhenSubsequentEntryChanges() {
+        Mapping original = new Mapping();
+        original.put("plain_key", new Scalar("plain_value"));
+        original.put("var_key", new Scalar("${VAR}"));
+
+        CNode resultNode = CNodeInterpolator.interpolate(original, context);
+
+        assertNotSame(original, resultNode);
+        Mapping result = resultNode.asMapping();
+
+        assertEquals("plain_value", result.getScalarValue("plain_key"));
+        assertEquals("resolved_value", result.getScalarValue("var_key"));
+    }
+
+    @Test
+    public void shouldReturnSameSequenceWhenNothingChanges() {
+        Sequence original = new Sequence();
+        original.add(new Scalar("plain_text1"));
+        original.add(new Scalar("plain_text2"));
+
+        CNode result = CNodeInterpolator.interpolate(original, context);
+
+        assertSame(original, result);
+    }
+
+    @Test
+    public void shouldReturnSameNodeForUnknownCNodeType() {
+        CNode customNode = new CNode() {
+            @Override
+            public Type getType() {
+                return null;
+            }
+
+            @Override
+            public io.jenkins.plugins.casc.model.Source getSource() {
+                return null;
+            }
+
+            @Override
+            public CNode clone() {
+                try {
+                    return (CNode) super.clone();
+                } catch (CloneNotSupportedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        };
+
+        CNode resultNode = CNodeInterpolator.interpolate(customNode, context);
+
+        assertSame(customNode, resultNode);
+    }
+
     @TestExtension
     public static class DummySecretSource extends SecretSource {
         @NonNull
