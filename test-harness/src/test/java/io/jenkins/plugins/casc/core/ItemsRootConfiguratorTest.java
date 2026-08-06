@@ -16,11 +16,13 @@ import hudson.model.FreeStyleProject;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.ConfiguratorException;
+import io.jenkins.plugins.casc.ConfiguratorRegistry;
 import io.jenkins.plugins.casc.ItemConfigurator;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
+import io.jenkins.plugins.casc.model.Scalar;
 import io.jenkins.plugins.casc.model.Sequence;
 import java.io.IOException;
 import java.util.Set;
@@ -232,10 +234,10 @@ public class ItemsRootConfiguratorTest {
     @Test
     public void shouldCheckValidConfiguration() {
         ItemsRootConfigurator configurator = new ItemsRootConfigurator();
-        ConfigurationContext context = new ConfigurationContext(io.jenkins.plugins.casc.ConfiguratorRegistry.get());
+        ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
 
         Mapping properties = new Mapping();
-        properties.put("name", new io.jenkins.plugins.casc.model.Scalar("my-check-job"));
+        properties.put("name", new Scalar("my-check-job"));
 
         Mapping item = new Mapping();
         item.put("dummy", properties);
@@ -251,10 +253,10 @@ public class ItemsRootConfiguratorTest {
     @Test
     public void shouldFailCheckOnUnknownType() {
         ItemsRootConfigurator configurator = new ItemsRootConfigurator();
-        ConfigurationContext context = new ConfigurationContext(io.jenkins.plugins.casc.ConfiguratorRegistry.get());
+        ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
 
         Mapping properties = new Mapping();
-        properties.put("name", new io.jenkins.plugins.casc.model.Scalar("my-check-job"));
+        properties.put("name", new Scalar("my-check-job"));
 
         Mapping item = new Mapping();
         item.put("unknown_type", properties);
