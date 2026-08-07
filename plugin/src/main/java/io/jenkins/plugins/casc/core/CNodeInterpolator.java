@@ -17,7 +17,12 @@ public class CNodeInterpolator {
         if (node instanceof Scalar scalar) {
             String original = scalar.getValue();
             String resolved = context.getSecretSourceResolver().resolve(original);
-            return original.equals(resolved) ? scalar : new Scalar(resolved);
+
+            if (original.equals(resolved)) {
+                return scalar;
+            }
+
+            return new Scalar(resolved, scalar.getSource());
         }
 
         if (node instanceof Mapping mapping) {
@@ -28,17 +33,10 @@ public class CNodeInterpolator {
                 CNode originalChild = entry.getValue();
                 CNode interpolatedChild = interpolate(originalChild, context);
 
-                if (newMapping == null && originalChild != interpolatedChild) {
-                    newMapping = new Mapping();
-                    for (Map.Entry<String, CNode> previous : mapping.entrySet()) {
-                        if (previous.getKey().equals(key)) {
-                            break;
-                        }
-                        newMapping.put(previous.getKey(), previous.getValue());
+                if (originalChild != interpolatedChild) {
+                    if (newMapping == null) {
+                        newMapping = mapping.clone();
                     }
-                }
-
-                if (newMapping != null) {
                     newMapping.put(key, interpolatedChild);
                 }
             }
@@ -48,22 +46,17 @@ public class CNodeInterpolator {
 
         if (node instanceof Sequence sequence) {
             Sequence newSequence = null;
-            int index = 0;
 
-            for (CNode child : sequence) {
+            for (int i = 0; i < sequence.size(); i++) {
+                CNode child = sequence.get(i);
                 CNode interpolatedChild = interpolate(child, context);
 
-                if (newSequence == null && child != interpolatedChild) {
-                    newSequence = new Sequence();
-                    for (int i = 0; i < index; i++) {
-                        newSequence.add(sequence.get(i));
+                if (child != interpolatedChild) {
+                    if (newSequence == null) {
+                        newSequence = sequence.clone();
                     }
+                    newSequence.set(i, interpolatedChild);
                 }
-
-                if (newSequence != null) {
-                    newSequence.add(interpolatedChild);
-                }
-                index++;
             }
 
             return newSequence != null ? newSequence : sequence;
