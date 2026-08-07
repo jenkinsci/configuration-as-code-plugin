@@ -7,6 +7,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -15,11 +16,14 @@ import hudson.model.FreeStyleProject;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.ConfiguratorException;
+import io.jenkins.plugins.casc.ConfiguratorRegistry;
 import io.jenkins.plugins.casc.ItemConfigurator;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
+import io.jenkins.plugins.casc.model.Scalar;
+import io.jenkins.plugins.casc.model.Sequence;
 import java.io.IOException;
 import java.util.Set;
 import jenkins.model.Jenkins;
@@ -225,5 +229,46 @@ public class ItemsRootConfiguratorTest {
                     "Message did not match. Got: " + e.getMessage(),
                     e.getMessage().contains("exactly one type key"));
         }
+    }
+
+    @Test
+    public void shouldCheckValidConfiguration() {
+        ItemsRootConfigurator configurator = new ItemsRootConfigurator();
+        ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
+
+        Mapping properties = new Mapping();
+        properties.put("name", new Scalar("my-check-job"));
+
+        Mapping item = new Mapping();
+        item.put("dummy", properties);
+
+        Sequence itemsSequence = new Sequence();
+        itemsSequence.add(item);
+
+        Jenkins result = configurator.check(itemsSequence, context);
+
+        assertNotNull("Check should return a non-null Jenkins instance", result);
+    }
+
+    @Test
+    public void shouldFailCheckOnUnknownType() {
+        ItemsRootConfigurator configurator = new ItemsRootConfigurator();
+        ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
+
+        Mapping properties = new Mapping();
+        properties.put("name", new Scalar("my-check-job"));
+
+        Mapping item = new Mapping();
+        item.put("unknown_type", properties);
+
+        Sequence itemsSequence = new Sequence();
+        itemsSequence.add(item);
+
+        ConfiguratorException e =
+                assertThrows(ConfiguratorException.class, () -> configurator.check(itemsSequence, context));
+
+        assertTrue(
+                "Message did not match. Got: " + e.getMessage(),
+                e.getMessage().contains("No ItemConfigurator found for type: unknown_type"));
     }
 }
