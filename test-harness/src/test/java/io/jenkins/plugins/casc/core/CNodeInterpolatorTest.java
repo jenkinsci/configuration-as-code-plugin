@@ -1,5 +1,6 @@
 package io.jenkins.plugins.casc.core;
 
+import static io.jenkins.plugins.casc.core.CNodeInterpolator.interpolate;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
@@ -14,6 +15,7 @@ import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Mapping;
 import io.jenkins.plugins.casc.model.Scalar;
 import io.jenkins.plugins.casc.model.Sequence;
+import io.jenkins.plugins.casc.model.Source;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Rule;
@@ -35,13 +37,13 @@ public class CNodeInterpolatorTest {
 
     @Test
     public void shouldReturnNullForNullNode() {
-        assertNull(CNodeInterpolator.interpolate(null, context));
+        assertNull(interpolate(null, context));
     }
 
     @Test
     public void shouldInterpolateScalarAndAllocateNew() {
         Scalar original = new Scalar("${VAR}");
-        CNode result = CNodeInterpolator.interpolate(original, context);
+        CNode result = interpolate(original, context);
 
         assertNotSame(original, result);
         assertEquals("resolved_value", result.asScalar().getValue());
@@ -50,7 +52,7 @@ public class CNodeInterpolatorTest {
     @Test
     public void shouldRespectEscapedVariables() {
         Scalar original = new Scalar("^${VAR}");
-        CNode result = CNodeInterpolator.interpolate(original, context);
+        CNode result = interpolate(original, context);
 
         assertNotSame(original, result);
         assertEquals("${VAR}", result.asScalar().getValue());
@@ -59,7 +61,7 @@ public class CNodeInterpolatorTest {
     @Test
     public void shouldResolveUnknownVariableToEmptyString() {
         Scalar original = new Scalar("${UNKNOWN}");
-        CNode result = CNodeInterpolator.interpolate(original, context);
+        CNode result = interpolate(original, context);
 
         assertEquals("", result.asScalar().getValue());
     }
@@ -70,7 +72,7 @@ public class CNodeInterpolatorTest {
         original.put("${VAR}", new Scalar("${VAR}"));
         original.put("plain_key", new Scalar("plain_value"));
 
-        CNode resultNode = CNodeInterpolator.interpolate(original, context);
+        CNode resultNode = interpolate(original, context);
 
         assertNotSame(original, resultNode);
         Mapping result = resultNode.asMapping();
@@ -88,7 +90,7 @@ public class CNodeInterpolatorTest {
         original.add(new Scalar("plain_text"));
         original.add(new Scalar("${VAR}"));
 
-        CNode resultNode = CNodeInterpolator.interpolate(original, context);
+        CNode resultNode = interpolate(original, context);
 
         assertNotSame(original, resultNode);
         Sequence result = resultNode.asSequence();
@@ -103,7 +105,7 @@ public class CNodeInterpolatorTest {
         Mapping mapping = new Mapping();
         mapping.put("name", new Scalar("plain"));
 
-        CNode result = CNodeInterpolator.interpolate(mapping, context);
+        CNode result = interpolate(mapping, context);
 
         assertSame(mapping, result);
     }
@@ -122,7 +124,7 @@ public class CNodeInterpolatorTest {
         rootMapping.put("sequence", sequence);
         rootMapping.put("static_sibling", new Scalar("static_value"));
 
-        CNode resultNode = CNodeInterpolator.interpolate(rootMapping, context);
+        CNode resultNode = interpolate(rootMapping, context);
 
         assertNotSame(rootMapping, resultNode);
         Mapping result = resultNode.asMapping();
@@ -143,7 +145,7 @@ public class CNodeInterpolatorTest {
         original.put("plain_key", new Scalar("plain_value"));
         original.put("var_key", new Scalar("${VAR}"));
 
-        CNode resultNode = CNodeInterpolator.interpolate(original, context);
+        CNode resultNode = interpolate(original, context);
 
         assertNotSame(original, resultNode);
         Mapping result = resultNode.asMapping();
@@ -158,7 +160,7 @@ public class CNodeInterpolatorTest {
         original.add(new Scalar("plain_text1"));
         original.add(new Scalar("plain_text2"));
 
-        CNode result = CNodeInterpolator.interpolate(original, context);
+        CNode result = interpolate(original, context);
 
         assertSame(original, result);
     }
@@ -172,7 +174,7 @@ public class CNodeInterpolatorTest {
             }
 
             @Override
-            public io.jenkins.plugins.casc.model.Source getSource() {
+            public Source getSource() {
                 return null;
             }
 
@@ -186,7 +188,7 @@ public class CNodeInterpolatorTest {
             }
         };
 
-        CNode resultNode = CNodeInterpolator.interpolate(customNode, context);
+        CNode resultNode = interpolate(customNode, context);
 
         assertSame(customNode, resultNode);
     }
