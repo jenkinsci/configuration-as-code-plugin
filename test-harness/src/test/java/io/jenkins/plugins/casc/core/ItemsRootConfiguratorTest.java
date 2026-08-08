@@ -228,6 +228,20 @@ public class ItemsRootConfiguratorTest {
         }
     }
 
+    public static class ScopedSystemProperty implements AutoCloseable {
+        private final String key;
+
+        public ScopedSystemProperty(String key, String value) {
+            this.key = key;
+            System.setProperty(key, value);
+        }
+
+        @Override
+        public void close() {
+            System.clearProperty(key);
+        }
+    }
+
     @Test
     public void shouldReturnTargetComponent() {
         ItemsRootConfigurator configurator = new ItemsRootConfigurator();
@@ -434,17 +448,13 @@ public class ItemsRootConfiguratorTest {
 
     @Test
     public void shouldInterpolateVariablesInItemName() {
-        System.setProperty("MY_INTERPOLATED_JOB_NAME", "dynamic-job-name");
-
-        try {
+        try (ScopedSystemProperty ignored = new ScopedSystemProperty("MY_INTERPOLATED_JOB_NAME", "dynamic-job-name")) {
             ItemsRootConfigurator configurator = new ItemsRootConfigurator();
             ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
 
             configurator.configure(root(null, "${MY_INTERPOLATED_JOB_NAME}"), context);
 
             assertNotNull("Job should be created using the interpolated name", j.jenkins.getItem("dynamic-job-name"));
-        } finally {
-            System.clearProperty("MY_INTERPOLATED_JOB_NAME");
         }
     }
 
