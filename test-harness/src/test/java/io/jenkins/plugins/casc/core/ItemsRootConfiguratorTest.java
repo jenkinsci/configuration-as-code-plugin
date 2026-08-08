@@ -18,6 +18,7 @@ import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.ConfiguratorRegistry;
 import io.jenkins.plugins.casc.ItemConfigurator;
+import io.jenkins.plugins.casc.core.CascItemProperty.DescriptorImpl;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.model.CNode;
@@ -596,5 +597,15 @@ public class ItemsRootConfiguratorTest {
         configurator.configure(root, context);
 
         assertEquals(0, j.jenkins.getItems().size());
+    }
+
+    @Test
+    public void testCascItemPropertyAndDescriptor() {
+        CascItemProperty property = new CascItemProperty();
+        assertNotNull("Property instance should be created", property);
+
+        DescriptorImpl descriptor = new DescriptorImpl();
+        assertTrue("Descriptor should be applicable to any Job type", descriptor.isApplicable(FreeStyleProject.class));
+        assertNotNull("Display name should not be null", descriptor.getDisplayName());
     }
 }
