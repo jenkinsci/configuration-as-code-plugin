@@ -489,4 +489,112 @@ public class ItemsRootConfiguratorTest {
         assertNotNull("Job B should be created by the second sync", j.jenkins.getItem("job-B"));
         assertEquals("Total items should remain 1", 1, j.jenkins.getItems().size());
     }
+
+    @Test
+    public void shouldHandleMissingItemsKey() {
+        ItemsRootConfigurator configurator = new ItemsRootConfigurator();
+        ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
+
+        Mapping root = new Mapping();
+        root.put("removeStrategy", new Scalar("sync"));
+
+        configurator.configure(root, context);
+
+        assertEquals(0, j.jenkins.getItems().size());
+    }
+
+    @Test
+    public void shouldCheckValidMappingConfiguration() {
+        ItemsRootConfigurator configurator = new ItemsRootConfigurator();
+        ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
+
+        Jenkins result = configurator.check(root("sync", "job-A"), context);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    public void shouldFailOnInvalidItemsMapping() {
+        ItemsRootConfigurator configurator = new ItemsRootConfigurator();
+        ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
+
+        Mapping mapping = new Mapping();
+        mapping.put("foo", new Scalar("bar"));
+
+        ConfiguratorException e = assertThrows(ConfiguratorException.class, () -> configurator.check(mapping, context));
+
+        assertTrue(e.getMessage().contains("Invalid items configuration"));
+    }
+
+    @Test
+    public void shouldFailWhenItemsIsNotSequence() {
+        ItemsRootConfigurator configurator = new ItemsRootConfigurator();
+        ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
+
+        Mapping root = new Mapping();
+        root.put("items", new Mapping());
+
+        ConfiguratorException e = assertThrows(ConfiguratorException.class, () -> configurator.check(root, context));
+
+        assertTrue(e.getMessage().contains("Expected a sequence of items"));
+    }
+
+    @Test
+    public void shouldNotRetagAlreadyManagedJob() throws Exception {
+        FreeStyleProject job = j.createFreeStyleProject("job-A");
+        job.addProperty(new CascItemProperty());
+        job.save();
+
+        ItemsRootConfigurator configurator = new ItemsRootConfigurator();
+        ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
+
+        configurator.configure(root(null, "job-A"), context);
+
+        assertNotNull(job.getProperty(CascItemProperty.class));
+    }
+
+    @Test
+    public void shouldNotDeleteConfiguredItemWithRemoveAll() {
+        ItemsRootConfigurator configurator = new ItemsRootConfigurator();
+        ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
+
+        configurator.configure(root("remove-all", "job-A"), context);
+
+        assertNotNull(j.jenkins.getItem("job-A"));
+    }
+
+    @Test
+    public void shouldFailCheckOnInvalidRemoveStrategy() {
+        ItemsRootConfigurator configurator = new ItemsRootConfigurator();
+        ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
+
+        Mapping root = new Mapping();
+        root.put("removeStrategy", new Scalar("invalid"));
+        root.put("items", new Sequence());
+
+        assertThrows(ConfiguratorException.class, () -> configurator.check(root, context));
+    }
+
+    @Test
+    public void shouldFailOnEmptyMapping() {
+        ItemsRootConfigurator configurator = new ItemsRootConfigurator();
+        ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
+
+        Mapping mapping = new Mapping();
+
+        assertThrows(ConfiguratorException.class, () -> configurator.check(mapping, context));
+    }
+
+    @Test
+    public void shouldAllowMissingItemsWhenOnlyStrategySpecified() {
+        ItemsRootConfigurator configurator = new ItemsRootConfigurator();
+        ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
+
+        Mapping root = new Mapping();
+        root.put("removeStrategy", new Scalar("none"));
+
+        configurator.configure(root, context);
+
+        assertEquals(0, j.jenkins.getItems().size());
+    }
 }

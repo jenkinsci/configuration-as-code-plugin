@@ -61,13 +61,7 @@ public class ItemsRootConfigurator implements RootElementConfigurator<Jenkins> {
 
         if (interpolatedConfig instanceof Mapping) {
             Mapping mapping = interpolatedConfig.asMapping();
-            if (mapping.containsKey("removeStrategy")) {
-                try {
-                    strategy = fromString(mapping.getScalarValue("removeStrategy"));
-                } catch (IllegalArgumentException e) {
-                    throw new ConfiguratorException(e.getMessage());
-                }
-            }
+            strategy = parseRemoveStrategy(mapping);
             itemsSequence = mapping.containsKey("items") ? mapping.get("items") : new Sequence();
         }
 
@@ -122,17 +116,17 @@ public class ItemsRootConfigurator implements RootElementConfigurator<Jenkins> {
 
                     if (strategy == ItemRemoveStrategy.REMOVE_ALL) {
                         LOGGER.log(INFO, "CasC remove-all strategy: Deleting unconfigured item {0}", item.getName());
-                        item.delete();
+                        jenkins.remove(item);
                     } else if (strategy == ItemRemoveStrategy.SYNC && isCascManaged) {
                         LOGGER.log(
                                 INFO,
                                 "CasC sync strategy: Deleting previously managed, now unconfigured item {0}",
                                 item.getName());
-                        item.delete();
+                        jenkins.remove(item);
                     }
                 }
             }
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException | IllegalArgumentException e) {
             throw new ConfiguratorException("Failed to apply item removal strategy", e);
         }
     }
@@ -153,6 +147,7 @@ public class ItemsRootConfigurator implements RootElementConfigurator<Jenkins> {
                 throw new ConfiguratorException(
                         "Invalid items configuration. Expected a sequence of items, or a mapping containing 'items' or 'removeStrategy'.");
             }
+            parseRemoveStrategy(mapping);
             itemsSequence = mapping.containsKey("items") ? mapping.get("items") : new Sequence();
         }
 
@@ -190,6 +185,18 @@ public class ItemsRootConfigurator implements RootElementConfigurator<Jenkins> {
         }
 
         return Jenkins.get();
+    }
+
+    private ItemRemoveStrategy parseRemoveStrategy(Mapping mapping) throws ConfiguratorException {
+        if (!mapping.containsKey("removeStrategy")) {
+            return NONE;
+        }
+
+        try {
+            return fromString(mapping.get("removeStrategy").asScalar().getValue());
+        } catch (IllegalArgumentException e) {
+            throw new ConfiguratorException(e.getMessage());
+        }
     }
 
     private ItemConfigurator<?> findConfigurator(String type) {
