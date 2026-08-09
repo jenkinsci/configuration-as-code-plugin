@@ -264,16 +264,55 @@ public class SchemaGeneration {
             }
             itemsSchema.put("type", "string").put("enum", new JSONArray(values));
         } else {
-            JSONObject properties = new JSONObject();
-            Configurator<Object> lookup = context.lookup(attribute.getType());
-            if (lookup != null) {
-                lookup.getAttributes()
-                        .forEach(attr -> properties.put(
-                                attr.getName(),
-                                generateNonEnumAttributeObject(attr, baseConfigurator, context, definitions)));
-            }
+            @SuppressWarnings("rawtypes")
+            Configurator lookup = context.lookup(attribute.getType());
 
-            itemsSchema.put("type", "object").put("properties", properties).put("additionalProperties", false);
+            if (lookup != null) {
+                @SuppressWarnings({"rawtypes", "unchecked"})
+                List<Configurator> implementors = lookup.getConfigurators(context);
+
+                if (implementors.size() > 1) {
+                    JSONArray oneOfJsonArray = new JSONArray();
+                    JSONObject propertiesObject = new JSONObject();
+
+                    for (Object obj : implementors) {
+                        @SuppressWarnings("rawtypes")
+                        Configurator impl = (Configurator) obj;
+                        String name = impl.getName();
+                        Class<?> targetClass = impl.getTarget();
+                        propertiesObject.put(
+                                name, new JSONObject().put("$ref", "#/definitions/" + targetClass.getName()));
+                        oneOfJsonArray.put(new JSONObject().put("required", new JSONArray().put(name)));
+                        ensureDefinitionExists(targetClass, context, definitions);
+                    }
+                    itemsSchema
+                            .put("type", "object")
+                            .put("additionalProperties", false)
+                            .put("properties", propertiesObject)
+                            .put("minProperties", 1)
+                            .put("maxProperties", 1)
+                            .put("oneOf", oneOfJsonArray);
+                } else if (lookup instanceof HeteroDescribableConfigurator) {
+                    itemsSchema = generateHeteroDescribableConfigObject(
+                            (HeteroDescribableConfigurator<?>) lookup, context, definitions);
+                } else {
+                    JSONObject properties = new JSONObject();
+                    for (Object attr : lookup.getAttributes()) {
+                        Attribute<?, ?> a = (Attribute<?, ?>) attr;
+                        properties.put(
+                                a.getName(), generateNonEnumAttributeObject(a, baseConfigurator, context, definitions));
+                    }
+                    itemsSchema
+                            .put("type", "object")
+                            .put("properties", properties)
+                            .put("additionalProperties", false);
+                }
+            } else {
+                itemsSchema
+                        .put("type", "object")
+                        .put("properties", new JSONObject())
+                        .put("additionalProperties", false);
+            }
         }
 
         JSONObject attributeObject = new JSONObject().put("type", "array").put("items", itemsSchema);
