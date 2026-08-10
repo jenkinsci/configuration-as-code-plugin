@@ -1,5 +1,6 @@
 package io.jenkins.plugins.casc;
 
+import static io.jenkins.plugins.casc.SchemaGeneration.generateSchema;
 import static io.jenkins.plugins.casc.misc.Util.convertYamlFileToJson;
 import static io.jenkins.plugins.casc.misc.Util.validateSchema;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -89,8 +90,37 @@ class SchemaGenerationTest {
     }
 
     @Test
+    void itemsRootShouldExposePolymorphicItemSchema(JenkinsConfiguredWithCodeRule j) {
+        JSONObject schema = generateSchema();
+        JSONObject itemsRoot = schema.getJSONObject("properties").getJSONObject("items");
+        JSONObject itemsRootProperties = itemsRoot.getJSONObject("properties");
+
+        assertEquals(
+                "string",
+                itemsRootProperties.getJSONObject("actionOnUndeclaredItems").getString("type"),
+                "actionOnUndeclaredItems should be generated as a string enum");
+        assertEquals(
+                "array",
+                itemsRootProperties.getJSONObject("items").getString("type"),
+                "items should be generated as an array");
+
+        JSONObject itemSchema = itemsRootProperties.getJSONObject("items").getJSONObject("items");
+        JSONObject itemProperties = itemSchema.getJSONObject("properties");
+        assertNotNull(itemProperties.getJSONObject("freestyle"), "freestyle should be present in item schema");
+        assertEquals(
+                "#/definitions/hudson.model.FreeStyleProject",
+                itemProperties.getJSONObject("freestyle").getString("$ref"),
+                "freestyle should reference the FreeStyleProject definition");
+        assertNotNull(
+                itemSchema.getJSONArray("oneOf"), "polymorphic item schema should expose oneOf for item configurators");
+        assertNotNull(
+                schema.getJSONObject("definitions").getJSONObject("hudson.model.FreeStyleProject"),
+                "FreeStyleProject definition should be generated");
+    }
+
+    @Test
     void arrayEnumAttributesShouldGenerateAsEnumArrays(JenkinsConfiguredWithCodeRule j) {
-        JSONObject schema = SchemaGeneration.generateSchema();
+        JSONObject schema = generateSchema();
 
         JSONObject unclassifiedProps =
                 schema.getJSONObject("properties").getJSONObject("unclassified").getJSONObject("properties");

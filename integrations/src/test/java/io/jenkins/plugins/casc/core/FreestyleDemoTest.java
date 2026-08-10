@@ -24,7 +24,7 @@ public class FreestyleDemoTest {
     public JenkinsConfiguredWithReadmeRule j = new JenkinsConfiguredWithReadmeRule();
 
     @Test
-    @ConfiguredWithReadme("jobs/README.md")
+    @ConfiguredWithReadme("jobs/README.md#0")
     public void shouldConfigureFreestyleJobFromReadme() {
         FreeStyleProject job = (FreeStyleProject) Jenkins.get().getItem("my-freestyle-full-job");
 
@@ -76,5 +76,14 @@ public class FreestyleDemoTest {
                 (StringParameterDefinition) paramProp.getParameterDefinitions().get(0);
         assertEquals("DEPLOY_ENV", stringParam.getName());
         assertEquals("dev", stringParam.getDefaultValue());
+    }
+
+    @Test
+    @ConfiguredWithReadme("jobs/README.md#1")
+    public void shouldConfigureFreestyleJobWithSyncStrategyFromReadme() {
+        FreeStyleProject job = (FreeStyleProject) Jenkins.get().getItem("my-freestyle-job");
+
+        assertNotNull("Freestyle job with sync strategy should have been created by JCasC from README", job);
+        assertEquals("my-freestyle-job", job.getName());
     }
 }
