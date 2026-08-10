@@ -62,12 +62,12 @@ public class ItemsRootConfigurator extends BaseConfigurator<ItemsRootConfigurato
         doCheck(interpolatedConfig);
         Jenkins jenkins = Jenkins.get();
 
-        ItemRemoveStrategy strategy = NONE;
+        ItemRemoveStrategy actionOnUndeclaredItems = NONE;
         CNode itemsSequence = interpolatedConfig;
 
         if (interpolatedConfig instanceof Mapping) {
             Mapping mapping = interpolatedConfig.asMapping();
-            strategy = parseRemoveStrategy(mapping);
+            actionOnUndeclaredItems = parseActionOnUndeclaredItems(mapping);
             itemsSequence = mapping.containsKey("items") ? mapping.get("items") : new Sequence();
         }
 
@@ -90,22 +90,6 @@ public class ItemsRootConfigurator extends BaseConfigurator<ItemsRootConfigurato
 
                 TopLevelItem configuredItem = configurator.configure(name, properties, context);
 
-                if (configuredItem instanceof Job<?, ?> job) {
-                    if (job.getProperty(CascItemProperty.class) == null) {
-                        try {
-                            job.addProperty(new CascItemProperty());
-                        } catch (IOException e) {
-                            throw new ConfiguratorException("Failed to add CasC tag property to job: " + name, e);
-                        }
-                    }
-                }
-
-                try {
-                    configuredItem.save();
-                } catch (IOException e) {
-                    throw new ConfiguratorException("Failed to save configured item: " + name, e);
-                }
-
                 File cascMarker = new File(configuredItem.getRootDir(), ".casc-managed");
                 File parentDir = cascMarker.getParentFile();
 
@@ -125,7 +109,7 @@ public class ItemsRootConfigurator extends BaseConfigurator<ItemsRootConfigurato
                 }
             }
 
-            applyRemovalStrategy(jenkins, configuredItemNames, strategy);
+            applyRemovalStrategy(jenkins, configuredItemNames, actionOnUndeclaredItems);
         }
         return this;
     }
@@ -178,19 +162,19 @@ public class ItemsRootConfigurator extends BaseConfigurator<ItemsRootConfigurato
         if (interpolatedConfig instanceof Mapping) {
             Mapping mapping = interpolatedConfig.asMapping();
 
-            if (!mapping.containsKey("items") && !mapping.containsKey("removeStrategy")) {
+            if (!mapping.containsKey("items") && !mapping.containsKey("actionOnUndeclaredItems")) {
                 throw new ConfiguratorException(
-                        "Invalid items configuration. Expected a sequence of items, or a mapping containing 'items' or 'removeStrategy'.");
+                        "Invalid items configuration. Expected a sequence of items, or a mapping containing 'items' or 'actionOnUndeclaredItems'.");
             }
 
             for (String key : mapping.keySet()) {
-                if (!key.equals("items") && !key.equals("removeStrategy")) {
+                if (!key.equals("items") && !key.equals("actionOnUndeclaredItems")) {
                     throw new ConfiguratorException("Invalid items configuration. Unsupported key '" + key
-                            + "'. Only 'items' and 'removeStrategy' are allowed.");
+                            + "'. Only 'items' and 'actionOnUndeclaredItems' are allowed.");
                 }
             }
 
-            parseRemoveStrategy(mapping);
+            parseActionOnUndeclaredItems(mapping);
             itemsSequence = mapping.containsKey("items") ? mapping.get("items") : new Sequence();
         }
 
@@ -233,13 +217,13 @@ public class ItemsRootConfigurator extends BaseConfigurator<ItemsRootConfigurato
         Jenkins.get();
     }
 
-    private ItemRemoveStrategy parseRemoveStrategy(Mapping mapping) throws ConfiguratorException {
-        if (!mapping.containsKey("removeStrategy")) {
+    private ItemRemoveStrategy parseActionOnUndeclaredItems(Mapping mapping) throws ConfiguratorException {
+        if (!mapping.containsKey("actionOnUndeclaredItems")) {
             return NONE;
         }
 
         try {
-            return fromString(mapping.get("removeStrategy").asScalar().getValue());
+            return fromString(mapping.get("actionOnUndeclaredItems").asScalar().getValue());
         } catch (IllegalArgumentException e) {
             throw new ConfiguratorException(e.getMessage());
         }
@@ -272,9 +256,9 @@ public class ItemsRootConfigurator extends BaseConfigurator<ItemsRootConfigurato
                 .getter(target -> Jenkins.get().getItems())
                 .setter(noop()));
 
-        attributes.add(
-                new Attribute<ItemsRootConfigurator, ItemRemoveStrategy>("removeStrategy", ItemRemoveStrategy.class)
-                        .setter(noop()));
+        attributes.add(new Attribute<ItemsRootConfigurator, ItemRemoveStrategy>(
+                        "actionOnUndeclaredItems", ItemRemoveStrategy.class)
+                .setter(noop()));
 
         return unmodifiableSet(attributes);
     }

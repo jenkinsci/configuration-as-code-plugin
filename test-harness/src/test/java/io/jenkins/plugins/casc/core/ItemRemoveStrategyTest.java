@@ -13,16 +13,17 @@ public class ItemRemoveStrategyTest {
 
     @Test
     public void testFromStringValidStrategies() {
-        assertEquals(NONE, fromString("none"));
-        assertEquals(SYNC, fromString("sync"));
-        assertEquals(REMOVE_ALL, fromString("remove-all"));
+        assertEquals(NONE, fromString("keep"));
+        assertEquals(SYNC, fromString("delete-tracked"));
+        assertEquals(REMOVE_ALL, fromString("delete-all"));
     }
 
     @Test
     public void testFromStringCaseInsensitive() {
-        assertEquals(SYNC, fromString("SYNC"));
-        assertEquals(REMOVE_ALL, fromString("Remove-All"));
-        assertEquals(NONE, fromString("NoNe"));
+        // Change these to use the new string values with mixed casing
+        assertEquals(SYNC, fromString("Delete-Tracked"));
+        assertEquals(REMOVE_ALL, fromString("DELETE-ALL"));
+        assertEquals(NONE, fromString("kEeP"));
     }
 
     @Test
@@ -41,9 +42,9 @@ public class ItemRemoveStrategyTest {
 
     @Test
     public void testGetValue() {
-        assertEquals("none", NONE.getValue());
-        assertEquals("sync", SYNC.getValue());
-        assertEquals("remove-all", REMOVE_ALL.getValue());
+        assertEquals("keep", NONE.getValue());
+        assertEquals("delete-tracked", SYNC.getValue());
+        assertEquals("delete-all", REMOVE_ALL.getValue());
     }
 
     @Test

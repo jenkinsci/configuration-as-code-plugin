@@ -7,19 +7,19 @@ public enum ItemRemoveStrategy {
     /**
      * Do not remove any items that are not present in the configuration.
      */
-    NONE("none"),
+    NONE("keep"),
 
     /**
      * Remove items that are not present in the configuration if they were
      * previously managed by Configuration as Code.
      */
-    SYNC("sync"),
+    SYNC("delete-tracked"),
 
     /**
      * Remove all items that are not present in the configuration,
      * regardless of whether they were previously managed by Configuration as Code.
      */
-    REMOVE_ALL("remove-all");
+    REMOVE_ALL("delete-all");
 
     private final String value;
 
@@ -42,6 +42,6 @@ public enum ItemRemoveStrategy {
                 return s;
             }
         }
-        throw new IllegalArgumentException("Invalid removeStrategy: " + strategy);
+        throw new IllegalArgumentException("Invalid actionOnUndeclaredItems: " + strategy);
     }
 }

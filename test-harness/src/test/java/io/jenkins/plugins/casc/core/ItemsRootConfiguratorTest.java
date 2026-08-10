@@ -60,7 +60,7 @@ public class ItemsRootConfiguratorTest {
         }
         Mapping root = new Mapping();
         if (strategy != null) {
-            root.put("removeStrategy", new Scalar(strategy));
+            root.put("actionOnUndeclaredItems", new Scalar(strategy));
         }
         root.put("items", itemsSequence);
         return root;
@@ -161,7 +161,7 @@ public class ItemsRootConfiguratorTest {
         items.add(item);
 
         Mapping configRoot = new Mapping();
-        configRoot.put("removeStrategy", new Scalar("sync"));
+        configRoot.put("actionOnUndeclaredItems", new Scalar("delete-tracked"));
         configRoot.put("items", items);
 
         configurator.configure(configRoot, context);
@@ -173,7 +173,7 @@ public class ItemsRootConfiguratorTest {
         File markerFile = new File(createdItem.getRootDir(), ".casc-managed");
         assertTrue("CasC marker file should exist in the root dir", markerFile.exists());
 
-        configurator.configure(root("sync"), context);
+        configurator.configure(root("delete-tracked"), context);
 
         assertNull(
                 "Non-job item should be deleted during sync because it was CasC managed",
@@ -467,7 +467,7 @@ public class ItemsRootConfiguratorTest {
         ItemsRootConfigurator configurator = new ItemsRootConfigurator();
         ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
 
-        configurator.configure(root("remove-all", "casc-job"), context);
+        configurator.configure(root("delete-all", "casc-job"), context);
 
         assertNull("Manual job should be deleted by remove-all strategy", j.jenkins.getItem("manual-job"));
         assertNotNull("CasC job should exist", j.jenkins.getItem("casc-job"));
@@ -484,16 +484,15 @@ public class ItemsRootConfiguratorTest {
         ItemsRootConfigurator configurator = new ItemsRootConfigurator();
         ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
 
-        configurator.configure(root("sync", "new-casc-job"), context);
+        configurator.configure(root("delete-tracked", "new-casc-job"), context);
 
         assertNotNull("Manual job should be untouched by sync strategy", j.jenkins.getItem("manual-job"));
         assertNull("Old CasC job should be deleted because it is no longer in YAML", j.jenkins.getItem("old-casc-job"));
         assertNotNull("New CasC job should exist", j.jenkins.getItem("new-casc-job"));
 
         FreeStyleProject newJob = (FreeStyleProject) j.jenkins.getItem("new-casc-job");
-        assertNotNull(
-                "New job must be tagged with CascItemProperty",
-                requireNonNull(newJob).getProperty(CascItemProperty.class));
+        File cascMarker = new File(requireNonNull(newJob).getRootDir(), ".casc-managed");
+        assertTrue("New job must have the .casc-managed marker file", cascMarker.exists());
     }
 
     @Test
@@ -508,7 +507,7 @@ public class ItemsRootConfiguratorTest {
         ItemsRootConfigurator configurator = new ItemsRootConfigurator();
         ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
 
-        configurator.configure(root("sync", "new-casc-job"), context);
+        configurator.configure(root("delete-tracked", "new-casc-job"), context);
 
         assertNotNull("manual-job-1 should be untouched", j.jenkins.getItem("manual-job-1"));
         assertNotNull("manual-job-2 should be untouched", j.jenkins.getItem("manual-job-2"));
@@ -535,7 +534,7 @@ public class ItemsRootConfiguratorTest {
         items.add(item);
 
         Mapping root = new Mapping();
-        root.put("removeStrategy", new Scalar("sync"));
+        root.put("actionOnUndeclaredItems", new Scalar("delete-tracked"));
         root.put("items", items);
 
         configurator.configure(root, context);
@@ -552,11 +551,11 @@ public class ItemsRootConfiguratorTest {
         ItemsRootConfigurator configurator = new ItemsRootConfigurator();
         ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
 
-        configurator.configure(root("sync", "job-A", "job-B"), context);
+        configurator.configure(root("delete-tracked", "job-A", "job-B"), context);
         assertNotNull(j.jenkins.getItem("job-A"));
         assertNotNull(j.jenkins.getItem("job-B"));
 
-        configurator.configure(root("sync", "job-A"), context);
+        configurator.configure(root("delete-tracked", "job-A"), context);
 
         assertNotNull("Job A should exist", j.jenkins.getItem("job-A"));
         assertNull("Job B should be removed via partial sync", j.jenkins.getItem("job-B"));
@@ -574,14 +573,14 @@ public class ItemsRootConfiguratorTest {
         ItemsRootConfigurator configurator = new ItemsRootConfigurator();
         ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
 
-        configurator.configure(root("sync"), context);
+        configurator.configure(root("delete-tracked"), context);
 
         assertNotNull("Manual job should be preserved", j.jenkins.getItem("manual-job"));
         assertNull("Old CasC job should be deleted because items list is empty", j.jenkins.getItem("old-casc-job"));
     }
 
     @Test
-    public void shouldFailOnInvalidRemoveStrategy() {
+    public void shouldFailOnInvalidActionOnUndeclaredItems() {
         ItemsRootConfigurator configurator = new ItemsRootConfigurator();
         ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
 
@@ -590,7 +589,7 @@ public class ItemsRootConfiguratorTest {
 
         assertTrue(
                 "Message did not match. Got: " + e.getMessage(),
-                e.getMessage().contains("Invalid removeStrategy: abc"));
+                e.getMessage().contains("Invalid actionOnUndeclaredItems: abc"));
     }
 
     @Test
@@ -635,11 +634,11 @@ public class ItemsRootConfiguratorTest {
         ItemsRootConfigurator configurator = new ItemsRootConfigurator();
         ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
 
-        configurator.configure(root("sync", "job-A"), context);
+        configurator.configure(root("delete-tracked", "job-A"), context);
         assertNotNull("Job A should exist after first sync", j.jenkins.getItem("job-A"));
         assertEquals(1, j.jenkins.getItems().size());
 
-        configurator.configure(root("sync", "job-B"), context);
+        configurator.configure(root("delete-tracked", "job-B"), context);
 
         assertNull(
                 "Job A should be deleted by the second sync because it is missing from YAML",
@@ -654,7 +653,7 @@ public class ItemsRootConfiguratorTest {
         ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
 
         Mapping root = new Mapping();
-        root.put("removeStrategy", new Scalar("sync"));
+        root.put("actionOnUndeclaredItems", new Scalar("delete-tracked"));
 
         configurator.configure(root, context);
 
@@ -666,7 +665,7 @@ public class ItemsRootConfiguratorTest {
         ItemsRootConfigurator configurator = new ItemsRootConfigurator();
         ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
 
-        ItemsRootConfigurator result = configurator.check(root("sync", "job-A"), context);
+        ItemsRootConfigurator result = configurator.check(root("delete-tracked", "job-A"), context);
 
         assertNotNull(result);
     }
@@ -716,18 +715,18 @@ public class ItemsRootConfiguratorTest {
         ItemsRootConfigurator configurator = new ItemsRootConfigurator();
         ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
 
-        configurator.configure(root("remove-all", "job-A"), context);
+        configurator.configure(root("delete-all", "job-A"), context);
 
         assertNotNull(j.jenkins.getItem("job-A"));
     }
 
     @Test
-    public void shouldFailCheckOnInvalidRemoveStrategy() {
+    public void shouldFailCheckOnInvalidActionOnUndeclaredItems() {
         ItemsRootConfigurator configurator = new ItemsRootConfigurator();
         ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
 
         Mapping root = new Mapping();
-        root.put("removeStrategy", new Scalar("invalid"));
+        root.put("actionOnUndeclaredItems", new Scalar("invalid"));
         root.put("items", new Sequence());
 
         assertThrows(ConfiguratorException.class, () -> configurator.check(root, context));
@@ -749,7 +748,7 @@ public class ItemsRootConfiguratorTest {
         ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
 
         Mapping root = new Mapping();
-        root.put("removeStrategy", new Scalar("none"));
+        root.put("actionOnUndeclaredItems", new Scalar("keep"));
 
         configurator.configure(root, context);
 
@@ -774,7 +773,7 @@ public class ItemsRootConfiguratorTest {
         ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
 
         Mapping root = new Mapping();
-        root.put("removeStrategy", new Scalar("remove-all"));
+        root.put("actionOnUndeclaredItems", new Scalar("remove-all"));
         root.put("itmes", new Sequence());
 
         ConfiguratorException e =
@@ -792,7 +791,7 @@ public class ItemsRootConfiguratorTest {
         ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
 
         Mapping root = new Mapping();
-        root.put("removeStrategy", new Scalar("sync"));
+        root.put("actionOnUndeclaredItems", new Scalar("sync"));
         root.put("itmes", new Sequence());
 
         ConfiguratorException e =
@@ -820,7 +819,7 @@ public class ItemsRootConfiguratorTest {
         ItemsRootConfigurator configurator = new ItemsRootConfigurator();
         ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
 
-        configurator.configure(root("sync", "job-A"), context);
+        configurator.configure(root("keep", "job-A"), context);
 
         TopLevelItem item = j.jenkins.getItem("job-A");
         assertNotNull(item);
@@ -834,7 +833,7 @@ public class ItemsRootConfiguratorTest {
         ItemsRootConfigurator configurator = new ItemsRootConfigurator();
         ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
 
-        configurator.configure(root("sync", "job-A"), context);
+        configurator.configure(root("delete-tracked", "job-A"), context);
 
         TopLevelItem item = j.jenkins.getItem("job-A");
         assertNotNull(item);
@@ -842,7 +841,7 @@ public class ItemsRootConfiguratorTest {
         File rootDir = item.getRootDir();
         assertTrue(rootDir.exists());
 
-        configurator.configure(root("sync"), context);
+        configurator.configure(root("delete-tracked"), context);
 
         assertNull(j.jenkins.getItem("job-A"));
         assertFalse("Item directory should be deleted", rootDir.exists());

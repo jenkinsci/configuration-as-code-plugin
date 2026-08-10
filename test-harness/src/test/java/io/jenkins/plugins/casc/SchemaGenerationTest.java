@@ -97,8 +97,8 @@ class SchemaGenerationTest {
 
         assertEquals(
                 "string",
-                itemsRootProperties.getJSONObject("removeStrategy").getString("type"),
-                "removeStrategy should be generated as a string enum");
+                itemsRootProperties.getJSONObject("actionOnUndeclaredItems").getString("type"),
+                "actionOnUndeclaredItems should be generated as a string enum");
         assertEquals(
                 "array",
                 itemsRootProperties.getJSONObject("items").getString("type"),

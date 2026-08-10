@@ -67,22 +67,22 @@ items:
 
 ## Item removal strategy
 
-The `items` root element supports an optional `removeStrategy` property to
+The `items` root element supports an optional `actionOnUndeclaredItems` property to
 control how items that are not present in the configuration are handled.
 
 The following strategies are supported:
 
-| Strategy | Description |
-| --- | --- |
-| `none` | Do not remove items that are not present in the configuration. This is the default. |
-| `sync` | Remove items that are not present in the configuration if they were previously managed by JCasC. |
-| `remove-all` | Remove all items that are not present in the configuration. |
+| Strategy     | Description |
+|--------------| --- |
+| `keep`       | Do not remove items that are not present in the configuration. This is the default. |
+| `delete-tracked`       | Remove items that are not present in the configuration if they were previously managed by JCasC. |
+| `delete-all` | Remove all items that are not present in the configuration. |
 
 For example, to synchronize JCasC-managed items:
 
 ```yaml
 items:
-  removeStrategy: sync
+  actionOnUndeclaredItems: delete-tracked
   items:
     - freestyle:
         name: my-freestyle-job
