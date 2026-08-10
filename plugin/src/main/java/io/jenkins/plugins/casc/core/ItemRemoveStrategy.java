@@ -7,19 +7,19 @@ public enum ItemRemoveStrategy {
     /**
      * Do not remove any items that are not present in the configuration.
      */
-    NONE("keep"),
+    KEEP("keep"),
 
     /**
      * Remove items that are not present in the configuration if they were
      * previously managed by Configuration as Code.
      */
-    SYNC("delete-tracked"),
+    DELETE_TRACKED("delete-tracked"),
 
     /**
      * Remove all items that are not present in the configuration,
      * regardless of whether they were previously managed by Configuration as Code.
      */
-    REMOVE_ALL("delete-all");
+    DELETE_ALL("delete-all");
 
     private final String value;
 
@@ -34,7 +34,7 @@ public enum ItemRemoveStrategy {
     // In ItemRemoveStrategy.java
     public static ItemRemoveStrategy fromString(String strategy) {
         if (StringUtils.isBlank(strategy)) {
-            return NONE;
+            return KEEP;
         }
         String cleanStrategy = strategy.trim();
         for (ItemRemoveStrategy s : values()) {

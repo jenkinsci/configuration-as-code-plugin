@@ -1,7 +1,7 @@
 package io.jenkins.plugins.casc.core;
 
 import static io.jenkins.plugins.casc.Attribute.noop;
-import static io.jenkins.plugins.casc.core.ItemRemoveStrategy.NONE;
+import static io.jenkins.plugins.casc.core.ItemRemoveStrategy.KEEP;
 import static io.jenkins.plugins.casc.core.ItemRemoveStrategy.fromString;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.unmodifiableSet;
@@ -61,7 +61,7 @@ public class ItemsRootConfigurator extends BaseConfigurator<ItemsRootConfigurato
         doCheck(interpolatedConfig);
         Jenkins jenkins = Jenkins.get();
 
-        ItemRemoveStrategy actionOnUndeclaredItems = NONE;
+        ItemRemoveStrategy actionOnUndeclaredItems = KEEP;
         CNode itemsSequence = interpolatedConfig;
 
         if (interpolatedConfig instanceof Mapping) {
@@ -115,7 +115,7 @@ public class ItemsRootConfigurator extends BaseConfigurator<ItemsRootConfigurato
 
     private void applyRemovalStrategy(Jenkins jenkins, Set<String> configuredItemNames, ItemRemoveStrategy strategy)
             throws ConfiguratorException {
-        if (strategy == NONE) {
+        if (strategy == KEEP) {
             return;
         }
 
@@ -125,10 +125,10 @@ public class ItemsRootConfigurator extends BaseConfigurator<ItemsRootConfigurato
 
                     boolean isCascManaged = new File(item.getRootDir(), ".casc-managed").exists();
 
-                    if (strategy == ItemRemoveStrategy.REMOVE_ALL) {
+                    if (strategy == ItemRemoveStrategy.DELETE_ALL) {
                         LOGGER.log(INFO, "CasC remove-all strategy: Deleting unconfigured item {0}", item.getName());
                         item.delete();
-                    } else if (strategy == ItemRemoveStrategy.SYNC && isCascManaged) {
+                    } else if (strategy == ItemRemoveStrategy.DELETE_TRACKED && isCascManaged) {
                         LOGGER.log(
                                 INFO,
                                 "CasC sync strategy: Deleting previously managed, now unconfigured item {0}",
@@ -215,7 +215,7 @@ public class ItemsRootConfigurator extends BaseConfigurator<ItemsRootConfigurato
 
     private ItemRemoveStrategy parseActionOnUndeclaredItems(Mapping mapping) throws ConfiguratorException {
         if (!mapping.containsKey("actionOnUndeclaredItems")) {
-            return NONE;
+            return KEEP;
         }
 
         try {
