@@ -11,7 +11,6 @@ import static java.util.logging.Level.WARNING;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.ExtensionList;
-import hudson.model.Job;
 import hudson.model.TopLevelItem;
 import hudson.security.ACL;
 import hudson.security.ACLContext;
@@ -124,10 +123,7 @@ public class ItemsRootConfigurator extends BaseConfigurator<ItemsRootConfigurato
             for (TopLevelItem item : jenkins.getItems()) {
                 if (!configuredItemNames.contains(item.getName())) {
 
-                    boolean isFileManaged = new File(item.getRootDir(), ".casc-managed").exists();
-                    boolean isLegacyJobManaged =
-                            (item instanceof Job) && ((Job<?, ?>) item).getProperty(CascItemProperty.class) != null;
-                    boolean isCascManaged = isFileManaged || isLegacyJobManaged;
+                    boolean isCascManaged = new File(item.getRootDir(), ".casc-managed").exists();
 
                     if (strategy == ItemRemoveStrategy.REMOVE_ALL) {
                         LOGGER.log(INFO, "CasC remove-all strategy: Deleting unconfigured item {0}", item.getName());

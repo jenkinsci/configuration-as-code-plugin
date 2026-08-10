@@ -24,7 +24,6 @@ import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.ConfiguratorRegistry;
 import io.jenkins.plugins.casc.ItemConfigurator;
-import io.jenkins.plugins.casc.core.CascItemProperty.DescriptorImpl;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.model.CNode;
@@ -478,8 +477,8 @@ public class ItemsRootConfiguratorTest {
         j.createFreeStyleProject("manual-job");
 
         FreeStyleProject oldCascJob = j.createFreeStyleProject("old-casc-job");
-        oldCascJob.addProperty(new CascItemProperty());
-        oldCascJob.save();
+        File markerFile = new File(oldCascJob.getRootDir(), ".casc-managed");
+        assertTrue(markerFile.createNewFile());
 
         ItemsRootConfigurator configurator = new ItemsRootConfigurator();
         ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
@@ -501,8 +500,8 @@ public class ItemsRootConfiguratorTest {
         j.createFreeStyleProject("manual-job-2");
 
         FreeStyleProject oldCascJob = j.createFreeStyleProject("old-casc-job");
-        oldCascJob.addProperty(new CascItemProperty());
-        oldCascJob.save();
+        File markerFile = new File(oldCascJob.getRootDir(), ".casc-managed");
+        assertTrue(markerFile.createNewFile());
 
         ItemsRootConfigurator configurator = new ItemsRootConfigurator();
         ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
@@ -518,7 +517,8 @@ public class ItemsRootConfiguratorTest {
     @Test
     public void shouldKeepAndConfigureManagedJobWhenStillPresent() throws Exception {
         FreeStyleProject oldCascJob = j.createFreeStyleProject("old-casc-job");
-        oldCascJob.addProperty(new CascItemProperty());
+        File markerFile = new File(oldCascJob.getRootDir(), ".casc-managed");
+        assertTrue(markerFile.createNewFile());
         oldCascJob.setDescription("original description");
         oldCascJob.save();
 
@@ -567,8 +567,8 @@ public class ItemsRootConfiguratorTest {
         j.createFreeStyleProject("manual-job");
 
         FreeStyleProject oldCascJob = j.createFreeStyleProject("old-casc-job");
-        oldCascJob.addProperty(new CascItemProperty());
-        oldCascJob.save();
+        File markerFile = new File(oldCascJob.getRootDir(), ".casc-managed");
+        assertTrue(markerFile.createNewFile());
 
         ItemsRootConfigurator configurator = new ItemsRootConfigurator();
         ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
@@ -697,20 +697,6 @@ public class ItemsRootConfiguratorTest {
     }
 
     @Test
-    public void shouldNotRetagAlreadyManagedJob() throws Exception {
-        FreeStyleProject job = j.createFreeStyleProject("job-A");
-        job.addProperty(new CascItemProperty());
-        job.save();
-
-        ItemsRootConfigurator configurator = new ItemsRootConfigurator();
-        ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
-
-        configurator.configure(root(null, "job-A"), context);
-
-        assertNotNull(job.getProperty(CascItemProperty.class));
-    }
-
-    @Test
     public void shouldNotDeleteConfiguredItemWithRemoveAll() {
         ItemsRootConfigurator configurator = new ItemsRootConfigurator();
         ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
@@ -753,16 +739,6 @@ public class ItemsRootConfiguratorTest {
         configurator.configure(root, context);
 
         assertEquals(0, j.jenkins.getItems().size());
-    }
-
-    @Test
-    public void testCascItemPropertyAndDescriptor() {
-        CascItemProperty property = new CascItemProperty();
-        assertNotNull("Property instance should be created", property);
-
-        DescriptorImpl descriptor = new DescriptorImpl();
-        assertTrue("Descriptor should be applicable to any Job type", descriptor.isApplicable(FreeStyleProject.class));
-        assertNotNull("Display name should not be null", descriptor.getDisplayName());
     }
 
     @Test
