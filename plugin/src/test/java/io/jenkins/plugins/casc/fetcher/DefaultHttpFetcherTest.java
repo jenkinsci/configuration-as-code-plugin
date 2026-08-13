@@ -10,6 +10,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.interrupted;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Base64.getEncoder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
@@ -148,8 +149,7 @@ public class DefaultHttpFetcherTest {
         stubFor(get(urlEqualTo("/private.yaml"))
                 .withHeader(
                         "Authorization",
-                        equalTo("Basic "
-                                + java.util.Base64.getEncoder().encodeToString("user:password".getBytes(UTF_8))))
+                        equalTo("Basic " + getEncoder().encodeToString("user:password".getBytes(UTF_8))))
                 .willReturn(aResponse().withStatus(200).withBody("jenkins:\n  systemMessage: 'Private'")));
 
         FetchCredentials credentials = new FetchCredentials() {
@@ -181,8 +181,7 @@ public class DefaultHttpFetcherTest {
         verify(getRequestedFor(urlEqualTo("/private.yaml"))
                 .withHeader(
                         "Authorization",
-                        equalTo("Basic "
-                                + java.util.Base64.getEncoder().encodeToString("user:password".getBytes(UTF_8)))));
+                        equalTo("Basic " + getEncoder().encodeToString("user:password".getBytes(UTF_8)))));
     }
 
     @Test
