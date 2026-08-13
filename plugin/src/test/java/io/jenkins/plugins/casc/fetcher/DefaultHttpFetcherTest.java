@@ -46,9 +46,6 @@ public class DefaultHttpFetcherTest {
 
     @Test
     public void testFetchThrowsOnFailedSanitizeUri() {
-        // "http:example.com" parses successfully as an opaque URI initially.
-        // However, the fetcher reconstructs the URI string by unconditionally appending "://" after the scheme.
-        // This results in "http://", which is invalid (missing authority) and throws a URISyntaxException.
         String targetUrl = "http:example.com";
 
         IOException e = assertThrows(
