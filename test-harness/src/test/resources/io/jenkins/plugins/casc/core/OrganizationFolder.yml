@@ -1,0 +1,6 @@
+items:
+  - organizationFolder:
+      name: "my-github-org"
+      navigators:
+        - github:
+            repoOwner: "test-org"
