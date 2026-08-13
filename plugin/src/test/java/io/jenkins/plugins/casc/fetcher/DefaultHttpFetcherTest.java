@@ -45,6 +45,23 @@ public class DefaultHttpFetcherTest {
     }
 
     @Test
+    public void testFetchThrowsOnFailedSanitizeUri() {
+        // "http:example.com" parses successfully as an opaque URI initially.
+        // However, the fetcher reconstructs the URI string by unconditionally appending "://" after the scheme.
+        // This results in "http://", which is invalid (missing authority) and throws a URISyntaxException.
+        String targetUrl = "http:example.com";
+
+        IOException e = assertThrows(
+                "Expected fetcher to throw IOException due to URI reconstruction failure",
+                IOException.class,
+                () -> fetcher.fetch(targetUrl, null));
+
+        assertTrue(
+                "Message should indicate sanitization failure",
+                e.getMessage().contains("Failed to sanitize URI: " + targetUrl));
+    }
+
+    @Test
     public void testActualHttpFetchIntegration() throws Exception {
         stubFor(get(urlEqualTo("/casc.yaml"))
                 .willReturn(aResponse().withStatus(200).withBody("jenkins:\n  systemMessage: 'Hello HTTP'")));
@@ -265,5 +282,17 @@ public class DefaultHttpFetcherTest {
 
         verify(getRequestedFor(urlEqualTo("/config.yaml?signature=a%26b&foo=bar"))
                 .withHeader("Authorization", equalTo("Bearer secret-token")));
+    }
+
+    @Test
+    public void testFetchUrlWithFragment() throws Exception {
+        stubFor(get(urlEqualTo("/casc.yaml"))
+                .willReturn(aResponse().withStatus(200).withBody("jenkins:\n  systemMessage: 'Fragment Test'")));
+
+        String targetUrl = wireMockRule.baseUrl() + "/casc.yaml#section1";
+        FetchResult result = fetcher.fetch(targetUrl, null);
+
+        assertEquals(1, result.items().size());
+        verify(getRequestedFor(urlEqualTo("/casc.yaml")));
     }
 }
