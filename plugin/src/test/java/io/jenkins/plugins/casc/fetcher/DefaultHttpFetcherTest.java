@@ -205,7 +205,6 @@ public class DefaultHttpFetcherTest {
 
         fetcher.fetch(targetUrl, credentials);
 
-        // FIXED: Using getRequestedFor
         verify(getRequestedFor(urlEqualTo("/config.yaml?foo=bar"))
                 .withHeader("Authorization", equalTo("Bearer secret-token")));
     }
@@ -236,8 +235,18 @@ public class DefaultHttpFetcherTest {
     }
 
     @Test
-    public void testFetchWithCredentialIdParameter() throws Exception {
-        stubFor(get(urlEqualTo("/private.yaml"))
+    public void testGenericCredentialIdIsPreservedAsNormalQueryParam() throws Exception {
+        stubFor(get(urlEqualTo("/private.yaml?credentialId=SERVER_PARAM"))
+                .willReturn(aResponse().withStatus(200).withBody("jenkins: {}")));
+
+        fetcher.fetch(wireMockRule.baseUrl() + "/private.yaml?credentialId=SERVER_PARAM", null);
+
+        verify(getRequestedFor(urlEqualTo("/private.yaml?credentialId=SERVER_PARAM")));
+    }
+
+    @Test
+    public void testPreservesEncodedQueryParameters() throws Exception {
+        stubFor(get(urlEqualTo("/config.yaml?signature=a%26b&foo=bar"))
                 .withHeader("Authorization", equalTo("Bearer secret-token"))
                 .willReturn(aResponse().withStatus(200).withBody("jenkins: {}")));
 
@@ -251,9 +260,11 @@ public class DefaultHttpFetcherTest {
             }
         };
 
-        fetcher.fetch(wireMockRule.baseUrl() + "/private.yaml?credentialId=MY_TOKEN", credentials);
+        String targetUrl = wireMockRule.baseUrl() + "/config.yaml?signature=a%26b&cascCredentialId=MY_TOKEN&foo=bar";
 
-        verify(getRequestedFor(urlEqualTo("/private.yaml"))
+        fetcher.fetch(targetUrl, credentials);
+
+        verify(getRequestedFor(urlEqualTo("/config.yaml?signature=a%26b&foo=bar"))
                 .withHeader("Authorization", equalTo("Bearer secret-token")));
     }
 }

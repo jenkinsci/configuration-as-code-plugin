@@ -8,6 +8,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -22,7 +23,6 @@ import java.util.List;
 public class DefaultHttpFetcher implements CasCConfigFetcher {
 
     private static final String CREDENTIAL_ID_PARAM = "cascCredentialId";
-    private static final String FALLBACK_CREDENTIAL_ID_PARAM = "credentialId";
 
     @Override
     public boolean supports(String location) {
@@ -38,38 +38,50 @@ public class DefaultHttpFetcher implements CasCConfigFetcher {
             throw new IOException("Invalid URL: " + location, e);
         }
 
-        String rawQuery = originalUri.getQuery();
+        String rawQuery = originalUri.getRawQuery();
         String credentialId = null;
-        String sanitizedQuery = null;
+        String sanitizedRawQuery = null;
 
         if (rawQuery != null && !rawQuery.isEmpty()) {
             List<String> remainingParams = new ArrayList<>();
-            for (String param : rawQuery.split("&")) {
+            for (String param : rawQuery.split("&", -1)) {
                 String[] pair = param.split("=", 2);
-                String key = pair[0];
-                String value = pair.length > 1 ? pair[1] : "";
+                String rawKey = pair[0];
+                String rawValue = pair.length > 1 ? pair[1] : "";
 
-                if (CREDENTIAL_ID_PARAM.equalsIgnoreCase(key) || FALLBACK_CREDENTIAL_ID_PARAM.equalsIgnoreCase(key)) {
-                    credentialId = value;
+                String decodedKey = URLDecoder.decode(rawKey, StandardCharsets.UTF_8);
+
+                if (CREDENTIAL_ID_PARAM.equalsIgnoreCase(decodedKey)) {
+                    credentialId = URLDecoder.decode(rawValue, StandardCharsets.UTF_8);
                 } else {
                     remainingParams.add(param);
                 }
             }
             if (!remainingParams.isEmpty()) {
-                sanitizedQuery = String.join("&", remainingParams);
+                sanitizedRawQuery = String.join("&", remainingParams);
             }
         }
 
         URI requestUri;
         try {
-            requestUri = new URI(
-                    originalUri.getScheme(),
-                    originalUri.getUserInfo(),
-                    originalUri.getHost(),
-                    originalUri.getPort(),
-                    originalUri.getPath(),
-                    sanitizedQuery,
-                    originalUri.getFragment());
+            StringBuilder uriBuilder = new StringBuilder();
+            if (originalUri.getScheme() != null) {
+                uriBuilder.append(originalUri.getScheme()).append("://");
+            }
+            if (originalUri.getRawAuthority() != null) {
+                uriBuilder.append(originalUri.getRawAuthority());
+            }
+            if (originalUri.getRawPath() != null) {
+                uriBuilder.append(originalUri.getRawPath());
+            }
+            if (sanitizedRawQuery != null) {
+                uriBuilder.append("?").append(sanitizedRawQuery);
+            }
+            if (originalUri.getRawFragment() != null) {
+                uriBuilder.append("#").append(originalUri.getRawFragment());
+            }
+
+            requestUri = new URI(uriBuilder.toString());
         } catch (URISyntaxException e) {
             throw new IOException("Failed to sanitize URI: " + location, e);
         }
