@@ -1,9 +1,12 @@
 package io.jenkins.plugins.casc.fetcher;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.interrupted;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -112,5 +115,145 @@ public class DefaultHttpFetcherTest {
             @SuppressWarnings("unused")
             boolean cleared = interrupted();
         }
+    }
+
+    @Test
+    public void testFetchWithTokenCredential() throws Exception {
+        stubFor(get(urlEqualTo("/private.yaml"))
+                .withHeader("Authorization", equalTo("Bearer secret-token"))
+                .willReturn(aResponse().withStatus(200).withBody("jenkins:\n  systemMessage: 'Private'")));
+
+        FetchCredentials credentials = new FetchCredentials() {
+            @Override
+            public <T extends FetchAuthData> T get(String credentialId, Class<T> type) {
+                if ("MY_TOKEN".equals(credentialId) && type == FetchAuthData.Token.class) {
+                    return type.cast((FetchAuthData.Token) () -> "secret-token");
+                }
+                return null;
+            }
+        };
+
+        String targetUrl = wireMockRule.baseUrl() + "/private.yaml?cascCredentialId=MY_TOKEN";
+
+        FetchResult result = fetcher.fetch(targetUrl, credentials);
+
+        assertEquals(1, result.items().size());
+
+        verify(getRequestedFor(urlEqualTo("/private.yaml"))
+                .withHeader("Authorization", equalTo("Bearer secret-token")));
+    }
+
+    @Test
+    public void testFetchWithUsernamePasswordCredential() throws Exception {
+        stubFor(get(urlEqualTo("/private.yaml"))
+                .withHeader(
+                        "Authorization",
+                        equalTo("Basic "
+                                + java.util.Base64.getEncoder().encodeToString("user:password".getBytes(UTF_8))))
+                .willReturn(aResponse().withStatus(200).withBody("jenkins:\n  systemMessage: 'Private'")));
+
+        FetchCredentials credentials = new FetchCredentials() {
+            @Override
+            public <T extends FetchAuthData> T get(String credentialId, Class<T> type) {
+                if ("MY_CREDENTIALS".equals(credentialId) && type == FetchAuthData.UsernamePassword.class) {
+                    return type.cast(new FetchAuthData.UsernamePassword() {
+                        @Override
+                        public String getUsername() {
+                            return "user";
+                        }
+
+                        @Override
+                        public String getPassword() {
+                            return "password";
+                        }
+                    });
+                }
+                return null;
+            }
+        };
+
+        String targetUrl = wireMockRule.baseUrl() + "/private.yaml?cascCredentialId=MY_CREDENTIALS";
+
+        FetchResult result = fetcher.fetch(targetUrl, credentials);
+
+        assertEquals(1, result.items().size());
+
+        verify(getRequestedFor(urlEqualTo("/private.yaml"))
+                .withHeader(
+                        "Authorization",
+                        equalTo("Basic "
+                                + java.util.Base64.getEncoder().encodeToString("user:password".getBytes(UTF_8)))));
+    }
+
+    @Test
+    public void testCredentialIdIsRemovedFromRequestUrl() throws Exception {
+        stubFor(get(urlEqualTo("/config.yaml?foo=bar"))
+                .withHeader("Authorization", equalTo("Bearer secret-token"))
+                .willReturn(aResponse().withStatus(200).withBody("jenkins: {}")));
+
+        FetchCredentials credentials = new FetchCredentials() {
+            @Override
+            public <T extends FetchAuthData> T get(String credentialId, Class<T> type) {
+                if ("MY_TOKEN".equals(credentialId) && type == FetchAuthData.Token.class) {
+                    return type.cast((FetchAuthData.Token) () -> "secret-token");
+                }
+                return null;
+            }
+        };
+
+        String targetUrl = wireMockRule.baseUrl() + "/config.yaml?foo=bar&cascCredentialId=MY_TOKEN";
+
+        fetcher.fetch(targetUrl, credentials);
+
+        // FIXED: Using getRequestedFor
+        verify(getRequestedFor(urlEqualTo("/config.yaml?foo=bar"))
+                .withHeader("Authorization", equalTo("Bearer secret-token")));
+    }
+
+    @Test
+    public void testFetchThrowsWhenCredentialCannotBeResolved() {
+        FetchCredentials credentials = new FetchCredentials() {
+            @Override
+            public <T extends FetchAuthData> T get(String credentialId, Class<T> type) {
+                return null;
+            }
+        };
+
+        String targetUrl = wireMockRule.baseUrl() + "/private.yaml?cascCredentialId=UNKNOWN";
+
+        IOException e = assertThrows(IOException.class, () -> fetcher.fetch(targetUrl, credentials));
+
+        assertTrue(e.getMessage().contains("Unable to resolve credentials with ID 'UNKNOWN'"));
+    }
+
+    @Test
+    public void testFetchThrowsWhenCredentialResolverIsMissing() {
+        String targetUrl = wireMockRule.baseUrl() + "/private.yaml?cascCredentialId=MY_TOKEN";
+
+        IOException e = assertThrows(IOException.class, () -> fetcher.fetch(targetUrl, null));
+
+        assertTrue(e.getMessage().contains("no credential resolver was provided"));
+    }
+
+    @Test
+    public void testFetchWithCredentialIdParameter() throws Exception {
+        stubFor(get(urlEqualTo("/private.yaml"))
+                .withHeader("Authorization", equalTo("Bearer secret-token"))
+                .willReturn(aResponse().withStatus(200).withBody("jenkins: {}")));
+
+        FetchCredentials credentials = new FetchCredentials() {
+            @Override
+            public <T extends FetchAuthData> T get(String credentialId, Class<T> type) {
+                if ("MY_TOKEN".equals(credentialId) && type == FetchAuthData.Token.class) {
+                    return type.cast((FetchAuthData.Token) () -> "secret-token");
+                }
+                return null;
+            }
+        };
+
+        fetcher.fetch(wireMockRule.baseUrl() + "/private.yaml?credentialId=MY_TOKEN", credentials);
+
+        verify(getRequestedFor(urlEqualTo("/private.yaml"))
+                .withHeader("Authorization", equalTo("Bearer secret-token")));
     }
 }
