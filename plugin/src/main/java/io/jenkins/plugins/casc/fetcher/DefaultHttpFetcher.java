@@ -38,7 +38,6 @@ public class DefaultHttpFetcher implements CasCConfigFetcher {
             throw new IOException("Invalid URL: " + location, e);
         }
 
-        // Extract credentialId from query parameters and sanitize the URI
         String rawQuery = originalUri.getQuery();
         String credentialId = null;
         String sanitizedQuery = null;
@@ -61,7 +60,6 @@ public class DefaultHttpFetcher implements CasCConfigFetcher {
             }
         }
 
-        // Rebuild the URI without the credentialId parameter
         URI requestUri;
         try {
             requestUri = new URI(
@@ -89,7 +87,6 @@ public class DefaultHttpFetcher implements CasCConfigFetcher {
         HttpRequest.Builder requestBuilder =
                 ProxyConfiguration.newHttpRequestBuilder(requestUri).GET().timeout(Duration.ofSeconds(30));
 
-        // Handle credentials and fail fast if requested credential cannot be resolved
         if (credentialId != null && !credentialId.isEmpty()) {
             if (credentials == null) {
                 throw new IOException("Credential ID specified in URL, but no credential resolver was provided.");
@@ -106,7 +103,6 @@ public class DefaultHttpFetcher implements CasCConfigFetcher {
                 if (token != null) {
                     requestBuilder.header("Authorization", "Bearer " + token.getToken());
                 } else {
-                    // Fail fast: throw IOException instead of falling back to unauthenticated request
                     throw new IOException(
                             "Unable to resolve credentials with ID '" + credentialId + "' for configuration source.");
                 }
