@@ -5,6 +5,7 @@ import static io.jenkins.plugins.casc.Attribute.noop;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.ProxyConfiguration;
+import hudson.model.Computer;
 import hudson.model.ComputerSet;
 import hudson.model.Descriptor;
 import hudson.model.Node;
@@ -79,6 +80,27 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
                             .collect(Collectors.toList());
                     nodesToKeep.addAll(configuredNodes);
                     jenkins.setNodes(nodesToKeep);
+                    for (Node node : nodesToKeep) {
+                        DisconnectedOnStartupProperty prop =
+                                node.getNodeProperties().get(DisconnectedOnStartupProperty.class);
+
+                        Computer c = node.toComputer();
+                        if (c == null) {
+                            continue;
+                        }
+
+                        if (prop != null && prop.isEnabled()) {
+                            c.setTemporaryOfflineCause(new JCasCOfflineCause(prop.getReason()));
+                            LOGGER.fine(() -> "Marking node '" + node.getNodeName() + "' offline via JCasC");
+                        } else {
+                            if (c.isOffline() && c.getOfflineCause() instanceof JCasCOfflineCause) {
+                                c.setTemporaryOfflineCause(null);
+                                if (!c.isConnecting()) {
+                                    c.connect(false);
+                                }
+                            }
+                        }
+                    }
                 }));
 
         // Add updateCenter, all legwork will be done by a configurator
