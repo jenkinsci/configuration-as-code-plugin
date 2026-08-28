@@ -62,7 +62,8 @@ public class LocalFileSystemFetcher implements CasCConfigFetcher {
         try (Stream<Path> stream = Files.find(
                 root,
                 Integer.MAX_VALUE,
-                (next, attrs) -> !attrs.isDirectory() && matcher.matches(next),
+                (next, attrs) ->
+                        !attrs.isDirectory() && matcher.matches(next) && !hasHiddenComponent(root.relativize(next)),
                 FileVisitOption.FOLLOW_LINKS)) {
 
             List<ResolvedYaml> items = stream.map(path -> {
@@ -73,5 +74,14 @@ public class LocalFileSystemFetcher implements CasCConfigFetcher {
 
             return new FetchResult(items, (AutoCloseable) null);
         }
+    }
+
+    private static boolean hasHiddenComponent(Path relativePath) {
+        for (Path component : relativePath) {
+            if (component.toString().startsWith(".")) {
+                return true;
+            }
+        }
+        return false;
     }
 }
