@@ -106,8 +106,7 @@ public class DefaultHttpFetcher implements CasCConfigFetcher {
                 FetchAuthData.UsernamePassword userPass =
                         credentials.get(credentialId, FetchAuthData.UsernamePassword.class);
                 if (userPass == null) {
-                    throw new IOException(
-                        "Unable to resolve Username/Password for ID: " + credentialId);
+                    throw new IOException("Unable to resolve Username/Password for ID: " + credentialId);
                 }
                 String authString = userPass.getUsername() + ":" + userPass.getPassword();
                 String encodedAuth = Base64.getEncoder().encodeToString(authString.getBytes(StandardCharsets.UTF_8));

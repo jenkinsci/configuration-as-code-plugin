@@ -1,5 +1,8 @@
 package io.jenkins.plugins.casc.fetcher;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.unmodifiableList;
+
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.model.Describable;
@@ -18,9 +21,8 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest2;
-
-import static java.util.Collections.emptyList;
-import static java.util.Collections.unmodifiableList;
+import org.kohsuke.stapler.verb.GET;
+import org.kohsuke.stapler.verb.POST;
 
 @Extension
 public class CascHttpSettings extends GlobalConfiguration {
@@ -223,8 +225,10 @@ public class CascHttpSettings extends GlobalConfiguration {
                 return "Remote HTTP Configuration";
             }
 
+            @GET
             @SuppressWarnings("unused")
             public ListBoxModel doFillAuthMethodItems() {
+                Jenkins.get().checkPermission(Jenkins.ADMINISTER);
                 ListBoxModel items = new ListBoxModel();
                 for (AuthMethod method : AuthMethod.values()) {
                     items.add(method.getDescription(), method.name());
@@ -232,8 +236,10 @@ public class CascHttpSettings extends GlobalConfiguration {
                 return items;
             }
 
+            @POST
             @SuppressWarnings("unused")
             public FormValidation doCheckUrlPrefix(@QueryParameter String value) {
+                Jenkins.get().checkPermission(Jenkins.ADMINISTER);
                 if (StringUtils.isBlank(value)) {
                     return FormValidation.error("URL Prefix cannot be empty.");
                 }
@@ -266,8 +272,10 @@ public class CascHttpSettings extends GlobalConfiguration {
                 return FormValidation.ok();
             }
 
+            @POST
             @SuppressWarnings("unused")
             public FormValidation doCheckCredentialId(@QueryParameter String value, @QueryParameter String authMethod) {
+                Jenkins.get().checkPermission(Jenkins.ADMINISTER);
                 if (!AuthMethod.NONE.name().equals(authMethod) && StringUtils.isBlank(value)) {
                     return FormValidation.error("Credential ID is required when authentication is enabled.");
                 }
