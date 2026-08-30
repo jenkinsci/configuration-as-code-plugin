@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import org.junit.Rule;
 import org.junit.Test;
@@ -42,31 +43,71 @@ public class LocalFileSystemFetcherTest {
     }
 
     @Test
-    public void testFetchDirectoryIgnoresNonYaml() throws Exception {
+    public void testFetchSingleFileWithFileUri() throws Exception {
+        File file = tempFolder.newFile("single_uri.yaml");
+        Files.writeString(file.toPath(), "jenkins:");
 
+        FetchResult result = fetcher.fetch(file.toURI().toString(), null);
+        List<ResolvedYaml> items = result.items();
+
+        assertEquals(1, items.size());
+        assertEquals("single_uri.yaml", items.get(0).relativePath());
+    }
+
+    @Test
+    public void testFetchDirectoryIgnoresNonYamlAndHiddenFiles() throws Exception {
         File dir = tempFolder.newFolder("casc-configs");
         File valid1 = new File(dir, "a.yaml");
         File valid2 = new File(dir, "b.yml");
-        File previouslyHidden = new File(dir, ".secrets.yaml");
+        File hiddenFile = new File(dir, ".secrets.yaml");
         File txtFile = new File(dir, "readme.txt");
 
-        Files.write(valid1.toPath(), "jenkins:".getBytes());
-        Files.write(valid2.toPath(), "unclassified:".getBytes());
-        Files.write(previouslyHidden.toPath(), "secret: 123".getBytes());
-        Files.write(txtFile.toPath(), "hello".getBytes());
+        File hiddenDir = new File(dir, ".hidden");
+        assertTrue(hiddenDir.mkdir());
+        File hiddenNestedYaml = new File(hiddenDir, "c.yaml");
+
+        Files.writeString(valid1.toPath(), "jenkins:");
+        Files.writeString(valid2.toPath(), "unclassified:");
+        Files.writeString(hiddenFile.toPath(), "secret: 123");
+        Files.writeString(txtFile.toPath(), "hello");
+        Files.writeString(hiddenNestedYaml.toPath(), "jenkins:");
 
         FetchResult result = fetcher.fetch(dir.getAbsolutePath(), null);
         List<ResolvedYaml> items = result.items();
 
-        assertEquals("Should find a.yaml, b.yml, and .secrets.yaml", 3, items.size());
+        assertEquals(
+                "Should only find a.yaml and b.yml, ignoring non-yaml and hidden files/directories", 2, items.size());
 
         boolean hasA = items.stream().anyMatch(i -> i.relativePath().equals("a.yaml"));
         boolean hasB = items.stream().anyMatch(i -> i.relativePath().equals("b.yml"));
-        boolean hasSecrets = items.stream().anyMatch(i -> i.relativePath().equals(".secrets.yaml"));
 
         assertTrue(hasA);
         assertTrue(hasB);
-        assertTrue(hasSecrets);
+    }
+
+    @Test
+    public void testIgnoresKubernetesConfigMapHiddenDirectories() throws Exception {
+        File dir = tempFolder.newFolder("k8s-casc");
+        Path rootPath = dir.toPath();
+
+        Path timestampDir = Files.createDirectory(rootPath.resolve("..2026_08_13_11_47_28"));
+        Path realFile = Files.createFile(timestampDir.resolve("appearance.yaml"));
+        Files.writeString(realFile, "jenkins:\n  systemMessage: 'k8s'");
+
+        Path dataSymlink = rootPath.resolve("..data");
+        Files.createSymbolicLink(dataSymlink, timestampDir);
+
+        Path topLevelSymlink = rootPath.resolve("appearance.yaml");
+        Files.createSymbolicLink(topLevelSymlink, dataSymlink.resolve("appearance.yaml"));
+
+        FetchResult result = fetcher.fetch(rootPath.toString(), null);
+        List<ResolvedYaml> items = result.items();
+
+        assertEquals(
+                "Should ignore ..data and ..2026_... hidden directories and return only top-level appearance.yaml",
+                1,
+                items.size());
+        assertEquals("appearance.yaml", items.get(0).relativePath());
     }
 
     @Test
