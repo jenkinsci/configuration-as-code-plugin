@@ -21,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.stream.Collectors;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -29,7 +30,14 @@ public class DefaultHttpFetcherTest {
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(0);
 
-    private final DefaultHttpFetcher fetcher = new DefaultHttpFetcher();
+    private CascHttpSettings.RemoteConfig mockConfig;
+    private DefaultHttpFetcher fetcher;
+
+    @Before
+    public void setup() {
+        mockConfig = null;
+        fetcher = new DefaultHttpFetcher(url -> mockConfig);
+    }
 
     @Test
     public void testSupportsLogic() {
@@ -42,20 +50,6 @@ public class DefaultHttpFetcherTest {
     @Test(expected = IOException.class)
     public void testFetchThrowsOnInvalidUrl() throws Exception {
         fetcher.fetch("http://example.com/invalid path with spaces", null);
-    }
-
-    @Test
-    public void testFetchThrowsOnFailedSanitizeUri() {
-        String targetUrl = "http:example.com";
-
-        IOException e = assertThrows(
-                "Expected fetcher to throw IOException due to URI reconstruction failure",
-                IOException.class,
-                () -> fetcher.fetch(targetUrl, null));
-
-        assertTrue(
-                "Message should indicate sanitization failure",
-                e.getMessage().contains("Failed to sanitize URI: " + targetUrl));
     }
 
     @Test
@@ -133,10 +127,13 @@ public class DefaultHttpFetcherTest {
     }
 
     @Test
-    public void testFetchWithTokenCredential() throws Exception {
+    public void testFetchWithBearerToken() throws Exception {
         stubFor(get(urlEqualTo("/private.yaml"))
                 .withHeader("Authorization", equalTo("Bearer secret-token"))
                 .willReturn(aResponse().withStatus(200).withBody("jenkins:\n  systemMessage: 'Private'")));
+
+        mockConfig =
+                new CascHttpSettings.RemoteConfig("http://localhost", "MY_TOKEN", CascHttpSettings.AuthMethod.BEARER);
 
         FetchCredentials credentials = new FetchCredentials() {
             @Override
@@ -148,8 +145,7 @@ public class DefaultHttpFetcherTest {
             }
         };
 
-        String targetUrl = wireMockRule.baseUrl() + "/private.yaml?cascCredentialId=MY_TOKEN";
-
+        String targetUrl = wireMockRule.baseUrl() + "/private.yaml";
         FetchResult result = fetcher.fetch(targetUrl, credentials);
 
         assertEquals(1, result.items().size());
@@ -165,6 +161,9 @@ public class DefaultHttpFetcherTest {
                         "Authorization",
                         equalTo("Basic " + getEncoder().encodeToString("user:password".getBytes(UTF_8))))
                 .willReturn(aResponse().withStatus(200).withBody("jenkins:\n  systemMessage: 'Private'")));
+
+        mockConfig = new CascHttpSettings.RemoteConfig(
+                "http://localhost", "MY_CREDENTIALS", CascHttpSettings.AuthMethod.BASIC);
 
         FetchCredentials credentials = new FetchCredentials() {
             @Override
@@ -186,8 +185,7 @@ public class DefaultHttpFetcherTest {
             }
         };
 
-        String targetUrl = wireMockRule.baseUrl() + "/private.yaml?cascCredentialId=MY_CREDENTIALS";
-
+        String targetUrl = wireMockRule.baseUrl() + "/private.yaml";
         FetchResult result = fetcher.fetch(targetUrl, credentials);
 
         assertEquals(1, result.items().size());
@@ -199,31 +197,60 @@ public class DefaultHttpFetcherTest {
     }
 
     @Test
-    public void testCredentialIdIsRemovedFromRequestUrl() throws Exception {
-        stubFor(get(urlEqualTo("/config.yaml?foo=bar"))
-                .withHeader("Authorization", equalTo("Bearer secret-token"))
+    public void testFetchWithApiKeyCustomHeader() throws Exception {
+        stubFor(get(urlEqualTo("/private.yaml"))
+                .withHeader("X-Custom-Auth", equalTo("secret-key"))
                 .willReturn(aResponse().withStatus(200).withBody("jenkins: {}")));
+
+        mockConfig = new CascHttpSettings.RemoteConfig(
+                "http://localhost", "MY_API_KEY", CascHttpSettings.AuthMethod.API_KEY);
+        mockConfig.setHeaderName("X-Custom-Auth");
 
         FetchCredentials credentials = new FetchCredentials() {
             @Override
             public <T extends FetchAuthData> T get(String credentialId, Class<T> type) {
-                if ("MY_TOKEN".equals(credentialId) && type == FetchAuthData.Token.class) {
-                    return type.cast((FetchAuthData.Token) () -> "secret-token");
+                if ("MY_API_KEY".equals(credentialId) && type == FetchAuthData.Token.class) {
+                    return type.cast((FetchAuthData.Token) () -> "secret-key");
                 }
                 return null;
             }
         };
 
-        String targetUrl = wireMockRule.baseUrl() + "/config.yaml?foo=bar&cascCredentialId=MY_TOKEN";
+        fetcher.fetch(wireMockRule.baseUrl() + "/private.yaml", credentials);
 
-        fetcher.fetch(targetUrl, credentials);
+        verify(getRequestedFor(urlEqualTo("/private.yaml")).withHeader("X-Custom-Auth", equalTo("secret-key")));
+    }
 
-        verify(getRequestedFor(urlEqualTo("/config.yaml?foo=bar"))
-                .withHeader("Authorization", equalTo("Bearer secret-token")));
+    @Test
+    public void testFetchWithApiKeyDefaultHeader() throws Exception {
+        stubFor(get(urlEqualTo("/private.yaml"))
+                .withHeader("x-api-key", equalTo("secret-key"))
+                .willReturn(aResponse().withStatus(200).withBody("jenkins: {}")));
+
+        mockConfig = new CascHttpSettings.RemoteConfig(
+                "http://localhost", "MY_API_KEY", CascHttpSettings.AuthMethod.API_KEY);
+        mockConfig.setHeaderName("");
+
+        FetchCredentials credentials = new FetchCredentials() {
+            @Override
+            public <T extends FetchAuthData> T get(String credentialId, Class<T> type) {
+                if ("MY_API_KEY".equals(credentialId) && type == FetchAuthData.Token.class) {
+                    return type.cast((FetchAuthData.Token) () -> "secret-key");
+                }
+                return null;
+            }
+        };
+
+        fetcher.fetch(wireMockRule.baseUrl() + "/private.yaml", credentials);
+
+        verify(getRequestedFor(urlEqualTo("/private.yaml")).withHeader("x-api-key", equalTo("secret-key")));
     }
 
     @Test
     public void testFetchThrowsWhenCredentialCannotBeResolved() {
+        mockConfig =
+                new CascHttpSettings.RemoteConfig("http://localhost", "UNKNOWN", CascHttpSettings.AuthMethod.BEARER);
+
         FetchCredentials credentials = new FetchCredentials() {
             @Override
             public <T extends FetchAuthData> T get(String credentialId, Class<T> type) {
@@ -231,54 +258,21 @@ public class DefaultHttpFetcherTest {
             }
         };
 
-        String targetUrl = wireMockRule.baseUrl() + "/private.yaml?cascCredentialId=UNKNOWN";
+        String targetUrl = wireMockRule.baseUrl() + "/private.yaml";
 
         IOException e = assertThrows(IOException.class, () -> fetcher.fetch(targetUrl, credentials));
-
-        assertTrue(e.getMessage().contains("Unable to resolve credentials with ID 'UNKNOWN'"));
+        assertTrue(e.getMessage().contains("Unable to resolve Token for ID: UNKNOWN"));
     }
 
     @Test
     public void testFetchThrowsWhenCredentialResolverIsMissing() {
-        String targetUrl = wireMockRule.baseUrl() + "/private.yaml?cascCredentialId=MY_TOKEN";
+        mockConfig =
+                new CascHttpSettings.RemoteConfig("http://localhost", "MY_TOKEN", CascHttpSettings.AuthMethod.BEARER);
+        String targetUrl = wireMockRule.baseUrl() + "/private.yaml";
 
         IOException e = assertThrows(IOException.class, () -> fetcher.fetch(targetUrl, null));
 
         assertTrue(e.getMessage().contains("no credential resolver was provided"));
-    }
-
-    @Test
-    public void testGenericCredentialIdIsPreservedAsNormalQueryParam() throws Exception {
-        stubFor(get(urlEqualTo("/private.yaml?credentialId=SERVER_PARAM"))
-                .willReturn(aResponse().withStatus(200).withBody("jenkins: {}")));
-
-        fetcher.fetch(wireMockRule.baseUrl() + "/private.yaml?credentialId=SERVER_PARAM", null);
-
-        verify(getRequestedFor(urlEqualTo("/private.yaml?credentialId=SERVER_PARAM")));
-    }
-
-    @Test
-    public void testPreservesEncodedQueryParameters() throws Exception {
-        stubFor(get(urlEqualTo("/config.yaml?signature=a%26b&foo=bar"))
-                .withHeader("Authorization", equalTo("Bearer secret-token"))
-                .willReturn(aResponse().withStatus(200).withBody("jenkins: {}")));
-
-        FetchCredentials credentials = new FetchCredentials() {
-            @Override
-            public <T extends FetchAuthData> T get(String credentialId, Class<T> type) {
-                if ("MY_TOKEN".equals(credentialId) && type == FetchAuthData.Token.class) {
-                    return type.cast((FetchAuthData.Token) () -> "secret-token");
-                }
-                return null;
-            }
-        };
-
-        String targetUrl = wireMockRule.baseUrl() + "/config.yaml?signature=a%26b&cascCredentialId=MY_TOKEN&foo=bar";
-
-        fetcher.fetch(targetUrl, credentials);
-
-        verify(getRequestedFor(urlEqualTo("/config.yaml?signature=a%26b&foo=bar"))
-                .withHeader("Authorization", equalTo("Bearer secret-token")));
     }
 
     @Test
@@ -291,5 +285,27 @@ public class DefaultHttpFetcherTest {
 
         assertEquals(1, result.items().size());
         verify(getRequestedFor(urlEqualTo("/casc.yaml")));
+    }
+
+    @Test
+    public void testFetchWithNoAuthentication() throws Exception {
+        stubFor(get(urlEqualTo("/public.yaml"))
+                .willReturn(aResponse().withStatus(200).withBody("jenkins: {}")));
+
+        mockConfig = new CascHttpSettings.RemoteConfig("http://localhost", null, CascHttpSettings.AuthMethod.NONE);
+
+        fetcher.fetch(wireMockRule.baseUrl() + "/public.yaml", null);
+
+        verify(getRequestedFor(urlEqualTo("/public.yaml")).withoutHeader("Authorization"));
+    }
+
+    @Test
+    public void testFetchWithoutMatchingConfiguration() throws Exception {
+        stubFor(get(urlEqualTo("/public.yaml"))
+                .willReturn(aResponse().withStatus(200).withBody("jenkins: {}")));
+
+        fetcher.fetch(wireMockRule.baseUrl() + "/public.yaml", null);
+
+        verify(getRequestedFor(urlEqualTo("/public.yaml")).withoutHeader("Authorization"));
     }
 }
