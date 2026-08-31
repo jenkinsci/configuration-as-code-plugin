@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   security-scan:
-    uses: jenkins-infra/jenkins-security-scan/.github/workflows/jenkins-security-scan.yaml@v2
+    uses: jenkins-infra/jenkins-security-scan/.github/workflows/jenkins-security-scan.yaml@da7438f10fecc21e40174d420ef34daae0874122 # v2
     with:
       java-cache: 'maven' # Optionally enable use of a build dependency cache. Specify 'maven' or 'gradle' as appropriate.
       # java-version: 21 # Optionally specify what version of Java to set up for the build, or remove to use a recent default.
