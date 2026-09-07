@@ -7,9 +7,6 @@ import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import hudson.ExtensionList;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfigurationContext;
@@ -40,6 +37,8 @@ import org.json.JSONTokener;
 import org.jvnet.hudson.test.LogRecorder;
 import org.jvnet.hudson.test.LoggerRule;
 import org.yaml.snakeyaml.nodes.Node;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.dataformat.yaml.YAMLMapper;
 
 public class Util {
 
@@ -252,15 +251,11 @@ public class Util {
      * @return the json conversion of the yaml string.
      */
     public static String convertToJson(String yamlString) {
-        try {
-            ObjectMapper yamlReader = new ObjectMapper(new YAMLFactory());
-            Object obj = yamlReader.readValue(yamlString, Object.class);
+        ObjectMapper yamlReader = new YAMLMapper();
+        Object obj = yamlReader.readValue(yamlString, Object.class);
 
-            ObjectMapper jsonWriter = new ObjectMapper();
-            return jsonWriter.writeValueAsString(obj);
-        } catch (JsonProcessingException e) {
-            throw new UncheckedIOException(e);
-        }
+        ObjectMapper jsonWriter = new ObjectMapper();
+        return jsonWriter.writeValueAsString(obj);
     }
 
     /**
