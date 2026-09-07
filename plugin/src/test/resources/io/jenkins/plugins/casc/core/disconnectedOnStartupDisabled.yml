@@ -1,0 +1,10 @@
+jenkins:
+  nodes:
+    - permanent:
+        name: "test-node-disabled"
+        remoteFS: "/tmp"
+        numExecutors: 1
+        mode: NORMAL
+        nodeProperties:
+          - disconnectedOnStartup:
+              enabled: false
