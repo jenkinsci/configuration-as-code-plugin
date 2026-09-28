@@ -10,6 +10,7 @@ import hudson.security.ACLContext;
 import hudson.util.HttpResponses;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -67,6 +68,7 @@ public class TokenReloadAction implements UnprotectedRootAction {
 
                     String message = e.getMessage() != null ? e.getMessage() : "Unknown configuration error";
 
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     HttpResponses.errorJSON("Failed to reload configuration: " + message)
                             .generateResponse(request, response, this);
                 }
