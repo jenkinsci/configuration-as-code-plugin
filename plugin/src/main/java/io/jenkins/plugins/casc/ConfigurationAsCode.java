@@ -113,6 +113,7 @@ public class ConfigurationAsCode extends ManagementLink {
     public static final String DEFAULT_JENKINS_YAML_PATH = "jenkins.yaml";
     public static final String YAML_FILES_PATTERN = "glob:**.{yml,yaml,YAML,YML}";
     public static final String ALLOW_ANONYMOUS_SCHEMA_PROPERTY = "io.jenkins.plugins.casc.allowAnonymousSchema";
+    public static final String ALLOW_SYSTEM_READ_CHECK_PROPERTY = "io.jenkins.plugins.casc.allowSystemReadCheck";
 
     private static final Logger LOGGER = Logger.getLogger(ConfigurationAsCode.class.getName());
 
@@ -501,7 +502,9 @@ public class ConfigurationAsCode extends ManagementLink {
     @RequirePOST
     @Restricted(NoExternalUse.class)
     public void doCheck(StaplerRequest2 req, StaplerResponse2 res) throws Exception {
-        if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
+        boolean allowSystemReadCheck = Boolean.getBoolean(ALLOW_SYSTEM_READ_CHECK_PROPERTY);
+        if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)
+                && !(allowSystemReadCheck && Jenkins.get().hasPermission(Jenkins.SYSTEM_READ))) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
