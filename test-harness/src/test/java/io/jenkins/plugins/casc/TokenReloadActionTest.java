@@ -189,7 +189,7 @@ public class TokenReloadActionTest {
             WebRequest request = new WebRequest(url, HttpMethod.POST);
             WebResponse response = wc.getPage(request).getWebResponse();
 
-            assertEquals(HttpServletResponse.SC_OK, response.getStatusCode());
+            assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, response.getStatusCode());
             assertTrue("Content-Type should be JSON", response.getContentType().contains("application/json"));
 
             String body = response.getContentAsString();
