@@ -2,6 +2,7 @@ package io.jenkins.plugins.casc;
 
 import hudson.util.BootFailure;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import org.kohsuke.stapler.StaplerRequest2;
 import org.kohsuke.stapler.StaplerResponse2;
@@ -13,7 +14,7 @@ public class ConfigurationAsCodeBootFailure extends BootFailure {
     }
 
     public void doDynamic(StaplerRequest2 req, StaplerResponse2 rsp) throws IOException, ServletException {
-        rsp.setStatus(503);
+        rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         ConfigurationAsCode.handleExceptionOnReloading(req, rsp, (ConfiguratorException) getCause());
     }
 }
