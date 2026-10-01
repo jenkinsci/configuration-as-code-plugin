@@ -62,12 +62,12 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.jenkins-ci.main</groupId>
-      <artifactId>jenkins-test-harness</artifactId>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>jackson3-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>jackson2-api</artifactId>
+      <groupId>org.jenkins-ci.main</groupId>
+      <artifactId>jenkins-test-harness</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.code.findbugs</groupId>
