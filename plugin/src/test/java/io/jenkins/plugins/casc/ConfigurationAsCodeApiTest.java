@@ -28,7 +28,12 @@ public class ConfigurationAsCodeApiTest {
     public final FlagRule<String> anonymousSchemaFlag =
             FlagRule.systemProperty(ConfigurationAsCode.ALLOW_ANONYMOUS_SCHEMA_PROPERTY);
 
+    @Rule
+    public final FlagRule<String> systemReadCheckFlag =
+            FlagRule.systemProperty(ConfigurationAsCode.ALLOW_SYSTEM_READ_CHECK_PROPERTY);
+
     private static final String ENDPOINT = "configuration-as-code/configure";
+    private static final String CHECK_ENDPOINT = "manage/configuration-as-code/check";
     private static final String SCHEMA_ENDPOINT = "manage/configuration-as-code/schema";
     private static final String YAML_CONTENT_TYPE = "application/yaml";
     private static final String ADMIN = "admin";
@@ -52,6 +57,24 @@ public class ConfigurationAsCodeApiTest {
                 .grant(Jenkins.ADMINISTER)
                 .everywhere()
                 .to(ADMIN));
+    }
+
+    private void configureSystemReaderSecurity(String username) {
+        j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
+        j.jenkins.setAuthorizationStrategy(new MockAuthorizationStrategy()
+                .grant(Jenkins.READ)
+                .everywhere()
+                .to(username)
+                .grant(Jenkins.SYSTEM_READ)
+                .everywhere()
+                .to(username));
+    }
+
+    private WebRequest checkPost(String requestBody) throws Exception {
+        WebRequest request = new WebRequest(new URL(j.getURL(), CHECK_ENDPOINT), HttpMethod.POST);
+        request.setAdditionalHeader("Content-Type", YAML_CONTENT_TYPE);
+        request.setRequestBody(requestBody);
+        return request;
     }
 
     @Test
@@ -239,6 +262,67 @@ public class ConfigurationAsCodeApiTest {
 
             assertThat(response.getStatusCode(), is(200));
             assertThat(response.getContentType(), is("application/json"));
+        }
+    }
+
+    @Test
+    public void testDoCheck_DefaultIsProtected() throws Exception {
+        configureSystemReaderSecurity("systemReader");
+
+        try (JenkinsRule.WebClient wc = j.createWebClient().withBasicApiToken("systemReader")) {
+            wc.setThrowExceptionOnFailingStatusCode(false);
+
+            WebRequest request = checkPost("jenkins:\n  systemMessage: 'check'");
+            WebResponse response = wc.getPage(request).getWebResponse();
+
+            assertThat(response.getStatusCode(), is(403));
+        }
+    }
+
+    @Test
+    public void testDoCheck_AdminCanAccess() throws Exception {
+        configureAdminSecurity();
+
+        try (JenkinsRule.WebClient wc = j.createWebClient().withBasicApiToken(ADMIN)) {
+            wc.setThrowExceptionOnFailingStatusCode(false);
+
+            WebRequest request = checkPost("jenkins:\n  systemMessage: 'check'");
+            WebResponse response = wc.getPage(request).getWebResponse();
+
+            assertThat(response.getStatusCode(), is(200));
+            assertThat(response.getContentAsString(), is("[]"));
+        }
+    }
+
+    @Test
+    public void testDoCheck_SystemReaderAccessWhenPropertyEnabled() throws Exception {
+        configureSystemReaderSecurity("systemReader");
+        System.setProperty(ConfigurationAsCode.ALLOW_SYSTEM_READ_CHECK_PROPERTY, "true");
+
+        try (JenkinsRule.WebClient wc = j.createWebClient().withBasicApiToken("systemReader")) {
+            wc.setThrowExceptionOnFailingStatusCode(false);
+
+            WebRequest request = checkPost("jenkins:\n  systemMessage: 'check'");
+            WebResponse response = wc.getPage(request).getWebResponse();
+
+            assertThat(response.getStatusCode(), is(200));
+        }
+    }
+
+    @Test
+    public void testDoCheck_NonSystemReaderForbiddenWhenPropertyEnabled() throws Exception {
+        j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
+        j.jenkins.setAuthorizationStrategy(
+                new MockAuthorizationStrategy().grant(Jenkins.READ).everywhere().to("reader"));
+        System.setProperty(ConfigurationAsCode.ALLOW_SYSTEM_READ_CHECK_PROPERTY, "true");
+
+        try (JenkinsRule.WebClient wc = j.createWebClient().withBasicApiToken("reader")) {
+            wc.setThrowExceptionOnFailingStatusCode(false);
+
+            WebRequest request = checkPost("jenkins:\n  systemMessage: 'check'");
+            WebResponse response = wc.getPage(request).getWebResponse();
+
+            assertThat(response.getStatusCode(), is(403));
         }
     }
 }

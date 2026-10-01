@@ -17,6 +17,7 @@
 - [Security considerations](#security-considerations)
 - [Exporting configurations](./docs/features/configExport.md)
 - [Validating configurations](./docs/features/jsonSchema.md)
+- [Configuration Validation (check)](./docs/features/configurationCheck.md)
 - [Merge Strategy](./docs/features/mergeStrategy.md)
 - [Triggering Configuration Reload](./docs/features/configurationReload.md)
 - [Installing plugins](#installing-plugins)
