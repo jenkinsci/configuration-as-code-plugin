@@ -8,8 +8,11 @@ import static org.junit.Assert.assertTrue;
 import hudson.model.Node;
 import hudson.slaves.DumbSlave;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
+import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.Configurator;
 import io.jenkins.plugins.casc.ConfiguratorRegistry;
+import io.jenkins.plugins.casc.model.CNode;
+import io.jenkins.plugins.casc.model.Mapping;
 import java.io.File;
 import org.junit.Rule;
 import org.junit.Test;
@@ -126,6 +129,38 @@ public class DumbSlaveConfiguratorTest {
         DumbSlave slave = getDumbSlave("node-5");
 
         assertEquals("label-1 label-2", slave.getLabelString());
+    }
+
+    @Test
+    public void testExportDumbSlaveConfiguredWithLabels() throws Exception {
+        String yaml = """
+            jenkins:
+              nodes:
+                - permanent:
+                    name: "node-export"
+                    remoteFS: "/tmp"
+                    launcher: "jnlp"
+                    labels:
+                      - "label-1"
+                      - "label-2"
+                      - ["nested-1", "nested-2"]
+            """;
+
+        configureWithYaml(yaml);
+
+        DumbSlave slave = getDumbSlave("node-export");
+        Configurator<DumbSlave> configurator = ConfiguratorRegistry.get().lookupOrFail(DumbSlave.class);
+        ConfigurationContext context = new ConfigurationContext(ConfiguratorRegistry.get());
+
+        CNode cnode = configurator.describe(slave, context);
+
+        assertNotNull(cnode);
+        assertTrue(cnode instanceof Mapping);
+        Mapping mapping = (Mapping) cnode;
+
+        assertEquals(
+                "label-1 label-2 nested-1 nested-2",
+                mapping.get("labelString").asScalar().getValue());
     }
 
     @Test

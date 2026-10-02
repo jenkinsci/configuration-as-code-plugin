@@ -8,9 +8,11 @@ import static org.junit.Assert.assertTrue;
 import hudson.model.Node.Mode;
 import hudson.model.Slave;
 import hudson.plugins.sshslaves.SSHLauncher;
+import hudson.slaves.DumbSlave;
 import hudson.slaves.JNLPLauncher;
 import io.jenkins.plugins.casc.misc.ConfiguredWithReadme;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithReadmeRule;
+import java.util.Objects;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -44,5 +46,15 @@ public class BuildAgentsTest {
         assertThat(launcher.getCredentialsId(), is("test"));
         assertThat(launcher.getMaxNumRetries(), is(3));
         assertThat(launcher.getRetryWaitTime(), is(30));
+    }
+
+    @Test
+    @ConfiguredWithReadme(value = "build_agents/README.md#1")
+    public void configure_build_agent_labels() {
+        DumbSlave javaNode = (DumbSlave) j.getInstance().getNode("java-node");
+        assertThat(Objects.requireNonNull(javaNode).getLabelString(), is("linux docker java maven"));
+
+        DumbSlave pythonNode = (DumbSlave) j.getInstance().getNode("python-node");
+        assertThat(Objects.requireNonNull(pythonNode).getLabelString(), is("linux docker python pytest"));
     }
 }
