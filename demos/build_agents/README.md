@@ -1,8 +1,8 @@
 # build agents
 
-Build agents configuration belongs under `jenkins` root element
+Build agents configuration belongs (currently) under `jenkins` root element
 
-## Sample configuration
+## sample configuration
 
 ```yaml
 jenkins:
