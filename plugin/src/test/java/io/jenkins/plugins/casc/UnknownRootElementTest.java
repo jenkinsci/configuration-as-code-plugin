@@ -15,18 +15,22 @@ class UnknownRootElementTest {
 
     @Test
     void oneUnknown(JenkinsRule j) {
-        ConfiguratorException ex = assertThrows(ConfiguratorException.class, () -> ConfigurationAsCode.get()
-                .configure(Objects.requireNonNull(getClass().getResource("unknown1.yml"))
-                        .toExternalForm()));
+        ConfiguratorException ex = assertThrows(
+                ConfiguratorException.class,
+                () -> ConfigurationAsCode.get()
+                        .configure(Objects.requireNonNull(getClass().getResource("unknown1.yml"))
+                                .toExternalForm()));
 
         assertThat(ex.getMessage(), containsString("No configurator found for the following root element: alice"));
     }
 
     @Test
     void twoUnknown(JenkinsRule j) {
-        ConfiguratorException ex = assertThrows(ConfiguratorException.class, () -> ConfigurationAsCode.get()
-                .configure(Objects.requireNonNull(getClass().getResource("unknown2.yml"))
-                        .toExternalForm()));
+        ConfiguratorException ex = assertThrows(
+                ConfiguratorException.class,
+                () -> ConfigurationAsCode.get()
+                        .configure(Objects.requireNonNull(getClass().getResource("unknown2.yml"))
+                                .toExternalForm()));
 
         assertThat(
                 ex.getMessage(), containsString("No configurator found for the following root elements: bob, alice"));

@@ -822,8 +822,9 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     private static boolean isHidden(Path path) {
-        return IntStream.range(0, path.getNameCount()).mapToObj(path::getName).anyMatch(subPath -> subPath.toString()
-                .startsWith("."));
+        return IntStream.range(0, path.getNameCount())
+                .mapToObj(path::getName)
+                .anyMatch(subPath -> subPath.toString().startsWith("."));
     }
 
     @FunctionalInterface
