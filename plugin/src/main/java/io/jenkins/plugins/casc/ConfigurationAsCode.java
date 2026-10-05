@@ -12,6 +12,7 @@ import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.PLAIN;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
+import hudson.ExtensionList;
 import hudson.Functions;
 import hudson.PluginManager;
 import hudson.Util;
@@ -1049,5 +1050,35 @@ public class ConfigurationAsCode extends ManagementLink {
 
             res.getWriter().print(errors);
         }
+    }
+
+    public ExtensionList<CasCManagementAction> getCustomActions() {
+        return CasCManagementAction.all();
+    }
+
+    @CheckForNull
+    public CasCManagementAction getOverrideFor(String targetAction) {
+        for (CasCManagementAction action : getCustomActions()) {
+            if (Objects.equals(targetAction, action.getOverridesAction())) {
+                return action;
+            }
+        }
+        return null;
+    }
+
+    public Object getDynamic(String token) {
+        if (!Jenkins.get().hasPermission(getRequiredPermission())) {
+            return null;
+        }
+
+        for (CasCManagementAction action : getCustomActions()) {
+            if (Objects.equals(action.getUrlName(), token)) {
+                if (!Jenkins.get().hasPermission(action.getRequiredPermission())) {
+                    return null;
+                }
+                return action;
+            }
+        }
+        return null;
     }
 }
