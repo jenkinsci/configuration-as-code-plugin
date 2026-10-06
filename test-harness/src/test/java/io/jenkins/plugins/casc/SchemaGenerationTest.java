@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import hudson.Extension;
+import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
 import java.util.List;
@@ -166,6 +167,109 @@ class SchemaGenerationTest {
     @Test
     void validArraySchemaShouldSucceed(JenkinsConfiguredWithCodeRule j) throws Exception {
         assertThat(validateSchema(convertYamlFileToJson(this, "validArraySchemaConfig.yml")), empty());
+    }
+
+    @Test
+    void listItemAttributesKeepTheirTypes(JenkinsConfiguredWithCodeRule j) throws Exception {
+        assertThat(validateSchema(convertYamlFileToJson(this, "validListItemSchemaConfig.yml")), empty());
+    }
+
+    @Test
+    void listItemEnumRejectsUnknownConstant(JenkinsConfiguredWithCodeRule j) throws Exception {
+        assertThat(
+                validateSchema(convertYamlFileToJson(this, "invalidListItemSchemaConfig.yml")),
+                contains("#/unclassified/listItemConfig/entries/0/mode: VALUE_C is not a valid enum value"));
+    }
+
+    public static class ListItem {
+        private final DummyEnum mode;
+        private List<String> names;
+
+        @DataBoundConstructor
+        public ListItem(DummyEnum mode) {
+            this.mode = mode;
+        }
+
+        public DummyEnum getMode() {
+            return mode;
+        }
+
+        public List<String> getNames() {
+            return names;
+        }
+
+        @DataBoundSetter
+        public void setNames(List<String> names) {
+            this.names = names;
+        }
+    }
+
+    @Extension
+    @Symbol("listItemConfig")
+    public static class ListItemConfig extends GlobalConfiguration {
+        private List<ListItem> entries;
+
+        @DataBoundConstructor
+        public ListItemConfig() {}
+
+        public List<ListItem> getEntries() {
+            return entries;
+        }
+
+        @DataBoundSetter
+        public void setEntries(List<ListItem> entries) {
+            this.entries = entries;
+        }
+    }
+
+    @Test
+    void enumsAreListedByConstantName(JenkinsConfiguredWithCodeRule j) throws Exception {
+        assertThat(validateSchema(convertYamlFileToJson(this, "validEnumNameSchemaConfig.yml")), empty());
+    }
+
+    @Test
+    @ConfiguredWithCode("validEnumNameSchemaConfig.yml")
+    void enumConstantNamesAreWhatConfigurationAccepts(JenkinsConfiguredWithCodeRule j) {
+        EnumNameConfig config = GlobalConfiguration.all().get(EnumNameConfig.class);
+        assertEquals(RenamedEnum.LOWER_CASED, config.getSpelling());
+        assertEquals(List.of(RenamedEnum.LOWER_CASED), config.getSpellings());
+    }
+
+    public enum RenamedEnum {
+        LOWER_CASED;
+
+        @Override
+        public String toString() {
+            return "lower-cased";
+        }
+    }
+
+    @Extension
+    @Symbol("enumNameConfig")
+    public static class EnumNameConfig extends GlobalConfiguration {
+        private RenamedEnum spelling;
+        private List<RenamedEnum> spellings;
+
+        @DataBoundConstructor
+        public EnumNameConfig() {}
+
+        public RenamedEnum getSpelling() {
+            return spelling;
+        }
+
+        @DataBoundSetter
+        public void setSpelling(RenamedEnum spelling) {
+            this.spelling = spelling;
+        }
+
+        public List<RenamedEnum> getSpellings() {
+            return spellings;
+        }
+
+        @DataBoundSetter
+        public void setSpellings(List<RenamedEnum> spellings) {
+            this.spellings = spellings;
+        }
     }
 
     //    For testing manually

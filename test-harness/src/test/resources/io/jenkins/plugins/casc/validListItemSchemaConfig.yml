@@ -1,0 +1,7 @@
+unclassified:
+  listItemConfig:
+    entries:
+      - mode: VALUE_A
+        names:
+          - "first"
+      - mode: VALUE_B

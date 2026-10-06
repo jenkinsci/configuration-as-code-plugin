@@ -4,7 +4,6 @@ import io.jenkins.plugins.casc.impl.DefaultConfiguratorRegistry;
 import io.jenkins.plugins.casc.impl.attributes.DescribableAttribute;
 import io.jenkins.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -13,10 +12,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
+import org.apache.commons.beanutils.Converter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.Beta;
+import org.kohsuke.stapler.Stapler;
 
 @Restricted(Beta.class)
 public class SchemaGeneration {
@@ -258,11 +259,7 @@ public class SchemaGeneration {
         if (attribute.type.getName().equals("java.lang.String")) {
             itemsSchema.put("type", "string");
         } else if (attribute.type.isEnum()) {
-            ArrayList<String> values = new ArrayList<>();
-            for (Object obj : attribute.type.getEnumConstants()) {
-                values.add(obj.toString());
-            }
-            itemsSchema.put("type", "string").put("enum", new JSONArray(values));
+            itemsSchema.put("type", "string").put("enum", enumValues(attribute.type));
         } else {
             @SuppressWarnings("rawtypes")
             Configurator lookup = context.lookup(attribute.getType());
@@ -296,16 +293,8 @@ public class SchemaGeneration {
                     itemsSchema = generateHeteroDescribableConfigObject(
                             (HeteroDescribableConfigurator<?>) lookup, context, definitions);
                 } else {
-                    JSONObject properties = new JSONObject();
-                    for (Object attr : lookup.getAttributes()) {
-                        Attribute<?, ?> a = (Attribute<?, ?>) attr;
-                        properties.put(
-                                a.getName(), generateNonEnumAttributeObject(a, baseConfigurator, context, definitions));
-                    }
-                    itemsSchema
-                            .put("type", "object")
-                            .put("properties", properties)
-                            .put("additionalProperties", false);
+                    itemsSchema.put("$ref", "#/definitions/" + attribute.type.getName());
+                    ensureDefinitionExists(attribute.getType(), context, definitions);
                 }
             } else {
                 itemsSchema
@@ -330,13 +319,32 @@ public class SchemaGeneration {
             description.ifPresent(desc -> jsonObject.put("description", desc));
             attributeSchemaTemplate.put(attribute.getName(), jsonObject);
         } else {
-            ArrayList<String> attributeList = new ArrayList<>();
-            for (Object obj : attribute.type.getEnumConstants()) {
-                attributeList.add(obj.toString());
-            }
-            JSONObject jsonObject = new JSONObject().put("type", "string").put("enum", new JSONArray(attributeList));
+            JSONObject jsonObject = new JSONObject().put("type", "string").put("enum", enumValues(attribute.type));
             description.ifPresent(desc -> jsonObject.put("description", desc));
             attributeSchemaTemplate.put(attribute.getName(), jsonObject);
+        }
+    }
+
+    /**
+     * The spellings {@link io.jenkins.plugins.casc.impl.DefaultConfiguratorRegistry} accepts. An enum with a Stapler
+     * converter is read by that converter, which may accept only {@code toString()}; any other enum is read by
+     * {@link Enum#valueOf}, which accepts only {@code name()}.
+     */
+    private static JSONArray enumValues(Class<?> type) {
+        Converter converter = Stapler.lookupConverter(type);
+        JSONArray values = new JSONArray();
+        for (Object constant : type.getEnumConstants()) {
+            String name = ((Enum<?>) constant).name();
+            values.put(converter == null || converts(converter, type, name, constant) ? name : constant.toString());
+        }
+        return values;
+    }
+
+    private static boolean converts(Converter converter, Class<?> type, String text, Object expected) {
+        try {
+            return converter.convert(type, text) == expected;
+        } catch (RuntimeException e) {
+            return false;
         }
     }
 
