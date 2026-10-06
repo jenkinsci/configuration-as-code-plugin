@@ -168,6 +168,59 @@ class SchemaGenerationTest {
         assertThat(validateSchema(convertYamlFileToJson(this, "validArraySchemaConfig.yml")), empty());
     }
 
+    @Test
+    void listItemAttributesKeepTheirTypes(JenkinsConfiguredWithCodeRule j) throws Exception {
+        assertThat(validateSchema(convertYamlFileToJson(this, "validListItemSchemaConfig.yml")), empty());
+    }
+
+    @Test
+    void listItemEnumRejectsUnknownConstant(JenkinsConfiguredWithCodeRule j) throws Exception {
+        assertThat(
+                validateSchema(convertYamlFileToJson(this, "invalidListItemSchemaConfig.yml")),
+                contains("#/unclassified/listItemConfig/entries/0/mode: VALUE_C is not a valid enum value"));
+    }
+
+    public static class ListItem {
+        private final DummyEnum mode;
+        private List<String> names;
+
+        @DataBoundConstructor
+        public ListItem(DummyEnum mode) {
+            this.mode = mode;
+        }
+
+        public DummyEnum getMode() {
+            return mode;
+        }
+
+        public List<String> getNames() {
+            return names;
+        }
+
+        @DataBoundSetter
+        public void setNames(List<String> names) {
+            this.names = names;
+        }
+    }
+
+    @Extension
+    @Symbol("listItemConfig")
+    public static class ListItemConfig extends GlobalConfiguration {
+        private List<ListItem> entries;
+
+        @DataBoundConstructor
+        public ListItemConfig() {}
+
+        public List<ListItem> getEntries() {
+            return entries;
+        }
+
+        @DataBoundSetter
+        public void setEntries(List<ListItem> entries) {
+            this.entries = entries;
+        }
+    }
+
     //    For testing manually
     //    @Test
     //    public void writeSchema() throws Exception {

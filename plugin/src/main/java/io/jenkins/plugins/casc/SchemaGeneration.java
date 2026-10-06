@@ -296,16 +296,8 @@ public class SchemaGeneration {
                     itemsSchema = generateHeteroDescribableConfigObject(
                             (HeteroDescribableConfigurator<?>) lookup, context, definitions);
                 } else {
-                    JSONObject properties = new JSONObject();
-                    for (Object attr : lookup.getAttributes()) {
-                        Attribute<?, ?> a = (Attribute<?, ?>) attr;
-                        properties.put(
-                                a.getName(), generateNonEnumAttributeObject(a, baseConfigurator, context, definitions));
-                    }
-                    itemsSchema
-                            .put("type", "object")
-                            .put("properties", properties)
-                            .put("additionalProperties", false);
+                    itemsSchema.put("$ref", "#/definitions/" + attribute.type.getName());
+                    ensureDefinitionExists(attribute.getType(), context, definitions);
                 }
             } else {
                 itemsSchema
