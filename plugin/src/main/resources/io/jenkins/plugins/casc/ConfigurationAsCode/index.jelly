@@ -2,11 +2,8 @@
 <j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout" xmlns:f="/lib/form" xmlns:i="jelly:fmt"
   xmlns:t="/lib/hudson">
   <l:settings-subpage permissions="${app.MANAGE_AND_SYSTEM_READ}" header="${null}">
-    <j:set var="replaceOverride" value="${it.getOverrideFor('replace')}"/>
-    <j:set var="exportOverride" value="${it.getOverrideFor('viewExport')}"/>
-    <j:set var="reloadOverride" value="${it.getOverrideFor('reload')}"/>
 
-    <j:if test="${replaceOverride == null}">
+    <j:if test="${!it.replaceDisabled}">
       <l:dialog title="${%Apply Configuration as Code file}" hash="new">
         <l:isAdmin>
           <f:form method="post" action="replace" name="replace">
@@ -21,147 +18,54 @@
     </j:if>
 
     <l:app-bar title="${it.displayName}">
-      <j:choose>
-        <j:when test="${replaceOverride == null}">
-          <j:if test="${!empty it.sources}">
-            <button id="btn-open-apply-configuration"
-              class="jenkins-button"
-              data-type="dialog-opener"
-              data-dialog-id="${dialogId}">
-              <l:icon src="symbol-add"/>
-              ${%Apply configuration}
-            </button>
-          </j:if>
-        </j:when>
-        <j:otherwise>
-          <l:hasPermission permission="${replaceOverride.requiredPermission}">
-            <j:choose>
-              <j:when test="${replaceOverride.requiresPost()}">
-                <f:form method="post" action="${replaceOverride.urlName}" name="${replaceOverride.urlName}">
-                  <input type="hidden" name="${h.getCrumbRequestField()}" value="${h.getCrumb(request2)}"/>
-                  <button name="${replaceOverride.urlName}" class="jenkins-button">
-                    <j:if test="${replaceOverride.iconFileName != null}">
-                      <l:icon src="${replaceOverride.iconFileName}"/>
-                    </j:if>
-                    ${replaceOverride.displayName}
-                  </button>
-                </f:form>
-              </j:when>
-              <j:otherwise>
-                <a href="${replaceOverride.urlName}" class="jenkins-button">
-                  <j:if test="${replaceOverride.iconFileName != null}">
-                    <l:icon src="${replaceOverride.iconFileName}"/>
-                  </j:if>
-                  ${replaceOverride.displayName}
-                </a>
-              </j:otherwise>
-            </j:choose>
-          </l:hasPermission>
-        </j:otherwise>
-      </j:choose>
-
-      <j:choose>
-        <j:when test="${exportOverride == null}">
-          <f:form method="post" action="viewExport" name="viewExport">
-            <l:hasPermission permission="${app.SYSTEM_READ}">
-              <button name="viewExport" class="jenkins-button">
-                ${%Export configuration}
-              </button>
-            </l:hasPermission>
-          </f:form>
-        </j:when>
-        <j:otherwise>
-          <l:hasPermission permission="${exportOverride.requiredPermission}">
-            <j:choose>
-              <j:when test="${exportOverride.requiresPost()}">
-                <f:form method="post" action="${exportOverride.urlName}" name="${exportOverride.urlName}">
-                  <input type="hidden" name="${h.getCrumbRequestField()}" value="${h.getCrumb(request2)}"/>
-                  <button name="${exportOverride.urlName}" class="jenkins-button">
-                    <j:if test="${exportOverride.iconFileName != null}">
-                      <l:icon src="${exportOverride.iconFileName}"/>
-                    </j:if>
-                    ${exportOverride.displayName}
-                  </button>
-                </f:form>
-              </j:when>
-              <j:otherwise>
-                <a href="${exportOverride.urlName}" class="jenkins-button">
-                  <j:if test="${exportOverride.iconFileName != null}">
-                    <l:icon src="${exportOverride.iconFileName}"/>
-                  </j:if>
-                  ${exportOverride.displayName}
-                </a>
-              </j:otherwise>
-            </j:choose>
-          </l:hasPermission>
-        </j:otherwise>
-      </j:choose>
-
-      <j:if test="${!empty it.sources}">
-        <j:choose>
-          <j:when test="${reloadOverride == null}">
-            <f:form method="post" action="reload" name="reload">
-              <l:hasAdministerOrManage>
-                <button name="reload" tooltip="${%Reload configuration}" class="jenkins-button">
-                  <l:icon src="symbol-refresh"/>
-                </button>
-              </l:hasAdministerOrManage>
-            </f:form>
-          </j:when>
-          <j:otherwise>
-            <l:hasPermission permission="${reloadOverride.requiredPermission}">
-              <j:choose>
-                <j:when test="${reloadOverride.requiresPost()}">
-                  <f:form method="post" action="${reloadOverride.urlName}" name="${reloadOverride.urlName}">
-                    <input type="hidden" name="${h.getCrumbRequestField()}" value="${h.getCrumb(request2)}"/>
-                    <button name="${reloadOverride.urlName}" tooltip="${%Reload configuration}" class="jenkins-button">
-                      <j:if test="${reloadOverride.iconFileName != null}">
-                        <l:icon src="${reloadOverride.iconFileName}"/>
-                      </j:if>
-                      ${reloadOverride.displayName}
-                    </button>
-                  </f:form>
-                </j:when>
-                <j:otherwise>
-                  <a href="${reloadOverride.urlName}" class="jenkins-button">
-                    <j:if test="${reloadOverride.iconFileName != null}">
-                      <l:icon src="${reloadOverride.iconFileName}"/>
-                    </j:if>
-                    ${reloadOverride.displayName}
-                  </a>
-                </j:otherwise>
-              </j:choose>
-            </l:hasPermission>
-          </j:otherwise>
-        </j:choose>
+      <j:if test="${!it.replaceDisabled}">
+        <j:if test="${!empty it.sources}">
+          <button id="btn-open-apply-configuration"
+            class="jenkins-button"
+            data-type="dialog-opener"
+            data-dialog-id="${dialogId}">
+            <l:icon src="symbol-add"/>
+            ${%Apply configuration}
+          </button>
+        </j:if>
       </j:if>
 
-      <j:forEach var="action" items="${it.customActions}">
-        <j:if test="${action.overridesAction == null}">
-          <l:hasPermission permission="${action.requiredPermission}">
-            <j:choose>
-              <j:when test="${action.requiresPost()}">
-                <f:form method="post" action="${action.urlName}" name="${action.urlName}">
-                  <input type="hidden" name="${h.getCrumbRequestField()}" value="${h.getCrumb(request2)}"/>
-                  <button name="${action.urlName}" class="jenkins-button">
-                    <j:if test="${action.iconFileName != null}">
-                      <l:icon src="${action.iconFileName}"/>
-                    </j:if>
-                    ${action.displayName}
-                  </button>
-                </f:form>
-              </j:when>
-              <j:otherwise>
-                <a href="${action.urlName}" class="jenkins-button">
-                  <j:if test="${action.iconFileName != null}">
-                    <l:icon src="${action.iconFileName}"/>
-                  </j:if>
-                  ${action.displayName}
-                </a>
-              </j:otherwise>
-            </j:choose>
-          </l:hasPermission>
-        </j:if>
+      <j:forEach var="casc" items="${it.customActions}">
+        <l:hasPermission permission="${casc.requiredPermission}">
+          <j:choose>
+            <j:when test="${casc.requiresPost()}">
+              <f:form method="post" action="${casc.urlName}" name="${casc.urlName}">
+                <input type="hidden"
+                  name="${h.getCrumbRequestField()}"
+                  value="${h.getCrumb(request2)}"/>
+                <button name="${casc.urlName}" class="jenkins-button"
+                  tooltip="${casc.iconFileName != null ? casc.displayName : null}">
+                  <j:choose>
+                    <j:when test="${casc.iconFileName != null}">
+                      <l:icon src="${casc.iconFileName}"/>
+                    </j:when>
+                    <j:otherwise>
+                      ${casc.displayName}
+                    </j:otherwise>
+                  </j:choose>
+                </button>
+              </f:form>
+            </j:when>
+            <j:otherwise>
+              <a href="${casc.urlName}" class="jenkins-button"
+                tooltip="${casc.iconFileName != null ? casc.displayName : null}">
+                <j:choose>
+                  <j:when test="${casc.iconFileName != null}">
+                    <l:icon src="${casc.iconFileName}"/>
+                  </j:when>
+                  <j:otherwise>
+                    ${casc.displayName}
+                  </j:otherwise>
+                </j:choose>
+              </a>
+            </j:otherwise>
+          </j:choose>
+        </l:hasPermission>
       </j:forEach>
 
     </l:app-bar>
@@ -175,38 +79,13 @@
         <l:notice icon="symbol-logo plugin-configuration-as-code"
           title="${%Controller has no configuration as code file set}">
           <l:isAdmin>
-            <j:choose>
-              <j:when test="${replaceOverride == null}">
-                <button id="btn-open-apply-configuration" class="jenkins-button"
-                  data-type="dialog-opener"
-                  data-dialog-id="${dialogId}">
-                  ${%Setup configuration}
-                </button>
-              </j:when>
-              <j:otherwise>
-                <j:choose>
-                  <j:when test="${replaceOverride.requiresPost()}">
-                    <f:form method="post" action="${replaceOverride.urlName}" name="${replaceOverride.urlName}-setup">
-                      <input type="hidden" name="${h.getCrumbRequestField()}" value="${h.getCrumb(request2)}"/>
-                      <button name="${replaceOverride.urlName}" class="jenkins-button">
-                        <j:if test="${replaceOverride.iconFileName != null}">
-                          <l:icon src="${replaceOverride.iconFileName}"/>
-                        </j:if>
-                        ${replaceOverride.displayName}
-                      </button>
-                    </f:form>
-                  </j:when>
-                  <j:otherwise>
-                    <a href="${replaceOverride.urlName}" class="jenkins-button">
-                      <j:if test="${replaceOverride.iconFileName != null}">
-                        <l:icon src="${replaceOverride.iconFileName}"/>
-                      </j:if>
-                      ${replaceOverride.displayName}
-                    </a>
-                  </j:otherwise>
-                </j:choose>
-              </j:otherwise>
-            </j:choose>
+            <j:if test="${!it.replaceDisabled}">
+              <button id="btn-open-apply-configuration" class="jenkins-button"
+                data-type="dialog-opener"
+                data-dialog-id="${dialogId}">
+                ${%Setup configuration}
+              </button>
+            </j:if>
           </l:isAdmin>
         </l:notice>
       </j:when>
@@ -230,12 +109,8 @@
     <l:hasPermission permission="${app.SYSTEM_READ}">
       <f:section title="${%Reference}">
         <dt>
-          <dl>
-            <a href="reference">${%Documentation}</a>
-          </dl>
-          <dl>
-            <a href="schema">${%JSON schema}</a>
-          </dl>
+          <dl><a href="reference">${%Documentation}</a></dl>
+          <dl><a href="schema">${%JSON schema}</a></dl>
         </dt>
       </f:section>
     </l:hasPermission>

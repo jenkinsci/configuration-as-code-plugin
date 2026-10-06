@@ -1052,22 +1052,16 @@ public class ConfigurationAsCode extends ManagementLink {
         }
     }
 
+    public boolean isReplaceDisabled() {
+        return Boolean.getBoolean("casc.management.replace.disabled");
+    }
+
     public ExtensionList<CasCManagementAction> getCustomActions() {
         return CasCManagementAction.all();
     }
 
-    @CheckForNull
-    public CasCManagementAction getOverrideFor(String targetAction) {
-        for (CasCManagementAction action : getCustomActions()) {
-            if (Objects.equals(targetAction, action.getOverridesAction())) {
-                return action;
-            }
-        }
-        return null;
-    }
-
     public Object getDynamic(String token) {
-        if (!Jenkins.get().hasPermission(getRequiredPermission())) {
+        if (!Jenkins.get().hasPermission(Jenkins.MANAGE)) {
             return null;
         }
 
@@ -1080,5 +1074,48 @@ public class ConfigurationAsCode extends ManagementLink {
             }
         }
         return null;
+    }
+
+    @Extension
+    public static class ReloadCasCAction implements CasCManagementAction {
+
+        @Override
+        public String getIconFileName() {
+            return "symbol-refresh";
+        }
+
+        @Override
+        public String getDisplayName() {
+            return "Reload configuration";
+        }
+
+        @Override
+        public String getUrlName() {
+            return "reload";
+        }
+    }
+
+    @Extension
+    public static class ExportCasCAction implements CasCManagementAction {
+        @CheckForNull
+        @Override
+        public String getIconFileName() {
+            return null;
+        }
+
+        @Override
+        public String getDisplayName() {
+            return "Export configuration";
+        }
+
+        @Override
+        public String getUrlName() {
+            return "viewExport";
+        }
+
+        @Override
+        public Permission getRequiredPermission() {
+            return Jenkins.SYSTEM_READ;
+        }
     }
 }

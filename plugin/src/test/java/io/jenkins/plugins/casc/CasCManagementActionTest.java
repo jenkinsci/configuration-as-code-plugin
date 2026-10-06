@@ -2,6 +2,7 @@ package io.jenkins.plugins.casc;
 
 import static jenkins.model.Jenkins.MANAGE;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -9,6 +10,7 @@ import static org.junit.Assert.assertTrue;
 import hudson.model.User;
 import hudson.security.ACL;
 import hudson.security.ACLContext;
+import java.util.List;
 import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,28 +45,59 @@ public class CasCManagementActionTest {
         assertTrue("Actions should require POST by default for CSRF protection", defaultAction.requiresPost());
         assertEquals(
                 "Actions should require MANAGE permission by default", MANAGE, defaultAction.getRequiredPermission());
-        assertNull("Actions should not override anything by default", defaultAction.getOverridesAction());
     }
 
     @Test
-    public void testExtensionDiscovery() {
-        assertEquals(
-                "Should discover both TestExtension actions",
-                2,
-                CasCManagementAction.all().size());
+    public void testBuiltinActionsDiscovered() {
+        List<String> urlNames = CasCManagementAction.all().stream()
+                .map(CasCManagementAction::getUrlName)
+                .toList();
+
+        assertTrue("Built-in ReloadCasCAction must be discovered", urlNames.contains("reload"));
+        assertTrue("Built-in ExportCasCAction must be discovered", urlNames.contains("viewExport"));
     }
 
     @Test
-    public void testGetOverrideFor() {
+    public void testBuiltinReloadActionProperties() {
+        CasCManagementAction reload = CasCManagementAction.all().stream()
+                .filter(a -> "reload".equals(a.getUrlName()))
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull("ReloadCasCAction must be in the extension list", reload);
+        assertTrue("Reload must require POST (CSRF protection)", reload.requiresPost());
+        assertEquals("Reload must require MANAGE permission", Jenkins.MANAGE, reload.getRequiredPermission());
+        assertNotNull("Reload should have an icon", reload.getIconFileName());
+    }
+
+    @Test
+    public void testBuiltinExportActionProperties() {
+        CasCManagementAction export = CasCManagementAction.all().stream()
+                .filter(a -> "viewExport".equals(a.getUrlName()))
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull("ExportCasCAction must be in the extension list", export);
+        assertTrue("Export must require POST (CSRF protection)", export.requiresPost());
+        assertEquals("Export must require SYSTEM_READ permission", Jenkins.SYSTEM_READ, export.getRequiredPermission());
+    }
+
+    @Test
+    public void testCustomStandaloneActionDiscovered() {
+        List<String> urlNames = CasCManagementAction.all().stream()
+                .map(CasCManagementAction::getUrlName)
+                .toList();
+
+        assertTrue("Custom StandaloneAction must be discovered", urlNames.contains("standalone-action"));
+    }
+
+    @Test
+    public void testGetCustomActionsMatchesAll() {
         ConfigurationAsCode casc = ConfigurationAsCode.get();
-
-        CasCManagementAction reloadOverride = casc.getOverrideFor("reload");
-        assertNotNull("Should find the override for 'reload'", reloadOverride);
-        assertEquals("custom-reload", reloadOverride.getUrlName());
-        assertTrue("Should be an instance of OverrideReloadAction", reloadOverride instanceof OverrideReloadAction);
-
-        CasCManagementAction exportOverride = casc.getOverrideFor("viewExport");
-        assertNull("Should return null when no extension overrides 'viewExport'", exportOverride);
+        assertEquals(
+                "getCustomActions() must return all registered CasCManagementAction extensions",
+                CasCManagementAction.all().size(),
+                casc.getCustomActions().size());
     }
 
     @Test
@@ -82,8 +115,9 @@ public class CasCManagementActionTest {
         j.jenkins.setAuthorizationStrategy(auth);
 
         try (ACLContext ignored = ACL.as(User.getById("alice", true))) {
-            Object routed = casc.getDynamic("standalone-action");
-            assertNull("Stapler routing must return null if user lacks the required permission", routed);
+            assertNull(
+                    "Stapler routing must return null if user lacks MANAGE permission",
+                    casc.getDynamic("standalone-action"));
         }
 
         try (ACLContext ignored = ACL.as(User.getById("bob", true))) {
@@ -91,8 +125,43 @@ public class CasCManagementActionTest {
             assertNotNull("Stapler routing must return the action for privileged users", routed);
             assertTrue("Routed object should be the standalone action", routed instanceof StandaloneAction);
 
-            Object invalidRoute = casc.getDynamic("does-not-exist");
-            assertNull("Stapler routing must return null for unregistered tokens", invalidRoute);
+            assertNull("Stapler routing must return null for unregistered tokens", casc.getDynamic("does-not-exist"));
+        }
+    }
+
+    @Test
+    public void testGetDynamicReturnsBuiltinActionsWhenPermitted() {
+        ConfigurationAsCode casc = ConfigurationAsCode.get();
+
+        Object reload = casc.getDynamic("reload");
+        assertNotNull("getDynamic(\"reload\") should return ReloadCasCAction when permitted", reload);
+        assertEquals(
+                "Returned action urlName must be 'reload'", "reload", ((CasCManagementAction) reload).getUrlName());
+
+        Object export = casc.getDynamic("viewExport");
+        assertNotNull("getDynamic(\"viewExport\") should return ExportCasCAction when permitted", export);
+        assertEquals(
+                "Returned action urlName must be 'viewExport'",
+                "viewExport",
+                ((CasCManagementAction) export).getUrlName());
+    }
+
+    @Test
+    public void testReplaceDisabledDefaultFalse() {
+        assertFalse(
+                "replaceDisabled must be false when the system property is not set",
+                ConfigurationAsCode.get().isReplaceDisabled());
+    }
+
+    @Test
+    public void testReplaceDisabledTrueWhenPropertySet() {
+        System.setProperty("casc.management.replace.disabled", "true");
+        try {
+            assertTrue(
+                    "replaceDisabled must be true when casc.management.replace.disabled=true",
+                    ConfigurationAsCode.get().isReplaceDisabled());
+        } finally {
+            System.clearProperty("casc.management.replace.disabled");
         }
     }
 
@@ -111,34 +180,6 @@ public class CasCManagementActionTest {
         @Override
         public String getUrlName() {
             return "standalone-action";
-        }
-    }
-
-    @TestExtension
-    public static class OverrideReloadAction implements CasCManagementAction {
-        @Override
-        public String getIconFileName() {
-            return null;
-        }
-
-        @Override
-        public String getDisplayName() {
-            return "Custom Reload";
-        }
-
-        @Override
-        public String getUrlName() {
-            return "custom-reload";
-        }
-
-        @Override
-        public String getOverridesAction() {
-            return "reload";
-        }
-
-        @Override
-        public boolean requiresPost() {
-            return false;
         }
     }
 }

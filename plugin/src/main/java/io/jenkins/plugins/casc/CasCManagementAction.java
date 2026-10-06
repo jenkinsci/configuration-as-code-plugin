@@ -1,28 +1,15 @@
 package io.jenkins.plugins.casc;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
 import hudson.ExtensionList;
 import hudson.ExtensionPoint;
+import hudson.model.Action;
 import hudson.security.Permission;
 import jenkins.model.Jenkins;
 
-public interface CasCManagementAction extends ExtensionPoint {
-
-    @CheckForNull
-    @SuppressWarnings("unused")
-    String getIconFileName();
-
-    String getDisplayName();
-
-    String getUrlName();
+public interface CasCManagementAction extends Action, ExtensionPoint {
 
     default boolean requiresPost() {
         return true;
-    }
-
-    @CheckForNull
-    default String getOverridesAction() {
-        return null;
     }
 
     default Permission getRequiredPermission() {
