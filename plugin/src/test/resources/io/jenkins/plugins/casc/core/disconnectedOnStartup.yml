@@ -1,0 +1,11 @@
+jenkins:
+  nodes:
+    - permanent:
+        name: "test-node-enabled"
+        remoteFS: "/tmp"
+        numExecutors: 1
+        mode: NORMAL
+        nodeProperties:
+          - disconnectedOnStartup:
+              enabled: true
+              reason: "Maintenance Mode"
