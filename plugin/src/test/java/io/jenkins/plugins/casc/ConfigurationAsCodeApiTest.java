@@ -265,7 +265,7 @@ public class ConfigurationAsCodeApiTest {
     public void testDoCheck_DefaultIsProtected() throws Exception {
         j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
         j.jenkins.setAuthorizationStrategy(
-            new MockAuthorizationStrategy().grant(Jenkins.READ).everywhere().toEveryone());
+                new MockAuthorizationStrategy().grant(Jenkins.READ).everywhere().toEveryone());
 
         try (JenkinsRule.WebClient wc = j.createWebClient()) {
             wc.setThrowExceptionOnFailingStatusCode(false);
