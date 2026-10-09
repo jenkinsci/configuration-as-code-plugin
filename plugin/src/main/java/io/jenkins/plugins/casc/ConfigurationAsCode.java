@@ -12,6 +12,7 @@ import static org.yaml.snakeyaml.DumperOptions.ScalarStyle.PLAIN;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
+import hudson.ExtensionList;
 import hudson.Functions;
 import hudson.PluginManager;
 import hudson.Util;
@@ -1048,6 +1049,73 @@ public class ConfigurationAsCode extends ManagementLink {
             errors.add(error);
 
             res.getWriter().print(errors);
+        }
+    }
+
+    public boolean isReplaceDisabled() {
+        return Boolean.getBoolean("casc.management.replace.disabled");
+    }
+
+    public ExtensionList<CasCManagementAction> getCustomActions() {
+        return CasCManagementAction.all();
+    }
+
+    public Object getDynamic(String token) {
+        if (!Jenkins.get().hasPermission(Jenkins.MANAGE)) {
+            return null;
+        }
+
+        for (CasCManagementAction action : getCustomActions()) {
+            if (Objects.equals(action.getUrlName(), token)) {
+                if (!Jenkins.get().hasPermission(action.getRequiredPermission())) {
+                    return null;
+                }
+                return action;
+            }
+        }
+        return null;
+    }
+
+    @Extension
+    public static class ReloadCasCAction implements CasCManagementAction {
+
+        @Override
+        public String getIconFileName() {
+            return "symbol-refresh";
+        }
+
+        @Override
+        public String getDisplayName() {
+            return "Reload configuration";
+        }
+
+        @Override
+        public String getUrlName() {
+            return "reload";
+        }
+    }
+
+    @Extension
+    public static class ExportCasCAction implements CasCManagementAction {
+        @CheckForNull
+        @Override
+        public String getIconFileName() {
+            return null;
+        }
+
+        @Override
+        public String getDisplayName() {
+            return "Export configuration";
+        }
+
+        @Override
+        public String getUrlName() {
+            return "viewExport";
+        }
+
+        @Override
+        public Permission getRequiredPermission() {
+            return Jenkins.SYSTEM_READ;
         }
     }
 }
