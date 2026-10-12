@@ -120,23 +120,18 @@ public class GlobalNodePropertiesWithEnvVarsTest {
     }
 
     @Test
-    @ConfiguredWithCode({"GlobalNodePropertiesWithEnvVarsTest.yml", "GlobalNodePropertiesWithEnvVarsAdditionalTest.yml"
+    @ConfiguredWithCode({"GlobalNodePropertiesWithEnvVarsConflict1.yml", "GlobalNodePropertiesWithEnvVarsConflict2.yml"
     })
-    @Envs({
-        @Env(name = "VALUE_1", value = "BAR"),
-        @Env(name = "TEST_GIT_HOME", value = "git-home"),
-        @Env(name = "CASC_MERGE_STRATEGY", value = "override")
-    })
+    @Envs({@Env(name = "CASC_MERGE_STRATEGY", value = "override")})
     public void mergeEnvVarsWithOverrideStrategy() {
         DescribableList<NodeProperty<?>, NodePropertyDescriptor> nodeProperties = j.jenkins.getGlobalNodeProperties();
 
         EnvironmentVariablesNodeProperty envProperty = nodeProperties.get(EnvironmentVariablesNodeProperty.class);
 
         assertThat(envProperty, notNullValue());
-        Map<String, String> envVars = envProperty.getEnvVars();
 
-        assertThat(envVars.get("FOO"), is("BAR"));
-        assertThat(envVars.get("FOO3"), is("baz"));
+        Map<String, String> envVars = envProperty.getEnvVars();
+        assertThat(envVars.get("FOO"), is("BAZ"));
     }
 
     @Test

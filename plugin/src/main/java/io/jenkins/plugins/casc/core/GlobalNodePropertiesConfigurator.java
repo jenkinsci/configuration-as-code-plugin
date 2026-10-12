@@ -257,7 +257,7 @@ public class GlobalNodePropertiesConfigurator extends DataBoundConfigurator<Envi
     }
 
     private static boolean isKey(Node node, String expected) {
-        return node instanceof ScalarNode && expected.equals(((ScalarNode) node).getValue());
+        return node instanceof ScalarNode && expected.equalsIgnoreCase(((ScalarNode) node).getValue());
     }
 
     private static String getScalarValue(MappingNode mapping, String key) {
