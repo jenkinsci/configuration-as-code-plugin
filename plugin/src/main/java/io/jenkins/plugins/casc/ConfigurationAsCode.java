@@ -23,6 +23,7 @@ import hudson.security.ACL;
 import hudson.security.ACLContext;
 import hudson.security.Permission;
 import hudson.util.FormValidation;
+import hudson.util.HttpResponses;
 import io.jenkins.plugins.casc.fetcher.CasCConfigFetcher;
 import io.jenkins.plugins.casc.fetcher.FetchContext;
 import io.jenkins.plugins.casc.fetcher.FetchCredentials;
@@ -70,6 +71,7 @@ import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
@@ -115,6 +117,12 @@ public class ConfigurationAsCode extends ManagementLink {
     public static final String ALLOW_ANONYMOUS_SCHEMA_PROPERTY = "io.jenkins.plugins.casc.allowAnonymousSchema";
 
     private static final Logger LOGGER = Logger.getLogger(ConfigurationAsCode.class.getName());
+
+    @Restricted(NoExternalUse.class)
+    public static final String RELOAD_IN_PROGRESS_MESSAGE =
+            "A configuration reload is already in progress, try again once it has completed";
+
+    private final AtomicBoolean reloadInProgress = new AtomicBoolean();
 
     @Inject
     private DefaultConfiguratorRegistry registry;
@@ -174,6 +182,10 @@ public class ConfigurationAsCode extends ManagementLink {
             return;
         }
 
+        if (!tryStartReload()) {
+            handleReloadInProgress(request, response);
+            return;
+        }
         try {
             configure();
         } catch (ConfiguratorException e) {
@@ -188,8 +200,40 @@ public class ConfigurationAsCode extends ManagementLink {
                 handleExceptionOnReloading(request, response, e);
             }
             return;
+        } finally {
+            finishReload();
         }
         response.sendRedirect("");
+    }
+
+    /**
+     * Marks a reload as started, unless one is already in progress.
+     *
+     * @return {@code true} if the caller may reload and must call {@link #finishReload()} afterwards,
+     *     {@code false} if another reload is already in progress
+     */
+    @Restricted(NoExternalUse.class)
+    public boolean tryStartReload() {
+        boolean started = reloadInProgress.compareAndSet(false, true);
+        if (!started) {
+            LOGGER.warning("Configuration reload rejected, a reload is already in progress");
+        }
+        return started;
+    }
+
+    @Restricted(NoExternalUse.class)
+    public void finishReload() {
+        reloadInProgress.set(false);
+    }
+
+    private static void handleReloadInProgress(StaplerRequest2 request, StaplerResponse2 response)
+            throws ServletException, IOException {
+        response.setStatus(HttpServletResponse.SC_CONFLICT);
+        request.setAttribute("errorMessage", RELOAD_IN_PROGRESS_MESSAGE);
+        RequestDispatcher view = request.getView(ConfigurationAsCode.class, "error.jelly");
+        if (view != null) {
+            view.forward(request, response);
+        }
     }
 
     @Restricted(NoExternalUse.class)
@@ -217,6 +261,10 @@ public class ConfigurationAsCode extends ManagementLink {
     public void doReplace(StaplerRequest2 request, StaplerResponse2 response) throws Exception {
         if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+        if (!tryStartReload()) {
+            handleReloadInProgress(request, response);
             return;
         }
         try {
@@ -267,6 +315,8 @@ public class ConfigurationAsCode extends ManagementLink {
                 handleExceptionOnReloading(request, response, e);
             }
             return;
+        } finally {
+            finishReload();
         }
 
         response.sendRedirect("");
@@ -558,7 +608,16 @@ public class ConfigurationAsCode extends ManagementLink {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
-        configureWith(YamlSource.of(req));
+        if (!tryStartReload()) {
+            res.setStatus(HttpServletResponse.SC_CONFLICT);
+            HttpResponses.errorJSON(RELOAD_IN_PROGRESS_MESSAGE).generateResponse(req, res, this);
+            return;
+        }
+        try {
+            configureWith(YamlSource.of(req));
+        } finally {
+            finishReload();
+        }
     }
 
     /**
@@ -1030,6 +1089,18 @@ public class ConfigurationAsCode extends ManagementLink {
             return;
         }
 
+        if (!tryStartReload()) {
+            res.setStatus(HttpServletResponse.SC_CONFLICT);
+            res.setContentType("application/json; charset=utf-8");
+            JSONArray errors = new JSONArray();
+            JSONObject error = new JSONObject();
+            error.put("line", -1);
+            error.put("message", RELOAD_IN_PROGRESS_MESSAGE);
+            errors.add(error);
+            res.getWriter().print(errors);
+            return;
+        }
+
         try {
             configureWith(YamlSource.of(req));
             res.setStatus(HttpServletResponse.SC_OK);
@@ -1048,6 +1119,8 @@ public class ConfigurationAsCode extends ManagementLink {
             errors.add(error);
 
             res.getWriter().print(errors);
+        } finally {
+            finishReload();
         }
     }
 }

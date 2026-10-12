@@ -27,7 +27,15 @@ public class ApplyConfigurationCommand extends CLICommand {
             return -1;
         }
 
-        ConfigurationAsCode.get().configureWith(YamlSource.of(stdin));
+        ConfigurationAsCode casc = ConfigurationAsCode.get();
+        if (!casc.tryStartReload()) {
+            throw new IllegalStateException(ConfigurationAsCode.RELOAD_IN_PROGRESS_MESSAGE);
+        }
+        try {
+            casc.configureWith(YamlSource.of(stdin));
+        } finally {
+            casc.finishReload();
+        }
         return 0;
     }
 }

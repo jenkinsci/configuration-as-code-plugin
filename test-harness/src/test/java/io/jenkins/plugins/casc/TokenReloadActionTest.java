@@ -92,6 +92,12 @@ public class TokenReloadActionTest {
         assertEquals(Level.WARNING, messages.get(0).getLevel());
     }
 
+    private static void assertReloadNotInProgress() {
+        ConfigurationAsCode casc = ConfigurationAsCode.get();
+        assertTrue("A reload should not be marked as in progress", casc.tryStartReload());
+        casc.finishReload();
+    }
+
     @Before
     public void setUp() {
         tokenReloadAction = new TokenReloadAction();
@@ -163,6 +169,68 @@ public class TokenReloadActionTest {
         tokenReloadAction.doIndex(newRequest("someSecretValue"), new ResponseImpl(null, response));
 
         assertConfigReloaded();
+    }
+
+    @Test
+    public void reloadReturnsConflictWhenReloadAlreadyInProgress() throws Exception {
+        System.setProperty("casc.reload.token", "someSecretValue");
+
+        ConfigurationAsCode casc = ConfigurationAsCode.get();
+        assertTrue(casc.tryStartReload());
+        try {
+            JenkinsRule.WebClient wc = j.createWebClient();
+            wc.getOptions().setThrowExceptionOnFailingStatusCode(false);
+
+            URL url = new URL(j.getURL(), "reload-configuration-as-code/?casc-reload-token=someSecretValue");
+            WebResponse response =
+                    wc.getPage(new WebRequest(url, HttpMethod.POST)).getWebResponse();
+
+            assertEquals(HttpServletResponse.SC_CONFLICT, response.getStatusCode());
+            assertTrue("Content-Type should be JSON", response.getContentType().contains("application/json"));
+            assertTrue(
+                    "Response body should explain that a reload is already in progress",
+                    response.getContentAsString().contains("A configuration reload is already in progress"));
+            assertFalse(configWasReloaded());
+            assertTrue(loggerRule.getRecords().isEmpty());
+        } finally {
+            casc.finishReload();
+        }
+    }
+
+    @Test
+    public void reloadIsAllowedAgainAfterPreviousReloadCompletes() throws IOException, ServletException {
+        System.setProperty("casc.reload.token", "someSecretValue");
+
+        tokenReloadAction.doIndex(newRequest("someSecretValue"), new ResponseImpl(null, response));
+        assertConfigReloaded();
+
+        response = new MockHttpServletResponse();
+        tokenReloadAction.doIndex(newRequest("someSecretValue"), new ResponseImpl(null, response));
+
+        assertEquals(200, response.getStatus());
+        assertEquals(2, loggerRule.getRecords().size());
+    }
+
+    @Test
+    public void reloadIsAllowedAgainAfterPreviousReloadFails() throws Exception {
+        System.setProperty("casc.reload.token", "someSecretValue");
+
+        Path tempFile = createTempFile("invalid-casc-config", ".yaml");
+        write(tempFile, asList("unclassified:", "  this_fake_property_forces_a_configurator_exception: true"));
+        System.setProperty("casc.jenkins.config", tempFile.toAbsolutePath().toString());
+        try {
+            JenkinsRule.WebClient wc = j.createWebClient();
+            wc.getOptions().setThrowExceptionOnFailingStatusCode(false);
+
+            URL url = new URL(j.getURL(), "reload-configuration-as-code/?casc-reload-token=someSecretValue");
+            WebResponse response =
+                    wc.getPage(new WebRequest(url, HttpMethod.POST)).getWebResponse();
+
+            assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, response.getStatusCode());
+            assertReloadNotInProgress();
+        } finally {
+            Files.deleteIfExists(tempFile);
+        }
     }
 
     @Test
