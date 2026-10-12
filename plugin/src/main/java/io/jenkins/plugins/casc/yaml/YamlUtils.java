@@ -4,6 +4,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfigurationContext;
+import io.jenkins.plugins.casc.Configurator;
 import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.fetcher.ResolvedYaml;
 import io.jenkins.plugins.casc.model.Mapping;
@@ -16,17 +17,13 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
+import jenkins.model.Jenkins;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.composer.Composer;
 import org.yaml.snakeyaml.error.YAMLException;
-import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
-import org.yaml.snakeyaml.nodes.NodeTuple;
-import org.yaml.snakeyaml.nodes.ScalarNode;
-import org.yaml.snakeyaml.nodes.SequenceNode;
 import org.yaml.snakeyaml.parser.ParserImpl;
 import org.yaml.snakeyaml.reader.StreamReader;
 import org.yaml.snakeyaml.resolver.Resolver;
@@ -57,7 +54,15 @@ public final class YamlUtils {
             }
         }
 
-        normalizeGlobalNodeProperties(root);
+        if (root != null) {
+            Jenkins jenkins = Jenkins.getInstanceOrNull();
+            if (jenkins != null) {
+                for (Configurator<?> configurator : jenkins.getExtensionList(Configurator.class)) {
+                    configurator.merge(root, context);
+                }
+            }
+        }
+
         return root;
     }
 
@@ -136,82 +141,5 @@ public final class YamlUtils {
                     }
                 });
         return (Mapping) constructor.getSingleData(Mapping.class);
-    }
-
-    private static void normalizeGlobalNodeProperties(Node root) {
-        if (!(root instanceof MappingNode)) {
-            return;
-        }
-
-        Node jenkinsNode = getMappingValue((MappingNode) root, "jenkins");
-        if (!(jenkinsNode instanceof MappingNode)) {
-            return;
-        }
-
-        Node propertiesNode = getMappingValue((MappingNode) jenkinsNode, "globalNodeProperties");
-
-        if (!(propertiesNode instanceof SequenceNode properties)) {
-            return;
-        }
-
-        Node mergedEnv = null;
-
-        Iterator<Node> iterator = properties.getValue().iterator();
-
-        while (iterator.hasNext()) {
-            Node propertyNode = iterator.next();
-
-            if (!(propertyNode instanceof MappingNode property)) {
-                continue;
-            }
-
-            if (property.getValue().size() != 1) {
-                continue;
-            }
-
-            NodeTuple propertyTuple = property.getValue().get(0);
-
-            if (!isKey(propertyTuple.getKeyNode(), "envVars")) {
-                continue;
-            }
-
-            Node envVarsNode = propertyTuple.getValueNode();
-
-            if (!(envVarsNode instanceof MappingNode)) {
-                continue;
-            }
-
-            Node envNode = getMappingValue((MappingNode) envVarsNode, "env");
-
-            if (envNode == null) {
-                continue;
-            }
-
-            if (mergedEnv == null) {
-                mergedEnv = envNode;
-            } else {
-                if (mergedEnv instanceof SequenceNode && envNode instanceof SequenceNode) {
-                    ((SequenceNode) mergedEnv).getValue().addAll(((SequenceNode) envNode).getValue());
-                    iterator.remove();
-                } else if (mergedEnv instanceof MappingNode && envNode instanceof MappingNode) {
-                    ((MappingNode) mergedEnv).getValue().addAll(((MappingNode) envNode).getValue());
-                    iterator.remove();
-                }
-            }
-        }
-    }
-
-    private static Node getMappingValue(MappingNode mapping, String key) {
-        for (NodeTuple tuple : mapping.getValue()) {
-            if (isKey(tuple.getKeyNode(), key)) {
-                return tuple.getValueNode();
-            }
-        }
-
-        return null;
-    }
-
-    private static boolean isKey(Node node, String expected) {
-        return node instanceof ScalarNode && expected.equals(((ScalarNode) node).getValue());
     }
 }

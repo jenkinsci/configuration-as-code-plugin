@@ -1,0 +1,6 @@
+jenkins:
+  globalNodeProperties:
+    - envVars:
+        env:
+          MAP_VAR: "from_mapping"
+          

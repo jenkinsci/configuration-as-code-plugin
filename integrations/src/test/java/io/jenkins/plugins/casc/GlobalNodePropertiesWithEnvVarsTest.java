@@ -3,9 +3,13 @@ package io.jenkins.plugins.casc;
 import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
 import static io.jenkins.plugins.casc.misc.Util.toStringFromYamlFile;
 import static io.jenkins.plugins.casc.misc.Util.toYamlString;
+import static java.util.Objects.requireNonNull;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.fail;
 
 import hudson.slaves.EnvironmentVariablesNodeProperty;
 import hudson.slaves.NodeProperty;
@@ -70,7 +74,7 @@ public class GlobalNodePropertiesWithEnvVarsTest {
 
         EnvironmentVariablesNodeProperty envProperty = nodeProperties.get(EnvironmentVariablesNodeProperty.class);
 
-        assertThat(envProperty, org.hamcrest.Matchers.notNullValue());
+        assertThat(envProperty, notNullValue());
 
         Map<String, String> envVars = envProperty.getEnvVars();
 
@@ -92,7 +96,7 @@ public class GlobalNodePropertiesWithEnvVarsTest {
 
         EnvironmentVariablesNodeProperty envProperty = nodeProperties.get(EnvironmentVariablesNodeProperty.class);
 
-        assertThat(envProperty, org.hamcrest.Matchers.notNullValue());
+        assertThat(envProperty, notNullValue());
         Map<String, String> envVars = envProperty.getEnvVars();
 
         assertThat(envVars.get("FOO"), is("BAR"));
@@ -110,7 +114,7 @@ public class GlobalNodePropertiesWithEnvVarsTest {
 
         ToolLocationNodeProperty toolLocations = nodeProperties.get(ToolLocationNodeProperty.class);
 
-        assertThat(toolLocations, org.hamcrest.Matchers.notNullValue());
+        assertThat(toolLocations, notNullValue());
         assertThat(toolLocations.getLocations(), hasSize(1));
         assertThat(toolLocations.getLocations().get(0).getHome(), is("git-home"));
     }
@@ -128,10 +132,76 @@ public class GlobalNodePropertiesWithEnvVarsTest {
 
         EnvironmentVariablesNodeProperty envProperty = nodeProperties.get(EnvironmentVariablesNodeProperty.class);
 
-        assertThat(envProperty, org.hamcrest.Matchers.notNullValue());
+        assertThat(envProperty, notNullValue());
         Map<String, String> envVars = envProperty.getEnvVars();
 
         assertThat(envVars.get("FOO"), is("BAR"));
         assertThat(envVars.get("FOO3"), is("baz"));
+    }
+
+    @Test
+    public void shouldNotNormalizeEnvVarsWithMultipleEntries() {
+        try {
+            ConfigurationAsCode.get()
+                    .configure(requireNonNull(getClass().getResource("GlobalNodePropertiesWithEnvVarsMultipleKeys.yml"))
+                            .toExternalForm());
+            fail("Expected an exception due to invalid key in envVars");
+        } catch (ConfiguratorException e) {
+            assertThat(e.getMessage(), containsString("invalidKey"));
+        } catch (Exception e) {
+            fail("Expected ConfiguratorException, got " + e.getClass());
+        }
+    }
+
+    @Test
+    public void shouldThrowExceptionOnConflictingValues() {
+        try {
+            ConfigurationAsCode.get()
+                    .configure(
+                            requireNonNull(getClass().getResource("GlobalNodePropertiesWithEnvVarsConflict1.yml"))
+                                    .toExternalForm(),
+                            requireNonNull(getClass().getResource("GlobalNodePropertiesWithEnvVarsConflict2.yml"))
+                                    .toExternalForm());
+            fail("Expected an exception due to conflicting environment variable values");
+        } catch (ConfiguratorException e) {
+            assertThat(e.getMessage(), containsString("Found conflicting environment variable"));
+        } catch (Exception e) {
+            fail("Expected ConfiguratorException, got " + e.getClass());
+        }
+    }
+
+    @Test
+    public void shouldThrowExceptionOnIncompatibleNodeTypes() {
+        try {
+            ConfigurationAsCode.get()
+                    .configure(
+                            requireNonNull(getClass().getResource("GlobalNodePropertiesWithEnvVarsSeq.yml"))
+                                    .toExternalForm(),
+                            requireNonNull(getClass().getResource("GlobalNodePropertiesWithEnvVarsMap.yml"))
+                                    .toExternalForm());
+            fail("Expected an exception due to incompatible environment variable definitions");
+        } catch (ConfiguratorException e) {
+            assertThat(e.getMessage(), containsString("cannot merge a sequence with a mapping"));
+        } catch (Exception e) {
+            fail("Expected ConfiguratorException, got " + e.getClass());
+        }
+    }
+
+    @Test
+    public void shouldPreserveMalformedDefinitionAndFailValidation() {
+        try {
+            ConfigurationAsCode.get()
+                    .configure(
+                            requireNonNull(getClass().getResource("GlobalNodePropertiesWithEnvVarsMalformed.yml"))
+                                    .toExternalForm(),
+                            requireNonNull(getClass().getResource("GlobalNodePropertiesWithEnvVarsTest.yml"))
+                                    .toExternalForm());
+            fail(
+                    "Expected an exception because the malformed YAML should survive the merge phase and fail core JCasC validation");
+        } catch (ConfiguratorException e) {
+            assertThat(e.getMessage(), notNullValue());
+        } catch (Exception e) {
+            fail("Expected ConfiguratorException, got " + e.getClass());
+        }
     }
 }

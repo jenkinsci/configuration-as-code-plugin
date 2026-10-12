@@ -1,0 +1,7 @@
+jenkins:
+  globalNodeProperties:
+    - envVars:
+        env:
+          - key: "SEQ_VAR"
+            value: "from_sequence"
+            

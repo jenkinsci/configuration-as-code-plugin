@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.Symbol;
+import org.yaml.snakeyaml.nodes.Node;
 
 /**
  * Define a {@link Configurator} which handles a configuration element, identified by name.
@@ -171,6 +172,15 @@ public interface Configurator<T> {
      * @throws ConfiguratorException on configuration error
      */
     T check(CNode config, ConfigurationContext context) throws ConfiguratorException;
+
+    /**
+     * Optional hook to allow configurators to customize or merge YAML nodes during the configuration merge process.
+     *
+     * @param root the merged root YAML node
+     * @param context configuration context
+     * @throws ConfiguratorException if merge fails
+     */
+    default void merge(Node root, ConfigurationContext context) throws ConfiguratorException {}
 
     /**
      * Describe a component as a Configuration Nodes {@link CNode} to be exported as yaml.
