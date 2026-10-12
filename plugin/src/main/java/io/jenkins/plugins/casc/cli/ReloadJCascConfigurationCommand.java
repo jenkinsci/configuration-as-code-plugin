@@ -26,7 +26,15 @@ public class ReloadJCascConfigurationCommand extends CLICommand {
             return -1;
         }
 
-        ConfigurationAsCode.get().configure();
+        ConfigurationAsCode casc = ConfigurationAsCode.get();
+        if (!casc.tryStartReload()) {
+            throw new IllegalStateException(ConfigurationAsCode.RELOAD_IN_PROGRESS_MESSAGE);
+        }
+        try {
+            casc.configure();
+        } finally {
+            casc.finishReload();
+        }
         return 0;
     }
 }

@@ -59,10 +59,18 @@ public class TokenReloadAction implements UnprotectedRootAction {
             if (requestToken != null
                     && MessageDigest.isEqual(
                             token.getBytes(StandardCharsets.UTF_8), requestToken.getBytes(StandardCharsets.UTF_8))) {
+                ConfigurationAsCode casc = ConfigurationAsCode.get();
+                if (!casc.tryStartReload()) {
+                    response.setStatus(HttpServletResponse.SC_CONFLICT);
+                    HttpResponses.errorJSON(ConfigurationAsCode.RELOAD_IN_PROGRESS_MESSAGE)
+                            .generateResponse(request, response, this);
+                    return;
+                }
+
                 LOGGER.info("Configuration reload triggered via token");
 
                 try (ACLContext ignored = ACL.as2(ACL.SYSTEM2)) {
-                    ConfigurationAsCode.get().configure();
+                    casc.configure();
                 } catch (ConfiguratorException e) {
                     LOGGER.log(SEVERE, "Failed to reload Jenkins Configuration as Code via token", e);
 
@@ -71,6 +79,8 @@ public class TokenReloadAction implements UnprotectedRootAction {
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     HttpResponses.errorJSON("Failed to reload configuration: " + message)
                             .generateResponse(request, response, this);
+                } finally {
+                    casc.finishReload();
                 }
             } else {
                 response.sendError(401);

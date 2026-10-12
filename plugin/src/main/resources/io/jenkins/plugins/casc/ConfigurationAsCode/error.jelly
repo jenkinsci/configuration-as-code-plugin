@@ -4,7 +4,11 @@
     <l:main-panel>
      <l:app-bar title="${%Error loading configuration}" />
 
-      <p>${errorMessage}<pre><code>${target}</code></pre></p>
+      <p>${errorMessage}
+        <j:if test="${target != null}">
+          <pre><code>${target}</code></pre>
+        </j:if>
+      </p>
 
       <j:if test="${invalidAttribute != null}">
         <p>Attribute was: <pre><code>${invalidAttribute}</code></pre></p>

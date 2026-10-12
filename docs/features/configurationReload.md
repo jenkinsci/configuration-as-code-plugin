@@ -51,3 +51,14 @@ reload-jcasc-configuration
   ConfigurationAsCode.get().configure()
   ```
   _Note: that running the above code in a pipeline will put this plugin in a bad state where the configuration cannot be reloaded at all until Jenkins is restarted. See [#1227](https://github.com/jenkinsci/configuration-as-code-plugin/issues/1227) for more info._
+
+### Concurrent reloads
+
+Only one configuration reload or apply can run at a time. If one is already in progress, a new request is
+rejected instead of running alongside it:
+
+- HTTP endpoints respond with `409 Conflict` and the message
+  `A configuration reload is already in progress, try again once it has completed`.
+- The `reload-jcasc-configuration` and `apply-configuration` CLI commands fail with exit code `4` and the same message.
+
+Automation that triggers reloads, such as a sidecar watching a `ConfigMap`, should retry later when it receives a `409`.
