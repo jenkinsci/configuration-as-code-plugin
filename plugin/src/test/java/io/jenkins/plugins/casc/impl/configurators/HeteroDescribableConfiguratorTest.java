@@ -52,9 +52,9 @@ public class HeteroDescribableConfiguratorTest {
                         getClass().getResource("HeteroDescribableConfiguratorTest_scalarInterpolation.yml"))
                 .toExternalForm();
 
-        UnknownAttributesException thrown =
-                assertThrows(UnknownAttributesException.class, () -> ConfigurationAsCode.get()
-                        .configure(yamlResource));
+        UnknownAttributesException thrown = assertThrows(
+                UnknownAttributesException.class,
+                () -> ConfigurationAsCode.get().configure(yamlResource));
 
         assertThat(
                 "Exception should mention the failure to find an implementation",
@@ -65,9 +65,11 @@ public class HeteroDescribableConfiguratorTest {
 
     @Test
     public void shouldFailWhenMultipleImplementationsProvidedForNestedSingleValuedDescribable() {
-        ConfiguratorException exception = assertThrows(ConfiguratorException.class, () -> ConfigurationAsCode.get()
-                .configure(Objects.requireNonNull(getClass().getResource("multiple-implementations.yml"))
-                        .toExternalForm()));
+        ConfiguratorException exception = assertThrows(
+                ConfiguratorException.class,
+                () -> ConfigurationAsCode.get()
+                        .configure(Objects.requireNonNull(getClass().getResource("multiple-implementations.yml"))
+                                .toExternalForm()));
 
         String errorMessage = exception.getMessage();
         if (exception.getCause() != null) {

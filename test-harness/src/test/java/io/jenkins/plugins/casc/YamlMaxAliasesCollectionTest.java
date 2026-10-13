@@ -23,8 +23,10 @@ public class YamlMaxAliasesCollectionTest {
     @Test
     public void testAMaxOfOneEnv() {
         env.set(ConfigurationContext.CASC_YAML_MAX_ALIASES_ENV, "1");
-        ConfiguratorException e = assertThrows(ConfiguratorException.class, () -> ConfigurationAsCode.get()
-                .configure(getClass().getResource("maxAliasesLimit.yml").toExternalForm()));
+        ConfiguratorException e = assertThrows(
+                ConfiguratorException.class,
+                () -> ConfigurationAsCode.get()
+                        .configure(getClass().getResource("maxAliasesLimit.yml").toExternalForm()));
         assertEquals(
                 "Number of aliases for non-scalar nodes exceeds the specified max=1\n"
                         + "You can increase the maximum by setting an environment variable or property\n"
@@ -36,8 +38,10 @@ public class YamlMaxAliasesCollectionTest {
     @Test
     public void testAMaxOfOneProp() {
         System.setProperty(ConfigurationContext.CASC_YAML_MAX_ALIASES_PROPERTY, "1");
-        ConfiguratorException e = assertThrows(ConfiguratorException.class, () -> ConfigurationAsCode.get()
-                .configure(getClass().getResource("maxAliasesLimit.yml").toExternalForm()));
+        ConfiguratorException e = assertThrows(
+                ConfiguratorException.class,
+                () -> ConfigurationAsCode.get()
+                        .configure(getClass().getResource("maxAliasesLimit.yml").toExternalForm()));
         assertEquals(
                 "Number of aliases for non-scalar nodes exceeds the specified max=1\n"
                         + "You can increase the maximum by setting an environment variable or property\n"

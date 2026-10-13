@@ -24,6 +24,7 @@ import io.vavr.control.Try;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -62,24 +63,26 @@ public class JenkinsConfigurator extends BaseConfigurator<Jenkins> implements Ro
 
         // Add remoting security, all legwork will be done by a configurator
         attributes.add(new Attribute<Jenkins, AdminWhitelistRule>("remotingSecurity", AdminWhitelistRule.class)
-                .getter(j -> j.getInjector().getInstance(AdminWhitelistRule.class))
+                .getter(j -> Objects.requireNonNull(j.getInjector()).getInstance(AdminWhitelistRule.class))
                 .setter(noop()));
 
         // Override "nodes" getter so we don't export Nodes registered by Cloud plugins
-        Attribute.<Jenkins, List<Node>>get(attributes, "nodes").ifPresent(attribute -> attribute
-                .getter(jenkins -> jenkins.getNodes().stream()
-                        .filter(node -> !shouldKeepNode(node))
-                        .collect(Collectors.toList()))
-                .setter((jenkins, configuredNodes) -> {
-                    List<String> configuredNodesNames =
-                            configuredNodes.stream().map(Node::getNodeName).collect(Collectors.toList());
-                    List<Node> nodesToKeep = jenkins.getNodes().stream()
-                            .filter(node -> !configuredNodesNames.contains(node.getNodeName()))
-                            .filter(this::shouldKeepNode)
-                            .collect(Collectors.toList());
-                    nodesToKeep.addAll(configuredNodes);
-                    jenkins.setNodes(nodesToKeep);
-                }));
+        Attribute.<Jenkins, List<Node>>get(attributes, "nodes")
+                .ifPresent(attribute -> attribute
+                        .getter(jenkins -> jenkins.getNodes().stream()
+                                .filter(node -> !shouldKeepNode(node))
+                                .collect(Collectors.toList()))
+                        .setter((jenkins, configuredNodes) -> {
+                            List<String> configuredNodesNames = configuredNodes.stream()
+                                    .map(Node::getNodeName)
+                                    .collect(Collectors.toList());
+                            List<Node> nodesToKeep = jenkins.getNodes().stream()
+                                    .filter(node -> !configuredNodesNames.contains(node.getNodeName()))
+                                    .filter(this::shouldKeepNode)
+                                    .collect(Collectors.toList());
+                            nodesToKeep.addAll(configuredNodes);
+                            jenkins.setNodes(nodesToKeep);
+                        }));
 
         // Add updateCenter, all legwork will be done by a configurator
         attributes.add(new Attribute<Jenkins, UpdateCenter>("updateCenter", UpdateCenter.class)
