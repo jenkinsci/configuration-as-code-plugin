@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import jenkins.model.Jenkins;
+import org.hamcrest.Matchers;
 import org.htmlunit.html.HtmlPage;
 import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -135,7 +136,12 @@ class PermissionsTest {
 
     private void assertActionAvailable(HtmlPage page, Action action, boolean shouldContain) {
         String responseContent = page.getWebResponse().getContentAsString();
-        if (shouldContain) {
+        if (action == APPLY_NEW_CONFIGURATION && shouldContain) {
+            assertThat(
+                    format("Action %s should be available", action.name()),
+                    responseContent,
+                    Matchers.anyOf(containsString("Setup configuration"), containsString("Apply configuration")));
+        } else if (shouldContain) {
             assertThat(
                     format("Action %s should be available", action.name()),
                     responseContent,
