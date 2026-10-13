@@ -1,5 +1,10 @@
 # matrix-auth-plugin
 
+> **Note:** Starting from **matrix-auth 3.2**, the older  
+> `grantedPermissions:` JCasC syntax is **deprecated**.  
+> The examples below already use the new **`entries:`** format, which should be used going forward.
+
+
 Configuration of the [Matrix Authorization Strategy plugin](https://plugins.jenkins.io/matrix-auth)
 
 There are a couple of built-in authorizations to consider.
