@@ -4,6 +4,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfigurationContext;
+import io.jenkins.plugins.casc.Configurator;
 import io.jenkins.plugins.casc.ConfiguratorException;
 import io.jenkins.plugins.casc.fetcher.ResolvedYaml;
 import io.jenkins.plugins.casc.model.Mapping;
@@ -18,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.logging.Logger;
+import jenkins.model.Jenkins;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.composer.Composer;
 import org.yaml.snakeyaml.error.YAMLException;
@@ -49,6 +51,15 @@ public final class YamlUtils {
                 }
             } catch (IOException io) {
                 throw new ConfiguratorException("Failed to read " + source, io);
+            }
+        }
+
+        if (root != null) {
+            Jenkins jenkins = Jenkins.getInstanceOrNull();
+            if (jenkins != null) {
+                for (Configurator<?> configurator : jenkins.getExtensionList(Configurator.class)) {
+                    configurator.merge(root, context);
+                }
             }
         }
 
