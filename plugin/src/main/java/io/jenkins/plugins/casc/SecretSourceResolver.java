@@ -54,7 +54,9 @@ public class SecretSourceResolver {
                 "json",
                 JsonLookup.INSTANCE,
                 "trim",
-                TrimLookup.INSTANCE);
+                TrimLookup.INSTANCE,
+                "decrypt",
+                DecryptLookup.INSTANCE);
 
         substitutor = new StringSubstitutor(new FixedInterpolatorStringLookup(
                         map, new ConfigurationContextStringLookup(configurationContext)))

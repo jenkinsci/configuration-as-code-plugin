@@ -11,14 +11,24 @@ import io.jenkins.plugins.casc.SecretSourceResolver.Base64Lookup;
 import io.jenkins.plugins.casc.SecretSourceResolver.FileBase64Lookup;
 import io.jenkins.plugins.casc.SecretSourceResolver.FileStringLookup;
 import io.jenkins.plugins.casc.SecretSourceResolver.SystemPropertyLookup;
+import io.jenkins.plugins.casc.impl.RSAEncryptionEngine;
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.spec.MGF1ParameterSpec;
 import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.crypto.Cipher;
+import javax.crypto.spec.OAEPParameterSpec;
+import javax.crypto.spec.PSource;
 import org.apache.commons.text.lookup.StringLookup;
 import org.apache.commons.text.lookup.StringLookupFactory;
 import org.junit.Before;
@@ -575,5 +585,60 @@ public class SecretSourceResolverTest {
             resolve("${FOO}:${MISSING}");
         });
         assertThat(exception.getMessage(), containsString("MISSING"));
+    }
+
+    @Test
+    public void resolve_decryptRsaLookup() throws Exception {
+        String originalKeyProperty = System.getProperty(RSAEncryptionEngine.KEY_PROP);
+        Path keyFile = Files.createTempFile("casc-resolver-rsa", ".pem");
+
+        try {
+            KeyPair keyPair = createRsaKeyPair();
+            writeRsaPrivateKey(keyFile, keyPair.getPrivate());
+
+            System.setProperty(
+                    RSAEncryptionEngine.KEY_PROP, keyFile.toAbsolutePath().toString());
+
+            String secret = "resolver-integration-secret";
+            String ciphertext = encryptWithRsaPublicKey(secret, keyPair.getPublic());
+
+            String output = resolve("${decrypt:rsa:" + ciphertext + "}");
+
+            assertThat(output, equalTo(secret));
+        } finally {
+            if (originalKeyProperty == null) {
+                System.clearProperty(RSAEncryptionEngine.KEY_PROP);
+            } else {
+                System.setProperty(RSAEncryptionEngine.KEY_PROP, originalKeyProperty);
+            }
+
+            Files.deleteIfExists(keyFile);
+        }
+    }
+
+    private static KeyPair createRsaKeyPair() throws Exception {
+        KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
+        generator.initialize(2048);
+        return generator.generateKeyPair();
+    }
+
+    private static String encryptWithRsaPublicKey(String secret, PublicKey publicKey) throws Exception {
+        OAEPParameterSpec parameters =
+                new OAEPParameterSpec("SHA-256", "MGF1", MGF1ParameterSpec.SHA256, PSource.PSpecified.DEFAULT);
+
+        Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPPadding");
+        cipher.init(Cipher.ENCRYPT_MODE, publicKey, parameters);
+
+        byte[] encrypted = cipher.doFinal(secret.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+
+        return Base64.getEncoder().encodeToString(encrypted);
+    }
+
+    private static void writeRsaPrivateKey(Path path, PrivateKey privateKey) throws IOException {
+        String encoded = Base64.getMimeEncoder(64, new byte[] {'\n'}).encodeToString(privateKey.getEncoded());
+
+        String pem = "-----BEGIN PRIVATE KEY-----\n" + encoded + "\n-----END PRIVATE KEY-----\n";
+
+        Files.writeString(path, pem, java.nio.charset.StandardCharsets.UTF_8);
     }
 }
