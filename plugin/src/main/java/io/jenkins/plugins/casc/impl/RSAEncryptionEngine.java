@@ -76,7 +76,7 @@ public class RSAEncryptionEngine extends EncryptionEngine {
 
         if (keyFile.length() > MAX_KEY_FILE_SIZE_BYTES) {
             throw new IllegalStateException(
-                "Decryption key file exceeds maximum allowed size (16KB). Check configuration.");
+                    "Decryption key file exceeds maximum allowed size (16KB). Check configuration.");
         }
 
         try {
@@ -90,7 +90,7 @@ public class RSAEncryptionEngine extends EncryptionEngine {
             throw new IllegalStateException("I/O error occurred while reading the decryption key file.", e);
         } catch (GeneralSecurityException | IllegalArgumentException e) {
             throw new IllegalStateException(
-                "Failed to parse the PKCS#8 RSA private key. Ensure it is a valid, unencrypted PKCS#8 PEM.", e);
+                    "Failed to parse the PKCS#8 RSA private key. Ensure it is a valid, unencrypted PKCS#8 PEM.", e);
         }
     }
 
@@ -98,14 +98,14 @@ public class RSAEncryptionEngine extends EncryptionEngine {
         if (!keyPem.startsWith("-----BEGIN PRIVATE KEY-----")) {
             if (keyPem.startsWith("-----BEGIN RSA PRIVATE KEY-----")) {
                 throw new IllegalArgumentException(
-                    "Traditional PKCS#1 RSA keys are not supported. Please convert to PKCS#8 format.");
+                        "Traditional PKCS#1 RSA keys are not supported. Please convert to PKCS#8 format.");
             }
             throw new IllegalArgumentException("Invalid key format. Expected unencrypted PKCS#8 PEM format.");
         }
 
         String base64KeyData = keyPem.replace("-----BEGIN PRIVATE KEY-----", "")
-            .replace("-----END PRIVATE KEY-----", "")
-            .replaceAll("\\s+", "");
+                .replace("-----END PRIVATE KEY-----", "")
+                .replaceAll("\\s+", "");
 
         byte[] decoded = Base64.getDecoder().decode(base64KeyData);
         PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(decoded);
