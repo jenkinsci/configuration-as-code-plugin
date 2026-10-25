@@ -2,6 +2,7 @@ package io.jenkins.plugins.casc.misc.junit.jupiter;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
 import static org.htmlunit.HttpMethod.POST;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -9,13 +10,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfiguratorException;
+import io.jenkins.plugins.casc.misc.Util;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import org.apache.commons.io.IOUtils;
 import org.htmlunit.WebRequest;
@@ -89,6 +93,16 @@ public abstract class AbstractRoundTripTest {
     protected abstract String stringInLogExpected();
 
     /**
+     * Whether the {@link #configResource()} should be validated against the JSON schema generated for the running
+     * Jenkins instance before it is applied. Disabled by default; override and return {@code true} to opt in.
+     *
+     * @return {@code true} to fail the round trip test if the configuration does not match the schema.
+     */
+    protected boolean validateSchema() {
+        return false;
+    }
+
+    /**
      * 1. Configure the instance with the {@link #configResource()} implemented. 2. Check it was
      * configured correctly. 3. Check the configuration is valid via Web UI. 4. Apply the
      * configuration via Web UI. 5. Write the configuration to $JENKINS_HOME/jenkins.yaml. 6.
@@ -103,6 +117,11 @@ public abstract class AbstractRoundTripTest {
 
         assertNotNull(resourcePath);
         assertNotNull(resourceContent);
+
+        // Validate against the JSON schema, if enabled
+        if (validateSchema()) {
+            assertConfigMatchesSchema(resourcePath);
+        }
 
         // Configure and validate
         configureWithResource(resourcePath);
@@ -133,6 +152,11 @@ public abstract class AbstractRoundTripTest {
 
         // Verify the configuration set at home/jenkins.yaml is loaded
         assertConfiguredAsExpected(r, resourceContent);
+    }
+
+    private void assertConfigMatchesSchema(String resourcePath) throws URISyntaxException {
+        List<String> errors = Util.validateSchema(Util.convertYamlFileToJson(this, resourcePath));
+        assertThat("Config resource " + resourcePath + " does not match the JSON schema", errors, empty());
     }
 
     private void configureWithResource(String config) throws ConfiguratorException {
