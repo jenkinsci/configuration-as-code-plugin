@@ -5,6 +5,7 @@ import io.jenkins.plugins.casc.impl.attributes.DescribableAttribute;
 import io.jenkins.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -39,19 +40,32 @@ public class SchemaGeneration {
         JSONObject definitions = new JSONObject();
         for (RootElementConfigurator rootElementConfigurator : RootElementConfigurator.all()) {
             JSONObject schemaConfiguratorObjects = new JSONObject();
+            Set<Attribute<?, ?>> rootAttributes = rootElementConfigurator.describe();
             Set<Object> elements = new LinkedHashSet<>();
-            listElements(elements, rootElementConfigurator.describe(), context, true);
+            listElements(elements, rootAttributes, context, true);
+            // a nested configurator sharing a root key's name (e.g. JDK vs. its descriptor, both "jdk") must not
+            // replace the configurator that actually handles that key
+            Map<String, Class<?>> rootKeyTypes = new HashMap<>();
+            rootAttributes.forEach(attribute -> rootKeyTypes.put(attribute.getName(), attribute.getType()));
+            rootKeyTypes.entrySet().removeIf(key -> elements.stream()
+                    .noneMatch(e -> e instanceof Configurator<?> c
+                            && c.getName().equals(key.getKey())
+                            && c.getTarget() == key.getValue()));
             for (Object configuratorObject : elements) {
                 if (configuratorObject instanceof BaseConfigurator<?> baseConfigurator) {
                     JSONObject baseConfigSchema =
                             generateBaseConfiguratorSchema(baseConfigurator, context, definitions);
-                    schemaConfiguratorObjects.put(baseConfigurator.getName(), baseConfigSchema);
+                    if (handlesKey(rootKeyTypes, baseConfigurator)) {
+                        schemaConfiguratorObjects.put(baseConfigurator.getName(), baseConfigSchema);
+                    }
                     if (baseConfigurator.getTarget() != null) {
                         definitions.put(baseConfigurator.getTarget().getName(), baseConfigSchema);
                     }
                 } else if (configuratorObject instanceof HeteroDescribableConfigurator<?> hetero) {
                     JSONObject heteroSchema = generateHeteroDescribableConfigObject(hetero, context, definitions);
-                    schemaConfiguratorObjects.put(hetero.getName(), heteroSchema);
+                    if (handlesKey(rootKeyTypes, hetero)) {
+                        schemaConfiguratorObjects.put(hetero.getName(), heteroSchema);
+                    }
                     if (hetero.getTarget() != null) {
                         definitions.put(hetero.getTarget().getName(), heteroSchema);
                     }
@@ -82,6 +96,11 @@ public class SchemaGeneration {
         schemaObject.put("properties", rootConfiguratorProperties);
         schemaObject.put("definitions", definitions);
         return schemaObject;
+    }
+
+    private static boolean handlesKey(Map<String, Class<?>> rootKeyTypes, Configurator<?> configurator) {
+        Class<?> keyType = rootKeyTypes.get(configurator.getName());
+        return keyType == null || keyType == configurator.getTarget();
     }
 
     public static String writeJSONSchema() {

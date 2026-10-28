@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import hudson.Extension;
+import hudson.model.JDK;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
@@ -65,6 +66,28 @@ class SchemaGenerationTest {
         assertThat(
                 validateSchema(convertYamlFileToJson(this, "attributesNotFlattenedToTop.yml")),
                 contains("#/tool: extraneous key [acceptLicense] is not permitted"));
+    }
+
+    @Test
+    void toolInstallationsShouldSucceed(JenkinsConfiguredWithCodeRule j) throws Exception {
+        assertThat(validateSchema(convertYamlFileToJson(this, "validToolInstallationsSchemaConfig.yml")), empty());
+    }
+
+    @Test
+    @ConfiguredWithCode("validToolInstallationsSchemaConfig.yml")
+    void toolInstallationsAreWhatConfigurationAccepts(JenkinsConfiguredWithCodeRule j) {
+        JDK[] installations =
+                j.jenkins.getDescriptorByType(JDK.DescriptorImpl.class).getInstallations();
+        assertEquals(1, installations.length);
+        assertEquals("jdk17", installations[0].getName());
+        assertEquals("/opt/jdk-17", installations[0].getHome());
+    }
+
+    @Test
+    void rejectsUnknownKeyUnderTool(JenkinsConfiguredWithCodeRule j) throws Exception {
+        assertThat(
+                validateSchema(convertYamlFileToJson(this, "invalidToolInstallationsSchemaConfig.yml")),
+                contains("#/tool/jdk: extraneous key [unknownKey] is not permitted"));
     }
 
     @Test
