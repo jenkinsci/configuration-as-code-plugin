@@ -4,6 +4,7 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.slaves.EnvironmentVariablesNodeProperty;
+import hudson.slaves.NodeProperty;
 import io.jenkins.plugins.casc.Attribute;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.ConfiguratorConflictException;
@@ -36,6 +37,14 @@ public class GlobalNodePropertiesConfigurator extends DataBoundConfigurator<Envi
     @Override
     public String getName() {
         return "globalNodeProperties";
+    }
+
+    /**
+     * {@code jenkins.globalNodeProperties} is a list of node properties, not a single env vars property.
+     */
+    @Override
+    public Class<?> getSchemaListItemType() {
+        return NodeProperty.class;
     }
 
     @NonNull
