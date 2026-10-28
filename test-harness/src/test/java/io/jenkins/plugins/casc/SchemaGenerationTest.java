@@ -6,10 +6,16 @@ import static io.jenkins.plugins.casc.misc.Util.validateSchema;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasItem;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import hudson.Extension;
+import hudson.model.Describable;
+import hudson.model.Descriptor;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
@@ -269,6 +275,88 @@ class SchemaGenerationTest {
         @DataBoundSetter
         public void setSpellings(List<RenamedEnum> spellings) {
             this.spellings = spellings;
+        }
+    }
+
+    @Test
+    void heteroDescribableAcceptsEverySymbol(JenkinsConfiguredWithCodeRule j) throws Exception {
+        assertThat(validateSchema(convertYamlFileToJson(this, "validHeteroSymbolsSchemaConfig.yml")), empty());
+    }
+
+    @Test
+    @ConfiguredWithCode("validHeteroSymbolsSchemaConfig.yml")
+    void heteroDescribableSymbolsAreWhatConfigurationAccepts(JenkinsConfiguredWithCodeRule j) {
+        ShapeConfig config = GlobalConfiguration.all().get(ShapeConfig.class);
+        assertInstanceOf(RingShape.class, config.getPreferred());
+        assertInstanceOf(RingShape.class, config.getAlias());
+        assertInstanceOf(RingShape.class, config.getDerived());
+    }
+
+    @Test
+    void heteroDescribableAliasesAreDeprecated(JenkinsConfiguredWithCodeRule j) {
+        JSONObject shapeProperties = generateSchema()
+                .getJSONObject("definitions")
+                .getJSONObject(Shape.class.getName())
+                .getJSONObject("properties");
+
+        assertFalse(shapeProperties.getJSONObject("round").has("deprecated"), "preferred symbol is not deprecated");
+        assertTrue(shapeProperties.getJSONObject("circle").getBoolean("deprecated"), "@Symbol alias is deprecated");
+        assertTrue(shapeProperties.getJSONObject("ring").getBoolean("deprecated"), "derived name is deprecated");
+    }
+
+    @Test
+    void heteroDescribableRejectsUnknownSymbol(JenkinsConfiguredWithCodeRule j) throws Exception {
+        assertThat(
+                validateSchema(convertYamlFileToJson(this, "invalidHeteroSymbolsSchemaConfig.yml")),
+                hasItem("#/unclassified/shapeConfig/preferred: extraneous key [square] is not permitted"));
+    }
+
+    public abstract static class Shape implements Describable<Shape> {}
+
+    public static class RingShape extends Shape {
+        @DataBoundConstructor
+        public RingShape() {}
+
+        @Extension
+        @Symbol({"round", "circle"})
+        public static class DescriptorImpl extends Descriptor<Shape> {}
+    }
+
+    @Extension
+    @Symbol("shapeConfig")
+    public static class ShapeConfig extends GlobalConfiguration {
+        private Shape preferred;
+        private Shape alias;
+        private Shape derived;
+
+        @DataBoundConstructor
+        public ShapeConfig() {}
+
+        public Shape getPreferred() {
+            return preferred;
+        }
+
+        @DataBoundSetter
+        public void setPreferred(Shape preferred) {
+            this.preferred = preferred;
+        }
+
+        public Shape getAlias() {
+            return alias;
+        }
+
+        @DataBoundSetter
+        public void setAlias(Shape alias) {
+            this.alias = alias;
+        }
+
+        public Shape getDerived() {
+            return derived;
+        }
+
+        @DataBoundSetter
+        public void setDerived(Shape derived) {
+            this.derived = derived;
         }
     }
 
