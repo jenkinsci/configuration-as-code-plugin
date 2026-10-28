@@ -13,14 +13,18 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import hudson.EnvVars;
 import hudson.Extension;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
+import hudson.model.TaskListener;
+import hudson.slaves.NodeProperty;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
 import java.util.List;
 import jenkins.model.GlobalConfiguration;
+import jenkins.model.Jenkins;
 import org.jenkinsci.Symbol;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -311,6 +315,46 @@ class SchemaGenerationTest {
                 hasItem("#/unclassified/shapeConfig/preferred: extraneous key [square] is not permitted"));
     }
 
+    @Test
+    void heteroListItemsAcceptEverySymbol(JenkinsConfiguredWithCodeRule j) throws Exception {
+        assertThat(validateSchema(convertYamlFileToJson(this, "validHeteroListSymbolsSchemaConfig.yml")), empty());
+    }
+
+    @Test
+    void heteroListItemAliasesAreDeprecated(JenkinsConfiguredWithCodeRule j) {
+        JSONObject itemProperties = generateSchema()
+                .getJSONObject("properties")
+                .getJSONObject("unclassified")
+                .getJSONObject("properties")
+                .getJSONObject("shapeConfig")
+                .getJSONObject("properties")
+                .getJSONObject("shapes")
+                .getJSONObject("items")
+                .getJSONObject("properties");
+
+        assertFalse(itemProperties.getJSONObject("round").has("deprecated"), "preferred symbol is not deprecated");
+        assertTrue(itemProperties.getJSONObject("circle").getBoolean("deprecated"), "@Symbol alias is deprecated");
+        assertTrue(itemProperties.getJSONObject("ring").getBoolean("deprecated"), "derived name is deprecated");
+    }
+
+    @Test
+    void heteroListItemsRejectUnknownSymbol(JenkinsConfiguredWithCodeRule j) throws Exception {
+        List<String> errors = validateSchema(convertYamlFileToJson(this, "invalidHeteroListSymbolsSchemaConfig.yml"));
+        assertThat(errors, hasItem("#/unclassified/shapeConfig/shapes/0: extraneous key [square] is not permitted"));
+        // the abstract type itself is not something configuration can create
+        assertThat(errors, hasItem("#/unclassified/shapeConfig/shapes/1: extraneous key [shape] is not permitted"));
+    }
+
+    @Test
+    @ConfiguredWithCode("validNodePropertiesSchemaConfig.yml")
+    void heteroListItemSymbolsAreWhatConfigurationAccepts(JenkinsConfiguredWithCodeRule j) throws Exception {
+        EnvVars env = new EnvVars();
+        for (NodeProperty<?> property : Jenkins.get().getNodeProperties()) {
+            property.buildEnvVars(env, TaskListener.NULL);
+        }
+        assertEquals("bar", env.get("FOO"));
+    }
+
     public abstract static class Shape implements Describable<Shape> {}
 
     public static class RingShape extends Shape {
@@ -328,6 +372,7 @@ class SchemaGenerationTest {
         private Shape preferred;
         private Shape alias;
         private Shape derived;
+        private List<Shape> shapes;
 
         @DataBoundConstructor
         public ShapeConfig() {}
@@ -357,6 +402,15 @@ class SchemaGenerationTest {
         @DataBoundSetter
         public void setDerived(Shape derived) {
             this.derived = derived;
+        }
+
+        public List<Shape> getShapes() {
+            return shapes;
+        }
+
+        @DataBoundSetter
+        public void setShapes(List<Shape> shapes) {
+            this.shapes = shapes;
         }
     }
 
