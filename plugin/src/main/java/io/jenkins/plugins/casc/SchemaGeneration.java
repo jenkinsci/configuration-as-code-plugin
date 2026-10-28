@@ -46,7 +46,20 @@ public class SchemaGeneration {
                 if (configuratorObject instanceof BaseConfigurator<?> baseConfigurator) {
                     JSONObject baseConfigSchema =
                             generateBaseConfiguratorSchema(baseConfigurator, context, definitions);
-                    schemaConfiguratorObjects.put(baseConfigurator.getName(), baseConfigSchema);
+                    Class<?> listItemType = baseConfigurator.getSchemaListItemType();
+                    Configurator<?> listItemConfigurator = listItemType != null ? context.lookup(listItemType) : null;
+                    if (listItemConfigurator instanceof HeteroDescribableConfigurator<?> listItems) {
+                        schemaConfiguratorObjects.put(
+                                baseConfigurator.getName(),
+                                new JSONObject()
+                                        .put("type", "array")
+                                        .put(
+                                                "items",
+                                                generateHeteroDescribableConfigObject(
+                                                        listItems, context, definitions)));
+                    } else {
+                        schemaConfiguratorObjects.put(baseConfigurator.getName(), baseConfigSchema);
+                    }
                     if (baseConfigurator.getTarget() != null) {
                         definitions.put(baseConfigurator.getTarget().getName(), baseConfigSchema);
                     }

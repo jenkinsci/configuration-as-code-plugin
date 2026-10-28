@@ -18,6 +18,7 @@ import hudson.Extension;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
 import hudson.model.TaskListener;
+import hudson.slaves.EnvironmentVariablesNodeProperty;
 import hudson.slaves.NodeProperty;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
@@ -230,6 +231,27 @@ class SchemaGenerationTest {
         public void setEntries(List<ListItem> entries) {
             this.entries = entries;
         }
+    }
+
+    @Test
+    void globalNodePropertiesIsAListOfNodeProperties(JenkinsConfiguredWithCodeRule j) throws Exception {
+        assertThat(validateSchema(convertYamlFileToJson(this, "validGlobalNodePropertiesSchemaConfig.yml")), empty());
+    }
+
+    @Test
+    @ConfiguredWithCode("validGlobalNodePropertiesSchemaConfig.yml")
+    void globalNodePropertiesSchemaMatchesWhatConfigurationAccepts(JenkinsConfiguredWithCodeRule j) {
+        EnvironmentVariablesNodeProperty envVars =
+                j.jenkins.getGlobalNodeProperties().get(EnvironmentVariablesNodeProperty.class);
+        assertNotNull(envVars, "envVars node property should be configured");
+        assertEquals("bar", envVars.getEnvVars().get("FOO"));
+    }
+
+    @Test
+    void globalNodePropertiesRejectsUnknownPropertyType(JenkinsConfiguredWithCodeRule j) throws Exception {
+        assertThat(
+                validateSchema(convertYamlFileToJson(this, "invalidGlobalNodePropertiesSchemaConfig.yml")),
+                hasItem("#/jenkins/globalNodeProperties/0: extraneous key [unknownNodeProperty] is not permitted"));
     }
 
     @Test
