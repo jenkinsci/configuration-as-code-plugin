@@ -118,7 +118,9 @@ public class SchemaGeneration {
             ConfigurationContext context,
             JSONObject definitions) {
 
-        Map<String, ? extends Class<?>> implementorsMap = heteroDescribableConfiguratorObject.getImplementors();
+        Map<String, ? extends Class<?>> implementorsMap = heteroDescribableConfiguratorObject.getImplementorsBySymbol();
+        Set<String> preferredSymbols =
+                heteroDescribableConfiguratorObject.getImplementors().keySet();
         JSONObject finalHeteroConfiguratorObject = new JSONObject();
         if (!implementorsMap.isEmpty()) {
             JSONArray oneOfJsonArray = new JSONArray();
@@ -127,7 +129,12 @@ public class SchemaGeneration {
             for (Map.Entry<String, ? extends Class<?>> entry : implementorsMap.entrySet()) {
                 String className = entry.getValue().getName();
 
-                propertiesObject.put(entry.getKey(), new JSONObject().put("$ref", "#/definitions/" + className));
+                JSONObject propertySchema = new JSONObject().put("$ref", "#/definitions/" + className);
+                // aliases are accepted at runtime but reported as obsolete
+                if (!preferredSymbols.contains(entry.getKey())) {
+                    propertySchema.put("deprecated", true);
+                }
+                propertiesObject.put(entry.getKey(), propertySchema);
                 oneOfJsonArray.put(new JSONObject().put("required", new JSONArray().put(entry.getKey())));
                 ensureDefinitionExists(entry.getValue(), context, definitions);
             }
