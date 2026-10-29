@@ -1,0 +1,4 @@
+jenkins:
+  permanent:
+    name: "agent1"
+    remoteFS: "/home/jenkins"
