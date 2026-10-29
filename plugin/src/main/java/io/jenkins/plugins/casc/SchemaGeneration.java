@@ -1,5 +1,6 @@
 package io.jenkins.plugins.casc;
 
+import hudson.model.TopLevelItem;
 import io.jenkins.plugins.casc.impl.DefaultConfiguratorRegistry;
 import io.jenkins.plugins.casc.impl.attributes.DescribableAttribute;
 import io.jenkins.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
@@ -56,7 +57,21 @@ public class SchemaGeneration {
                     JSONObject baseConfigSchema =
                             generateBaseConfiguratorSchema(baseConfigurator, context, definitions);
                     if (handlesKey(rootKeyTypes, baseConfigurator)) {
-                        schemaConfiguratorObjects.put(baseConfigurator.getName(), baseConfigSchema);
+                        Class<?> listItemType = baseConfigurator.getSchemaListItemType();
+                        Configurator<?> listItemConfigurator =
+                                listItemType != null ? context.lookup(listItemType) : null;
+                        if (listItemConfigurator instanceof HeteroDescribableConfigurator<?> listItems) {
+                            schemaConfiguratorObjects.put(
+                                    baseConfigurator.getName(),
+                                    new JSONObject()
+                                            .put("type", "array")
+                                            .put(
+                                                    "items",
+                                                    generateHeteroDescribableConfigObject(
+                                                            listItems, context, definitions)));
+                        } else {
+                            schemaConfiguratorObjects.put(baseConfigurator.getName(), baseConfigSchema);
+                        }
                     }
                     if (baseConfigurator.getTarget() != null) {
                         definitions.put(baseConfigurator.getTarget().getName(), baseConfigSchema);
@@ -294,7 +309,13 @@ public class SchemaGeneration {
                 @SuppressWarnings({"rawtypes", "unchecked"})
                 List<Configurator> implementors = lookup.getConfigurators(context);
 
-                if (implementors.size() > 1) {
+                // list items are configured one by one like single fields, so they accept the same symbols;
+                // items are the exception, ItemsRootConfigurator matches them by ItemConfigurator name
+                if (lookup instanceof HeteroDescribableConfigurator
+                        && !TopLevelItem.class.isAssignableFrom(attribute.type)) {
+                    itemsSchema = generateHeteroDescribableConfigObject(
+                            (HeteroDescribableConfigurator<?>) lookup, context, definitions);
+                } else if (implementors.size() > 1) {
                     JSONArray oneOfJsonArray = new JSONArray();
                     JSONObject propertiesObject = new JSONObject();
 
@@ -315,9 +336,6 @@ public class SchemaGeneration {
                             .put("minProperties", 1)
                             .put("maxProperties", 1)
                             .put("oneOf", oneOfJsonArray);
-                } else if (lookup instanceof HeteroDescribableConfigurator) {
-                    itemsSchema = generateHeteroDescribableConfigObject(
-                            (HeteroDescribableConfigurator<?>) lookup, context, definitions);
                 } else {
                     itemsSchema.put("$ref", "#/definitions/" + attribute.type.getName());
                     ensureDefinitionExists(attribute.getType(), context, definitions);
