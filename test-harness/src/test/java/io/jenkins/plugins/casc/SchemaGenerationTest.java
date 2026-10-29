@@ -18,7 +18,9 @@ import hudson.Extension;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
 import hudson.model.JDK;
+import hudson.model.Node;
 import hudson.model.TaskListener;
+import hudson.slaves.DumbSlave;
 import hudson.slaves.EnvironmentVariablesNodeProperty;
 import hudson.slaves.NodeProperty;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
@@ -122,6 +124,18 @@ class SchemaGenerationTest {
         JSONObject items = agentProtocols.getJSONObject("items");
         assertNotNull(items, "agentProtocols should have an 'items' definition");
         assertEquals("string", items.getString("type"), "agentProtocols items should be of type string");
+    }
+
+    @Test
+    void itemsRootAcceptsItemList(JenkinsConfiguredWithCodeRule j) throws Exception {
+        assertThat(validateSchema(convertYamlFileToJson(this, "validItemsSchemaConfig.yml")), empty());
+    }
+
+    @Test
+    void itemsRootRejectsItemTypeAsKey(JenkinsConfiguredWithCodeRule j) throws Exception {
+        assertThat(
+                validateSchema(convertYamlFileToJson(this, "invalidItemsRootKeySchemaConfig.yml")),
+                contains("#/items: extraneous key [freestyle] is not permitted"));
     }
 
     @Test
@@ -268,6 +282,31 @@ class SchemaGenerationTest {
                 j.jenkins.getGlobalNodeProperties().get(EnvironmentVariablesNodeProperty.class);
         assertNotNull(envVars, "envVars node property should be configured");
         assertEquals("bar", envVars.getEnvVars().get("FOO"));
+    }
+
+    @Test
+    void jenkinsRootAcceptsNodeProperties(JenkinsConfiguredWithCodeRule j) throws Exception {
+        assertThat(validateSchema(convertYamlFileToJson(this, "validNodePropertiesSchemaConfig.yml")), empty());
+    }
+
+    @Test
+    void jenkinsRootAcceptsNodes(JenkinsConfiguredWithCodeRule j) throws Exception {
+        assertThat(validateSchema(convertYamlFileToJson(this, "validNodesSchemaConfig.yml")), empty());
+    }
+
+    @Test
+    @ConfiguredWithCode("validNodesSchemaConfig.yml")
+    void jenkinsRootNodesAreWhatConfigurationAccepts(JenkinsConfiguredWithCodeRule j) {
+        Node agent = j.jenkins.getNode("agent1");
+        assertInstanceOf(DumbSlave.class, agent);
+        assertEquals("/home/jenkins", ((DumbSlave) agent).getRemoteFS());
+    }
+
+    @Test
+    void jenkinsRootRejectsNestedConfigurators(JenkinsConfiguredWithCodeRule j) throws Exception {
+        assertThat(
+                validateSchema(convertYamlFileToJson(this, "invalidJenkinsRootKeySchemaConfig.yml")),
+                contains("#/jenkins: extraneous key [permanent] is not permitted"));
     }
 
     @Test

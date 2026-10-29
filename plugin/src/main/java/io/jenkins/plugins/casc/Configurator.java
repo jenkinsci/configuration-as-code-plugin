@@ -183,18 +183,6 @@ public interface Configurator<T> {
     default void merge(Node root, ConfigurationContext context) throws ConfiguratorException {}
 
     /**
-     * Optional hook for configurators whose YAML key holds a list of describables rather than a single object,
-     * for example {@code globalNodeProperties}, which is a list of node properties.
-     *
-     * @return the describable base type of the list items to use in the JSON schema,
-     *      or {@code null} to describe this configurator's own attributes as an object
-     */
-    @CheckForNull
-    default Class<?> getSchemaListItemType() {
-        return null;
-    }
-
-    /**
      * Describe a component as a Configuration Nodes {@link CNode} to be exported as yaml.
      * Only export attributes which are <b>not</b> set to default value.
      */
