@@ -17,6 +17,7 @@ import hudson.EnvVars;
 import hudson.Extension;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
+import hudson.model.JDK;
 import hudson.model.TaskListener;
 import hudson.slaves.EnvironmentVariablesNodeProperty;
 import hudson.slaves.NodeProperty;
@@ -76,6 +77,28 @@ class SchemaGenerationTest {
         assertThat(
                 validateSchema(convertYamlFileToJson(this, "attributesNotFlattenedToTop.yml")),
                 contains("#/tool: extraneous key [acceptLicense] is not permitted"));
+    }
+
+    @Test
+    void toolInstallationsShouldSucceed(JenkinsConfiguredWithCodeRule j) throws Exception {
+        assertThat(validateSchema(convertYamlFileToJson(this, "validToolInstallationsSchemaConfig.yml")), empty());
+    }
+
+    @Test
+    @ConfiguredWithCode("validToolInstallationsSchemaConfig.yml")
+    void toolInstallationsAreWhatConfigurationAccepts(JenkinsConfiguredWithCodeRule j) {
+        JDK[] installations =
+                j.jenkins.getDescriptorByType(JDK.DescriptorImpl.class).getInstallations();
+        assertEquals(1, installations.length);
+        assertEquals("jdk17", installations[0].getName());
+        assertEquals("/opt/jdk-17", installations[0].getHome());
+    }
+
+    @Test
+    void rejectsUnknownKeyUnderTool(JenkinsConfiguredWithCodeRule j) throws Exception {
+        assertThat(
+                validateSchema(convertYamlFileToJson(this, "invalidToolInstallationsSchemaConfig.yml")),
+                contains("#/tool/jdk: extraneous key [unknownKey] is not permitted"));
     }
 
     @Test

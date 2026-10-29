@@ -1,0 +1,5 @@
+tool:
+  jdk:
+    installations:
+      - name: "jdk17"
+        home: "/opt/jdk-17"
