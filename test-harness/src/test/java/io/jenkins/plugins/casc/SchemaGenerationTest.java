@@ -5,8 +5,10 @@ import static io.jenkins.plugins.casc.misc.Util.convertYamlFileToJson;
 import static io.jenkins.plugins.casc.misc.Util.validateSchema;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -430,6 +432,54 @@ class SchemaGenerationTest {
     }
 
     @Test
+    void heteroDescribableAcceptsShortForm(JenkinsConfiguredWithCodeRule j) throws Exception {
+        assertThat(validateSchema(convertYamlFileToJson(this, "validHeteroShortFormSchemaConfig.yml")), empty());
+    }
+
+    @Test
+    @ConfiguredWithCode("validHeteroShortFormSchemaConfig.yml")
+    void heteroDescribableShortFormIsWhatConfigurationAccepts(JenkinsConfiguredWithCodeRule j) {
+        ShapeConfig config = GlobalConfiguration.all().get(ShapeConfig.class);
+        assertInstanceOf(RingShape.class, config.getPreferred());
+        assertInstanceOf(RingShape.class, config.getAlias());
+        assertInstanceOf(RingShape.class, config.getDerived());
+    }
+
+    @Test
+    void heteroDescribableFieldOnlyReferencesItsDefinition(JenkinsConfiguredWithCodeRule j) {
+        JSONObject shapeConfigProperties = generateSchema()
+                .getJSONObject("properties")
+                .getJSONObject("unclassified")
+                .getJSONObject("properties")
+                .getJSONObject("shapeConfig")
+                .getJSONObject("properties");
+
+        // a "type": "object" sibling would reject the short form wherever $ref siblings are applied
+        JSONObject hetero = shapeConfigProperties.getJSONObject("preferred");
+        assertEquals("#/definitions/" + Shape.class.getName(), hetero.getString("$ref"));
+        assertFalse(hetero.has("type"), "heterogeneous describable field has no type next to its $ref");
+        assertFalse(hetero.has("additionalProperties"), "heterogeneous describable field has no additionalProperties");
+
+        JSONObject concrete = shapeConfigProperties.getJSONObject("concrete");
+        assertEquals("#/definitions/" + RingShape.class.getName(), concrete.getString("$ref"));
+        assertEquals("object", concrete.getString("type"));
+        assertFalse(concrete.getBoolean("additionalProperties"));
+    }
+
+    @Test
+    void heteroListItemsAcceptShortForm(JenkinsConfiguredWithCodeRule j) throws Exception {
+        assertThat(validateSchema(convertYamlFileToJson(this, "validHeteroListShortFormSchemaConfig.yml")), empty());
+    }
+
+    @Test
+    void heteroShortFormRejectsUnknownSymbol(JenkinsConfiguredWithCodeRule j) throws Exception {
+        List<String> errors = validateSchema(convertYamlFileToJson(this, "invalidHeteroShortFormSchemaConfig.yml"));
+        assertThat(errors, hasItem(containsString("#/unclassified/shapeConfig/preferred")));
+        assertThat(errors, hasItem(containsString("#/unclassified/shapeConfig/shapes/1")));
+        assertThat(errors, not(hasItem(containsString("#/unclassified/shapeConfig/shapes/0"))));
+    }
+
+    @Test
     @ConfiguredWithCode("validNodePropertiesSchemaConfig.yml")
     void heteroListItemSymbolsAreWhatConfigurationAccepts(JenkinsConfiguredWithCodeRule j) throws Exception {
         EnvVars env = new EnvVars();
@@ -457,9 +507,19 @@ class SchemaGenerationTest {
         private Shape alias;
         private Shape derived;
         private List<Shape> shapes;
+        private RingShape concrete;
 
         @DataBoundConstructor
         public ShapeConfig() {}
+
+        public RingShape getConcrete() {
+            return concrete;
+        }
+
+        @DataBoundSetter
+        public void setConcrete(RingShape concrete) {
+            this.concrete = concrete;
+        }
 
         public Shape getPreferred() {
             return preferred;
