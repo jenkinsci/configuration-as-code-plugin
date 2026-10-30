@@ -147,6 +147,9 @@ public class SchemaGeneration {
         JSONObject finalHeteroConfiguratorObject = new JSONObject();
         if (!implementorsMap.isEmpty()) {
             JSONArray oneOfJsonArray = new JSONArray();
+            // the short form: a bare symbol configures that implementation without arguments
+            oneOfJsonArray.put(
+                    new JSONObject().put("type", "string").put("enum", new JSONArray(implementorsMap.keySet())));
             JSONObject propertiesObject = new JSONObject();
 
             for (Map.Entry<String, ? extends Class<?>> entry : implementorsMap.entrySet()) {
@@ -158,12 +161,14 @@ public class SchemaGeneration {
                     propertySchema.put("deprecated", true);
                 }
                 propertiesObject.put(entry.getKey(), propertySchema);
-                oneOfJsonArray.put(new JSONObject().put("required", new JSONArray().put(entry.getKey())));
+                // typed, so that a string only matches the short form branch
+                oneOfJsonArray.put(
+                        new JSONObject().put("type", "object").put("required", new JSONArray().put(entry.getKey())));
                 ensureDefinitionExists(entry.getValue(), context, definitions);
             }
 
+            // no top level type: oneOf allows a string or an object, the other keywords only constrain objects
             finalHeteroConfiguratorObject
-                    .put("type", "object")
                     .put("additionalProperties", false)
                     .put("properties", propertiesObject)
                     .put("minProperties", 1)
@@ -258,9 +263,12 @@ public class SchemaGeneration {
                 break;
 
             default:
-                attributeType.put("type", "object");
+                // a heterogeneous describable also accepts its short form (a string), so only its definition decides
+                if (!(context.lookup(attribute.getType()) instanceof HeteroDescribableConfigurator)) {
+                    attributeType.put("type", "object");
+                    attributeType.put("additionalProperties", false);
+                }
                 description.ifPresent(desc -> attributeType.put("description", desc));
-                attributeType.put("additionalProperties", false);
                 attributeType.put("$ref", "#/definitions/" + attribute.type.getName());
                 ensureDefinitionExists(attribute.getType(), context, definitions);
                 break;
@@ -315,7 +323,8 @@ public class SchemaGeneration {
                         Class<?> targetClass = impl.getTarget();
                         propertiesObject.put(
                                 name, new JSONObject().put("$ref", "#/definitions/" + targetClass.getName()));
-                        oneOfJsonArray.put(new JSONObject().put("required", new JSONArray().put(name)));
+                        oneOfJsonArray.put(
+                                new JSONObject().put("type", "object").put("required", new JSONArray().put(name)));
                         ensureDefinitionExists(targetClass, context, definitions);
                     }
                     itemsSchema

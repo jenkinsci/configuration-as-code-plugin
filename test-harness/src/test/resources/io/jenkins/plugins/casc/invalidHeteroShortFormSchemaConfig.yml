@@ -1,0 +1,6 @@
+unclassified:
+  shapeConfig:
+    preferred: square
+    shapes:
+      - round
+      - square
