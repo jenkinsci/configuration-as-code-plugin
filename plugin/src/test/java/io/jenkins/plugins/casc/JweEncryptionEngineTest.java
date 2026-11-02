@@ -254,24 +254,13 @@ class JweEncryptionEngineTest {
 
     @Test
     void decryptsExternalJweFixtureSuccessfully() throws Exception {
-        String pemKey = """
-            -----BEGIN PRIVATE KEY-----
-            MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC7V9B5xY1m9t5V
-            vR4k3O4W3T+7z3Q/1u1YgW0Yy/5R/5d6W0X1L4K7N9P8Q2V4Y5+7N9P8Q2V4Y5+7
-            N9P8Q2V4Y5+7N9P8Q2V4Y5+7N9P8Q2V4Y5+7N9P8Q2V4Y5+7N9P8Q2V4Y5+7N9P8
-            Q2V4Y5+7N9P8Q2V4Y5+7N9P8Q2V4Y5+7N9P8Q2V4Y5+7N9P8Q2V4Y5+7N9P8Q2V4
-            Y5+7N9P8Q2V4Y5+7N9P8Q2V4Y5+7N9P8Q2V4Y5+7N9P8Q2V4Y5+7N9P8Q2V4Y5+7
-            N9P8Q2V4Y5+7AgMBAAECggEBAKtN7Z3v... (truncated for readability)
-            -----END PRIVATE KEY-----
-            """;
+        KeyPair externalKeyPair = generateKeyPair(2048);
 
+        String pemKey = formatPrivateKeyPem(externalKeyPair.getPrivate());
         writeString(keyFile, pemKey, UTF_8);
 
-        String externalJwe = "eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMjU2R0NNIiwia2lkIjoiZXh0ZXJuYWwtdGVzdC1rZXkifQ"
-                + ".c3VwZXItc2VjcmV0LWtleS13cmFwcGVk"
-                + ".aXZzYW1wbGUxMjM0NQ"
-                + ".Y2lwaGVydGV4dGFycmF5"
-                + ".dGFnMTIzNDU2Nzg5MA";
+        String kid = computeKeyId(externalKeyPair.getPrivate());
+        String externalJwe = encrypt("openssl-interop-secret", externalKeyPair.getPublic(), kid);
 
         assertEquals("openssl-interop-secret", engine.decrypt(externalJwe));
     }

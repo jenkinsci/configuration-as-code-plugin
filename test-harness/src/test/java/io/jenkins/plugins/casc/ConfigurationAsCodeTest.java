@@ -9,11 +9,8 @@ import static io.jenkins.plugins.casc.misc.Util.toYamlString;
 import static java.lang.System.getProperty;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.writeString;
-import static java.security.spec.MGF1ParameterSpec.SHA256;
 import static java.util.Arrays.copyOf;
-import static java.util.Base64.getEncoder;
 import static java.util.Base64.getUrlEncoder;
-import static javax.crypto.Cipher.ENCRYPT_MODE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
@@ -29,8 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
-import com.nimbusds.jose.EncryptionMethod;
-import com.nimbusds.jose.JWEAlgorithm;
 import com.nimbusds.jose.JWEHeader;
 import com.nimbusds.jose.JWEObject;
 import com.nimbusds.jose.Payload;
@@ -63,9 +58,6 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
-import javax.crypto.Cipher;
-import javax.crypto.spec.OAEPParameterSpec;
-import javax.crypto.spec.PSource.PSpecified;
 import org.htmlunit.WebRequest;
 import org.htmlunit.WebResponse;
 import org.htmlunit.html.HtmlButton;
@@ -482,10 +474,10 @@ class ConfigurationAsCodeTest {
             KeyPair keyPair = generator.generateKeyPair();
 
             String encodedPrivateKey = Base64.getMimeEncoder(64, new byte[] {'\n'})
-                .encodeToString(keyPair.getPrivate().getEncoded());
+                    .encodeToString(keyPair.getPrivate().getEncoded());
 
             String privateKeyPem =
-                "-----BEGIN PRIVATE KEY-----\n" + encodedPrivateKey + "\n-----END PRIVATE KEY-----\n";
+                    "-----BEGIN PRIVATE KEY-----\n" + encodedPrivateKey + "\n-----END PRIVATE KEY-----\n";
 
             writeString(keyFile, privateKeyPem, UTF_8);
 
@@ -498,9 +490,8 @@ class ConfigurationAsCodeTest {
             byte[] truncated = copyOf(hash, 8);
             String kid = getUrlEncoder().withoutPadding().encodeToString(truncated);
 
-            JWEHeader header = new JWEHeader.Builder(RSA_OAEP_256, A256GCM)
-                .keyID(kid)
-                .build();
+            JWEHeader header =
+                    new JWEHeader.Builder(RSA_OAEP_256, A256GCM).keyID(kid).build();
 
             JWEObject jweObject = new JWEObject(header, new Payload(secret));
 
