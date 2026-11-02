@@ -1,5 +1,9 @@
 package io.jenkins.plugins.casc;
 
+import static com.nimbusds.jose.EncryptionMethod.A256GCM;
+import static com.nimbusds.jose.JWEAlgorithm.RSA_OAEP_256;
+import static io.jenkins.plugins.casc.impl.JweEncryptionEngine.KEY_PROP;
+import static java.util.Base64.getMimeEncoder;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.startsWith;
@@ -7,28 +11,36 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
+import com.nimbusds.jose.JWEHeader;
+import com.nimbusds.jose.JWEObject;
+import com.nimbusds.jose.Payload;
+import com.nimbusds.jose.crypto.RSAEncrypter;
 import io.jenkins.plugins.casc.SecretSourceResolver.Base64Lookup;
 import io.jenkins.plugins.casc.SecretSourceResolver.FileBase64Lookup;
 import io.jenkins.plugins.casc.SecretSourceResolver.FileStringLookup;
 import io.jenkins.plugins.casc.SecretSourceResolver.SystemPropertyLookup;
-import io.jenkins.plugins.casc.impl.RSAEncryptionEngine;
+import io.jenkins.plugins.casc.encryption.DecryptionEngine;
+import io.jenkins.plugins.casc.impl.JweEncryptionEngine;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.spec.MGF1ParameterSpec;
+import java.security.interfaces.RSAPrivateCrtKey;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.RSAPublicKeySpec;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.crypto.Cipher;
-import javax.crypto.spec.OAEPParameterSpec;
-import javax.crypto.spec.PSource;
 import org.apache.commons.text.lookup.StringLookup;
 import org.apache.commons.text.lookup.StringLookupFactory;
 import org.junit.Before;
@@ -589,30 +601,12 @@ public class SecretSourceResolverTest {
 
     @Test
     public void resolve_decryptRsaLookup() throws Exception {
-        String originalKeyProperty = System.getProperty(RSAEncryptionEngine.KEY_PROP);
-        Path keyFile = Files.createTempFile("casc-resolver-rsa", ".pem");
-
-        try {
-            KeyPair keyPair = createRsaKeyPair();
-            writeRsaPrivateKey(keyFile, keyPair.getPrivate());
-
-            System.setProperty(
-                    RSAEncryptionEngine.KEY_PROP, keyFile.toAbsolutePath().toString());
-
+        try (RsaTestContext ctx = new RsaTestContext()) {
             String secret = "resolver-integration-secret";
-            String ciphertext = encryptWithRsaPublicKey(secret, keyPair.getPublic());
-
-            String output = resolve("${decrypt:rsa:" + ciphertext + "}");
+            String ciphertext = ctx.encrypt(secret);
+            String output = resolve("${decrypt:jwe:" + ciphertext + "}");
 
             assertThat(output, equalTo(secret));
-        } finally {
-            if (originalKeyProperty == null) {
-                System.clearProperty(RSAEncryptionEngine.KEY_PROP);
-            } else {
-                System.setProperty(RSAEncryptionEngine.KEY_PROP, originalKeyProperty);
-            }
-
-            Files.deleteIfExists(keyFile);
         }
     }
 
@@ -622,23 +616,230 @@ public class SecretSourceResolverTest {
         return generator.generateKeyPair();
     }
 
-    private static String encryptWithRsaPublicKey(String secret, PublicKey publicKey) throws Exception {
-        OAEPParameterSpec parameters =
-                new OAEPParameterSpec("SHA-256", "MGF1", MGF1ParameterSpec.SHA256, PSource.PSpecified.DEFAULT);
+    private static String encryptJwe(String secret, PublicKey publicKey, String kid) throws Exception {
+        JWEHeader header =
+                new JWEHeader.Builder(RSA_OAEP_256, A256GCM).keyID(kid).build();
 
-        Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPPadding");
-        cipher.init(Cipher.ENCRYPT_MODE, publicKey, parameters);
+        JWEObject jwe = new JWEObject(header, new Payload(secret));
+        jwe.encrypt(new RSAEncrypter((RSAPublicKey) publicKey));
 
-        byte[] encrypted = cipher.doFinal(secret.getBytes(java.nio.charset.StandardCharsets.UTF_8));
-
-        return Base64.getEncoder().encodeToString(encrypted);
+        return jwe.serialize();
     }
 
     private static void writeRsaPrivateKey(Path path, PrivateKey privateKey) throws IOException {
-        String encoded = Base64.getMimeEncoder(64, new byte[] {'\n'}).encodeToString(privateKey.getEncoded());
+        String encoded = getMimeEncoder(64, new byte[] {'\n'}).encodeToString(privateKey.getEncoded());
 
         String pem = "-----BEGIN PRIVATE KEY-----\n" + encoded + "\n-----END PRIVATE KEY-----\n";
 
         Files.writeString(path, pem, java.nio.charset.StandardCharsets.UTF_8);
+    }
+
+    private static final class RsaTestContext implements AutoCloseable {
+
+        final KeyPair keyPair;
+        final Path keyFile;
+        final String originalKeyProperty;
+        final String kid;
+
+        RsaTestContext() throws Exception {
+            originalKeyProperty = System.getProperty(KEY_PROP);
+            keyPair = createRsaKeyPair();
+            kid = computeKeyId((RSAPrivateCrtKey) keyPair.getPrivate());
+
+            keyFile = Files.createTempFile("casc-interp-test", ".pem");
+            writeRsaPrivateKey(keyFile, keyPair.getPrivate());
+            System.setProperty(KEY_PROP, keyFile.toAbsolutePath().toString());
+            clearRsaEngineCache();
+        }
+
+        String encrypt(String plaintext) throws Exception {
+            return encryptJwe(plaintext, keyPair.getPublic(), kid);
+        }
+
+        private static String computeKeyId(RSAPrivateCrtKey key) throws Exception {
+            RSAPublicKeySpec publicKeySpec = new RSAPublicKeySpec(key.getModulus(), key.getPublicExponent());
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            PublicKey publicKey = keyFactory.generatePublic(publicKeySpec);
+
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(publicKey.getEncoded());
+
+            byte[] truncated = Arrays.copyOf(hash, 8);
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(truncated);
+        }
+
+        @Override
+        public void close() throws Exception {
+            if (originalKeyProperty == null) {
+                System.clearProperty(KEY_PROP);
+            } else {
+                System.setProperty(KEY_PROP, originalKeyProperty);
+            }
+            clearRsaEngineCache();
+            Files.deleteIfExists(keyFile);
+        }
+
+        private static void clearRsaEngineCache() {
+            for (DecryptionEngine engine : DecryptionEngine.all()) {
+                if (engine instanceof JweEncryptionEngine rsaEngine) {
+                    try {
+                        Field f = JweEncryptionEngine.class.getDeclaredField("cachedPrivateKeys");
+                        f.setAccessible(true);
+                        f.set(rsaEngine, null);
+                    } catch (ReflectiveOperationException e) {
+                        throw new RuntimeException("Could not clear JweEncryptionEngine cache", e);
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    public void resolve_decrypt_plaintextWithMissingVariable_isPreservedLiterally() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String plaintext = "p${UNSET}ss";
+            String ciphertext = ctx.encrypt(plaintext);
+
+            String output = resolve("${decrypt:jwe:" + ciphertext + "}");
+
+            assertThat("Decrypted value containing ${UNSET} must not be interpolated", output, equalTo(plaintext));
+        }
+    }
+
+    @Test
+    public void resolve_decrypt_plaintextThatIsOnlyAVariable_isPreservedLiterally() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String plaintext = "${ENV_VAR}";
+            String ciphertext = ctx.encrypt(plaintext);
+
+            String output = resolve("${decrypt:jwe:" + ciphertext + "}");
+
+            assertThat("Decrypted value '${ENV_VAR}' must not be further interpolated", output, equalTo(plaintext));
+        }
+    }
+
+    @Test
+    public void resolve_decrypt_plaintextWithSurroundingText_isPreservedLiterally() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String plaintext = "prefix-${missing}-suffix";
+            String ciphertext = ctx.encrypt(plaintext);
+
+            String output = resolve("${decrypt:jwe:" + ciphertext + "}");
+
+            assertThat("Decrypted value 'prefix-${missing}-suffix' must remain unchanged", output, equalTo(plaintext));
+        }
+    }
+
+    @Test
+    public void resolve_decrypt_ordinaryPlaintext_resolvesCorrectly() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String plaintext = "normal-password";
+            String ciphertext = ctx.encrypt(plaintext);
+
+            String output = resolve("${decrypt:jwe:" + ciphertext + "}");
+
+            assertThat("Ordinary plaintext must resolve to its decrypted value", output, equalTo(plaintext));
+        }
+    }
+
+    @Test
+    public void resolve_decrypt_strictMode_plaintextWithMissingVariable_isPreservedLiterally() throws Exception {
+        environment.set("CASC_STRICT_SECRET_RESOLUTION", "true");
+
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String plaintext = "p${UNSET}ss";
+            String ciphertext = ctx.encrypt(plaintext);
+
+            String output = resolve("${decrypt:jwe:" + ciphertext + "}");
+
+            assertThat(
+                    "Strict mode: decrypted value with ${UNSET} must not be interpolated", output, equalTo(plaintext));
+        }
+    }
+
+    @Test
+    public void resolve_decrypt_strictMode_plainEnvVarOutside_stillThrows() {
+        environment.set("CASC_STRICT_SECRET_RESOLUTION", "true");
+
+        assertThrows(IllegalStateException.class, () -> resolve("${TRULY_MISSING_OUTSIDE_DECRYPT}"));
+    }
+
+    @Test
+    public void resolve_decrypt_embeddedInLargerString_isPreservedLiterally() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String plaintext = "sec${UNSET}ret";
+            String ciphertext = ctx.encrypt(plaintext);
+
+            String output = resolve("prefix-${decrypt:jwe:" + ciphertext + "}-suffix");
+
+            assertThat(
+                    "Decrypted value embedded in larger string must not be interpolated",
+                    output,
+                    equalTo("prefix-" + plaintext + "-suffix"));
+        }
+    }
+
+    @Test
+    public void resolve_nonDecryptVariables_behaviorUnchanged() {
+        environment.set("MY_VAR", "hello");
+        assertThat(resolve("${MY_VAR}"), equalTo("hello"));
+        assertThat(resolve("${UNDEFINED_VAR}"), equalTo(""));
+        assertThat(resolve("${UNDEFINED_VAR:-fallback}"), equalTo("fallback"));
+    }
+
+    @Test
+    public void resolve_multipleDecryptExpressions_resolvesBothCorrectly() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String secret1 = "first-password";
+            String secret2 = "second-password";
+            String cipher1 = ctx.encrypt(secret1);
+            String cipher2 = ctx.encrypt(secret2);
+
+            String output = resolve("User:${decrypt:jwe:" + cipher1 + "}:Pass:${decrypt:jwe:" + cipher2 + "}");
+
+            assertThat(
+                    "Multiple decrypt expressions in one input must all resolve correctly",
+                    output,
+                    equalTo("User:first-password:Pass:second-password"));
+        }
+    }
+
+    @Test
+    public void resolve_decrypt_plaintextWithNestedDecrypt_isPreservedLiterally() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String plaintext = "prefix-${decrypt:jwe:fake-ciphertext}-suffix";
+            String ciphertext = ctx.encrypt(plaintext);
+
+            String output = resolve("${decrypt:jwe:" + ciphertext + "}");
+
+            assertThat(
+                    "Decrypted plaintext containing a nested decrypt expression must remain literal",
+                    output,
+                    equalTo(plaintext));
+        }
+    }
+
+    @Test
+    public void resolve_failedResolutionFollowedBySuccess_leavesNoStaleState() throws Exception {
+        environment.set("CASC_STRICT_SECRET_RESOLUTION", "true");
+        environment.set("VALID_VAR", "success-value");
+
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            IllegalStateException exception =
+                    assertThrows(IllegalStateException.class, () -> resolve("${MISSING_VAR}"));
+            assertThat(exception.getMessage(), containsString("MISSING_VAR"));
+
+            String standardOutput = resolve("${VALID_VAR}");
+            assertThat(
+                    "Subsequent standard lookup must succeed without stale state",
+                    standardOutput,
+                    equalTo("success-value"));
+
+            String plaintext = "my-secret";
+            String ciphertext = ctx.encrypt(plaintext);
+            String decryptOutput = resolve("${decrypt:jwe:" + ciphertext + "}");
+
+            assertThat("Subsequent decrypt lookup must succeed without stale state", decryptOutput, equalTo(plaintext));
+        }
     }
 }

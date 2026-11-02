@@ -1,82 +1,113 @@
 package io.jenkins.plugins.casc;
 
+import static com.nimbusds.jose.EncryptionMethod.A256GCM;
+import static com.nimbusds.jose.JWEAlgorithm.RSA_OAEP_256;
+import static io.jenkins.plugins.casc.impl.JweEncryptionEngine.KEY_PROP;
+import static java.lang.System.clearProperty;
+import static java.lang.System.getProperty;
+import static java.lang.System.setProperty;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.Files.createTempFile;
+import static java.nio.file.Files.deleteIfExists;
+import static java.nio.file.Files.writeString;
+import static java.util.Base64.getMimeEncoder;
+import static java.util.Base64.getUrlEncoder;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.nimbusds.jose.JWEHeader;
+import com.nimbusds.jose.JWEObject;
+import com.nimbusds.jose.Payload;
+import com.nimbusds.jose.crypto.RSAEncrypter;
+import io.jenkins.plugins.casc.encryption.DecryptionEngine;
+import io.jenkins.plugins.casc.impl.JweEncryptionEngine;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
+import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
+import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.spec.MGF1ParameterSpec;
-import java.util.Base64;
-import javax.crypto.Cipher;
-import javax.crypto.spec.OAEPParameterSpec;
-import javax.crypto.spec.PSource;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
+import java.security.interfaces.RSAPrivateCrtKey;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.RSAPublicKeySpec;
+import java.util.Arrays;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
-public class DecryptLookupTest {
-
-    @ClassRule
-    public static final JenkinsRule j = new JenkinsRule();
-
-    private static final OAEPParameterSpec OAEP_PARAMS =
-            new OAEPParameterSpec("SHA-256", "MGF1", MGF1ParameterSpec.SHA256, PSource.PSpecified.DEFAULT);
+@WithJenkins
+class DecryptLookupTest {
 
     private KeyPair keyPair;
     private Path keyFile;
     private String originalKeyProperty;
 
-    @Before
-    public void setUp() throws Exception {
-        originalKeyProperty = System.getProperty(io.jenkins.plugins.casc.impl.RSAEncryptionEngine.KEY_PROP);
+    @BeforeEach
+    void setUp() throws Exception {
+        originalKeyProperty = getProperty(KEY_PROP);
 
         keyPair = generateKeyPair();
-        keyFile = Files.createTempFile("casc-decrypt-lookup", ".pem");
+        keyFile = createTempFile("casc-decrypt-lookup", ".pem");
         writePrivateKey(keyFile, keyPair.getPrivate());
 
-        System.setProperty(
-                io.jenkins.plugins.casc.impl.RSAEncryptionEngine.KEY_PROP,
-                keyFile.toAbsolutePath().toString());
+        setProperty(KEY_PROP, keyFile.toAbsolutePath().toString());
+
+        // Clear the cached private keys so the engine re-reads the key file
+        clearRsaEngineCache();
     }
 
-    @After
-    public void tearDown() throws IOException {
-        String property = io.jenkins.plugins.casc.impl.RSAEncryptionEngine.KEY_PROP;
-
+    @AfterEach
+    void tearDown() throws IOException {
         if (originalKeyProperty == null) {
-            System.clearProperty(property);
+            clearProperty(KEY_PROP);
         } else {
-            System.setProperty(property, originalKeyProperty);
+            setProperty(KEY_PROP, originalKeyProperty);
         }
 
+        clearRsaEngineCache();
+
         if (keyFile != null) {
-            Files.deleteIfExists(keyFile);
+            deleteIfExists(keyFile);
+        }
+    }
+
+    private static void clearRsaEngineCache() {
+        for (DecryptionEngine engine : DecryptionEngine.all()) {
+            if (engine instanceof JweEncryptionEngine rsaEngine) {
+                try {
+                    Field f = JweEncryptionEngine.class.getDeclaredField("cachedPrivateKeys");
+                    f.setAccessible(true);
+                    f.set(rsaEngine, null);
+                } catch (ReflectiveOperationException e) {
+                    throw new RuntimeException("Could not clear JweEncryptionEngine cache", e);
+                }
+            }
         }
     }
 
     @Test
-    public void lookupDecryptsPayloadUsingMatchingEngine() throws GeneralSecurityException {
+    @SuppressWarnings({"unused"})
+    void lookupDecryptsPayloadUsingMatchingEngine(JenkinsRule j) throws Exception {
         String secret = "lookup-test-secret";
-        String encrypted = encrypt(secret, keyPair.getPublic());
+        String kid = computeKeyId(keyPair.getPrivate());
+        String jwePayload = encryptJwe(secret, keyPair.getPublic(), kid);
 
-        String decrypted = DecryptLookup.INSTANCE.lookup("rsa:" + encrypted);
+        String decrypted = DecryptLookup.INSTANCE.lookup("jwe:" + jwePayload);
 
         assertThat(decrypted, equalTo(secret));
     }
 
     @Test
-    public void lookupRejectsUnknownEngine() {
+    @SuppressWarnings({"unused"})
+    void lookupRejectsUnknownEngine(JenkinsRule j) {
         IllegalStateException exception = assertThrows(
                 IllegalStateException.class, () -> DecryptLookup.INSTANCE.lookup("unknown-engine:payload"));
 
@@ -84,11 +115,25 @@ public class DecryptLookupTest {
     }
 
     @Test
-    public void lookupRejectsMissingEnginePayloadSeparator() {
+    @SuppressWarnings({"unused"})
+    void lookupRejectsMissingEnginePayloadSeparator(JenkinsRule j) {
         IllegalArgumentException exception =
-                assertThrows(IllegalArgumentException.class, () -> DecryptLookup.INSTANCE.lookup("rsa"));
+                assertThrows(IllegalArgumentException.class, () -> DecryptLookup.INSTANCE.lookup("jwe"));
 
         assertThat(exception.getMessage(), containsString("Invalid decrypt syntax"));
+    }
+
+    @Test
+    @SuppressWarnings({"unused"})
+    void lookupIncludesUnderlyingDecryptionFailureMessage(JenkinsRule j) {
+        String ciphertext = "invalid.jwe.payload";
+
+        IllegalStateException exception =
+                assertThrows(IllegalStateException.class, () -> DecryptLookup.INSTANCE.lookup("jwe:" + ciphertext));
+
+        assertThat(exception.getMessage(), containsString("Failed to parse JWE payload"));
+
+        assertThat(exception.getCause(), org.hamcrest.Matchers.notNullValue());
     }
 
     private static KeyPair generateKeyPair() throws GeneralSecurityException {
@@ -97,20 +142,32 @@ public class DecryptLookupTest {
         return generator.generateKeyPair();
     }
 
-    private static String encrypt(String plaintext, PublicKey publicKey) throws GeneralSecurityException {
-        Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPPadding");
-        cipher.init(Cipher.ENCRYPT_MODE, publicKey, OAEP_PARAMS);
+    private static String encryptJwe(String plaintext, PublicKey publicKey, String kid) throws Exception {
+        JWEHeader header =
+                new JWEHeader.Builder(RSA_OAEP_256, A256GCM).keyID(kid).build();
 
-        byte[] encrypted = cipher.doFinal(plaintext.getBytes(StandardCharsets.UTF_8));
+        JWEObject jwe = new JWEObject(header, new Payload(plaintext));
+        jwe.encrypt(new RSAEncrypter((RSAPublicKey) publicKey));
 
-        return Base64.getEncoder().encodeToString(encrypted);
+        return jwe.serialize();
     }
 
     private static void writePrivateKey(Path path, PrivateKey privateKey) throws IOException {
-        String encodedKey = Base64.getMimeEncoder(64, new byte[] {'\n'}).encodeToString(privateKey.getEncoded());
-
+        String encodedKey = getMimeEncoder(64, new byte[] {'\n'}).encodeToString(privateKey.getEncoded());
         String pem = "-----BEGIN PRIVATE KEY-----\n" + encodedKey + "\n-----END PRIVATE KEY-----\n";
+        writeString(path, pem, UTF_8);
+    }
 
-        Files.writeString(path, pem, StandardCharsets.UTF_8);
+    private static String computeKeyId(PrivateKey privateKey) throws GeneralSecurityException {
+        RSAPrivateCrtKey key = (RSAPrivateCrtKey) privateKey;
+        RSAPublicKeySpec publicKeySpec = new RSAPublicKeySpec(key.getModulus(), key.getPublicExponent());
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        PublicKey publicKey = keyFactory.generatePublic(publicKeySpec);
+
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(publicKey.getEncoded());
+        byte[] truncated = Arrays.copyOf(hash, 8);
+
+        return getUrlEncoder().withoutPadding().encodeToString(truncated);
     }
 }

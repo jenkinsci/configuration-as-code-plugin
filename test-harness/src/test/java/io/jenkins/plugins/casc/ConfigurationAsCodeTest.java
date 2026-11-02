@@ -1,8 +1,15 @@
 package io.jenkins.plugins.casc;
 
 import static io.jenkins.plugins.casc.ConfigurationAsCode.CASC_JENKINS_CONFIG_PROPERTY;
+import static io.jenkins.plugins.casc.impl.JweEncryptionEngine.KEY_PROP;
 import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
 import static io.jenkins.plugins.casc.misc.Util.toYamlString;
+import static java.lang.System.getProperty;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.Files.writeString;
+import static java.security.spec.MGF1ParameterSpec.SHA256;
+import static java.util.Base64.getEncoder;
+import static javax.crypto.Cipher.ENCRYPT_MODE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
@@ -23,7 +30,6 @@ import hudson.util.FormValidation;
 import io.jenkins.plugins.casc.fetcher.CasCConfigFetcher;
 import io.jenkins.plugins.casc.fetcher.FetchCredentials;
 import io.jenkins.plugins.casc.fetcher.FetchResult;
-import io.jenkins.plugins.casc.impl.RSAEncryptionEngine;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
@@ -35,21 +41,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.spec.MGF1ParameterSpec;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import javax.crypto.Cipher;
 import javax.crypto.spec.OAEPParameterSpec;
-import javax.crypto.spec.PSource;
+import javax.crypto.spec.PSource.PSpecified;
 import org.htmlunit.WebRequest;
 import org.htmlunit.WebResponse;
 import org.htmlunit.html.HtmlButton;
@@ -457,7 +461,7 @@ class ConfigurationAsCodeTest {
 
     @Test
     void configure_should_decrypt_rsa_encrypted_secret(JenkinsConfiguredWithCodeRule j) throws Exception {
-        String originalKeyProperty = System.getProperty(RSAEncryptionEngine.KEY_PROP);
+        String originalKeyProperty = getProperty(KEY_PROP);
         Path keyFile = Files.createTempFile(tempFolder.toPath(), "casc-rsa", ".pem");
 
         try {
@@ -471,35 +475,32 @@ class ConfigurationAsCodeTest {
             String privateKeyPem =
                     "-----BEGIN PRIVATE KEY-----\n" + encodedPrivateKey + "\n-----END PRIVATE KEY-----\n";
 
-            Files.writeString(keyFile, privateKeyPem, StandardCharsets.UTF_8);
+            writeString(keyFile, privateKeyPem, UTF_8);
 
-            System.setProperty(
-                    RSAEncryptionEngine.KEY_PROP, keyFile.toAbsolutePath().toString());
+            System.setProperty(KEY_PROP, keyFile.toAbsolutePath().toString());
 
             String secret = "integration-test-secret";
 
-            OAEPParameterSpec oaepParameters =
-                    new OAEPParameterSpec("SHA-256", "MGF1", MGF1ParameterSpec.SHA256, PSource.PSpecified.DEFAULT);
+            OAEPParameterSpec oaepParameters = new OAEPParameterSpec("SHA-256", "MGF1", SHA256, PSpecified.DEFAULT);
 
             Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPPadding");
-            cipher.init(Cipher.ENCRYPT_MODE, keyPair.getPublic(), oaepParameters);
+            cipher.init(ENCRYPT_MODE, keyPair.getPublic(), oaepParameters);
 
-            String ciphertext =
-                    Base64.getEncoder().encodeToString(cipher.doFinal(secret.getBytes(StandardCharsets.UTF_8)));
+            String ciphertext = getEncoder().encodeToString(cipher.doFinal(secret.getBytes(UTF_8)));
 
             Path configFile = tempFolder.toPath().resolve("encrypted-secret.yaml");
             String yaml = "jenkins:\n" + "  systemMessage: \"${decrypt:rsa:" + ciphertext + "}\"\n";
 
-            Files.writeString(configFile, yaml, StandardCharsets.UTF_8);
+            writeString(configFile, yaml, UTF_8);
 
             ConfigurationAsCode.get().configure(configFile.toUri().toString());
 
             assertEquals(secret, j.jenkins.getSystemMessage());
         } finally {
             if (originalKeyProperty == null) {
-                System.clearProperty(RSAEncryptionEngine.KEY_PROP);
+                System.clearProperty(KEY_PROP);
             } else {
-                System.setProperty(RSAEncryptionEngine.KEY_PROP, originalKeyProperty);
+                System.setProperty(KEY_PROP, originalKeyProperty);
             }
 
             Files.deleteIfExists(keyFile);

@@ -233,6 +233,14 @@ Here are some examples of changes that could be problematic:
 - Modification of the security realm or authorization strategy settings could give users higher permissions than intended.
 - Interpolation of secrets in unprotected contexts may expose sensitive data. For example, a snippet like `systemMessage: "${SENSITIVE_VARIABLE}"` could expose the value of a sensitive environment variable to all users who are able to access Jenkins.
 
+### External encrypted secrets
+
+Secrets decrypted using `${decrypt:jwe:<JWE_COMPACT_SERIALIZATION>}` are not restricted to `hudson.util.Secret` fields. Ciphertexts can be moved into ordinary fields (e.g., `jenkins.systemMessage`), potentially exposing decrypted values through the Jenkins UI or logs.
+
+**Anyone with write access to JCasC configuration must be trusted with read access to all decryptable secrets.**
+
+For comprehensive documentation on key generation, encryption procedures, configuration, deployment, and security considerations, see [Handling Secrets: External secret decryption (JWE)](./docs/features/secrets.adoc#external-secret-decryption-jwe).
+
 ## Installing plugins
 
 We don't support installing plugins with JCasC, so you need to use something else for this,

@@ -10,10 +10,12 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.commons.text.lookup.StringLookup;
@@ -31,6 +33,12 @@ public class SecretSourceResolver {
     private static final String escapeEnclosedBy = escapedWith + enclosedBy;
 
     private static final Logger LOGGER = Logger.getLogger(SecretSourceResolver.class.getName());
+
+    private static final String PLACEHOLDER_PREFIX = "\u0000CASC_DECRYPT_";
+
+    private static final String PLACEHOLDER_SUFFIX = "\u0000";
+
+    private static final ThreadLocal<Map<String, String>> DECRYPT_PLACEHOLDERS = new ThreadLocal<>();
 
     private final StringSubstitutor nullSubstitutor;
     private final StringSubstitutor substitutor;
@@ -56,7 +64,7 @@ public class SecretSourceResolver {
                 "trim",
                 TrimLookup.INSTANCE,
                 "decrypt",
-                DecryptLookup.INSTANCE);
+                PlaceholderDecryptLookup.INSTANCE);
 
         substitutor = new StringSubstitutor(new FixedInterpolatorStringLookup(
                         map, new ConfigurationContextStringLookup(configurationContext)))
@@ -69,6 +77,28 @@ public class SecretSourceResolver {
                 .setEscapeChar(escapedWith)
                 .setVariablePrefix(enclosedBy)
                 .setVariableSuffix(enclosedIn);
+    }
+
+    static class PlaceholderDecryptLookup implements StringLookup {
+
+        static final PlaceholderDecryptLookup INSTANCE = new PlaceholderDecryptLookup();
+
+        private PlaceholderDecryptLookup() {}
+
+        @Override
+        public String lookup(@NonNull final String key) {
+            String plaintext = DecryptLookup.INSTANCE.lookup(key);
+
+            Map<String, String> placeholderMap = DECRYPT_PLACEHOLDERS.get();
+            if (placeholderMap == null) {
+                throw new IllegalStateException(
+                        "Decrypt lookup must be invoked through SecretSourceResolver.resolve()");
+            }
+
+            String placeholder = PLACEHOLDER_PREFIX + UUID.randomUUID() + PLACEHOLDER_SUFFIX;
+            placeholderMap.put(placeholder, plaintext);
+            return placeholder;
+        }
     }
 
     /**
@@ -113,9 +143,27 @@ public class SecretSourceResolver {
         if (StringUtils.isBlank(toInterpolate) || !toInterpolate.contains(enclosedBy)) {
             return toInterpolate;
         }
-        String result = substitutor.replace(toInterpolate);
-        result = nullSubstitutor.replace(result);
-        return result;
+
+        Map<String, String> previous = DECRYPT_PLACEHOLDERS.get();
+        Map<String, String> placeholders = new HashMap<>();
+        DECRYPT_PLACEHOLDERS.set(placeholders);
+
+        try {
+            String result = substitutor.replace(toInterpolate);
+            result = nullSubstitutor.replace(result);
+
+            for (Map.Entry<String, String> entry : placeholders.entrySet()) {
+                result = result.replace(entry.getKey(), entry.getValue());
+            }
+
+            return result;
+        } finally {
+            if (previous == null) {
+                DECRYPT_PLACEHOLDERS.remove();
+            } else {
+                DECRYPT_PLACEHOLDERS.set(previous);
+            }
+        }
     }
 
     static class UnresolvedLookup implements StringLookup {
@@ -157,7 +205,7 @@ public class SecretSourceResolver {
         public String lookup(String key) {
             return context.getSecretSources().stream()
                     .map(source -> unchecked(() -> source.reveal(key)).apply())
-                    .flatMap(o -> o.map(Stream::of).orElseGet(Stream::empty))
+                    .flatMap(Optional::stream)
                     .findFirst()
                     .orElse(null);
         }
@@ -189,7 +237,7 @@ public class SecretSourceResolver {
         @Override
         public String lookup(@NonNull final String key) {
             try {
-                return new String(Files.readAllBytes(Paths.get(key)), StandardCharsets.UTF_8);
+                return Files.readString(Paths.get(key));
             } catch (IOException | InvalidPathException e) {
                 LOGGER.log(
                         Level.WARNING,
