@@ -27,6 +27,7 @@ import io.vavr.control.Option;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -127,6 +128,18 @@ public class HeteroDescribableConfigurator<T extends Describable<T>> implements 
                 .foldLeft(HashMap.empty(), this::handleDuplicateSymbols)
                 .mapValues(this::descriptorClass)
                 .toJavaMap();
+    }
+
+    /**
+     * Like {@link #getImplementors()}, but also includes every other name accepted when configuring
+     * (all {@link Symbol} values and the class-derived names).
+     * Preferred symbols always win if an alias of one implementation clashes with another's preferred symbol.
+     */
+    public Map<String, Class<T>> getImplementorsBySymbol() {
+        Map<String, Class<T>> implementors = new LinkedHashMap<>(getImplementors());
+        getDescriptors().forEach(descriptor -> getSymbols(descriptor)
+                .forEach(symbol -> implementors.putIfAbsent(symbol, descriptorClass(descriptor))));
+        return implementors;
     }
 
     private Option<Configurator<T>> lookupConfigurator(ConfigurationContext context, Class<?> descriptor) {

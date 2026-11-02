@@ -1,0 +1,6 @@
+unclassified:
+  shapeConfig:
+    shapes:
+      - round
+      - circle: {}
+      - ring

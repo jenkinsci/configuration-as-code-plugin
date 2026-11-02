@@ -1,0 +1,8 @@
+jenkins:
+  nodes:
+    - permanent:
+        name: "agent1"
+        remoteFS: "/home/jenkins"
+        numExecutors: 1
+        launcher:
+          inbound: {}

@@ -1,0 +1,5 @@
+unclassified:
+  shapeConfig:
+    preferred: round
+    alias: circle
+    derived: ring

@@ -2,6 +2,7 @@ package io.jenkins.plugins.casc.misc;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
 import static org.htmlunit.HttpMethod.POST;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -13,8 +14,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import org.apache.commons.io.IOUtils;
 import org.htmlunit.WebRequest;
@@ -82,6 +85,16 @@ public abstract class RoundTripAbstractTest {
     protected abstract String stringInLogExpected();
 
     /**
+     * Whether the {@link #configResource()} should be validated against the JSON schema generated for the running
+     * Jenkins instance before it is applied. Disabled by default; override and return {@code true} to opt in.
+     *
+     * @return {@code true} to fail the round trip test if the configuration does not match the schema.
+     */
+    protected boolean validateSchema() {
+        return false;
+    }
+
+    /**
      * 1. Configure the instance with the {@link #configResource()} implemented.
      * 2. Check it was configured correctly.
      * 3. Check the configuration is valid via Web UI.
@@ -101,6 +114,11 @@ public abstract class RoundTripAbstractTest {
         assertNotNull(resourceContent);
 
         r.then(step -> {
+            // Validate against the JSON schema, if enabled
+            if (validateSchema()) {
+                assertConfigMatchesSchema(resourcePath);
+            }
+
             // Configure and validate
             configureWithResource(resourcePath);
             assertConfiguredAsExpected(r, resourceContent);
@@ -129,6 +147,11 @@ public abstract class RoundTripAbstractTest {
             // Verify the configuration set at home/jenkins.yaml is loaded
             assertConfiguredAsExpected(r, resourceContent);
         });
+    }
+
+    private void assertConfigMatchesSchema(String resourcePath) throws URISyntaxException {
+        List<String> errors = Util.validateSchema(Util.convertYamlFileToJson(this, resourcePath));
+        assertThat("Config resource " + resourcePath + " does not match the JSON schema", errors, empty());
     }
 
     private void configureWithResource(String config) throws ConfiguratorException {

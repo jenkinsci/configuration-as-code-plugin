@@ -1,0 +1,2 @@
+jenkins:
+  systemMessage: "Configured by JUnit 4 schema validated round trip"

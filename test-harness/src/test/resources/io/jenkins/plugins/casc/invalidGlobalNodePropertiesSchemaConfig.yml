@@ -1,0 +1,4 @@
+jenkins:
+  globalNodeProperties:
+    - unknownNodeProperty:
+        foo: "bar"
