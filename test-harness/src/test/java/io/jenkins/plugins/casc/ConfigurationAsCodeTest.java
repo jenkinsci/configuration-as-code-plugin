@@ -1,5 +1,7 @@
 package io.jenkins.plugins.casc;
 
+import static com.nimbusds.jose.EncryptionMethod.A256GCM;
+import static com.nimbusds.jose.JWEAlgorithm.RSA_OAEP_256;
 import static io.jenkins.plugins.casc.ConfigurationAsCode.CASC_JENKINS_CONFIG_PROPERTY;
 import static io.jenkins.plugins.casc.impl.JweEncryptionEngine.KEY_PROP;
 import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
@@ -8,7 +10,9 @@ import static java.lang.System.getProperty;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.writeString;
 import static java.security.spec.MGF1ParameterSpec.SHA256;
+import static java.util.Arrays.copyOf;
 import static java.util.Base64.getEncoder;
+import static java.util.Base64.getUrlEncoder;
 import static javax.crypto.Cipher.ENCRYPT_MODE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -25,6 +29,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
+import com.nimbusds.jose.EncryptionMethod;
+import com.nimbusds.jose.JWEAlgorithm;
+import com.nimbusds.jose.JWEHeader;
+import com.nimbusds.jose.JWEObject;
+import com.nimbusds.jose.Payload;
+import com.nimbusds.jose.crypto.RSAEncrypter;
 import hudson.Functions;
 import hudson.util.FormValidation;
 import io.jenkins.plugins.casc.fetcher.CasCConfigFetcher;
@@ -47,6 +57,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.MessageDigest;
+import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
@@ -460,9 +472,9 @@ class ConfigurationAsCodeTest {
     }
 
     @Test
-    void configure_should_decrypt_rsa_encrypted_secret(JenkinsConfiguredWithCodeRule j) throws Exception {
+    void configure_should_decrypt_jwe_encrypted_secret(JenkinsConfiguredWithCodeRule j) throws Exception {
         String originalKeyProperty = getProperty(KEY_PROP);
-        Path keyFile = Files.createTempFile(tempFolder.toPath(), "casc-rsa", ".pem");
+        Path keyFile = Files.createTempFile(tempFolder.toPath(), "casc-jwe", ".pem");
 
         try {
             KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
@@ -470,10 +482,10 @@ class ConfigurationAsCodeTest {
             KeyPair keyPair = generator.generateKeyPair();
 
             String encodedPrivateKey = Base64.getMimeEncoder(64, new byte[] {'\n'})
-                    .encodeToString(keyPair.getPrivate().getEncoded());
+                .encodeToString(keyPair.getPrivate().getEncoded());
 
             String privateKeyPem =
-                    "-----BEGIN PRIVATE KEY-----\n" + encodedPrivateKey + "\n-----END PRIVATE KEY-----\n";
+                "-----BEGIN PRIVATE KEY-----\n" + encodedPrivateKey + "\n-----END PRIVATE KEY-----\n";
 
             writeString(keyFile, privateKeyPem, UTF_8);
 
@@ -481,15 +493,23 @@ class ConfigurationAsCodeTest {
 
             String secret = "integration-test-secret";
 
-            OAEPParameterSpec oaepParameters = new OAEPParameterSpec("SHA-256", "MGF1", SHA256, PSpecified.DEFAULT);
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(keyPair.getPublic().getEncoded());
+            byte[] truncated = copyOf(hash, 8);
+            String kid = getUrlEncoder().withoutPadding().encodeToString(truncated);
 
-            Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPPadding");
-            cipher.init(ENCRYPT_MODE, keyPair.getPublic(), oaepParameters);
+            JWEHeader header = new JWEHeader.Builder(RSA_OAEP_256, A256GCM)
+                .keyID(kid)
+                .build();
 
-            String ciphertext = getEncoder().encodeToString(cipher.doFinal(secret.getBytes(UTF_8)));
+            JWEObject jweObject = new JWEObject(header, new Payload(secret));
+
+            jweObject.encrypt(new RSAEncrypter((RSAPublicKey) keyPair.getPublic()));
+
+            String ciphertext = jweObject.serialize();
 
             Path configFile = tempFolder.toPath().resolve("encrypted-secret.yaml");
-            String yaml = "jenkins:\n" + "  systemMessage: \"${decrypt:rsa:" + ciphertext + "}\"\n";
+            String yaml = "jenkins:\n" + "  systemMessage: \"${decrypt:jwe:" + ciphertext + "}\"\n";
 
             writeString(configFile, yaml, UTF_8);
 
