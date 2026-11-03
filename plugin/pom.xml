@@ -34,7 +34,7 @@
     <hpi.compatibleSinceVersion>1.28</hpi.compatibleSinceVersion>
     <hpi.pluginChangelogUrl>https://github.com/jenkinsci/configuration-as-code-plugin/releases</hpi.pluginChangelogUrl>
     <hpi.pluginLogoUrl>https://raw.githubusercontent.com/jenkinsci/configuration-as-code-plugin/master/plugin/src/main/resources/images/symbols/logo.svg</hpi.pluginLogoUrl>
-    <hpi.bundledArtifacts>nimbus-jose-jwt,vavr,vavr-match</hpi.bundledArtifacts>
+    <hpi.bundledArtifacts>vavr,vavr-match</hpi.bundledArtifacts>
     <hpi.strictBundledArtifacts>true</hpi.strictBundledArtifacts>
   </properties>
 
@@ -52,11 +52,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.nimbusds</groupId>
-      <artifactId>nimbus-jose-jwt</artifactId>
-      <version>10.0.2</version>
-    </dependency>
-    <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>caffeine-api</artifactId>
     </dependency>
@@ -71,6 +66,11 @@
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>json-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>nimbus-jose-jwt-api</artifactId>
+      <version>10.10-12.vd4e6d651b_7f7</version>
     </dependency>
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
@@ -107,6 +107,12 @@
       <groupId>org.wiremock</groupId>
       <artifactId>wiremock-standalone</artifactId>
       <version>3.13.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>uk.org.webcompere</groupId>
+      <artifactId>system-stubs-jupiter</artifactId>
+      <version>2.1.8</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

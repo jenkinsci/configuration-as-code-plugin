@@ -1,5 +1,6 @@
 package io.jenkins.plugins.casc;
 
+import static io.jenkins.plugins.casc.impl.JweEncryptionEngine.KEY_ENV;
 import static io.jenkins.plugins.casc.impl.JweEncryptionEngine.KEY_PROP;
 import static java.lang.System.clearProperty;
 import static java.lang.System.getProperty;
@@ -36,8 +37,16 @@ import java.util.Base64;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import uk.org.webcompere.systemstubs.environment.EnvironmentVariables;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 
+@ExtendWith(SystemStubsExtension.class)
 class JwePrecedenceTest {
+
+    @SystemStub
+    private final EnvironmentVariables environmentVariables = new EnvironmentVariables();
 
     private Path propKeyFile;
     private Path envKeyFile;
@@ -73,6 +82,8 @@ class JwePrecedenceTest {
 
     @Test
     void systemPropertyTakesPrecedenceOverEnvironment() throws Exception {
+        environmentVariables.set(KEY_ENV, envKeyFile.toAbsolutePath().toString());
+
         setProperty(KEY_PROP, propKeyFile.toAbsolutePath().toString());
         JweEncryptionEngine engine = new JweEncryptionEngine();
 
@@ -85,6 +96,33 @@ class JwePrecedenceTest {
         String envJwe = encrypt("secret-from-env-key", envKeyPair.getPublic(), envKid);
 
         assertThrows(GeneralSecurityException.class, () -> engine.decrypt(envJwe));
+    }
+
+    @Test
+    void environmentVariableIsUsedWhenSystemPropertyIsNotSet() throws Exception {
+        clearProperty(KEY_PROP);
+
+        environmentVariables.set(KEY_ENV, envKeyFile.toAbsolutePath().toString());
+
+        JweEncryptionEngine engine = new JweEncryptionEngine();
+
+        String envKid = computeKeyId(envKeyPair.getPrivate());
+        String envJwe = encrypt("secret-from-env-key", envKeyPair.getPublic(), envKid);
+
+        assertEquals("secret-from-env-key", engine.decrypt(envJwe));
+    }
+
+    @Test
+    void decryptionFailsWhenNoKeyConfigurationIsProvided() throws Exception {
+        clearProperty(KEY_PROP);
+        environmentVariables.set(KEY_ENV, null);
+
+        JweEncryptionEngine engine = new JweEncryptionEngine();
+
+        String dummyKid = computeKeyId(propKeyPair.getPrivate());
+        String dummyJwe = encrypt("secret-with-missing-config", propKeyPair.getPublic(), dummyKid);
+
+        assertThrows(IllegalStateException.class, () -> engine.decrypt(dummyJwe));
     }
 
     private static KeyPair generateKeyPair() throws GeneralSecurityException {

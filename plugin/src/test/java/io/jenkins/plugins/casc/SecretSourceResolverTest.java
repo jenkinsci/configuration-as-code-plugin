@@ -3,6 +3,7 @@ package io.jenkins.plugins.casc;
 import static com.nimbusds.jose.EncryptionMethod.A256GCM;
 import static com.nimbusds.jose.JWEAlgorithm.RSA_OAEP_256;
 import static io.jenkins.plugins.casc.impl.JweEncryptionEngine.KEY_PROP;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Base64.getMimeEncoder;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -863,6 +864,136 @@ public class SecretSourceResolverTest {
             assertThat(decryptPlaceholders.get(), equalTo(previousMap));
         } finally {
             decryptPlaceholders.remove();
+        }
+    }
+
+    @Test
+    public void resolve_base64OverDecrypt() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String secret = "hello";
+            String ciphertext = ctx.encrypt(secret);
+            String output = resolve("${base64:${decrypt:jwe:" + ciphertext + "}}");
+
+            assertThat(output, equalTo("aGVsbG8="));
+        }
+    }
+
+    @Test
+    public void resolve_decodeBase64OverDecrypt() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String secret = "aGVsbG8=";
+            String ciphertext = ctx.encrypt(secret);
+            String output = resolve("${decodeBase64:${decrypt:jwe:" + ciphertext + "}}");
+
+            assertThat(output, equalTo("hello"));
+        }
+    }
+
+    @Test
+    public void resolve_trimOverDecrypt() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String secret = "  secret_value  \n";
+            String ciphertext = ctx.encrypt(secret);
+            String output = resolve("${trim:${decrypt:jwe:" + ciphertext + "}}");
+
+            assertThat(output, equalTo("  secret_value"));
+        }
+    }
+
+    @Test
+    public void resolve_jsonOverDecrypt() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String secret = "{\"user\":\"admin_user\"}";
+            String ciphertext = ctx.encrypt(secret);
+            String output = resolve("${json:user:${decrypt:jwe:" + ciphertext + "}}");
+
+            assertThat(output, equalTo("admin_user"));
+        }
+    }
+
+    @Test
+    public void resolve_fileBase64OverDecrypt() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            Path tempSecretFile = Files.createTempFile("casc-secret", ".txt");
+            tempSecretFile.toFile().deleteOnExit();
+            Files.writeString(tempSecretFile, "hello");
+
+            String secretPath = tempSecretFile.toAbsolutePath().toString();
+            String ciphertext = ctx.encrypt(secretPath);
+            String output = resolve("${fileBase64:${decrypt:jwe:" + ciphertext + "}}");
+
+            assertThat(output, equalTo("aGVsbG8="));
+        }
+    }
+
+    @Test
+    public void resolve_nestedHelpersOverDecrypt() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String secret = "  hello  \n";
+            String ciphertext = ctx.encrypt(secret);
+            String output = resolve("${base64:${trim:${decrypt:jwe:" + ciphertext + "}}}");
+
+            assertThat(output, equalTo("ICBoZWxsbw=="));
+        }
+    }
+
+    @Test
+    public void resolve_multiplePlaceholdersInOneHelper() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String secret1 = "part1";
+            String secret2 = "part2";
+            String cipher1 = ctx.encrypt(secret1);
+            String cipher2 = ctx.encrypt(secret2);
+            String output = resolve("${base64:${decrypt:jwe:" + cipher1 + "}-${decrypt:jwe:" + cipher2 + "}}");
+
+            assertThat(output, equalTo("cGFydDEtcGFydDI="));
+        }
+    }
+
+    @Test
+    public void resolve_decryptInDefaultExpression() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String secret = "fallback-secret";
+            String ciphertext = ctx.encrypt(secret);
+            String output = resolve("${UNSET:-${decrypt:jwe:" + ciphertext + "}}");
+
+            assertThat(output, equalTo(secret));
+        }
+    }
+
+    @Test
+    public void resolve_prefixSuffixPreservationWithHelper() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String secret = "hello";
+            String ciphertext = ctx.encrypt(secret);
+            String output = resolve("prefix-${base64:${decrypt:jwe:" + ciphertext + "}}-suffix");
+
+            assertThat(output, equalTo("prefix-aGVsbG8=-suffix"));
+        }
+    }
+
+    @Test
+    public void resolve_base64OverDecrypt_preservesInterpolationSyntax() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String secret = "${UNSET}";
+            String ciphertext = ctx.encrypt(secret);
+            String output = resolve("${base64:${decrypt:jwe:" + ciphertext + "}}");
+
+            assertThat(output, equalTo(Base64.getEncoder().encodeToString(secret.getBytes(UTF_8))));
+        }
+    }
+
+    @Test
+    public void resolve_nestedHelperOverDecrypt_withPlaceholderLikePlaintext_isPreservedLiterally() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String plaintext = "p${UNSET}ss";
+            String ciphertext = ctx.encrypt(plaintext);
+            String output = resolve("${base64:${decrypt:jwe:" + ciphertext + "}}");
+
+            assertThat(
+                    "Nested helper processing must not trigger interpolation of decrypted plaintext",
+                    output,
+                    equalTo("cCR7VU5TRVR9c3M="));
         }
     }
 }

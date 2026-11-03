@@ -44,30 +44,20 @@ public class SecretSourceResolver {
     private final StringSubstitutor substitutor;
 
     public SecretSourceResolver(ConfigurationContext configurationContext) {
-        Map<String, StringLookup> map = Map.of(
-                "base64",
-                Base64Lookup.INSTANCE,
-                "fileBase64",
-                FileBase64Lookup.INSTANCE,
-                "readFileBase64",
-                FileBase64Lookup.INSTANCE,
-                "file",
-                FileStringLookup.INSTANCE,
-                "readFile",
-                FileStringLookup.INSTANCE,
-                "sysProp",
-                SystemPropertyLookup.INSTANCE,
-                "decodeBase64",
-                DecodeBase64Lookup.INSTANCE,
-                "json",
-                JsonLookup.INSTANCE,
-                "trim",
-                TrimLookup.INSTANCE,
-                "decrypt",
-                PlaceholderDecryptLookup.INSTANCE);
+        Map<String, StringLookup> map = new HashMap<>();
+        map.put("base64", new PlaceholderAwareLookup(Base64Lookup.INSTANCE));
+        map.put("fileBase64", new PlaceholderAwareLookup(FileBase64Lookup.INSTANCE));
+        map.put("readFileBase64", new PlaceholderAwareLookup(FileBase64Lookup.INSTANCE));
+        map.put("file", new PlaceholderAwareLookup(FileStringLookup.INSTANCE));
+        map.put("readFile", new PlaceholderAwareLookup(FileStringLookup.INSTANCE));
+        map.put("sysProp", new PlaceholderAwareLookup(SystemPropertyLookup.INSTANCE));
+        map.put("decodeBase64", new PlaceholderAwareLookup(DecodeBase64Lookup.INSTANCE));
+        map.put("json", new PlaceholderAwareLookup(JsonLookup.INSTANCE));
+        map.put("trim", new PlaceholderAwareLookup(TrimLookup.INSTANCE));
+        map.put("decrypt", PlaceholderDecryptLookup.INSTANCE);
 
         substitutor = new StringSubstitutor(new FixedInterpolatorStringLookup(
-                        map, new ConfigurationContextStringLookup(configurationContext)))
+                        map, new PlaceholderAwareLookup(new ConfigurationContextStringLookup(configurationContext))))
                 .setEscapeChar(escapedWith)
                 .setVariablePrefix(enclosedBy)
                 .setVariableSuffix(enclosedIn)
@@ -236,7 +226,7 @@ public class SecretSourceResolver {
         @Override
         public String lookup(@NonNull final String key) {
             try {
-                return Files.readString(Paths.get(key));
+                return new String(Files.readAllBytes(Paths.get(key)), StandardCharsets.UTF_8);
             } catch (IOException | InvalidPathException e) {
                 LOGGER.log(
                         Level.WARNING,
@@ -324,6 +314,48 @@ public class SecretSourceResolver {
         @Override
         public String lookup(@NonNull final String key) {
             return StringUtils.stripEnd(key, null);
+        }
+    }
+
+    static class PlaceholderAwareLookup implements StringLookup {
+        private final StringLookup delegate;
+
+        PlaceholderAwareLookup(StringLookup delegate) {
+            this.delegate = delegate;
+        }
+
+        @Override
+        public String lookup(String key) {
+            if (key == null) {
+                return null;
+            }
+
+            Map<String, String> placeholderMap = DECRYPT_PLACEHOLDERS.get();
+            if (placeholderMap == null || placeholderMap.isEmpty()) {
+                return delegate.apply(key);
+            }
+
+            boolean modified = false;
+            String unwrappedKey = key;
+
+            for (Map.Entry<String, String> entry : placeholderMap.entrySet()) {
+                if (unwrappedKey.contains(entry.getKey())) {
+                    unwrappedKey = unwrappedKey.replace(entry.getKey(), entry.getValue());
+                    modified = true;
+                }
+            }
+
+            // Execute the actual helper logic with the raw plaintext
+            String result = delegate.apply(unwrappedKey);
+
+            // If we operated on decrypted data, wrap the result in a new placeholder to keep it opaque
+            if (modified && result != null) {
+                String newPlaceholder = PLACEHOLDER_PREFIX + UUID.randomUUID() + PLACEHOLDER_SUFFIX;
+                placeholderMap.put(newPlaceholder, result);
+                return newPlaceholder;
+            }
+
+            return result;
         }
     }
 }

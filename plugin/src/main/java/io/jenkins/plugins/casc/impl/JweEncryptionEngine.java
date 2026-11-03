@@ -65,8 +65,8 @@ public class JweEncryptionEngine extends DecryptionEngine {
     public static final String KEY_ENV = "CASC_DECRYPTION_KEY_FILE";
     public static final String KEY_PROP = "casc.decryption.key.file";
 
-    // Standard expected header parameters for JCasC JWE compact serialization
-    private static final Set<String> ALLOWED_HEADER_PARAMS = Set.of("alg", "enc", "kid");
+    // Standard expected header parameters for JCasC JWE compact serialization.
+    private static final Set<String> ALLOWED_HEADER_PARAMS = Set.of("alg", "enc", "kid", "typ", "cty");
 
     // A standard PEM-encoded 4096-bit RSA key is ~3.2KB.
     // 64KB allows for ~20 concurrent keys in a file to easily support rotation.
@@ -74,6 +74,9 @@ public class JweEncryptionEngine extends DecryptionEngine {
 
     // 10 MB character limit to prevent resource exhaustion during parsing/decryption.
     private static final int MAX_JWE_SIZE_BYTES = 10 * 1024 * 1024;
+
+    // Key IDs are Base64URL-encoded 8-byte SHA-256 prefixes, producing exactly 11 characters.
+    private static final int MAX_KID_LENGTH = 11;
 
     private Map<String, PrivateKey> cachedPrivateKeys;
     private byte[] cachedContentHash;
@@ -89,6 +92,11 @@ public class JweEncryptionEngine extends DecryptionEngine {
             throw new IllegalArgumentException("JWE payload must not be empty.");
         }
 
+        if (encryptedData.chars().anyMatch(Character::isWhitespace)) {
+            throw new IllegalArgumentException("JWE payload must not contain whitespace. "
+                    + "Ensure it uses a single-line JWE Compact Serialization.");
+        }
+
         if (encryptedData.length() > MAX_JWE_SIZE_BYTES) {
             throw new IllegalArgumentException("JWE payload exceeds the maximum allowed size.");
         }
@@ -99,7 +107,9 @@ public class JweEncryptionEngine extends DecryptionEngine {
 
             PrivateKey privateKey = getPrivateKeys().get(headerKid);
             if (privateKey == null) {
-                throw new GeneralSecurityException("No key found matching kid: " + headerKid);
+                throw new GeneralSecurityException("No private key found matching the JWE key ID. "
+                        + "Verify that the configured decryption key file contains "
+                        + "the corresponding private key.");
             }
 
             jweObject.decrypt(new RSADecrypter(privateKey));
@@ -129,9 +139,19 @@ public class JweEncryptionEngine extends DecryptionEngine {
             throw new GeneralSecurityException("JWE compression is not supported.");
         }
 
-        if (!header.getIncludedParams().containsAll(ALLOWED_HEADER_PARAMS)
-                || !ALLOWED_HEADER_PARAMS.containsAll(header.getIncludedParams())) {
-            throw new GeneralSecurityException("JWE header must contain only alg, enc, and kid.");
+        if (header.getCriticalParams() != null && !header.getCriticalParams().isEmpty()) {
+            throw new GeneralSecurityException("Critical JWE headers are not supported.");
+        }
+
+        Set<String> includedParams = header.getIncludedParams();
+
+        if (!includedParams.containsAll(Set.of("alg", "enc", "kid"))) {
+            throw new GeneralSecurityException("JWE header must contain alg, enc, and kid.");
+        }
+
+        if (!ALLOWED_HEADER_PARAMS.containsAll(includedParams)) {
+            throw new GeneralSecurityException("JWE header contains unsupported parameters. "
+                    + "Allowed parameters are alg, enc, kid, typ, and cty.");
         }
 
         if (!RSA_OAEP_256.equals(header.getAlgorithm())) {
@@ -142,13 +162,17 @@ public class JweEncryptionEngine extends DecryptionEngine {
             throw new GeneralSecurityException("Unsupported JWE content encryption algorithm. Expected A256GCM.");
         }
 
-        if (header.getCriticalParams() != null && !header.getCriticalParams().isEmpty()) {
-            throw new GeneralSecurityException("Critical JWE headers are not supported.");
-        }
-
         String headerKid = header.getKeyID();
         if (headerKid == null || headerKid.isBlank()) {
             throw new GeneralSecurityException("JWE protected header must contain a key ID (kid).");
+        }
+
+        if (headerKid.length() > MAX_KID_LENGTH) {
+            throw new GeneralSecurityException("JWE key ID exceeds the maximum allowed length.");
+        }
+
+        if (!headerKid.chars().allMatch(c -> c >= 0x21 && c <= 0x7E)) {
+            throw new GeneralSecurityException("JWE key ID contains invalid characters.");
         }
 
         return headerKid;
@@ -173,6 +197,10 @@ public class JweEncryptionEngine extends DecryptionEngine {
 
             String keyPem = new String(keyBytes, UTF_8).trim();
 
+            if (keyPem.startsWith("\uFEFF")) {
+                keyPem = keyPem.substring(1);
+            }
+
             cachedPrivateKeys = parsePrivateKeys(keyPem);
             cachedContentHash = newHash;
 
@@ -182,7 +210,9 @@ public class JweEncryptionEngine extends DecryptionEngine {
             throw new IllegalStateException("I/O error occurred while reading the decryption key file.", e);
         } catch (GeneralSecurityException | IllegalArgumentException e) {
             throw new IllegalStateException(
-                    "Failed to parse the PKCS#8 RSA private keys. Ensure they are valid, unencrypted PKCS#8 PEM blocks.",
+                    "Failed to parse the PKCS#8 RSA private keys. "
+                            + "Ensure they are valid, unencrypted PKCS#8 PEM blocks. "
+                            + e.getMessage(),
                     e);
         }
     }
@@ -289,6 +319,7 @@ public class JweEncryptionEngine extends DecryptionEngine {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         byte[] hash = digest.digest(publicKey.getEncoded());
 
+        // Use the first 8 bytes of the SHA-256 hash to generate a compact 64-bit key identifier.
         byte[] truncated = copyOf(hash, 8);
 
         return getUrlEncoder().withoutPadding().encodeToString(truncated);
