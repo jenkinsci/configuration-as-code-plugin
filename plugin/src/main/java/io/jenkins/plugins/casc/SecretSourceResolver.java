@@ -87,14 +87,13 @@ public class SecretSourceResolver {
 
         @Override
         public String lookup(@NonNull final String key) {
-            String plaintext = DecryptLookup.INSTANCE.lookup(key);
-
             Map<String, String> placeholderMap = DECRYPT_PLACEHOLDERS.get();
             if (placeholderMap == null) {
                 throw new IllegalStateException(
                         "Decrypt lookup must be invoked through SecretSourceResolver.resolve()");
             }
 
+            String plaintext = DecryptLookup.INSTANCE.lookup(key);
             String placeholder = PLACEHOLDER_PREFIX + UUID.randomUUID() + PLACEHOLDER_SUFFIX;
             placeholderMap.put(placeholder, plaintext);
             return placeholder;

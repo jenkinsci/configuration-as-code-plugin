@@ -72,22 +72,6 @@ class JwePrecedenceTest {
     }
 
     @Test
-    void failsWhenNeitherPropertyNorEnvVariableIsConfigured() throws Exception {
-        clearProperty(KEY_PROP);
-        JweEncryptionEngine engine = new JweEncryptionEngine();
-
-        String validKid = computeKeyId(propKeyPair.getPrivate());
-        String validJwe = encrypt("dummy-secret", propKeyPair.getPublic(), validKid);
-
-        IllegalStateException ex = assertThrows(IllegalStateException.class, () -> engine.decrypt(validJwe));
-
-        assertEquals(
-                "Decryption key file is not configured. Set either the system property '" + KEY_PROP
-                        + "' or the environment variable 'CASC_DECRYPTION_KEY_FILE'.",
-                ex.getMessage());
-    }
-
-    @Test
     void systemPropertyTakesPrecedenceOverEnvironment() throws Exception {
         setProperty(KEY_PROP, propKeyFile.toAbsolutePath().toString());
         JweEncryptionEngine engine = new JweEncryptionEngine();

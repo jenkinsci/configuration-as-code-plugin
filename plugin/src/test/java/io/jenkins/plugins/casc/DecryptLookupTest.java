@@ -15,6 +15,7 @@ import static java.util.Base64.getUrlEncoder;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.nimbusds.jose.JWEHeader;
@@ -41,6 +42,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.TestExtension;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
 @WithJenkins
@@ -133,7 +135,31 @@ class DecryptLookupTest {
 
         assertThat(exception.getMessage(), containsString("Failed to parse JWE payload"));
 
-        assertThat(exception.getCause(), org.hamcrest.Matchers.notNullValue());
+        assertThat(exception.getCause(), notNullValue());
+    }
+
+    @Test
+    @SuppressWarnings("unused")
+    void lookupUsesFallbackMessageWhenDecryptionExceptionHasNullMessage(JenkinsRule j) {
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class, () -> DecryptLookup.INSTANCE.lookup("null-message-test:payload"));
+
+        assertThat(exception.getMessage(), containsString("An unexpected error occurred."));
+        assertThat(exception.getCause(), notNullValue());
+    }
+
+    @TestExtension
+    public static class NullMessageDecryptionEngine extends DecryptionEngine {
+
+        @Override
+        public String getId() {
+            return "null-message-test";
+        }
+
+        @Override
+        public String decrypt(String encryptedData) throws GeneralSecurityException {
+            throw new GeneralSecurityException((String) null);
+        }
     }
 
     private static KeyPair generateKeyPair() throws GeneralSecurityException {

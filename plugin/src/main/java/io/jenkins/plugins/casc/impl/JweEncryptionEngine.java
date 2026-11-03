@@ -125,6 +125,10 @@ public class JweEncryptionEngine extends DecryptionEngine {
     }
 
     private String validateHeaderAndGetKid(JWEHeader header) throws GeneralSecurityException {
+        if (header.getCompressionAlgorithm() != null) {
+            throw new GeneralSecurityException("JWE compression is not supported.");
+        }
+
         if (!header.getIncludedParams().containsAll(ALLOWED_HEADER_PARAMS)
                 || !ALLOWED_HEADER_PARAMS.containsAll(header.getIncludedParams())) {
             throw new GeneralSecurityException("JWE header must contain only alg, enc, and kid.");
@@ -136,10 +140,6 @@ public class JweEncryptionEngine extends DecryptionEngine {
 
         if (!A256GCM.equals(header.getEncryptionMethod())) {
             throw new GeneralSecurityException("Unsupported JWE content encryption algorithm. Expected A256GCM.");
-        }
-
-        if (header.getCompressionAlgorithm() != null) {
-            throw new GeneralSecurityException("JWE compression is not supported.");
         }
 
         if (header.getCriticalParams() != null && !header.getCriticalParams().isEmpty()) {

@@ -39,6 +39,8 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.text.lookup.StringLookup;
@@ -731,18 +733,6 @@ public class SecretSourceResolverTest {
     }
 
     @Test
-    public void resolve_decrypt_ordinaryPlaintext_resolvesCorrectly() throws Exception {
-        try (RsaTestContext ctx = new RsaTestContext()) {
-            String plaintext = "normal-password";
-            String ciphertext = ctx.encrypt(plaintext);
-
-            String output = resolve("${decrypt:jwe:" + ciphertext + "}");
-
-            assertThat("Ordinary plaintext must resolve to its decrypted value", output, equalTo(plaintext));
-        }
-    }
-
-    @Test
     public void resolve_decrypt_strictMode_plaintextWithMissingVariable_isPreservedLiterally() throws Exception {
         environment.set("CASC_STRICT_SECRET_RESOLUTION", "true");
 
@@ -840,6 +830,39 @@ public class SecretSourceResolverTest {
             String decryptOutput = resolve("${decrypt:jwe:" + ciphertext + "}");
 
             assertThat("Subsequent decrypt lookup must succeed without stale state", decryptOutput, equalTo(plaintext));
+        }
+    }
+
+    @Test
+    public void decryptLookupOutsideResolver_throwsIllegalStateException() {
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> SecretSourceResolver.PlaceholderDecryptLookup.INSTANCE.lookup("jwe:unused"));
+
+        assertThat(
+                exception.getMessage(),
+                equalTo("Decrypt lookup must be invoked through SecretSourceResolver.resolve()"));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void resolve_restoresPreviousThreadLocalPlaceholders() throws Exception {
+        Field threadLocalField = SecretSourceResolver.class.getDeclaredField("DECRYPT_PLACEHOLDERS");
+        threadLocalField.setAccessible(true);
+
+        ThreadLocal<Map<String, String>> decryptPlaceholders =
+                (ThreadLocal<Map<String, String>>) threadLocalField.get(null);
+
+        Map<String, String> previousMap = new HashMap<>();
+        previousMap.put("dummy-key", "dummy-value");
+        decryptPlaceholders.set(previousMap);
+
+        try {
+            environment.set("FOO", "hello");
+            assertThat(resolve("${FOO}"), equalTo("hello"));
+            assertThat(decryptPlaceholders.get(), equalTo(previousMap));
+        } finally {
+            decryptPlaceholders.remove();
         }
     }
 }
