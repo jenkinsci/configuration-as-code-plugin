@@ -51,8 +51,7 @@ public class SchemaGeneration {
             rootAttributes.forEach(attribute -> rootKeyTypes.put(attribute.getName(), attribute.getType()));
             for (Object configuratorObject : elements) {
                 if (configuratorObject instanceof BaseConfigurator<?> baseConfigurator) {
-                    JSONObject baseConfigSchema =
-                            generateBaseConfiguratorSchema(baseConfigurator, context, definitions);
+                    JSONObject baseConfigSchema = generateConfiguratorSchema(baseConfigurator, context, definitions);
                     if (handlesKey(rootKeyTypes, baseConfigurator)) {
                         schemaConfiguratorObjects.put(baseConfigurator.getName(), baseConfigSchema);
                     }
@@ -102,17 +101,17 @@ public class SchemaGeneration {
         return generateSchema().toString(4);
     }
 
-    private static JSONObject generateBaseConfiguratorSchema(
-            BaseConfigurator<?> baseConfigurator, ConfigurationContext context, JSONObject definitions) {
+    private static JSONObject generateConfiguratorSchema(
+            Configurator<?> configurator, ConfigurationContext context, JSONObject definitions) {
         JSONObject schema = new JSONObject().put("additionalProperties", false).put("type", "object");
 
-        List<? extends Attribute<?, ?>> attributes = baseConfigurator.getAttributes();
+        List<? extends Attribute<?, ?>> attributes = configurator.getAttributes();
         if (attributes.isEmpty()) {
             schema.put("properties", new JSONObject());
         } else {
             JSONObject attributeSchema = new JSONObject();
             for (Attribute<?, ?> attribute : attributes) {
-                generateAttributeSchema(attributeSchema, attribute, context, baseConfigurator, definitions);
+                generateAttributeSchema(attributeSchema, attribute, context, configurator, definitions);
             }
             schema.put("properties", attributeSchema);
         }
@@ -123,16 +122,15 @@ public class SchemaGeneration {
             JSONObject attributeSchema,
             Attribute<?, ?> attribute,
             ConfigurationContext context,
-            BaseConfigurator<?> baseConfigurator,
+            Configurator<?> configurator,
             JSONObject definitions) {
         if (attribute.multiple) {
-            generateMultipleAttributeSchema(attributeSchema, attribute, context, baseConfigurator, definitions);
+            generateMultipleAttributeSchema(attributeSchema, attribute, context, configurator, definitions);
         } else if (attribute.type.isEnum()) {
-            generateEnumAttributeSchema(attributeSchema, attribute, baseConfigurator);
+            generateEnumAttributeSchema(attributeSchema, attribute, configurator);
         } else {
             attributeSchema.put(
-                    attribute.getName(),
-                    generateNonEnumAttributeObject(attribute, baseConfigurator, context, definitions));
+                    attribute.getName(), generateNonEnumAttributeObject(attribute, configurator, context, definitions));
         }
     }
 
@@ -187,14 +185,14 @@ public class SchemaGeneration {
         definitions.put(className, new JSONObject().put("type", "object"));
 
         Configurator<?> lookup = context.lookup(clazz);
-        if (lookup instanceof BaseConfigurator) {
-            definitions.put(
-                    className, generateBaseConfiguratorSchema((BaseConfigurator<?>) lookup, context, definitions));
-        } else if (lookup instanceof HeteroDescribableConfigurator) {
+        if (lookup instanceof HeteroDescribableConfigurator) {
             definitions.put(
                     className,
                     generateHeteroDescribableConfigObject(
                             (HeteroDescribableConfigurator<?>) lookup, context, definitions));
+        } else if (lookup != null) {
+            // any other configurator accepts the attributes it describes, whether or not it extends BaseConfigurator
+            definitions.put(className, generateConfiguratorSchema(lookup, context, definitions));
         } else {
             definitions.put(
                     className,
@@ -236,11 +234,11 @@ public class SchemaGeneration {
 
     private static JSONObject generateNonEnumAttributeObject(
             Attribute<?, ?> attribute,
-            BaseConfigurator<?> baseConfigurator,
+            Configurator<?> configurator,
             ConfigurationContext context,
             JSONObject definitions) {
         JSONObject attributeType = new JSONObject();
-        Optional<String> description = getDescription(attribute, baseConfigurator);
+        Optional<String> description = getDescription(attribute, configurator);
         switch (attribute.type.getName()) {
             case "java.lang.String":
             case "hudson.util.Secret":
@@ -276,10 +274,10 @@ public class SchemaGeneration {
         return attributeType;
     }
 
-    private static Optional<String> getDescription(Attribute attribute, BaseConfigurator baseConfigurator) {
+    private static Optional<String> getDescription(Attribute attribute, Configurator<?> configurator) {
         String description = null;
-        if (baseConfigurator != null) {
-            description = retrieveDocStringFromAttribute(baseConfigurator.getTarget(), attribute.name);
+        if (configurator != null) {
+            description = retrieveDocStringFromAttribute(configurator.getTarget(), attribute.name);
         }
         return Optional.ofNullable(description);
     }
@@ -288,9 +286,9 @@ public class SchemaGeneration {
             JSONObject attributeSchema,
             Attribute attribute,
             ConfigurationContext context,
-            BaseConfigurator<?> baseConfigurator,
+            Configurator<?> configurator,
             JSONObject definitions) {
-        Optional<String> description = getDescription(attribute, baseConfigurator);
+        Optional<String> description = getDescription(attribute, configurator);
 
         JSONObject itemsSchema = new JSONObject();
 
@@ -353,8 +351,8 @@ public class SchemaGeneration {
     }
 
     private static void generateEnumAttributeSchema(
-            JSONObject attributeSchemaTemplate, Attribute attribute, BaseConfigurator baseConfigurator) {
-        Optional<String> description = getDescription(attribute, baseConfigurator);
+            JSONObject attributeSchemaTemplate, Attribute attribute, Configurator<?> configurator) {
+        Optional<String> description = getDescription(attribute, configurator);
 
         if (attribute.type.getEnumConstants().length == 0) {
             JSONObject jsonObject = new JSONObject().put("type", "string");
