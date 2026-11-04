@@ -30,6 +30,8 @@ class ModelConstructor extends CustomClassLoaderConstructor {
 
         this.yamlConstructors.put(Tag.BOOL, ConstructScalar);
         this.yamlConstructors.put(Tag.INT, ConstructScalar);
+        // otherwise a float is a java.lang.Double, which is dropped from a mapping and breaks a sequence
+        this.yamlConstructors.put(Tag.FLOAT, ConstructScalar);
         this.yamlConstructors.put(Tag.STR, ConstructScalar);
     }
 

@@ -5,6 +5,7 @@ import static io.jenkins.plugins.casc.misc.Util.convertYamlFileToJson;
 import static io.jenkins.plugins.casc.misc.Util.validateSchema;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasItem;
@@ -21,6 +22,7 @@ import hudson.model.Describable;
 import hudson.model.Descriptor;
 import hudson.model.JDK;
 import hudson.model.Node;
+import hudson.model.Result;
 import hudson.model.TaskListener;
 import hudson.slaves.DumbSlave;
 import hudson.slaves.EnvironmentVariablesNodeProperty;
@@ -555,6 +557,98 @@ class SchemaGenerationTest {
         @DataBoundSetter
         public void setShapes(List<Shape> shapes) {
             this.shapes = shapes;
+        }
+    }
+
+    @Test
+    void stringConvertedScalarsAcceptTheirScalarValues(JenkinsConfiguredWithCodeRule j) throws Exception {
+        assertThat(validateSchema(convertYamlFileToJson(this, "validScalarSchemaConfig.yml")), empty());
+    }
+
+    @Test
+    @ConfiguredWithCode("validScalarSchemaConfig.yml")
+    void stringConvertedScalarsAreWhatConfigurationAccepts(JenkinsConfiguredWithCodeRule j) {
+        ScalarConfig config = GlobalConfiguration.all().get(ScalarConfig.class);
+        assertEquals(1.5, config.getRatio());
+        assertEquals(1.5f, config.getScale());
+        // a float list item used to break loading the YAML
+        assertEquals(List.of(1.5, 2.0), config.getWeights());
+        assertEquals(Result.UNSTABLE, config.getThreshold());
+    }
+
+    @Test
+    @ConfiguredWithCode("floatForStringConfig.yml")
+    void floatForStringFieldIsConfiguredAsItsText(JenkinsConfiguredWithCodeRule j) {
+        // a float used to be dropped from its mapping, leaving the field unset
+        assertEquals("1.10", GlobalConfiguration.all().get(ScalarConfig.class).getLabel());
+    }
+
+    @Test
+    void stringConvertedScalarsRejectObjects(JenkinsConfiguredWithCodeRule j) throws Exception {
+        assertThat(
+                validateSchema(convertYamlFileToJson(this, "invalidScalarSchemaConfig.yml")),
+                containsInAnyOrder(
+                        "#/unclassified/scalarConfig/ratio: expected type: Number, found: JSONObject",
+                        "#/unclassified/scalarConfig/scale: expected type: Number, found: JSONObject",
+                        "#/unclassified/scalarConfig/weights/0: expected type: Number, found: JSONObject",
+                        "#/unclassified/scalarConfig/threshold: expected type: String, found: JSONObject"));
+    }
+
+    @Extension
+    @Symbol("scalarConfig")
+    public static class ScalarConfig extends GlobalConfiguration {
+        private Double ratio;
+        private Float scale;
+        private List<Double> weights;
+        private Result threshold;
+        private String label;
+
+        @DataBoundConstructor
+        public ScalarConfig() {}
+
+        public String getLabel() {
+            return label;
+        }
+
+        @DataBoundSetter
+        public void setLabel(String label) {
+            this.label = label;
+        }
+
+        public Double getRatio() {
+            return ratio;
+        }
+
+        @DataBoundSetter
+        public void setRatio(Double ratio) {
+            this.ratio = ratio;
+        }
+
+        public Float getScale() {
+            return scale;
+        }
+
+        @DataBoundSetter
+        public void setScale(Float scale) {
+            this.scale = scale;
+        }
+
+        public List<Double> getWeights() {
+            return weights;
+        }
+
+        @DataBoundSetter
+        public void setWeights(List<Double> weights) {
+            this.weights = weights;
+        }
+
+        public Result getThreshold() {
+            return threshold;
+        }
+
+        @DataBoundSetter
+        public void setThreshold(Result threshold) {
+            this.threshold = threshold;
         }
     }
 

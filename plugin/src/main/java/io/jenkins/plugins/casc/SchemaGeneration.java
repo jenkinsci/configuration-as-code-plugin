@@ -4,7 +4,10 @@ import hudson.model.TopLevelItem;
 import io.jenkins.plugins.casc.impl.DefaultConfiguratorRegistry;
 import io.jenkins.plugins.casc.impl.attributes.DescribableAttribute;
 import io.jenkins.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
+import io.jenkins.plugins.casc.impl.configurators.PrimitiveConfigurator;
 import java.io.IOException;
+import java.lang.invoke.MethodType;
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -239,41 +242,50 @@ public class SchemaGeneration {
             BaseConfigurator<?> baseConfigurator,
             ConfigurationContext context,
             JSONObject definitions) {
-        JSONObject attributeType = new JSONObject();
         Optional<String> description = getDescription(attribute, baseConfigurator);
-        switch (attribute.type.getName()) {
-            case "java.lang.String":
-            case "hudson.util.Secret":
-                attributeType.put("type", "string");
-                description.ifPresent(desc -> attributeType.put("description", desc));
-                break;
-
-            case "int":
-            case "java.lang.Integer":
-            case "long":
-            case "java.lang.Long":
-                attributeType.put("type", "integer");
-                description.ifPresent(desc -> attributeType.put("description", desc));
-                break;
-
-            case "boolean":
-            case "java.lang.Boolean":
-                attributeType.put("type", "boolean");
-                description.ifPresent(desc -> attributeType.put("description", desc));
-                break;
-
-            default:
-                // a heterogeneous describable also accepts its short form (a string), so only its definition decides
-                if (!(context.lookup(attribute.getType()) instanceof HeteroDescribableConfigurator)) {
-                    attributeType.put("type", "object");
-                    attributeType.put("additionalProperties", false);
-                }
-                description.ifPresent(desc -> attributeType.put("description", desc));
-                attributeType.put("$ref", "#/definitions/" + attribute.type.getName());
-                ensureDefinitionExists(attribute.getType(), context, definitions);
-                break;
+        Optional<String> scalarType = scalarType(attribute.getType(), context);
+        if (scalarType.isPresent()) {
+            JSONObject attributeType = new JSONObject().put("type", scalarType.get());
+            description.ifPresent(desc -> attributeType.put("description", desc));
+            return attributeType;
         }
+        JSONObject attributeType = new JSONObject();
+        // a heterogeneous describable also accepts its short form (a string), so only its definition decides
+        if (!(context.lookup(attribute.getType()) instanceof HeteroDescribableConfigurator)) {
+            attributeType.put("type", "object");
+            attributeType.put("additionalProperties", false);
+        }
+        description.ifPresent(desc -> attributeType.put("description", desc));
+        attributeType.put("$ref", "#/definitions/" + attribute.type.getName());
+        ensureDefinitionExists(attribute.getType(), context, definitions);
         return attributeType;
+    }
+
+    private static final Set<Class<?>> INTEGRAL_TYPES =
+            Set.of(Byte.class, Short.class, Integer.class, Long.class, BigInteger.class);
+
+    /**
+     * The JSON type of a type {@link PrimitiveConfigurator} configures, which converts a single scalar with the Stapler
+     * converter of the type: a boolean, an integer or a number for the converters of those types, a string for any
+     * other converter (e.g. {@link hudson.util.Secret}, {@link hudson.model.Result}).
+     *
+     * @return empty if the type is not configured from a scalar
+     */
+    private static Optional<String> scalarType(Class<?> type, ConfigurationContext context) {
+        if (!(context.lookup(type) instanceof PrimitiveConfigurator)) {
+            return Optional.empty();
+        }
+        Class<?> boxed = MethodType.methodType(type).wrap().returnType();
+        if (boxed == Boolean.class) {
+            return Optional.of("boolean");
+        }
+        if (INTEGRAL_TYPES.contains(boxed)) {
+            return Optional.of("integer");
+        }
+        if (Number.class.isAssignableFrom(boxed)) {
+            return Optional.of("number");
+        }
+        return Optional.of("string");
     }
 
     private static Optional<String> getDescription(Attribute attribute, BaseConfigurator baseConfigurator) {
@@ -293,11 +305,12 @@ public class SchemaGeneration {
         Optional<String> description = getDescription(attribute, baseConfigurator);
 
         JSONObject itemsSchema = new JSONObject();
+        Optional<String> scalarType = scalarType(attribute.type, context);
 
-        if (attribute.type.getName().equals("java.lang.String")) {
-            itemsSchema.put("type", "string");
-        } else if (attribute.type.isEnum()) {
+        if (attribute.type.isEnum()) {
             itemsSchema.put("type", "string").put("enum", enumValues(attribute.type));
+        } else if (scalarType.isPresent()) {
+            itemsSchema.put("type", scalarType.get());
         } else {
             @SuppressWarnings("rawtypes")
             Configurator lookup = context.lookup(attribute.getType());

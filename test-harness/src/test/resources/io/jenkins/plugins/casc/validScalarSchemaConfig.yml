@@ -1,0 +1,8 @@
+unclassified:
+  scalarConfig:
+    ratio: 1.5
+    scale: 1.5
+    weights:
+      - 1.5
+      - 2
+    threshold: UNSTABLE
