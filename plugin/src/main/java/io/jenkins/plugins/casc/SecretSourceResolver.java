@@ -1,6 +1,7 @@
 package io.jenkins.plugins.casc;
 
 import static io.vavr.API.unchecked;
+import static java.lang.Boolean.TRUE;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -39,6 +40,11 @@ public class SecretSourceResolver {
     private static final String PLACEHOLDER_SUFFIX = "\u0000";
 
     private static final ThreadLocal<Map<String, String>> DECRYPT_PLACEHOLDERS = new ThreadLocal<>();
+    private static final ThreadLocal<Boolean> CURRENT_INPUT_DECRYPTED = new ThreadLocal<>();
+
+    static boolean isDecryptedInput() {
+        return TRUE.equals(CURRENT_INPUT_DECRYPTED.get());
+    }
 
     private final StringSubstitutor nullSubstitutor;
     private final StringSubstitutor substitutor;
@@ -141,11 +147,7 @@ public class SecretSourceResolver {
             String result = substitutor.replace(toInterpolate);
             result = nullSubstitutor.replace(result);
 
-            for (Map.Entry<String, String> entry : placeholders.entrySet()) {
-                result = result.replace(entry.getKey(), entry.getValue());
-            }
-
-            return result;
+            return restorePlaceholders(result, placeholders).text();
         } finally {
             if (previous == null) {
                 DECRYPT_PLACEHOLDERS.remove();
@@ -153,6 +155,51 @@ public class SecretSourceResolver {
                 DECRYPT_PLACEHOLDERS.set(previous);
             }
         }
+    }
+
+    record RestorationResult(String text, boolean modified) {}
+
+    static RestorationResult restorePlaceholders(String text, Map<String, String> placeholders) {
+        if (text == null || placeholders == null || placeholders.isEmpty()) {
+            return new RestorationResult(text, false);
+        }
+
+        int prefixIdx = text.indexOf(PLACEHOLDER_PREFIX);
+        if (prefixIdx == -1) {
+            return new RestorationResult(text, false);
+        }
+
+        StringBuilder sb = new StringBuilder(text.length());
+        int cursor = 0;
+        boolean modified = false;
+
+        while (prefixIdx != -1) {
+            sb.append(text, cursor, prefixIdx);
+            int suffixIdx = text.indexOf(PLACEHOLDER_SUFFIX, prefixIdx + PLACEHOLDER_PREFIX.length());
+            if (suffixIdx != -1) {
+                String candidate = text.substring(prefixIdx, suffixIdx + PLACEHOLDER_SUFFIX.length());
+                String replacement = placeholders.get(candidate);
+                if (replacement != null) {
+                    sb.append(replacement);
+                    cursor = suffixIdx + PLACEHOLDER_SUFFIX.length();
+                    modified = true;
+                } else {
+                    sb.append(candidate);
+                    cursor = suffixIdx + PLACEHOLDER_SUFFIX.length();
+                }
+            } else {
+                sb.append(text, prefixIdx, text.length());
+                cursor = text.length();
+                break;
+            }
+            prefixIdx = text.indexOf(PLACEHOLDER_PREFIX, cursor);
+        }
+
+        if (cursor < text.length()) {
+            sb.append(text, cursor, text.length());
+        }
+
+        return new RestorationResult(sb.toString(), modified);
     }
 
     static class UnresolvedLookup implements StringLookup {
@@ -192,6 +239,9 @@ public class SecretSourceResolver {
 
         @Override
         public String lookup(String key) {
+            if (isDecryptedInput()) {
+                return null;
+            }
             return context.getSecretSources().stream()
                     .map(source -> unchecked(() -> source.reveal(key)).apply())
                     .flatMap(Optional::stream)
@@ -208,11 +258,17 @@ public class SecretSourceResolver {
         public String lookup(@NonNull final String key) {
             final String output = System.getProperty(key);
             if (output == null) {
-                LOGGER.log(
-                        Level.WARNING,
-                        String.format(
-                                "Configuration import: System Properties did not contain the specified key '%s'. Will default to empty string.",
-                                key));
+                if (isDecryptedInput()) {
+                    LOGGER.log(
+                            Level.WARNING,
+                            "Configuration import: System Properties did not contain the specified key. Will default to empty string.");
+                } else {
+                    LOGGER.log(
+                            Level.WARNING,
+                            String.format(
+                                    "Configuration import: System Properties did not contain the specified key '%s'. Will default to empty string.",
+                                    key));
+                }
                 return "";
             }
             return output;
@@ -228,12 +284,18 @@ public class SecretSourceResolver {
             try {
                 return new String(Files.readAllBytes(Paths.get(key)), StandardCharsets.UTF_8);
             } catch (IOException | InvalidPathException e) {
-                LOGGER.log(
-                        Level.WARNING,
-                        String.format(
-                                "Configuration import: Error looking up file '%s' with UTF-8 encoding. Will default to empty string",
-                                key),
-                        e);
+                if (isDecryptedInput()) {
+                    LOGGER.log(
+                            Level.WARNING,
+                            "Configuration import: Error looking up file with UTF-8 encoding. Will default to empty string");
+                } else {
+                    LOGGER.log(
+                            Level.WARNING,
+                            String.format(
+                                    "Configuration import: Error looking up file '%s' with UTF-8 encoding. Will default to empty string",
+                                    key),
+                            e);
+                }
                 return null;
             }
         }
@@ -269,11 +331,17 @@ public class SecretSourceResolver {
                 byte[] fileContent = Files.readAllBytes(Paths.get(key));
                 return Base64.getEncoder().encodeToString(fileContent);
             } catch (IOException | InvalidPathException e) {
-                LOGGER.log(
-                        Level.WARNING,
-                        String.format(
-                                "Configuration import: Error looking up file '%s'. Will default to empty string", key),
-                        e);
+                if (isDecryptedInput()) {
+                    LOGGER.log(
+                            Level.WARNING, "Configuration import: Error looking up file. Will default to empty string");
+                } else {
+                    LOGGER.log(
+                            Level.WARNING,
+                            String.format(
+                                    "Configuration import: Error looking up file '%s'. Will default to empty string",
+                                    key),
+                            e);
+                }
                 return null;
             }
         }
@@ -288,17 +356,37 @@ public class SecretSourceResolver {
         @Override
         public String lookup(@NonNull final String key) {
             final String[] components = key.split(":", 2);
+            if (components.length < 2) {
+                if (isDecryptedInput()) {
+                    LOGGER.log(
+                            Level.WARNING,
+                            "Configuration import: Invalid JSON lookup syntax. Will default to empty string.");
+                } else {
+                    LOGGER.log(
+                            Level.WARNING,
+                            String.format(
+                                    "Configuration import: Invalid JSON lookup syntax '%s'. Will default to empty string.",
+                                    key));
+                }
+                return "";
+            }
             final String jsonFieldName = components[0];
             final String json = components[1];
             final JSONObject root = new JSONObject(json);
 
             final String output = root.optString(jsonFieldName, null);
             if (output == null) {
-                LOGGER.log(
-                        Level.WARNING,
-                        String.format(
-                                "Configuration import: JSON secret did not contain the specified key '%s'. Will default to empty string.",
-                                jsonFieldName));
+                if (isDecryptedInput()) {
+                    LOGGER.log(
+                            Level.WARNING,
+                            "Configuration import: JSON secret did not contain the specified key. Will default to empty string.");
+                } else {
+                    LOGGER.log(
+                            Level.WARNING,
+                            String.format(
+                                    "Configuration import: JSON secret did not contain the specified key '%s'. Will default to empty string.",
+                                    jsonFieldName));
+                }
                 return "";
             }
             return output;
@@ -335,27 +423,27 @@ public class SecretSourceResolver {
                 return delegate.apply(key);
             }
 
-            boolean modified = false;
-            String unwrappedKey = key;
+            RestorationResult unwrapped = restorePlaceholders(key, placeholderMap);
+            if (!unwrapped.modified()) {
+                return delegate.apply(key);
+            }
 
-            for (Map.Entry<String, String> entry : placeholderMap.entrySet()) {
-                if (unwrappedKey.contains(entry.getKey())) {
-                    unwrappedKey = unwrappedKey.replace(entry.getKey(), entry.getValue());
-                    modified = true;
+            Boolean previousDecrypted = CURRENT_INPUT_DECRYPTED.get();
+            CURRENT_INPUT_DECRYPTED.set(true);
+            try {
+                String result = delegate.apply(unwrapped.text());
+                String placeholder = PLACEHOLDER_PREFIX + UUID.randomUUID() + PLACEHOLDER_SUFFIX;
+                placeholderMap.put(placeholder, result != null ? result : "");
+                return placeholder;
+            } catch (Exception e) {
+                throw new IllegalStateException("Failed to evaluate helper with decrypted secret");
+            } finally {
+                if (previousDecrypted == null) {
+                    CURRENT_INPUT_DECRYPTED.remove();
+                } else {
+                    CURRENT_INPUT_DECRYPTED.set(previousDecrypted);
                 }
             }
-
-            // Execute the actual helper logic with the raw plaintext
-            String result = delegate.apply(unwrappedKey);
-
-            // If we operated on decrypted data, wrap the result in a new placeholder to keep it opaque
-            if (modified && result != null) {
-                String newPlaceholder = PLACEHOLDER_PREFIX + UUID.randomUUID() + PLACEHOLDER_SUFFIX;
-                placeholderMap.put(newPlaceholder, result);
-                return newPlaceholder;
-            }
-
-            return result;
         }
     }
 }

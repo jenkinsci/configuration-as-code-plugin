@@ -5,8 +5,11 @@ import static com.nimbusds.jose.JWEAlgorithm.RSA_OAEP_256;
 import static io.jenkins.plugins.casc.impl.JweEncryptionEngine.KEY_PROP;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Base64.getMimeEncoder;
+import static java.util.UUID.randomUUID;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
@@ -19,11 +22,14 @@ import com.nimbusds.jose.crypto.RSAEncrypter;
 import io.jenkins.plugins.casc.SecretSourceResolver.Base64Lookup;
 import io.jenkins.plugins.casc.SecretSourceResolver.FileBase64Lookup;
 import io.jenkins.plugins.casc.SecretSourceResolver.FileStringLookup;
+import io.jenkins.plugins.casc.SecretSourceResolver.PlaceholderAwareLookup;
 import io.jenkins.plugins.casc.SecretSourceResolver.SystemPropertyLookup;
 import io.jenkins.plugins.casc.encryption.DecryptionEngine;
 import io.jenkins.plugins.casc.impl.JweEncryptionEngine;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -38,11 +44,15 @@ import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.RSAPublicKeySpec;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import org.apache.commons.text.lookup.StringLookup;
 import org.apache.commons.text.lookup.StringLookupFactory;
@@ -995,5 +1005,211 @@ public class SecretSourceResolverTest {
                     output,
                     equalTo("cCR7VU5TRVR9c3M="));
         }
+    }
+
+    @Test
+    public void resolve_failedReadFileOverDecrypt_doesNotLogPlaintextOrException() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String secretPath = "super-secret-missing-file-path-" + randomUUID();
+            String ciphertext = ctx.encrypt(secretPath);
+
+            String output = resolve("${readFile:${decrypt:jwe:" + ciphertext + "}}");
+
+            assertThat(output, equalTo(""));
+
+            for (LogRecord record : logging.getRecords()) {
+                assertThat(record.getMessage(), not(containsString(secretPath)));
+                if (record.getParameters() != null) {
+                    for (Object param : record.getParameters()) {
+                        assertThat(param.toString(), not(containsString(secretPath)));
+                    }
+                }
+                if (record.getThrown() != null) {
+                    assertThat(record.getThrown().getMessage(), not(containsString(secretPath)));
+                    StringWriter sw = new StringWriter();
+                    record.getThrown().printStackTrace(new PrintWriter(sw));
+                    assertThat(sw.toString(), not(containsString(secretPath)));
+                }
+            }
+            assertTrue(logContains(
+                    "Configuration import: Error looking up file with UTF-8 encoding. Will default to empty string"));
+        }
+    }
+
+    @Test
+    public void resolve_failedFileBase64OverDecrypt_doesNotLogPlaintextOrException() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String secretPath = "super-secret-missing-binary-path-" + randomUUID();
+            String ciphertext = ctx.encrypt(secretPath);
+
+            String output = resolve("${fileBase64:${decrypt:jwe:" + ciphertext + "}}");
+
+            assertThat(output, equalTo(""));
+
+            for (LogRecord record : logging.getRecords()) {
+                assertThat(record.getMessage(), not(containsString(secretPath)));
+                if (record.getThrown() != null) {
+                    assertThat(record.getThrown().getMessage(), not(containsString(secretPath)));
+                }
+            }
+            assertTrue(logContains("Configuration import: Error looking up file. Will default to empty string"));
+        }
+    }
+
+    @Test
+    public void resolve_failedSysPropOverDecrypt_doesNotLogPlaintext() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String secretPropName = "super.secret.property.name." + randomUUID();
+            String ciphertext = ctx.encrypt(secretPropName);
+
+            String output = resolve("${sysProp:${decrypt:jwe:" + ciphertext + "}}");
+
+            assertThat(output, equalTo(""));
+
+            for (LogRecord record : logging.getRecords()) {
+                assertThat(record.getMessage(), not(containsString(secretPropName)));
+            }
+            assertTrue(
+                    logContains(
+                            "Configuration import: System Properties did not contain the specified key. Will default to empty string."));
+        }
+    }
+
+    @Test
+    public void resolve_helperReturningNullWithDecryptedInput_doesNotCallSecretSourceReveal() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String secretPlaintext = "secret-payload-should-not-reach-vault-" + randomUUID();
+            String ciphertext = ctx.encrypt(secretPlaintext);
+
+            List<String> revealedKeys = new ArrayList<>();
+            SecretSource trackingSource = new SecretSource() {
+                @Override
+                public Optional<String> reveal(String secret) {
+                    revealedKeys.add(secret);
+                    return Optional.empty();
+                }
+            };
+
+            context.getSecretSources().add(0, trackingSource);
+            try {
+                String output = resolve("${readFile:${decrypt:jwe:" + ciphertext + "}}");
+
+                assertThat(output, equalTo(""));
+                for (String key : revealedKeys) {
+                    assertThat(
+                            "Revealed key must not contain decrypted plaintext",
+                            key,
+                            not(containsString(secretPlaintext)));
+                }
+                assertThat(
+                        "SecretSource.reveal must not be called for the failed helper with decrypted input",
+                        revealedKeys.size(),
+                        equalTo(0));
+            } finally {
+                context.getSecretSources().remove(trackingSource);
+            }
+        }
+    }
+
+    @Test
+    public void resolve_helperThrowingExceptionWithDecryptedInput_throwsSanitizedException() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String sensitiveInvalidBase64 = "sensitive-invalid-base64-content-" + randomUUID();
+            String ciphertext = ctx.encrypt(sensitiveInvalidBase64);
+
+            IllegalStateException ex = assertThrows(
+                    IllegalStateException.class, () -> resolve("${decodeBase64:${decrypt:jwe:" + ciphertext + "}}"));
+
+            assertThat(ex.getMessage(), not(containsString(sensitiveInvalidBase64)));
+            assertThat(ex.getCause(), nullValue());
+            StringWriter sw = new StringWriter();
+            ex.printStackTrace(new PrintWriter(sw));
+            assertThat(sw.toString(), not(containsString(sensitiveInvalidBase64)));
+        }
+    }
+
+    @Test
+    public void resolve_restoresCurrentInputDecryptedThreadLocal() throws Exception {
+        Field threadLocalField = SecretSourceResolver.class.getDeclaredField("CURRENT_INPUT_DECRYPTED");
+        threadLocalField.setAccessible(true);
+        ThreadLocal<?> threadLocal = (ThreadLocal<?>) threadLocalField.get(null);
+
+        assertThat(threadLocal.get(), nullValue());
+
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String ciphertext = ctx.encrypt("hello");
+            resolve("${base64:${decrypt:jwe:" + ciphertext + "}}");
+            assertThat(
+                    "ThreadLocal must be restored after successful helper evaluation", threadLocal.get(), nullValue());
+
+            String missingPath = "missing-" + randomUUID();
+            String missingCiphertext = ctx.encrypt(missingPath);
+            resolve("${readFile:${decrypt:jwe:" + missingCiphertext + "}}");
+            assertThat("ThreadLocal must be restored after failed helper evaluation", threadLocal.get(), nullValue());
+
+            String invalidBase64 = "invalid-base64-" + randomUUID();
+            String invalidCiphertext = ctx.encrypt(invalidBase64);
+            assertThrows(
+                    IllegalStateException.class,
+                    () -> resolve("${decodeBase64:${decrypt:jwe:" + invalidCiphertext + "}}"));
+            assertThat("ThreadLocal must be restored after helper throws exception", threadLocal.get(), nullValue());
+        }
+    }
+
+    @Test
+    public void resolve_placeholderRestoration_doesNotRescanInsertedPlaintext() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String fakePlaceholder = "\u0000CASC_DECRYPT_" + randomUUID() + "\u0000";
+            String secret1 = "secret-with-" + fakePlaceholder + "-embedded";
+            String secret2 = "DANGER_LEAK";
+
+            String cipher1 = ctx.encrypt(secret1);
+            String cipher2 = ctx.encrypt(secret2);
+
+            String output = resolve("${decrypt:jwe:" + cipher1 + "} and ${decrypt:jwe:" + cipher2 + "}");
+
+            assertThat(output, equalTo(secret1 + " and " + secret2));
+            assertThat(output, containsString(fakePlaceholder));
+            assertThat(output, not(containsString("secret-with-DANGER_LEAK-embedded")));
+        }
+    }
+
+    @Test
+    public void resolve_ordinaryNonDecryptedHelperFailures_preserveDetailedLogging() {
+        String missingFile = "./non-decrypted-missing-" + randomUUID() + ".txt";
+        resolve("${readFile:" + missingFile + "}");
+
+        assertTrue(logContains(
+                String.format("Configuration import: Error looking up file '%s' with UTF-8 encoding.", missingFile)));
+
+        String missingProp = "non.decrypted.missing.prop." + randomUUID();
+        resolve("${sysProp:" + missingProp + "}");
+
+        assertTrue(logContains(String.format(
+                "Configuration import: System Properties did not contain the specified key '%s'.", missingProp)));
+    }
+
+    @Test
+    public void resolve_nestedTrimOverReadFileOverDecrypt_resolvesSuccessfully() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            Path tempSecretFile = Files.createTempFile("casc-nested-secret", ".txt");
+            tempSecretFile.toFile().deleteOnExit();
+            Files.writeString(tempSecretFile, "nested-content-value  \n");
+
+            String secretPath = tempSecretFile.toAbsolutePath().toString();
+            String ciphertext = ctx.encrypt(secretPath);
+            String output = resolve("${trim:${readFile:${decrypt:jwe:" + ciphertext + "}}}");
+
+            assertThat(output, equalTo("nested-content-value"));
+        }
+    }
+
+    @Test
+    public void placeholderAwareLookup_nullKeyReturnsNull() {
+        StringLookup lookup = new PlaceholderAwareLookup(key -> {
+            throw new AssertionError("Delegate must not be invoked for a null key");
+        });
+
+        assertThat(lookup.apply(null), nullValue());
     }
 }

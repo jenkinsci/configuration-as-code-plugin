@@ -720,6 +720,24 @@ class JweEncryptionEngineTest {
                 "Arbitrary text between PEM blocks must be explicitly rejected");
     }
 
+    @Test
+    void rejectsKidContainingInvalidCharacters() throws Exception {
+        String invalidKid = "kid\u007F";
+
+        JWEHeader header =
+                new JWEHeader.Builder(RSA_OAEP_256, A256GCM).keyID(invalidKid).build();
+
+        JWEObject jwe = new JWEObject(header, new Payload("secret"));
+        jwe.encrypt(new RSAEncrypter((RSAPublicKey) keyPair.getPublic()));
+
+        String ciphertext = jwe.serialize();
+
+        GeneralSecurityException exception =
+                assertThrows(GeneralSecurityException.class, () -> engine.decrypt(ciphertext));
+
+        assertEquals("JWE key ID contains invalid characters.", exception.getMessage());
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {" ", "\t", "\r", "\n"})
     void rejectsJweContainingWhitespace(String whitespace) throws Exception {

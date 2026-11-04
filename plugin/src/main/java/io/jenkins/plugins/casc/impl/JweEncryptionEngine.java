@@ -105,9 +105,12 @@ public class JweEncryptionEngine extends DecryptionEngine {
             JWEObject jweObject = JWEObject.parse(encryptedData);
             String headerKid = validateHeaderAndGetKid(jweObject.getHeader());
 
-            PrivateKey privateKey = getPrivateKeys().get(headerKid);
+            Map<String, PrivateKey> keys = getPrivateKeys();
+            PrivateKey privateKey = keys.get(headerKid);
+
             if (privateKey == null) {
-                throw new GeneralSecurityException("No private key found matching the JWE key ID. "
+                throw new GeneralSecurityException("No private key found matching the JWE key ID '" + headerKid + "'. "
+                        + "Available key IDs are: " + keys.keySet() + ". "
                         + "Verify that the configured decryption key file contains "
                         + "the corresponding private key.");
             }
