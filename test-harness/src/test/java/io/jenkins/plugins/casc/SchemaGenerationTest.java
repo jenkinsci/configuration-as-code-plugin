@@ -37,6 +37,7 @@ import org.jenkinsci.Symbol;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import org.jvnet.hudson.test.TestExtension;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
@@ -594,7 +595,7 @@ class SchemaGenerationTest {
                         "#/unclassified/scalarConfig/threshold: expected type: String, found: JSONObject"));
     }
 
-    @Extension
+    @TestExtension
     @Symbol("scalarConfig")
     public static class ScalarConfig extends GlobalConfiguration {
         private Double ratio;
