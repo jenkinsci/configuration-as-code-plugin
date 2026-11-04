@@ -40,6 +40,7 @@ import org.jenkinsci.Symbol;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import org.jvnet.hudson.test.TestExtension;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
@@ -621,7 +622,7 @@ class SchemaGenerationTest {
     }
 
     /** Implements {@link Configurator} directly, neither {@link BaseConfigurator} nor a heterogeneous describable. */
-    @Extension
+    @TestExtension
     public static class QuietPeriodConfigurator implements Configurator<QuietPeriod> {
 
         @Override
@@ -662,7 +663,7 @@ class SchemaGenerationTest {
         }
     }
 
-    @Extension
+    @TestExtension
     @Symbol("quietPeriodConfig")
     public static class QuietPeriodConfig extends GlobalConfiguration {
         private QuietPeriod quietPeriod;
