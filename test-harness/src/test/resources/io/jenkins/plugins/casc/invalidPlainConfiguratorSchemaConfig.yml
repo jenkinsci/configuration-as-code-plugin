@@ -1,0 +1,5 @@
+unclassified:
+  quietPeriodConfig:
+    quietPeriod:
+      label: weekends
+      unknownKey: true

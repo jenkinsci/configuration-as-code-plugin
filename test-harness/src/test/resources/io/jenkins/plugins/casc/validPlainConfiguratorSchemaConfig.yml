@@ -1,0 +1,7 @@
+unclassified:
+  quietPeriodConfig:
+    quietPeriod:
+      label: weekends
+      windows:
+        - from: "23:13"
+          to: "23:59"

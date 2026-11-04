@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.model.Describable;
@@ -30,7 +31,11 @@ import hudson.slaves.NodeProperty;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
+import io.jenkins.plugins.casc.model.CNode;
+import io.jenkins.plugins.casc.model.Mapping;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
 import org.jenkinsci.Symbol;
@@ -650,6 +655,123 @@ class SchemaGenerationTest {
         @DataBoundSetter
         public void setThreshold(Result threshold) {
             this.threshold = threshold;
+        }
+    }
+
+    @Test
+    void plainConfiguratorAcceptsTheAttributesItDescribes(JenkinsConfiguredWithCodeRule j) throws Exception {
+        assertThat(validateSchema(convertYamlFileToJson(this, "validPlainConfiguratorSchemaConfig.yml")), empty());
+    }
+
+    @Test
+    void plainConfiguratorRejectsUnknownKey(JenkinsConfiguredWithCodeRule j) throws Exception {
+        assertThat(
+                validateSchema(convertYamlFileToJson(this, "invalidPlainConfiguratorSchemaConfig.yml")),
+                contains("#/unclassified/quietPeriodConfig/quietPeriod: extraneous key [unknownKey] is not permitted"));
+    }
+
+    @Test
+    @ConfiguredWithCode("validPlainConfiguratorSchemaConfig.yml")
+    void plainConfiguratorSchemaMatchesWhatConfigurationAccepts(JenkinsConfiguredWithCodeRule j) {
+        QuietPeriod quietPeriod =
+                GlobalConfiguration.all().get(QuietPeriodConfig.class).getQuietPeriod();
+        assertNotNull(quietPeriod, "quietPeriod should be configured");
+        assertEquals("weekends", quietPeriod.getLabel());
+        assertEquals(1, quietPeriod.getWindows().size());
+        assertEquals("23:13", quietPeriod.getWindows().get(0).getFrom());
+        assertEquals("23:59", quietPeriod.getWindows().get(0).getTo());
+    }
+
+    /** Not data-bound: only {@link QuietPeriodConfigurator} knows how to configure it. */
+    public static class QuietPeriod {
+        private String label;
+        private final List<TimeWindow> windows = new ArrayList<>();
+
+        public String getLabel() {
+            return label;
+        }
+
+        public List<TimeWindow> getWindows() {
+            return windows;
+        }
+    }
+
+    public static class TimeWindow {
+        private final String from;
+        private final String to;
+
+        @DataBoundConstructor
+        public TimeWindow(String from, String to) {
+            this.from = from;
+            this.to = to;
+        }
+
+        public String getFrom() {
+            return from;
+        }
+
+        public String getTo() {
+            return to;
+        }
+    }
+
+    /** Implements {@link Configurator} directly, neither {@link BaseConfigurator} nor a heterogeneous describable. */
+    @TestExtension
+    public static class QuietPeriodConfigurator implements Configurator<QuietPeriod> {
+
+        @Override
+        public Class<QuietPeriod> getTarget() {
+            return QuietPeriod.class;
+        }
+
+        @NonNull
+        @Override
+        public Set<Attribute<QuietPeriod, ?>> describe() {
+            return Set.of(
+                    new Attribute<QuietPeriod, String>("label", String.class),
+                    new Attribute<QuietPeriod, TimeWindow>("windows", TimeWindow.class).multiple(true));
+        }
+
+        @NonNull
+        @Override
+        public QuietPeriod configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
+            Mapping mapping = config.asMapping();
+            QuietPeriod quietPeriod = new QuietPeriod();
+            CNode label = mapping.get("label");
+            if (label != null) {
+                quietPeriod.label = label.asScalar().getValue();
+            }
+            CNode windows = mapping.get("windows");
+            if (windows != null) {
+                Configurator<TimeWindow> windowConfigurator = context.lookupOrFail(TimeWindow.class);
+                for (CNode window : windows.asSequence()) {
+                    quietPeriod.windows.add(windowConfigurator.configure(window, context));
+                }
+            }
+            return quietPeriod;
+        }
+
+        @Override
+        public QuietPeriod check(CNode config, ConfigurationContext context) throws ConfiguratorException {
+            return configure(config, context);
+        }
+    }
+
+    @TestExtension
+    @Symbol("quietPeriodConfig")
+    public static class QuietPeriodConfig extends GlobalConfiguration {
+        private QuietPeriod quietPeriod;
+
+        @DataBoundConstructor
+        public QuietPeriodConfig() {}
+
+        public QuietPeriod getQuietPeriod() {
+            return quietPeriod;
+        }
+
+        @DataBoundSetter
+        public void setQuietPeriod(QuietPeriod quietPeriod) {
+            this.quietPeriod = quietPeriod;
         }
     }
 
