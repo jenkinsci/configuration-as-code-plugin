@@ -1,8 +1,16 @@
 package io.jenkins.plugins.casc;
 
+import static com.nimbusds.jose.EncryptionMethod.A256GCM;
+import static com.nimbusds.jose.JWEAlgorithm.RSA_OAEP_256;
 import static io.jenkins.plugins.casc.ConfigurationAsCode.CASC_JENKINS_CONFIG_PROPERTY;
+import static io.jenkins.plugins.casc.impl.JweEncryptionEngine.KEY_PROP;
 import static io.jenkins.plugins.casc.misc.Util.getJenkinsRoot;
 import static io.jenkins.plugins.casc.misc.Util.toYamlString;
+import static java.lang.System.getProperty;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.Files.writeString;
+import static java.util.Arrays.copyOf;
+import static java.util.Base64.getUrlEncoder;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
@@ -18,6 +26,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
+import com.nimbusds.jose.JWEHeader;
+import com.nimbusds.jose.JWEObject;
+import com.nimbusds.jose.Payload;
+import com.nimbusds.jose.crypto.RSAEncrypter;
 import hudson.Functions;
 import hudson.util.FormValidation;
 import io.jenkins.plugins.casc.fetcher.CasCConfigFetcher;
@@ -38,7 +50,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.MessageDigest;
+import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import org.htmlunit.WebRequest;
@@ -444,6 +461,61 @@ class ConfigurationAsCodeTest {
         assertTrue(
                 ex.getCause().getMessage().contains("is not supported by any registered configuration fetcher"),
                 "Should cover the if (!fetched) block");
+    }
+
+    @Test
+    void configure_should_decrypt_jwe_encrypted_secret(JenkinsConfiguredWithCodeRule j) throws Exception {
+        String originalKeyProperty = getProperty(KEY_PROP);
+        Path keyFile = Files.createTempFile(tempFolder.toPath(), "casc-jwe", ".pem");
+
+        try {
+            KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
+            generator.initialize(2048);
+            KeyPair keyPair = generator.generateKeyPair();
+
+            String encodedPrivateKey = Base64.getMimeEncoder(64, new byte[] {'\n'})
+                    .encodeToString(keyPair.getPrivate().getEncoded());
+
+            String privateKeyPem =
+                    "-----BEGIN PRIVATE KEY-----\n" + encodedPrivateKey + "\n-----END PRIVATE KEY-----\n";
+
+            writeString(keyFile, privateKeyPem, UTF_8);
+
+            System.setProperty(KEY_PROP, keyFile.toAbsolutePath().toString());
+
+            String secret = "integration-test-secret";
+
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(keyPair.getPublic().getEncoded());
+            byte[] truncated = copyOf(hash, 8);
+            String kid = getUrlEncoder().withoutPadding().encodeToString(truncated);
+
+            JWEHeader header =
+                    new JWEHeader.Builder(RSA_OAEP_256, A256GCM).keyID(kid).build();
+
+            JWEObject jweObject = new JWEObject(header, new Payload(secret));
+
+            jweObject.encrypt(new RSAEncrypter((RSAPublicKey) keyPair.getPublic()));
+
+            String ciphertext = jweObject.serialize();
+
+            Path configFile = tempFolder.toPath().resolve("encrypted-secret.yaml");
+            String yaml = "jenkins:\n" + "  systemMessage: \"${decrypt:jwe:" + ciphertext + "}\"\n";
+
+            writeString(configFile, yaml, UTF_8);
+
+            ConfigurationAsCode.get().configure(configFile.toUri().toString());
+
+            assertEquals(secret, j.jenkins.getSystemMessage());
+        } finally {
+            if (originalKeyProperty == null) {
+                System.clearProperty(KEY_PROP);
+            } else {
+                System.setProperty(KEY_PROP, originalKeyProperty);
+            }
+
+            Files.deleteIfExists(keyFile);
+        }
     }
 
     @TestExtension
