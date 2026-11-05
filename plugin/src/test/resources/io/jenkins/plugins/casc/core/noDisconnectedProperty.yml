@@ -1,0 +1,7 @@
+jenkins:
+  nodes:
+    - permanent:
+        name: "test-node-default"
+        remoteFS: "/tmp"
+        numExecutors: 1
+        mode: NORMAL
