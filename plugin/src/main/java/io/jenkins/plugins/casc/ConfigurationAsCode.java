@@ -558,8 +558,14 @@ public class ConfigurationAsCode extends ManagementLink {
 
         res.setContentType("application/json");
 
+        // Only administrators may see resolved variable values. For anyone else the check runs without resolving
+        // ${...} expressions at all, so no file, environment, system property or secret source value can be
+        // reflected back in validation messages or errors.
+        final boolean resolveSecrets = Jenkins.get().hasPermission(Jenkins.ADMINISTER);
+
         try {
-            final Map<Source, String> validationIssues = checkWith(YamlSource.of(req));
+            final Map<Source, String> validationIssues =
+                    checkWith(Collections.singletonList(YamlSource.of(req)), resolveSecrets);
 
             // Create JSON array for response
             JSONArray response = new JSONArray();
@@ -843,10 +849,18 @@ public class ConfigurationAsCode extends ManagementLink {
     }
 
     private Map<Source, String> checkWith(List<YamlSource> sources) throws ConfiguratorException {
+        return checkWith(sources, true);
+    }
+
+    private Map<Source, String> checkWith(List<YamlSource> sources, boolean resolveSecrets)
+            throws ConfiguratorException {
         if (sources.isEmpty()) {
             return Collections.emptyMap();
         }
         ConfigurationContext context = new ConfigurationContext(registry);
+        if (!resolveSecrets) {
+            context.disableSecretResolution();
+        }
         return checkWith(YamlUtils.loadFrom(sources, context), context);
     }
 

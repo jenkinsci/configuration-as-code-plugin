@@ -8,6 +8,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.Stapler;
 
 /**
@@ -44,6 +46,8 @@ public class ConfigurationContext implements ConfiguratorRegistry {
 
     private transient SecretSourceResolver secretSourceResolver;
 
+    private transient boolean secretResolutionDisabled;
+
     public ConfigurationContext(ConfiguratorRegistry registry) {
         this(registry, null);
     }
@@ -66,6 +70,25 @@ public class ConfigurationContext implements ConfiguratorRegistry {
 
     public SecretSourceResolver getSecretSourceResolver() {
         return secretSourceResolver;
+    }
+
+    /**
+     * Prevents this context from resolving any variable: {@code ${...}} expressions are left as-is and no lookup
+     * (file, environment, system property, {@link SecretSource}, ...) is ever performed.
+     * Used when the configuration is supplied by a user who is not allowed to see resolved values.
+     * This cannot be undone.
+     */
+    @Restricted(NoExternalUse.class)
+    public void disableSecretResolution() {
+        secretResolutionDisabled = true;
+        secretSourceResolver = new SecretSourceResolver(this, false);
+    }
+
+    /**
+     * @return {@code false} if variables must not be resolved in this context, see {@link #disableSecretResolution()}
+     */
+    public boolean isSecretResolutionEnabled() {
+        return !secretResolutionDisabled;
     }
 
     public void addListener(Listener listener) {
@@ -158,6 +181,9 @@ public class ConfigurationContext implements ConfiguratorRegistry {
      * Get the {@link SecretSource}s used to substitute <code>${XX}</code> test used as yaml values with sensitive data.
      */
     public List<SecretSource> getSecretSources() {
+        if (secretResolutionDisabled) {
+            return new ArrayList<>();
+        }
         return SecretSource.all();
     }
 
