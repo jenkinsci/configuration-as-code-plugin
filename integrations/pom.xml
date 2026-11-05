@@ -127,6 +127,14 @@
       <artifactId>artifactory</artifactId>
       <version>4.0.8</version>
       <scope>test</scope>
+      <exclusions>
+        <!-- build-info-api pulls jackson-annotations 2.14.1, which shadows the newer copy
+             jackson2-api provides through jackson-annotations2-api and breaks ObjectMapper -->
+        <exclusion>
+          <groupId>com.fasterxml.jackson.core</groupId>
+          <artifactId>jackson-annotations</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>

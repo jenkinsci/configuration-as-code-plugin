@@ -170,7 +170,8 @@ class DataBoundConfiguratorTest {
                 "string is required to configure class io.jenkins.plugins.casc.impl.configurators.nonnull.nonnullparampackage.PackageParametersAreNonnullByDefault";
 
         ConfiguratorException exception = assertThrows(
-                ConfiguratorException.class, () -> registry.lookupOrFail(PackageParametersAreNonnullByDefault.class)
+                ConfiguratorException.class,
+                () -> registry.lookupOrFail(PackageParametersAreNonnullByDefault.class)
                         .configure(config, new ConfigurationContext(registry)));
 
         assertThat(exception.getMessage(), is(expectedMessage));
@@ -214,9 +215,10 @@ class DataBoundConfiguratorTest {
         Mapping config = new Mapping();
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
 
-        ConfiguratorException exception = assertThrows(ConfiguratorException.class, () -> registry.lookupOrFail(
-                        JakartaNonnullRequiredParameterConstructor.class)
-                .configure(config, new ConfigurationContext(registry)));
+        ConfiguratorException exception = assertThrows(
+                ConfiguratorException.class,
+                () -> registry.lookupOrFail(JakartaNonnullRequiredParameterConstructor.class)
+                        .configure(config, new ConfigurationContext(registry)));
 
         assertThat(
                 exception.getMessage(),
