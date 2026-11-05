@@ -34,8 +34,19 @@ public class SecretSourceResolver {
 
     private final StringSubstitutor nullSubstitutor;
     private final StringSubstitutor substitutor;
+    private final boolean resolveVariables;
 
     public SecretSourceResolver(ConfigurationContext configurationContext) {
+        this(configurationContext, true);
+    }
+
+    /**
+     * @param configurationContext the context secret sources are looked up from
+     * @param resolveVariables when {@code false}, {@link #resolve(String)} returns its input unchanged and never
+     *     invokes any lookup or {@link SecretSource}. Used when the caller is not trusted to see resolved values.
+     */
+    SecretSourceResolver(ConfigurationContext configurationContext, boolean resolveVariables) {
+        this.resolveVariables = resolveVariables;
         Map<String, StringLookup> map = Map.of(
                 "base64",
                 Base64Lookup.INSTANCE,
@@ -108,6 +119,10 @@ public class SecretSourceResolver {
      * String. Secrets are defined as anything enclosed by '${}'
      */
     public String resolve(String toInterpolate) {
+        if (!resolveVariables) {
+            // Leave every ${...} expression untouched: no file, environment, system property or secret source lookup.
+            return toInterpolate;
+        }
         if (StringUtils.isBlank(toInterpolate) || !toInterpolate.contains(enclosedBy)) {
             return toInterpolate;
         }
