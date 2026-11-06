@@ -17,6 +17,7 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -99,7 +100,9 @@ public class DataBoundConfigurator<T> extends BaseConfigurator<T> {
         T object = super.configure(c, context);
 
         for (Method method : target.getMethods()) {
-            if (method.getParameterCount() == 0 && hasAnnotation(method, POST_CONSTRUCT_ANNOTATIONS)) {
+            if (!Modifier.isStatic(method.getModifiers())
+                    && method.getParameterCount() == 0
+                    && hasAnnotation(method, POST_CONSTRUCT_ANNOTATIONS)) {
                 try {
                     method.invoke(object, null);
                 } catch (IllegalAccessException | InvocationTargetException e) {

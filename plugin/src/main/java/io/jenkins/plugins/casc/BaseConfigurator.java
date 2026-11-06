@@ -64,6 +64,9 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
         final Set<String> exclusions = exclusions();
 
         for (Field field : getTarget().getFields()) {
+            if (Modifier.isStatic(field.getModifiers())) {
+                continue;
+            }
             final String name = field.getName();
             if (exclusions.contains(name)) {
                 continue;
@@ -86,6 +89,9 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
         // Resolve the methods and merging overrides to more concretized signatures
         // because the methods can to have been overridden with concretized type
         for (Method method : target.getMethods()) {
+            if (Modifier.isStatic(method.getModifiers())) {
+                continue;
+            }
             final String methodName = method.getName();
             if (method.getParameterCount() == 0
                     && methodName.startsWith("get")
@@ -230,6 +236,9 @@ public abstract class BaseConfigurator<T> implements Configurator<T> {
         String isMethod = "is" + s;
 
         for (Method m : c.getMethods()) {
+            if (Modifier.isStatic(m.getModifiers())) {
+                continue;
+            }
             if (m.getParameterCount() == 0) {
                 if (m.getName().equals(getMethod)) {
                     return m;

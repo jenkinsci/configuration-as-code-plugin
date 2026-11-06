@@ -302,6 +302,62 @@ public class BaseConfiguratorTest {
         }
     }
 
+    @SuppressWarnings("unused")
+    public static class TargetWithStaticMembers {
+        public static PersistedList<String> staticPersistedList;
+        public static String staticField;
+
+        private String instanceField;
+
+        public static PersistedList<String> getStaticPersistedList() {
+            return staticPersistedList;
+        }
+
+        public static TargetWithStaticMembers getDescriptor() {
+            return null;
+        }
+
+        public static void setDescriptor(TargetWithStaticMembers descriptor) {}
+
+        public static String getStaticProperty() {
+            return null;
+        }
+
+        public static void setStaticProperty(String val) {}
+
+        public String getPropertyWithStaticSetter() {
+            return null;
+        }
+
+        public static void setPropertyWithStaticSetter(String val) {}
+
+        public static String getPropertyWithStaticGetter() {
+            return null;
+        }
+
+        public void setPropertyWithStaticGetter(String val) {}
+
+        public String getInstanceField() {
+            return instanceField;
+        }
+
+        public void setInstanceField(String instanceField) {
+            this.instanceField = instanceField;
+        }
+    }
+
+    public static class TargetWithStaticMembersConfigurator extends BaseConfigurator<TargetWithStaticMembers> {
+        @Override
+        public Class<TargetWithStaticMembers> getTarget() {
+            return TargetWithStaticMembers.class;
+        }
+
+        @Override
+        protected TargetWithStaticMembers instance(Mapping mapping, ConfigurationContext context) {
+            return new TargetWithStaticMembers();
+        }
+    }
+
     @Test
     public void testDescribeResolvesBestSetters() {
         DummyConfigurator configurator = new DummyConfigurator();
@@ -521,5 +577,15 @@ public class BaseConfiguratorTest {
         Method best = configurator.resolveBestSetter(orderedMethods, null);
 
         assertEquals("Should upgrade bestType and resolve to the more specific Animal setter", setAnimal, best);
+    }
+
+    @Test
+    public void testIgnoreStaticMembers() {
+        TargetWithStaticMembersConfigurator configurator = new TargetWithStaticMembersConfigurator();
+        Set<Attribute<TargetWithStaticMembers, ?>> attributes = configurator.describe();
+
+        Set<String> attributeNames = attributes.stream().map(Attribute::getName).collect(Collectors.toSet());
+
+        assertEquals("Only instance properties should be discovered", Set.of("instanceField"), attributeNames);
     }
 }
