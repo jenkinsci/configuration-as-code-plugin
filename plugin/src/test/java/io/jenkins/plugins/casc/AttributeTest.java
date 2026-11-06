@@ -1,6 +1,9 @@
 package io.jenkins.plugins.casc;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import hudson.util.Secret;
@@ -229,5 +232,120 @@ public class AttributeTest {
         boolean secondUnknown = Attribute.calculateIfSecret(null, "someField");
         assertFalse(firstUnknown);
         assertFalse(secondUnknown, "Subsequent calls should return the same fallback FALSE result");
+    }
+
+    @Test
+    void checkStaticMembersNotConsideredSecret() {
+        assertFieldIsNotSecret(StaticSecretHolder.class, "staticSecretField");
+        assertFieldIsNotSecret(StaticSecretHolder.class, "privateStaticSecretField");
+        assertFieldIsNotSecret(StaticSecretHolder.class, "staticSecretGetter");
+        assertFieldIsNotSecret(StaticSecretHolder.class, "staticSecretSetter");
+    }
+
+    public static class StaticSecretHolder {
+        public static Secret staticSecretField;
+        private static Secret privateStaticSecretField;
+
+        public static Secret getStaticSecretGetter() {
+            return null;
+        }
+
+        public static void setStaticSecretSetter(Secret s) {}
+    }
+
+    @Test
+    void checkInheritedSecretFoundWhenHiddenBySubclassStaticField() {
+        assertFieldIsSecret(SubclassWithStaticSecretHidingParent.class, "password");
+    }
+
+    public static class ParentWithPrivateSecret {
+        private Secret password;
+
+        public String getPassword() {
+            return password != null ? password.getPlainText() : null;
+        }
+
+        public void setPassword(String password) {
+            this.password = Secret.fromString(password);
+        }
+    }
+
+    public static class SubclassWithStaticSecretHidingParent extends ParentWithPrivateSecret {
+        public static Secret password;
+    }
+
+    @Test
+    void checkSetValuePrefersInstanceSetterOverStaticOverload() throws Exception {
+        Attribute<SubclassWithInstanceSetter, String> attr = new Attribute<>("foo", String.class);
+        SubclassWithInstanceSetter target = new SubclassWithInstanceSetter();
+
+        ParentWithStaticSetter.staticValue = null;
+        attr.setValue(target, "hello");
+
+        assertEquals("hello", target.getFoo());
+        assertNull(ParentWithStaticSetter.staticValue, "Static setter should not be invoked");
+        assertEquals("hello", attr.getValue(target));
+    }
+
+    @Test
+    void checkStaticOnlyMembersRejectedByDefaultGetAndSetValue() {
+        Attribute<TargetWithOnlyStaticSetterAndGetter, String> attr = new Attribute<>("bar", String.class);
+        TargetWithOnlyStaticSetterAndGetter target = new TargetWithOnlyStaticSetterAndGetter();
+
+        TargetWithOnlyStaticSetterAndGetter.staticVal = null;
+
+        assertThrows(IllegalStateException.class, () -> attr.setValue(target, "newValue"));
+        assertNull(TargetWithOnlyStaticSetterAndGetter.staticVal, "Static setter should not be invoked");
+
+        TargetWithOnlyStaticSetterAndGetter.staticVal = "someVal";
+        assertThrows(ConfiguratorException.class, () -> attr.getValue(target));
+    }
+
+    @Test
+    void checkGetValueReadsInheritedPublicFieldWhenHiddenBySubclassStaticField() throws Exception {
+        Attribute<SubclassWithStaticFieldHidingParent, String> attr = new Attribute<>("myField", String.class);
+        SubclassWithStaticFieldHidingParent target = new SubclassWithStaticFieldHidingParent();
+
+        assertEquals("parentValue", attr.getValue(target));
+    }
+
+    public static class ParentWithStaticSetter {
+        public static String staticValue;
+
+        public static void setFoo(String v) {
+            staticValue = v;
+        }
+    }
+
+    public static class SubclassWithInstanceSetter extends ParentWithStaticSetter {
+        private String value;
+
+        public void setFoo(CharSequence v) {
+            this.value = v.toString();
+        }
+
+        public String getFoo() {
+            return value;
+        }
+    }
+
+    public static class TargetWithOnlyStaticSetterAndGetter {
+        public static String staticVal;
+
+        public static void setBar(String v) {
+            staticVal = v;
+        }
+
+        public static String getBar() {
+            return staticVal;
+        }
+    }
+
+    public static class ParentWithPublicField {
+        public final String myField = "parentValue";
+    }
+
+    public static class SubclassWithStaticFieldHidingParent extends ParentWithPublicField {
+        public static String myField = "staticValue";
     }
 }
