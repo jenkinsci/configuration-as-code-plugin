@@ -10,7 +10,7 @@
 
   <groupId>io.jenkins.configuration-as-code</groupId>
   <artifactId>parent</artifactId>
-  <version>${changelist}</version>
+  <version>2140.${changelist}</version>
   <packaging>pom</packaging>
   <name>Configuration as Code Parent</name>
   <description>The Configuration as Code plugin has been designed as an opinionated way to configure Jenkins based on human-readable declarative configuration files</description>
