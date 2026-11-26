@@ -1,0 +1,65 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+    <f:entry title="${%URL Prefix}" field="urlPrefix">
+        <f:textbox/>
+    </f:entry>
+
+    <f:entry title="${%Authentication Method}" field="authMethod">
+        <f:select class="casc-auth-method"/>
+    </f:entry>
+
+    <f:entry title="${%Credential ID}" field="credentialId">
+        <f:textbox class="casc-cred-id"/>
+    </f:entry>
+
+    <f:entry title="${%Header Name}" field="headerName">
+        <f:textbox class="casc-header-name"/>
+    </f:entry>
+
+    <f:entry title="">
+        <div align="right">
+            <f:repeatableDeleteButton/>
+        </div>
+    </f:entry>
+
+    <script>
+        Behaviour.specify(".casc-auth-method", 'CascAuthMethodToggle', 0, function (e) {
+            const update = function () {
+                const val = e.value;
+                const formTable = e.closest('table') || e.closest('.repeated-chunk');
+                const credInput = formTable.querySelector('.casc-cred-id');
+                const headerInput = formTable.querySelector('.casc-header-name');
+
+                if (credInput &amp;&amp; headerInput) {
+                    const credRow = credInput.closest('.tr') || credInput.closest('tr');
+                    const headerRow = headerInput.closest('.tr') || headerInput.closest('tr');
+
+                    if (val === 'NONE') {
+                        if (credRow) {
+                            credRow.style.display = 'none';
+                        }
+                        if (headerRow) {
+                            headerRow.style.display = 'none';
+                        }
+                    } else if (val === 'API_KEY') {
+                        if (credRow) {
+                            credRow.style.display = '';
+                        }
+                        if (headerRow) {
+                            headerRow.style.display = '';
+                        }
+                    } else {
+                        if (credRow) {
+                            credRow.style.display = '';
+                        }
+                        if (headerRow) {
+                            headerRow.style.display = 'none';
+                        }
+                    }
+                }
+            };
+            e.onchange = update;
+            update();
+        });
+    </script>
+</j:jelly>
