@@ -1,23 +1,58 @@
 package io.jenkins.plugins.casc;
 
+import static com.nimbusds.jose.EncryptionMethod.A256GCM;
+import static com.nimbusds.jose.JWEAlgorithm.RSA_OAEP_256;
+import static io.jenkins.plugins.casc.impl.JweEncryptionEngine.KEY_PROP;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Base64.getMimeEncoder;
+import static java.util.UUID.randomUUID;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
+import com.nimbusds.jose.JWEHeader;
+import com.nimbusds.jose.JWEObject;
+import com.nimbusds.jose.Payload;
+import com.nimbusds.jose.crypto.RSAEncrypter;
 import io.jenkins.plugins.casc.SecretSourceResolver.Base64Lookup;
 import io.jenkins.plugins.casc.SecretSourceResolver.FileBase64Lookup;
 import io.jenkins.plugins.casc.SecretSourceResolver.FileStringLookup;
+import io.jenkins.plugins.casc.SecretSourceResolver.PlaceholderAwareLookup;
 import io.jenkins.plugins.casc.SecretSourceResolver.SystemPropertyLookup;
+import io.jenkins.plugins.casc.encryption.DecryptionEngine;
+import io.jenkins.plugins.casc.impl.JweEncryptionEngine;
 import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.reflect.Field;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.MessageDigest;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.interfaces.RSAPrivateCrtKey;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.RSAPublicKeySpec;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import org.apache.commons.text.lookup.StringLookup;
 import org.apache.commons.text.lookup.StringLookupFactory;
@@ -575,5 +610,606 @@ public class SecretSourceResolverTest {
             resolve("${FOO}:${MISSING}");
         });
         assertThat(exception.getMessage(), containsString("MISSING"));
+    }
+
+    @Test
+    public void resolve_decryptRsaLookup() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String secret = "resolver-integration-secret";
+            String ciphertext = ctx.encrypt(secret);
+            String output = resolve("${decrypt:jwe:" + ciphertext + "}");
+
+            assertThat(output, equalTo(secret));
+        }
+    }
+
+    private static KeyPair createRsaKeyPair() throws Exception {
+        KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
+        generator.initialize(2048);
+        return generator.generateKeyPair();
+    }
+
+    private static String encryptJwe(String secret, PublicKey publicKey, String kid) throws Exception {
+        JWEHeader header =
+                new JWEHeader.Builder(RSA_OAEP_256, A256GCM).keyID(kid).build();
+
+        JWEObject jwe = new JWEObject(header, new Payload(secret));
+        jwe.encrypt(new RSAEncrypter((RSAPublicKey) publicKey));
+
+        return jwe.serialize();
+    }
+
+    private static void writeRsaPrivateKey(Path path, PrivateKey privateKey) throws IOException {
+        String encoded = getMimeEncoder(64, new byte[] {'\n'}).encodeToString(privateKey.getEncoded());
+
+        String pem = "-----BEGIN PRIVATE KEY-----\n" + encoded + "\n-----END PRIVATE KEY-----\n";
+
+        Files.writeString(path, pem, java.nio.charset.StandardCharsets.UTF_8);
+    }
+
+    private static final class RsaTestContext implements AutoCloseable {
+
+        final KeyPair keyPair;
+        final Path keyFile;
+        final String originalKeyProperty;
+        final String kid;
+
+        RsaTestContext() throws Exception {
+            originalKeyProperty = System.getProperty(KEY_PROP);
+            keyPair = createRsaKeyPair();
+            kid = computeKeyId((RSAPrivateCrtKey) keyPair.getPrivate());
+
+            keyFile = Files.createTempFile("casc-interp-test", ".pem");
+            writeRsaPrivateKey(keyFile, keyPair.getPrivate());
+            System.setProperty(KEY_PROP, keyFile.toAbsolutePath().toString());
+            clearRsaEngineCache();
+        }
+
+        String encrypt(String plaintext) throws Exception {
+            return encryptJwe(plaintext, keyPair.getPublic(), kid);
+        }
+
+        private static String computeKeyId(RSAPrivateCrtKey key) throws Exception {
+            RSAPublicKeySpec publicKeySpec = new RSAPublicKeySpec(key.getModulus(), key.getPublicExponent());
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            PublicKey publicKey = keyFactory.generatePublic(publicKeySpec);
+
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(publicKey.getEncoded());
+
+            byte[] truncated = Arrays.copyOf(hash, 8);
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(truncated);
+        }
+
+        @Override
+        public void close() throws Exception {
+            if (originalKeyProperty == null) {
+                System.clearProperty(KEY_PROP);
+            } else {
+                System.setProperty(KEY_PROP, originalKeyProperty);
+            }
+            clearRsaEngineCache();
+            Files.deleteIfExists(keyFile);
+        }
+
+        private static void clearRsaEngineCache() {
+            for (DecryptionEngine engine : DecryptionEngine.all()) {
+                if (engine instanceof JweEncryptionEngine rsaEngine) {
+                    try {
+                        Field f = JweEncryptionEngine.class.getDeclaredField("cachedPrivateKeys");
+                        f.setAccessible(true);
+                        f.set(rsaEngine, null);
+                    } catch (ReflectiveOperationException e) {
+                        throw new RuntimeException("Could not clear JweEncryptionEngine cache", e);
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    public void resolve_decrypt_plaintextWithMissingVariable_isPreservedLiterally() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String plaintext = "p${UNSET}ss";
+            String ciphertext = ctx.encrypt(plaintext);
+
+            String output = resolve("${decrypt:jwe:" + ciphertext + "}");
+
+            assertThat("Decrypted value containing ${UNSET} must not be interpolated", output, equalTo(plaintext));
+        }
+    }
+
+    @Test
+    public void resolve_decrypt_plaintextThatIsOnlyAVariable_isPreservedLiterally() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String plaintext = "${ENV_VAR}";
+            String ciphertext = ctx.encrypt(plaintext);
+
+            String output = resolve("${decrypt:jwe:" + ciphertext + "}");
+
+            assertThat("Decrypted value '${ENV_VAR}' must not be further interpolated", output, equalTo(plaintext));
+        }
+    }
+
+    @Test
+    public void resolve_decrypt_plaintextWithSurroundingText_isPreservedLiterally() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String plaintext = "prefix-${missing}-suffix";
+            String ciphertext = ctx.encrypt(plaintext);
+
+            String output = resolve("${decrypt:jwe:" + ciphertext + "}");
+
+            assertThat("Decrypted value 'prefix-${missing}-suffix' must remain unchanged", output, equalTo(plaintext));
+        }
+    }
+
+    @Test
+    public void resolve_decrypt_strictMode_plaintextWithMissingVariable_isPreservedLiterally() throws Exception {
+        environment.set("CASC_STRICT_SECRET_RESOLUTION", "true");
+
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String plaintext = "p${UNSET}ss";
+            String ciphertext = ctx.encrypt(plaintext);
+
+            String output = resolve("${decrypt:jwe:" + ciphertext + "}");
+
+            assertThat(
+                    "Strict mode: decrypted value with ${UNSET} must not be interpolated", output, equalTo(plaintext));
+        }
+    }
+
+    @Test
+    public void resolve_decrypt_strictMode_plainEnvVarOutside_stillThrows() {
+        environment.set("CASC_STRICT_SECRET_RESOLUTION", "true");
+
+        assertThrows(IllegalStateException.class, () -> resolve("${TRULY_MISSING_OUTSIDE_DECRYPT}"));
+    }
+
+    @Test
+    public void resolve_decrypt_embeddedInLargerString_isPreservedLiterally() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String plaintext = "sec${UNSET}ret";
+            String ciphertext = ctx.encrypt(plaintext);
+
+            String output = resolve("prefix-${decrypt:jwe:" + ciphertext + "}-suffix");
+
+            assertThat(
+                    "Decrypted value embedded in larger string must not be interpolated",
+                    output,
+                    equalTo("prefix-" + plaintext + "-suffix"));
+        }
+    }
+
+    @Test
+    public void resolve_nonDecryptVariables_behaviorUnchanged() {
+        environment.set("MY_VAR", "hello");
+        assertThat(resolve("${MY_VAR}"), equalTo("hello"));
+        assertThat(resolve("${UNDEFINED_VAR}"), equalTo(""));
+        assertThat(resolve("${UNDEFINED_VAR:-fallback}"), equalTo("fallback"));
+    }
+
+    @Test
+    public void resolve_multipleDecryptExpressions_resolvesBothCorrectly() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String secret1 = "first-password";
+            String secret2 = "second-password";
+            String cipher1 = ctx.encrypt(secret1);
+            String cipher2 = ctx.encrypt(secret2);
+
+            String output = resolve("User:${decrypt:jwe:" + cipher1 + "}:Pass:${decrypt:jwe:" + cipher2 + "}");
+
+            assertThat(
+                    "Multiple decrypt expressions in one input must all resolve correctly",
+                    output,
+                    equalTo("User:first-password:Pass:second-password"));
+        }
+    }
+
+    @Test
+    public void resolve_decrypt_plaintextWithNestedDecrypt_isPreservedLiterally() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String plaintext = "prefix-${decrypt:jwe:fake-ciphertext}-suffix";
+            String ciphertext = ctx.encrypt(plaintext);
+
+            String output = resolve("${decrypt:jwe:" + ciphertext + "}");
+
+            assertThat(
+                    "Decrypted plaintext containing a nested decrypt expression must remain literal",
+                    output,
+                    equalTo(plaintext));
+        }
+    }
+
+    @Test
+    public void resolve_failedResolutionFollowedBySuccess_leavesNoStaleState() throws Exception {
+        environment.set("CASC_STRICT_SECRET_RESOLUTION", "true");
+        environment.set("VALID_VAR", "success-value");
+
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            IllegalStateException exception =
+                    assertThrows(IllegalStateException.class, () -> resolve("${MISSING_VAR}"));
+            assertThat(exception.getMessage(), containsString("MISSING_VAR"));
+
+            String standardOutput = resolve("${VALID_VAR}");
+            assertThat(
+                    "Subsequent standard lookup must succeed without stale state",
+                    standardOutput,
+                    equalTo("success-value"));
+
+            String plaintext = "my-secret";
+            String ciphertext = ctx.encrypt(plaintext);
+            String decryptOutput = resolve("${decrypt:jwe:" + ciphertext + "}");
+
+            assertThat("Subsequent decrypt lookup must succeed without stale state", decryptOutput, equalTo(plaintext));
+        }
+    }
+
+    @Test
+    public void decryptLookupOutsideResolver_throwsIllegalStateException() {
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> SecretSourceResolver.PlaceholderDecryptLookup.INSTANCE.lookup("jwe:unused"));
+
+        assertThat(
+                exception.getMessage(),
+                equalTo("Decrypt lookup must be invoked through SecretSourceResolver.resolve()"));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void resolve_restoresPreviousThreadLocalPlaceholders() throws Exception {
+        Field threadLocalField = SecretSourceResolver.class.getDeclaredField("DECRYPT_PLACEHOLDERS");
+        threadLocalField.setAccessible(true);
+
+        ThreadLocal<Map<String, String>> decryptPlaceholders =
+                (ThreadLocal<Map<String, String>>) threadLocalField.get(null);
+
+        Map<String, String> previousMap = new HashMap<>();
+        previousMap.put("dummy-key", "dummy-value");
+        decryptPlaceholders.set(previousMap);
+
+        try {
+            environment.set("FOO", "hello");
+            assertThat(resolve("${FOO}"), equalTo("hello"));
+            assertThat(decryptPlaceholders.get(), equalTo(previousMap));
+        } finally {
+            decryptPlaceholders.remove();
+        }
+    }
+
+    @Test
+    public void resolve_base64OverDecrypt() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String secret = "hello";
+            String ciphertext = ctx.encrypt(secret);
+            String output = resolve("${base64:${decrypt:jwe:" + ciphertext + "}}");
+
+            assertThat(output, equalTo("aGVsbG8="));
+        }
+    }
+
+    @Test
+    public void resolve_decodeBase64OverDecrypt() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String secret = "aGVsbG8=";
+            String ciphertext = ctx.encrypt(secret);
+            String output = resolve("${decodeBase64:${decrypt:jwe:" + ciphertext + "}}");
+
+            assertThat(output, equalTo("hello"));
+        }
+    }
+
+    @Test
+    public void resolve_trimOverDecrypt() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String secret = "  secret_value  \n";
+            String ciphertext = ctx.encrypt(secret);
+            String output = resolve("${trim:${decrypt:jwe:" + ciphertext + "}}");
+
+            assertThat(output, equalTo("  secret_value"));
+        }
+    }
+
+    @Test
+    public void resolve_jsonOverDecrypt() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String secret = "{\"user\":\"admin_user\"}";
+            String ciphertext = ctx.encrypt(secret);
+            String output = resolve("${json:user:${decrypt:jwe:" + ciphertext + "}}");
+
+            assertThat(output, equalTo("admin_user"));
+        }
+    }
+
+    @Test
+    public void resolve_fileBase64OverDecrypt() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            Path tempSecretFile = Files.createTempFile("casc-secret", ".txt");
+            tempSecretFile.toFile().deleteOnExit();
+            Files.writeString(tempSecretFile, "hello");
+
+            String secretPath = tempSecretFile.toAbsolutePath().toString();
+            String ciphertext = ctx.encrypt(secretPath);
+            String output = resolve("${fileBase64:${decrypt:jwe:" + ciphertext + "}}");
+
+            assertThat(output, equalTo("aGVsbG8="));
+        }
+    }
+
+    @Test
+    public void resolve_nestedHelpersOverDecrypt() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String secret = "  hello  \n";
+            String ciphertext = ctx.encrypt(secret);
+            String output = resolve("${base64:${trim:${decrypt:jwe:" + ciphertext + "}}}");
+
+            assertThat(output, equalTo("ICBoZWxsbw=="));
+        }
+    }
+
+    @Test
+    public void resolve_multiplePlaceholdersInOneHelper() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String secret1 = "part1";
+            String secret2 = "part2";
+            String cipher1 = ctx.encrypt(secret1);
+            String cipher2 = ctx.encrypt(secret2);
+            String output = resolve("${base64:${decrypt:jwe:" + cipher1 + "}-${decrypt:jwe:" + cipher2 + "}}");
+
+            assertThat(output, equalTo("cGFydDEtcGFydDI="));
+        }
+    }
+
+    @Test
+    public void resolve_decryptInDefaultExpression() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String secret = "fallback-secret";
+            String ciphertext = ctx.encrypt(secret);
+            String output = resolve("${UNSET:-${decrypt:jwe:" + ciphertext + "}}");
+
+            assertThat(output, equalTo(secret));
+        }
+    }
+
+    @Test
+    public void resolve_prefixSuffixPreservationWithHelper() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String secret = "hello";
+            String ciphertext = ctx.encrypt(secret);
+            String output = resolve("prefix-${base64:${decrypt:jwe:" + ciphertext + "}}-suffix");
+
+            assertThat(output, equalTo("prefix-aGVsbG8=-suffix"));
+        }
+    }
+
+    @Test
+    public void resolve_base64OverDecrypt_preservesInterpolationSyntax() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String secret = "${UNSET}";
+            String ciphertext = ctx.encrypt(secret);
+            String output = resolve("${base64:${decrypt:jwe:" + ciphertext + "}}");
+
+            assertThat(output, equalTo(Base64.getEncoder().encodeToString(secret.getBytes(UTF_8))));
+        }
+    }
+
+    @Test
+    public void resolve_nestedHelperOverDecrypt_withPlaceholderLikePlaintext_isPreservedLiterally() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String plaintext = "p${UNSET}ss";
+            String ciphertext = ctx.encrypt(plaintext);
+            String output = resolve("${base64:${decrypt:jwe:" + ciphertext + "}}");
+
+            assertThat(
+                    "Nested helper processing must not trigger interpolation of decrypted plaintext",
+                    output,
+                    equalTo("cCR7VU5TRVR9c3M="));
+        }
+    }
+
+    @Test
+    public void resolve_failedReadFileOverDecrypt_doesNotLogPlaintextOrException() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String secretPath = "super-secret-missing-file-path-" + randomUUID();
+            String ciphertext = ctx.encrypt(secretPath);
+
+            String output = resolve("${readFile:${decrypt:jwe:" + ciphertext + "}}");
+
+            assertThat(output, equalTo(""));
+
+            for (LogRecord record : logging.getRecords()) {
+                assertThat(record.getMessage(), not(containsString(secretPath)));
+                if (record.getParameters() != null) {
+                    for (Object param : record.getParameters()) {
+                        assertThat(param.toString(), not(containsString(secretPath)));
+                    }
+                }
+                if (record.getThrown() != null) {
+                    assertThat(record.getThrown().getMessage(), not(containsString(secretPath)));
+                    StringWriter sw = new StringWriter();
+                    record.getThrown().printStackTrace(new PrintWriter(sw));
+                    assertThat(sw.toString(), not(containsString(secretPath)));
+                }
+            }
+            assertTrue(logContains(
+                    "Configuration import: Error looking up file with UTF-8 encoding. Will default to empty string"));
+        }
+    }
+
+    @Test
+    public void resolve_failedFileBase64OverDecrypt_doesNotLogPlaintextOrException() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String secretPath = "super-secret-missing-binary-path-" + randomUUID();
+            String ciphertext = ctx.encrypt(secretPath);
+
+            String output = resolve("${fileBase64:${decrypt:jwe:" + ciphertext + "}}");
+
+            assertThat(output, equalTo(""));
+
+            for (LogRecord record : logging.getRecords()) {
+                assertThat(record.getMessage(), not(containsString(secretPath)));
+                if (record.getThrown() != null) {
+                    assertThat(record.getThrown().getMessage(), not(containsString(secretPath)));
+                }
+            }
+            assertTrue(logContains("Configuration import: Error looking up file. Will default to empty string"));
+        }
+    }
+
+    @Test
+    public void resolve_failedSysPropOverDecrypt_doesNotLogPlaintext() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String secretPropName = "super.secret.property.name." + randomUUID();
+            String ciphertext = ctx.encrypt(secretPropName);
+
+            String output = resolve("${sysProp:${decrypt:jwe:" + ciphertext + "}}");
+
+            assertThat(output, equalTo(""));
+
+            for (LogRecord record : logging.getRecords()) {
+                assertThat(record.getMessage(), not(containsString(secretPropName)));
+            }
+            assertTrue(
+                    logContains(
+                            "Configuration import: System Properties did not contain the specified key. Will default to empty string."));
+        }
+    }
+
+    @Test
+    public void resolve_helperReturningNullWithDecryptedInput_doesNotCallSecretSourceReveal() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String secretPlaintext = "secret-payload-should-not-reach-vault-" + randomUUID();
+            String ciphertext = ctx.encrypt(secretPlaintext);
+
+            List<String> revealedKeys = new ArrayList<>();
+            SecretSource trackingSource = new SecretSource() {
+                @Override
+                public Optional<String> reveal(String secret) {
+                    revealedKeys.add(secret);
+                    return Optional.empty();
+                }
+            };
+
+            context.getSecretSources().add(0, trackingSource);
+            try {
+                String output = resolve("${readFile:${decrypt:jwe:" + ciphertext + "}}");
+
+                assertThat(output, equalTo(""));
+                for (String key : revealedKeys) {
+                    assertThat(
+                            "Revealed key must not contain decrypted plaintext",
+                            key,
+                            not(containsString(secretPlaintext)));
+                }
+                assertThat(
+                        "SecretSource.reveal must not be called for the failed helper with decrypted input",
+                        revealedKeys.size(),
+                        equalTo(0));
+            } finally {
+                context.getSecretSources().remove(trackingSource);
+            }
+        }
+    }
+
+    @Test
+    public void resolve_helperThrowingExceptionWithDecryptedInput_throwsSanitizedException() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String sensitiveInvalidBase64 = "sensitive-invalid-base64-content-" + randomUUID();
+            String ciphertext = ctx.encrypt(sensitiveInvalidBase64);
+
+            IllegalStateException ex = assertThrows(
+                    IllegalStateException.class, () -> resolve("${decodeBase64:${decrypt:jwe:" + ciphertext + "}}"));
+
+            assertThat(ex.getMessage(), not(containsString(sensitiveInvalidBase64)));
+            assertThat(ex.getCause(), nullValue());
+            StringWriter sw = new StringWriter();
+            ex.printStackTrace(new PrintWriter(sw));
+            assertThat(sw.toString(), not(containsString(sensitiveInvalidBase64)));
+        }
+    }
+
+    @Test
+    public void resolve_restoresCurrentInputDecryptedThreadLocal() throws Exception {
+        Field threadLocalField = SecretSourceResolver.class.getDeclaredField("CURRENT_INPUT_DECRYPTED");
+        threadLocalField.setAccessible(true);
+        ThreadLocal<?> threadLocal = (ThreadLocal<?>) threadLocalField.get(null);
+
+        assertThat(threadLocal.get(), nullValue());
+
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String ciphertext = ctx.encrypt("hello");
+            resolve("${base64:${decrypt:jwe:" + ciphertext + "}}");
+            assertThat(
+                    "ThreadLocal must be restored after successful helper evaluation", threadLocal.get(), nullValue());
+
+            String missingPath = "missing-" + randomUUID();
+            String missingCiphertext = ctx.encrypt(missingPath);
+            resolve("${readFile:${decrypt:jwe:" + missingCiphertext + "}}");
+            assertThat("ThreadLocal must be restored after failed helper evaluation", threadLocal.get(), nullValue());
+
+            String invalidBase64 = "invalid-base64-" + randomUUID();
+            String invalidCiphertext = ctx.encrypt(invalidBase64);
+            assertThrows(
+                    IllegalStateException.class,
+                    () -> resolve("${decodeBase64:${decrypt:jwe:" + invalidCiphertext + "}}"));
+            assertThat("ThreadLocal must be restored after helper throws exception", threadLocal.get(), nullValue());
+        }
+    }
+
+    @Test
+    public void resolve_placeholderRestoration_doesNotRescanInsertedPlaintext() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            String fakePlaceholder = "\u0000CASC_DECRYPT_" + randomUUID() + "\u0000";
+            String secret1 = "secret-with-" + fakePlaceholder + "-embedded";
+            String secret2 = "DANGER_LEAK";
+
+            String cipher1 = ctx.encrypt(secret1);
+            String cipher2 = ctx.encrypt(secret2);
+
+            String output = resolve("${decrypt:jwe:" + cipher1 + "} and ${decrypt:jwe:" + cipher2 + "}");
+
+            assertThat(output, equalTo(secret1 + " and " + secret2));
+            assertThat(output, containsString(fakePlaceholder));
+            assertThat(output, not(containsString("secret-with-DANGER_LEAK-embedded")));
+        }
+    }
+
+    @Test
+    public void resolve_ordinaryNonDecryptedHelperFailures_preserveDetailedLogging() {
+        String missingFile = "./non-decrypted-missing-" + randomUUID() + ".txt";
+        resolve("${readFile:" + missingFile + "}");
+
+        assertTrue(logContains(
+                String.format("Configuration import: Error looking up file '%s' with UTF-8 encoding.", missingFile)));
+
+        String missingProp = "non.decrypted.missing.prop." + randomUUID();
+        resolve("${sysProp:" + missingProp + "}");
+
+        assertTrue(logContains(String.format(
+                "Configuration import: System Properties did not contain the specified key '%s'.", missingProp)));
+    }
+
+    @Test
+    public void resolve_nestedTrimOverReadFileOverDecrypt_resolvesSuccessfully() throws Exception {
+        try (RsaTestContext ctx = new RsaTestContext()) {
+            Path tempSecretFile = Files.createTempFile("casc-nested-secret", ".txt");
+            tempSecretFile.toFile().deleteOnExit();
+            Files.writeString(tempSecretFile, "nested-content-value  \n");
+
+            String secretPath = tempSecretFile.toAbsolutePath().toString();
+            String ciphertext = ctx.encrypt(secretPath);
+            String output = resolve("${trim:${readFile:${decrypt:jwe:" + ciphertext + "}}}");
+
+            assertThat(output, equalTo("nested-content-value"));
+        }
+    }
+
+    @Test
+    public void placeholderAwareLookup_nullKeyReturnsNull() {
+        StringLookup lookup = new PlaceholderAwareLookup(key -> {
+            throw new AssertionError("Delegate must not be invoked for a null key");
+        });
+
+        assertThat(lookup.apply(null), nullValue());
     }
 }
