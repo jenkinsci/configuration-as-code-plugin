@@ -48,27 +48,44 @@ public class SecretSourceResolver {
 
     private final StringSubstitutor nullSubstitutor;
     private final StringSubstitutor substitutor;
+    private final boolean resolveVariables;
 
     public SecretSourceResolver(ConfigurationContext configurationContext) {
-        Map<String, StringLookup> map = new HashMap<>();
-        map.put("base64", new PlaceholderAwareLookup(Base64Lookup.INSTANCE));
-        map.put("fileBase64", new PlaceholderAwareLookup(FileBase64Lookup.INSTANCE));
-        map.put("readFileBase64", new PlaceholderAwareLookup(FileBase64Lookup.INSTANCE));
-        map.put("file", new PlaceholderAwareLookup(FileStringLookup.INSTANCE));
-        map.put("readFile", new PlaceholderAwareLookup(FileStringLookup.INSTANCE));
-        map.put("sysProp", new PlaceholderAwareLookup(SystemPropertyLookup.INSTANCE));
-        map.put("decodeBase64", new PlaceholderAwareLookup(DecodeBase64Lookup.INSTANCE));
-        map.put("json", new PlaceholderAwareLookup(JsonLookup.INSTANCE));
-        map.put("trim", new PlaceholderAwareLookup(TrimLookup.INSTANCE));
-        map.put("decrypt", PlaceholderDecryptLookup.INSTANCE);
+        this(configurationContext, true);
+    }
 
-        substitutor = new StringSubstitutor(new FixedInterpolatorStringLookup(
-                        map, new PlaceholderAwareLookup(new ConfigurationContextStringLookup(configurationContext))))
+    /**
+     * @param configurationContext the context secret sources are looked up from
+     * @param resolveVariables when {@code false}, {@link #resolve(String)} returns its input unchanged and never
+     *     invokes any lookup or {@link SecretSource}. Used when the caller is not trusted to see resolved values.
+     */
+    SecretSourceResolver(ConfigurationContext configurationContext, boolean resolveVariables) {
+        this.resolveVariables = resolveVariables;
+
+        Map<String, StringLookup> map = Map.of(
+            "base64", new PlaceholderAwareLookup(Base64Lookup.INSTANCE),
+            "fileBase64", new PlaceholderAwareLookup(FileBase64Lookup.INSTANCE),
+            "readFileBase64", new PlaceholderAwareLookup(FileBase64Lookup.INSTANCE),
+            "file", new PlaceholderAwareLookup(FileStringLookup.INSTANCE),
+            "readFile", new PlaceholderAwareLookup(FileStringLookup.INSTANCE),
+            "sysProp", new PlaceholderAwareLookup(SystemPropertyLookup.INSTANCE),
+            "decodeBase64", new PlaceholderAwareLookup(DecodeBase64Lookup.INSTANCE),
+            "json", new PlaceholderAwareLookup(JsonLookup.INSTANCE),
+            "trim", new PlaceholderAwareLookup(TrimLookup.INSTANCE),
+            "decrypt", PlaceholderDecryptLookup.INSTANCE
+        );
+
+        substitutor = new StringSubstitutor(
+                new FixedInterpolatorStringLookup(
+                        map,
+                        new PlaceholderAwareLookup(
+                                new ConfigurationContextStringLookup(configurationContext))))
                 .setEscapeChar(escapedWith)
                 .setVariablePrefix(enclosedBy)
                 .setVariableSuffix(enclosedIn)
                 .setEnableSubstitutionInVariables(true)
                 .setPreserveEscapes(true);
+
         nullSubstitutor = new StringSubstitutor(UnresolvedLookup.INSTANCE)
                 .setEscapeChar(escapedWith)
                 .setVariablePrefix(enclosedBy)
@@ -135,6 +152,10 @@ public class SecretSourceResolver {
      * String. Secrets are defined as anything enclosed by '${}'
      */
     public String resolve(String toInterpolate) {
+        if (!resolveVariables) {
+            // Leave every ${...} expression untouched: no file, environment, system property or secret source lookup.
+            return toInterpolate;
+        }
         if (StringUtils.isBlank(toInterpolate) || !toInterpolate.contains(enclosedBy)) {
             return toInterpolate;
         }

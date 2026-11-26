@@ -8,11 +8,11 @@ import hudson.util.Secret;
 import io.jenkins.plugins.casc.model.CNode;
 import io.jenkins.plugins.casc.model.Scalar;
 import io.jenkins.plugins.casc.model.Sequence;
-import io.jenkins.plugins.casc.util.ExtraFieldUtils;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -378,7 +378,7 @@ public class Attribute<Owner, Type> {
         final List<String> accessors = Arrays.asList("get" + upname, "is" + upname);
 
         for (Method method : clazz.getMethods()) {
-            if (method.getParameterCount() != 0) {
+            if (Modifier.isStatic(method.getModifiers()) || method.getParameterCount() != 0) {
                 continue;
             }
             if (accessors.contains(method.getName())) {
@@ -395,12 +395,32 @@ public class Attribute<Owner, Type> {
 
     @CheckForNull
     private static Field locatePublicField(Class<?> clazz, @NonNull String fieldName) {
-        return ExtraFieldUtils.getField(clazz, fieldName, false);
+        for (Class<?> acls = clazz; acls != null; acls = acls.getSuperclass()) {
+            try {
+                Field field = acls.getDeclaredField(fieldName);
+                if (Modifier.isPublic(field.getModifiers()) && !Modifier.isStatic(field.getModifiers())) {
+                    return field;
+                }
+            } catch (NoSuchFieldException ex) {
+                // ignore
+            }
+        }
+        return null;
     }
 
     @CheckForNull
     private static Field locatePrivateFieldInHierarchy(Class<?> clazz, @NonNull String fieldName) {
-        return ExtraFieldUtils.getFieldNoForce(clazz, fieldName);
+        for (Class<?> acls = clazz; acls != null; acls = acls.getSuperclass()) {
+            try {
+                Field field = acls.getDeclaredField(fieldName);
+                if (!Modifier.isStatic(field.getModifiers())) {
+                    return field;
+                }
+            } catch (NoSuchFieldException ex) {
+                // ignore
+            }
+        }
+        return null;
     }
 
     /**
@@ -476,9 +496,16 @@ public class Attribute<Owner, Type> {
             }
 
             // If this is a public final field, developers don't define getters as jelly can use them as-is
-            final Field field = ExtraFieldUtils.getField(clazz, this.name, true);
-            if (field != null) {
-                return (Type) field.get(target);
+            for (Class<?> c = clazz; c != null; c = c.getSuperclass()) {
+                try {
+                    Field field = c.getDeclaredField(this.name);
+                    if (!Modifier.isStatic(field.getModifiers())) {
+                        field.setAccessible(true);
+                        return (Type) field.get(target);
+                    }
+                } catch (NoSuchFieldException ex) {
+                    // search in superclass
+                }
             }
 
             throw new ConfiguratorException("Can't read attribute '" + name + "' from " + target);
@@ -496,6 +523,9 @@ public class Attribute<Owner, Type> {
 
         Method writeMethod = null;
         for (Method method : target.getClass().getMethods()) {
+            if (Modifier.isStatic(method.getModifiers())) {
+                continue;
+            }
             // Find most specialized variant of setter because the method
             // can to have been overridden with concretized type
             if (method.getName().equals("set" + StringUtils.capitalize(name))
@@ -555,6 +585,9 @@ public class Attribute<Owner, Type> {
     private static boolean hasSecretSetter(Class<?> clazz, @NonNull String fieldName) {
         final String setterName = "set" + StringUtils.capitalize(fieldName);
         for (Method method : clazz.getMethods()) {
+            if (Modifier.isStatic(method.getModifiers())) {
+                continue;
+            }
             if (method.getName().equals(setterName) && method.getParameterCount() == 1) {
                 if (method.getParameterTypes()[0] == Secret.class) {
                     return true;

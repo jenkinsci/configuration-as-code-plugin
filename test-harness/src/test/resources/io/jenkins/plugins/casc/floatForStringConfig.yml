@@ -1,0 +1,4 @@
+# runtime only: the schema requires a string for a String field
+unclassified:
+  scalarConfig:
+    label: 1.10

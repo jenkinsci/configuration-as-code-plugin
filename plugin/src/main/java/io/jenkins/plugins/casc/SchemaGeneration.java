@@ -4,7 +4,10 @@ import hudson.model.TopLevelItem;
 import io.jenkins.plugins.casc.impl.DefaultConfiguratorRegistry;
 import io.jenkins.plugins.casc.impl.attributes.DescribableAttribute;
 import io.jenkins.plugins.casc.impl.configurators.HeteroDescribableConfigurator;
+import io.jenkins.plugins.casc.impl.configurators.PrimitiveConfigurator;
 import java.io.IOException;
+import java.lang.invoke.MethodType;
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -51,8 +54,7 @@ public class SchemaGeneration {
             rootAttributes.forEach(attribute -> rootKeyTypes.put(attribute.getName(), attribute.getType()));
             for (Object configuratorObject : elements) {
                 if (configuratorObject instanceof BaseConfigurator<?> baseConfigurator) {
-                    JSONObject baseConfigSchema =
-                            generateBaseConfiguratorSchema(baseConfigurator, context, definitions);
+                    JSONObject baseConfigSchema = generateConfiguratorSchema(baseConfigurator, context, definitions);
                     if (handlesKey(rootKeyTypes, baseConfigurator)) {
                         schemaConfiguratorObjects.put(baseConfigurator.getName(), baseConfigSchema);
                     }
@@ -102,17 +104,17 @@ public class SchemaGeneration {
         return generateSchema().toString(4);
     }
 
-    private static JSONObject generateBaseConfiguratorSchema(
-            BaseConfigurator<?> baseConfigurator, ConfigurationContext context, JSONObject definitions) {
+    private static JSONObject generateConfiguratorSchema(
+            Configurator<?> configurator, ConfigurationContext context, JSONObject definitions) {
         JSONObject schema = new JSONObject().put("additionalProperties", false).put("type", "object");
 
-        List<? extends Attribute<?, ?>> attributes = baseConfigurator.getAttributes();
+        List<? extends Attribute<?, ?>> attributes = configurator.getAttributes();
         if (attributes.isEmpty()) {
             schema.put("properties", new JSONObject());
         } else {
             JSONObject attributeSchema = new JSONObject();
             for (Attribute<?, ?> attribute : attributes) {
-                generateAttributeSchema(attributeSchema, attribute, context, baseConfigurator, definitions);
+                generateAttributeSchema(attributeSchema, attribute, context, configurator, definitions);
             }
             schema.put("properties", attributeSchema);
         }
@@ -123,16 +125,15 @@ public class SchemaGeneration {
             JSONObject attributeSchema,
             Attribute<?, ?> attribute,
             ConfigurationContext context,
-            BaseConfigurator<?> baseConfigurator,
+            Configurator<?> configurator,
             JSONObject definitions) {
         if (attribute.multiple) {
-            generateMultipleAttributeSchema(attributeSchema, attribute, context, baseConfigurator, definitions);
+            generateMultipleAttributeSchema(attributeSchema, attribute, context, configurator, definitions);
         } else if (attribute.type.isEnum()) {
-            generateEnumAttributeSchema(attributeSchema, attribute, baseConfigurator);
+            generateEnumAttributeSchema(attributeSchema, attribute, configurator);
         } else {
             attributeSchema.put(
-                    attribute.getName(),
-                    generateNonEnumAttributeObject(attribute, baseConfigurator, context, definitions));
+                    attribute.getName(), generateNonEnumAttributeObject(attribute, configurator, context, definitions));
         }
     }
 
@@ -187,14 +188,14 @@ public class SchemaGeneration {
         definitions.put(className, new JSONObject().put("type", "object"));
 
         Configurator<?> lookup = context.lookup(clazz);
-        if (lookup instanceof BaseConfigurator) {
-            definitions.put(
-                    className, generateBaseConfiguratorSchema((BaseConfigurator<?>) lookup, context, definitions));
-        } else if (lookup instanceof HeteroDescribableConfigurator) {
+        if (lookup instanceof HeteroDescribableConfigurator) {
             definitions.put(
                     className,
                     generateHeteroDescribableConfigObject(
                             (HeteroDescribableConfigurator<?>) lookup, context, definitions));
+        } else if (lookup != null) {
+            // any other configurator accepts the attributes it describes, whether or not it extends BaseConfigurator
+            definitions.put(className, generateConfiguratorSchema(lookup, context, definitions));
         } else {
             definitions.put(
                     className,
@@ -236,50 +237,59 @@ public class SchemaGeneration {
 
     private static JSONObject generateNonEnumAttributeObject(
             Attribute<?, ?> attribute,
-            BaseConfigurator<?> baseConfigurator,
+            Configurator<?> configurator,
             ConfigurationContext context,
             JSONObject definitions) {
-        JSONObject attributeType = new JSONObject();
-        Optional<String> description = getDescription(attribute, baseConfigurator);
-        switch (attribute.type.getName()) {
-            case "java.lang.String":
-            case "hudson.util.Secret":
-                attributeType.put("type", "string");
-                description.ifPresent(desc -> attributeType.put("description", desc));
-                break;
-
-            case "int":
-            case "java.lang.Integer":
-            case "long":
-            case "java.lang.Long":
-                attributeType.put("type", "integer");
-                description.ifPresent(desc -> attributeType.put("description", desc));
-                break;
-
-            case "boolean":
-            case "java.lang.Boolean":
-                attributeType.put("type", "boolean");
-                description.ifPresent(desc -> attributeType.put("description", desc));
-                break;
-
-            default:
-                // a heterogeneous describable also accepts its short form (a string), so only its definition decides
-                if (!(context.lookup(attribute.getType()) instanceof HeteroDescribableConfigurator)) {
-                    attributeType.put("type", "object");
-                    attributeType.put("additionalProperties", false);
-                }
-                description.ifPresent(desc -> attributeType.put("description", desc));
-                attributeType.put("$ref", "#/definitions/" + attribute.type.getName());
-                ensureDefinitionExists(attribute.getType(), context, definitions);
-                break;
+        Optional<String> description = getDescription(attribute, configurator);
+        Optional<String> scalarType = scalarType(attribute.getType(), context);
+        if (scalarType.isPresent()) {
+            JSONObject attributeType = new JSONObject().put("type", scalarType.get());
+            description.ifPresent(desc -> attributeType.put("description", desc));
+            return attributeType;
         }
+        JSONObject attributeType = new JSONObject();
+        // a heterogeneous describable also accepts its short form (a string), so only its definition decides
+        if (!(context.lookup(attribute.getType()) instanceof HeteroDescribableConfigurator)) {
+            attributeType.put("type", "object");
+            attributeType.put("additionalProperties", false);
+        }
+        description.ifPresent(desc -> attributeType.put("description", desc));
+        attributeType.put("$ref", "#/definitions/" + attribute.type.getName());
+        ensureDefinitionExists(attribute.getType(), context, definitions);
         return attributeType;
     }
 
-    private static Optional<String> getDescription(Attribute attribute, BaseConfigurator baseConfigurator) {
+    private static final Set<Class<?>> INTEGRAL_TYPES =
+            Set.of(Byte.class, Short.class, Integer.class, Long.class, BigInteger.class);
+
+    /**
+     * The JSON type of a type {@link PrimitiveConfigurator} configures, which converts a single scalar with the Stapler
+     * converter of the type: a boolean, an integer or a number for the converters of those types, a string for any
+     * other converter (e.g. {@link hudson.util.Secret}, {@link hudson.model.Result}).
+     *
+     * @return empty if the type is not configured from a scalar
+     */
+    private static Optional<String> scalarType(Class<?> type, ConfigurationContext context) {
+        if (!(context.lookup(type) instanceof PrimitiveConfigurator)) {
+            return Optional.empty();
+        }
+        Class<?> boxed = MethodType.methodType(type).wrap().returnType();
+        if (boxed == Boolean.class) {
+            return Optional.of("boolean");
+        }
+        if (INTEGRAL_TYPES.contains(boxed)) {
+            return Optional.of("integer");
+        }
+        if (Number.class.isAssignableFrom(boxed)) {
+            return Optional.of("number");
+        }
+        return Optional.of("string");
+    }
+
+    private static Optional<String> getDescription(Attribute attribute, Configurator<?> configurator) {
         String description = null;
-        if (baseConfigurator != null) {
-            description = retrieveDocStringFromAttribute(baseConfigurator.getTarget(), attribute.name);
+        if (configurator != null) {
+            description = retrieveDocStringFromAttribute(configurator.getTarget(), attribute.name);
         }
         return Optional.ofNullable(description);
     }
@@ -288,16 +298,17 @@ public class SchemaGeneration {
             JSONObject attributeSchema,
             Attribute attribute,
             ConfigurationContext context,
-            BaseConfigurator<?> baseConfigurator,
+            Configurator<?> configurator,
             JSONObject definitions) {
-        Optional<String> description = getDescription(attribute, baseConfigurator);
+        Optional<String> description = getDescription(attribute, configurator);
 
         JSONObject itemsSchema = new JSONObject();
+        Optional<String> scalarType = scalarType(attribute.type, context);
 
-        if (attribute.type.getName().equals("java.lang.String")) {
-            itemsSchema.put("type", "string");
-        } else if (attribute.type.isEnum()) {
+        if (attribute.type.isEnum()) {
             itemsSchema.put("type", "string").put("enum", enumValues(attribute.type));
+        } else if (scalarType.isPresent()) {
+            itemsSchema.put("type", scalarType.get());
         } else {
             @SuppressWarnings("rawtypes")
             Configurator lookup = context.lookup(attribute.getType());
@@ -353,8 +364,8 @@ public class SchemaGeneration {
     }
 
     private static void generateEnumAttributeSchema(
-            JSONObject attributeSchemaTemplate, Attribute attribute, BaseConfigurator baseConfigurator) {
-        Optional<String> description = getDescription(attribute, baseConfigurator);
+            JSONObject attributeSchemaTemplate, Attribute attribute, Configurator<?> configurator) {
+        Optional<String> description = getDescription(attribute, configurator);
 
         if (attribute.type.getEnumConstants().length == 0) {
             JSONObject jsonObject = new JSONObject().put("type", "string");
