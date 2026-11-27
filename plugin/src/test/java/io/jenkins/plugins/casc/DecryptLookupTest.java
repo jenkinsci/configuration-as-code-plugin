@@ -176,7 +176,7 @@ class DecryptLookupTest {
         }
 
         @Override
-        public String decrypt(String encryptedData) throws GeneralSecurityException {
+        public String decrypt(String encryptedData, ConfigurationContext context) throws GeneralSecurityException {
             throw new GeneralSecurityException((String) null);
         }
     }

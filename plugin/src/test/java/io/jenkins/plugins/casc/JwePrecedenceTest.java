@@ -102,12 +102,12 @@ class JwePrecedenceTest {
         String propKid = computeKeyId(propKeyPair.getPrivate());
         String propJwe = encrypt("secret-from-prop-key", propKeyPair.getPublic(), propKid);
 
-        assertEquals("secret-from-prop-key", engine.decrypt(propJwe));
+        assertEquals("secret-from-prop-key", engine.decrypt(propJwe, null));
 
         String envKid = computeKeyId(envKeyPair.getPrivate());
         String envJwe = encrypt("secret-from-env-key", envKeyPair.getPublic(), envKid);
 
-        assertThrows(GeneralSecurityException.class, () -> engine.decrypt(envJwe));
+        assertThrows(GeneralSecurityException.class, () -> engine.decrypt(envJwe, null));
     }
 
     @Test
@@ -121,7 +121,7 @@ class JwePrecedenceTest {
         String envKid = computeKeyId(envKeyPair.getPrivate());
         String envJwe = encrypt("secret-from-env-key", envKeyPair.getPublic(), envKid);
 
-        assertEquals("secret-from-env-key", engine.decrypt(envJwe));
+        assertEquals("secret-from-env-key", engine.decrypt(envJwe, null));
     }
 
     @Test
@@ -134,7 +134,7 @@ class JwePrecedenceTest {
         String dummyKid = computeKeyId(propKeyPair.getPrivate());
         String dummyJwe = encrypt("secret-with-missing-config", propKeyPair.getPublic(), dummyKid);
 
-        assertThrows(IllegalStateException.class, () -> engine.decrypt(dummyJwe));
+        assertThrows(IllegalStateException.class, () -> engine.decrypt(dummyJwe, null));
     }
 
     @Test
@@ -147,7 +147,7 @@ class JwePrecedenceTest {
         String yamlJwe = encryptForKeyPair("secret-from-yaml-key", yamlKeyPair);
 
         assertEquals("secret-from-yaml-key", engine.decrypt(yamlJwe, context));
-        assertThrows(IllegalStateException.class, () -> engine.decrypt(yamlJwe));
+        assertThrows(IllegalStateException.class, () -> engine.decrypt(yamlJwe, null));
 
         setProperty(KEY_PROP, "   ");
         environmentVariables.set(KEY_ENV, "");

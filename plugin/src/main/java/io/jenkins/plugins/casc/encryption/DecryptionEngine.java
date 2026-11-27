@@ -32,26 +32,20 @@ public abstract class DecryptionEngine implements ExtensionPoint {
     public abstract String getId();
 
     /**
-     * Decrypts the supplied encrypted payload.
+     * Decrypts the supplied encrypted payload using the current JCasC configuration context.
      * Implementations must return the decrypted plaintext or throw an
      * exception if decryption fails. This method must never return {@code null}.
      * Exception messages must not disclose plaintext, private keys,
      * or other sensitive information.
      *
      * @param encryptedData the encrypted payload
+     * @param context the current JCasC configuration context (may be {@code null} when invoked without YAML context)
      * @return the decrypted plaintext
      * @throws GeneralSecurityException if decryption fails
      * @throws IOException if an I/O error occurs
      */
-    public abstract String decrypt(String encryptedData) throws GeneralSecurityException, IOException;
-
-    /**
-     * Decrypts the supplied payload using the current JCasC configuration context.
-     */
-    public String decrypt(String encryptedData, ConfigurationContext context)
-            throws GeneralSecurityException, IOException {
-        return decrypt(encryptedData);
-    }
+    public abstract String decrypt(String encryptedData, ConfigurationContext context)
+            throws GeneralSecurityException, IOException;
 
     /**
      * Returns all registered decryption engines.

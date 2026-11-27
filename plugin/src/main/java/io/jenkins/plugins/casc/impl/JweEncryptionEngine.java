@@ -88,11 +88,6 @@ public class JweEncryptionEngine extends DecryptionEngine {
     }
 
     @Override
-    public String decrypt(String encryptedData) throws GeneralSecurityException, IOException {
-        return decrypt(encryptedData, null);
-    }
-
-    @Override
     public String decrypt(String encryptedData, ConfigurationContext context)
             throws GeneralSecurityException, IOException {
         if (encryptedData == null || encryptedData.isBlank()) {
