@@ -2,6 +2,7 @@ package io.jenkins.plugins.casc.encryption;
 
 import hudson.ExtensionList;
 import hudson.ExtensionPoint;
+import io.jenkins.plugins.casc.ConfigurationContext;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.HashMap;
@@ -20,8 +21,6 @@ import java.util.Map;
  * <p>Decryption failures must be reported through exceptions. Implementations
  * must never return {@code null} or include decrypted plaintext, private keys,
  * or other sensitive material in exception messages.
- *
- * @since TODO
  */
 public abstract class DecryptionEngine implements ExtensionPoint {
 
@@ -45,6 +44,15 @@ public abstract class DecryptionEngine implements ExtensionPoint {
      * @throws IOException if an I/O error occurs
      */
     public abstract String decrypt(String encryptedData) throws GeneralSecurityException, IOException;
+
+
+    /**
+     * Decrypts the supplied payload using the current JCasC configuration context.
+     */
+    public String decrypt(String encryptedData, ConfigurationContext context)
+        throws GeneralSecurityException, IOException {
+        return decrypt(encryptedData);
+    }
 
     /**
      * Returns all registered decryption engines.

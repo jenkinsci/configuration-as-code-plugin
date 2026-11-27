@@ -72,7 +72,7 @@ public class SecretSourceResolver {
                 "decodeBase64", new PlaceholderAwareLookup(DecodeBase64Lookup.INSTANCE),
                 "json", new PlaceholderAwareLookup(JsonLookup.INSTANCE),
                 "trim", new PlaceholderAwareLookup(TrimLookup.INSTANCE),
-                "decrypt", PlaceholderDecryptLookup.INSTANCE);
+            "decrypt", new PlaceholderDecryptLookup(configurationContext));
 
         substitutor = new StringSubstitutor(new FixedInterpolatorStringLookup(
                         map, new PlaceholderAwareLookup(new ConfigurationContextStringLookup(configurationContext))))
@@ -90,9 +90,11 @@ public class SecretSourceResolver {
 
     static class PlaceholderDecryptLookup implements StringLookup {
 
-        static final PlaceholderDecryptLookup INSTANCE = new PlaceholderDecryptLookup();
+        private final DecryptLookup decryptLookup;
 
-        private PlaceholderDecryptLookup() {}
+        PlaceholderDecryptLookup(ConfigurationContext context) {
+            this.decryptLookup = new DecryptLookup(context);
+        }
 
         @Override
         public String lookup(@NonNull final String key) {
@@ -102,7 +104,7 @@ public class SecretSourceResolver {
                         "Decrypt lookup must be invoked through SecretSourceResolver.resolve()");
             }
 
-            String plaintext = DecryptLookup.INSTANCE.lookup(key);
+            String plaintext = decryptLookup.lookup(key);
             String placeholder = PLACEHOLDER_PREFIX + UUID.randomUUID() + PLACEHOLDER_SUFFIX;
             placeholderMap.put(placeholder, plaintext);
             return placeholder;

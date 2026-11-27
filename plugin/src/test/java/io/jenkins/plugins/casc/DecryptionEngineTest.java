@@ -77,7 +77,7 @@ public class DecryptionEngineTest {
 
         IllegalStateException ex = assertThrows(
                 IllegalStateException.class,
-                () -> DecryptLookup.INSTANCE.lookup("dummy-null-test:some-secret-data"),
+                () -> new DecryptLookup(null).lookup("dummy-null-test:some-secret-data"),
                 "DecryptLookup should throw an exception if the underlying engine returns null");
 
         assertTrue(ex.getMessage().contains("returned null"));
@@ -96,7 +96,7 @@ public class DecryptionEngineTest {
         registerEngines(j, leakingEngine);
 
         Exception ex = assertThrows(
-                Exception.class, () -> DecryptLookup.INSTANCE.lookup("dummy-leak-test:some-encrypted-payload"));
+                Exception.class, () -> new DecryptLookup(null).lookup("dummy-leak-test:some-encrypted-payload"));
 
         assertFalse(
                 ex.getMessage().contains(sensitiveData),

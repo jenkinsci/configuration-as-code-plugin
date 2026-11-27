@@ -29,6 +29,7 @@ public class ConfigurationContext implements ConfiguratorRegistry {
     private String mergeStrategy;
     private final transient int yamlMaxAliasesForCollections;
     private final transient int yamlCodePointLimit;
+    private transient String jweKeyFileFromConfiguration;
 
     /**
      * the model-introspection model to be applied by configuration-as-code.
@@ -127,6 +128,14 @@ public class ConfigurationContext implements ConfiguratorRegistry {
 
     public void setUnknown(Unknown unknown) {
         this.unknown = unknown;
+    }
+
+    public void setJweKeyFileFromConfiguration(String keyFile) {
+        this.jweKeyFileFromConfiguration = keyFile;
+    }
+
+    public String jweKeyFileFromConfiguration() {
+        return jweKeyFileFromConfiguration;
     }
 
     public String getMergeStrategy() {

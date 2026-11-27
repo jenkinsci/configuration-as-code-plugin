@@ -14,6 +14,7 @@ import com.nimbusds.jose.JWEHeader;
 import com.nimbusds.jose.JWEObject;
 import com.nimbusds.jose.crypto.RSADecrypter;
 import hudson.Extension;
+import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.encryption.DecryptionEngine;
 import java.io.File;
 import java.io.IOException;
@@ -88,13 +89,19 @@ public class JweEncryptionEngine extends DecryptionEngine {
 
     @Override
     public String decrypt(String encryptedData) throws GeneralSecurityException, IOException {
+        return decrypt(encryptedData, null);
+    }
+
+    @Override
+    public String decrypt(String encryptedData, ConfigurationContext context)
+        throws GeneralSecurityException, IOException {
         if (encryptedData == null || encryptedData.isBlank()) {
             throw new IllegalArgumentException("JWE payload must not be empty.");
         }
 
         if (encryptedData.chars().anyMatch(Character::isWhitespace)) {
             throw new IllegalArgumentException("JWE payload must not contain whitespace. "
-                    + "Ensure it uses a single-line JWE Compact Serialization.");
+                + "Ensure it uses a single-line JWE Compact Serialization.");
         }
 
         if (encryptedData.length() > MAX_JWE_SIZE_BYTES) {
@@ -105,14 +112,14 @@ public class JweEncryptionEngine extends DecryptionEngine {
             JWEObject jweObject = JWEObject.parse(encryptedData);
             String headerKid = validateHeaderAndGetKid(jweObject.getHeader());
 
-            Map<String, PrivateKey> keys = getPrivateKeys();
+            Map<String, PrivateKey> keys = getPrivateKeys(context);
             PrivateKey privateKey = keys.get(headerKid);
 
             if (privateKey == null) {
                 throw new GeneralSecurityException("No private key found matching the JWE key ID '" + headerKid + "'. "
-                        + "Available key IDs are: " + keys.keySet() + ". "
-                        + "Verify that the configured decryption key file contains "
-                        + "the corresponding private key.");
+                    + "Available key IDs are: " + keys.keySet() + ". "
+                    + "Verify that the configured decryption key file contains "
+                    + "the corresponding private key.");
             }
 
             jweObject.decrypt(new RSADecrypter(privateKey));
@@ -127,13 +134,13 @@ public class JweEncryptionEngine extends DecryptionEngine {
 
         } catch (ParseException e) {
             throw new IllegalArgumentException(
-                    "Failed to parse JWE payload. Ensure it uses JWE compact serialization.", e);
+                "Failed to parse JWE payload. Ensure it uses JWE compact serialization.", e);
         } catch (JOSEException e) {
             throw new GeneralSecurityException(
-                    "JWE decryption failed. Verify that the ciphertext was encrypted "
-                            + "using the matching RSA private key, RSA-OAEP-256, and A256GCM. "
-                            + "Also check that the ciphertext has not been modified.",
-                    e);
+                "JWE decryption failed. Verify that the ciphertext was encrypted "
+                    + "using the matching RSA private key, RSA-OAEP-256, and A256GCM. "
+                    + "Also check that the ciphertext has not been modified.",
+                e);
         }
     }
 
@@ -154,7 +161,7 @@ public class JweEncryptionEngine extends DecryptionEngine {
 
         if (!ALLOWED_HEADER_PARAMS.containsAll(includedParams)) {
             throw new GeneralSecurityException("JWE header contains unsupported parameters. "
-                    + "Allowed parameters are alg, enc, kid, typ, and cty.");
+                + "Allowed parameters are alg, enc, kid, typ, and cty.");
         }
 
         if (!RSA_OAEP_256.equals(header.getAlgorithm())) {
@@ -181,15 +188,15 @@ public class JweEncryptionEngine extends DecryptionEngine {
         return headerKid;
     }
 
-    private synchronized Map<String, PrivateKey> getPrivateKeys() {
-        File keyFile = resolveKeyFile();
+    private synchronized Map<String, PrivateKey> getPrivateKeys(ConfigurationContext context) {
+        File keyFile = resolveKeyFile(context);
 
         try (InputStream input = Files.newInputStream(keyFile.toPath())) {
             byte[] keyBytes = input.readNBytes((int) MAX_KEY_FILE_SIZE_BYTES + 1);
 
             if (keyBytes.length > MAX_KEY_FILE_SIZE_BYTES) {
                 throw new IllegalStateException(
-                        "Decryption key file exceeds maximum allowed size (64KB). Check configuration.");
+                    "Decryption key file exceeds maximum allowed size (64KB). Check configuration.");
             }
 
             byte[] newHash = MessageDigest.getInstance("SHA-256").digest(keyBytes);
@@ -213,43 +220,57 @@ public class JweEncryptionEngine extends DecryptionEngine {
             throw new IllegalStateException("I/O error occurred while reading the decryption key file.", e);
         } catch (GeneralSecurityException | IllegalArgumentException e) {
             throw new IllegalStateException(
-                    "Failed to parse the PKCS#8 RSA private keys. "
-                            + "Ensure they are valid, unencrypted PKCS#8 PEM blocks. "
-                            + e.getMessage(),
-                    e);
+                "Failed to parse the PKCS#8 RSA private keys. "
+                    + "Ensure they are valid, unencrypted PKCS#8 PEM blocks. "
+                    + e.getMessage(),
+                e);
         }
     }
 
-    private File resolveKeyFile() {
+    private File resolveKeyFile(ConfigurationContext context) {
+        String keyPath = resolveKeyPath(context);
+        return validateKeyFile(keyPath);
+    }
+
+    private String resolveKeyPath(ConfigurationContext context) {
         String keyPath = System.getProperty(KEY_PROP);
 
         if (keyPath == null || keyPath.isBlank()) {
             keyPath = System.getenv(KEY_ENV);
         }
 
-        if (keyPath == null || keyPath.isBlank()) {
-            throw new IllegalStateException("Decryption key file is not configured. Set either the system property '"
-                    + KEY_PROP
-                    + "' or the environment variable '"
-                    + KEY_ENV
-                    + "'.");
+        if ((keyPath == null || keyPath.isBlank()) && context != null) {
+            keyPath = context.jweKeyFileFromConfiguration();
         }
 
+        if (keyPath == null || keyPath.isBlank()) {
+            throw new IllegalStateException(
+                "Decryption key file is not configured. Set either the system property '"
+                    + KEY_PROP
+                    + "', the environment variable '"
+                    + KEY_ENV
+                    + "', or configure 'decryption.jwe.keyFile' in JCasC.");
+        }
+
+        return keyPath;
+    }
+
+    private File validateKeyFile(String keyPath) {
         File keyFile = new File(keyPath);
 
         if (!keyFile.exists()) {
-            throw new IllegalStateException("Decryption key file does not exist at path: " + keyFile.getAbsolutePath()
-                    + ". Configured using system property '" + KEY_PROP
-                    + "' or environment variable '" + KEY_ENV + "'.");
+            throw new IllegalStateException(
+                "Decryption key file does not exist at path: " + keyFile.getAbsolutePath());
         }
 
         if (!keyFile.isFile()) {
-            throw new IllegalStateException("Decryption key path is not a regular file: " + keyFile.getAbsolutePath());
+            throw new IllegalStateException(
+                "Decryption key path is not a regular file: " + keyFile.getAbsolutePath());
         }
 
         if (!keyFile.canRead()) {
             throw new IllegalStateException(
-                    "Decryption key file is not readable: " + keyFile.getAbsolutePath() + ". Check file permissions.");
+                "Decryption key file is not readable: " + keyFile.getAbsolutePath());
         }
 
         return keyFile;
@@ -272,7 +293,7 @@ public class JweEncryptionEngine extends DecryptionEngine {
             String blockType = remaining.substring(11, beginEndIdx);
             if (blockType.equals("RSA PRIVATE KEY")) {
                 throw new IllegalArgumentException(
-                        "Traditional PKCS#1 RSA keys are not supported. Please convert to PKCS#8 format.");
+                    "Traditional PKCS#1 RSA keys are not supported. Please convert to PKCS#8 format.");
             }
             if (!blockType.equals("PRIVATE KEY")) {
                 throw new IllegalArgumentException("Unexpected PEM block type: " + blockType);
