@@ -142,8 +142,7 @@ class DecryptionRootConfiguratorTest {
 
         Mapping scalarEntries = new Mapping();
         scalarEntries.put("decryption", new Scalar("/path/to/key.pem"));
-        assertThrows(
-                ConfiguratorException.class, () -> DecryptionRootConfigurator.initialize(scalarEntries, context));
+        assertThrows(ConfiguratorException.class, () -> DecryptionRootConfigurator.initialize(scalarEntries, context));
     }
 
     @Test
@@ -164,11 +163,13 @@ class DecryptionRootConfiguratorTest {
         ConfigurationContext rejectContext = newContext();
         Mapping rejectNested = loadYaml(yamlWithUnknownNested, rejectContext);
         assertThrows(
-                UnknownAttributesException.class, () -> DecryptionRootConfigurator.initialize(rejectNested, rejectContext));
+                UnknownAttributesException.class,
+                () -> DecryptionRootConfigurator.initialize(rejectNested, rejectContext));
 
         Mapping rejectTop = loadYaml(yamlWithUnknownTopLevel, rejectContext);
         assertThrows(
-                UnknownAttributesException.class, () -> DecryptionRootConfigurator.initialize(rejectTop, rejectContext));
+                UnknownAttributesException.class,
+                () -> DecryptionRootConfigurator.initialize(rejectTop, rejectContext));
 
         ConfigurationContext warnContext = newContext();
         warnContext.setUnknown(ConfigurationContext.Unknown.warn);
@@ -211,7 +212,6 @@ class DecryptionRootConfiguratorTest {
     }
 
     private static Mapping loadYaml(String yaml, ConfigurationContext context) throws ConfiguratorException {
-        return YamlUtils.loadFrom(
-                List.of(YamlSource.of(new ByteArrayInputStream(yaml.getBytes(UTF_8)))), context);
+        return YamlUtils.loadFrom(List.of(YamlSource.of(new ByteArrayInputStream(yaml.getBytes(UTF_8)))), context);
     }
 }

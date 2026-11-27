@@ -999,7 +999,8 @@ public class ConfigurationAsCode extends ManagementLink {
             if ("configuration-as-code".equalsIgnoreCase(entry.getKey())) {
                 RootElementConfigurator<?> selfConfigurator = context.lookupRootElement("configuration-as-code");
                 if (selfConfigurator != null) {
-                    CNode nodeToCheck = entry.getValue() != null ? entry.getValue().clone() : null;
+                    CNode nodeToCheck =
+                            entry.getValue() != null ? entry.getValue().clone() : null;
                     selfConfigurator.check(nodeToCheck, context);
                 }
             }

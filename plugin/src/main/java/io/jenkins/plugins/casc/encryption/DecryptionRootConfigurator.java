@@ -21,9 +21,8 @@ import org.kohsuke.stapler.DataBoundSetter;
  *     keyFile: /run/secrets/casc/private-key.pem
  */
 @Extension
-public class DecryptionRootConfigurator
-    extends BaseConfigurator<DecryptionRootConfigurator.DecryptionConfiguration>
-    implements RootElementConfigurator<DecryptionRootConfigurator.DecryptionConfiguration> {
+public class DecryptionRootConfigurator extends BaseConfigurator<DecryptionRootConfigurator.DecryptionConfiguration>
+        implements RootElementConfigurator<DecryptionRootConfigurator.DecryptionConfiguration> {
 
     private static final String ROOT_NAME = "decryption";
 
@@ -50,17 +49,14 @@ public class DecryptionRootConfigurator
 
     @Override
     protected void configure(
-        Mapping config,
-        DecryptionConfiguration instance,
-        boolean dryrun,
-        ConfigurationContext context) throws ConfiguratorException {
+            Mapping config, DecryptionConfiguration instance, boolean dryrun, ConfigurationContext context)
+            throws ConfiguratorException {
         super.configure(config, instance, false, context);
     }
 
     @Override
     @NonNull
-    public DecryptionConfiguration configure(CNode config, ConfigurationContext context)
-        throws ConfiguratorException {
+    public DecryptionConfiguration configure(CNode config, ConfigurationContext context) throws ConfiguratorException {
 
         DecryptionConfiguration configuration = super.configure(config, context);
         applyConfiguration(configuration, config, context);
@@ -70,8 +66,7 @@ public class DecryptionRootConfigurator
 
     @Override
     @NonNull
-    public DecryptionConfiguration check(CNode config, ConfigurationContext context)
-        throws ConfiguratorException {
+    public DecryptionConfiguration check(CNode config, ConfigurationContext context) throws ConfiguratorException {
 
         DecryptionConfiguration configuration = super.check(config, context);
         applyConfiguration(configuration, config, context);
@@ -84,8 +79,7 @@ public class DecryptionRootConfigurator
      * are executed. This is necessary because secret interpolation happens
      * during the configuration validation phase.
      */
-    public static void initialize(Mapping entries, ConfigurationContext context)
-        throws ConfiguratorException {
+    public static void initialize(Mapping entries, ConfigurationContext context) throws ConfiguratorException {
 
         CNode decryptionNode = null;
         boolean found = false;
@@ -93,8 +87,7 @@ public class DecryptionRootConfigurator
         for (Map.Entry<String, CNode> entry : entries.entrySet()) {
             if (ROOT_NAME.equalsIgnoreCase(entry.getKey())) {
                 if (found) {
-                    throw ConfiguratorException.from(
-                        entries, "Duplicate '" + ROOT_NAME + "' configuration section.");
+                    throw ConfiguratorException.from(entries, "Duplicate '" + ROOT_NAME + "' configuration section.");
                 }
 
                 decryptionNode = entry.getValue();
@@ -108,16 +101,13 @@ public class DecryptionRootConfigurator
         }
     }
 
-    private void applyConfiguration(
-        DecryptionConfiguration configuration,
-        CNode config,
-        ConfigurationContext context) throws ConfiguratorException {
+    private void applyConfiguration(DecryptionConfiguration configuration, CNode config, ConfigurationContext context)
+            throws ConfiguratorException {
 
         JweConfiguration jwe = configuration.getJwe();
 
         if (jwe == null) {
-            throw ConfiguratorException.from(
-                config, "Missing required configuration: 'decryption.jwe.keyFile'.");
+            throw ConfiguratorException.from(config, "Missing required configuration: 'decryption.jwe.keyFile'.");
         }
 
         context.setJweKeyFileFromConfiguration(jwe.getKeyFile());
@@ -152,8 +142,7 @@ public class DecryptionRootConfigurator
         @DataBoundConstructor
         public JweConfiguration(String keyFile) {
             if (keyFile == null || keyFile.isBlank()) {
-                throw new IllegalArgumentException(
-                    "'decryption.jwe.keyFile' must be a non-empty file path.");
+                throw new IllegalArgumentException("'decryption.jwe.keyFile' must be a non-empty file path.");
             }
 
             this.keyFile = keyFile.trim();

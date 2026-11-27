@@ -45,12 +45,11 @@ public abstract class DecryptionEngine implements ExtensionPoint {
      */
     public abstract String decrypt(String encryptedData) throws GeneralSecurityException, IOException;
 
-
     /**
      * Decrypts the supplied payload using the current JCasC configuration context.
      */
     public String decrypt(String encryptedData, ConfigurationContext context)
-        throws GeneralSecurityException, IOException {
+            throws GeneralSecurityException, IOException {
         return decrypt(encryptedData);
     }
 

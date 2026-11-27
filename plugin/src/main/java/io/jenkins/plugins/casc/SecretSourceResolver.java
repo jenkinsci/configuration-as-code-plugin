@@ -63,16 +63,26 @@ public class SecretSourceResolver {
         this.resolveVariables = resolveVariables;
 
         Map<String, StringLookup> map = Map.of(
-                "base64", new PlaceholderAwareLookup(Base64Lookup.INSTANCE),
-                "fileBase64", new PlaceholderAwareLookup(FileBase64Lookup.INSTANCE),
-                "readFileBase64", new PlaceholderAwareLookup(FileBase64Lookup.INSTANCE),
-                "file", new PlaceholderAwareLookup(FileStringLookup.INSTANCE),
-                "readFile", new PlaceholderAwareLookup(FileStringLookup.INSTANCE),
-                "sysProp", new PlaceholderAwareLookup(SystemPropertyLookup.INSTANCE),
-                "decodeBase64", new PlaceholderAwareLookup(DecodeBase64Lookup.INSTANCE),
-                "json", new PlaceholderAwareLookup(JsonLookup.INSTANCE),
-                "trim", new PlaceholderAwareLookup(TrimLookup.INSTANCE),
-            "decrypt", new PlaceholderDecryptLookup(configurationContext));
+                "base64",
+                new PlaceholderAwareLookup(Base64Lookup.INSTANCE),
+                "fileBase64",
+                new PlaceholderAwareLookup(FileBase64Lookup.INSTANCE),
+                "readFileBase64",
+                new PlaceholderAwareLookup(FileBase64Lookup.INSTANCE),
+                "file",
+                new PlaceholderAwareLookup(FileStringLookup.INSTANCE),
+                "readFile",
+                new PlaceholderAwareLookup(FileStringLookup.INSTANCE),
+                "sysProp",
+                new PlaceholderAwareLookup(SystemPropertyLookup.INSTANCE),
+                "decodeBase64",
+                new PlaceholderAwareLookup(DecodeBase64Lookup.INSTANCE),
+                "json",
+                new PlaceholderAwareLookup(JsonLookup.INSTANCE),
+                "trim",
+                new PlaceholderAwareLookup(TrimLookup.INSTANCE),
+                "decrypt",
+                new PlaceholderDecryptLookup(configurationContext));
 
         substitutor = new StringSubstitutor(new FixedInterpolatorStringLookup(
                         map, new PlaceholderAwareLookup(new ConfigurationContextStringLookup(configurationContext))))

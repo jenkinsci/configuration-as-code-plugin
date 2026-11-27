@@ -227,7 +227,8 @@ class JweYamlConfigurationIntegrationTest {
         Path source1 = writeYaml("01-decryption.yaml", decryptionAndPolicyYaml);
         Path source2 = writeYaml("02-jenkins.yaml", jenkinsYaml);
 
-        ConfigurationAsCode.get().configure(source1.toUri().toString(), source2.toUri().toString());
+        ConfigurationAsCode.get()
+                .configure(source1.toUri().toString(), source2.toUri().toString());
         assertThat(j.jenkins.getSystemMessage(), equalTo(secret));
 
         String strictYaml = """
@@ -237,9 +238,8 @@ class JweYamlConfigurationIntegrationTest {
                     unknownNestedAttr: rejected
                 """.formatted(yamlPath(fixture.keyFile));
         Path strictFile = writeYaml("strict-unknown.yaml", strictYaml);
-        assertThrows(
-                UnknownAttributesException.class,
-                () -> ConfigurationAsCode.get().configure(strictFile.toUri().toString()));
+        assertThrows(UnknownAttributesException.class, () -> ConfigurationAsCode.get()
+                .configure(strictFile.toUri().toString()));
     }
 
     @Test
@@ -260,7 +260,8 @@ class JweYamlConfigurationIntegrationTest {
 
         assertThrows(
                 ConfiguratorException.class,
-                () -> configureWithMessage(yamlFixture.keyFile, "${decrypt:jwe:" + envFixture.encrypt(envSecret) + "}"));
+                () -> configureWithMessage(
+                        yamlFixture.keyFile, "${decrypt:jwe:" + envFixture.encrypt(envSecret) + "}"));
         assertThrows(
                 ConfiguratorException.class,
                 () -> configureWithMessage(
@@ -319,11 +320,9 @@ class JweYamlConfigurationIntegrationTest {
 
         environmentVariables.set(KEY_ENV, null);
         Path noDecryptionYaml = writeYaml(
-                "missing-decryption.yaml",
-                "jenkins:\n  systemMessage: \"${decrypt:jwe:" + ciphertext + "}\"\n");
-        ConfiguratorException noSourceEx = assertThrows(
-                ConfiguratorException.class,
-                () -> ConfigurationAsCode.get().configure(noDecryptionYaml.toUri().toString()));
+                "missing-decryption.yaml", "jenkins:\n  systemMessage: \"${decrypt:jwe:" + ciphertext + "}\"\n");
+        ConfiguratorException noSourceEx = assertThrows(ConfiguratorException.class, () -> ConfigurationAsCode.get()
+                .configure(noDecryptionYaml.toUri().toString()));
         assertTrue(
                 hasMessageInCauseChain(noSourceEx, "not configured"),
                 "Missing decryption key source should preserve clear configuration cause");
@@ -372,20 +371,17 @@ class JweYamlConfigurationIntegrationTest {
                 """.formatted(yamlPath(firstFixture.keyFile));
         Path failingFile = writeYaml("failing-followup.yaml", failingYaml);
         assertThrows(
-                ConfiguratorException.class,
-                () -> ConfigurationAsCode.get().checkWith(YamlSource.of(failingFile)));
+                ConfiguratorException.class, () -> ConfigurationAsCode.get().checkWith(YamlSource.of(failingFile)));
 
         Path noKeyYaml = writeYaml(
                 "no-decryption-followup.yaml",
                 "jenkins:\n  systemMessage: \"${decrypt:jwe:" + firstCiphertext + "}\"\n");
-        assertThrows(
-                ConfiguratorException.class,
-                () -> ConfigurationAsCode.get().configure(noKeyYaml.toUri().toString()));
+        assertThrows(ConfiguratorException.class, () -> ConfigurationAsCode.get()
+                .configure(noKeyYaml.toUri().toString()));
 
         ConfigurationContext ctx1 = new ConfigurationContext(ConfiguratorRegistry.get());
         DecryptionRootConfigurator.initialize(
-                loadYaml("decryption:\n  jwe:\n    keyFile: \"" + yamlPath(firstFixture.keyFile) + "\"\n", ctx1),
-                ctx1);
+                loadYaml("decryption:\n  jwe:\n    keyFile: \"" + yamlPath(firstFixture.keyFile) + "\"\n", ctx1), ctx1);
 
         ConfigurationContext ctx2 = new ConfigurationContext(ConfiguratorRegistry.get());
         DecryptionRootConfigurator.initialize(
@@ -395,16 +391,15 @@ class JweYamlConfigurationIntegrationTest {
         ConfigurationContext unconfiguredCtx = new ConfigurationContext(ConfiguratorRegistry.get());
 
         CNode interpolated1 = CNodeInterpolator.interpolate(new Scalar("${decrypt:jwe:" + firstCiphertext + "}"), ctx1);
-        CNode interpolated2 = CNodeInterpolator.interpolate(new Scalar("${decrypt:jwe:" + secondCiphertext + "}"), ctx2);
+        CNode interpolated2 =
+                CNodeInterpolator.interpolate(new Scalar("${decrypt:jwe:" + secondCiphertext + "}"), ctx2);
         assertThat(interpolated1.asScalar().getValue(), equalTo("first-secret"));
         assertThat(interpolated2.asScalar().getValue(), equalTo("second-secret"));
 
-        assertThrows(
-                IllegalStateException.class,
-                () -> ctx1.getSecretSourceResolver().resolve("${decrypt:jwe:" + secondCiphertext + "}"));
-        assertThrows(
-                IllegalStateException.class,
-                () -> ctx2.getSecretSourceResolver().resolve("${decrypt:jwe:" + firstCiphertext + "}"));
+        assertThrows(IllegalStateException.class, () -> ctx1.getSecretSourceResolver()
+                .resolve("${decrypt:jwe:" + secondCiphertext + "}"));
+        assertThrows(IllegalStateException.class, () -> ctx2.getSecretSourceResolver()
+                .resolve("${decrypt:jwe:" + firstCiphertext + "}"));
         assertThrows(
                 IllegalStateException.class,
                 () -> unconfiguredCtx.getSecretSourceResolver().resolve("${decrypt:jwe:" + firstCiphertext + "}"));
@@ -438,7 +433,8 @@ class JweYamlConfigurationIntegrationTest {
         String aqEncrypted = Secret.fromString(aqPlaintext).getEncryptedValue();
         assertThat(aqEncrypted, startsWith("{AQ"));
 
-        String combinedYaml = """
+        String combinedYaml =
+                """
                 decryption:
                   jwe:
                     keyFile: "%s"
@@ -448,8 +444,7 @@ class JweYamlConfigurationIntegrationTest {
                     name: "proxy.example.internal"
                     port: 8443
                     secretPassword: "%s"
-                """.formatted(
-                yamlPath(yamlFixture.keyFile), yamlFixture.encrypt("jwe-compat-part"), aqEncrypted);
+                """.formatted(yamlPath(yamlFixture.keyFile), yamlFixture.encrypt("jwe-compat-part"), aqEncrypted);
 
         Path combinedFile = writeYaml("combined-compat.yaml", combinedYaml);
         ConfigurationAsCode.get().configure(combinedFile.toUri().toString());
@@ -503,8 +498,7 @@ class JweYamlConfigurationIntegrationTest {
     }
 
     private static Mapping loadYaml(String yaml, ConfigurationContext context) throws ConfiguratorException {
-        return YamlUtils.loadFrom(
-                List.of(YamlSource.of(new ByteArrayInputStream(yaml.getBytes(UTF_8)))), context);
+        return YamlUtils.loadFrom(List.of(YamlSource.of(new ByteArrayInputStream(yaml.getBytes(UTF_8)))), context);
     }
 
     private static WebResponse postCheck(JenkinsRule j, String user, String yaml) throws Exception {

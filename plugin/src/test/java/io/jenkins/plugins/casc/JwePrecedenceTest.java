@@ -232,8 +232,8 @@ class JwePrecedenceTest {
         assertTrue(missingEx.getMessage().contains("does not exist"));
 
         Path directory = createTempDirectory(tempDir, "key-dir");
-        IllegalStateException dirEx = assertThrows(
-                IllegalStateException.class, () -> engine.decrypt(yamlJwe, contextWithYamlKey(directory)));
+        IllegalStateException dirEx =
+                assertThrows(IllegalStateException.class, () -> engine.decrypt(yamlJwe, contextWithYamlKey(directory)));
         assertTrue(dirEx.getMessage().contains("regular file"));
 
         Path invalidPemFile = tempDir.resolve("invalid.pem");

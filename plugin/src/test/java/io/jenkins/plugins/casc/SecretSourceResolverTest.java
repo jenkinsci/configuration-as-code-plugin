@@ -848,8 +848,7 @@ public class SecretSourceResolverTest {
     @Test
     public void decryptLookupOutsideResolver_throwsIllegalStateException() {
         IllegalStateException exception = assertThrows(
-                IllegalStateException.class,
-                () -> new PlaceholderDecryptLookup(null).lookup("jwe:unused"));
+                IllegalStateException.class, () -> new PlaceholderDecryptLookup(null).lookup("jwe:unused"));
 
         assertThat(
                 exception.getMessage(),
