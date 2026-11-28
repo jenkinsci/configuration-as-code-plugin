@@ -46,6 +46,7 @@ public class SelfConfigurator extends BaseConfigurator<ConfigurationContext>
     protected void configure(
             Mapping config, ConfigurationContext instance, boolean dryrun, ConfigurationContext context)
             throws ConfiguratorException {
+        // ConfigurationContext has to be configured _even_ for dry-run as it determine CasC behaviour
         CNode decryption = config.remove("decryption");
         super.configure(config, instance, false, context);
         if (decryption != null) {
@@ -77,7 +78,6 @@ public class SelfConfigurator extends BaseConfigurator<ConfigurationContext>
                 context.warning(decryption, message);
             }
         }
-        // ConfigurationContext has to be configured _even_ for dry-run as it determine CasC behaviour
     }
 
     @CheckForNull
