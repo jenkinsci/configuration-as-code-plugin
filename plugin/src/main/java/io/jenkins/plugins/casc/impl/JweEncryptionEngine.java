@@ -81,7 +81,8 @@ public class JweEncryptionEngine extends DecryptionEngine {
 
     private Map<String, PrivateKey> cachedPrivateKeys;
     private byte[] cachedContentHash;
-    private String resolvedKeySource;
+
+    private record ResolvedKeyPath(String path, String source) {}
 
     @Override
     public String getId() {
@@ -224,11 +225,11 @@ public class JweEncryptionEngine extends DecryptionEngine {
     }
 
     private File resolveKeyFile(ConfigurationContext context) {
-        String keyPath = resolveKeyPath(context);
-        return validateKeyFile(keyPath);
+        ResolvedKeyPath resolved = resolveKeyPath(context);
+        return validateKeyFile(resolved);
     }
 
-    private String resolveKeyPath(ConfigurationContext context) {
+    private ResolvedKeyPath resolveKeyPath(ConfigurationContext context) {
         String keyPath = System.getProperty(KEY_PROP);
         String source = "system property '" + KEY_PROP + "'";
 
@@ -257,14 +258,12 @@ public class JweEncryptionEngine extends DecryptionEngine {
                     source + " overrides YAML 'configuration-as-code.decryption.jwe.keyFile'.");
         }
 
-        resolvedKeySource = source;
-
-        return keyPath;
+        return new ResolvedKeyPath(keyPath, source);
     }
 
-    private File validateKeyFile(String keyPath) {
-        File keyFile = new File(keyPath);
-        String source = resolvedKeySource == null ? "configured source" : resolvedKeySource;
+    private File validateKeyFile(ResolvedKeyPath resolved) {
+        File keyFile = new File(resolved.path());
+        String source = resolved.source();
 
         if (!keyFile.exists()) {
             throw new IllegalStateException(
