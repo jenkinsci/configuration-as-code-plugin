@@ -126,6 +126,61 @@ class JweYamlConfigurationIntegrationTest {
     }
 
     @Test
+    @SuppressWarnings("unused")
+    void decryptionConfigurationRequiresJweKeyFile(JenkinsRule j) throws Exception {
+        Path config = writeYaml("missing-jwe-key-file.yaml", "configuration-as-code:\n  decryption: {}\n");
+
+        ConfiguratorException exception = assertThrows(
+                ConfiguratorException.class, () -> ConfigurationAsCode.get().checkWith(YamlSource.of(config)));
+
+        assertThat(exception.getErrorMessage(), containsString("Missing required configuration"));
+        assertThat(exception.getErrorMessage(), containsString("decryption.jwe.keyFile"));
+    }
+
+    @Test
+    @SuppressWarnings("unused")
+    void decryptionConfigurationRequiresJweAndKeyFile(JenkinsRule j) throws Exception {
+        Path missingJwe = writeYaml("missing-jwe.yaml", """
+            configuration-as-code:
+              decryption: {}
+            """);
+
+        ConfiguratorException missingJweException = assertThrows(
+                ConfiguratorException.class, () -> ConfigurationAsCode.get().checkWith(YamlSource.of(missingJwe)));
+
+        assertThat(missingJweException.getErrorMessage(), containsString("Missing required configuration"));
+        assertThat(missingJweException.getErrorMessage(), containsString("decryption.jwe.keyFile"));
+
+        Path missingKeyFile = writeYaml("missing-key-file.yaml", """
+            configuration-as-code:
+              decryption:
+                jwe: {}
+            """);
+
+        ConfiguratorException missingKeyFileException = assertThrows(
+                ConfiguratorException.class, () -> ConfigurationAsCode.get().checkWith(YamlSource.of(missingKeyFile)));
+
+        assertThat(missingKeyFileException.getErrorMessage(), containsString("Missing required configuration"));
+        assertThat(missingKeyFileException.getErrorMessage(), containsString("decryption.jwe.keyFile"));
+    }
+
+    @Test
+    @SuppressWarnings("unused")
+    void rejectsRelativeJweKeyFilePath(JenkinsRule j) throws Exception {
+        Path config = writeYaml("relative-key-file.yaml", """
+            configuration-as-code:
+              decryption:
+                jwe:
+                  keyFile: "relative/private-key.pem"
+            """);
+
+        ConfiguratorException exception = assertThrows(
+                ConfiguratorException.class, () -> ConfigurationAsCode.get().checkWith(YamlSource.of(config)));
+
+        assertThat(exception.getErrorMessage(), containsString("absolute"));
+    }
+
+    @Test
     void checkWithAndCheckEndpointResolveYamlKeyBeforeValidationAndProtectNonAdmins(JenkinsRule j) throws Exception {
         boolean systemReadWasEnabled = Jenkins.SYSTEM_READ.getEnabled();
         Jenkins.SYSTEM_READ.setEnabled(true);
