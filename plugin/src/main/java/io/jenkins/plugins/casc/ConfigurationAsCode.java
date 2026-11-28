@@ -24,7 +24,6 @@ import hudson.security.ACLContext;
 import hudson.security.Permission;
 import hudson.util.FormValidation;
 import hudson.util.HttpResponses;
-import io.jenkins.plugins.casc.encryption.DecryptionRootConfigurator;
 import io.jenkins.plugins.casc.fetcher.CasCConfigFetcher;
 import io.jenkins.plugins.casc.fetcher.FetchContext;
 import io.jenkins.plugins.casc.fetcher.FetchCredentials;
@@ -988,7 +987,6 @@ public class ConfigurationAsCode extends ManagementLink {
         Map<Source, String> issues = new HashMap<>();
         context.addListener((node, message) -> issues.put(node.getSource(), message));
         initializeSelfConfigurator(entries, context);
-        DecryptionRootConfigurator.initialize(entries, context);
         invokeWith(entries, (configurator, config) -> configurator.check(config, context));
         return issues;
     }

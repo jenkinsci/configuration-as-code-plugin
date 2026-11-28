@@ -1,7 +1,5 @@
 package io.jenkins.plugins.casc;
 
-import static com.nimbusds.jose.EncryptionMethod.A256GCM;
-import static com.nimbusds.jose.JWEAlgorithm.RSA_OAEP_256;
 import static io.jenkins.plugins.casc.impl.JweEncryptionEngine.KEY_ENV;
 import static io.jenkins.plugins.casc.impl.JweEncryptionEngine.KEY_PROP;
 import static java.lang.System.clearProperty;
@@ -11,9 +9,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.createTempFile;
 import static java.nio.file.Files.isReadable;
 import static java.nio.file.Files.writeString;
-import static java.util.Arrays.copyOf;
-import static java.util.Base64.getMimeEncoder;
-import static java.util.Base64.getUrlEncoder;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
@@ -25,34 +20,25 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
-import com.nimbusds.jose.JWEHeader;
-import com.nimbusds.jose.JWEObject;
-import com.nimbusds.jose.Payload;
-import com.nimbusds.jose.crypto.RSAEncrypter;
 import hudson.ProxyConfiguration;
 import hudson.util.Secret;
 import io.jenkins.plugins.casc.core.CNodeInterpolator;
-import io.jenkins.plugins.casc.encryption.DecryptionRootConfigurator;
 import io.jenkins.plugins.casc.model.CNode;
-import io.jenkins.plugins.casc.model.Mapping;
 import io.jenkins.plugins.casc.model.Scalar;
 import io.jenkins.plugins.casc.model.Source;
 import io.jenkins.plugins.casc.yaml.YamlSource;
-import io.jenkins.plugins.casc.yaml.YamlUtils;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
-import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.RSAPublicKeySpec;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.Map;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONArray;
@@ -106,9 +92,10 @@ class JweYamlConfigurationIntegrationTest {
         String secretAfter = "yaml-after-secret";
 
         String yamlDecryptionFirst = """
-                decryption:
-                  jwe:
-                    keyFile: "%s"
+                configuration-as-code:
+                  decryption:
+                    jwe:
+                      keyFile: "%s"
                 jenkins:
                   systemMessage: "${decrypt:jwe:%s}"
                 """.formatted(yamlPath(fixture.keyFile), fixture.encrypt(secretFirst));
@@ -120,9 +107,10 @@ class JweYamlConfigurationIntegrationTest {
         String yamlJenkinsFirst = """
                 jenkins:
                   systemMessage: "${decrypt:jwe:%s}"
-                decryption:
-                  jwe:
-                    keyFile: "%s"
+                configuration-as-code:
+                  decryption:
+                    jwe:
+                      keyFile: "%s"
                 """.formatted(fixture.encrypt(secretAfter), yamlPath(fixture.keyFile));
 
         Path configAfter = writeYaml("jenkins-first.yaml", yamlJenkinsFirst);
@@ -151,9 +139,10 @@ class JweYamlConfigurationIntegrationTest {
                     jenkins:
                       markupFormatter: "${decrypt:jwe:%s}"
                       numExecutors: "${decrypt:jwe:%s}"
-                    decryption:
-                      jwe:
-                        keyFile: "%s"
+                    configuration-as-code:
+                      decryption:
+                        jwe:
+                          keyFile: "%s"
                     """.formatted(encryptedFormatter, encryptedExecutors, yamlPath(fixture.keyFile));
 
             Path validConfig = writeYaml("check-valid.yaml", validYaml);
@@ -176,9 +165,10 @@ class JweYamlConfigurationIntegrationTest {
             String invalidRealmYaml = """
                     jenkins:
                       securityRealm: "${decrypt:jwe:%s}"
-                    decryption:
-                      jwe:
-                        keyFile: "%s"
+                    configuration-as-code:
+                      decryption:
+                        jwe:
+                          keyFile: "%s"
                     """.formatted(encryptedMissingRealm, yamlPath(fixture.keyFile));
             WebResponse adminBadRealm = postCheck(j, "admin", invalidRealmYaml);
             assertThat(adminBadRealm.getStatusCode(), is(400));
@@ -187,9 +177,10 @@ class JweYamlConfigurationIntegrationTest {
             String secretMessage = "super-secret-check-endpoint-plaintext";
             String readerExpression = "${decrypt:jwe:" + fixture.encrypt(secretMessage) + "}";
             String readerYaml = """
-                    decryption:
-                      jwe:
-                        keyFile: "%s"
+                    configuration-as-code:
+                      decryption:
+                        jwe:
+                          keyFile: "%s"
                     jenkins:
                       securityRealm: "%s"
                     """.formatted(yamlPath(tempDir.resolve("never-read-missing.pem")), readerExpression);
@@ -212,11 +203,11 @@ class JweYamlConfigurationIntegrationTest {
         String decryptionAndPolicyYaml = """
                 configuration-as-code:
                   unknown: warn
-                decryption:
-                  unknownTopAttr: tolerated-under-warn
-                  jwe:
-                    keyFile: "%s"
-                    unknownNestedAttr: tolerated-under-warn
+                  decryption:
+                    unknownTopAttr: tolerated-under-warn
+                    jwe:
+                      keyFile: "%s"
+                      unknownNestedAttr: tolerated-under-warn
                 """.formatted(yamlPath(fixture.keyFile));
 
         String jenkinsYaml = """
@@ -232,10 +223,11 @@ class JweYamlConfigurationIntegrationTest {
         assertThat(j.jenkins.getSystemMessage(), equalTo(secret));
 
         String strictYaml = """
-                decryption:
-                  jwe:
-                    keyFile: "%s"
-                    unknownNestedAttr: rejected
+                configuration-as-code:
+                  decryption:
+                    jwe:
+                      keyFile: "%s"
+                      unknownNestedAttr: rejected
                 """.formatted(yamlPath(fixture.keyFile));
         Path strictFile = writeYaml("strict-unknown.yaml", strictYaml);
         assertThrows(UnknownAttributesException.class, () -> ConfigurationAsCode.get()
@@ -363,9 +355,10 @@ class JweYamlConfigurationIntegrationTest {
         assertThat(j.jenkins.getSystemMessage(), equalTo("second-secret"));
 
         String failingYaml = """
-                decryption:
-                  jwe:
-                    keyFile: "%s"
+                configuration-as-code:
+                  decryption:
+                    jwe:
+                      keyFile: "%s"
                 jenkins:
                   securityRealm: "non-existent-realm"
                 """.formatted(yamlPath(firstFixture.keyFile));
@@ -380,13 +373,10 @@ class JweYamlConfigurationIntegrationTest {
                 .configure(noKeyYaml.toUri().toString()));
 
         ConfigurationContext ctx1 = new ConfigurationContext(ConfiguratorRegistry.get());
-        DecryptionRootConfigurator.initialize(
-                loadYaml("decryption:\n  jwe:\n    keyFile: \"" + yamlPath(firstFixture.keyFile) + "\"\n", ctx1), ctx1);
+        ctx1.getDecryption().setJwe(new ConfigurationContext.JweConfiguration(firstFixture.keyFile.toString()));
 
         ConfigurationContext ctx2 = new ConfigurationContext(ConfiguratorRegistry.get());
-        DecryptionRootConfigurator.initialize(
-                loadYaml("decryption:\n  jwe:\n    keyFile: \"" + yamlPath(secondFixture.keyFile) + "\"\n", ctx2),
-                ctx2);
+        ctx2.getDecryption().setJwe(new ConfigurationContext.JweConfiguration(secondFixture.keyFile.toString()));
 
         ConfigurationContext unconfiguredCtx = new ConfigurationContext(ConfiguratorRegistry.get());
 
@@ -435,9 +425,10 @@ class JweYamlConfigurationIntegrationTest {
 
         String combinedYaml =
                 """
-                decryption:
-                  jwe:
-                    keyFile: "%s"
+                configuration-as-code:
+                  decryption:
+                    jwe:
+                      keyFile: "%s"
                 jenkins:
                   systemMessage: "${decrypt:jwe:%s}-${COMPAT_PLAIN_ENV}-${UNSET_COMPAT:-fallback}"
                   proxy:
@@ -455,9 +446,10 @@ class JweYamlConfigurationIntegrationTest {
 
         String jweProxySecret = "jwe-into-hudson-secret";
         String secretFieldYaml = """
-                decryption:
-                  jwe:
-                    keyFile: "%s"
+                configuration-as-code:
+                  decryption:
+                    jwe:
+                      keyFile: "%s"
                 jenkins:
                   proxy:
                     name: "proxy.example.internal"
@@ -480,9 +472,10 @@ class JweYamlConfigurationIntegrationTest {
 
     private void configureWithMessage(Path yamlKeyFile, String systemMessageValue) throws Exception {
         String yaml = """
-                decryption:
-                  jwe:
-                    keyFile: "%s"
+                configuration-as-code:
+                  decryption:
+                    jwe:
+                      keyFile: "%s"
                 jenkins:
                   systemMessage: "%s"
                 """.formatted(yamlPath(yamlKeyFile), systemMessageValue);
@@ -495,10 +488,6 @@ class JweYamlConfigurationIntegrationTest {
         Path file = tempDir.resolve(fileName);
         writeString(file, content, UTF_8);
         return file;
-    }
-
-    private static Mapping loadYaml(String yaml, ConfigurationContext context) throws ConfiguratorException {
-        return YamlUtils.loadFrom(List.of(YamlSource.of(new ByteArrayInputStream(yaml.getBytes(UTF_8)))), context);
     }
 
     private static WebResponse postCheck(JenkinsRule j, String user, String yaml) throws Exception {
@@ -528,35 +517,37 @@ class JweYamlConfigurationIntegrationTest {
     }
 
     private static final class RsaFixture {
-
         final KeyPair keyPair;
         final Path keyFile;
-        final String kid;
+        private final String kid;
 
-        RsaFixture(Path dir, String fileName) throws Exception {
+        RsaFixture(Path directory, String fileName) throws Exception {
             KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
             generator.initialize(2048);
-            this.keyPair = generator.generateKeyPair();
-            this.keyFile = dir.resolve(fileName);
-
-            String encoded = getMimeEncoder(64, new byte[] {'\n'})
+            keyPair = generator.generateKeyPair();
+            keyFile = directory.resolve(fileName);
+            String encoded = Base64.getMimeEncoder(64, new byte[] {'\n'})
                     .encodeToString(keyPair.getPrivate().getEncoded());
-            String pem = "-----BEGIN PRIVATE KEY-----\n" + encoded + "\n-----END PRIVATE KEY-----\n";
-            Files.writeString(keyFile, pem, UTF_8);
-
-            RSAPrivateCrtKey crtKey = (RSAPrivateCrtKey) keyPair.getPrivate();
-            RSAPublicKeySpec publicKeySpec = new RSAPublicKeySpec(crtKey.getModulus(), crtKey.getPublicExponent());
-            PublicKey publicKey = KeyFactory.getInstance("RSA").generatePublic(publicKeySpec);
-            byte[] hash = MessageDigest.getInstance("SHA-256").digest(publicKey.getEncoded());
-            this.kid = getUrlEncoder().withoutPadding().encodeToString(copyOf(hash, 8));
+            writeString(keyFile, "-----BEGIN PRIVATE KEY-----\n" + encoded + "\n-----END PRIVATE KEY-----\n", UTF_8);
+            RSAPrivateCrtKey privateKey = (RSAPrivateCrtKey) keyPair.getPrivate();
+            RSAPublicKeySpec publicKeySpec =
+                    new RSAPublicKeySpec(privateKey.getModulus(), privateKey.getPublicExponent());
+            byte[] hash = MessageDigest.getInstance("SHA-256")
+                    .digest(java.security.KeyFactory.getInstance("RSA")
+                            .generatePublic(publicKeySpec)
+                            .getEncoded());
+            kid = Base64.getUrlEncoder().withoutPadding().encodeToString(Arrays.copyOf(hash, 8));
         }
 
         String encrypt(String plaintext) throws Exception {
-            JWEHeader header =
-                    new JWEHeader.Builder(RSA_OAEP_256, A256GCM).keyID(kid).build();
-            JWEObject jweObject = new JWEObject(header, new Payload(plaintext));
-            jweObject.encrypt(new RSAEncrypter((RSAPublicKey) keyPair.getPublic()));
-            return jweObject.serialize();
+            com.nimbusds.jose.JWEHeader header = new com.nimbusds.jose.JWEHeader.Builder(
+                            com.nimbusds.jose.JWEAlgorithm.RSA_OAEP_256, com.nimbusds.jose.EncryptionMethod.A256GCM)
+                    .keyID(kid)
+                    .build();
+            com.nimbusds.jose.JWEObject jwe =
+                    new com.nimbusds.jose.JWEObject(header, new com.nimbusds.jose.Payload(plaintext));
+            jwe.encrypt(new com.nimbusds.jose.crypto.RSAEncrypter((RSAPublicKey) keyPair.getPublic()));
+            return jwe.serialize();
         }
     }
 }

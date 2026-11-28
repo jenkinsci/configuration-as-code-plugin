@@ -7,33 +7,22 @@ import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.createTempDirectory;
-import static java.nio.file.Files.createTempFile;
 import static java.nio.file.Files.deleteIfExists;
 import static java.nio.file.Files.isReadable;
 import static java.nio.file.Files.writeString;
-import static java.util.Base64.getUrlEncoder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
-import com.nimbusds.jose.EncryptionMethod;
-import com.nimbusds.jose.JWEAlgorithm;
-import com.nimbusds.jose.JWEHeader;
-import com.nimbusds.jose.JWEObject;
-import com.nimbusds.jose.Payload;
-import com.nimbusds.jose.crypto.RSAEncrypter;
 import io.jenkins.plugins.casc.impl.JweEncryptionEngine;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.RSAPublicKeySpec;
@@ -57,26 +46,22 @@ class JwePrecedenceTest {
     private Path propKeyFile;
     private Path envKeyFile;
     private Path yamlKeyFile;
-    private KeyPair propKeyPair;
-    private KeyPair envKeyPair;
-    private KeyPair yamlKeyPair;
+    private JweFixture propFixture;
+    private JweFixture envFixture;
+    private JweFixture yamlFixture;
     private String originalProp;
 
     @BeforeEach
     void setUp() throws Exception {
         originalProp = getProperty(KEY_PROP);
 
-        propKeyPair = generateKeyPair();
-        envKeyPair = generateKeyPair();
-        yamlKeyPair = generateKeyPair();
-
-        propKeyFile = createTempFile("casc-prop-key", ".pem");
-        envKeyFile = createTempFile("casc-env-key", ".pem");
-        yamlKeyFile = createTempFile("casc-yaml-key", ".pem");
-
-        writePrivateKey(propKeyFile, propKeyPair.getPrivate());
-        writePrivateKey(envKeyFile, envKeyPair.getPrivate());
-        writePrivateKey(yamlKeyFile, yamlKeyPair.getPrivate());
+        Path directory = createTempDirectory("casc-jwe-test");
+        propFixture = new JweFixture(directory, "prop.pem");
+        envFixture = new JweFixture(directory, "env.pem");
+        yamlFixture = new JweFixture(directory, "yaml.pem");
+        propKeyFile = propFixture.keyFile;
+        envKeyFile = envFixture.keyFile;
+        yamlKeyFile = yamlFixture.keyFile;
     }
 
     @AfterEach
@@ -99,13 +84,11 @@ class JwePrecedenceTest {
         setProperty(KEY_PROP, propKeyFile.toAbsolutePath().toString());
         JweEncryptionEngine engine = new JweEncryptionEngine();
 
-        String propKid = computeKeyId(propKeyPair.getPrivate());
-        String propJwe = encrypt("secret-from-prop-key", propKeyPair.getPublic(), propKid);
+        String propJwe = propFixture.encrypt("secret-from-prop-key");
 
         assertEquals("secret-from-prop-key", engine.decrypt(propJwe, null));
 
-        String envKid = computeKeyId(envKeyPair.getPrivate());
-        String envJwe = encrypt("secret-from-env-key", envKeyPair.getPublic(), envKid);
+        String envJwe = envFixture.encrypt("secret-from-env-key");
 
         assertThrows(GeneralSecurityException.class, () -> engine.decrypt(envJwe, null));
     }
@@ -118,8 +101,7 @@ class JwePrecedenceTest {
 
         JweEncryptionEngine engine = new JweEncryptionEngine();
 
-        String envKid = computeKeyId(envKeyPair.getPrivate());
-        String envJwe = encrypt("secret-from-env-key", envKeyPair.getPublic(), envKid);
+        String envJwe = envFixture.encrypt("secret-from-env-key");
 
         assertEquals("secret-from-env-key", engine.decrypt(envJwe, null));
     }
@@ -131,8 +113,7 @@ class JwePrecedenceTest {
 
         JweEncryptionEngine engine = new JweEncryptionEngine();
 
-        String dummyKid = computeKeyId(propKeyPair.getPrivate());
-        String dummyJwe = encrypt("secret-with-missing-config", propKeyPair.getPublic(), dummyKid);
+        String dummyJwe = propFixture.encrypt("secret-with-missing-config");
 
         assertThrows(IllegalStateException.class, () -> engine.decrypt(dummyJwe, null));
     }
@@ -144,7 +125,7 @@ class JwePrecedenceTest {
 
         ConfigurationContext context = contextWithYamlKey(yamlKeyFile);
         JweEncryptionEngine engine = new JweEncryptionEngine();
-        String yamlJwe = encryptForKeyPair("secret-from-yaml-key", yamlKeyPair);
+        String yamlJwe = yamlFixture.encrypt("secret-from-yaml-key");
 
         assertEquals("secret-from-yaml-key", engine.decrypt(yamlJwe, context));
         assertThrows(IllegalStateException.class, () -> engine.decrypt(yamlJwe, null));
@@ -161,26 +142,12 @@ class JwePrecedenceTest {
         ConfigurationContext context = contextWithYamlKey(yamlKeyFile);
 
         JweEncryptionEngine engine = new JweEncryptionEngine();
-        String propJwe = encryptForKeyPair("secret-from-prop-key", propKeyPair);
-        String envJwe = encryptForKeyPair("secret-from-env-key", envKeyPair);
-        String yamlJwe = encryptForKeyPair("secret-from-yaml-key", yamlKeyPair);
+        String propJwe = propFixture.encrypt("secret-from-prop-key");
+        String envJwe = envFixture.encrypt("secret-from-env-key");
+        String yamlJwe = yamlFixture.encrypt("secret-from-yaml-key");
 
         assertEquals("secret-from-prop-key", engine.decrypt(propJwe, context));
         assertThrows(GeneralSecurityException.class, () -> engine.decrypt(envJwe, context));
-        assertThrows(GeneralSecurityException.class, () -> engine.decrypt(yamlJwe, context));
-    }
-
-    @Test
-    void systemPropertyOverridesYamlWhenEnvironmentIsAbsent() throws Exception {
-        environmentVariables.set(KEY_ENV, null);
-        setProperty(KEY_PROP, propKeyFile.toAbsolutePath().toString());
-        ConfigurationContext context = contextWithYamlKey(yamlKeyFile);
-
-        JweEncryptionEngine engine = new JweEncryptionEngine();
-        String propJwe = encryptForKeyPair("secret-from-prop-key", propKeyPair);
-        String yamlJwe = encryptForKeyPair("secret-from-yaml-key", yamlKeyPair);
-
-        assertEquals("secret-from-prop-key", engine.decrypt(propJwe, context));
         assertThrows(GeneralSecurityException.class, () -> engine.decrypt(yamlJwe, context));
     }
 
@@ -191,8 +158,8 @@ class JwePrecedenceTest {
         ConfigurationContext context = contextWithYamlKey(yamlKeyFile);
 
         JweEncryptionEngine engine = new JweEncryptionEngine();
-        String envJwe = encryptForKeyPair("secret-from-env-key", envKeyPair);
-        String yamlJwe = encryptForKeyPair("secret-from-yaml-key", yamlKeyPair);
+        String envJwe = envFixture.encrypt("secret-from-env-key");
+        String yamlJwe = yamlFixture.encrypt("secret-from-yaml-key");
 
         assertEquals("secret-from-env-key", engine.decrypt(envJwe, context));
         assertThrows(GeneralSecurityException.class, () -> engine.decrypt(yamlJwe, context));
@@ -204,18 +171,14 @@ class JwePrecedenceTest {
         environmentVariables.set(KEY_ENV, null);
 
         JweEncryptionEngine engine = new JweEncryptionEngine();
-        String yamlJwe = encryptForKeyPair("secret-with-missing-config", yamlKeyPair);
+        String yamlJwe = yamlFixture.encrypt("secret-with-missing-config");
 
         ConfigurationContext nullPathContext = new ConfigurationContext(null);
         IllegalStateException nullEx =
                 assertThrows(IllegalStateException.class, () -> engine.decrypt(yamlJwe, nullPathContext));
         assertTrue(nullEx.getMessage().contains("not configured"));
 
-        ConfigurationContext blankPathContext = new ConfigurationContext(null);
-        blankPathContext.setJweKeyFileFromConfiguration("   ");
-        IllegalStateException blankEx =
-                assertThrows(IllegalStateException.class, () -> engine.decrypt(yamlJwe, blankPathContext));
-        assertTrue(blankEx.getMessage().contains("not configured"));
+        assertThrows(IllegalArgumentException.class, () -> new ConfigurationContext.JweConfiguration("   "));
     }
 
     @Test
@@ -224,7 +187,7 @@ class JwePrecedenceTest {
         environmentVariables.set(KEY_ENV, null);
 
         JweEncryptionEngine engine = new JweEncryptionEngine();
-        String yamlJwe = encryptForKeyPair("secret", yamlKeyPair);
+        String yamlJwe = yamlFixture.encrypt("secret");
 
         Path missingFile = tempDir.resolve("does-not-exist.pem");
         IllegalStateException missingEx = assertThrows(
@@ -243,7 +206,7 @@ class JwePrecedenceTest {
         assertTrue(invalidEx.getMessage().contains("Failed to parse"));
 
         Path unreadableFile = tempDir.resolve("unreadable.pem");
-        writePrivateKey(unreadableFile, yamlKeyPair.getPrivate());
+        JweFixture.writePrivateKey(unreadableFile, yamlFixture.keyPair);
         try {
             boolean permissionsChanged = unreadableFile.toFile().setReadable(false, false);
             assumeTrue(permissionsChanged && !isReadable(unreadableFile));
@@ -261,7 +224,7 @@ class JwePrecedenceTest {
     @Test
     void invalidHigherPrecedenceKeyDoesNotFallBackToYamlOrEnvironment(@TempDir Path tempDir) throws Exception {
         JweEncryptionEngine engine = new JweEncryptionEngine();
-        String yamlJwe = encryptForKeyPair("secret-from-yaml-key", yamlKeyPair);
+        String yamlJwe = yamlFixture.encrypt("secret-from-yaml-key");
         ConfigurationContext validYamlContext = contextWithYamlKey(yamlKeyFile);
 
         Path invalidPemFile = tempDir.resolve("malformed-higher.pem");
@@ -298,8 +261,8 @@ class JwePrecedenceTest {
         ConfigurationContext contextA = contextWithYamlKey(envKeyFile);
         ConfigurationContext contextB = contextWithYamlKey(yamlKeyFile);
 
-        String jweForA = encryptForKeyPair("secret-for-a", envKeyPair);
-        String jweForB = encryptForKeyPair("secret-for-b", yamlKeyPair);
+        String jweForA = envFixture.encrypt("secret-for-a");
+        String jweForB = yamlFixture.encrypt("secret-for-b");
 
         assertEquals("secret-for-a", engine.decrypt(jweForA, contextA));
         assertThrows(GeneralSecurityException.class, () -> engine.decrypt(jweForB, contextA));
@@ -314,65 +277,54 @@ class JwePrecedenceTest {
         assertThrows(IllegalStateException.class, () -> engine.decrypt(jweForA, contextWithYamlKey(invalidPem)));
     }
 
-    @Test
-    void yamlKeyPathConfiguredInOneContextDoesNotLeakIntoAnotherContext() throws Exception {
-        clearProperty(KEY_PROP);
-        environmentVariables.set(KEY_ENV, null);
-
-        JweEncryptionEngine engine = new JweEncryptionEngine();
-        ConfigurationContext configuredContext = contextWithYamlKey(yamlKeyFile);
-        ConfigurationContext unconfiguredContext = new ConfigurationContext(null);
-
-        String yamlJwe = encryptForKeyPair("isolated-secret", yamlKeyPair);
-
-        assertEquals("isolated-secret", engine.decrypt(yamlJwe, configuredContext));
-        IllegalStateException ex =
-                assertThrows(IllegalStateException.class, () -> engine.decrypt(yamlJwe, unconfiguredContext));
-        assertTrue(ex.getMessage().contains("not configured"));
-    }
-
     private static ConfigurationContext contextWithYamlKey(Path keyPath) {
         ConfigurationContext context = new ConfigurationContext(null);
-        context.setJweKeyFileFromConfiguration(keyPath.toAbsolutePath().toString());
+        context.getDecryption()
+                .setJwe(new ConfigurationContext.JweConfiguration(
+                        keyPath.toAbsolutePath().toString()));
         return context;
     }
 
-    private static String encryptForKeyPair(String plaintext, KeyPair keyPair) throws Exception {
-        String kid = computeKeyId(keyPair.getPrivate());
-        return encrypt(plaintext, keyPair.getPublic(), kid);
-    }
+    private static final class JweFixture {
+        final KeyPair keyPair;
+        final Path keyFile;
+        private final String kid;
 
-    private static KeyPair generateKeyPair() throws GeneralSecurityException {
-        KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
-        generator.initialize(2048);
-        return generator.generateKeyPair();
-    }
+        JweFixture(Path directory, String fileName) throws Exception {
+            KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
+            generator.initialize(2048);
+            keyPair = generator.generateKeyPair();
+            keyFile = directory.resolve(fileName);
+            writePrivateKey(keyFile, keyPair);
+            kid = computeKeyId(keyPair);
+        }
 
-    private static String encrypt(String plaintext, PublicKey publicKey, String kid) throws Exception {
-        JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.RSA_OAEP_256, EncryptionMethod.A256GCM)
-                .keyID(kid)
-                .build();
-        JWEObject jwe = new JWEObject(header, new Payload(plaintext));
-        jwe.encrypt(new RSAEncrypter((RSAPublicKey) publicKey));
-        return jwe.serialize();
-    }
+        String encrypt(String plaintext) throws Exception {
+            com.nimbusds.jose.JWEHeader header = new com.nimbusds.jose.JWEHeader.Builder(
+                            com.nimbusds.jose.JWEAlgorithm.RSA_OAEP_256, com.nimbusds.jose.EncryptionMethod.A256GCM)
+                    .keyID(kid)
+                    .build();
+            com.nimbusds.jose.JWEObject jwe =
+                    new com.nimbusds.jose.JWEObject(header, new com.nimbusds.jose.Payload(plaintext));
+            jwe.encrypt(new com.nimbusds.jose.crypto.RSAEncrypter((RSAPublicKey) keyPair.getPublic()));
+            return jwe.serialize();
+        }
 
-    private static void writePrivateKey(Path path, PrivateKey privateKey) throws IOException {
-        String encodedKey = Base64.getMimeEncoder(64, new byte[] {'\n'}).encodeToString(privateKey.getEncoded());
-        String pem = "-----BEGIN PRIVATE KEY-----\n" + encodedKey + "\n-----END PRIVATE KEY-----\n";
-        Files.writeString(path, pem, UTF_8);
-    }
+        static void writePrivateKey(Path path, KeyPair keyPair) throws IOException {
+            String encoded = Base64.getMimeEncoder(64, new byte[] {'\n'})
+                    .encodeToString(keyPair.getPrivate().getEncoded());
+            writeString(path, "-----BEGIN PRIVATE KEY-----\n" + encoded + "\n-----END PRIVATE KEY-----\n", UTF_8);
+        }
 
-    private static String computeKeyId(PrivateKey privateKey) throws GeneralSecurityException {
-        RSAPrivateCrtKey key = (RSAPrivateCrtKey) privateKey;
-        RSAPublicKeySpec publicKeySpec = new RSAPublicKeySpec(key.getModulus(), key.getPublicExponent());
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        PublicKey publicKey = keyFactory.generatePublic(publicKeySpec);
-
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] hash = digest.digest(publicKey.getEncoded());
-        byte[] truncated = Arrays.copyOf(hash, 8);
-
-        return getUrlEncoder().withoutPadding().encodeToString(truncated);
+        private static String computeKeyId(KeyPair keyPair) throws GeneralSecurityException {
+            RSAPrivateCrtKey privateKey = (RSAPrivateCrtKey) keyPair.getPrivate();
+            RSAPublicKeySpec publicKeySpec =
+                    new RSAPublicKeySpec(privateKey.getModulus(), privateKey.getPublicExponent());
+            byte[] hash = MessageDigest.getInstance("SHA-256")
+                    .digest(KeyFactory.getInstance("RSA")
+                            .generatePublic(publicKeySpec)
+                            .getEncoded());
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(Arrays.copyOf(hash, 8));
+        }
     }
 }

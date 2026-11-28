@@ -81,6 +81,7 @@ public class JweEncryptionEngine extends DecryptionEngine {
 
     private Map<String, PrivateKey> cachedPrivateKeys;
     private byte[] cachedContentHash;
+    private String resolvedKeySource;
 
     @Override
     public String getId() {
@@ -229,13 +230,17 @@ public class JweEncryptionEngine extends DecryptionEngine {
 
     private String resolveKeyPath(ConfigurationContext context) {
         String keyPath = System.getProperty(KEY_PROP);
+        String source = "system property '" + KEY_PROP + "'";
 
         if (keyPath == null || keyPath.isBlank()) {
             keyPath = System.getenv(KEY_ENV);
+            source = "environment variable '" + KEY_ENV + "'";
         }
 
         if ((keyPath == null || keyPath.isBlank()) && context != null) {
-            keyPath = context.jweKeyFileFromConfiguration();
+            ConfigurationContext.JweConfiguration jwe = context.getDecryption().getJwe();
+            keyPath = jwe == null ? null : jwe.getKeyFile();
+            source = "YAML 'configuration-as-code.decryption.jwe.keyFile'";
         }
 
         if (keyPath == null || keyPath.isBlank()) {
@@ -243,25 +248,37 @@ public class JweEncryptionEngine extends DecryptionEngine {
                     + KEY_PROP
                     + "', the environment variable '"
                     + KEY_ENV
-                    + "', or configure 'decryption.jwe.keyFile' in JCasC.");
+                    + "', or configure 'configuration-as-code.decryption.jwe.keyFile' in JCasC.");
         }
+
+        if (context != null && context.getDecryption().getJwe() != null && !source.startsWith("YAML ")) {
+            context.warning(
+                    new io.jenkins.plugins.casc.model.Scalar(keyPath),
+                    source + " overrides YAML 'configuration-as-code.decryption.jwe.keyFile'.");
+        }
+
+        resolvedKeySource = source;
 
         return keyPath;
     }
 
     private File validateKeyFile(String keyPath) {
         File keyFile = new File(keyPath);
+        String source = resolvedKeySource == null ? "configured source" : resolvedKeySource;
 
         if (!keyFile.exists()) {
-            throw new IllegalStateException("Decryption key file does not exist at path: " + keyFile.getAbsolutePath());
+            throw new IllegalStateException(
+                    "Decryption key file from " + source + " does not exist at path: " + keyFile.getAbsolutePath());
         }
 
         if (!keyFile.isFile()) {
-            throw new IllegalStateException("Decryption key path is not a regular file: " + keyFile.getAbsolutePath());
+            throw new IllegalStateException(
+                    "Decryption key file from " + source + " is not a regular file: " + keyFile.getAbsolutePath());
         }
 
         if (!keyFile.canRead()) {
-            throw new IllegalStateException("Decryption key file is not readable: " + keyFile.getAbsolutePath());
+            throw new IllegalStateException(
+                    "Decryption key file from " + source + " is not readable: " + keyFile.getAbsolutePath());
         }
 
         return keyFile;
