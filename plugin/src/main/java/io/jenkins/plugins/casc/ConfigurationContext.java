@@ -29,6 +29,7 @@ public class ConfigurationContext implements ConfiguratorRegistry {
     private String mergeStrategy;
     private final transient int yamlMaxAliasesForCollections;
     private final transient int yamlCodePointLimit;
+    private DecryptionConfiguration decryption = new DecryptionConfiguration();
 
     /**
      * the model-introspection model to be applied by configuration-as-code.
@@ -127,6 +128,48 @@ public class ConfigurationContext implements ConfiguratorRegistry {
 
     public void setUnknown(Unknown unknown) {
         this.unknown = unknown;
+    }
+
+    public DecryptionConfiguration getDecryption() {
+        return decryption;
+    }
+
+    public void setDecryption(DecryptionConfiguration decryption) {
+        this.decryption = decryption;
+    }
+
+    public static class DecryptionConfiguration {
+        private JweConfiguration jwe;
+
+        public JweConfiguration getJwe() {
+            return jwe;
+        }
+
+        public void setJwe(JweConfiguration jwe) {
+            this.jwe = jwe;
+        }
+    }
+
+    public record JweConfiguration(
+            // Stores only the path to the key file (not key material)
+            // lgtm[jenkins/plaintext-storage]
+            String keyFile) {
+
+        public JweConfiguration {
+            if (keyFile == null || keyFile.isBlank()) {
+                throw new IllegalArgumentException(
+                        "'configuration-as-code.decryption.jwe.keyFile' must be a non-empty file path.");
+            }
+            keyFile = keyFile.trim();
+            if (!new java.io.File(keyFile).isAbsolute()) {
+                throw new IllegalArgumentException(
+                        "'configuration-as-code.decryption.jwe.keyFile' must be an absolute path.");
+            }
+        }
+
+        public String getKeyFile() {
+            return keyFile;
+        }
     }
 
     public String getMergeStrategy() {

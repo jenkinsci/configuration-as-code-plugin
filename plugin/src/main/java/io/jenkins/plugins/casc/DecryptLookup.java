@@ -6,9 +6,11 @@ import org.apache.commons.text.lookup.StringLookup;
 
 class DecryptLookup implements StringLookup {
 
-    static final DecryptLookup INSTANCE = new DecryptLookup();
+    private final ConfigurationContext context;
 
-    private DecryptLookup() {}
+    DecryptLookup(ConfigurationContext context) {
+        this.context = context;
+    }
 
     @Override
     public String lookup(@NonNull final String key) {
@@ -25,7 +27,7 @@ class DecryptLookup implements StringLookup {
             if (engine.getId().equalsIgnoreCase(engineId)) {
                 String decrypted;
                 try {
-                    decrypted = engine.decrypt(payload);
+                    decrypted = engine.decrypt(payload, context);
                 } catch (Exception e) {
                     throw new IllegalStateException(
                             "Failed to decrypt secret using engine '" + engineId + "' due to "

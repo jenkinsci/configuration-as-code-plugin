@@ -102,7 +102,7 @@ class DecryptLookupTest {
         String kid = computeKeyId(keyPair.getPrivate());
         String jwePayload = encryptJwe(secret, keyPair.getPublic(), kid);
 
-        String decrypted = DecryptLookup.INSTANCE.lookup("jwe:" + jwePayload);
+        String decrypted = new DecryptLookup(null).lookup("jwe:" + jwePayload);
 
         assertThat(decrypted, equalTo(secret));
     }
@@ -111,7 +111,7 @@ class DecryptLookupTest {
     @SuppressWarnings({"unused"})
     void lookupRejectsUnknownEngine(JenkinsRule j) {
         IllegalStateException exception = assertThrows(
-                IllegalStateException.class, () -> DecryptLookup.INSTANCE.lookup("unknown-engine:payload"));
+                IllegalStateException.class, () -> new DecryptLookup(null).lookup("unknown-engine:payload"));
 
         assertThat(exception.getMessage(), containsString("unknown-engine"));
     }
@@ -120,7 +120,7 @@ class DecryptLookupTest {
     @SuppressWarnings({"unused"})
     void lookupRejectsMissingEnginePayloadSeparator(JenkinsRule j) {
         IllegalArgumentException exception =
-                assertThrows(IllegalArgumentException.class, () -> DecryptLookup.INSTANCE.lookup("jwe"));
+                assertThrows(IllegalArgumentException.class, () -> new DecryptLookup(null).lookup("jwe"));
 
         assertThat(exception.getMessage(), containsString("Invalid decrypt syntax"));
     }
@@ -131,7 +131,7 @@ class DecryptLookupTest {
         String ciphertext = "invalid.jwe.payload";
 
         IllegalStateException exception =
-                assertThrows(IllegalStateException.class, () -> DecryptLookup.INSTANCE.lookup("jwe:" + ciphertext));
+                assertThrows(IllegalStateException.class, () -> new DecryptLookup(null).lookup("jwe:" + ciphertext));
 
         assertThat(exception.getMessage(), containsString("Failed to decrypt secret using engine 'jwe' due to "));
         assertThat(exception.getCause(), notNullValue());
@@ -141,7 +141,7 @@ class DecryptLookupTest {
     @SuppressWarnings("unused")
     void lookupUsesFallbackMessageWhenDecryptionExceptionHasNullMessage(JenkinsRule j) {
         IllegalStateException exception = assertThrows(
-                IllegalStateException.class, () -> DecryptLookup.INSTANCE.lookup("null-message-test:payload"));
+                IllegalStateException.class, () -> new DecryptLookup(null).lookup("null-message-test:payload"));
 
         assertThat(exception.getMessage(), containsString("due to GeneralSecurityException"));
         assertThat(exception.getCause(), notNullValue());
@@ -153,7 +153,7 @@ class DecryptLookupTest {
         String payload = "first:second:third";
 
         IllegalStateException exception =
-                assertThrows(IllegalStateException.class, () -> DecryptLookup.INSTANCE.lookup("jwe:" + payload));
+                assertThrows(IllegalStateException.class, () -> new DecryptLookup(null).lookup("jwe:" + payload));
 
         assertThat(exception.getMessage(), containsString("Failed to decrypt secret"));
     }
@@ -162,7 +162,7 @@ class DecryptLookupTest {
     @SuppressWarnings("unused")
     void lookupRejectsEmptyPayload(JenkinsRule j) {
         IllegalArgumentException exception =
-                assertThrows(IllegalArgumentException.class, () -> DecryptLookup.INSTANCE.lookup("jwe:"));
+                assertThrows(IllegalArgumentException.class, () -> new DecryptLookup(null).lookup("jwe:"));
 
         assertThat(exception.getMessage(), containsString("Invalid decrypt syntax"));
     }
@@ -176,7 +176,7 @@ class DecryptLookupTest {
         }
 
         @Override
-        public String decrypt(String encryptedData) throws GeneralSecurityException {
+        public String decrypt(String encryptedData, ConfigurationContext context) throws GeneralSecurityException {
             throw new GeneralSecurityException((String) null);
         }
     }

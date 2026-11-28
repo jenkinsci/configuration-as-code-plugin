@@ -23,6 +23,7 @@ import io.jenkins.plugins.casc.SecretSourceResolver.Base64Lookup;
 import io.jenkins.plugins.casc.SecretSourceResolver.FileBase64Lookup;
 import io.jenkins.plugins.casc.SecretSourceResolver.FileStringLookup;
 import io.jenkins.plugins.casc.SecretSourceResolver.PlaceholderAwareLookup;
+import io.jenkins.plugins.casc.SecretSourceResolver.PlaceholderDecryptLookup;
 import io.jenkins.plugins.casc.SecretSourceResolver.SystemPropertyLookup;
 import io.jenkins.plugins.casc.encryption.DecryptionEngine;
 import io.jenkins.plugins.casc.impl.JweEncryptionEngine;
@@ -847,8 +848,7 @@ public class SecretSourceResolverTest {
     @Test
     public void decryptLookupOutsideResolver_throwsIllegalStateException() {
         IllegalStateException exception = assertThrows(
-                IllegalStateException.class,
-                () -> SecretSourceResolver.PlaceholderDecryptLookup.INSTANCE.lookup("jwe:unused"));
+                IllegalStateException.class, () -> new PlaceholderDecryptLookup(null).lookup("jwe:unused"));
 
         assertThat(
                 exception.getMessage(),

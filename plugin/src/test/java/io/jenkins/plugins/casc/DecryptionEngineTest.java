@@ -69,7 +69,7 @@ public class DecryptionEngineTest {
     void contractViolationWhenEngineReturnsNull(JenkinsRule j) {
         DecryptionEngine nullReturningEngine = new StubEngine("dummy-null-test") {
             @Override
-            public String decrypt(String encryptedData) {
+            public String decrypt(String encryptedData, ConfigurationContext context) {
                 return null;
             }
         };
@@ -77,7 +77,7 @@ public class DecryptionEngineTest {
 
         IllegalStateException ex = assertThrows(
                 IllegalStateException.class,
-                () -> DecryptLookup.INSTANCE.lookup("dummy-null-test:some-secret-data"),
+                () -> new DecryptLookup(null).lookup("dummy-null-test:some-secret-data"),
                 "DecryptLookup should throw an exception if the underlying engine returns null");
 
         assertTrue(ex.getMessage().contains("returned null"));
@@ -89,14 +89,14 @@ public class DecryptionEngineTest {
 
         DecryptionEngine leakingEngine = new StubEngine("dummy-leak-test") {
             @Override
-            public String decrypt(String encryptedData) throws GeneralSecurityException {
+            public String decrypt(String encryptedData, ConfigurationContext context) throws GeneralSecurityException {
                 throw new GeneralSecurityException("Failed to decrypt: " + sensitiveData);
             }
         };
         registerEngines(j, leakingEngine);
 
         Exception ex = assertThrows(
-                Exception.class, () -> DecryptLookup.INSTANCE.lookup("dummy-leak-test:some-encrypted-payload"));
+                Exception.class, () -> new DecryptLookup(null).lookup("dummy-leak-test:some-encrypted-payload"));
 
         assertFalse(
                 ex.getMessage().contains(sensitiveData),
@@ -107,7 +107,7 @@ public class DecryptionEngineTest {
     void exceptionIsPropagatedOnFailure(JenkinsRule j) {
         DecryptionEngine failingEngine = new StubEngine("dummy-fail-test") {
             @Override
-            public String decrypt(String encryptedData) throws GeneralSecurityException {
+            public String decrypt(String encryptedData, ConfigurationContext context) throws GeneralSecurityException {
                 throw new GeneralSecurityException("Invalid payload");
             }
         };
@@ -118,7 +118,8 @@ public class DecryptionEngineTest {
                 .findFirst()
                 .orElseThrow();
 
-        GeneralSecurityException ex = assertThrows(GeneralSecurityException.class, () -> resolved.decrypt("bad-data"));
+        GeneralSecurityException ex =
+                assertThrows(GeneralSecurityException.class, () -> resolved.decrypt("bad-data", null));
         assertEquals("Invalid payload", ex.getMessage());
     }
 
@@ -168,7 +169,7 @@ public class DecryptionEngineTest {
         }
 
         @Override
-        public String decrypt(String encryptedData) throws GeneralSecurityException {
+        public String decrypt(String encryptedData, ConfigurationContext context) throws GeneralSecurityException {
             return "decrypted-" + encryptedData;
         }
     }

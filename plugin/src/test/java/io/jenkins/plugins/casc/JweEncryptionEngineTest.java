@@ -113,7 +113,7 @@ class JweEncryptionEngineTest {
 
         String ciphertext = jwe.serialize();
 
-        assertThrows(GeneralSecurityException.class, () -> engine.decrypt(ciphertext));
+        assertThrows(GeneralSecurityException.class, () -> engine.decrypt(ciphertext, null));
     }
 
     @Test
@@ -122,14 +122,14 @@ class JweEncryptionEngineTest {
         String kid = computeKeyId(keyPair.getPrivate());
         String ciphertext = encrypt(secret, keyPair.getPublic(), kid);
 
-        assertEquals(secret, engine.decrypt(ciphertext));
+        assertEquals(secret, engine.decrypt(ciphertext, null));
     }
 
     @Test
     void failsWhenKidDoesNotMatchLocalKeys() throws Exception {
         String ciphertext = encrypt("my-test-password", keyPair.getPublic(), "non-existent-kid");
 
-        assertThrows(GeneralSecurityException.class, () -> engine.decrypt(ciphertext));
+        assertThrows(GeneralSecurityException.class, () -> engine.decrypt(ciphertext, null));
     }
 
     @Test
@@ -140,15 +140,15 @@ class JweEncryptionEngineTest {
         String secretOldKey = "old-secret";
         String ciphertextOld = encrypt(secretOldKey, keyPair.getPublic(), computeKeyId(keyPair.getPrivate()));
 
-        assertEquals(secretOldKey, engine.decrypt(ciphertextOld));
+        assertEquals(secretOldKey, engine.decrypt(ciphertextOld, null));
 
         writeString(keyFile, formatPrivateKeyPem(newKeyPair.getPrivate()), UTF_8, APPEND);
 
         String secretNewKey = "new-secret";
         String ciphertextNew = encrypt(secretNewKey, newKeyPair.getPublic(), newKid);
 
-        assertEquals(secretOldKey, engine.decrypt(ciphertextOld));
-        assertEquals(secretNewKey, engine.decrypt(ciphertextNew));
+        assertEquals(secretOldKey, engine.decrypt(ciphertextOld, null));
+        assertEquals(secretNewKey, engine.decrypt(ciphertextNew, null));
     }
 
     @Test
@@ -156,11 +156,11 @@ class JweEncryptionEngineTest {
         String kid = computeKeyId(keyPair.getPrivate());
         String ciphertext = encrypt("my-test-password", keyPair.getPublic(), kid);
 
-        assertEquals("my-test-password", engine.decrypt(ciphertext));
+        assertEquals("my-test-password", engine.decrypt(ciphertext, null));
 
         writeString(keyFile, "", UTF_8);
 
-        assertThrows(IllegalStateException.class, () -> engine.decrypt(ciphertext));
+        assertThrows(IllegalStateException.class, () -> engine.decrypt(ciphertext, null));
     }
 
     @Test
@@ -168,11 +168,11 @@ class JweEncryptionEngineTest {
         String kid = computeKeyId(keyPair.getPrivate());
         String ciphertext = encrypt("my-test-password", keyPair.getPublic(), kid);
 
-        assertEquals("my-test-password", engine.decrypt(ciphertext));
+        assertEquals("my-test-password", engine.decrypt(ciphertext, null));
 
         writeString(keyFile, "invalid PEM content", UTF_8);
 
-        assertThrows(IllegalStateException.class, () -> engine.decrypt(ciphertext));
+        assertThrows(IllegalStateException.class, () -> engine.decrypt(ciphertext, null));
     }
 
     @Test
@@ -181,12 +181,12 @@ class JweEncryptionEngineTest {
         String kid = computeKeyId(keyPair.getPrivate());
         String ciphertext = encrypt("my-test-password", otherKeyPair.getPublic(), kid);
 
-        assertThrows(GeneralSecurityException.class, () -> engine.decrypt(ciphertext));
+        assertThrows(GeneralSecurityException.class, () -> engine.decrypt(ciphertext, null));
     }
 
     @Test
     void rejectsInvalidJwePayload() {
-        assertThrows(IllegalArgumentException.class, () -> engine.decrypt("not.a.valid.jwe.format"));
+        assertThrows(IllegalArgumentException.class, () -> engine.decrypt("not.a.valid.jwe.format", null));
     }
 
     @Test
@@ -196,7 +196,7 @@ class JweEncryptionEngineTest {
         String ciphertext = encrypt("secret", keyPair.getPublic(), kid);
 
         IllegalStateException exception =
-                assertThrows(IllegalStateException.class, () -> new JweEncryptionEngine().decrypt(ciphertext));
+                assertThrows(IllegalStateException.class, () -> new JweEncryptionEngine().decrypt(ciphertext, null));
 
         assertTrue(exception.getMessage().contains("not configured"));
     }
@@ -212,7 +212,7 @@ class JweEncryptionEngineTest {
         String kid = computeKeyId(keyPair.getPrivate());
         String ciphertext = encrypt("secret", keyPair.getPublic(), kid);
 
-        assertThrows(IllegalStateException.class, () -> new JweEncryptionEngine().decrypt(ciphertext));
+        assertThrows(IllegalStateException.class, () -> new JweEncryptionEngine().decrypt(ciphertext, null));
     }
 
     @Test
@@ -222,7 +222,7 @@ class JweEncryptionEngineTest {
         String kid = computeKeyId(keyPair.getPrivate());
         String ciphertext = encrypt("secret", keyPair.getPublic(), kid);
 
-        assertThrows(IllegalStateException.class, () -> new JweEncryptionEngine().decrypt(ciphertext));
+        assertThrows(IllegalStateException.class, () -> new JweEncryptionEngine().decrypt(ciphertext, null));
     }
 
     @Test
@@ -233,7 +233,7 @@ class JweEncryptionEngineTest {
         String kid = computeKeyId(keyPair.getPrivate());
         String ciphertext = encrypt("secret", keyPair.getPublic(), kid);
 
-        assertThrows(IllegalStateException.class, () -> new JweEncryptionEngine().decrypt(ciphertext));
+        assertThrows(IllegalStateException.class, () -> new JweEncryptionEngine().decrypt(ciphertext, null));
     }
 
     @Test
@@ -243,7 +243,7 @@ class JweEncryptionEngineTest {
         String kid = computeKeyId(keyPair.getPrivate());
         String ciphertext = encrypt("secret", keyPair.getPublic(), kid);
 
-        assertThrows(IllegalStateException.class, () -> new JweEncryptionEngine().decrypt(ciphertext));
+        assertThrows(IllegalStateException.class, () -> new JweEncryptionEngine().decrypt(ciphertext, null));
     }
 
     @Test
@@ -256,7 +256,7 @@ class JweEncryptionEngineTest {
         String kid = computeKeyId(keyPair.getPrivate());
         String ciphertext = encrypt("secret", keyPair.getPublic(), kid);
 
-        assertThrows(IllegalStateException.class, () -> new JweEncryptionEngine().decrypt(ciphertext));
+        assertThrows(IllegalStateException.class, () -> new JweEncryptionEngine().decrypt(ciphertext, null));
     }
 
     @Test
@@ -269,8 +269,8 @@ class JweEncryptionEngineTest {
             String kid = computeKeyId(keyPair.getPrivate());
             String ciphertext = encrypt("secret", keyPair.getPublic(), kid);
 
-            IllegalStateException exception =
-                    assertThrows(IllegalStateException.class, () -> new JweEncryptionEngine().decrypt(ciphertext));
+            IllegalStateException exception = assertThrows(
+                    IllegalStateException.class, () -> new JweEncryptionEngine().decrypt(ciphertext, null));
 
             assertTrue(exception.getMessage().contains("regular file"));
             assertTrue(
@@ -290,7 +290,7 @@ class JweEncryptionEngineTest {
         String kid = computeKeyId(externalKeyPair.getPrivate());
         String externalJwe = encrypt("openssl-interop-secret", externalKeyPair.getPublic(), kid);
 
-        assertEquals("openssl-interop-secret", engine.decrypt(externalJwe));
+        assertEquals("openssl-interop-secret", engine.decrypt(externalJwe, null));
     }
 
     @Test
@@ -317,7 +317,7 @@ class JweEncryptionEngineTest {
 
         writePrivateKey(keyFile, privateKey);
 
-        assertEquals("node-jose-interop-secret", engine.decrypt(fixture));
+        assertEquals("node-jose-interop-secret", engine.decrypt(fixture, null));
     }
 
     @Test
@@ -330,7 +330,7 @@ class JweEncryptionEngineTest {
         String oversizedJwe = new String(oversizedChars);
 
         IllegalArgumentException exception =
-                assertThrows(IllegalArgumentException.class, () -> engine.decrypt(oversizedJwe));
+                assertThrows(IllegalArgumentException.class, () -> engine.decrypt(oversizedJwe, null));
 
         assertEquals("JWE payload exceeds the maximum allowed size.", exception.getMessage());
     }
@@ -350,7 +350,7 @@ class JweEncryptionEngineTest {
         String ciphertext = jwe.serialize();
 
         GeneralSecurityException exception =
-                assertThrows(GeneralSecurityException.class, () -> engine.decrypt(ciphertext));
+                assertThrows(GeneralSecurityException.class, () -> engine.decrypt(ciphertext, null));
 
         assertEquals("Decrypted JWE payload is not valid UTF-8.", exception.getMessage());
 
@@ -369,7 +369,7 @@ class JweEncryptionEngineTest {
         String ciphertext = jwe.serialize();
 
         GeneralSecurityException exception =
-                assertThrows(GeneralSecurityException.class, () -> engine.decrypt(ciphertext));
+                assertThrows(GeneralSecurityException.class, () -> engine.decrypt(ciphertext, null));
 
         assertEquals("Unsupported JWE key management algorithm. Expected RSA-OAEP-256.", exception.getMessage());
     }
@@ -386,7 +386,7 @@ class JweEncryptionEngineTest {
         String ciphertext = jwe.serialize();
 
         GeneralSecurityException exception =
-                assertThrows(GeneralSecurityException.class, () -> engine.decrypt(ciphertext));
+                assertThrows(GeneralSecurityException.class, () -> engine.decrypt(ciphertext, null));
 
         assertEquals("Unsupported JWE content encryption algorithm. Expected A256GCM.", exception.getMessage());
     }
@@ -404,7 +404,7 @@ class JweEncryptionEngineTest {
         String ciphertext = jwe.serialize();
 
         GeneralSecurityException exception =
-                assertThrows(GeneralSecurityException.class, () -> engine.decrypt(ciphertext));
+                assertThrows(GeneralSecurityException.class, () -> engine.decrypt(ciphertext, null));
 
         assertEquals("JWE compression is not supported.", exception.getMessage());
     }
@@ -423,7 +423,7 @@ class JweEncryptionEngineTest {
         String ciphertext = jwe.serialize();
 
         GeneralSecurityException exception =
-                assertThrows(GeneralSecurityException.class, () -> engine.decrypt(ciphertext));
+                assertThrows(GeneralSecurityException.class, () -> engine.decrypt(ciphertext, null));
 
         assertEquals("Critical JWE headers are not supported.", exception.getMessage());
     }
@@ -439,7 +439,7 @@ class JweEncryptionEngineTest {
         String ciphertext = jwe.serialize();
 
         GeneralSecurityException exception =
-                assertThrows(GeneralSecurityException.class, () -> engine.decrypt(ciphertext));
+                assertThrows(GeneralSecurityException.class, () -> engine.decrypt(ciphertext, null));
 
         assertEquals("JWE protected header must contain a key ID (kid).", exception.getMessage());
     }
@@ -461,7 +461,7 @@ class JweEncryptionEngineTest {
             String ciphertext = encrypt("secret", keyPair.getPublic(), kid);
 
             IllegalStateException exception =
-                    assertThrows(IllegalStateException.class, () -> engine.decrypt(ciphertext));
+                    assertThrows(IllegalStateException.class, () -> engine.decrypt(ciphertext, null));
 
             assertTrue(exception.getMessage().contains("not readable"));
             assertTrue(exception
@@ -482,7 +482,8 @@ class JweEncryptionEngineTest {
         String kid = computeKeyId(keyPair.getPrivate());
         String ciphertext = encrypt("secret", keyPair.getPublic(), kid);
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> engine.decrypt(ciphertext));
+        IllegalStateException exception =
+                assertThrows(IllegalStateException.class, () -> engine.decrypt(ciphertext, null));
 
         assertTrue(
                 exception
@@ -509,7 +510,8 @@ class JweEncryptionEngineTest {
         String kid = computeKeyId(keyPair.getPrivate());
         String ciphertext = encrypt("secret", keyPair.getPublic(), kid);
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> engine.decrypt(ciphertext));
+        IllegalStateException exception =
+                assertThrows(IllegalStateException.class, () -> engine.decrypt(ciphertext, null));
 
         assertTrue(
                 exception
@@ -536,7 +538,8 @@ class JweEncryptionEngineTest {
         String kid = computeKeyId(keyPair.getPrivate());
         String ciphertext = encrypt("secret", keyPair.getPublic(), kid);
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> engine.decrypt(ciphertext));
+        IllegalStateException exception =
+                assertThrows(IllegalStateException.class, () -> engine.decrypt(ciphertext, null));
 
         assertTrue(
                 exception
@@ -562,7 +565,8 @@ class JweEncryptionEngineTest {
         String kid = computeKeyId(keyPair.getPrivate());
         String ciphertext = encrypt("secret", keyPair.getPublic(), kid);
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> engine.decrypt(ciphertext));
+        IllegalStateException exception =
+                assertThrows(IllegalStateException.class, () -> engine.decrypt(ciphertext, null));
 
         assertTrue(
                 exception
@@ -590,7 +594,8 @@ class JweEncryptionEngineTest {
         String kid = computeKeyId(keyPair.getPrivate());
         String ciphertext = encrypt("secret", keyPair.getPublic(), kid);
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> engine.decrypt(ciphertext));
+        IllegalStateException exception =
+                assertThrows(IllegalStateException.class, () -> engine.decrypt(ciphertext, null));
 
         assertTrue(
                 exception
@@ -615,7 +620,8 @@ class JweEncryptionEngineTest {
         String kid = computeKeyId(keyPair.getPrivate());
         String ciphertext = encrypt("secret", keyPair.getPublic(), kid);
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> engine.decrypt(ciphertext));
+        IllegalStateException exception =
+                assertThrows(IllegalStateException.class, () -> engine.decrypt(ciphertext, null));
 
         assertTrue(
                 exception
@@ -641,7 +647,7 @@ class JweEncryptionEngineTest {
 
         String ciphertext = encrypt(secret, keyPair.getPublic(), header);
 
-        assertEquals(secret, engine.decrypt(ciphertext));
+        assertEquals(secret, engine.decrypt(ciphertext, null));
     }
 
     @Test
@@ -656,7 +662,7 @@ class JweEncryptionEngineTest {
 
         String ciphertext = encrypt(secret, keyPair.getPublic(), header);
 
-        assertEquals(secret, engine.decrypt(ciphertext));
+        assertEquals(secret, engine.decrypt(ciphertext, null));
     }
 
     @Test
@@ -672,7 +678,7 @@ class JweEncryptionEngineTest {
 
         String ciphertext = encrypt(secret, keyPair.getPublic(), header);
 
-        assertEquals(secret, engine.decrypt(ciphertext));
+        assertEquals(secret, engine.decrypt(ciphertext, null));
     }
 
     @Test
@@ -684,7 +690,7 @@ class JweEncryptionEngineTest {
         String kid = computeKeyId(keyPair.getPrivate());
         String ciphertext = encrypt(secret, keyPair.getPublic(), kid);
 
-        assertEquals(secret, engine.decrypt(ciphertext));
+        assertEquals(secret, engine.decrypt(ciphertext, null));
     }
 
     @Test
@@ -695,7 +701,8 @@ class JweEncryptionEngineTest {
         String kid = computeKeyId(keyPair.getPrivate());
         String ciphertext = encrypt("secret", keyPair.getPublic(), kid);
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> engine.decrypt(ciphertext));
+        IllegalStateException exception =
+                assertThrows(IllegalStateException.class, () -> engine.decrypt(ciphertext, null));
 
         assertTrue(
                 exception.getMessage().contains("Unexpected or malformed content found outside of PEM blocks"),
@@ -713,7 +720,8 @@ class JweEncryptionEngineTest {
         String kid = computeKeyId(keyPair.getPrivate());
         String ciphertext = encrypt("secret", keyPair.getPublic(), kid);
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> engine.decrypt(ciphertext));
+        IllegalStateException exception =
+                assertThrows(IllegalStateException.class, () -> engine.decrypt(ciphertext, null));
 
         assertTrue(
                 exception.getMessage().contains("Unexpected or malformed content found outside of PEM blocks"),
@@ -733,7 +741,7 @@ class JweEncryptionEngineTest {
         String ciphertext = jwe.serialize();
 
         GeneralSecurityException exception =
-                assertThrows(GeneralSecurityException.class, () -> engine.decrypt(ciphertext));
+                assertThrows(GeneralSecurityException.class, () -> engine.decrypt(ciphertext, null));
 
         assertEquals("JWE key ID contains invalid characters.", exception.getMessage());
     }
@@ -746,7 +754,7 @@ class JweEncryptionEngineTest {
         String wrapped = encrypted.substring(0, 20) + whitespace + encrypted.substring(20);
 
         IllegalArgumentException exception =
-                assertThrows(IllegalArgumentException.class, () -> engine.decrypt(wrapped));
+                assertThrows(IllegalArgumentException.class, () -> engine.decrypt(wrapped, null));
 
         assertTrue(
                 exception.getMessage().contains("must not contain whitespace"),
@@ -757,7 +765,7 @@ class JweEncryptionEngineTest {
     @MethodSource("missingHeaderJwes")
     void rejectsMissingAlgOrEncInHeader(String invalidJwe) {
         IllegalArgumentException exception =
-                assertThrows(IllegalArgumentException.class, () -> engine.decrypt(invalidJwe));
+                assertThrows(IllegalArgumentException.class, () -> engine.decrypt(invalidJwe, null));
 
         assertTrue(exception.getMessage().contains("Failed to parse JWE payload"));
     }
@@ -768,7 +776,7 @@ class JweEncryptionEngineTest {
         String ciphertext = encrypt("secret", keyPair.getPublic(), header);
 
         GeneralSecurityException exception =
-                assertThrows(GeneralSecurityException.class, () -> engine.decrypt(ciphertext));
+                assertThrows(GeneralSecurityException.class, () -> engine.decrypt(ciphertext, null));
 
         assertTrue(exception.getMessage().contains("unsupported parameters"));
     }
@@ -777,7 +785,7 @@ class JweEncryptionEngineTest {
     @MethodSource("emptyPayloads")
     void rejectsNullOrBlankJwePayload(String encryptedData) {
         IllegalArgumentException exception =
-                assertThrows(IllegalArgumentException.class, () -> engine.decrypt(encryptedData));
+                assertThrows(IllegalArgumentException.class, () -> engine.decrypt(encryptedData, null));
 
         assertEquals("JWE payload must not be empty.", exception.getMessage());
     }

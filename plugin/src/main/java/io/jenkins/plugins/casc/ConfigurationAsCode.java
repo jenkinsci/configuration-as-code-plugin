@@ -986,8 +986,23 @@ public class ConfigurationAsCode extends ManagementLink {
     public Map<Source, String> checkWith(Mapping entries, ConfigurationContext context) throws ConfiguratorException {
         Map<Source, String> issues = new HashMap<>();
         context.addListener((node, message) -> issues.put(node.getSource(), message));
+        initializeSelfConfigurator(entries, context);
         invokeWith(entries, (configurator, config) -> configurator.check(config, context));
         return issues;
+    }
+
+    private static void initializeSelfConfigurator(Mapping entries, ConfigurationContext context)
+            throws ConfiguratorException {
+        for (Map.Entry<String, CNode> entry : entries.entrySet()) {
+            if ("configuration-as-code".equalsIgnoreCase(entry.getKey())) {
+                RootElementConfigurator<?> selfConfigurator = context.lookupRootElement("configuration-as-code");
+                if (selfConfigurator != null) {
+                    CNode nodeToCheck =
+                            entry.getValue() != null ? entry.getValue().clone() : null;
+                    selfConfigurator.check(nodeToCheck, context);
+                }
+            }
+        }
     }
 
     public static ConfigurationAsCode get() {
